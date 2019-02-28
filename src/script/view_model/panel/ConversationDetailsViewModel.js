@@ -17,11 +17,16 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 /* eslint-disable no-unused-vars */
 import receiptModeToggle from 'components/receiptModeToggle';
 /* eslint-enable no-unused-vars */
 import BasePanelViewModel from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
+
+import '../../components/panel/panelActions';
 
 export default class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -48,7 +53,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
@@ -87,11 +92,9 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       return this.activeConversation() && this.activeConversation().firstUserEntity();
     });
 
-    this.isSingleUserMode = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? this.activeConversation().is1to1() || this.activeConversation().isRequest()
-        : false;
-    });
+    this.isSingleUserMode = conversationEntity => {
+      return conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
+    };
 
     this.isActiveGroupParticipant = ko.pureComputed(() => {
       return this.activeConversation()
@@ -116,30 +119,14 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.isServiceMode = ko.pureComputed(() => {
-      return this.isSingleUserMode() && this.firstParticipant() && this.firstParticipant().isService;
+      return (
+        this.isSingleUserMode(this.activeConversation()) && this.firstParticipant() && this.firstParticipant().isService
+      );
     });
 
     this.showTopActions = ko.pureComputed(() => this.isActiveGroupParticipant() || this.showSectionOptions());
 
     this.showActionAddParticipants = this.isActiveGroupParticipant;
-
-    this.showActionBlock = ko.pureComputed(() => {
-      if (this.isSingleUserMode() && this.firstParticipant()) {
-        return this.firstParticipant().isConnected() || this.firstParticipant().isRequest();
-      }
-    });
-
-    this.showActionCreateGroup = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().is1to1() && !this.isServiceMode();
-    });
-
-    this.showActionCancelRequest = ko.pureComputed(() => {
-      return this.activeConversation() && this.activeConversation().isRequest();
-    });
-
-    this.showActionClear = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isClearable());
-
-    this.showActionLeave = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isLeavable());
 
     this.showActionMute = ko.pureComputed(() => {
       return this.activeConversation() && this.activeConversation().isMutable() && !this.isTeam();
@@ -201,7 +188,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       if (this.activeConversation()) {
         const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return z.util.TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+          return TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');
@@ -212,10 +199,6 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       return t('tooltipConversationDetailsAddPeople', addPeopleShortcut);
     });
 
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.serviceParticipants() && this.userParticipants() && this.isVisible())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
-
     this.isServiceMode.subscribe(isService => {
       if (isService) {
         const entity = this.firstParticipant();
@@ -225,6 +208,77 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
         });
       }
     });
+  }
+
+  getConversationActions(conversationEntity) {
+    if (!conversationEntity) {
+      return [];
+    }
+
+    const is1to1 = conversationEntity.is1to1();
+    const isSingleUserMode = this.isSingleUserMode(conversationEntity);
+
+    const allMenuElements = [
+      {
+        condition: () => z.userPermission().canCreateGroupConversation() && is1to1 && !this.isServiceMode(),
+        item: {
+          click: () => this.clickOnCreateGroup(),
+          icon: 'group-icon',
+          identifier: 'go-create-group',
+          label: t('conversationDetailsActionCreateGroup'),
+        },
+      },
+      {
+        condition: () => true,
+        item: {
+          click: () => this.clickToArchive(),
+          icon: 'archive-icon',
+          identifier: 'do-archive',
+          label: t('conversationDetailsActionArchive'),
+        },
+      },
+      {
+        condition: () => conversationEntity.isRequest(),
+        item: {
+          click: () => this.clickToCancelRequest(),
+          icon: 'close-icon',
+          identifier: 'do-cancel-request',
+          label: t('conversationDetailsActionCancelRequest'),
+        },
+      },
+      {
+        condition: () => conversationEntity.isClearable(),
+        item: {
+          click: () => this.clickToClear(),
+          icon: 'delete-icon',
+          identifier: 'do-clear',
+          label: t('conversationDetailsActionClear'),
+        },
+      },
+      {
+        condition: () => {
+          const firstUser = conversationEntity.firstUserEntity();
+          return isSingleUserMode && firstUser && (firstUser.isConnected() || firstUser.isRequest());
+        },
+        item: {
+          click: () => this.clickToBlock(),
+          icon: 'block-icon',
+          identifier: 'do-block',
+          label: t('conversationDetailsActionBlock'),
+        },
+      },
+      {
+        condition: () => conversationEntity.isLeavable(),
+        item: {
+          click: () => this.clickToLeave(),
+          icon: 'leave-icon',
+          identifier: 'do-leave',
+          label: t('conversationDetailsActionLeave'),
+        },
+      },
+    ];
+
+    return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
   getElementId() {

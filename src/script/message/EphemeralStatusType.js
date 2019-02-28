@@ -17,16 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
 /**
  * Enum of different ephemeral status types.
- * @type {z.message.EphemeralStatusType} Enum of ephemeral status types
+ * @type {EphemeralStatusType} Enum of ephemeral status types
  */
-z.message.EphemeralStatusType = {
+const EphemeralStatusType = {
   ACTIVE: 1,
   INACTIVE: 2,
   NONE: 0,
   TIMED_OUT: 3,
 };
+
+export default EphemeralStatusType;

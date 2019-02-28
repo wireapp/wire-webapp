@@ -17,6 +17,7 @@
  *
  */
 
+import Conversation from 'src/script/entity/Conversation';
 import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 const buildConversationEphemeralHandler = () => {
@@ -36,7 +37,7 @@ describe('z.conversation.ConversationEphemeralHandler', () => {
       ];
 
       return testedTimers.map(timerDesc => {
-        const conversationEntity = new z.entity.Conversation();
+        const conversationEntity = new Conversation();
         const event = {data: {message_timer: timerDesc.value}};
         return conversationEphemeralHandler._updateEphemeralTimer(conversationEntity, event).then(() => {
           expect(conversationEntity.globalMessageTimer()).toBe(timerDesc.expected);

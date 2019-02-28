@@ -17,6 +17,10 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
+import CALL_STATE from '../calling/enum/CallState';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -26,7 +30,7 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     this.onRejectCall = this.onRejectCall.bind(this);
 
     this.callingRepository = repositories.calling;
-    this.logger = new z.util.Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));
@@ -37,11 +41,11 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
 
     if (callEntity) {
       switch (callEntity.state()) {
-        case z.calling.enum.CALL_STATE.ONGOING:
-        case z.calling.enum.CALL_STATE.OUTGOING:
+        case CALL_STATE.ONGOING:
+        case CALL_STATE.OUTGOING:
           this._subscribeOutgoingOrOngoingCall();
           break;
-        case z.calling.enum.CALL_STATE.INCOMING:
+        case CALL_STATE.INCOMING:
           this._subscribeIncomingCall();
           break;
         default:

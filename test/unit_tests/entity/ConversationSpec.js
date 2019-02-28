@@ -21,13 +21,14 @@ import 'src/script/localization/Localizer';
 import Conversation from 'src/script/entity/Conversation';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
 import Message from 'src/script/entity/message/Message';
+import User from 'src/script/entity/User';
 import ConversationMapper from 'src/script/conversation/ConversationMapper';
 
 describe('Conversation', () => {
   let conversation_et = null;
   let other_user = null;
 
-  const self_user = new z.entity.User(entities.user.john_doe.id);
+  const self_user = new User(entities.user.john_doe.id);
   self_user.is_me = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
@@ -35,7 +36,7 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     conversation_et = new Conversation();
-    other_user = new z.entity.User(entities.user.jane_roe.id);
+    other_user = new User(entities.user.jane_roe.id);
   });
 
   describe('type checks', () => {
@@ -280,8 +281,8 @@ describe('Conversation', () => {
     });
 
     it('returns last delivered message', () => {
-      const remoteUserEntity = new z.entity.User(z.util.createRandomUuid());
-      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const remoteUserEntity = new User(z.util.createRandomUuid());
+      const selfUserEntity = new User(z.util.createRandomUuid());
       selfUserEntity.is_me = true;
 
       const sentMessageEntity = new ContentMessage(z.util.createRandomUuid());
@@ -325,7 +326,7 @@ describe('Conversation', () => {
     let self_user_et = undefined;
 
     beforeEach(() => {
-      self_user_et = new z.entity.User();
+      self_user_et = new User();
       self_user_et.is_me = true;
     });
 
@@ -338,7 +339,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new z.entity.PingMessage();
       message_et.id = z.util.createRandomUuid();
-      message_et.user(new z.entity.User());
+      message_et.user(new User());
       conversation_et.add_message(message_et);
 
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -347,7 +348,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new z.entity.PingMessage();
       message_et.id = z.util.createRandomUuid();
-      message_et.user(new z.entity.User());
+      message_et.user(new User());
       conversation_et.add_message(message_et);
 
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -357,7 +358,7 @@ describe('Conversation', () => {
       const message_et = new ContentMessage();
       message_et.add_asset(new z.entity.Text());
       message_et.id = z.util.createRandomUuid();
-      message_et.user(new z.entity.User());
+      message_et.user(new User());
       conversation_et.add_message(message_et);
 
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -382,7 +383,7 @@ describe('Conversation', () => {
 
       const ping_message_et = new z.entity.PingMessage();
       ping_message_et.id = z.util.createRandomUuid();
-      ping_message_et.user(new z.entity.User());
+      ping_message_et.user(new User());
       conversation_et.add_message(ping_message_et);
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();
@@ -466,7 +467,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new z.entity.User(z.util.createRandomUuid());
+      const third_user = new User(z.util.createRandomUuid());
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -486,7 +487,7 @@ describe('Conversation', () => {
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new z.entity.User(z.util.createRandomUuid());
+      const user = new User(z.util.createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
       conversation_et.participating_user_ids.push(other_user.id);
       conversation_et.participating_user_ids.push(user.id);
@@ -517,11 +518,11 @@ describe('Conversation', () => {
       const third_client = new z.client.ClientEntity();
       third_client.id = '6c0daa855d6b8b6e';
 
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.devices.push(first_client);
       user_et.devices.push(second_client);
 
-      const second_user_et = new z.entity.User();
+      const second_user_et = new User();
       second_user_et.devices.push(third_client);
 
       conversation_et.participating_user_ets.push(user_et);
@@ -540,11 +541,11 @@ describe('Conversation', () => {
       const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new z.entity.User(z.util.createRandomUuid());
+      const self_user_et = new User(z.util.createRandomUuid());
       self_user_et.is_me = true;
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
@@ -556,16 +557,16 @@ describe('Conversation', () => {
       const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new z.entity.User();
+      const self_user_et = new User();
       self_user_et.is_me = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.devices.push(unverified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new z.entity.User();
+      const user_et_two = new User();
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -577,16 +578,16 @@ describe('Conversation', () => {
       const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new z.entity.User();
+      const self_user_et = new User();
       self_user_et.is_me = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.devices.push(verified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new z.entity.User();
+      const user_et_two = new User();
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -598,13 +599,13 @@ describe('Conversation', () => {
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
       conversation_et = new Conversation(z.util.createRandomUuid());
-      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const selfUserEntity = new User(z.util.createRandomUuid());
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
-      const userEntity = new z.entity.User(z.util.createRandomUuid());
+      const userEntity = new User(z.util.createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
@@ -616,7 +617,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
-      const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const secondUserEntity = new User(z.util.createRandomUuid());
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -642,7 +643,7 @@ describe('Conversation', () => {
 
   describe('hasService', () => {
     it('detects conversations with services', () => {
-      const userEntity = new z.entity.User(z.util.createRandomUuid());
+      const userEntity = new User(z.util.createRandomUuid());
 
       conversation_et = new Conversation(z.util.createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
@@ -655,7 +656,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.hasService()).toBe(false);
 
-      const secondUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const secondUserEntity = new User(z.util.createRandomUuid());
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -853,7 +854,7 @@ describe('Conversation', () => {
 
     const conversationEntity = new Conversation(z.util.createRandomUuid());
 
-    const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+    const selfUserEntity = new User(z.util.createRandomUuid());
     selfUserEntity.is_me = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
@@ -1044,7 +1045,7 @@ describe('Conversation', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
       const conversationEntity = new Conversation(z.util.createRandomUuid());
-      const selfUserEntity = new z.entity.User(z.util.createRandomUuid());
+      const selfUserEntity = new User(z.util.createRandomUuid());
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.selfUser(selfUserEntity);

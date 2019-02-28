@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 window.z.event.preprocessor = z.event.preprocessor || {};
@@ -31,7 +33,7 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = new z.util.Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   processEvent(event) {

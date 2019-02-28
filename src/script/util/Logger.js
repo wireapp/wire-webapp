@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
-window.z.tracking.attribute = z.tracking.attribute || {};
+import '../../ext/js/webapp-module-logger/Logger.js';
+import {amplify} from 'amplify';
+import moment from 'moment';
 
-z.tracking.attribute.ConversationType = {
-  GROUP: 'group',
-  ONE_TO_ONE: 'one_to_one',
-};
+window.amplify = amplify; // The logger needs amplify to be on the root scope
+window.moment = moment; // The logger needs moment to be on the root scope
+
+export default z.util.Logger;

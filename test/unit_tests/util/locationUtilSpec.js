@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+import {getMapsUrl} from 'src/script/util/locationUtil';
 
-z.error.LocationError = class LocationError extends z.error.BaseError {
-  constructor(type, message) {
-    super('LocationError', type, message);
-  }
-
-  static get MESSAGE() {
-    return {
-      REQUEST_FAILED: 'Location related request failed',
-    };
-  }
-
-  static get TYPE() {
-    return {
-      REQUEST_FAILED: 'REQUEST_FAILED',
-    };
-  }
-};
+describe('locationUtil', () => {
+  describe('getMapsUrl', () => {
+    it('should return the proper urls', () => {
+      expect(getMapsUrl(52, 13)).toBe('https://google.com/maps/@52,13');
+      expect(getMapsUrl(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
+      expect(getMapsUrl(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
+      expect(getMapsUrl(48, 16, 'Wien', 14)).toBe('https://google.com/maps/place/Wien/@48,16,14z');
+    });
+  });
+});

@@ -17,6 +17,11 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+import trackingHelpers from '../../tracking/Helpers';
+import {ConversationType} from '../../tracking/attribute';
+
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
@@ -24,7 +29,7 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 // Call traces entity.
 z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor() {
-    this.logger = new z.util.Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
 
     this.sessions = {};
     this.remote_version = undefined;
@@ -80,7 +85,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
@@ -127,9 +132,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           conversation_participants_in_call_max: this.maxNumberOfParticipants
             ? this.maxNumberOfParticipants
             : undefined,
-          conversation_type: isGroup
-            ? z.tracking.attribute.ConversationType.GROUP
-            : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: isGroup ? ConversationType.GROUP : ConversationType.ONE_TO_ONE,
           direction: this.direction,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
@@ -140,7 +143,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           started_as_video: videoTypes.includes(this.mediaType),
           with_service: conversationEntity.hasService(),
         },
-        z.tracking.helpers.getGuestAttributes(conversationEntity),
+        trackingHelpers.getGuestAttributes(conversationEntity),
         attributes
       );
     }
@@ -156,7 +159,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   track_duration(callEntity) {
     const {terminationReason, timerStart, durationTime} = callEntity;
 
-    const duration = Math.floor((Date.now() - timerStart) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const duration = Math.floor((Date.now() - timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     if (!window.isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());

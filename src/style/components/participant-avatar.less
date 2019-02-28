@@ -117,10 +117,18 @@ participant-avatar {
 
   &.avatar-xl {
     .avatar-size(xl);
+
+    .avatar-service-placeholder service-icon svg {
+      width: 100%;
+    }
   }
 
   &.avatar-l {
     .avatar-size(l);
+
+    .avatar-service-placeholder service-icon svg {
+      width: 100%;
+    }
   }
 
   &.avatar-m {
@@ -208,12 +216,13 @@ participant-avatar {
     }
   }
 
-  .avatar-service-placeholder {
+  .avatar-service-placeholder,
+  .avatar-service-placeholder service-icon {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    & > svg {
+    svg {
       width: 60%;
 
       & > path {

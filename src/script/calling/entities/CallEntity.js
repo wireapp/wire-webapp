@@ -17,6 +17,12 @@
  *
  */
 
+import TimeUtil from 'utils/TimeUtil';
+import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import CALL_STATE from '../enum/CallState';
+import CALL_STATE_GROUP from '../enum/CallStateGroup';
+import TERMINATION_REASON from '../enum/TerminationReason';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
@@ -29,10 +35,10 @@ z.calling.entities.CallEntity = class CallEntity {
         MAXIMUM_TIMEOUT: 90,
         MINIMUM_TIMEOUT: 60,
       },
-      STATE_TIMEOUT: 60 * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+      STATE_TIMEOUT: 60 * TimeUtil.UNITS_IN_MILLIS.SECOND,
       TIMER: {
         INIT_THRESHOLD: 100,
-        UPDATE_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+        UPDATE_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     };
   }
@@ -41,8 +47,8 @@ z.calling.entities.CallEntity = class CallEntity {
    * Construct a new call entity.
    *
    * @class z.calling.entities.Call
-   * @param {z.entity.Conversation} conversationEntity - Conversation the call takes place in
-   * @param {z.entity.User} creatingUser - Entity of user starting the call
+   * @param {Conversation} conversationEntity - Conversation the call takes place in
+   * @param {User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
    * @param {z.calling.CallingRepository} callingRepository - Calling Repository
    */
@@ -84,7 +90,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.selfClientJoined = ko.observable(false);
     this.selfUserJoined = ko.observable(false);
-    this.state = ko.observable(z.calling.enum.CALL_STATE.UNKNOWN);
+    this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.previousState = undefined;
 
     this.participants = ko.observableArray([]);
@@ -99,17 +105,17 @@ z.calling.entities.CallEntity = class CallEntity {
     this._resetTimer();
 
     // Computed values
-    this.isConnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.CONNECTING);
-    this.isDeclined = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.REJECTED);
-    this.isDisconnecting = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.DISCONNECTING);
-    this.isIncoming = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.INCOMING);
-    this.isOngoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.ONGOING);
-    this.isOutgoing = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.OUTGOING);
+    this.isConnecting = ko.pureComputed(() => this.state() === CALL_STATE.CONNECTING);
+    this.isDeclined = ko.pureComputed(() => this.state() === CALL_STATE.REJECTED);
+    this.isDisconnecting = ko.pureComputed(() => this.state() === CALL_STATE.DISCONNECTING);
+    this.isIncoming = ko.pureComputed(() => this.state() === CALL_STATE.INCOMING);
+    this.isOngoing = ko.pureComputed(() => this.state() === CALL_STATE.ONGOING);
+    this.isOutgoing = ko.pureComputed(() => this.state() === CALL_STATE.OUTGOING);
 
-    this.canConnectState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state()));
-    this.canJoinState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.CAN_JOIN.includes(this.state()));
-    this.isActiveState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(this.state()));
-    this.isEndedState = ko.pureComputed(() => z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
+    this.canConnectState = ko.pureComputed(() => CALL_STATE_GROUP.CAN_CONNECT.includes(this.state()));
+    this.canJoinState = ko.pureComputed(() => CALL_STATE_GROUP.CAN_JOIN.includes(this.state()));
+    this.isActiveState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ACTIVE.includes(this.state()));
+    this.isEndedState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
 
     this.isOngoingOnAnotherClient = ko.pureComputed(() => this.selfUserJoined() && !this.selfClientJoined());
     this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
@@ -146,7 +152,7 @@ z.calling.entities.CallEntity = class CallEntity {
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
-          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
           this.durationTime(durationInSeconds);
         }, CallEntity.CONFIG.TIMER.UPDATE_INTERVAL);
       }
@@ -194,18 +200,18 @@ z.calling.entities.CallEntity = class CallEntity {
 
       this._clearStateTimeout();
 
-      const hasState = state !== z.calling.enum.CALL_STATE.UNKNOWN;
+      const hasState = state !== CALL_STATE.UNKNOWN;
       if (hasState) {
-        const isUnansweredState = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(state);
+        const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
-          const isIncomingCall = state === z.calling.enum.CALL_STATE.INCOMING;
+          const isIncomingCall = state === CALL_STATE.INCOMING;
           this._onStateStartRinging(isIncomingCall);
         } else {
           this._onStateStopRinging();
         }
       }
 
-      const isConnectingCall = state === z.calling.enum.CALL_STATE.CONNECTING;
+      const isConnectingCall = state === CALL_STATE.CONNECTING;
       if (isConnectingCall) {
         this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
       }
@@ -229,14 +235,14 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message for deactivation
    * @param {boolean} fromSelf - Deactivation triggered by self user change
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
+   * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {Promise<boolean>} Resolves with a boolean whether the call was deleted
    */
-  deactivateCall(callMessageEntity, fromSelf, terminationReason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
+  deactivateCall(callMessageEntity, fromSelf, terminationReason = TERMINATION_REASON.SELF_USER) {
     this._clearTimeouts();
 
     const everyoneLeft = this.participants().length <= 0 + fromSelf ? 1 : 0;
-    const onGroupCheck = terminationReason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
+    const onGroupCheck = terminationReason === TERMINATION_REASON.GROUP_CHECK;
 
     const shouldDeleteCall = everyoneLeft || onGroupCheck;
     if (shouldDeleteCall) {
@@ -254,9 +260,7 @@ z.calling.entities.CallEntity = class CallEntity {
   }
 
   _deleteCall(callMessageEntity, everyoneLeft, onGroupCheck) {
-    const reason = !this.wasConnected
-      ? z.calling.enum.TERMINATION_REASON.MISSED
-      : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const reason = !this.wasConnected ? TERMINATION_REASON.MISSED : TERMINATION_REASON.COMPLETED;
 
     if (onGroupCheck && !everyoneLeft) {
       const userIds = this.participants().map(participantEntity => participantEntity.id);
@@ -278,7 +282,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   deleteCall() {
-    this.state(z.calling.enum.CALL_STATE.ENDED);
+    this.state(CALL_STATE.ENDED);
     this._resetCall();
   }
 
@@ -289,7 +293,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   joinCall(mediaType) {
     if (this.canConnectState()) {
-      this.state(z.calling.enum.CALL_STATE.CONNECTING);
+      this.state(CALL_STATE.CONNECTING);
     }
 
     return this.isGroup ? this._joinGroupCall(mediaType) : this._join1to1Call();
@@ -325,12 +329,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Leave the call.
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Call termination reason
+   * @param {TERMINATION_REASON} terminationReason - Call termination reason
    * @returns {undefined} No return value
    */
   leaveCall(terminationReason) {
     if (this.isOngoing() && !this.isGroup) {
-      this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
+      this.state(CALL_STATE.DISCONNECTING);
     }
 
     let callMessageEntity = this.isConnected()
@@ -365,7 +369,7 @@ z.calling.entities.CallEntity = class CallEntity {
       })
       .then(wasDeleted => {
         if (!wasDeleted) {
-          this.state(z.calling.enum.CALL_STATE.REJECTED);
+          this.state(CALL_STATE.REJECTED);
         }
       });
   }
@@ -374,7 +378,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * Check if group call should continue after participant left.
    *
    * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Last member leaving call
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Reason for call participant to leave
+   * @param {TERMINATION_REASON} terminationReason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
   participantLeft(callMessageEntity, terminationReason) {
@@ -391,7 +395,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   rejectCall(shareRejection = false) {
-    this.state(z.calling.enum.CALL_STATE.REJECTED);
+    this.state(CALL_STATE.REJECTED);
     if (this.isRemoteVideoCall()) {
       this.callingRepository.mediaStreamHandler.resetMediaStream();
     }
@@ -415,7 +419,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Set the self state.
    * @param {boolean} joinedState - Self joined state
-   * @param {z.calling.enum.TERMINATION_REASON} [terminationReason] - Call termination reason
+   * @param {TERMINATION_REASON} [terminationReason] - Call termination reason
    * @returns {undefined} No return value
    */
   setSelfState(joinedState, terminationReason) {
@@ -495,7 +499,7 @@ z.calling.entities.CallEntity = class CallEntity {
       return this.scheduleGroupCheck();
     }
 
-    this.leaveCall(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+    this.leaveCall(TERMINATION_REASON.OTHER_USER);
   }
 
   /**
@@ -512,7 +516,7 @@ z.calling.entities.CallEntity = class CallEntity {
     );
     const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
 
-    this.deactivateCall(callMessageEntity, false, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
+    this.deactivateCall(callMessageEntity, false, TERMINATION_REASON.GROUP_CHECK);
   }
 
   /**
@@ -524,7 +528,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
     const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
-    const timeout = timeoutInSeconds * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = timeoutInSeconds * TimeUtil.UNITS_IN_MILLIS.SECOND;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
 
     const timeoutId = this.groupCheckTimeoutId;
@@ -538,7 +542,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _setVerifyGroupCheckTimeout() {
     const ACTIVITY_TIMEOUT = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
-    const timeout = ACTIVITY_TIMEOUT * z.util.TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = ACTIVITY_TIMEOUT * TimeUtil.UNITS_IN_MILLIS.SECOND;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeout);
     this.callLogger.debug(`Set verifying group check after '${ACTIVITY_TIMEOUT}s' (ID: ${this.groupCheckTimeoutId})`);
@@ -559,12 +563,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
     let callMessageEntity;
     switch (type) {
-      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
+      case CALL_MESSAGE_TYPE.HANGUP: {
         callMessageEntity = z.calling.CallMessageBuilder.buildHangup(true, this.sessionId, payload);
         break;
       }
 
-      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
+      case CALL_MESSAGE_TYPE.PROP_SYNC: {
         const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
 
         callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);
@@ -632,9 +636,9 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _onStateStopRinging() {
-    const wasUnanswered = z.calling.enum.CALL_STATE_GROUP.UNANSWERED.includes(this.previousState);
+    const wasUnanswered = CALL_STATE_GROUP.UNANSWERED.includes(this.previousState);
     if (wasUnanswered) {
-      const wasIncomingCall = this.previousState === z.calling.enum.CALL_STATE.INCOMING;
+      const wasIncomingCall = this.previousState === CALL_STATE.INCOMING;
       this._stopRingTone(wasIncomingCall);
     }
   }
@@ -666,7 +670,7 @@ z.calling.entities.CallEntity = class CallEntity {
         return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
       }
 
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
+      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
     }, CallEntity.CONFIG.STATE_TIMEOUT);
   }
 
@@ -735,7 +739,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - ID of user to be removed from the call
    * @param {string} clientId - ID of client that requested the removal from the call
-   * @param {z.calling.enum.TERMINATION_REASON} terminationReason - Call termination reason
+   * @param {TERMINATION_REASON} terminationReason - Call termination reason
    * @returns {Promise} Resolves with the call entity
    */
   deleteParticipant(userId, clientId, terminationReason) {
@@ -754,13 +758,13 @@ z.calling.entities.CallEntity = class CallEntity {
 
         if (this.selfClientJoined()) {
           switch (terminationReason) {
-            case z.calling.enum.TERMINATION_REASON.OTHER_USER: {
+            case TERMINATION_REASON.OTHER_USER: {
               amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
               break;
             }
 
-            case z.calling.enum.TERMINATION_REASON.CONNECTION_DROP:
-            case z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE: {
+            case TERMINATION_REASON.CONNECTION_DROP:
+            case TERMINATION_REASON.MEMBER_LEAVE: {
               amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
               break;
             }
@@ -953,7 +957,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Initiate the call telemetry.
-   * @param {z.calling.enum.CALL_STATE} direction - direction of the call (outgoing or incoming)
+   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */

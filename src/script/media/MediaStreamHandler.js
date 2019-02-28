@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import Logger from 'utils/Logger';
 
-z.media.MediaStreamHandler = class MediaStreamHandler {
+export default class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
    * @param {MediaStream} mediaStream - MediaStream to detect the type off
@@ -82,7 +81,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Construct a new MediaStream handler.
-   * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
+   * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
    * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
    */
   constructor(mediaRepository, permissionRepository) {
@@ -91,7 +90,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = new z.util.Logger('z.media.MediaStreamHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MediaStreamHandler', z.config.LOGGER.OPTIONS);
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();
@@ -989,4 +988,4 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   setJoinedCall(callEntity) {
     this.joinedCall(callEntity);
   }
-};
+}

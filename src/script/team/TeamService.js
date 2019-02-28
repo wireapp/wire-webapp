@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.team = z.team || {};
 
@@ -34,7 +36,7 @@ z.team.TeamService = class TeamService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
   getTeamById(teamId) {

@@ -17,6 +17,9 @@
  *
  */
 
+import {GenericMessage} from '@wireapp/protocol-messaging';
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.broadcast = z.broadcast || {};
 
@@ -37,7 +40,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.userRepository = userRepository;
-    this.logger = new z.util.Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 
@@ -125,11 +128,11 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * Estimate whether message should be send as type external.
    *
    * @private
-   * @param {z.proto.GenericMessage} genericMessage - Generic message that will be send
+   * @param {GenericMessage} genericMessage - Generic message that will be send
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(genericMessage) {
-    const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
+    const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = this._getNumberOfClients() * messageInBytes;
 
     return estimatedPayloadInBytes > z.conversation.ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;

@@ -18,6 +18,8 @@
  */
 
 import EventMapper from 'src/script/conversation/EventMapper';
+import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
@@ -25,10 +27,10 @@ describe('z.conversation.EventBuilder', () => {
   let self_user_et = undefined;
 
   beforeEach(() => {
-    self_user_et = new z.entity.User(z.util.createRandomUuid());
+    self_user_et = new User(z.util.createRandomUuid());
     self_user_et.is_me = true;
 
-    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+    conversation_et = new Conversation(z.util.createRandomUuid());
     conversation_et.selfUser(self_user_et);
 
     event_mapper = new EventMapper();

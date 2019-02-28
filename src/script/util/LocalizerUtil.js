@@ -87,9 +87,9 @@ const LocalizerUtil = {
 
     const replaceDangerously = Object.assign(
       {
-        '/bold': '</b>',
+        '/bold': '</strong>',
         '/italic': '</i>',
-        bold: '<b>',
+        bold: '<strong>',
         italic: '<i>',
       },
       dangerousSubstitutions

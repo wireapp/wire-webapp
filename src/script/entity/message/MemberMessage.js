@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import User from '../User';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -90,7 +91,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
 
-    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new z.entity.User()));
+    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User()));
 
     this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {

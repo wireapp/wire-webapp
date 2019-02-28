@@ -18,6 +18,7 @@
  */
 
 import {memoize} from 'underscore';
+import Logger from './Logger';
 
 let dependencyGraph;
 let loggerConfig;
@@ -52,7 +53,7 @@ const resolver = {
       throw new Error(`No dependencies configuration for class: ${dependencyClass}`);
     }
     const dependencies = config.dependencies.map(resolver.resolve);
-    const dependencyLogger = new z.util.Logger(config.name, loggerConfig);
+    const dependencyLogger = new Logger(config.name, loggerConfig);
     return new dependencyClass(...dependencies.concat(dependencyLogger));
   }),
 };

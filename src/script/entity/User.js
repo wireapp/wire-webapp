@@ -18,11 +18,10 @@
  */
 
 import ko from 'knockout';
+
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
+import TimeUtil from 'utils/TimeUtil';
 
 // Please note: The own user has a "locale"
 class User {
@@ -45,9 +44,9 @@ class User {
         WIRE: 'wire',
       },
       TEMPORARY_GUEST: {
-        EXPIRATION_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
-        EXPIRATION_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-        LIFETIME: z.util.TimeUtil.UNITS_IN_MILLIS.DAY,
+        EXPIRATION_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        EXPIRATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+        LIFETIME: TimeUtil.UNITS_IN_MILLIS.DAY,
       },
     };
   }
@@ -77,21 +76,21 @@ class User {
       () => {
         switch (this.accent_id()) {
           case z.config.ACCENT_ID.BLUE:
-            return z.entity.User.THEME.BLUE;
+            return User.THEME.BLUE;
           case z.config.ACCENT_ID.GREEN:
-            return z.entity.User.THEME.GREEN;
+            return User.THEME.GREEN;
           case z.config.ACCENT_ID.ORANGE:
-            return z.entity.User.THEME.ORANGE;
+            return User.THEME.ORANGE;
           case z.config.ACCENT_ID.PINK:
-            return z.entity.User.THEME.PINK;
+            return User.THEME.PINK;
           case z.config.ACCENT_ID.PURPLE:
-            return z.entity.User.THEME.PURPLE;
+            return User.THEME.PURPLE;
           case z.config.ACCENT_ID.RED:
-            return z.entity.User.THEME.RED;
+            return User.THEME.RED;
           case z.config.ACCENT_ID.YELLOW:
-            return z.entity.User.THEME.YELLOW;
+            return User.THEME.YELLOW;
           default:
-            return z.entity.User.THEME.BLUE;
+            return User.THEME.BLUE;
         }
       },
       this,
@@ -102,21 +101,21 @@ class User {
       () => {
         switch (this.accent_id()) {
           case z.config.ACCENT_ID.BLUE:
-            return z.entity.User.ACCENT_COLOR.BLUE;
+            return User.ACCENT_COLOR.BLUE;
           case z.config.ACCENT_ID.GREEN:
-            return z.entity.User.ACCENT_COLOR.GREEN;
+            return User.ACCENT_COLOR.GREEN;
           case z.config.ACCENT_ID.ORANGE:
-            return z.entity.User.ACCENT_COLOR.ORANGE;
+            return User.ACCENT_COLOR.ORANGE;
           case z.config.ACCENT_ID.PINK:
-            return z.entity.User.ACCENT_COLOR.PINK;
+            return User.ACCENT_COLOR.PINK;
           case z.config.ACCENT_ID.PURPLE:
-            return z.entity.User.ACCENT_COLOR.PURPLE;
+            return User.ACCENT_COLOR.PURPLE;
           case z.config.ACCENT_ID.RED:
-            return z.entity.User.ACCENT_COLOR.RED;
+            return User.ACCENT_COLOR.RED;
           case z.config.ACCENT_ID.YELLOW:
-            return z.entity.User.ACCENT_COLOR.YELLOW;
+            return User.ACCENT_COLOR.YELLOW;
           default:
-            return z.entity.User.ACCENT_COLOR.BLUE;
+            return User.ACCENT_COLOR.BLUE;
         }
       },
       this,
@@ -286,19 +285,19 @@ class User {
 
   _setRemainingExpirationTime(expirationTime) {
     const remainingTime = z.util.NumberUtil.clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
-    const remainingMinutes = Math.ceil(remainingTime / z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+    const remainingMinutes = Math.ceil(remainingTime / TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
     if (remainingMinutes <= 45) {
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       const timeValue = remainingQuarters * 15;
       this.expirationText(t('userRemainingTimeMinutes', timeValue));
-      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE);
+      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
       this.expirationText(t('userRemainingTimeHours', timeValue));
-      this.expirationRemaining(timeValue * z.util.TimeUtil.UNITS_IN_MILLIS.HOUR);
+      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 
@@ -307,4 +306,3 @@ class User {
 }
 
 export default User;
-z.entity.User = User;

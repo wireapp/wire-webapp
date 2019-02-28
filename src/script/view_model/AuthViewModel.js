@@ -17,22 +17,24 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import Cookies from 'js-cookie';
 
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
-import UserService from '../user/UserService';
 import UserRepository from '../user/UserRepository';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import view from '../auth/AuthView';
 import validationError from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
+import {resolve as resolveDependency, graph} from '../config/appResolver';
 
-// @formatter:off
 class AuthViewModel {
   static get CONFIG() {
     return {
@@ -41,20 +43,19 @@ class AuthViewModel {
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
-      RESET_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      RESET_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 
   /**
    * View model for the auth page.
    * @param {z.main.Auth} authComponent - App authentication
-   * @param {z.location.LocationRepository} locationRepository - Location Repository
    */
   constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.elementId = 'auth-page';
-    this.logger = new z.util.Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.authRepository = authComponent.repository;
     this.audio_repository = authComponent.audio;
@@ -66,9 +67,6 @@ class AuthViewModel {
     this.storageService = new StorageService();
     this.storage_repository = new z.storage.StorageRepository(this.storageService);
 
-    const locationService = new z.location.LocationService(backendClient);
-    this.locationRepository = new z.location.LocationRepository(locationService);
-
     this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
@@ -77,14 +75,13 @@ class AuthViewModel {
     this.client_service = new z.client.ClientService(backendClient, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.selfService = new z.self.SelfService(backendClient);
-    this.user_service = new UserService(backendClient);
+    this.selfService = resolveDependency(graph.SelfService);
     this.user_repository = new UserRepository(
-      this.user_service,
+      resolveDependency(graph.UserService),
       this.asset_service,
-      new z.self.SelfService(backendClient),
+      this.selfService,
       this.client_repository,
-      new z.time.ServerTimeRepository()
+      resolveDependency(graph.ServerTimeRepository)
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
@@ -161,7 +158,7 @@ class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= z.util.TimeUtil.getUnixTimestamp()) {
+        if (timestamp <= TimeUtil.getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -179,7 +176,7 @@ class AuthViewModel {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < z.util.TimeUtil.getUnixTimestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < TimeUtil.getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_account = ko.pureComputed(() => !this.disabled_by_animation());
@@ -428,9 +425,9 @@ class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + response.expires_in);
+          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(z.util.TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(z.auth.AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

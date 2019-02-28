@@ -17,9 +17,12 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
+import trackingHelpers from '../../tracking/Helpers';
 
 export default class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -39,7 +42,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.teamRepository = team;
     this.userRepository = user;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
@@ -98,15 +101,6 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
         : t('addParticipantsHeader')
     );
 
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => {
-        if (this.isVisible()) {
-          this.contacts();
-          this.searchInput();
-        }
-      })
-      .extend({notify: 'always', rateLimit: 500});
-
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
 
@@ -154,7 +148,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.isInitialServiceSearch(true);
   }
 
-  searchServices(query) {
+  searchServices() {
     if (this.isStateAddService()) {
       this.integrationRepository
         .searchForServices(this.searchInput(), this.searchInput)
@@ -174,7 +168,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
 
       const isTeamConversation = !!this.activeConversation().team_id;
       if (isTeamConversation) {
-        const participants = z.tracking.helpers.getParticipantTypes(userEntities, false);
+        const participants = trackingHelpers.getParticipantTypes(userEntities, false);
 
         Object.assign(attributes, {
           guest_num: participants.guests,

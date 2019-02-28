@@ -17,20 +17,23 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+
 window.z = window.z || {};
 window.z.lifecycle = z.lifecycle || {};
 
 z.lifecycle.LifecycleRepository = class LifecycleRepository {
   static get CONFIG() {
     return {
-      CHECK_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR * 3,
-      CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
-      UPDATE_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.HOUR * 6,
+      CHECK_INTERVAL: TimeUtil.UNITS_IN_MILLIS.HOUR * 3,
+      CHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+      UPDATE_INTERVAL: TimeUtil.UNITS_IN_MILLIS.HOUR * 6,
     };
   }
 
   constructor(lifecycleService, userRepository) {
-    this.logger = new z.util.Logger('z.lifecycle.LifecycleRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.lifecycle.LifecycleRepository', z.config.LOGGER.OPTIONS);
     this.lifecycleService = lifecycleService;
     this.userRepository = userRepository;
 

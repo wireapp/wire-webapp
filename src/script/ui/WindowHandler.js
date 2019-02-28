@@ -17,13 +17,15 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.WindowHandler = class WindowHandler {
   constructor() {
     this.init = this.init.bind(this);
-    this.logger = new z.util.Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
 
     this.height = 0;
     this.width = 0;

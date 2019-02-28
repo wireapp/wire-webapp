@@ -17,6 +17,9 @@
  *
  */
 
+import {Quote} from '@wireapp/protocol-messaging';
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 window.z.event.preprocessor = z.event.preprocessor || {};
@@ -33,7 +36,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = new z.util.Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -98,12 +101,14 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
       return Promise.resolve(event);
     }
 
-    const quote = z.proto.Quote.decode64(rawQuote);
+    const quote = Quote.decode(z.util.base64ToArray(rawQuote));
     this.logger.info('Found quoted message', quote);
 
-    return this.eventService.loadEvent(event.conversation, quote.quoted_message_id).then(quotedMessage => {
+    const messageId = quote.quotedMessageId;
+
+    return this.eventService.loadEvent(event.conversation, messageId).then(quotedMessage => {
       if (!quotedMessage) {
-        this.logger.warn(`Quoted message with ID "${quote.quoted_message_id}" not found.`);
+        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
         const quoteData = {
           error: {
             type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
@@ -114,28 +119,28 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
       }
 
-      return this.messageHasher
-        .validateHash(quotedMessage, quote.quoted_message_sha256.toArrayBuffer())
-        .then(isValid => {
-          let quoteData;
+      const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
 
-          if (!isValid) {
-            this.logger.warn(`Quoted message hash for message ID "${quote.quoted_message_id}" does not match.`);
-            quoteData = {
-              error: {
-                type: z.message.QuoteEntity.ERROR.INVALID_HASH,
-              },
-            };
-          } else {
-            quoteData = {
-              message_id: quote.quoted_message_id,
-              user_id: quotedMessage.from,
-            };
-          }
+      return this.messageHasher.validateHash(quotedMessage, quotedMessageHash).then(isValid => {
+        let quoteData;
 
-          const decoratedData = Object.assign({}, event.data, {quote: quoteData});
-          return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
-        });
+        if (!isValid) {
+          this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
+          quoteData = {
+            error: {
+              type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+            },
+          };
+        } else {
+          quoteData = {
+            message_id: messageId,
+            user_id: quotedMessage.from,
+          };
+        }
+
+        const decoratedData = Object.assign({}, event.data, {quote: quoteData});
+        return Promise.resolve(Object.assign({}, event, {data: decoratedData}));
+      });
     });
   }
 

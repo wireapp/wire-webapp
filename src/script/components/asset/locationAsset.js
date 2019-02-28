@@ -17,25 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.LocationAssetComponent = class LocationAssetComponent {
-  /**
-   * Construct a new audio asset.
-   * @param {Object} params - Component parameters
-   * @param {z.entity.Location} params.asset - Location asset
-   */
-  constructor(params) {
-    this.asset = params.asset;
-    this.locationRepository = params.locationRepository;
-  }
-
-  getMapsUrl(assetEntity) {
-    const {latitude, longitude, name, zoom} = assetEntity;
-    return this.locationRepository.getMapsUrl(latitude, longitude, name, zoom);
-  }
-};
+import {getMapsUrl} from 'utils/locationUtil';
 
 ko.components.register('location-asset', {
   template: `
@@ -43,5 +25,9 @@ ko.components.register('location-asset', {
     <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
     <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: getMapsUrl(asset)}, text: t('conversationLocationLink')"></a>
   `,
-  viewModel: z.components.LocationAssetComponent,
+  viewModel: function({asset}) {
+    this.asset = asset;
+
+    this.getMapsUrl = ({latitude, longitude, name, zoom}) => getMapsUrl(latitude, longitude, name, zoom);
+  },
 });

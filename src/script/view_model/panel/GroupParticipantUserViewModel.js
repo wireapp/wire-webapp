@@ -17,7 +17,14 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
+import {t} from 'utils/LocalizerUtil';
+
+import '../../components/panel/panelActions';
+import '../../components/panel/enrichedFields';
+import '../../components/panel/userDetails';
 
 export default class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {
@@ -28,52 +35,11 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
-
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.logger = new Logger('GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
 
     this.selectedParticipant = ko.observable(undefined);
 
-    this.selectedIsConnected = ko.pureComputed(() => {
-      return this.selectedParticipant().isConnected() || this.selectedParticipant().isTeamMember();
-    });
-    this.selectedIsInConversation = ko.pureComputed(() => {
-      if (this.isVisible()) {
-        const participatingUserIds = this.activeConversation().participating_user_ids();
-        return participatingUserIds.some(id => this.selectedParticipant().id === id);
-      }
-    });
-
-    this.selfIsActiveParticipant = ko.pureComputed(() => {
-      return this.isVisible() ? this.activeConversation().isActiveParticipant() : false;
-    });
-
-    this.showActionsIncomingRequest = ko.pureComputed(() => this.selectedParticipant().isIncomingRequest());
-    this.showActionsOutgoingRequest = ko.pureComputed(() => this.selectedParticipant().isOutgoingRequest());
-
-    this.showActionBlock = ko.pureComputed(() => {
-      return this.selectedParticipant().isConnected() || this.selectedParticipant().isRequest();
-    });
     this.showActionDevices = ko.pureComputed(() => !this.selectedParticipant().is_me);
-    this.showActionOpenConversation = ko.pureComputed(() => {
-      return this.selectedIsConnected() && !this.selectedParticipant().is_me;
-    });
-    this.showActionRemove = ko.pureComputed(() => this.selfIsActiveParticipant() && this.selectedIsInConversation());
-    this.showActionSelfProfile = ko.pureComputed(() => this.selectedParticipant().is_me);
-    this.showActionSendRequest = ko.pureComputed(() => {
-      const isNotConnectedUser = this.selectedParticipant().isCanceled() || this.selectedParticipant().isUnknown();
-      const canConnect = !this.selectedParticipant().isTeamMember() && !this.selectedParticipant().isTemporaryGuest();
-      return isNotConnectedUser && canConnect;
-    });
-    this.showActionLeave = ko.pureComputed(() => {
-      const isActiveParticipant = this.activeConversation() && !this.activeConversation().removed_from_conversation();
-      return this.selectedParticipant().is_me && isActiveParticipant;
-    });
-    this.showActionUnblock = ko.pureComputed(() => this.selectedParticipant().isBlocked());
-
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedParticipant() && this.isVisible())
-      .extend({notify: 'always', rateLimit: 500});
   }
 
   getElementId() {
@@ -82,6 +48,146 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
 
   getEntityId() {
     return this.selectedParticipant().id;
+  }
+
+  getParticipantActions(userEntity, conversationEntity) {
+    if (!userEntity) {
+      return [];
+    }
+
+    const openProfile = {
+      condition: () => true,
+      item: {
+        click: () => this.clickOnShowProfile(),
+        icon: 'profile-icon',
+        identifier: 'go-profile',
+        label: t('groupParticipantActionSelfProfile'),
+      },
+    };
+    const openConversation = {
+      condition: () => userEntity.isConnected() || userEntity.isTeamMember(),
+      item: {
+        click: () => this.clickOnOpenConversation(),
+        icon: 'message-icon',
+        identifier: 'go-conversation',
+        label: t('groupParticipantActionOpenConversation'),
+      },
+    };
+    const acceptRequest = {
+      condition: () => userEntity.isIncomingRequest(),
+      item: {
+        click: () => this.clickToAcceptRequest(),
+        icon: 'check-icon',
+        identifier: 'do-accept-request',
+        label: t('groupParticipantActionIncomingRequest'),
+      },
+    };
+    const ignoreRequest = {
+      condition: () => userEntity.isIncomingRequest(),
+      item: {
+        click: () => this.clickToIgnoreRequest(),
+        icon: 'close-icon',
+        identifier: 'do-ignore-request',
+        label: t('groupParticipantActionIgnoreRequest'),
+      },
+    };
+    const openRequest = {
+      condition: () => userEntity.isOutgoingRequest(),
+      item: {
+        click: () => this.clickOnOpenConversation(),
+        icon: 'message-icon',
+        identifier: 'go-conversation',
+        label: t('groupParticipantActionPending'),
+      },
+    };
+    const cancelRequest = {
+      condition: () => userEntity.isOutgoingRequest(),
+      item: {
+        click: () => this.clickToCancelRequest(),
+        icon: 'undo-icon',
+        identifier: 'do-cancel-request',
+        label: t('groupParticipantActionCancelRequest'),
+      },
+    };
+    const sendRequest = {
+      condition: () => {
+        const isNotConnectedUser = userEntity.isCanceled() || userEntity.isUnknown();
+        const canConnect = !userEntity.isTeamMember() && !userEntity.isTemporaryGuest();
+        return isNotConnectedUser && canConnect;
+      },
+      item: {
+        click: () => this.clickToSendRequest(),
+        icon: 'plus-icon',
+        identifier: 'do-send-request',
+        label: t('groupParticipantActionSendRequest'),
+      },
+    };
+    const block = {
+      condition: () => userEntity.isConnected() || userEntity.isRequest(),
+      item: {
+        click: () => this.clickToBlock(),
+        icon: 'block-icon',
+        identifier: 'do-block',
+        label: t('groupParticipantActionBlock'),
+      },
+    };
+    const unblock = {
+      condition: () => userEntity.isBlocked(),
+      item: {
+        click: () => this.clickToUnblock(),
+        icon: 'block-icon',
+        identifier: 'do-unblock',
+        label: t('groupParticipantActionUnblock'),
+      },
+    };
+    const leave = {
+      condition: () => {
+        const isActiveParticipant = conversationEntity && !conversationEntity.removed_from_conversation();
+        return conversationEntity.isGroup() && isActiveParticipant;
+      },
+      item: {
+        click: () => this.clickToLeave(),
+        icon: 'leave-icon',
+        identifier: 'do-leave',
+        label: t('groupParticipantActionLeave'),
+      },
+    };
+    const remove = {
+      condition: () => {
+        const isActive = this.isVisible() && conversationEntity.isActiveParticipant();
+        const isInConversation = conversationEntity.participating_user_ids().some(id => userEntity.id === id);
+
+        return isActive && isInConversation && z.userPermission().canUpdateGroupParticipants();
+      },
+      item: {
+        click: () => this.clickToRemove(),
+        icon: 'minus-icon',
+        identifier: 'do-remove',
+        label: t('groupParticipantActionRemove'),
+      },
+    };
+
+    const selfIsActivatedAccount = this.userRepository.isActivatedAccount();
+
+    let allItems = [];
+    if (userEntity.is_me) {
+      allItems = selfIsActivatedAccount ? [openProfile, leave] : [openProfile];
+    } else {
+      allItems = selfIsActivatedAccount
+        ? [
+            openConversation,
+            acceptRequest,
+            ignoreRequest,
+            openRequest,
+            cancelRequest,
+            sendRequest,
+            block,
+            unblock,
+            remove,
+          ]
+        : [];
+    }
+    return allItems.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
   clickOnDevices() {

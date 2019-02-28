@@ -103,14 +103,14 @@
     position: relative;
     display: flex;
     overflow: hidden;
+    width: @panel-width;
     flex-direction: column;
-    flex-grow: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
     transform: translateX(0);
 
-    &__scroll {
-      width: @panel-width;
-      overflow-x: hidden;
-      overflow-y: scroll;
+    &--fill {
+      flex-grow: 1;
     }
   }
 
@@ -136,6 +136,7 @@
   &__action-item {
     display: flex;
     height: 48px;
+    min-height: 48px;
     align-items: center;
     margin: 0 16px;
     cursor: pointer;
@@ -144,6 +145,7 @@
     user-select: none;
 
     &__option {
+      flex-shrink: 0;
       font-size: 14px;
 
       input {
@@ -218,13 +220,20 @@
       transform: translateX(0);
     }
 
-    &__icon {
+    &__icon,
+    &__context {
       display: flex;
       width: 40px;
       margin-left: 4px;
       path {
         fill: var(--background);
       }
+    }
+
+    &__context {
+      width: auto;
+      height: 100%;
+      align-items: center;
     }
 
     &__text {

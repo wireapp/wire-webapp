@@ -17,6 +17,8 @@
  *
  */
 
+import {Quote} from '@wireapp/protocol-messaging';
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -47,6 +49,9 @@ z.message.QuoteEntity = class QuoteEntity {
   }
 
   toProto() {
-    return new z.proto.Quote(this.messageId, new Uint8Array(this.hash));
+    return new Quote({
+      quotedMessageId: this.messageId,
+      quotedMessageSha256: new Uint8Array(this.hash),
+    });
   }
 };

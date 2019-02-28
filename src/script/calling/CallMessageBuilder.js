@@ -17,6 +17,8 @@
  *
  */
 
+import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
@@ -32,43 +34,43 @@ z.calling.CallMessageBuilder = (() => {
   };
 
   const _buildCancel = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
   };
 
   const _buildGroupCheck = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
   };
 
   const _buildGroupLeave = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
   };
 
   const _buildGroupSetup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
   };
 
   const _buildGroupStart = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
   };
 
   const _buildHangup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
   };
 
   const _buildPropSync = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
   };
 
   const _buildReject = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
   };
 
   const _buildSetup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
   };
 
   const _buildUpdate = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(z.calling.enum.CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
+    return _buildCallMessage(CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
   };
 
   /**

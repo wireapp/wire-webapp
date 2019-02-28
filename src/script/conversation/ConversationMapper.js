@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 // @ts-check
 
 /**
@@ -89,7 +91,7 @@ import Conversation from '../entity/Conversation';
 class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
-    this.logger = new z.util.Logger('ConversationMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('ConversationMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**

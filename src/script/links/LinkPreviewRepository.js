@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.links = z.links || {};
 
@@ -26,7 +28,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = new z.util.Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
 
     this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
@@ -63,7 +65,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
 
   /**
    * Creates link preview for given link. This will upload associated image as asset and will
-   * resolve with an z.proto.LinkPreview instance
+   * resolve with a LinkPreview instance
    *
    * @param {string} url - URL found to generate link preview from
    * @param {number} [offset=0] - starting index of the link
@@ -112,7 +114,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * Fetch and upload open graph images.
    *
    * @private
-   * @param {z.proto.LinkPreview} linkPreview - Link preview proto message
+   * @param {LinkPreview} linkPreview - Link preview proto message
    * @param {Object} [openGraphImage={}] - Open graph image URL
    * @returns {Promise} Resolves with the link preview proto message
    */

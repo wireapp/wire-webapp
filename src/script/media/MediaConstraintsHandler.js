@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import Logger from 'utils/Logger';
 
-z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
+export default class MediaConstraintsHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
@@ -66,11 +65,11 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
   /**
    * Construct a new MediaConstraints handler.
-   * @param {z.media.MediaRepository} mediaRepository - Media repository with with references to all other handlers
+   * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
   }
 
   //##############################################################################
@@ -183,4 +182,4 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
 
     return streamConstraints;
   }
-};
+}

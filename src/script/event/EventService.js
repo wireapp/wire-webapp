@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -28,7 +30,7 @@ z.event.EventService = class EventService {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = new z.util.Logger('z.conversation.EventService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.conversation.EventService', z.config.LOGGER.OPTIONS);
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
@@ -41,7 +43,7 @@ z.event.EventService = class EventService {
    */
   loadEvents(conversationId, eventIds) {
     if (!conversationId || !eventIds) {
-      this.logger.error(`Cannot get event '${eventIds}' in conversation '${conversationId}' without IDs`);
+      this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 

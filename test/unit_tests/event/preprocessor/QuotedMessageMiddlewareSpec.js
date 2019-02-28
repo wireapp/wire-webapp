@@ -17,22 +17,19 @@
  *
  */
 
-// KARMA_SPECS=event/preprocessor/QuotedMessageMiddleware yarn test:app
+import {Quote} from '@wireapp/protocol-messaging';
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
   let quotedMessageMiddleware;
 
   beforeEach(() => {
-    return z.util.protobuf
-      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
-      .then(() => testFactory.exposeEventActors())
-      .then(() => {
-        quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
-          TestFactory.event_service,
-          z.message.MessageHasher
-        );
-      });
+    return testFactory.exposeEventActors().then(() => {
+      quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
+        TestFactory.event_service,
+        z.message.MessageHasher
+      );
+    });
   });
 
   describe('processEvent', () => {
@@ -57,20 +54,22 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
       };
 
+      const quote = new Quote({
+        quotedMessageId: 'invalid-message-uuid',
+        quotedMessageSha256: '',
+      });
+
       const event = {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
-          quote: new z.proto.Quote({
-            quoted_message_id: 'invalid-message-uuid',
-            quoted_message_sha256: '',
-          }).encode64(),
+          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
         },
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
-        expect(parsedEvent.data.quote.quoted_message_id).toBeUndefined();
+        expect(parsedEvent.data.quote.quotedMessageId).toBeUndefined();
         expect(parsedEvent.data.quote.error).toEqual(expectedError);
       });
     });
@@ -90,14 +89,16 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
 
+      const quote = new Quote({
+        quotedMessageId: 'message-uuid',
+        quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
+      });
+
       const event = {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: new z.proto.Quote({
-            quoted_message_id: 'message-uuid',
-            quoted_message_sha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
-          }).encode64(),
+          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -121,14 +122,16 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       spyOn(z.message.MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
 
+      const quote = new Quote({
+        quotedMessageId: 'message-uuid',
+        quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
+      });
+
       const event = {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: new z.proto.Quote({
-            quoted_message_id: 'message-uuid',
-            quoted_message_sha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
-          }).encode64(),
+          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -182,7 +185,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
       jasmine.clock().install();
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+      return quotedMessageMiddleware.processEvent(event).then(() => {
         jasmine.clock().tick();
 
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
@@ -232,7 +235,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
       };
 
-      return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
+      return quotedMessageMiddleware.processEvent(event).then(() => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
             data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),

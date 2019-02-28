@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.connection = z.connection || {};
 
@@ -36,7 +38,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
-    this.logger = new z.util.Logger('z.connection.ConnectionRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.connection.ConnectionRepository', z.config.LOGGER.OPTIONS);
 
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
@@ -103,7 +105,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
 
   /**
    * Accept a connection request.
-   * @param {z.entity.User} userEntity - User to update connection with
+   * @param {User} userEntity - User to update connection with
    * @param {boolean} [showConversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
@@ -114,9 +116,9 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Block a user.
    *
-   * @param {z.entity.User} userEntity - User to block
+   * @param {User} userEntity - User to block
    * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
+   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
@@ -130,9 +132,9 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Cancel a connection request.
    *
-   * @param {z.entity.User} userEntity - User to cancel the sent connection request
+   * @param {User} userEntity - User to cancel the sent connection request
    * @param {boolean} [hideConversation=false] - Hide current conversation
-   * @param {z.entity.Conversation} [nextConversationEntity] - Conversation to be switched to
+   * @param {Conversation} [nextConversationEntity] - Conversation to be switched to
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
@@ -146,7 +148,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Create a connection request.
    *
-   * @param {z.entity.User} userEntity - User to connect to
+   * @param {User} userEntity - User to connect to
    * @param {boolean} [showConversation=false] - Should we open the new conversation
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
@@ -216,7 +218,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
 
   /**
    * Ignore connection request.
-   * @param {z.entity.User} userEntity - User to ignore the connection request
+   * @param {User} userEntity - User to ignore the connection request
    * @returns {Promise} Promise that resolves when an incoming connection request was ignored
    */
   ignoreRequest(userEntity) {
@@ -226,7 +228,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Unblock a user.
    *
-   * @param {z.entity.User} userEntity - User to unblock
+   * @param {User} userEntity - User to unblock
    * @param {boolean} [showConversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
@@ -274,7 +276,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Update the status of a connection.
    * @private
-   * @param {z.entity.User} userEntity - User to update connection with
+   * @param {User} userEntity - User to update connection with
    * @param {string} connectionStatus - Connection status
    * @param {boolean} [showConversation=false] - Show conversation on success
    * @returns {Promise} Promise that resolves when the connection status was updated

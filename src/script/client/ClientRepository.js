@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import platform from 'platform';
 
 import * as StorageUtil from 'utils/StorageUtil';
@@ -40,7 +42,7 @@ z.client.ClientRepository = class ClientRepository {
     this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = new z.util.Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
@@ -663,10 +665,9 @@ z.client.ClientRepository = class ClientRepository {
    * Listener for incoming user events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  onUserEvent(eventJson, source) {
+  onUserEvent(eventJson) {
     const type = eventJson.type;
 
     const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;

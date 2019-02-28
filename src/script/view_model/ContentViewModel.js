@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -48,7 +50,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -157,7 +159,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *  Conversation_et can also just be the conversation ID
    *
-   * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
+   * @param {Conversation|string} conversation - Conversation entity or conversation ID
    * @param {Object} options - State to open conversation in
    * @param {z.entity.Message} [options.exposeMessage] - Scroll to message and highlight it
    * @param {boolean} [options.openFirstSelfMention=false] - Open first self mention instead of passed message

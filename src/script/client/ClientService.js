@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.client = z.client || {};
 
@@ -37,7 +39,7 @@ z.client.ClientService = class ClientService {
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = new z.util.Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
 
     this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
   }

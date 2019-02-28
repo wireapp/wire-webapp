@@ -20,6 +20,10 @@
 import ko from 'knockout';
 
 import AssetTransferState from '../../assets/AssetTransferState';
+import AssetType from '../../assets/AssetType';
+import EphemeralStatusType from '../../message/EphemeralStatusType';
+import User from '../User';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -42,7 +46,7 @@ class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? z.util.TimeUtil.formatDurationCaption(remainingTime) : '';
+      return remainingTime ? TimeUtil.formatDurationCaption(remainingTime) : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
@@ -51,24 +55,24 @@ class Message {
     this.ephemeral_status = ko.computed(() => {
       const isExpired = this.ephemeral_expires() === true;
       if (isExpired) {
-        return z.message.EphemeralStatusType.TIMED_OUT;
+        return EphemeralStatusType.TIMED_OUT;
       }
 
       if (_.isNumber(this.ephemeral_expires())) {
-        return z.message.EphemeralStatusType.INACTIVE;
+        return EphemeralStatusType.INACTIVE;
       }
 
       if (_.isString(this.ephemeral_expires())) {
         const isExpiring = Date.now() >= this.ephemeral_expires();
-        return isExpiring ? z.message.EphemeralStatusType.TIMED_OUT : z.message.EphemeralStatusType.ACTIVE;
+        return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
-      return z.message.EphemeralStatusType.NONE;
+      return EphemeralStatusType.NONE;
     });
 
     this.isObfuscated = ko.pureComputed(() => {
       const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
-      const isEphemeralInactive = this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE;
+      const isEphemeralInactive = this.ephemeral_status() === EphemeralStatusType.INACTIVE;
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
 
@@ -80,7 +84,7 @@ class Message {
     this.primary_key = undefined;
     this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new z.entity.User());
+    this.user = ko.observable(new User());
     this.visible = ko.observable(true);
     this.version = 1;
 
@@ -92,7 +96,7 @@ class Message {
     this.category = undefined;
 
     this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+      const date = moment.unix(this.timestamp() / TimeUtil.UNITS_IN_MILLIS.SECOND);
       return date.local().format('HH:mm');
     };
 
@@ -113,7 +117,7 @@ class Message {
    * @returns {boolean} Message contains any file type asset
    */
   has_asset() {
-    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === z.assets.AssetType.FILE) : false;
+    return this.is_content() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
   }
 
   /**
@@ -177,7 +181,7 @@ class Message {
    * @returns {boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
-    const isExpiredEphemeral = this.ephemeral_status() === z.message.EphemeralStatusType.TIMED_OUT;
+    const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
     }
@@ -330,7 +334,7 @@ class Message {
       return;
     }
 
-    if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
+    if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
       const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
       this.ephemeral_expires(expirationTimestamp);

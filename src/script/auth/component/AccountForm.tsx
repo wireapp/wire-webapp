@@ -68,10 +68,14 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
-    name?: HTMLInputElement;
-    email?: HTMLInputElement;
-    password?: HTMLInputElement;
-  } = {};
+    name?: React.RefObject<any>;
+    email?: React.RefObject<any>;
+    password?: React.RefObject<any>;
+  } = {
+    email: React.createRef(),
+    name: React.createRef(),
+    password: React.createRef(),
+  };
 
   state: State = {
     registrationData: {
@@ -120,11 +124,11 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
     const errors: Error[] = [];
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      currentInput.value = currentInput.value.trim();
-      if (!currentInput.checkValidity()) {
-        errors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
+      currentInput.current.value = currentInput.current.value.trim();
+      if (!currentInput.current.checkValidity()) {
+        errors.push(ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity));
       }
-      validInputs[inputKey] = currentInput.validity.valid;
+      validInputs[inputKey] = currentInput.current.validity.valid;
     });
 
     this.setState({validInputs, validationErrors: errors});
@@ -184,7 +188,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <InputBlock>
             <Input
               name="name"
-              onChange={event =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
@@ -193,14 +197,14 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
                   validInputs: {...validInputs, name: true},
                 })
               }
-              innerRef={node => (this.inputs.name = node)}
+              ref={this.inputs.name}
               markInvalid={!validInputs.name}
               value={name}
               autoComplete="section-create-team username"
               placeholder={_(accountFormStrings.namePlaceholder)}
-              onKeyDown={event => {
+              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Enter') {
-                  this.inputs.email.focus();
+                  this.inputs.email.current.focus();
                 }
               }}
               autoFocus
@@ -212,7 +216,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="email"
-              onChange={event =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
@@ -221,16 +225,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
                   validInputs: {...validInputs, email: true},
                 })
               }
-              innerRef={node => (this.inputs.email = node)}
+              ref={this.inputs.email}
               markInvalid={!validInputs.email}
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(
                 isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder
               )}
-              onKeyDown={event => {
+              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Enter') {
-                  this.inputs.password.focus();
+                  this.inputs.password.current.focus();
                 }
               }}
               maxLength={128}
@@ -240,7 +244,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="password"
-              onChange={event =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
@@ -249,7 +253,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
                   validInputs: {...validInputs, password: true},
                 })
               }
-              innerRef={node => (this.inputs.password = node)}
+              ref={this.inputs.password}
               markInvalid={!validInputs.password}
               value={password}
               autoComplete="section-create-team new-password"
@@ -266,7 +270,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>
         <Checkbox
-          onChange={event =>
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             this.setState({
               registrationData: {
                 ...this.state.registrationData,

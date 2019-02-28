@@ -17,9 +17,12 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
+import User from '../../entity/User';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -64,7 +67,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -247,7 +250,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(participantEntity, event) {
-    const isUser = participantEntity instanceof z.entity.User;
+    const isUser = participantEntity instanceof User;
     if (isUser && participantEntity.isOutgoingRequest()) {
       return this.clickOnContact(participantEntity);
     }
@@ -524,7 +527,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
           });
         }
       })
-      .then(error => {
+      .then(() => {
         this.showSpinner(false);
       });
   }

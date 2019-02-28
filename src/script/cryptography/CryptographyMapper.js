@@ -17,6 +17,11 @@
  *
  */
 
+import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
+
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+
 export default class CryptographyMapper {
   static get CONFIG() {
     return {
@@ -26,13 +31,13 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**
    * Maps a generic message into an event in JSON.
    *
-   * @param {z.proto.GenericMessage} genericMessage - Received ProtoBuffer message
+   * @param {GenericMessage} genericMessage - Received ProtoBuffer message
    * @param {JSON} event - Event of z.event.Backend.CONVERSATION.OTR-ASSET-ADD or z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
@@ -81,7 +86,7 @@ export default class CryptographyMapper {
       }
 
       case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED: {
-        specificContent = this._mapEdited(genericMessage.edited, genericMessage.message_id);
+        specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
@@ -129,7 +134,7 @@ export default class CryptographyMapper {
       }
 
       default: {
-        const logMessage = `Skipped event '${genericMessage.message_id}' of unhandled type '${genericMessage.content}'`;
+        const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
         throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
       }
@@ -138,7 +143,7 @@ export default class CryptographyMapper {
     const genericContent = {
       conversation: event.conversation,
       from: event.from,
-      id: genericMessage.message_id,
+      id: genericMessage.messageId,
       status: event.status,
       time: event.time,
     };
@@ -147,15 +152,15 @@ export default class CryptographyMapper {
   }
 
   _mapAsset(asset) {
-    const {original, preview, uploaded, not_uploaded: notUploaded} = asset;
+    const {original, preview, uploaded, notUploaded} = asset;
     let data = {};
 
     if (original) {
       data = {
-        content_length: original.size.toNumber(),
-        content_type: original.mime_type,
+        content_length: original.size,
+        content_type: original.mimeType,
         info: {
-          name: original.name,
+          name: original.name || null,
         },
       };
 
@@ -171,29 +176,27 @@ export default class CryptographyMapper {
       const remote = preview.remote;
 
       data = Object.assign(data, {
-        preview_key: remote.asset_id,
-        preview_otr_key: new Uint8Array(remote.otr_key.toArrayBuffer()),
-        preview_sha256: new Uint8Array(remote.sha256.toArrayBuffer()),
-        preview_token: remote.asset_token,
+        preview_key: remote.assetId,
+        preview_otr_key: new Uint8Array(remote.otrKey),
+        preview_sha256: new Uint8Array(remote.sha256),
+        preview_token: remote.assetToken,
       });
     }
 
-    const isImage = uploaded && uploaded.asset_id && original && original.image;
+    const isImage = uploaded && uploaded.assetId && original && original.image;
     if (isImage) {
       data.info.tag = 'medium';
     }
 
-    if (uploaded !== null) {
+    if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
       data = Object.assign(data, {
-        key: uploaded.asset_id,
-        otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
-        sha256: new Uint8Array(uploaded.sha256.toArrayBuffer()),
+        key: uploaded.assetId,
+        otr_key: new Uint8Array(uploaded.otrKey),
+        sha256: new Uint8Array(uploaded.sha256),
         status: z.assets.AssetTransferState.UPLOADED,
-        token: uploaded.asset_token,
+        token: uploaded.assetToken,
       });
-    }
-
-    if (notUploaded !== null) {
+    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,
@@ -206,9 +209,9 @@ export default class CryptographyMapper {
   _mapAssetMetaData(original) {
     const audioData = original.audio;
     if (audioData) {
-      const loudnessArray = audioData.normalized_loudness ? audioData.normalized_loudness.toArrayBuffer() : [];
-      const durationInSeconds = audioData.duration_in_millis
-        ? audioData.duration_in_millis / z.util.TimeUtil.UNITS_IN_MILLIS.SECOND
+      const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : [];
+      const durationInSeconds = audioData.durationInMillis
+        ? audioData.durationInMillis / TimeUtil.UNITS_IN_MILLIS.SECOND
         : 0;
 
       return {
@@ -223,13 +226,13 @@ export default class CryptographyMapper {
       data: {
         availability: (() => {
           switch (availability.type) {
-            case z.proto.Availability.Type.NONE:
+            case Availability.Type.NONE:
               return z.user.AvailabilityType.NONE;
-            case z.proto.Availability.Type.AVAILABLE:
+            case Availability.Type.AVAILABLE:
               return z.user.AvailabilityType.AVAILABLE;
-            case z.proto.Availability.Type.AWAY:
+            case Availability.Type.AWAY:
               return z.user.AvailabilityType.AWAY;
-            case z.proto.Availability.Type.BUSY:
+            case Availability.Type.BUSY:
               return z.user.AvailabilityType.BUSY;
             default:
               const message = 'Unhandled availability type';
@@ -252,8 +255,8 @@ export default class CryptographyMapper {
   _mapCleared(cleared) {
     return {
       data: {
-        cleared_timestamp: cleared.cleared_timestamp.toString(),
-        conversationId: cleared.conversation_id,
+        cleared_timestamp: cleared.clearedTimestamp.toString(),
+        conversationId: cleared.conversationId,
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };
@@ -262,13 +265,13 @@ export default class CryptographyMapper {
   _mapConfirmation(confirmation) {
     return {
       data: {
-        message_id: confirmation.first_message_id,
-        more_message_ids: confirmation.more_message_ids || [],
+        message_id: confirmation.firstMessageId,
+        more_message_ids: confirmation.moreMessageIds || [],
         status: (() => {
           switch (confirmation.type) {
-            case z.proto.Confirmation.Type.DELIVERED:
+            case Confirmation.Type.DELIVERED:
               return z.message.StatusType.DELIVERED;
-            case z.proto.Confirmation.Type.READ:
+            case Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
             default:
               const message = 'Unhandled confirmation type';
@@ -283,7 +286,7 @@ export default class CryptographyMapper {
   _mapDeleted(deleted) {
     return {
       data: {
-        message_id: deleted.message_id,
+        message_id: deleted.messageId,
       },
       type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
     };
@@ -291,13 +294,13 @@ export default class CryptographyMapper {
 
   _mapEdited(edited, eventId) {
     const mappedMessage = this._mapText(edited.text, eventId);
-    mappedMessage.data.replacing_message_id = edited.replacing_message_id;
+    mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
 
   _mapEphemeral(genericMessage, event) {
-    const messageTimer = genericMessage.ephemeral.expire_after_millis.toNumber();
-    genericMessage.ephemeral.message_id = genericMessage.message_id;
+    const messageTimer = genericMessage.ephemeral[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
+    genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
     embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
@@ -309,25 +312,26 @@ export default class CryptographyMapper {
    * Unpacks a specific generic message which is wrapped inside an external generic message.
    *
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
-   * @param {z.proto.External} external - Generic message of type 'external'
+   * @param {External} external - Generic message of type 'external'
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
   _unwrapExternal(external, event) {
     return Promise.resolve(external)
-      .then(({otr_key: otrKey, sha256}) => {
+      .then(({otrKey, sha256}) => {
         const eventData = event.data;
+
         if (!eventData.data || !otrKey || !sha256) {
           throw new Error('Not all expected properties defined');
         }
 
         const cipherText = z.util.base64ToArray(eventData.data).buffer;
-        const keyBytes = new Uint8Array(otrKey.toArrayBuffer()).buffer;
-        const referenceSha256 = new Uint8Array(sha256.toArrayBuffer()).buffer;
+        const keyBytes = new Uint8Array(otrKey).buffer;
+        const referenceSha256 = new Uint8Array(sha256).buffer;
 
         return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, referenceSha256);
       })
-      .then(externalMessageBuffer => z.proto.GenericMessage.decode(externalMessageBuffer))
+      .then(externalMessageBuffer => GenericMessage.decode(new Uint8Array(externalMessageBuffer)))
       .catch(error => {
         this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
         throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.BROKEN_EXTERNAL);
@@ -337,8 +341,8 @@ export default class CryptographyMapper {
   _mapHidden(hidden) {
     return {
       data: {
-        conversation_id: hidden.conversation_id,
-        message_id: hidden.message_id,
+        conversation_id: hidden.conversationId,
+        message_id: hidden.messageId,
       },
       type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
     };
@@ -361,21 +365,21 @@ export default class CryptographyMapper {
     return {
       data: {
         content_length: image.size,
-        content_type: image.mime_type,
+        content_type: image.mimeType,
         id: eventId,
         info: {
           height: image.height,
           tag: image.tag,
           width: image.width,
         },
-        otr_key: new Uint8Array(image.otr_key ? image.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(image.sha256 ? image.sha256.toArrayBuffer() : []),
+        otr_key: new Uint8Array(image.otrKey ? image.otrKey : []),
+        sha256: new Uint8Array(image.sha256 ? image.sha256 : []),
       },
       type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 
-  _mapKnock(knock) {
+  _mapKnock() {
     return {
       data: {},
       type: z.event.Client.CONVERSATION.KNOCK,
@@ -385,8 +389,8 @@ export default class CryptographyMapper {
   _mapLastRead(lastRead) {
     return {
       data: {
-        conversationId: lastRead.conversation_id,
-        last_read_timestamp: lastRead.last_read_timestamp.toString(),
+        conversationId: lastRead.conversationId,
+        last_read_timestamp: lastRead.lastReadTimestamp.toString(),
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };
@@ -409,7 +413,7 @@ export default class CryptographyMapper {
   _mapReaction(reaction) {
     return {
       data: {
-        message_id: reaction.message_id,
+        message_id: reaction.messageId,
         reaction: reaction.emoji,
       },
       type: z.event.Client.CONVERSATION.REACTION,
@@ -417,7 +421,9 @@ export default class CryptographyMapper {
   }
 
   _mapText(text) {
-    const {link_preview: protoLinkPreviews, mentions: protoMentions, quote: protoQuote} = text;
+    const {mentions: protoMentions, quote: protoQuote} = text;
+
+    const protoLinkPreviews = text[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
@@ -427,9 +433,11 @@ export default class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => protoMention.encode64()),
-        previews: protoLinkPreviews.map(protoLinkPreview => protoLinkPreview.encode64()),
-        quote: protoQuote && protoQuote.encode64(),
+        mentions: protoMentions.map(protoMention => z.util.arrayToBase64(Mention.encode(protoMention).finish())),
+        previews: protoLinkPreviews.map(protoLinkPreview =>
+          z.util.arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
+        ),
+        quote: protoQuote && z.util.arrayToBase64(Quote.encode(protoQuote).finish()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
@@ -438,7 +446,7 @@ export default class CryptographyMapper {
 
 function addExpectReadReceiptData(mappedEvent, rawEvent) {
   mappedEvent.data = Object.assign({}, mappedEvent.data, {
-    expects_read_confirmation: rawEvent.expects_read_confirmation,
+    expects_read_confirmation: rawEvent.expectsReadConfirmation,
   });
   return mappedEvent;
 }

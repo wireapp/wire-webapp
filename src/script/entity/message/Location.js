@@ -17,6 +17,8 @@
  *
  */
 
+import AssetType from '../../assets/AssetType';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -27,7 +29,7 @@ z.entity.Location = class Location extends z.entity.Asset {
     this.latitude = '';
     this.longitude = '';
     this.name = '';
-    this.type = z.assets.AssetType.LOCATION;
+    this.type = AssetType.LOCATION;
     this.zoom = '';
   }
 };

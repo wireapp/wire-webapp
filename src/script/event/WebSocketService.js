@@ -17,6 +17,9 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+
 import * as StorageUtil from 'utils/StorageUtil';
 
 window.z = window.z || {};
@@ -40,8 +43,8 @@ z.event.WebSocketService = class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
+      PING_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      RECONNECT_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
     };
   }
 
@@ -53,7 +56,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
 
     this.clientId = undefined;
     this.connectionUrl = '';
@@ -80,7 +83,7 @@ z.event.WebSocketService = class WebSocketService {
   connect(onNotification) {
     this.onNotification = onNotification;
 
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
       if (this.clientId) {
         this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);

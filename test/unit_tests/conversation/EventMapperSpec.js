@@ -17,7 +17,11 @@
  *
  */
 
+import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
+
+import Conversation from 'src/script/entity/Conversation';
 import EventMapper from 'src/script/conversation/EventMapper';
+import AssetType from 'src/script/assets/AssetType';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -25,20 +29,17 @@ describe('Event Mapper', () => {
   let event_mapper = null;
 
   beforeAll(() => {
-    return z.util.protobuf
-      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
-      .then(() => test_factory.exposeUserActors())
-      .then(() => {
-        wire.app = {
-          service: {
-            asset: TestFactory.asset_service,
-          },
-        };
-      });
+    return test_factory.exposeUserActors().then(() => {
+      wire.app = {
+        service: {
+          asset: TestFactory.asset_service,
+        },
+      };
+    });
   });
 
   beforeEach(() => {
-    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+    conversation_et = new Conversation(z.util.createRandomUuid());
     event_mapper = new EventMapper();
   });
 
@@ -67,15 +68,23 @@ describe('Event Mapper', () => {
     it('maps text messages with deprecated link preview format', () => {
       const event_id = z.util.createRandomUuid;
 
-      const article = new z.proto.Article('test.com', 'Test title', 'Test description');
-      const link_preview = new z.proto.LinkPreview('test.com', 0, article);
+      const article = new Article({
+        permanentUrl: 'test.com',
+        summary: 'Test description',
+        title: 'Test title',
+      });
+      const link_preview = new LinkPreview({
+        article,
+        url: 'test.com',
+        urlOffset: 0,
+      });
 
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()],
+          previews: [z.util.arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
         from: z.util.createRandomUuid,
         id: event_id,
@@ -94,21 +103,21 @@ describe('Event Mapper', () => {
     it('maps text messages with link preview', () => {
       const event_id = z.util.createRandomUuid;
 
-      const link_preview = new z.proto.LinkPreview(
-        'test.com',
-        0,
-        null,
-        'test.com/perm',
-        'Test title',
-        'Test description'
-      );
+      const link_preview = new LinkPreview({
+        article: null,
+        permanentUrl: 'test.com/perm',
+        summary: 'Test description',
+        title: 'Test title',
+        url: 'test.com',
+        urlOffset: 0,
+      });
 
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()],
+          previews: [z.util.arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
         from: z.util.createRandomUuid,
         id: event_id,
@@ -135,7 +144,7 @@ describe('Event Mapper', () => {
         expect(messageEntity.get_first_asset().height).toBe(event.data.info.height);
         expect(messageEntity.get_first_asset().file_size).toBe(event.data.content_length);
         expect(messageEntity.get_first_asset().file_type).toBe(event.data.content_type);
-        expect(messageEntity.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
+        expect(messageEntity.get_first_asset().type).toBe(AssetType.IMAGE);
         expect(messageEntity.get_first_asset().resource().otrKey).toBe(event.data.otr_key);
         expect(messageEntity.get_first_asset().resource().sha256).toBe(event.data.sha256);
         expect(messageEntity).toBeDefined();
@@ -163,14 +172,17 @@ describe('Event Mapper', () => {
       const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
       const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
 
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(z.util.createRandomUuid());
 
       const event = {
         category: 16,
         conversation: conversationEntity.id,
         data: {
           content: text,
-          mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
+          mentions: [
+            z.util.arrayToBase64(Mention.encode(validMention.toProto()).finish()),
+            z.util.arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
+          ],
           previews: [],
         },
         from: z.util.createRandomUuid(),
@@ -201,7 +213,7 @@ describe('Event Mapper', () => {
       const overlappingStart = mandyStart + mandy.length - 1;
       const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, z.util.createRandomUuid());
 
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(z.util.createRandomUuid());
 
       const event = {
         category: 16,
@@ -209,9 +221,9 @@ describe('Event Mapper', () => {
         data: {
           content: text,
           mentions: [
-            validMention1.toProto().encode64(),
-            overlappingMention.toProto().encode64(),
-            validMention2.toProto().encode64(),
+            z.util.arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
+            z.util.arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
+            z.util.arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
           ],
           previews: [],
         },

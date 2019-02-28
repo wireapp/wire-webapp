@@ -17,7 +17,10 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -33,7 +36,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;
@@ -86,7 +89,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       const selfUserId = this.userRepository.self().id;
       const truncatedId = selfUserId.substr(0, z.telemetry.calling.CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const filename = `Wire-${truncatedId}-Calling_${z.util.TimeUtil.getCurrentDate()}.log`;
+      const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
 
       return z.util.downloadBlob(blob, filename);
     }

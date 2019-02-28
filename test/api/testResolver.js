@@ -17,8 +17,8 @@
  *
  */
 
-import dependenciesResolver from 'src/script/util/dependenciesResolver';
-import dependenciesGraph from 'src/script/config/dependenciesGraph';
+import dependenciesResolver from 'utils/dependenciesResolver';
+import * as graph from 'src/script/config/dependenciesGraph';
 
 import BackendClient from 'src/script/service/BackendClient';
 
@@ -28,7 +28,7 @@ export const backendConfig = {
   websocket_url: 'wss://localhost',
 };
 
-dependenciesResolver.init(dependenciesGraph, {level: z.util.Logger.prototype.levels.OFF});
+dependenciesResolver.init(graph.dependencies, {level: z.util.Logger.prototype.levels.OFF});
 
 beforeEach(() => {
   // revoke cache to avoid having statefull entities between tests
@@ -39,4 +39,6 @@ beforeEach(() => {
   backendClient.setSettings(backendConfig);
 });
 
-export default dependenciesResolver.resolve;
+const resolve = dependenciesResolver.resolve;
+
+export {resolve, graph};

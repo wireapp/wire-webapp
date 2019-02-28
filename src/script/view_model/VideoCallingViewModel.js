@@ -17,14 +17,19 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+import trackingHelpers from '../tracking/Helpers';
+import TERMINATION_REASON from '../calling/enum/TerminationReason';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
 z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   static get CONFIG() {
     return {
-      AUTO_MINIMIZE_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
-      HIDE_CONTROLS_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      AUTO_MINIMIZE_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      HIDE_CONTROLS_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
     };
   }
 
@@ -43,7 +48,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = new z.util.Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
@@ -186,6 +191,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
+
+    this.TimeUtil = TimeUtil;
   }
 
   chooseSharedScreen(conversationId) {
@@ -203,14 +210,14 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
             const conversationEntity = this.joinedCall().conversationEntity;
 
             const attributes = {
-              conversation_type: z.tracking.helpers.getConversationType(conversationEntity),
+              conversation_type: trackingHelpers.getConversationType(conversationEntity),
               kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
               num_screens: screenSources.length,
             };
 
             const isTeamConversation = !!conversationEntity.team_id;
             if (isTeamConversation) {
-              Object.assign(attributes, z.tracking.helpers.getGuestAttributes(conversationEntity));
+              Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
             }
 
             amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
@@ -239,7 +246,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clickedOnLeaveCall() {
     if (this.joinedCall()) {
-      const reason = z.calling.enum.TERMINATION_REASON.SELF_USER;
+      const reason = TERMINATION_REASON.SELF_USER;
       amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.joinedCall().id, reason);
     }
   }

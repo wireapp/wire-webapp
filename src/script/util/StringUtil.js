@@ -175,31 +175,6 @@ const stringUtil = {
     return 0;
   },
 
-  splitAtPivotElement: (text, pivot, replacement) => {
-    if (!pivot) {
-      return [
-        {
-          isStyled: false,
-          text,
-        },
-      ];
-    }
-
-    const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
-
-    return text
-      .split(findPivot)
-      .map(value => {
-        return value
-          ? {
-              isStyled: value === pivot,
-              text: value === pivot ? replacement : value,
-            }
-          : undefined;
-      })
-      .filter(item => item);
-  },
-
   startsWith: (string = '', query) => string.toLowerCase().startsWith(query.toLowerCase()),
 
   trimEnd: (string = '') => string.replace(/\s*$/, ''),

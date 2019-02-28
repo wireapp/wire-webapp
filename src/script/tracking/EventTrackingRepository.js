@@ -17,6 +17,10 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+import trackingHelpers from './Helpers';
+
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
@@ -25,7 +29,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: window.wire.env.RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        REPORTING_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
@@ -51,7 +55,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
@@ -176,7 +180,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _setSuperProperties() {
     this._setSuperProperty(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
     this._setSuperProperty(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
-    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.getPlatform());
+    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
     if (z.util.Environment.desktop) {
       this._setSuperProperty(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
     }

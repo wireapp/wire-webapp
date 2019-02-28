@@ -17,7 +17,10 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -36,12 +39,12 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
-    this.logger = new z.util.Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
 
-    this.activationDate = ko.observableArray([]);
+    this.activationDate = ko.observable();
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
     this.sessionResetState = ko.observable(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
@@ -50,16 +53,10 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       if (clientEntity) {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this._updateFingerprint();
-        this._updateActivationTime(clientEntity.time);
+        const date = TimeUtil.formatTimestamp(clientEntity.time);
+        this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       }
     });
-  }
-
-  _updateActivationTime(time) {
-    const formattedTime = z.util.TimeUtil.formatTimestamp(time);
-    const stringTemplate = t('preferencesDevicesActivatedOn');
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
-    this.activationDate(sanitizedText);
   }
 
   _updateFingerprint() {

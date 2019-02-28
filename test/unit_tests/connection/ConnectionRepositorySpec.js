@@ -18,6 +18,8 @@
  */
 
 import {backendConfig} from '../../api/testResolver';
+import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -45,7 +47,7 @@ describe('z.connection.ConnectionRepository', () => {
       const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
       connectionEntity.userId = userId;
 
-      userEntity = new z.entity.User(userId);
+      userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.connectionEntities.push(connectionEntity);
@@ -62,7 +64,7 @@ describe('z.connection.ConnectionRepository', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(userEntity, new z.entity.Conversation()).then(() => {
+      return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
         expect(connectionRepository._updateStatus).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });

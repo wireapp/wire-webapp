@@ -24,7 +24,7 @@ z.conversation.EventInfoEntity = class EventInfoEntity {
   /**
    * Constructs a new event info entity.
    * @class z.conversation.EventInfoEntity
-   * @param {z.proto.GenericMessage} [genericMessage] - Generic message
+   * @param {GenericMessage} [genericMessage] - Generic message
    * @param {string} [conversationId=''] - Conversation ID
    * @param {Object} options - Message sending options
    * @param {Array<string>|boolean} [options.nativePush=true] - Send native push notification for message

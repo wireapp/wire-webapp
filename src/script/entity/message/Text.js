@@ -19,13 +19,13 @@
 
 import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
+import Asset from './Asset';
+import AssetType from '../../assets/AssetType';
 
-z.entity.Text = class Text extends z.entity.Asset {
+export default class Text extends Asset {
   constructor(id, text = '') {
     super(id);
-    this.type = z.assets.AssetType.TEXT;
+    this.type = AssetType.TEXT;
 
     // Raw message text
     this.text = text;
@@ -54,4 +54,8 @@ z.entity.Text = class Text extends z.entity.Asset {
   isUserMentioned(userId) {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
-};
+}
+
+window.z = window.z || {};
+window.z.entity = z.entity || {};
+z.entity.Text = Text;

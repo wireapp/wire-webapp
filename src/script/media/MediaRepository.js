@@ -19,10 +19,12 @@
 
 import {t} from 'utils/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import MediaDevicesHandler from './MediaDevicesHandler';
+import MediaConstraintsHandler from './MediaConstraintsHandler';
+import MediaElementHandler from './MediaElementHandler';
+import MediaStreamHandler from './MediaStreamHandler';
 
-z.media.MediaRepository = class MediaRepository {
+export default class MediaRepository {
   // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
   static get AUDIO_CONTEXT_STATE() {
     return {
@@ -43,14 +45,15 @@ z.media.MediaRepository = class MediaRepository {
   /**
    * Construct a new Media repository.
    * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {Logger} logger - Logger configured for that class
    */
-  constructor(permissionRepository) {
-    this.logger = new z.util.Logger('z.media.MediaRepository', z.config.LOGGER.OPTIONS);
+  constructor(permissionRepository, logger) {
+    this.logger = logger;
 
-    this.constraintsHandler = new z.media.MediaConstraintsHandler(this);
-    this.devicesHandler = new z.media.MediaDevicesHandler(this);
-    this.elementHandler = new z.media.MediaElementHandler(this);
-    this.streamHandler = new z.media.MediaStreamHandler(this, permissionRepository);
+    this.constraintsHandler = new MediaConstraintsHandler(this);
+    this.devicesHandler = new MediaDevicesHandler(this);
+    this.elementHandler = new MediaElementHandler(this);
+    this.streamHandler = new MediaStreamHandler(this, permissionRepository);
 
     this.audioContext = undefined;
   }
@@ -108,4 +111,4 @@ z.media.MediaRepository = class MediaRepository {
     };
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
-};
+}

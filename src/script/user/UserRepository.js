@@ -17,13 +17,18 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+
 import ko from 'knockout';
+import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
 import ConsentValue from './ConsentValue';
 import ConsentType from './ConsentType';
 
+import User from '../entity/User';
 import UserMapper from './UserMapper';
 
 export default class UserRepository {
@@ -45,11 +50,11 @@ export default class UserRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {z.time.ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
-    this.logger = new z.util.Logger('UserRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('UserRepository', z.config.LOGGER.OPTIONS);
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -75,7 +80,7 @@ export default class UserRepository {
           .filter(user_et => user_et.isConnected())
           .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
       })
-      .extend({rateLimit: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND});
+      .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
@@ -321,9 +326,11 @@ export default class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-    const protoAvailability = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
-    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, protoAvailability);
+    const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      messageId: z.util.createRandomUuid(),
+    });
 
     amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
   }
@@ -356,7 +363,7 @@ export default class UserRepository {
   /**
    * Get a user from the backend.
    * @param {string} userId - User ID
-   * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
+   * @returns {Promise<User>} Promise that resolves with the user entity
    */
   _fetchUserById(userId) {
     return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
@@ -365,7 +372,7 @@ export default class UserRepository {
   /**
    * Get users from the backend.
    * @param {Array<string>} userIds - User IDs
-   * @returns {Promise<Array<z.entity.User>>} Promise that resolves with an array of user entities
+   * @returns {Promise<Array<User>>} Promise that resolves with an array of user entities
    */
   fetchUsersById(userIds = []) {
     userIds = userIds.filter(userId => !!userId);
@@ -412,7 +419,7 @@ export default class UserRepository {
   /**
    * Find a local user.
    * @param {string} userId - User ID
-   * @returns {Promise<z.entity.User>} Resolves with the matching user entity
+   * @returns {Promise<User>} Resolves with the matching user entity
    */
   findUserById(userId) {
     if (!userId) {
@@ -471,7 +478,7 @@ export default class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    * @param {string} user_id - User ID
-   * @returns {Promise<z.entity.User>} Promise that resolves with the matching user entity
+   * @returns {Promise<User>} Promise that resolves with the matching user entity
    */
   get_user_by_id(user_id) {
     return this.findUserById(user_id)
@@ -506,7 +513,7 @@ export default class UserRepository {
    * Check for users locally and fetch them from the server otherwise.
    * @param {Array<string>} user_ids - User IDs
    * @param {boolean} offline - Should we only look for cached contacts
-   * @returns {Promise<Array<z.entity.User>>} Resolves with an array of users
+   * @returns {Promise<Array<User>>} Resolves with an array of users
    */
   get_users_by_id(user_ids = [], offline = false) {
     if (!user_ids.length) {
@@ -525,7 +532,7 @@ export default class UserRepository {
     const find_users = user_ids.map(user_id => _find_user(user_id));
 
     return Promise.all(find_users).then(resolve_array => {
-      const known_user_ets = resolve_array.filter(array_item => array_item instanceof z.entity.User);
+      const known_user_ets = resolve_array.filter(array_item => !_.isString(array_item));
       const unknown_user_ids = resolve_array.filter(array_item => _.isString(array_item));
 
       if (offline || !unknown_user_ids.length) {
@@ -538,7 +545,7 @@ export default class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param {z.entity.User|string} user_id - User entity or user ID
+   * @param {User|string} user_id - User entity or user ID
    * @returns {boolean} Is the user the logged in user
    */
   is_me(user_id) {
@@ -550,7 +557,7 @@ export default class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param {z.entity.User|string} user_et - User entity or user ID
+   * @param {User|string} user_et - User entity or user ID
    * @param {boolean} is_me - True, if self user
    * @returns {Promise} Resolves with the user entity
    */
@@ -571,7 +578,7 @@ export default class UserRepository {
 
   /**
    * Save multiple users at once.
-   * @param {Array<z.entity.User>} user_ets - Array of user entities to be stored
+   * @param {Array<User>} user_ets - Array of user entities to be stored
    * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
@@ -604,7 +611,7 @@ export default class UserRepository {
       this.findUserById(userId).catch(error => {
         const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (isNotFound) {
-          return new z.entity.User();
+          return new User();
         }
         throw error;
       });
@@ -623,15 +630,15 @@ export default class UserRepository {
   /**
    * Add user entities for suspended users.
    * @param {Array<string>} user_ids - Requested user IDs
-   * @param {Array<z.entity.User>} user_ets - User entities returned by backend
-   * @returns {Array<z.entity.User>} User entities to be returned
+   * @param {Array<User>} user_ets - User entities returned by backend
+   * @returns {Array<User>} User entities to be returned
    */
   _add_suspended_users(user_ids, user_ets) {
     for (const user_id of user_ids) {
       const matching_user_ids = user_ets.find(user_et => user_et.id === user_id);
 
       if (!matching_user_ids) {
-        const user_et = new z.entity.User(user_id);
+        const user_et = new User(user_id);
         user_et.name(t('nonexistentUser'));
         user_ets.push(user_et);
       }

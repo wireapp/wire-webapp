@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.list = z.viewModel.list || {};
@@ -32,7 +34,7 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.mainViewModel = mainViewModel;
     this.listViewModel = listViewModel;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
     this.contentViewModel = this.mainViewModel.content;
     this.contentState = this.contentViewModel.state;

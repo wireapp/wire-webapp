@@ -17,8 +17,11 @@
  *
  */
 
+import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+
 import {backendConfig} from '../../api/testResolver';
 import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -46,8 +49,6 @@ describe('ConversationRepository', () => {
 
     return conversation;
   };
-
-  beforeAll(() => z.util.protobuf.loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto'));
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
@@ -138,7 +139,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should not delete other users messages', done => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.is_me = false;
       const message_to_delete_et = new z.entity.Message(z.util.createRandomUuid());
       message_to_delete_et.user(user_et);
@@ -156,7 +157,7 @@ describe('ConversationRepository', () => {
 
     it('should send delete and deletes message for own messages', () => {
       spyOn(TestFactory.event_service, 'deleteEvent');
-      const userEntity = new z.entity.User();
+      const userEntity = new User();
       userEntity.is_me = true;
       const messageEntityToDelete = new z.entity.Message();
       messageEntityToDelete.id = z.util.createRandomUuid();
@@ -257,7 +258,7 @@ describe('ConversationRepository', () => {
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
-      const userEntity = new z.entity.User(teamMemberId);
+      const userEntity = new User(teamMemberId);
       userEntity.inTeam(true);
       userEntity.isTeamMember(true);
       userEntity.teamId = teamId;
@@ -277,7 +278,7 @@ describe('ConversationRepository', () => {
       group_b.name('René, Benny, Gregor, Lipis');
 
       const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
-      self_user_et = new z.entity.User();
+      self_user_et = new User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
@@ -337,7 +338,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', () => {
-      spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
+      spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new User()));
 
       conversation_et = new Conversation(z.util.createRandomUuid());
       // prettier-ignore
@@ -925,11 +926,14 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository
         .save_conversation(largeConversationEntity)
         .then(() => {
-          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-          const text = new z.proto.Text(
-            'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
-          );
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, text);
+          const text = new Text({
+            content:
+              'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
+          });
+          const genericMessage = new GenericMessage({
+            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: text,
+            messageId: z.util.createRandomUuid(),
+          });
 
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
@@ -946,8 +950,10 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository
         .save_conversation(smallConversationEntity)
         .then(() => {
-          const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
+          const genericMessage = new GenericMessage({
+            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+            messageId: z.util.createRandomUuid(),
+          });
 
           const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
@@ -977,12 +983,12 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
       spyOn(conversationRepository.cryptography_repository, 'encryptGenericMessage').and.callFake(
-        (conversationId, genericMessage, payload, preconditionOption) => {
+        (conversationId, genericMessage) => {
           const {content, ephemeral} = genericMessage;
 
           expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
           expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
-          expect(ephemeral.expire_after_millis.toString()).toBe(expectedValues.shift());
+          expect(ephemeral.expireAfterMillis.toString()).toBe(expectedValues.shift());
           return Promise.resolve({
             recipients: {},
           });
@@ -991,7 +997,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser(new z.entity.User(z.util.createRandomUuid()));
+        conversation.selfUser(new User(z.util.createRandomUuid()));
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
@@ -1011,22 +1017,22 @@ describe('ConversationRepository', () => {
     let lara = undefined;
 
     beforeEach(() => {
-      anne = new z.entity.User();
+      anne = new User();
       anne.name('Anne');
 
-      bob = new z.entity.User('532af01e-1e24-4366-aacf-33b67d4ee376');
+      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376');
       bob.name('Bob');
 
-      jane = new z.entity.User(entities.user.jane_roe.id);
+      jane = new User(entities.user.jane_roe.id);
       jane.name('Jane');
 
-      john = new z.entity.User(entities.user.john_doe.id);
+      john = new User(entities.user.john_doe.id);
       john.name('John');
 
       const johns_computer = new z.client.ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
       john.devices.push(johns_computer);
 
-      lara = new z.entity.User();
+      lara = new User();
       lara.name('Lara');
 
       const bobs_computer = new z.client.ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
@@ -1065,7 +1071,6 @@ describe('ConversationRepository', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
       return TestFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(user_ets => {
         expect(user_ets.length).toBe(3);
-        expect(user_ets[0] instanceof z.entity.User).toBeTruthy();
         expect(TestFactory.conversation_repository.conversations().length).toBe(4);
       });
     });

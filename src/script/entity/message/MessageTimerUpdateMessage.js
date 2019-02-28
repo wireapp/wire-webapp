@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -33,7 +34,7 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
 
     this.caption = ko.pureComputed(() => {
       if (this.message_timer) {
-        const timeString = z.util.TimeUtil.formatDuration(this.message_timer).text;
+        const timeString = TimeUtil.formatDuration(this.message_timer).text;
         return this.user().is_me
           ? t('conversationUpdatedTimerYou', timeString)
           : t('conversationUpdatedTimer', timeString);

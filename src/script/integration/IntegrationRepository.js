@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -36,7 +38,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   constructor(integrationService, conversationRepository, teamRepository) {
-    this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
 
     this.integrationService = integrationService;
 
@@ -204,7 +206,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * Remove service from conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to remove service from
-   * @param {z.entity.User} userEntity - Service user to be removed from the conversation
+   * @param {User} userEntity - Service user to be removed from the conversation
    * @returns {Promise} Resolves when service was removed from the conversation
    */
   removeService(conversationEntity, userEntity) {

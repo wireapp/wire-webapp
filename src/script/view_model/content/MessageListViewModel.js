@@ -17,12 +17,17 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
+import TimeUtil from 'utils/TimeUtil';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 /* eslint-disable no-unused-vars */
 import mousewheel from 'jquery-mousewheel';
 /* eslint-enable no-unused-vars */
+
+import Conversation from '../../entity/Conversation';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -55,14 +60,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
-    this.locationRepository = repositories.location;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
 
-    this.conversation = ko.observable(new z.entity.Conversation());
+    this.conversation = ko.observable(new Conversation());
     this.verticallyCenterMessage = ko.pureComputed(() => {
       if (this.conversation().messages_visible().length === 1) {
         const [messageEntity] = this.conversation().messages_visible();
@@ -150,7 +154,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
         window.setTimeout(() => {
           this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
           this.mark_as_read_on_focus = undefined;
-        }, z.util.TimeUtil.UNITS_IN_MILLIS.SECOND);
+        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
       }
     });
 
@@ -163,7 +167,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Mark conversation as read if window has focus
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to mark as read
+   * @param {Conversation} conversation_et - Conversation entity to mark as read
    * @returns {undefined} No return value
    */
   _mark_conversation_as_read_on_focus(conversation_et) {
@@ -175,7 +179,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {z.entity.Conversation} [conversation_et] - Conversation entity to change to
+   * @param {Conversation} [conversation_et] - Conversation entity to change to
    * @returns {undefined} No return value
    */
   release_conversation(conversation_et) {
@@ -218,7 +222,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   /**
    * Change conversation.
    *
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to change to
+   * @param {Conversation} conversationEntity - Conversation entity to change to
    * @param {z.entity.Message} messageEntity - message to be focused
    * @returns {Promise} Resolves when conversation was changed
    */
@@ -275,7 +279,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity to set
+   * @param {Conversation} conversationEntity - Conversation entity to set
    * @param {z.entity.Message} messageEntity - Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
@@ -418,11 +422,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
       this.capture_scrolling_event = false;
-      return this.conversation_repository
-        .getSubsequentMessages(this.conversation(), last_message, false)
-        .then(message_ets => {
-          this.capture_scrolling_event = true;
-        });
+      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(() => {
+        this.capture_scrolling_event = true;
+      });
     }
     return Promise.resolve();
   }
@@ -463,7 +465,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Triggered when user clicks on an avatar in the message list.
-   * @param {z.entity.User} userEntity - User entity of the selected user
+   * @param {User} userEntity - User entity of the selected user
    * @returns {undefined} No return value
    */
   showUserDetails(userEntity) {
@@ -594,7 +596,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Message appeared in viewport.
-   * @param {z.entity.Conversation} conversationEntity - Conversation the message belongs to
+   * @param {Conversation} conversationEntity - Conversation the message belongs to
    * @param {z.entity.Message} messageEntity - Message to check
    * @returns {Function|null} Callback or null
    */

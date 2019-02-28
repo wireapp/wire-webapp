@@ -4,28 +4,25 @@
       <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-group-participant"></arrow-left-icon>
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
-    <div class="panel__content">
-      <div class="panel__content__scroll" data-bind="antiscroll: shouldUpdateScrollbar">
+    <div class="panel__content panel__content--fill" data-bind="fadingscrollbar">
+      <!-- ko if: selectedService() -->
+        <panel-service-details params="service: selectedService"></panel-service-details>
 
-        <!-- ko if: selectedService() -->
-          <panel-service-details params="service: selectedService"></panel-service-details>
-
-          <!-- ko if: showActions() -->
-            <!-- ko if: z.userPermission().canChatWithServices() -->
-              <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
-                <message-icon class="panel__action-item__icon"></message-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canUpdateGroupParticipants() -->
-              <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
-                <minus-icon class="panel__action-item__icon"></minus-icon>
-                <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>
-              </div>
-            <!-- /ko -->
+        <!-- ko if: showActions() -->
+          <!-- ko if: z.userPermission().canChatWithServices() -->
+            <div class="panel__action-item" data-bind="click: clickToOpen" data-uie-name="go-conversation">
+              <message-icon class="panel__action-item__icon"></message-icon>
+              <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionOpenConversation')"></div>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: z.userPermission().canUpdateGroupParticipants() -->
+            <div class="panel__action-item" data-bind="click: clickToRemove" data-uie-name="do-remove">
+              <minus-icon class="panel__action-item__icon"></minus-icon>
+              <div class="panel__action-item__text" data-bind="text: t('groupParticipantActionRemove')"></div>
+            </div>
           <!-- /ko -->
         <!-- /ko -->
-      </div>
+      <!-- /ko -->
     </div>
 
     <!-- ko if: isAddMode() -->

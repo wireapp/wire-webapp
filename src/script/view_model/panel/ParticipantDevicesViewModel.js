@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import BasePanelViewModel from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
@@ -39,7 +41,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
 
-    this.logger = new z.util.Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfClient = this.clientRepository.currentClient;
 
@@ -65,24 +67,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     });
 
     this.detailMessage = ko.pureComputed(() => {
-      if (!this.userEntity()) {
-        return '';
-      }
-
-      const text = t('participantDevicesDetailHeadline', this.userEntity().first_name());
-
-      const textWithHtmlTags = /\{\{[^\}]+\}\}[^\{]+\{\{[^\}]+\}\}/;
-      const textWithinHtmlTags = /\{\{[^\}]+\}\}/gm;
-
-      const [pivot] = text.match(textWithHtmlTags) || [];
-      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
-
-      return sanitizedText.map(element => {
-        if (element.isStyled) {
-          element.text = element.text.replace(textWithinHtmlTags, '');
-        }
-        return element;
-      });
+      return this.userEntity() ? t('participantDevicesDetailHeadline', {user: this.userEntity().first_name()}) : '';
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
@@ -121,9 +106,6 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
         }
       });
     });
-    this.shouldUpdateScrollbar = ko
-      .computed(() => this.clientEntities() && this.showDeviceDetails() && this.isVisible())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
 
     this.privacyHowUrl = getPrivacyHowUrl();
     this.privacyWhyUrl = getPrivacyWhyUrl();

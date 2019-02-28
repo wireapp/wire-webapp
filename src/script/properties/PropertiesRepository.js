@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ConsentType from '../user/ConsentType';
 import ConsentValue from '../user/ConsentValue';
 import ReceiptMode from '../conversation/ReceiptMode';
@@ -42,7 +44,7 @@ class PropertiesRepository {
   constructor(propertiesService, selfService) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
-    this.logger = new z.util.Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
@@ -53,9 +55,10 @@ class PropertiesRepository {
   }
 
   checkPrivacyPermission() {
+    const isCheckConsentDisabled = !z.config.FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
 
-    return isPrivacyPreferenceSet
+    return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
@@ -103,7 +106,7 @@ class PropertiesRepository {
 
   /**
    * Initialize properties on app startup.
-   * @param {z.entity.User} selfUserEntity - Self user
+   * @param {User} selfUserEntity - Self user
    * @returns {Promise} Resolves when repository has been initialized
    */
   init(selfUserEntity) {
@@ -168,7 +171,7 @@ class PropertiesRepository {
    */
   propertiesUpdated(properties) {
     if (properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]) {
-      amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]);
+      amplify.publish(Logger.prototype.LOG_ON_DEBUG, properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]);
     }
     return true;
   }
@@ -278,7 +281,7 @@ class PropertiesRepository {
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
         break;
       case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-        amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updatedPreference);
+        amplify.publish(Logger.prototype.LOG_ON_DEBUG, updatedPreference);
         break;
       case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);

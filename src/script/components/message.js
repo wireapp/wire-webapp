@@ -19,6 +19,7 @@
 
 import moment from 'moment';
 
+import EphemeralStatusType from '../message/EphemeralStatusType';
 import {t} from 'utils/LocalizerUtil';
 
 class Message {
@@ -42,7 +43,6 @@ class Message {
     onClickCancelRequest,
     onLike,
     conversationRepository,
-    locationRepository,
     actionsViewModel,
   }) {
     this.message = message;
@@ -68,7 +68,7 @@ class Message {
     this.onLike = onLike;
 
     this.conversationRepository = conversationRepository;
-    this.locationRepository = locationRepository;
+    this.EphemeralStatusType = EphemeralStatusType;
 
     this.actionsViewModel = actionsViewModel;
 
@@ -235,7 +235,6 @@ const normalTemplate = `
         quote: message.quote(),
         selfId: selfId,
         conversationRepository: conversationRepository,
-        locationRepository: locationRepository,
         showDetail: onClickImage,
         focusMessage: onClickTimestamp,
         handleClickOnMessage: onClickMessage,
@@ -244,7 +243,7 @@ const normalTemplate = `
   <!-- /ko -->
 
   <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
-    <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+    <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
       <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
     <!-- /ko -->
 
@@ -252,16 +251,16 @@ const normalTemplate = `
       <!-- ko if: asset.is_image() -->
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
+            attr: {'data-uie-visible': $parent.message.visible() && !message.isObfuscated()},
             background_image: asset.resource(),
             click: (data, event) => $parent.onClickImage(message, event),
-            css: {'bg-color-ephemeral': message.isObfuscated()},
+            css: {'bg-color-ephemeral': $parent.message.isObfuscated()},
             " data-uie-name="go-image-detail">
-            <!-- ko if: message.isObfuscated() -->
+            <!-- ko if: $parent.message.isObfuscated() -->
               <div class="icon-library flex-center full-screen text-white"></div>
             <!-- /ko -->
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': message.isObfuscated()}"/>
-            <!-- ko ifnot: message.isObfuscated() -->
+            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': $parent.message.isObfuscated()}"/>
+            <!-- ko ifnot: $parent.message.isObfuscated() -->
               <span class="image-placeholder-icon">
                 <div class="three-dots">
                   <span></span>
@@ -275,23 +274,23 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render($parent.selfId(), $parent.accentColor()), event: {click: $parent.onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': $parent.message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': $parent.message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parents[1].message.isObfuscated()}" params="message: $parents[1].message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
+        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': $parent.message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': $parent.message.isObfuscated()}" params="message: message"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
+        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': $parent.message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
-        <location-asset params="asset: asset, locationRepository: $parent.locationRepository"></location-asset>
+        <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
     <!-- /ko -->
 
@@ -306,10 +305,10 @@ const normalTemplate = `
 
     <div class="message-body-actions">
       <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(message, event)"></span>
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
       <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}, showAllTimestamps"></time>
       <!-- /ko -->
       ${receiptStatusTemplate}
@@ -356,11 +355,7 @@ const unableToDecryptTemplate = `
     <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
-        <svg class="message-header-decrypt-reset-session-spinner svg-theme spin"
-             data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}"
-             width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
-          <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
-        </svg>
+        <loading-icon class="svg-accent-color" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
         <span class="message-header-decrypt-reset-session-action button-label text-theme"
               data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
@@ -423,9 +418,7 @@ const verificationTemplate = `
         <verified-icon></verified-icon>
       <!-- /ko -->
       <!-- ko ifnot: message.isTypeVerified() -->
-        <svg width="16" height="16">
-          <use xlink:href="#icon-not-verified"></use>
-        </svg>
+        <not-verified-icon></not-verified-icon>
       <!-- /ko -->
     </div>
     <div class="message-header-label">

@@ -17,13 +17,8 @@
  *
  */
 
-import resolveDependency from '../config/appResolver';
-
-import AudioRepository from '../audio/AudioRepository';
-import BackendClient from '../service/BackendClient';
-
-window.z = window.z || {};
-window.z.main = z.main || {};
+import {resolve, graph} from '../config/appResolver';
+import {enableLogging} from '../util/LoggerUtil';
 
 class Auth {
   /**
@@ -46,6 +41,7 @@ class Auth {
 // Setting up the Environment (DIST)
 //##############################################################################
 $(() => {
+  enableLogging();
   const defaultEnvironment = z.util.Environment.frontend.isProduction()
     ? z.service.BackendEnvironment.PRODUCTION
     : z.service.BackendEnvironment.DEVELOPMENT;
@@ -64,8 +60,8 @@ $(() => {
         webSocketUrl: window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com',
       };
 
-  const audioRepository = resolveDependency(AudioRepository);
-  const backendClient = resolveDependency(BackendClient);
+  const audioRepository = resolve(graph.AudioRepository);
+  const backendClient = resolve(graph.BackendClient);
   backendClient.setSettings(settings);
 
   window.wire = Object.assign(window.wire || {}, {

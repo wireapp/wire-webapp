@@ -17,15 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.permission = z.permission || {};
+import Logger from 'utils/Logger';
 
 /**
  * Permission repository to check browser permissions.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
  */
-z.permission.PermissionRepository = class PermissionRepository {
+export default class PermissionRepository {
   static get CONFIG() {
     return {
       MEDIA_TYPES: [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE],
@@ -33,11 +32,9 @@ z.permission.PermissionRepository = class PermissionRepository {
   }
   /**
    * Construct a new Permission Repository.
-   * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationService} conversationRepository - Repository for all conversation interactions
    */
-  constructor(callingRepository, conversationRepository) {
-    this.logger = new z.util.Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
+  constructor() {
+    this.logger = new Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
 
     this.permissionState = {
       [z.permission.PermissionType.CAMERA]: ko.observable(undefined),
@@ -89,4 +86,4 @@ z.permission.PermissionRepository = class PermissionRepository {
 
     return Promise.all(permissionPromises);
   }
-};
+}

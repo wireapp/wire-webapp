@@ -17,10 +17,12 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import * as StorageUtil from 'utils/StorageUtil';
-import resolveDependency from '../../config/appResolver';
-import AssetUploader from '../../assets/AssetUploader';
+import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
+import TimeUtil from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -37,7 +39,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      PING_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -51,7 +53,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.onWindowClick = this.onWindowClick.bind(this);
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
-    this.assetUploader = resolveDependency(AssetUploader);
+    this.assetUploader = resolve(graph.AssetUploader);
 
     this.messageHasher = messageHasher;
 
@@ -67,7 +69,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfUser = this.userRepository.self;
@@ -747,7 +749,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  sendMessageEdit(messageText, messageEntity, replyMessageEntity) {
+  sendMessageEdit(messageText, messageEntity) {
     const mentionEntities = this.currentMentions.slice();
     this.cancelMessageEditing();
 

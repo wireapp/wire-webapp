@@ -18,6 +18,7 @@
  */
 
 import BasePanelViewModel from './BasePanelViewModel';
+import TimeUtil from 'utils/TimeUtil';
 
 export default class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
@@ -46,26 +47,20 @@ export default class TimedMessagesViewModel extends BasePanelViewModel {
       times.sort((timeA, timeB) => timeA - timeB);
 
       const mappedTimes = times.map(time => ({
-        text: z.util.TimeUtil.formatDuration(time).text,
+        text: TimeUtil.formatDuration(time).text,
         value: time,
       }));
 
       if (hasCustomTime()) {
         mappedTimes.push({
           isCustom: true,
-          text: z.util.TimeUtil.formatDuration(this.currentMessageTimer()).text,
+          text: TimeUtil.formatDuration(this.currentMessageTimer()).text,
           value: this.currentMessageTimer(),
         });
       }
 
       return mappedTimes;
     });
-
-    this.isRendered = ko.observable(false).extend({notify: 'always'});
-
-    this.shouldUpdateScrollbar = ko
-      .pureComputed(() => this.isRendered())
-      .extend({notify: 'always', rateLimit: {method: 'notifyWhenChangesStop', timeout: 0}});
   }
 
   timedMessageChange(viewModel, event) {

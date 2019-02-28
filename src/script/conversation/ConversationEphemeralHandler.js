@@ -17,6 +17,12 @@
  *
  */
 
+import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+
+import EphemeralStatusType from '../message/EphemeralStatusType';
+import Logger from 'utils/Logger';
+import TimeUtil from 'utils/TimeUtil';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -24,10 +30,10 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   .AbstractConversationEventHandler {
   static get CONFIG() {
     return {
-      INTERVAL_TIME: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
+      INTERVAL_TIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
       TIMER_RANGE: {
-        MAX: z.util.TimeUtil.UNITS_IN_MILLIS.YEAR,
-        MIN: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND,
+        MAX: TimeUtil.UNITS_IN_MILLIS.YEAR,
+        MIN: TimeUtil.UNITS_IN_MILLIS.SECOND,
       },
     };
   }
@@ -53,7 +59,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = new z.util.Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
 
     this.timedMessages = ko.observableArray([]);
 
@@ -89,17 +95,17 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     }
 
     switch (messageEntity.ephemeral_status()) {
-      case z.message.EphemeralStatusType.TIMED_OUT: {
+      case EphemeralStatusType.TIMED_OUT: {
         this._timeoutEphemeralMessage(messageEntity);
         break;
       }
 
-      case z.message.EphemeralStatusType.ACTIVE: {
+      case EphemeralStatusType.ACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
         break;
       }
 
-      case z.message.EphemeralStatusType.INACTIVE: {
+      case EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
 
         const changes = {
@@ -117,7 +123,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   }
 
   validateMessage(messageEntity) {
-    const isEphemeralMessage = messageEntity.ephemeral_status() !== z.message.EphemeralStatusType.NONE;
+    const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
     if (!isEphemeralMessage) {
       return messageEntity;
     }
@@ -200,8 +206,15 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const obfuscatedAsset = new z.entity.Text(messageEntity.id);
     const obfuscatedPreviews = assetEntity.previews().map(linkPreview => {
       linkPreview.obfuscate();
-      const protoArticle = new z.proto.Article(linkPreview.url, linkPreview.title); // deprecated format
-      return new z.proto.LinkPreview(linkPreview.url, 0, protoArticle, linkPreview.url, linkPreview.title).encode64();
+      const protoArticle = new Article({permanentUrl: linkPreview.url, title: linkPreview.title}); // deprecated format
+      const linkPreviewProto = new LinkPreview({
+        article: protoArticle,
+        permanentUrl: linkPreview.url,
+        title: linkPreview.title,
+        url: linkPreview.url,
+        urlOffset: 0,
+      });
+      return z.util.arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
     obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);

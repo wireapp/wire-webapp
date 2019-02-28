@@ -17,12 +17,12 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import * as StorageUtil from 'utils/StorageUtil';
+import MediaRepository from './MediaRepository';
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaDevicesHandler = class MediaDevicesHandler {
+export default class MediaDevicesHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
@@ -32,11 +32,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
   /**
    * Construct a new MediaDevices handler.
-   * @param {z.media.MediaRepository} mediaRepository - Media repository referencing the other handlers
+   * @param {MediaRepository} mediaRepository - Media repository referencing the other handlers
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MediaDevicesHandler', z.config.LOGGER.OPTIONS);
 
     this.availableDevices = {
       audioInput: ko.observableArray([]),
@@ -74,7 +74,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   initializeMediaDevices() {
-    if (z.media.MediaRepository.supportsMediaDevices()) {
+    if (MediaRepository.supportsMediaDevices()) {
       this.getMediaDevices().then(() => {
         this._setCurrentDevices();
         this._subscribeToObservables();
@@ -468,4 +468,4 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
     this._updateCurrentDeviceIndex(deviceIndexObservable, availableDevices, selectedInputDeviceId);
   }
-};
+}

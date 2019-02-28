@@ -12,7 +12,7 @@
         <span data-bind="foreach: device().formatId()" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
       </div>
       <div class="preferences-devices-activated">
-        <div data-bind="foreach: activationDate"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
+        <div data-bind="html: activationDate()"></div>
       </div>
       <div class="preferences-devices-fingerprint-label" data-bind="text: t('preferencesDevicesFingerprint')"></div>
       <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
  *
  */
 
-import protobuf from 'protobufjs';
+import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
-z.util.protobuf = {
-  loadProtos: file => {
-    return new Promise((resolve, reject) => {
-      protobuf.loadProtoFile(file, (error, builder) => {
-        if (error) {
-          return reject(new Error(`Loading protocol buffer file failed: ${error.message}`));
-        }
-
-        z.proto = z.proto || {};
-        _.extend(z.proto, builder.build());
-        resolve();
-      });
-    });
+ko.components.register('panel-actions', {
+  template: `
+    <!-- ko foreach: items -->
+      <div class="panel__action-item" data-bind="click: click, attr: {'data-uie-name': identifier}">
+        <div data-bind="component: icon" class="panel__action-item__icon"></div>
+        <div class="panel__action-item__text" data-bind="text: label"></div>
+      </div> 
+    <!-- /ko -->
+  `,
+  viewModel: function({items = ko.observable([])}) {
+    this.items = items;
   },
-};
+});

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import JSZip from 'jszip';
 
 import StorageSchemata from '../storage/StorageSchemata';
@@ -48,7 +50,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = new z.util.Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
@@ -259,7 +261,7 @@ z.backup.BackupRepository = class BackupRepository {
 
   _chunkImport(importFunction, chunks) {
     return chunks.reduce((promise, chunk) => {
-      return promise.then(result => {
+      return promise.then(() => {
         if (this.isCanceled) {
           return Promise.reject(new z.backup.CancelError());
         }

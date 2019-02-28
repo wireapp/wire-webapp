@@ -28,7 +28,7 @@ describe('ConversationService', () => {
   const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(() => {
-    return test_factory.exposeConversationActors().then(storage_repository => {
+    return test_factory.exposeConversationActors().then(() => {
       conversation_service = TestFactory.conversation_service;
       conversation_mapper = new ConversationMapper();
       storage_service = TestFactory.storage_service;

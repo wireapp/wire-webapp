@@ -17,6 +17,8 @@
  *
  */
 
+import MediaStreamHandler from './MediaStreamHandler';
+
 window.z = window.z || {};
 window.z.media = z.media || {};
 
@@ -31,6 +33,6 @@ z.media.MediaStreamInfo = class MediaStreamInfo {
   }
 
   getType() {
-    return z.media.MediaStreamHandler.detectMediaStreamType(this.stream);
+    return MediaStreamHandler.detectMediaStreamType(this.stream);
   }
 };

@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -36,7 +38,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
     this.mainViewModel = mainViewModel;
     this.userRepository = repositories.user;
-    this.logger = new z.util.Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userRepository.connect_requests;
@@ -47,7 +49,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   /**
    * Called after each connection request is rendered.
    * @param {Object} elements - rendered objects
-   * @param {z.entity.User} request - Rendered connection request
+   * @param {User} request - Rendered connection request
    * @returns {undefined} No return value
    */
   afterRender(elements, request) {
@@ -58,7 +60,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
   /**
    * Click on accept.
-   * @param {z.entity.User} userEntity - User to accept connection request from
+   * @param {User} userEntity - User to accept connection request from
    * @returns {undefined} No return value
    */
   clickOnAccept(userEntity) {
@@ -68,7 +70,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
   /**
    * Click on ignore.
-   * @param {z.entity.User} userEntity - User to ignore connection request from
+   * @param {User} userEntity - User to ignore connection request from
    * @returns {undefined} No return value
    */
   clickOnIgnore(userEntity) {

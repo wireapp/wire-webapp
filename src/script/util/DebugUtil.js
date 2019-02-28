@@ -17,9 +17,16 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
+
+function downloadText(text, filename = 'default.txt') {
+  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+  return z.util.downloadFile(url, filename);
+}
 
 export default class DebugUtil {
   constructor(repositories) {
@@ -37,7 +44,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
   blockAllConnections() {
@@ -157,7 +164,7 @@ export default class DebugUtil {
 
     this.cryptographyRepository.cryptobox
       .serialize()
-      .then(cryptobox => z.util.downloadText(JSON.stringify(cryptobox), fileName));
+      .then(cryptobox => downloadText(JSON.stringify(cryptobox), fileName));
   }
 
   getNotificationFromStream(notificationId, notificationIdSince) {

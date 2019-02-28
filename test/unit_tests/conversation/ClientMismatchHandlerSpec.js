@@ -17,16 +17,17 @@
  *
  */
 
+import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import Conversation from 'src/script/entity/Conversation';
+
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
 
   let conversationEntity = undefined;
 
-  beforeAll(() => z.util.protobuf.loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto'));
-
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
-      conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      conversationEntity = new Conversation(z.util.createRandomUuid());
       return conversationRepository.save_conversation(conversationEntity);
     });
   });
@@ -42,8 +43,10 @@ describe('ClientMismatchHandler', () => {
     let janeRoe = undefined;
 
     beforeAll(() => {
-      genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
+      genericMessage = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        messageId: z.util.createRandomUuid(),
+      });
 
       johnDoe = {
         client_id: 'd13a2ec9b6436122',

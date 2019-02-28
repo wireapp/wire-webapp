@@ -94,21 +94,21 @@ z.ui.Context = (() => {
     _removeListeners();
   };
 
-  const _build = (entries, identifier) => {
+  const _build = (entries, defaultIdentifier) => {
     const menu = document.createElement('div');
     menu.classList.add('ctx-menu');
 
-    entries.forEach(entry => {
+    entries.forEach(({title, label, click, identifier}) => {
       const element = document.createElement('div');
-      element.setAttribute('data-uie-name', identifier || 'ctx-menu');
-      element.setAttribute('title', entry.title || entry.label || '');
+      element.setAttribute('data-uie-name', identifier || defaultIdentifier || 'ctx-menu-item');
+      element.setAttribute('title', title || label || '');
       element.classList.add('ctx-menu-item');
-      element.innerText = entry.label;
+      element.innerText = label;
 
       element.onclick = event => {
         event.stopPropagation();
         _cleanup();
-        entry.click();
+        click();
       };
 
       element.onmouseenter = () => {

@@ -17,6 +17,9 @@
  *
  */
 
+import Logger from 'utils/Logger';
+import AssetType from '../../assets/AssetType';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
@@ -25,7 +28,7 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
     super(id);
 
     this.correlation_id = '';
-    this.type = z.assets.AssetType.IMAGE;
+    this.type = AssetType.IMAGE;
 
     this.width = '0px';
     this.height = '0px';
@@ -36,6 +39,7 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
 
     // z.assets.AssetRemoteData
     this.resource = ko.observable();
+    this.logger = new Logger('z.entity.MediumImage', z.config.LOGGER.OPTIONS);
   }
 
   /**

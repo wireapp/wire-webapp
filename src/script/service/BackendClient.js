@@ -17,15 +17,18 @@
  *
  */
 
+import PromiseQueue from 'utils/PromiseQueue';
+import TimeUtil from 'utils/TimeUtil';
+
 export default class BackendClient {
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
-        REQUEST_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        RECHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: z.util.TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      QUEUE_CHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.MINUTE,
     };
   }
 
@@ -73,9 +76,9 @@ export default class BackendClient {
     this.logger = logger;
 
     this.connectivityTimeout = undefined;
-    this.connectivityQueue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
+    this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.requestQueue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
+    this.requestQueue = new PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
     this.queueState = ko.observable(z.service.QUEUE_STATE.READY);
     this.queueTimeout = undefined;
 

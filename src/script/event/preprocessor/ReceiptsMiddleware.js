@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import ReceiptMode from '../../conversation/ReceiptMode';
 import StatusType from '../../message/StatusType';
 
@@ -34,7 +36,7 @@ export default class ReceiptsMiddleware {
     this.eventService = eventService;
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = new z.util.Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
   }
 
   /**

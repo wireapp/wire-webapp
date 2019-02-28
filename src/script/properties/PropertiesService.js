@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 class PropertiesService {
   static get CONFIG() {
     return {
@@ -30,7 +32,7 @@ class PropertiesService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new z.util.Logger('z.properties.PropertiesService', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.properties.PropertiesService', z.config.LOGGER.OPTIONS);
   }
 
   /**

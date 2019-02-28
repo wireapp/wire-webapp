@@ -44,7 +44,13 @@ window.z.config = {
   LOGGER: {
     OPTIONS: {
       domains: {
-        'app.wire.com': () => 0,
+        'app.wire.com': () => {
+          const loggerNamespace = localStorage.getItem('debug');
+          if (loggerNamespace && loggerNamespace.startsWith('@wireapp')) {
+            return 300;
+          }
+          return 0;
+        },
         localhost: () => 300,
         'wire.ms': () => 300,
         'wire-webapp-staging.wire.com': () => 300,

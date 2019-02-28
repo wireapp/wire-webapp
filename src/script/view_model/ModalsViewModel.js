@@ -17,6 +17,8 @@
  *
  */
 
+import Logger from 'utils/Logger';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -36,7 +38,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   constructor() {
-    this.logger = new z.util.Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
     this.elementId = 'modals';
 
     this.modals = {};
