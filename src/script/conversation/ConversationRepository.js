@@ -1739,7 +1739,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  send_asset_remotedata(conversationEntity, file, messageId) {
+  send_asset_remotedata(conversationEntity, file, messageId, asImage) {
     let genericMessage;
 
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
@@ -1750,7 +1750,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options);
+        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options, asImage);
         return uploadPromise;
       })
       .then(asset => {
@@ -1793,9 +1793,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that should receive the file
    * @param {File} file - File to send
+   * @param {boolean} allowImageDetection - allow images to be treated as images (not files)
    * @returns {Promise} Resolves when the asset metadata was sent
    */
-  send_asset_metadata(conversation_et, file) {
+  send_asset_metadata(conversation_et, file, allowImageDetection) {
     return AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
@@ -1809,7 +1810,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           assetOriginal.audio = metadata;
         } else if (AssetMetaDataBuilder.isVideo(file)) {
           assetOriginal.video = metadata;
-        } else if (AssetMetaDataBuilder.isImage(file)) {
+        } else if (allowImageDetection && AssetMetaDataBuilder.isImage(file)) {
           assetOriginal.image = metadata;
         }
 
@@ -1993,41 +1994,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         amplify.publish(z.event.WebApp.CALL.STATE.DELETE, callMessageEntity.conversationId);
-      });
-  }
-
-  /**
-   * Sends image asset in specified conversation using v3 api.
-   *
-   * @param {Conversation} conversationEntity - Conversation to send image in
-   * @param {File|Blob} image - Image
-   * @returns {Promise} Resolves when the image was sent
-   */
-  send_image_asset(conversationEntity, image) {
-    const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-    const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-      retention,
-    };
-
-    return this.asset_service
-      .uploadImageAsset(image, options)
-      .then(asset => {
-        let genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-          messageId: z.util.createRandomUuid(),
-        });
-
-        if (conversationEntity.messageTimer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
-        }
-
-        return this._send_and_inject_generic_message(conversationEntity, genericMessage);
-      })
-      .catch(error => {
-        const message = `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`;
-        this.logger.error(message, error);
-        throw error;
       });
   }
 
@@ -2771,9 +2737,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   upload_images(conversation_et, images) {
-    if (this._can_upload_assets_to_conversation(conversation_et)) {
-      Array.from(images).forEach(image => this.send_image_asset(conversation_et, image));
-    }
+    this.upload_files(conversation_et, images, true);
   }
 
   /**
@@ -2781,11 +2745,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to post the files
    * @param {Array|FileList} files - files
+   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {undefined} No return value
    */
-  upload_files(conversation_et, files) {
+  upload_files(conversation_et, files, asImage) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      Array.from(files).forEach(file => this.upload_file(conversation_et, file));
+      Array.from(files).forEach(file => this.upload_file(conversation_et, file, asImage));
     }
   }
 
@@ -2794,18 +2759,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to post the file
    * @param {Object} file - File object
+   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {Promise} Resolves when file was uploaded
    */
-  upload_file(conversation_et, file) {
+  upload_file(conversation_et, file, asImage) {
     let message_id;
     const upload_started = Date.now();
 
-    return this.send_asset_metadata(conversation_et, file)
+    return this.send_asset_metadata(conversation_et, file, asImage)
       .then(({id}) => {
         message_id = id;
         return this.sendAssetPreview(conversation_et, file, message_id);
       })
-      .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
+      .then(() => this.send_asset_remotedata(conversation_et, file, message_id, asImage))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);

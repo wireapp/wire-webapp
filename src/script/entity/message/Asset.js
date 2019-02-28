@@ -88,8 +88,3 @@ export default class Asset {
     return false;
   }
 }
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.Asset = Asset;
