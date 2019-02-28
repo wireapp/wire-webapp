@@ -58,7 +58,7 @@
     "@babel/preset-env": "7.3.4",
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.3.3",
-    "@types/enzyme": "3.1.17",
+    "@types/enzyme": "3.9.0",
     "@types/express-sitemap-xml": "1.0.1",
     "@types/express-useragent": "0.2.21",
     "@types/hbs": "4.0.0",
