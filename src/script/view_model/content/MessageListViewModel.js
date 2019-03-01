@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import TimeUtil from 'utils/TimeUtil';
+import {scrollEnd, scrollToBottom, scrollBy, isScrollable} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
@@ -35,6 +36,7 @@ import Conversation from '../../entity/Conversation';
 class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
+    this.onMessageContainerInitiated = this.onMessageContainerInitiated.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
@@ -115,6 +117,10 @@ class MessageListViewModel {
     });
   }
 
+  onMessageContainerInitiated(messagesContainer) {
+    this.messagesContainer = messagesContainer;
+  }
+
   /**
    * Mark conversation as read if window has focus
    * @param {Conversation} conversation_et - Conversation entity to mark as read
@@ -143,28 +149,27 @@ class MessageListViewModel {
       this.messagesChangeSubscription.dispose();
     }
     this.conversation_last_read_timestamp(false);
-    this.messagesContainer = undefined;
     window.removeEventListener('resize', this._handleWindowResize);
   }
 
   _shouldStickToBottom() {
     const messagesContainer = this.getMessagesContainer();
-    const scrollPosition = Math.ceil(messagesContainer.scrollTop());
-    const scrollEnd = Math.ceil(messagesContainer.scrollEnd());
-    return scrollPosition > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+    const scrollPosition = Math.ceil(messagesContainer.scrollTop);
+    const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
+    return scrollPosition > scrollEndValue - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
   _handleWindowResize() {
     if (this._shouldStickToBottom()) {
-      this.getMessagesContainer().scrollToBottom();
+      scrollToBottom(this.getMessagesContainer());
     }
   }
 
   _handleInputResize(inputSizeDiff) {
     if (inputSizeDiff) {
-      this.getMessagesContainer().scrollBy(inputSizeDiff);
+      scrollBy(this.getMessagesContainer(), inputSizeDiff);
     } else if (this._shouldStickToBottom()) {
-      this.getMessagesContainer().scrollToBottom();
+      scrollToBottom(this.getMessagesContainer());
     }
   }
 
@@ -220,9 +225,6 @@ class MessageListViewModel {
   }
 
   getMessagesContainer() {
-    if (!this.messagesContainer) {
-      this.messagesContainer = $('.message-list');
-    }
     return this.messagesContainer;
   }
 
@@ -244,7 +246,7 @@ class MessageListViewModel {
     return new Promise(resolve => {
       window.setTimeout(() => {
         // Reset scroll position
-        messages_container.scrollTop(0);
+        messages_container.scrollTop = 0;
 
         if (messageEntity) {
           this.focusMessage(messageEntity.id);
@@ -253,13 +255,13 @@ class MessageListViewModel {
           if (unread_message.length) {
             const unreadMarkerPosition = unread_message.parents('.message').position();
 
-            messages_container.scrollBy(unreadMarkerPosition.top);
+            scrollBy(messages_container, unreadMarkerPosition.top);
           } else {
-            messages_container.scrollToBottom();
+            scrollToBottom(messages_container);
           }
         }
 
-        if (!messages_container.isScrollable() && !this._conversationHasExtraMessages(this.conversation())) {
+        if (!isScrollable(messages_container) && !this._conversationHasExtraMessages(this.conversation())) {
           this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
@@ -318,14 +320,14 @@ class MessageListViewModel {
 
       // Scroll to bottom if self user send the message
       if (lastMessage.from === this.selfUser().id) {
-        window.requestAnimationFrame(() => messages_container.scrollToBottom());
+        window.requestAnimationFrame(() => scrollToBottom(messages_container));
         return;
       }
     }
 
     // Scroll to the end of the list if we are under a certain threshold
     if (shouldStickToBottom) {
-      window.requestAnimationFrame(() => messages_container.scrollToBottom());
+      window.requestAnimationFrame(() => scrollToBottom(messages_container));
 
       if (document.hasFocus()) {
         this.conversation_repository.markAsRead(this.conversation());
@@ -333,7 +335,7 @@ class MessageListViewModel {
     }
 
     // Mark as read when conversation is not scrollable
-    if (!messages_container.isScrollable()) {
+    if (!isScrollable(messages_container)) {
       this._mark_conversation_as_read_on_focus(this.conversation());
     }
   }
@@ -344,7 +346,7 @@ class MessageListViewModel {
    */
   loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const [messagesContainer] = this.getMessagesContainer().children();
+    const [messagesContainer] = this.getMessagesContainer().children;
 
     if (shouldPullMessages && messagesContainer) {
       const initialListHeight = messagesContainer.scrollHeight;
@@ -352,7 +354,7 @@ class MessageListViewModel {
       return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
-          this.getMessagesContainer().scrollTop(newListHeight - initialListHeight);
+          this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
         }
       });
     }
@@ -395,12 +397,13 @@ class MessageListViewModel {
     loadMessagePromise.then(() => {
       z.util.afterRender(() => {
         const messagesContainer = this.getMessagesContainer();
-        const messageElement = messagesContainer.find(`.message[data-uie-uid="${messageId}"]`);
+        const messageElement = messagesContainer.querySelector(`.message[data-uie-uid="${messageId}"]`);
 
-        if (messageElement.length) {
-          messageElement.removeClass('message-marked');
-          messagesContainer.scrollBy(messageElement.offset().top - messagesContainer.height() / 2);
-          messageElement.addClass('message-marked');
+        if (messageElement) {
+          messageElement.classList.remove('message-marked');
+          const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
+          scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
+          messageElement.classList.add('message-marked');
         }
       });
     });

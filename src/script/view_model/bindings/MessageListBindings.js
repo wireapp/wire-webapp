@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import moment from 'moment';
-import {debounce} from 'underscore';
 
 import 'jquery-mousewheel';
 import viewportObserver from '../../ui/viewportObserver';
@@ -81,19 +80,10 @@ ko.bindingHandlers.showAllTimestamps = {
 
 ko.bindingHandlers.infinite_scroll = {
   init(scrollingElement, params) {
-    const {onHitTop, onHitBottom} = params();
-
-    let scrollListenerEnabled = false;
-    const disableScrollListener = debounce(() => (scrollListenerEnabled = false), 500);
-    const temporarlyEnableScrollListener = () => {
-      scrollListenerEnabled = true;
-      disableScrollListener();
-    };
+    const {onHitTop, onHitBottom, onInit} = params();
+    onInit(scrollingElement);
 
     const onScroll = event => {
-      if (!scrollListenerEnabled) {
-        return;
-      }
       const element = event.target;
 
       // On some HiDPI screens scrollTop returns a floating point number instead of an integer
@@ -111,11 +101,6 @@ ko.bindingHandlers.infinite_scroll = {
     };
 
     const onMouseWheel = event => {
-      /**
-       * To avoid reacting to programmatically triggered scrolls, we just want to enable the scroll listener when there is a mouse event before it.
-       * The strategy here is to enable the scroll listener when there is a mouse event and automatically disable the listener after 500ms of inactivity of the mouse.
-       */
-      temporarlyEnableScrollListener();
       const element = event.currentTarget;
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (isScrollable) {
