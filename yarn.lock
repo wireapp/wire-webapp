@@ -1590,10 +1590,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.9":
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.9.tgz#52c9740b00064d14efef6774f8c4d282e6a625e5"
-  integrity sha512-Br3e472rYF3qqnG+uROUQXg/0Y/PBIaB/V79ccy4c1O6kYt34hj05vbgylNyazSGFXr2rI6hZ9WRTan6SlzNZA==
+"@wireapp/react-ui-kit@5.0.15":
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.15.tgz#67bb365e058f6a2ebdfae736eac79904532bdc5d"
+  integrity sha512-UycPCUYRSQEguJa/RHyR5/9uNzM5tUt01M0wEJGrGFeHUc8ADQdyvC8pJYmXuca5QuNW+umI24q+qfg+XPTfqg==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"
@@ -3082,7 +3082,7 @@ color-string@^1.4.0, color-string@^1.5.2:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
 
-color@3.1.0:
+color@3.1.0, color@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/color/-/color-3.1.0.tgz#d8e9fb096732875774c84bf922815df0308d0ffc"
   integrity sha512-CwyopLkuRYO5ei2EpzpIh6LqJMt6Mt+jZhO5VI5f/wJLZriXQE32/SSqzmrh+QB+AZT81Cj8yv+7zwToW8ahZg==
@@ -3106,14 +3106,6 @@ color@^1.0.3:
   dependencies:
     color-convert "^1.8.2"
     color-string "^1.4.0"
-
-color@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/color/-/color-3.0.0.tgz#d920b4328d534a3ac8295d68f7bd4ba6c427be9a"
-  integrity sha512-jCpd5+s0s0t7p3pHQKpnJ0TpQKKdleP71LWcA0aqiljpiuAkOSUFN/dyH8ZwF0hRmFlrIuRhufds1QyEP9EB+w==
-  dependencies:
-    color-convert "^1.9.1"
-    color-string "^1.5.2"
 
 colors@0.5.x:
   version "0.5.1"
