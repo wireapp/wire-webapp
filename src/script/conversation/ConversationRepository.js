@@ -1112,19 +1112,34 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Mark conversation as read.
+   * Sends a message to backend that the conversation has been fully read.
+   * The message will allow all the self clients to synchronize conversation read state.
+   *
    * @param {Conversation} conversationEntity - Conversation to be marked as read
    * @returns {undefined} No return value
    */
   markAsRead(conversationEntity) {
-    if (conversationEntity) {
-      const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
-      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
-      if (isNotMarkedAsRead && !this.block_event_handling()) {
-        this._updateLastReadTimestamp(conversationEntity);
-        amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
-      }
-    }
+    const conversationId = conversationEntity.id;
+    const timestamp = conversationEntity.last_read_timestamp();
+    const protoLastRead = new LastRead({
+      conversationId,
+      lastReadTimestamp: timestamp,
+    });
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
+      messageId: z.util.createRandomUuid(),
+    });
+
+    const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
+    this.sendGenericMessageToConversation(eventInfoEntity)
+      .then(() => {
+        this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
+      })
+      .catch(error => {
+        const errorMessage = 'Failed to update last read timestamp';
+        this.logger.error(`${errorMessage}: ${error.message}`, error);
+        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
+      });
   }
 
   /**
@@ -1687,40 +1702,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         title: titleText,
       },
     });
-  }
-
-  /**
-   * Update last read of conversation using timestamp.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation to update
-   * @returns {undefined} No return value
-   */
-  _updateLastReadTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
-    const conversationId = conversationEntity.id;
-
-    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ)) {
-      const protoLeastRead = new LastRead({
-        conversationId,
-        lastReadTimestamp: conversationEntity.last_read_timestamp(),
-      });
-      const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLeastRead,
-        messageId: z.util.createRandomUuid(),
-      });
-
-      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
-      this.sendGenericMessageToConversation(eventInfoEntity)
-        .then(() => {
-          this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
-        })
-        .catch(error => {
-          const errorMessage = 'Failed to update last read timestamp';
-          this.logger.error(`${errorMessage}: ${error.message}`, error);
-          Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
-        });
-    }
   }
 
   /**
