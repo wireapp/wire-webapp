@@ -7,7 +7,7 @@
                     attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
          data-uie-name="item-message">
 
-      <div class="message-header message-timestamp" data-bind="css: get_timestamp_class($data)">
+      <div class="message-header message-timestamp" data-bind="css: get_timestamp_class(message)">
         <div class="message-header-icon">
           <span class="message-unread-dot dot-md bg-theme"></span>
         </div>

@@ -73,7 +73,7 @@ class MessageListViewModel {
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
-    this.conversation_last_read_timestamp = ko.observable(undefined);
+    this.conversation_last_read_timestamp = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -124,7 +124,7 @@ class MessageListViewModel {
     if (this.messagesChangeSubscription) {
       this.messagesChangeSubscription.dispose();
     }
-    this.conversation_last_read_timestamp(false);
+    this.conversation_last_read_timestamp = undefined;
     window.removeEventListener('resize', this._handleWindowResize);
   }
 
@@ -168,7 +168,7 @@ class MessageListViewModel {
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
-      this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
+      this.conversation_last_read_timestamp = this.conversation().last_read_timestamp();
     }
 
     conversationEntity.is_loaded(false);
@@ -438,17 +438,17 @@ class MessageListViewModel {
   }
 
   get_timestamp_class(message_et) {
-    const last_message = this.conversation().get_previous_message(message_et);
-    if (last_message) {
+    const lastReadMessage = this.conversation().get_previous_message(message_et);
+    if (lastReadMessage) {
       if (message_et.is_call()) {
         return '';
       }
 
-      if (last_message.timestamp() === this.conversation_last_read_timestamp()) {
+      if (lastReadMessage.timestamp() === this.conversation_last_read_timestamp) {
         return 'message-timestamp-visible message-timestamp-unread';
       }
 
-      const last = moment(last_message.timestamp());
+      const last = moment(lastReadMessage.timestamp());
       const current = moment(message_et.timestamp());
 
       if (!last.isSame(current, 'day')) {
