@@ -65,7 +65,7 @@
           </div>
 
           <!-- ko if: isTeam() -->
-            <div class="preferences-account-team preferences-section-account-space-after" data-bind="text: teamName()" data-uie-name="status-team"></div>
+            <div class="preferences-account-team preferences-section-account-space-after" data-bind="html: teamName()" data-uie-name="status-team"></div>
           <!-- /ko -->
 
           <div class="preferences-account-mail" data-bind="text: selfUser().email()" data-uie-name="enter-email"></div>
