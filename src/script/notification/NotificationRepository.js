@@ -150,6 +150,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       this._notifySound(messageEntity);
       return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
     }
+    return Promise.resolve();
   }
 
   // Remove notifications from the queue that are no longer unread
