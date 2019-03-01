@@ -19,8 +19,10 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import Color from 'color';
 import {GlobalStyle} from '../GlobalStyle';
 import {COLOR} from '../Identity';
+import {defaultTransition} from '../Identity/motions';
 import {filterProps} from '../util';
 
 export interface StyledAppContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
@@ -30,9 +32,6 @@ export interface StyledAppContainerProps<T = HTMLDivElement> extends React.HTMLP
 const StyledAppContainerStyle: <T>(props: StyledAppContainerProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.GRAY_LIGHTEN_88,
 }) => ({
-  '*': {
-    boxSizing: 'border-box',
-  },
   MozOsxFontSmoothing: 'grayscale',
   WebkitFontSmoothing: 'antialiased',
   backgroundColor: backgroundColor,
@@ -43,6 +42,29 @@ const StyledAppContainerStyle: <T>(props: StyledAppContainerProps<T>) => ObjectI
   fontWeight: 300,
   lineHeight: 1.5,
   minHeight: '100vh',
+
+  '*': {
+    boxSizing: 'border-box',
+  },
+  a: {
+    color: COLOR.LINK,
+    fontWeight: 400,
+    textDecoration: 'none',
+    transition: defaultTransition,
+
+    '&:hover': {
+      color: Color(COLOR.LINK)
+        .mix(Color(COLOR.BLACK), 0.16)
+        .toString(),
+      cursor: 'pointer',
+    },
+    '&:visited,&:link,&:active': {
+      color: COLOR.LINK,
+    },
+  },
+  'b, strong': {
+    fontWeight: 600,
+  },
 });
 
 const filterStyledAppContainerProps = (props: Object) => filterProps(props, ['backgroundColor']);
