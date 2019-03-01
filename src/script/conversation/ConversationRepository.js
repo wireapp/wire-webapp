@@ -1133,6 +1133,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
     this.sendGenericMessageToConversation(eventInfoEntity)
       .then(() => {
+        amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
         this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
       })
       .catch(error => {
