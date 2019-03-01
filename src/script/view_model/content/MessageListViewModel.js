@@ -19,8 +19,7 @@
 
 import Logger from 'utils/Logger';
 
-import TimeUtil from 'utils/TimeUtil';
-import {scrollEnd, scrollToBottom, scrollBy, isScrollable} from 'utils/scroll-helpers';
+import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
@@ -55,6 +54,7 @@ class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
+    this.serverTimeRepository = repositories.serverTime;
     this.userRepository = repositories.user;
     this.logger = new Logger('MessageListViewModel', z.config.LOGGER.OPTIONS);
 
@@ -74,9 +74,6 @@ class MessageListViewModel {
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
-
-    // Store conversation to mark as read when browser gets focus
-    this.mark_as_read_on_focus = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -101,15 +98,6 @@ class MessageListViewModel {
 
     this.messagesContainer = undefined;
 
-    $(window).on('focus', () => {
-      if (this.mark_as_read_on_focus) {
-        window.setTimeout(() => {
-          this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
-          this.mark_as_read_on_focus = undefined;
-        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
-      }
-    });
-
     this.showInvitePeople = ko.pureComputed(() => {
       return (
         this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
@@ -119,18 +107,6 @@ class MessageListViewModel {
 
   onMessageContainerInitiated(messagesContainer) {
     this.messagesContainer = messagesContainer;
-  }
-
-  /**
-   * Mark conversation as read if window has focus
-   * @param {Conversation} conversation_et - Conversation entity to mark as read
-   * @returns {undefined} No return value
-   */
-  _mark_conversation_as_read_on_focus(conversation_et) {
-    if (document.hasFocus()) {
-      return this.conversation_repository.markAsRead(conversation_et);
-    }
-    this.mark_as_read_on_focus = conversation_et;
   }
 
   /**
@@ -261,10 +237,6 @@ class MessageListViewModel {
           }
         }
 
-        if (!isScrollable(messages_container) && !this._conversationHasExtraMessages(this.conversation())) {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        }
-
         window.addEventListener('resize', this._handleWindowResize);
 
         let shouldStickToBottomOnMessageAdd;
@@ -328,15 +300,6 @@ class MessageListViewModel {
     // Scroll to the end of the list if we are under a certain threshold
     if (shouldStickToBottom) {
       window.requestAnimationFrame(() => scrollToBottom(messages_container));
-
-      if (document.hasFocus()) {
-        this.conversation_repository.markAsRead(this.conversation());
-      }
-    }
-
-    // Mark as read when conversation is not scrollable
-    if (!isScrollable(messages_container)) {
-      this._mark_conversation_as_read_on_focus(this.conversation());
     }
   }
 
@@ -563,6 +526,19 @@ class MessageListViewModel {
       this.readMessagesBuffer.push({conversation: conversationEntity, message: messageEntity});
     };
 
+    const updateLastRead = () => {
+      const isLastMessage = messageEntity.timestamp() >= conversationEntity.last_server_timestamp();
+      const timestamp = isLastMessage
+        ? conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp())
+        : messageEntity.timestamp();
+
+      conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      if (isLastMessage) {
+        this.conversation_repository.markAsRead(conversationEntity);
+      }
+    };
+
     const startTimer = () => {
       if (messageEntity.conversation_id === conversationEntity.id) {
         this.conversation_repository.checkMessageTimer(messageEntity);
@@ -586,8 +562,11 @@ class MessageListViewModel {
       }
     }
 
-    if (isUnreadMessage && isNotOwnMessage && shouldSendReadReceipt) {
-      callbacks.push(sendReadReceipt);
+    if (isUnreadMessage && isNotOwnMessage) {
+      callbacks.push(updateLastRead);
+      if (shouldSendReadReceipt) {
+        callbacks.push(sendReadReceipt);
+      }
     }
 
     if (!callbacks.length) {
