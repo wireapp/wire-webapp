@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.15...@wireapp/react-ui-kit@5.0.16) (2019-03-01)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Add global styles ([#1590](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1590)) ([6bc1ebb](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6bc1ebb))
+
+
+
+
+
 ## [5.0.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.14...@wireapp/react-ui-kit@5.0.15) (2019-02-28)
 
 
