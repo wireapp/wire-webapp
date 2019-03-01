@@ -37,11 +37,13 @@ describe('messageListBindings', () => {
         const context = {
           onHitBottom: () => {},
           onHitTop: () => {},
+          onInit: () => {},
         };
 
         spyOn(context, 'onHitTop');
         spyOn(context, 'onHitBottom');
-        const boundElement = `<div style='height: 10px; overflow: scroll' class="scroll" data-bind="{infinite_scroll: {onHitTop, onHitBottom}}">
+        spyOn(context, 'onInit');
+        const boundElement = `<div style='height: 10px; overflow: scroll' class="scroll" data-bind="{infinite_scroll: {onHitTop, onHitBottom, onInit}}">
         <div style="height: ${contentHeight}px;"></div>
       </div>`;
 
@@ -53,7 +55,8 @@ describe('messageListBindings', () => {
           scrollingElement.scrollTop = scrollTop;
           return new Promise(resolve => {
             setTimeout(() => {
-              Object.keys(context).forEach(callback => {
+              expect(context.onInit).toHaveBeenCalledWith(scrollingElement);
+              ['onHitBottom', 'onHitTop'].forEach(callback => {
                 if (expectedCalls.includes(callback)) {
                   expect(context[callback]).toHaveBeenCalled();
                 } else {
