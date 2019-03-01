@@ -17,8 +17,10 @@
  *
  */
 
+import ko from 'knockout';
 import moment from 'moment';
 
+import 'jquery-mousewheel';
 import viewportObserver from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
@@ -73,6 +75,52 @@ ko.bindingHandlers.showAllTimestamps = {
 
     element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
     element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
+  },
+};
+
+ko.bindingHandlers.infinite_scroll = {
+  init(scrollingElement, params) {
+    const {onHitTop, onHitBottom, onInit} = params();
+    onInit(scrollingElement);
+
+    const onScroll = event => {
+      const element = event.target;
+
+      // On some HiDPI screens scrollTop returns a floating point number instead of an integer
+      // https://github.com/jquery/api.jquery.com/issues/608
+      const scrollPosition = Math.ceil(element.scrollTop);
+      const scrollEnd = element.offsetHeight + scrollPosition;
+      const hitTop = scrollPosition <= 0;
+      const hitBottom = scrollEnd >= element.scrollHeight;
+
+      if (hitTop) {
+        onHitTop();
+      } else if (hitBottom) {
+        onHitBottom();
+      }
+    };
+
+    const onMouseWheel = event => {
+      const element = event.currentTarget;
+      const isScrollable = element.scrollHeight > element.clientHeight;
+      if (isScrollable) {
+        // if the element is scrollable, the scroll event will take the relay
+        return true;
+      }
+      const isScrollingUp = event.deltaY > 0;
+      if (isScrollingUp) {
+        return onHitTop();
+      }
+      return onHitBottom();
+    };
+
+    scrollingElement.addEventListener('scroll', onScroll);
+    $(scrollingElement).on('mousewheel', onMouseWheel);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(scrollingElement, () => {
+      scrollingElement.removeEventListener('scroll', onScroll);
+      $(scrollingElement).off('mousewheel', onMouseWheel);
+    });
   },
 };
 

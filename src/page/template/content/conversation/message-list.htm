@@ -1,4 +1,4 @@
- <div id="message-list" class="message-list" data-bind="with: $root.messageList, fadingscrollbar, event: {mousewheel: $root.messageList.onMouseWheel, scroll: $root.messageList.onScroll}">
+ <div id="message-list" class="message-list" data-bind="with: $root.messageList, fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated}">
   <div class="messages"
         data-bind="css: {'flex-center': verticallyCenterMessage},
                    foreach: {data: conversation().messages_visible, as: 'message', noChildContext: true}">

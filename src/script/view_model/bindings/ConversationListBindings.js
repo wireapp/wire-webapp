@@ -17,29 +17,30 @@
  *
  */
 
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'utils/scroll-helpers';
+
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function() {
-  const calculate_borders = _.throttle($element => {
-    if ($element) {
+  const calculate_borders = _.throttle(element => {
+    if (element) {
       window.requestAnimationFrame(() => {
-        const list_column = $($element).parent();
-        if ($element.height() <= 0 || !$element.isScrollable()) {
+        const list_column = $(element).parent();
+        if (element.offsetHeight <= 0 || !isScrollable(element)) {
           return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
         }
 
-        list_column.toggleClass('left-list-center-border-top', !$element.isScrolledTop());
-        list_column.toggleClass('left-list-center-border-bottom', !$element.isScrolledBottom());
+        list_column.toggleClass('left-list-center-border-top', !isScrolledTop(element));
+        list_column.toggleClass('left-list-center-border-bottom', !isScrolledBottom(element));
       });
     }
   }, 100);
 
   return {
     init(element) {
-      const $element = $(element);
-      $element.on('scroll', () => calculate_borders($element));
-      $('.left').on('click', () => calculate_borders($element));
-      $(window).on('resize', () => calculate_borders($element));
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => calculate_borders($element));
+      element.addEventListener('scroll', () => calculate_borders(element));
+      $('.left').on('click', () => calculate_borders(element));
+      $(window).on('resize', () => calculate_borders(element));
+      amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => calculate_borders(element));
     },
 
     update(element, valueAccessor) {

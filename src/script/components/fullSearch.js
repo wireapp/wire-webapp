@@ -17,6 +17,8 @@
  *
  */
 
+import {isScrolledBottom} from 'utils/scroll-helpers';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -77,7 +79,7 @@ z.components.FullSearch = class FullSearch {
 
     // binding?
     $('.collection-list').on('scroll', event => {
-      const showAdditionalMessages = $(event.currentTarget).isScrolledBottom() && this.messageEntities.length;
+      const showAdditionalMessages = isScrolledBottom(event.currentTarget) && this.messageEntities.length;
       if (showAdditionalMessages) {
         const additionalMessageEntities = this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES);
         z.util.koArrayPushAll(this.visibleMessageEntities, additionalMessageEntities);

@@ -220,7 +220,6 @@ import GroupCreationViewModelGlobal from '../view_model/content/GroupCreationVie
 import HistoryExportViewModelGlobal from '../view_model/content/HistoryExportViewModel.js';
 import HistoryImportViewModelGlobal from '../view_model/content/HistoryImportViewModel.js';
 import InputBarViewModelGlobal from '../view_model/content/InputBarViewModel.js';
-import MessageListViewModelGlobal from '../view_model/content/MessageListViewModel.js';
 import PreferencesAboutViewModelGlobal from '../view_model/content/PreferencesAboutViewModel.js';
 import PreferencesAccountViewModelGlobal from '../view_model/content/PreferencesAccountViewModel.js';
 import PreferencesAVViewModelGlobal from '../view_model/content/PreferencesAVViewModel.js';
