@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.16...@wireapp/react-ui-kit@5.0.17) (2019-03-04)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Raise prio for Link CSS ([#1591](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1591)) ([ce64aaa](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/ce64aaa))
+
+
+
+
+
 ## [5.0.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.15...@wireapp/react-ui-kit@5.0.16) (2019-03-01)
 
 
