@@ -27,8 +27,6 @@
 }
 
 .progress-bar {
-  @light: fade(#000, 4%);
-  @dark: fade(#000, 8%);
   @rotation: 127deg;
   @size: 14px;
   @rotatedSize: (abs(cos(@rotation)) + abs(sin(@rotation))) * @size;
@@ -39,7 +37,14 @@
   border: none;
   animation: move 0.5s linear infinite;
   -webkit-appearance: none;
-  background-image: linear-gradient(@rotation, @light, @light 5px, @dark 7px, @dark 12px, @light 14px);
+  background-image: linear-gradient(
+    @rotation,
+    var(--background-fade-8),
+    var(--background-fade-8) 5px,
+    var(--background-fade-16) 7px,
+    var(--background-fade-16) 12px,
+    var(--background-fade-8) 14px
+  );
   background-size: @rotatedSize 4px;
   border-radius: 2px;
 
