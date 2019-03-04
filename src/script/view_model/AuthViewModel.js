@@ -54,7 +54,6 @@ class AuthViewModel {
   constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
-    this.elementId = 'auth-page';
     this.logger = new Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.authRepository = authComponent.repository;
@@ -214,13 +213,14 @@ class AuthViewModel {
       },
     };
 
-    ko.applyBindings(this, document.getElementById(this.elementId));
+    const elementSelector = '.auth-page';
+    ko.applyBindings(this, document.querySelector(elementSelector));
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
 
     this._init_base();
-    $(`.${this.elementId}`).show();
+    $(elementSelector).show();
     $('.auth-page-container').css({display: 'flex'});
   }
 
