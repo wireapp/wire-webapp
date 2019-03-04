@@ -171,7 +171,7 @@ ko.components.register('mention-suggestions', {
     <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position(), simplebar: {trigger: shouldUpdateScrollbar, onInit: onInitSimpleBar}">
       <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion', noChildContext: true}">
         <div class="mention-suggestion-list__item" data-bind="
-          click: onSuggestionClick,
+          click: (data, event) => onSuggestionClick(suggestion, event),
           event: { mouseenter: onMouseEnter},
           css: {'mention-suggestion-list__item--highlighted': suggestion === selectedSuggestion()},
           attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === selectedSuggestion()}" data-uie-name="item-mention-suggestion">

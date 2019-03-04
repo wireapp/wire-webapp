@@ -355,41 +355,39 @@
   width: @conversation-message-sender-width;
 }
 
-.message-asset-image {
+image-asset {
+  display: flex;
   margin-top: 16px;
   margin-bottom: 24px;
 
-  .image {
+  .image-asset {
     position: relative;
-    display: inline-block;
-    max-width: 100%;
-  }
-
-  .image-loading {
-    .image-element {
-      cursor: default;
-    }
-    .image-placeholder-icon {
-      display: flex;
-    }
-  }
-
-  .image-element {
-    max-width: 100%;
-    max-height: 80vh;
     cursor: pointer;
 
-    &.image-ephemeral {
+    &--no-image {
+      background-color: var(--foreground-fade-8);
       cursor: default;
-      opacity: 0;
+    }
+
+    image-icon svg {
+      fill: white;
+    }
+
+    .image-element {
+      position: relative;
+      max-width: 100%;
+      max-height: 80vh;
+
+      &.image-ephemeral {
+        cursor: default;
+        opacity: 0;
+      }
     }
   }
 
-  .image-placeholder-icon {
-    .asset-container-style;
-    .full-screen;
-
-    display: none;
+  asset-loader {
+    display: flex;
+    height: 100%;
     align-items: center;
     justify-content: center;
   }

@@ -33,11 +33,14 @@ export default class AssetUploader {
    * @param {string} messageId - id of the message the asset belongs to
    * @param {Blob} file - file to upload
    * @param {Object} options - upload options
+   * @param {boolean} asImage - force the asset to be considered an image
    * @returns {Promise<Asset>} Promise that resolves when the upload is done
    */
-  uploadAsset(messageId, file, options) {
-    return this.assetService
-      .uploadAsset(file, options, xhr => {
+  uploadAsset(messageId, file, options, asImage) {
+    const uploadFunction = asImage ? this.assetService.uploadImageAsset : this.assetService.uploadAsset;
+
+    return uploadFunction
+      .call(this.assetService, file, options, xhr => {
         const progressObservable = ko.observable(0);
         uploadQueue.push({messageId, progress: progressObservable, xhr});
         xhr.upload.onprogress = event => {

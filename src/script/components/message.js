@@ -22,6 +22,13 @@ import moment from 'moment';
 import EphemeralStatusType from '../message/EphemeralStatusType';
 import {t} from 'utils/LocalizerUtil';
 
+import './asset/audioAsset';
+import './asset/fileAsset';
+import './asset/imageAsset';
+import './asset/linkPreviewAsset';
+import './asset/locationAsset';
+import './asset/videoAsset';
+
 class Message {
   constructor({
     message,
@@ -249,35 +256,14 @@ const normalTemplate = `
 
     <!-- ko foreach: {data: message.assets, as: 'asset', noChildContext: true} -->
       <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image">
-          <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': message.visible() && !message.isObfuscated()},
-            background_image: asset.resource(),
-            click: (data, event) => onClickImage(message, event),
-            css: {'bg-color-ephemeral': message.isObfuscated()},
-            " data-uie-name="go-image-detail">
-            <!-- ko if: message.isObfuscated() -->
-              <div class="icon-library flex-center full-screen text-white"></div>
-            <!-- /ko -->
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': message.isObfuscated()}"/>
-            <!-- ko ifnot: message.isObfuscated() -->
-              <span class="image-placeholder-icon">
-                <div class="three-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </span>
-            <!-- /ko -->
-          </div>
-        </div>
+        <image-asset params="asset: asset, message: message, onClick: onClickImage"></image-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
           <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: message"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->

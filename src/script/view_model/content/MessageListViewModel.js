@@ -19,19 +19,12 @@
 
 import Logger from 'utils/Logger';
 
-import TimeUtil from 'utils/TimeUtil';
+import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
-/* eslint-disable no-unused-vars */
-import mousewheel from 'jquery-mousewheel';
-/* eslint-enable no-unused-vars */
 
 import Conversation from '../../entity/Conversation';
-
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
 
 /**
  * Message list rendering view model.
@@ -39,9 +32,10 @@ window.z.viewModel.content = z.viewModel.content || {};
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
  * @todo Remove all jQuery selectors
  */
-z.viewModel.content.MessageListViewModel = class MessageListViewModel {
+class MessageListViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this._scrollAddedMessagesIntoView = this._scrollAddedMessagesIntoView.bind(this);
+    this.onMessageContainerInitiated = this.onMessageContainerInitiated.bind(this);
     this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
     this.click_on_like = this.click_on_like.bind(this);
     this.clickOnInvitePeople = this.clickOnInvitePeople.bind(this);
@@ -60,8 +54,9 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
+    this.serverTimeRepository = repositories.serverTime;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.content.MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
@@ -78,13 +73,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
-    this.conversation_last_read_timestamp = ko.observable(undefined);
-
-    // Store conversation to mark as read when browser gets focus
-    this.mark_as_read_on_focus = undefined;
-
-    // Can be used to prevent scroll handler from being executed (e.g. when using scrollTop())
-    this.capture_scrolling_event = false;
+    this.conversation_last_read_timestamp = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -107,56 +96,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     this.messagesChangeSubscription = undefined;
     this.messagesBeforeChangeSubscription = undefined;
 
-    this.onMouseWheel = _.throttle((data, event) => {
-      const element = $(event.currentTarget);
-      if (element.isScrollable()) {
-        // if the element is scrollable, the scroll event will take the relay
-        return true;
-      }
-      const isScrollingUp = event.deltaY > 0;
-      if (isScrollingUp) {
-        this._loadPrecedingMessages();
-      } else {
-        this._loadFollowingMessages();
-      }
-
-      return true;
-    }, 50);
-
-    this.onScroll = _.throttle((data, event) => {
-      if (!this.capture_scrolling_event) {
-        return;
-      }
-      const element = $(event.currentTarget);
-
-      // On some HDPI screen scrollTop returns a floating point number instead of an integer
-      // https://github.com/jquery/api.jquery.com/issues/608
-      const scrollPosition = Math.ceil(element.scrollTop());
-      const scrollEnd = element.scrollEnd();
-      const hitTop = scrollPosition <= 0;
-      const hitBottom = scrollPosition >= scrollEnd;
-
-      if (hitTop) {
-        return this._loadPrecedingMessages();
-      }
-
-      if (hitBottom) {
-        this._loadFollowingMessages().then(() => {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        });
-      }
-    }, 100);
-
     this.messagesContainer = undefined;
-
-    $(window).on('focus', () => {
-      if (this.mark_as_read_on_focus) {
-        window.setTimeout(() => {
-          this.conversation_repository.markAsRead(this.mark_as_read_on_focus);
-          this.mark_as_read_on_focus = undefined;
-        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
-      }
-    });
 
     this.showInvitePeople = ko.pureComputed(() => {
       return (
@@ -165,16 +105,8 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     });
   }
 
-  /**
-   * Mark conversation as read if window has focus
-   * @param {Conversation} conversation_et - Conversation entity to mark as read
-   * @returns {undefined} No return value
-   */
-  _mark_conversation_as_read_on_focus(conversation_et) {
-    if (document.hasFocus()) {
-      return this.conversation_repository.markAsRead(conversation_et);
-    }
-    this.mark_as_read_on_focus = conversation_et;
+  onMessageContainerInitiated(messagesContainer) {
+    this.messagesContainer = messagesContainer;
   }
 
   /**
@@ -192,30 +124,28 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     if (this.messagesChangeSubscription) {
       this.messagesChangeSubscription.dispose();
     }
-    this.capture_scrolling_event = false;
-    this.conversation_last_read_timestamp(false);
-    this.messagesContainer = undefined;
+    this.conversation_last_read_timestamp = undefined;
     window.removeEventListener('resize', this._handleWindowResize);
   }
 
   _shouldStickToBottom() {
     const messagesContainer = this.getMessagesContainer();
-    const scrollPosition = Math.ceil(messagesContainer.scrollTop());
-    const scrollEnd = Math.ceil(messagesContainer.scrollEnd());
-    return scrollPosition > scrollEnd - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+    const scrollPosition = Math.ceil(messagesContainer.scrollTop);
+    const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
+    return scrollPosition > scrollEndValue - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
   _handleWindowResize() {
     if (this._shouldStickToBottom()) {
-      this.getMessagesContainer().scrollToBottom();
+      scrollToBottom(this.getMessagesContainer());
     }
   }
 
   _handleInputResize(inputSizeDiff) {
     if (inputSizeDiff) {
-      this.getMessagesContainer().scrollBy(inputSizeDiff);
+      scrollBy(this.getMessagesContainer(), inputSizeDiff);
     } else if (this._shouldStickToBottom()) {
-      this.getMessagesContainer().scrollToBottom();
+      scrollToBottom(this.getMessagesContainer());
     }
   }
 
@@ -238,7 +168,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
-      this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
+      this.conversation_last_read_timestamp = this.conversation().last_read_timestamp();
     }
 
     conversationEntity.is_loaded(false);
@@ -271,9 +201,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   getMessagesContainer() {
-    if (!this.messagesContainer) {
-      this.messagesContainer = $('.message-list');
-    }
     return this.messagesContainer;
   }
 
@@ -295,7 +222,7 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     return new Promise(resolve => {
       window.setTimeout(() => {
         // Reset scroll position
-        messages_container.scrollTop(0);
+        messages_container.scrollTop = 0;
 
         if (messageEntity) {
           this.focusMessage(messageEntity.id);
@@ -304,17 +231,12 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
           if (unread_message.length) {
             const unreadMarkerPosition = unread_message.parents('.message').position();
 
-            messages_container.scrollBy(unreadMarkerPosition.top);
+            scrollBy(messages_container, unreadMarkerPosition.top);
           } else {
-            messages_container.scrollToBottom();
+            scrollToBottom(messages_container);
           }
         }
 
-        if (!messages_container.isScrollable() && !this._conversationHasExtraMessages(this.conversation())) {
-          this._mark_conversation_as_read_on_focus(this.conversation());
-        }
-
-        this.capture_scrolling_event = true;
         window.addEventListener('resize', this._handleWindowResize);
 
         let shouldStickToBottomOnMessageAdd;
@@ -370,23 +292,14 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
 
       // Scroll to bottom if self user send the message
       if (lastMessage.from === this.selfUser().id) {
-        window.requestAnimationFrame(() => messages_container.scrollToBottom());
+        window.requestAnimationFrame(() => scrollToBottom(messages_container));
         return;
       }
     }
 
     // Scroll to the end of the list if we are under a certain threshold
     if (shouldStickToBottom) {
-      window.requestAnimationFrame(() => messages_container.scrollToBottom());
-
-      if (document.hasFocus()) {
-        this.conversation_repository.markAsRead(this.conversation());
-      }
-    }
-
-    // Mark as read when conversation is not scrollable
-    if (!messages_container.isScrollable()) {
-      this._mark_conversation_as_read_on_focus(this.conversation());
+      window.requestAnimationFrame(() => scrollToBottom(messages_container));
     }
   }
 
@@ -394,19 +307,17 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * Fetch older messages beginning from the oldest message in view
    * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _loadPrecedingMessages() {
+  loadPrecedingMessages() {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const [messagesContainer] = this.getMessagesContainer().children();
+    const [messagesContainer] = this.getMessagesContainer().children;
 
     if (shouldPullMessages && messagesContainer) {
       const initialListHeight = messagesContainer.scrollHeight;
 
-      this.capture_scrolling_event = false;
       return this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         if (messagesContainer) {
           const newListHeight = messagesContainer.scrollHeight;
-          this.getMessagesContainer().scrollTop(newListHeight - initialListHeight);
-          this.capture_scrolling_event = true;
+          this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
         }
       });
     }
@@ -417,14 +328,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
    * Fetch newer messages beginning from the newest message in view
    * @returns {Promise<any>} A promise that resolves when the loading is done
    */
-  _loadFollowingMessages() {
+  loadFollowingMessages() {
     const last_message = this.conversation().getLastMessage();
 
     if (last_message && this._conversationHasExtraMessages(this.conversation())) {
-      this.capture_scrolling_event = false;
-      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false).then(() => {
-        this.capture_scrolling_event = true;
-      });
+      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false);
     }
     return Promise.resolve();
   }
@@ -452,12 +360,13 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
     loadMessagePromise.then(() => {
       z.util.afterRender(() => {
         const messagesContainer = this.getMessagesContainer();
-        const messageElement = messagesContainer.find(`.message[data-uie-uid="${messageId}"]`);
+        const messageElement = messagesContainer.querySelector(`.message[data-uie-uid="${messageId}"]`);
 
-        if (messageElement.length) {
-          messageElement.removeClass('message-marked');
-          messagesContainer.scrollBy(messageElement.offset().top - messagesContainer.height() / 2);
-          messageElement.addClass('message-marked');
+        if (messageElement) {
+          messageElement.classList.remove('message-marked');
+          const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
+          scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
+          messageElement.classList.add('message-marked');
         }
       });
     });
@@ -529,17 +438,17 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
   }
 
   get_timestamp_class(message_et) {
-    const last_message = this.conversation().get_previous_message(message_et);
-    if (last_message) {
+    const lastReadMessage = this.conversation().get_previous_message(message_et);
+    if (lastReadMessage) {
       if (message_et.is_call()) {
         return '';
       }
 
-      if (last_message.timestamp() === this.conversation_last_read_timestamp()) {
+      if (lastReadMessage.timestamp() === this.conversation_last_read_timestamp) {
         return 'message-timestamp-visible message-timestamp-unread';
       }
 
-      const last = moment(last_message.timestamp());
+      const last = moment(lastReadMessage.timestamp());
       const current = moment(message_et.timestamp());
 
       if (!last.isSame(current, 'day')) {
@@ -617,6 +526,19 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       this.readMessagesBuffer.push({conversation: conversationEntity, message: messageEntity});
     };
 
+    const updateLastRead = () => {
+      const isLastMessage = messageEntity.timestamp() >= conversationEntity.last_server_timestamp();
+      const timestamp = isLastMessage
+        ? conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp())
+        : messageEntity.timestamp();
+
+      conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      if (isLastMessage) {
+        this.conversation_repository.markAsRead(conversationEntity);
+      }
+    };
+
     const startTimer = () => {
       if (messageEntity.conversation_id === conversationEntity.id) {
         this.conversation_repository.checkMessageTimer(messageEntity);
@@ -640,8 +562,11 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       }
     }
 
-    if (isUnreadMessage && isNotOwnMessage && shouldSendReadReceipt) {
-      callbacks.push(sendReadReceipt);
+    if (isUnreadMessage && isNotOwnMessage) {
+      callbacks.push(updateLastRead);
+      if (shouldSendReadReceipt) {
+        callbacks.push(sendReadReceipt);
+      }
     }
 
     if (!callbacks.length) {
@@ -686,4 +611,6 @@ z.viewModel.content.MessageListViewModel = class MessageListViewModel {
       });
     }
   }
-};
+}
+
+export default MessageListViewModel;

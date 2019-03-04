@@ -22,6 +22,7 @@ import {instantiateComponent} from '../../api/knockoutHelpers';
 
 import Conversation from 'src/script/entity/Conversation';
 import ContentMessage from 'src/script/entity/message/ContentMessage';
+import LinkPreview from 'src/script/entity/message/LinkPreview';
 import Text from 'src/script/entity/message/Text';
 import User from 'src/script/entity/User';
 import 'src/script/components/message';
@@ -86,7 +87,8 @@ describe('message', () => {
   });
 
   it('displays a link preview', () => {
-    defaultParams.message.get_first_asset().previews([{}]);
+    const linkPreview = new LinkPreview();
+    defaultParams.message.get_first_asset().previews([linkPreview]);
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(domContainer.querySelector('link-preview-asset')).not.toBe(null);
     });

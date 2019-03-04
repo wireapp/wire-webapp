@@ -18,13 +18,11 @@
  */
 
 import Logger from 'utils/Logger';
+import Asset from './Asset';
 import TimeUtil from 'utils/TimeUtil';
 import AssetType from '../../assets/AssetType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.File = class File extends z.entity.Asset {
+export default class File extends Asset {
   constructor(id) {
     super(id);
     this.cancel_download = this.cancel_download.bind(this);
@@ -116,4 +114,8 @@ z.entity.File = class File extends z.entity.Asset {
   reload() {
     this.logger.info('Restart upload');
   }
-};
+}
+
+window.z = window.z || {};
+window.z.entity = z.entity || {};
+z.entity.File = File;

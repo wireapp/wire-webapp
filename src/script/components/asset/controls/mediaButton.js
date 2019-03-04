@@ -18,11 +18,11 @@
  */
 
 import ko from 'knockout';
-import AssetTransferState from '../../../assets/AssetTransferState';
+import AbstractAssetTransferStateTracker from '../AbstractAssetTransferStateTracker';
 
 import '../assetLoader';
 
-class MediaButtonComponent {
+class MediaButtonComponent extends AbstractAssetTransferStateTracker {
   /**
    * Construct a media button.
    *
@@ -33,6 +33,7 @@ class MediaButtonComponent {
    * @param {Object} componentInfo - Component information
    */
   constructor(params, componentInfo) {
+    super();
     this.mediaElement = params.src;
     this.large = params.large;
     this.asset = params.asset;
@@ -67,18 +68,6 @@ class MediaButtonComponent {
     this.isPlaying(false);
   }
 
-  isUploaded(transferState) {
-    return transferState === AssetTransferState.UPLOADED;
-  }
-
-  isDownloading(transferState) {
-    return transferState === AssetTransferState.DOWNLOADING;
-  }
-
-  isUploading(transferState) {
-    return transferState === AssetTransferState.UPLOADING;
-  }
-
   dispose() {
     this.mediaElement.removeEventListener('playing', this.onPlay);
     this.mediaElement.removeEventListener('pause', this.onPause);
@@ -92,16 +81,10 @@ ko.components.register('media-button', {
       <div class='media-button media-button-pause icon-pause' data-bind="click: onClickPause, visible: isPlaying()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
     <!-- ko if: isDownloading(transferState()) -->
-      <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
-        <div class='media-button-border-fill'></div>
-        <asset-loader params="large: large, loadProgress: asset.downloadProgress"></asset-loader>
-      </div>
+      <asset-loader params="large: large, loadProgress: asset.downloadProgress, onCancel: asset.cancel_download"></asset-loader>
     <!-- /ko -->
-      <!-- ko if: isUploading(transferState()) -->
-      <div class="media-button icon-close" data-bind="click: onClickCancel" data-uie-name="do-cancel-media">
-        <div class='media-button-border-fill'></div>
-        <asset-loader params="large: large, loadProgress: uploadProgress"></asset-loader>
-      </div>
+    <!-- ko if: isUploading(transferState()) -->
+      <asset-loader params="large: large, loadProgress: uploadProgress, onCancel: onClickCancel"></asset-loader>
     <!-- /ko -->
 `,
   viewModel: {

@@ -19,9 +19,8 @@
 
 import ko from 'knockout';
 import $ from 'jquery';
-/* eslint-disable no-unused-vars */
-import bindingHandlersGlobal from '../../../src/script/view_model/bindings/CommonBindings';
-/* eslint-enable no-unused-vars */
+
+import '../../../src/script/view_model/bindings/CommonBindings';
 
 describe('ko.bindingHandlers', () => {
   describe('ko.bindingHandlers.enter', () => {
