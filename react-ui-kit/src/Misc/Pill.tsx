@@ -41,12 +41,13 @@ const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({
     [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_16,
     [PILL_TYPE.warning]: COLOR.YELLOW_OPAQUE_16,
   };
+  const backgroundColor = active ? '#eee' : type ? backgroundColors[type] : 'transparent';
   const pillAnimation = keyframes`
     0% {
       background-color: transparent;
     }
     100% {
-      background-color: #eee;
+      background-color: ${backgroundColor};
     }
 `;
   return {
@@ -57,7 +58,7 @@ const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({
       marginRight: 0,
     },
     animation: `${pillAnimation} ${DURATION.DEFAULT}ms ${EASE.QUART}`,
-    backgroundColor: active ? '#eee' : type ? backgroundColors[type] : 'transparent',
+    backgroundColor,
     borderRadius: '160px',
     cursor: active ? 'default' : undefined,
     display: 'inline-block',
