@@ -38,7 +38,7 @@ z.components.GroupListViewModel = class GroupListViewModel {
 ko.components.register('group-list', {
   template: `
     <div class="search-list search-list-lg" data-bind="foreach: {data: groups, as: 'group', noChildContext: true}">
-      <div class="search-list-item" data-bind="click: onSelect, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
+      <div class="search-list-item" data-bind="click: () => onSelect(group), attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
         <div class="search-list-item-image">
           <!-- ko if: group.is1to1() -->
             <participant-avatar params="participant: group.participating_user_ets()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
