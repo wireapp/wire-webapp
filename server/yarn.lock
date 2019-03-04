@@ -1353,10 +1353,10 @@ has-values@^1.0.0:
     is-number "^3.0.0"
     kind-of "^4.0.0"
 
-hbs@4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.0.2.tgz#9289ea8d0b906548cb61318f615dd10c5b5c152a"
-  integrity sha512-gYzYAp6HvW1+5ROd+gSoy0lrUEGzS+rgmxeU4cuGOgnVRAfRqa/Yb0XldvsEAIw7J90T9NhHnKXKVxBKKlSmDQ==
+hbs@4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.0.3.tgz#18f5b15cdc900798e26133284294070666f8131c"
+  integrity sha512-u8AAbtYUWqNATGEruLdlyAbN+lOtKED+mn38t/13ZkeaKy5BObknFuL1Gtmj0QwXgcSizQ68FHOP1ZST/HP+dg==
   dependencies:
     handlebars "4.0.13"
     walk "2.3.9"
