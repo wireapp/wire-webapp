@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.17...@wireapp/react-ui-kit@5.0.18) (2019-03-04)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Initial Pill animation ([#1598](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1598)) ([2464ac4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/2464ac4))
+
+
+
+
+
 ## [5.0.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.16...@wireapp/react-ui-kit@5.0.17) (2019-03-04)
 
 
