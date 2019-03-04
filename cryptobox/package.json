@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/fs-extra": "5.0.5",
-    "@types/node": "11.9.5",
+    "@types/node": "11.10.4",
     "@wireapp/lru-cache": "3.0.33",
     "@wireapp/priority-queue": "0.2.66",
     "@wireapp/proteus": "8.0.37",

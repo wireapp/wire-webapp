@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/chai": "4.1.7",
     "@types/ed2curve": "0.2.2",
-    "@types/node": "11.9.5",
+    "@types/node": "11.10.4",
     "@wireapp/cbor": "3.0.122",
     "ed2curve": "0.2.1",
     "libsodium-wrappers-sumo": "0.7.4"
