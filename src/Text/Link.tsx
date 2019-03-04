@@ -41,24 +41,27 @@ const linkStyle: <T>(props: LinkProps<T>) => ObjectInterpolation<undefined> = ({
   const hoverColor = Color(color)
     .mix(Color(COLOR.BLACK), darker)
     .toString();
+  const componentSelector = typeof props.component === 'string' ? props.component : 'a';
   return {
-    ...textStyle({bold, color, fontSize, textTransform, ...props}),
-    '&:hover': {
-      color: hoverColor,
-    },
-    '&:visited, &:link, &:active': {
+    [`${componentSelector}&, &`]: {
+      ...textStyle({bold, color, fontSize, textTransform, ...props}),
+      '&:hover': {
+        color: hoverColor,
+      },
+      '&:visited, &:link, &:active': {
+        color: color,
+      },
       color: color,
+      cursor: 'pointer',
+      textDecoration: 'none',
+      transition: defaultTransition,
     },
-    color: color,
-    cursor: 'pointer',
-    textDecoration: 'none',
-    transition: defaultTransition,
   };
 };
 
 const filterLinkProps = (props: Object) => filterProps(filterTextProps(props), ['component']);
 
 const Link = ({component = 'a', ...props}: LinkProps) =>
-  jsx(component, {css: linkStyle(props), ...filterLinkProps(props)} as any, props.children);
+  jsx(component, {css: linkStyle({component, ...props}), ...filterLinkProps(props)} as any, props.children);
 
 export {Link, linkStyle, filterLinkProps};
