@@ -143,7 +143,7 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
-    "typescript": "3.3.3",
+    "typescript": "3.3.3333",
     "webpack": "4.29.6",
     "webpack-cli": "3.2.3",
     "webpack-dev-middleware": "3.6.0",
