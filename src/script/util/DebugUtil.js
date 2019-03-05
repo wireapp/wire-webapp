@@ -75,6 +75,25 @@ export default class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
+  /**
+   * Will allow the webapp to generate fake link previews when sending a link in a message.
+   *
+   * @returns {void} - returns nothing
+   */
+  enableLinkPreviews() {
+    /*
+     * To allow the LinkPreviewRepository to generate link previews, we need to expose a fake 'openGraphAsync' method.
+     * This function is normally exposed by the desktop wrapper
+     */
+    window.openGraphAsync = url => {
+      return Promise.resolve({
+        image: {data: 'data:image/gif;base64,R0lGODdhAQABAIAAAADZ/wAR/ywAAAAAAQABAAACAkQBADs='},
+        title: 'A link to the past',
+        url,
+      });
+    };
+  }
+
   getLastMessagesFromDatabase(amount = 10, conversationId = this.conversationRepository.active_conversation().id) {
     return this.storageRepository.storageService.db.events.toArray(records => {
       const messages = records.filter(events => events.conversation === conversationId);
