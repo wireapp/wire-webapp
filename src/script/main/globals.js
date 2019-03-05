@@ -155,7 +155,6 @@ import UpdateSourceGlobal from '../lifecycle/UpdateSource.js';
 import LinkPreviewHelpersGlobal from '../links/LinkPreviewHelpers.js';
 import LinkPreviewMetaDataTypeGlobal from '../links/LinkPreviewMetaDataType.js';
 import LinkPreviewProtoBuilderGlobal from '../links/LinkPreviewProtoBuilder.js';
-import LinkPreviewRepositoryGlobal from '../links/LinkPreviewRepository.js';
 import LinkPreviewBlackListGlobal from '../links/LinkPreviewBlackList.js';
 import MediaConstraintsHandlerGlobal from '../media/MediaConstraintsHandler.js';
 import MediaDeviceTypeGlobal from '../media/MediaDeviceType.js';
