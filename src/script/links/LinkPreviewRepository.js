@@ -19,16 +19,13 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.links = z.links || {};
-
-z.links.LinkPreviewRepository = class LinkPreviewRepository {
+class LinkPreviewRepository {
   constructor(assetService, propertiesRepository) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = new Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new Logger('LinkPreviewRepository', z.config.LOGGER.OPTIONS);
 
     this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
@@ -184,4 +181,6 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
       this.assetService.uploadImageAsset(blob, {public: true})
     );
   }
-};
+}
+
+export default LinkPreviewRepository;
