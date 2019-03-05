@@ -17,39 +17,34 @@
  *
  */
 
-window.z = window.z || {};
-window.z.links = z.links || {};
-
 const codeBlockRegex = /(`+)[^`]*?\1$/gm;
 
-z.links.LinkPreviewHelpers = {
-  /**
-   * Check if the text contains only one link
-   * @param {string} text - Text to parse
-   * @returns {boolean} Text contains only a link
-   */
-  containsOnlyLink(text) {
-    const textWithoutCode = text.trim().replace(codeBlockRegex, '');
-    const urls = linkify.find(textWithoutCode, 'url');
-    return urls.length === 1 && urls[0].value === textWithoutCode;
-  },
+/**
+ * Check if the text contains only one link
+ * @param {string} text - Text to parse
+ * @returns {boolean} Text contains only a link
+ */
+export function containsOnlyLink(text) {
+  const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+  const urls = linkify.find(textWithoutCode, 'url');
+  return urls.length === 1 && urls[0].value === textWithoutCode;
+}
 
-  /**
-   * Get first link and link offset for given text.
-   * @param {string} text - Text to parse
-   * @returns {Object} Containing link and its offset
-   */
-  getFirstLinkWithOffset(text) {
-    const textWithoutCode = text.trim().replace(codeBlockRegex, '');
+/**
+ * Get first link and link offset for given text.
+ * @param {string} text - Text to parse
+ * @returns {Object} Containing link and its offset
+ */
+export function getFirstLinkWithOffset(text) {
+  const textWithoutCode = text.trim().replace(codeBlockRegex, '');
 
-    const [firstLink] = linkify.find(textWithoutCode, 'url');
+  const [firstLink] = linkify.find(textWithoutCode, 'url');
 
-    if (firstLink) {
-      const linkOffset = textWithoutCode.indexOf(firstLink.value);
-      return {
-        offset: linkOffset,
-        url: firstLink.value,
-      };
-    }
-  },
-};
+  if (firstLink) {
+    const linkOffset = textWithoutCode.indexOf(firstLink.value);
+    return {
+      offset: linkOffset,
+      url: firstLink.value,
+    };
+  }
+}
