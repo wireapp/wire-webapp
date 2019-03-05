@@ -24,6 +24,7 @@ import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
 import SDP_SOURCE from '../enum/SDPSource';
 import TERMINATION_REASON from '../enum/TerminationReason';
 import TimeUtil from 'utils/TimeUtil';
+import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -877,10 +878,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
           const connectionConfig =
             (this.peerConnection.getConfiguration && this.peerConnection.getConfiguration()) ||
             this.peerConnectionConfiguration;
-          const isValidGathering = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
-            connectionConfig,
-            iceCandidates
-          );
+          const isValidGathering = isValidIceCandidatesGathering(connectionConfig, iceCandidates);
           const attempts = this.iceCandidatesGatheringAttempts;
           const hasReachMaxGatheringAttempts = attempts >= FlowEntity.CONFIG.MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS;
           if (!hasReachMaxGatheringAttempts && !isValidGathering) {
@@ -893,7 +891,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
         this.iceCandidatesGatheringAttempts = 1;
 
-        const iceCandidateTypes = z.util.PeerConnectionUtil.getIceCandidatesTypes(iceCandidates);
+        const iceCandidateTypes = getIceCandidatesTypes(iceCandidates);
 
         const iceCandidateTypesLog = Object.keys(iceCandidateTypes)
           .map(candidateType => `${iceCandidateTypes[candidateType]} ${candidateType}`)
