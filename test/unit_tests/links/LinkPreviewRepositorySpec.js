@@ -17,14 +17,13 @@
  *
  */
 
-import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import {resolve, graph} from '../../api/testResolver';
 
-describe('z.links.LinkPreviewRepository', () => {
+describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const properties_repository = new PropertiesRepository();
-    link_preview_repository = new z.links.LinkPreviewRepository(undefined, properties_repository);
+    link_preview_repository = resolve(graph.LinkPreviewRepository);
   });
 
   afterEach(() => (window.openGraph = undefined));
