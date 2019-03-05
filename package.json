@@ -24,7 +24,7 @@
     "jszip": "3.2.0",
     "keyboardjs": "2.5.1",
     "knockout": "3.5.0",
-    "lint-staged": "8.1.4",
+    "lint-staged": "8.1.5",
     "long": "4.0.0",
     "moment": "2.24.0",
     "phoneformat.js": "1.0.7",
