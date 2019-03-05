@@ -1198,10 +1198,10 @@
     "@types/history" "*"
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16.8.5":
-  version "16.8.5"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.5.tgz#03b9a6597bc20f6eaaed43f377a160f7e41c2b90"
-  integrity sha512-8LRySaaSJVLNZb2dbOGvGmzn88cbAfrgDpuWy+6lLgQ0OJFgHHvyuaCX4/7ikqJlpmCPf4uazJAZcfTQRdJqdQ==
+"@types/react@*", "@types/react@16.8.6":
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.6.tgz#fa1de3fe56cc9b6afeddc73d093d7f30fd5e31cc"
+  integrity sha512-bN9qDjEMltmHrl0PZRI4IF2AbB7V5UlRfG+OOduckVnRQ4VzXVSzy/1eLAh778IEqhTnW0mmgL9yShfinNverA==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -1537,16 +1537,16 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.16":
-  version "5.0.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.16.tgz#351dfd09c373fff7433ace1dc271f1d2d2d3fdda"
-  integrity sha512-jVA6nnv5nAjGvpJgIuEdohsdI30OhND5k4JdJDMQzvugU/3ygStCYFfq2W4M6LHce0MEAU8sTa2etCAtb2/gJg==
+"@wireapp/react-ui-kit@5.0.18":
+  version "5.0.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.18.tgz#34ecaa1903f763244b9abe24c342a10023323ae1"
+  integrity sha512-ZZ116WF3VaU5qZWjU0PvuC1HHpIEwv0LYN70PugL+a3sbsuAgrX4KNIEPfIs9N80iGC8e7tIwDjtzKJKuy+CYA==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"
     "@types/color" "3.0.0"
-    "@types/react" "16.8.5"
-    bazinga64 "5.3.44"
+    "@types/react" "16.8.6"
+    bazinga64 "5.3.45"
     color "3.1.0"
     emotion-normalize "10.0.0"
     react "16.8.3"
@@ -2285,11 +2285,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bazinga64@5.3.44:
-  version "5.3.44"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.44.tgz#19526abf0c790841437d9a790dcf40f0199936de"
-  integrity sha512-JIies9o5MyKKzRojOqJUxg9kCDeiuLlZCqST3I/zPXeJpN/nopAs5pjm1tm3VowhqNo7aEl+uFMUZ1BRz+AyBw==
 
 bazinga64@5.3.45:
   version "5.3.45"
