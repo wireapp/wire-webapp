@@ -143,18 +143,20 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with the retrieved open graph data
    */
   _fetchOpenGraphData(link) {
+    const mergeOpenGraphData = data => {
+      if (data) {
+        return Object.entries(data).reduce((result, [key, value]) => {
+          result[key] = Array.isArray(value) ? value[0] : value;
+          return result;
+        }, {});
+      }
+    };
+
     if (typeof window.openGraphAsync === 'function') {
       return window
         .openGraphAsync(link)
-        .then(data => {
-          if (data) {
-            return Object.entries(data).reduce((result, [key, value]) => {
-              result[key] = Array.isArray(value) ? value[0] : value;
-              return result;
-            }, {});
-          }
-        })
-        .catch();
+        .then(data => mergeOpenGraphData(data))
+        .catch(() => Promise.resolve());
     }
 
     return new Promise(resolve => {
@@ -164,14 +166,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
             resolve();
           }
 
-          if (data) {
-            data = Object.entries(data).reduce((filteredData, [key, value]) => {
-              filteredData[key] = Array.isArray(value) ? value[0] : value;
-              return filteredData;
-            }, {});
-          }
-
-          resolve(data);
+          resolve(mergeOpenGraphData(data));
         })
         .catch(resolve);
     });
