@@ -155,7 +155,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     if (typeof window.openGraphAsync === 'function') {
       return window
         .openGraphAsync(link)
-        .then(data => mergeOpenGraphData(data))
+        .then(mergeOpenGraphData)
         .catch(() => Promise.resolve());
     }
 
