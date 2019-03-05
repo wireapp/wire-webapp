@@ -1120,6 +1120,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.5.tgz#011eece9d3f839a806b63973e228f85967b79ed3"
   integrity sha512-vVjM0SVzgaOUpflq4GYBvCpozes8OgIIS5gVXVka+OfK3hvnkC1i93U8WiY2OtNE4XUWyyy/86Kf6e0IHTQw1Q==
 
+"@types/node@10.12.29":
+  version "10.12.29"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.29.tgz#c2c8d2d27bb55649fbafe8ea1731658421f38acf"
+  integrity sha512-J/tnbnj8HcsBgCe2apZbdUpQ7hs4d7oZNTYA5bekWdP0sr2NGsOpI/HRdDroEi209tEvTcTtxhD0FfED3DhEcw==
+
 "@types/node@^10.1.0":
   version "10.12.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.24.tgz#b13564af612a22a20b5d95ca40f1bffb3af315cf"
@@ -12446,14 +12451,12 @@ wide-align@^1.1.0:
 
 "wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.14.0":
   version "0.14.0"
-  uid fab2d9bbbfcb039cf409820f105f7a398b77bc09
   resolved "https://github.com/wireapp/wire-web-config-wire#fab2d9bbbfcb039cf409820f105f7a398b77bc09"
   dependencies:
     adm-zip "0.4.13"
 
 "wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.14.0":
   version "0.14.0"
-  uid fab2d9bbbfcb039cf409820f105f7a398b77bc09
   resolved "https://github.com/wireapp/wire-web-config-default#fab2d9bbbfcb039cf409820f105f7a398b77bc09"
   dependencies:
     adm-zip "0.4.13"
