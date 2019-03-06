@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "resolveJsonModule": true,
     "rootDir": "src"
   },
   "exclude": ["dist", "node_modules"],
