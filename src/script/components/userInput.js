@@ -92,14 +92,14 @@ ko.components.register('user-input', {
             <!-- /ko -->
           <!-- /ko -->
           <input class="search-input" maxlength="128"
-                  required spellcheck="false" type="text"
-                  data-bind="textInput: input,
+                 required spellcheck="false" type="text"
+                 data-bind="textInput: input,
                             hasFocus: hasFocus,
                             attr: {placeholder: placeholder},
                             css: {'search-input-show-placeholder': placeholder},
                             event: {keydown: onKeyDown},
                             enter: onEnter"
-                  data-uie-name="enter-users">
+                 data-uie-name="enter-users">
         </div>
       </div>
     </form>
