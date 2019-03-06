@@ -49,5 +49,5 @@
     "test:browser": "karma start",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "5.3.47"
+  "version": "5.3.48"
 }
