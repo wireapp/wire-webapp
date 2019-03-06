@@ -109,7 +109,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       if (this.isTeam()) {
         const teamUsersWithoutPartners = this.teamRepository
           .teamUsers()
-          .filter(user => this.isSelfConnectedTo(user.id));
+          .filter(user => this.teamRepository.isSelfConnectedTo(user.id));
 
         return teamUsersWithoutPartners;
       }

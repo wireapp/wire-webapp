@@ -189,7 +189,9 @@ z.team.TeamRepository = class TeamRepository {
         const memberRoles = teamMembers.reduce((accumulator, teamMember) => {
           return {
             ...accumulator,
-            [teamMember.userId]: roleFromTeamPermissions(teamMember.permissions),
+            [teamMember.userId]: teamMember.permissions
+              ? roleFromTeamPermissions(teamMember.permissions)
+              : ROLE.INVALID,
           };
         }, {});
 
