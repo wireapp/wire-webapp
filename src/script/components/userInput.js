@@ -82,21 +82,28 @@ z.components.UserInput = class UserInput {
 
 ko.components.register('user-input', {
   template: `
-    <form autocomplete="off">
-      <div class="search-outer">
-        <div class="search-inner-wrap">
-          <div class="search-inner"">
-            <div class="search-icon icon-search"></div>
-              <!-- ko ifnot: noSelectedUsers-->
-                <!-- ko foreach: selectedUsers -->
-                  <span data-bind="text: first_name()" data-uie-name="item-selected"></span>
-                <!-- /ko -->
+    <form autocomplete="off" class="search-outer">
+      <div class="search-inner-wrap">
+        <div class="search-inner"">
+          <div class="search-icon icon-search"></div>
+            <!-- ko ifnot: noSelectedUsers-->
+              <!-- ko foreach: selectedUsers -->
+                <span data-bind="text: first_name()" data-uie-name="item-selected"></span>
               <!-- /ko -->
-              <input maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: hasFocus, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: onKeyDown}, enter: onEnter" data-uie-name="enter-users">
-            </div>
+            <!-- /ko -->
+            <input class="search-input" maxlength="128"
+                   required spellcheck="false" type="text"
+                   data-bind="textInput: input,
+                              hasFocus: hasFocus,
+                              attr: {placeholder: placeholder},
+                              css: {'search-input-show-placeholder': placeholder},
+                              event: {keydown: onKeyDown},
+                              enter: onEnter"
+                   data-uie-name="enter-users">
           </div>
         </div>
-      </form>
+      </div>
+    </form>
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
