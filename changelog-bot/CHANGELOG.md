@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.1.27...@wireapp/changelog-bot@2.2.0) (2019-03-06)
+
+
+### Features
+
+* **changelog-bot:** Use tags as commit range fallback ([#1604](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/1604)) ([053966e](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/053966e))
+
+
+
+
+
 ## [2.1.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.1.26...@wireapp/changelog-bot@2.1.27) (2019-03-04)
 
 **Note:** Version bump only for package @wireapp/changelog-bot
