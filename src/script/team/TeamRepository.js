@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import TeamMapper from './TeamMapper';
+import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -46,6 +47,12 @@ z.team.TeamRepository = class TeamRepository {
     this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
 
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.memberRoles = ko.observable({});
+    this.memberInviters = ko.observable({});
+
+    this.isSelfConnectedTo = userId =>
+      this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
@@ -54,6 +61,10 @@ z.team.TeamRepository = class TeamRepository {
         .filter((item, index, array) => array.indexOf(item) === index)
         .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
     });
+
+    this.teamUsersWithoutPartners = ko.pureComputed(() =>
+      this.teamUsers().filter(({id}) => this.isSelfConnectedTo(id))
+    );
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
@@ -179,6 +190,14 @@ z.team.TeamRepository = class TeamRepository {
   updateTeamMembers(teamEntity) {
     return this.getTeamMembers(teamEntity.id)
       .then(teamMembers => {
+        this.memberRoles(
+          teamMembers.reduce(
+            (acc, {userId, permissions}) => ({...acc, [userId]: roleFromTeamPermissions(permissions)}),
+            {}
+          )
+        );
+
+        this.memberInviters(teamMembers.reduce((acc, {userId, invitedBy}) => ({...acc, [userId]: invitedBy}), {}));
         const memberIds = teamMembers
           .filter(memberEntity => {
             const isSelfUser = memberEntity.userId === this.selfUser().id;

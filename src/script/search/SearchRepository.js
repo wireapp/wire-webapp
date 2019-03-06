@@ -70,15 +70,14 @@ class SearchRepository {
    *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns {Array<User>} the filtered list of users
    */
-  searchUserInSet(term, userEntities, properties) {
+  searchUserInSet(
+    term,
+    userEntities,
+    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME]
+  ) {
     if (term === '') {
       return userEntities;
     }
-    properties = properties || [
-      SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME,
-      SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME,
-    ];
-
     const weightedResults = userEntities.reduce((results, userEntity) => {
       const matchWeight = properties
         .slice()
@@ -93,7 +92,6 @@ class SearchRepository {
     }, []);
 
     return weightedResults
-      .slice()
       .sort((result1, result2) => {
         if (result2.weight === result1.weight) {
           return result2.user.name() > result1.user.name() ? -1 : 1;
