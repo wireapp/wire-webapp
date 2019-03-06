@@ -137,7 +137,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
   }
 
   _showModal(message) {
-    const modalOptions = {text: {message}, warning: true};
+    const modalOptions = {text: {message}};
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

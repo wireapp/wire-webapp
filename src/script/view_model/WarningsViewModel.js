@@ -127,7 +127,6 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
             message: t('modalCallNoMicrophoneMessage'),
             title: t('modalCallNoMicrophoneHeadline'),
           },
-          warning: true,
         });
         break;
       }

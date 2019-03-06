@@ -87,10 +87,6 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    if (options.warning) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    }
-
     const {preventClose = false, action: actionFn, close: closeFn, secondary: secondaryFn} = options;
     const modal = new z.ui.Modal(type, null, () => {
       $(type)

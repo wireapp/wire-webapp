@@ -127,7 +127,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
             message: t('modalIntegrationUnavailableMessage'),
             title: t('modalIntegrationUnavailableHeadline'),
           },
-          warning: true,
         });
         throw error;
       });

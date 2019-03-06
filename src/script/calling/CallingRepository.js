@@ -1064,7 +1064,6 @@ z.calling.CallingRepository = class CallingRepository {
             message: messageString,
             title: titleString,
           },
-          warning: true,
         });
         this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
@@ -1295,7 +1294,6 @@ z.calling.CallingRepository = class CallingRepository {
         message,
         title,
       },
-      warning: true,
     });
   }
 

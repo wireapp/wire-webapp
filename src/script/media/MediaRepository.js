@@ -108,7 +108,6 @@ export default class MediaRepository {
         ),
         title: t('modalNoCameraTitle'),
       },
-      warning: true,
     };
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }

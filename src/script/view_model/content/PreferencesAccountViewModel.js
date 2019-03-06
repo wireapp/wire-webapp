@@ -259,7 +259,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         message: t('modalAccountDeletionMessage'),
         title: t('modalAccountDeletionHeadline'),
       },
-      warning: true,
     });
   }
 
@@ -374,7 +373,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _showUploadWarning(title, message) {
-    const modalOptions = {text: {message, title}, warning: true};
+    const modalOptions = {text: {message, title}};
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
