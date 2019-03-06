@@ -18,14 +18,21 @@
  */
 
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
+import logdown from 'logdown';
 
 import {ChangelogBot} from './ChangelogBot';
 import {ChangelogData, LoginDataBackend, Parameters} from './Interfaces';
 
+const logger = logdown('@wireapp/changelog-bot/Start', {
+  logger: console,
+  markdown: false,
+});
+
 export async function start(parameters: Parameters): Promise<void> {
-  const {backend, conversationIds, email, excludeCommitTypes, password, travisCommitRange, travisRepoSlug} = parameters;
-  let message = parameters.message;
+  const {backend, conversationIds, email, excludeCommitTypes, password, travisRepoSlug, travisTag} = parameters;
+  let {travisCommitRange, message} = parameters;
   const isCustomMessage = !!message;
+  const MAXIMUM_CHARS = 10000;
 
   const loginData: LoginDataBackend = {
     backend,
@@ -47,11 +54,21 @@ export async function start(parameters: Parameters): Promise<void> {
   }
 
   if (!travisCommitRange) {
-    throw new Error('You need to specify a commit range. Otherwise this bot will not work.');
+    if (travisTag) {
+      logger.info('Info: Using the latest tag as commit base since no commit range was specified.');
+      travisCommitRange = await ChangelogBot.runCommand(`git describe --abbrev=0 --tags "${travisTag}^"`);
+    } else {
+      throw new Error('You need to specify a commit range or a tag. Otherwise this bot will not work.');
+    }
   }
 
   if (!message) {
-    message = await ChangelogBot.generateChangelog(travisRepoSlug, travisCommitRange, undefined, excludeCommitTypes);
+    message = await ChangelogBot.generateChangelog(
+      travisRepoSlug,
+      travisCommitRange,
+      MAXIMUM_CHARS,
+      excludeCommitTypes
+    );
   }
 
   const messageData: ChangelogData = {

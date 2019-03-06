@@ -35,8 +35,9 @@ interface Parameters {
   excludeCommitTypes?: string[];
   message?: string;
   password: string;
-  travisCommitRange: string;
+  travisCommitRange?: string;
   travisRepoSlug: string;
+  travisTag?: string;
 }
 
 export {ChangelogData, LoginDataBackend, Parameters};

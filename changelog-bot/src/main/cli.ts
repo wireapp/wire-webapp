@@ -19,7 +19,7 @@
  *
  */
 
-import * as program from 'commander';
+import program from 'commander';
 import logdown from 'logdown';
 
 import {Parameters} from './Interfaces';
@@ -44,6 +44,7 @@ program
   .option('-b, --backend <type>', 'Backend type ("production" or "staging")')
   .option('-s, --slug <slug>', 'A repo slug')
   .option('-r, --range <range>', 'The commit range')
+  .option('-t, --tag <tag>', 'The commit tag')
   .option('-x, --exclude-commit-types <type,...>', 'Commit types to exclude (e.g. chore,build,...)')
   .parse(process.argv);
 
@@ -63,15 +64,14 @@ const parameters: Parameters = {
   password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
   travisCommitRange: program.range || process.env.TRAVIS_COMMIT_RANGE,
   travisRepoSlug: program.slug || process.env.TRAVIS_REPO_SLUG,
+  travisTag: program.tag || process.env.TRAVIS_TAG,
 };
 
 logger.log(`wire-changelog-bot v${version}`);
 
-startChangelogBot(parameters)
-  .then(() => process.exit(0))
-  .catch(error => {
-    // Info:
-    // Don't log error payloads here (on a global level) as they can leak sensitive information. Stack traces are ok!
-    logger.error(error.message, error.stack);
-    process.exit(1);
-  });
+startChangelogBot(parameters).catch(error => {
+  // Info:
+  // Don't log error payloads here (on a global level) as they can leak sensitive information. Stack traces are ok!
+  logger.error(error.stack);
+  process.exit(1);
+});
