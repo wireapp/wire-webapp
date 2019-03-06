@@ -85,18 +85,19 @@ z.components.UserList = class UserList {
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
           const searchResults = this.searchRepository.searchUserInSet(normalizedQuery, this.userEntities(), properties);
-          const filteredResults = searchResults.filter(
-            user =>
+          const filteredResults = searchResults.filter(user => {
+            return (
               connectedUsers.includes(user) ||
               this.teamRepository.isSelfConnectedTo(user.id) ||
               (isHandle && user.username() === normalizedQuery)
-          );
+            );
+          });
           return filteredResults;
         }
       }
-      return this.userEntities().filter(
-        user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id)
-      );
+      return this.userEntities().filter(user => {
+        return connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id);
+      });
     });
 
     this.isSelected = userEntity => {

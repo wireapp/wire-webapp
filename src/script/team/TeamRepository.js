@@ -190,14 +190,20 @@ z.team.TeamRepository = class TeamRepository {
   updateTeamMembers(teamEntity) {
     return this.getTeamMembers(teamEntity.id)
       .then(teamMembers => {
-        this.memberRoles(
-          teamMembers.reduce(
-            (acc, {userId, permissions}) => ({...acc, [userId]: roleFromTeamPermissions(permissions)}),
-            {}
-          )
-        );
+        const memberRoles = teamMembers.reduce((accumulator, teamMember) => {
+          return {
+            ...accumulator,
+            [teamMember.userId]: roleFromTeamPermissions(teamMember.permissions),
+          };
+        }, {});
 
-        this.memberInviters(teamMembers.reduce((acc, {userId, invitedBy}) => ({...acc, [userId]: invitedBy}), {}));
+        const memberInvites = teamMembers.reduce((accumulator, teamMember) => {
+          return {...accumulator, [teamMember.userId]: teamMember.invitedBy};
+        }, {});
+
+        this.memberRoles(memberRoles);
+        this.memberInviters(memberInvites);
+
         const memberIds = teamMembers
           .filter(memberEntity => {
             const isSelfUser = memberEntity.userId === this.selfUser().id;

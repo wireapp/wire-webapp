@@ -581,12 +581,13 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
       const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
       const connectedUsers = this.conversationRepository.getConnectedUsers();
-      const filteredResults = contactResults.filter(
-        user =>
+      const filteredResults = contactResults.filter(user => {
+        return (
           connectedUsers.includes(user) ||
           this.teamRepository.isSelfConnectedTo(user.id) ||
           (isHandle && user.username() === normalizedQuery)
-      );
+        );
+      });
 
       this.searchResults.contacts(filteredResults);
 
