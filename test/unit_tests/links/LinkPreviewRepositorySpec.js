@@ -17,14 +17,13 @@
  *
  */
 
-import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import {resolve, graph} from '../../api/testResolver';
 
-describe('z.links.LinkPreviewRepository', () => {
+describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const properties_repository = new PropertiesRepository();
-    link_preview_repository = new z.links.LinkPreviewRepository(undefined, properties_repository);
+    link_preview_repository = resolve(graph.LinkPreviewRepository);
   });
 
   afterEach(() => (window.openGraph = undefined));
@@ -49,24 +48,12 @@ describe('z.links.LinkPreviewRepository', () => {
     };
   }
 
-  describe('getLinkPreview', () => {
-    it('rejects if openGraph lib is not available', done => {
-      window.openGraph = undefined;
-
-      link_preview_repository
-        .getLinkPreview()
-        .then(done.fail)
-        .catch(error => {
-          expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NOT_SUPPORTED);
-          done();
-        });
-    });
-
+  describe('_getLinkPreview', () => {
     it('fetches open graph data if openGraph lib is available', done => {
       window.openGraph = mockSucceedingOpenGraph();
 
       link_preview_repository
-        .getLinkPreview('https://app.wire.com/')
+        ._getLinkPreview('https://app.wire.com/')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
@@ -78,7 +65,7 @@ describe('z.links.LinkPreviewRepository', () => {
       window.openGraph = mockSucceedingOpenGraph();
 
       link_preview_repository
-        .getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
+        ._getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.BLACKLISTED);
@@ -91,7 +78,7 @@ describe('z.links.LinkPreviewRepository', () => {
 
       const invalidUrl = 'http:////api/apikey';
       link_preview_repository
-        .getLinkPreview(invalidUrl)
+        ._getLinkPreview(invalidUrl)
         .then(done.fail)
         .catch(error => {
           expect(error.type).toBe(z.error.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);

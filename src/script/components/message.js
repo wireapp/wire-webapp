@@ -38,6 +38,7 @@ class Message {
     isLastDeliveredMessage,
     shouldShowAvatar,
     shouldShowInvitePeople,
+    onContentUpdated,
     onClickAvatar,
     onClickImage,
     onClickInvitePeople,
@@ -76,6 +77,13 @@ class Message {
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
+
+    if (message.has_asset_text()) {
+      // add a listener to any changes to the assets. This will warn the parent that the message has changed
+      message.assets.subscribe(onContentUpdated);
+      // also listen for link previews on a single Text entity
+      message.get_first_asset().previews.subscribe(onContentUpdated);
+    }
 
     this.actionsViewModel = actionsViewModel;
 
@@ -260,7 +268,7 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: onClickMessage}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>

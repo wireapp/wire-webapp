@@ -2142,9 +2142,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
-        if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
-        }
+        return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
       })
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -2266,9 +2264,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     return this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity)
       .then(genericMessage => {
-        if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
-        }
+        return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
       })
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {

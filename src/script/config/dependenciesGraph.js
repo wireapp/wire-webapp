@@ -26,6 +26,7 @@ import CacheRepository from '../cache/CacheRepository';
 import CallingService from '../calling/CallingService';
 import GiphyRepository from '../extension/GiphyRepository';
 import GiphyService from '../extension/GiphyService';
+import LinkPreviewRepository from '../links/LinkPreviewRepository';
 import MediaRepository from '../media/MediaRepository';
 import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesRepository from '../properties/PropertiesRepository';
@@ -51,6 +52,10 @@ dependencies.set(CacheRepository, {dependencies: [], name: 'CacheRepository'});
 dependencies.set(CallingService, {dependencies: [BackendClient], name: 'CallingService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
+dependencies.set(LinkPreviewRepository, {
+  dependencies: [AssetService, PropertiesRepository],
+  name: 'LinkPreviewRepository',
+});
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
@@ -72,6 +77,7 @@ export {
   CallingService,
   GiphyRepository,
   GiphyService,
+  LinkPreviewRepository,
   MediaRepository,
   RichProfileRepository,
   PermissionRepository,
