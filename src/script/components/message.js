@@ -38,6 +38,7 @@ class Message {
     isLastDeliveredMessage,
     shouldShowAvatar,
     shouldShowInvitePeople,
+    onContentUpdated,
     onClickAvatar,
     onClickImage,
     onClickInvitePeople,
@@ -76,6 +77,13 @@ class Message {
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
+
+    if (message.has_asset_text()) {
+      // add a listener to any changes to the assets. This will warn the parent that the message has changed
+      message.assets.subscribe(onContentUpdated);
+      // also listen for link previews on a single Text entity
+      message.get_first_asset().previews.subscribe(onContentUpdated);
+    }
 
     this.actionsViewModel = actionsViewModel;
 

@@ -45,7 +45,6 @@ class MessageListViewModel {
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
     this.showUserDetails = this.showUserDetails.bind(this);
-    this._handleWindowResize = this._handleWindowResize.bind(this);
     this.focusMessage = this.focusMessage.bind(this);
     this.showParticipants = this.showParticipants.bind(this);
     this.showMessageDetails = this.showMessageDetails.bind(this);
@@ -125,7 +124,7 @@ class MessageListViewModel {
       this.messagesChangeSubscription.dispose();
     }
     this.conversation_last_read_timestamp = undefined;
-    window.removeEventListener('resize', this._handleWindowResize);
+    window.removeEventListener('resize', this._adjustScroll);
   }
 
   _shouldStickToBottom() {
@@ -135,11 +134,15 @@ class MessageListViewModel {
     return scrollPosition > scrollEndValue - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
   }
 
-  _handleWindowResize() {
+  /**
+   * Adjust the scroll position
+   * @returns {void} - nothing
+   */
+  _adjustScroll = () => {
     if (this._shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
-  }
+  };
 
   _handleInputResize(inputSizeDiff) {
     if (inputSizeDiff) {
@@ -237,7 +240,7 @@ class MessageListViewModel {
           }
         }
 
-        window.addEventListener('resize', this._handleWindowResize);
+        window.addEventListener('resize', this._adjustScroll);
 
         let shouldStickToBottomOnMessageAdd;
 
