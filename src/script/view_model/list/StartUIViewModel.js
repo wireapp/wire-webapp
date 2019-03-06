@@ -106,7 +106,15 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.conversationRepository.getConnectedUsers();
       }
 
-      return this.isTeam() ? this.teamRepository.teamUsersWithoutPartners() : this.userRepository.connected_users();
+      if (this.isTeam()) {
+        const teamUsersWithoutPartners = this.teamRepository
+          .teamUsers()
+          .filter(user => this.isSelfConnectedTo(user.id));
+
+        return teamUsersWithoutPartners;
+      }
+
+      return this.userRepository.connected_users();
     });
 
     this.matchedUsers = ko.observableArray([]);

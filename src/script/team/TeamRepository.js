@@ -62,10 +62,6 @@ z.team.TeamRepository = class TeamRepository {
         .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
     });
 
-    this.teamUsersWithoutPartners = ko.pureComputed(() =>
-      this.teamUsers().filter(({id}) => this.isSelfConnectedTo(id))
-    );
-
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
