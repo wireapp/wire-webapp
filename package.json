@@ -64,7 +64,6 @@
     "@types/hbs": "4.0.0",
     "@types/helmet": "0.0.42",
     "@types/js-cookie": "2.2.1",
-    "@types/node": "10.12.29",
     "@types/platform": "1.3.2",
     "@types/react-dom": "16.8.0",
     "@types/react-intl": "2.3.17",
