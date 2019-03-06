@@ -152,7 +152,6 @@ import ServiceTagGlobal from '../integration/ServiceTag.js';
 import LifecycleServiceGlobal from '../lifecycle/LifecycleService.js';
 import LifecycleRepositoryGlobal from '../lifecycle/LifecycleRepository.js';
 import UpdateSourceGlobal from '../lifecycle/UpdateSource.js';
-import LinkPreviewHelpersGlobal from '../links/LinkPreviewHelpers.js';
 import LinkPreviewMetaDataTypeGlobal from '../links/LinkPreviewMetaDataType.js';
 import LinkPreviewProtoBuilderGlobal from '../links/LinkPreviewProtoBuilder.js';
 import LinkPreviewBlackListGlobal from '../links/LinkPreviewBlackList.js';

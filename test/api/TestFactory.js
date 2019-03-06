@@ -336,7 +336,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.cryptography_repository,
         TestFactory.event_repository,
         undefined,
-        undefined,
+        resolve(graph.LinkPreviewRepository),
         resolve(graph.ServerTimeRepository),
         TestFactory.team_repository,
         TestFactory.user_repository,

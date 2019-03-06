@@ -17,15 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 
 class LinkPreviewRepository {
-  constructor(assetService, propertiesRepository) {
+  constructor(assetService, propertiesRepository, logger) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = new Logger('LinkPreviewRepository', z.config.LOGGER.OPTIONS);
+    this.logger = logger;
 
     this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
@@ -43,21 +43,20 @@ class LinkPreviewRepository {
    * @returns {Promise} Resolves with link preview proto message
    */
   getLinkPreviewFromString(string) {
-    if (this.shouldSendPreviews && z.util.Environment.desktop) {
-      return Promise.resolve().then(() => {
-        const linkData = z.links.LinkPreviewHelpers.getFirstLinkWithOffset(string);
-
-        if (linkData) {
-          return this.getLinkPreview(linkData.url, linkData.offset).catch(error => {
-            const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
-            if (!isLinkPreviewError) {
-              throw error;
-            }
-          });
-        }
-      });
+    if (!this.shouldSendPreviews || !(window.openGraph || window.openGraphAsync)) {
+      return Promise.resolve();
     }
-    return Promise.resolve();
+    const linkData = getFirstLinkWithOffset(string);
+    if (!linkData) {
+      return Promise.resolve();
+    }
+
+    return this._getLinkPreview(linkData.url, linkData.offset).catch(error => {
+      const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
+      if (!isLinkPreviewError) {
+        throw error;
+      }
+    });
   }
 
   /**
@@ -68,7 +67,7 @@ class LinkPreviewRepository {
    * @param {number} [offset=0] - starting index of the link
    * @returns {Promise} Resolves with a link preview if generated
    */
-  getLinkPreview(url, offset = 0) {
+  _getLinkPreview(url, offset = 0) {
     let openGraphData;
 
     return Promise.resolve()
@@ -77,11 +76,7 @@ class LinkPreviewRepository {
           throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
         }
 
-        if (window.openGraph) {
-          return this._fetchOpenGraphData(url);
-        }
-
-        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NOT_SUPPORTED);
+        return this._fetchOpenGraphData(url);
       })
       .then(fetchedData => {
         if (fetchedData) {
