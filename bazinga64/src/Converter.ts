@@ -17,7 +17,9 @@
  *
  */
 
-export class Converter {
+import {UnsupportedInputError} from './UnsupportedInputError';
+
+class Converter {
   public static arrayBufferViewToStringUTF8(arrayBufferView: Uint8Array): string {
     try {
       return this.arrayBufferViewToString(arrayBufferView);
@@ -151,82 +153,4 @@ export class Converter {
   }
 }
 
-export class DecodedData implements IData {
-  constructor(public asBytes: Uint8Array, public asString: string) {}
-}
-
-export class Decoder {
-  public static fromBase64(data: string): DecodedData {
-    /**
-     * RFC 2045: The encoded output stream must be represented in lines of no more than 76 characters each.
-     * All line breaks or other characters not found in the Base64 alphabet must be ignored by decoding software.
-     * @see https://www.ietf.org/rfc/rfc2045.txt
-     */
-    const nonBase64Alphabet = new RegExp('[^-A-Za-z0-9+/=]|=[^=]|={3,}$', 'igm');
-    const encoded = Converter.toString(data).replace(nonBase64Alphabet, '');
-    const asBytes = Decoder.toByteArray(encoded);
-    const asString = Converter.arrayBufferViewToStringUTF8(asBytes);
-
-    return new DecodedData(asBytes, asString);
-  }
-
-  private static toByteArray(encoded: string): Uint8Array {
-    if (encoded.length % 4 !== 0) {
-      throw new Error('Invalid string. Length must be a multiple of 4.');
-    }
-
-    if (typeof window === 'object') {
-      const decoded = window.atob(encoded);
-
-      const rawLength = decoded.length;
-      const arrayBufferView = new Uint8Array(new ArrayBuffer(rawLength));
-
-      for (let i = 0, len = arrayBufferView.length; i < len; i++) {
-        arrayBufferView[i] = decoded.charCodeAt(i);
-      }
-
-      return arrayBufferView;
-    } else {
-      const buffer = Buffer.from(encoded, 'base64');
-      return Converter.numberArrayToArrayBufferView(buffer);
-    }
-  }
-}
-
-export class EncodedData implements IData {
-  constructor(public asBytes: Uint8Array, public asString: string) {}
-}
-
-export class Encoder {
-  public static toBase64(data: string | number | number[] | ArrayBuffer | Buffer | Uint8Array): EncodedData {
-    const decoded = Converter.toArrayBufferView(data);
-    const asString = Encoder.fromByteArray(decoded);
-    const asBytes = Converter.stringToArrayBufferViewUTF8(asString);
-
-    return new EncodedData(asBytes, asString);
-  }
-
-  private static fromByteArray(decoded: Uint8Array): string {
-    if (typeof window === 'object') {
-      const decodedString = Converter.arrayBufferViewToBaselineString(decoded);
-      return window.btoa(decodedString);
-    }
-
-    return Buffer.from(decoded.buffer).toString('base64');
-  }
-}
-
-export class UnsupportedInputError extends Error {
-  constructor(public message: string) {
-    super(message);
-    Object.setPrototypeOf(this, UnsupportedInputError.prototype);
-    this.name = this.constructor.name;
-    this.message = message;
-    this.stack = new Error().stack;
-  }
-}
-
-export interface IData {
-  asBytes: Uint8Array;
-  asString: string;
-}
+export {Converter};
