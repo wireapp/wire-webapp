@@ -46,6 +46,7 @@
     "lint": "yarn lint:ts",
     "lint:ts": "tslint --config tslint.json --project tsconfig.json",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
-    "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json"
+    "test": "yarn test:types && ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json",
+    "test:types": "tsc --noEmit"
   }
 }
