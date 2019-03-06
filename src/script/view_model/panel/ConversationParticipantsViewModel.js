@@ -26,6 +26,8 @@ export default class ConversationParticipantsViewModel extends BasePanelViewMode
 
     const repositories = params.repositories;
     this.searchRepository = repositories.search;
+    this.teamRepository = repositories.team;
+    this.conversationRepository = repositories.conversation;
 
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {

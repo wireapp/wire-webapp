@@ -799,6 +799,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Get all the users that you are directly connected to.
+   * This means that the user either invited you, you are in a conversation with them or they are connected external users
+   * @returns {Array<User>} List of the connected users
+   */
+  getConnectedUsers() {
+    const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+    const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
+    const initialConnectedUsers = inviter ? [inviter] : [];
+    const allUsers = this.conversations().reduce((connectedUsers, conversation) => {
+      const users = conversation.participating_user_ets().filter(user => !user.isService);
+      return [...connectedUsers, ...users];
+    }, initialConnectedUsers);
+    return [...new Set(allUsers)];
+  }
+
+  /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
    * @returns {Promise} Resolves with the Conversation entity
@@ -832,13 +848,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} query - Query to be searched in group conversation names
    * @param {boolean} isHandle - Query string is handle
-   * @param {boolean} includeOne2One - Should 1to1 conversations be included
    * @returns {Array<Conversation>} Matching group conversations
    */
-  getGroupsByName(query, isHandle, includeOne2One = false) {
+  getGroupsByName(query, isHandle) {
     return this.sorted_conversations()
       .filter(conversationEntity => {
-        if (!includeOne2One && !conversationEntity.isGroup()) {
+        if (!conversationEntity.isGroup()) {
           return false;
         }
 

@@ -26,7 +26,7 @@
     <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
         <div class="group-creation-list-wrapper" data-bind="antiscroll: shouldUpdateScrollbar">
-          <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts, searchRepository: searchRepository"></user-list>
+          <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
         </div>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->

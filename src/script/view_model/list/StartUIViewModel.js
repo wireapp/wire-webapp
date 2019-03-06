@@ -102,7 +102,19 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matchedUsers();
       }
 
-      return this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+      if (this.showOnlyConnectedUsers()) {
+        return this.conversationRepository.getConnectedUsers();
+      }
+
+      if (this.isTeam()) {
+        const teamUsersWithoutPartners = this.teamRepository
+          .teamUsers()
+          .filter(user => this.teamRepository.isSelfConnectedTo(user.id));
+
+        return teamUsersWithoutPartners;
+      }
+
+      return this.userRepository.connected_users();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -127,13 +139,13 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    const {canInviteTeamMembers, canSearchForUsers} = generatePermissionHelpers();
+    const {canInviteTeamMembers, canSearchUnconnectedUsers} = generatePermissionHelpers();
     this.showInviteMember = ko.pureComputed(
       () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
     );
 
-    this.showConversationResultsOnly = ko.pureComputed(() => !canSearchForUsers(this.selfUser().teamRole()));
-    this.showContacts = ko.pureComputed(() => !this.showConversationResultsOnly() && this.contacts().length);
+    this.showOnlyConnectedUsers = ko.pureComputed(() => !canSearchUnconnectedUsers(this.selfUser().teamRole()));
+    this.showContacts = ko.pureComputed(() => this.contacts().length);
 
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
@@ -554,7 +566,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       // Contacts, groups and others
       const trimmedQuery = query.trim();
       const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
-      if (!this.showConversationResultsOnly()) {
+      if (!this.showOnlyConnectedUsers()) {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)
           .then(userEntities => {
@@ -564,21 +576,30 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
             }
           })
           .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
-
-        const localSearchSources = this.isTeam()
-          ? this.teamRepository.teamUsers()
-          : this.userRepository.connected_users();
-
-        const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-        const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-
-        const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-
-        this.searchResults.contacts(contactResults);
       }
-      this.searchResults.groups(
-        this.conversationRepository.getGroupsByName(normalizedQuery, isHandle, this.showConversationResultsOnly())
-      );
+
+      const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+
+      const localSearchSources = this.showOnlyConnectedUsers()
+        ? this.conversationRepository.getConnectedUsers()
+        : allLocalUsers;
+
+      const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+
+      const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+      const connectedUsers = this.conversationRepository.getConnectedUsers();
+      const filteredResults = contactResults.filter(user => {
+        return (
+          connectedUsers.includes(user) ||
+          this.teamRepository.isSelfConnectedTo(user.id) ||
+          (isHandle && user.username() === normalizedQuery)
+        );
+      });
+
+      this.searchResults.contacts(filteredResults);
+
+      this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }
 

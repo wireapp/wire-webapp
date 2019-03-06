@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import TeamMapper from './TeamMapper';
+import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -46,6 +47,12 @@ z.team.TeamRepository = class TeamRepository {
     this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
 
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.memberRoles = ko.observable({});
+    this.memberInviters = ko.observable({});
+
+    this.isSelfConnectedTo = userId =>
+      this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
@@ -179,6 +186,22 @@ z.team.TeamRepository = class TeamRepository {
   updateTeamMembers(teamEntity) {
     return this.getTeamMembers(teamEntity.id)
       .then(teamMembers => {
+        const memberRoles = teamMembers.reduce((accumulator, teamMember) => {
+          return {
+            ...accumulator,
+            [teamMember.userId]: teamMember.permissions
+              ? roleFromTeamPermissions(teamMember.permissions)
+              : ROLE.INVALID,
+          };
+        }, {});
+
+        const memberInvites = teamMembers.reduce((accumulator, teamMember) => {
+          return {...accumulator, [teamMember.userId]: teamMember.invitedBy};
+        }, {});
+
+        this.memberRoles(memberRoles);
+        this.memberInviters(memberInvites);
+
         const memberIds = teamMembers
           .filter(memberEntity => {
             const isSelfUser = memberEntity.userId === this.selfUser().id;
