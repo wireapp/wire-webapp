@@ -809,6 +809,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
               message: t('modalAssetTooLargeMessage', fileSize),
               title: t('modalAssetTooLargeHeadline'),
             },
+            warning: true,
           };
 
           return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
@@ -830,6 +831,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           message: t('modalAssetParallelUploadsMessage', concurrentUploadLimit),
           title: t('modalAssetParallelUploadsHeadline'),
         },
+        warning: true,
       };
 
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
@@ -859,6 +861,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         message,
         title,
       },
+      warning: true,
     };
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);

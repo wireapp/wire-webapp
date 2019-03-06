@@ -55,6 +55,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           message: t('modalUserBlockMessage', userEntity.first_name()),
           title: t('modalUserBlockHeadline', userEntity.first_name()),
         },
+        warning: true,
       });
     }
   }
@@ -69,6 +70,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           secondary: t('modalConnectCancelSecondary'),
           title: t('modalConnectCancelHeadline'),
         },
+        warning: true,
       });
     }
   }
@@ -89,6 +91,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           option: t('modalConversationClearOption'),
           title: t('modalConversationClearHeadline'),
         },
+        warning: true,
       });
     }
   }
@@ -118,7 +121,6 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           message: t('modalAccountRemoveDeviceMessage'),
           title: t('modalAccountRemoveDeviceHeadline', clientEntity.model),
         },
-        warning: false,
       });
     });
   }
@@ -136,6 +138,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             message: t('modalConversationDeleteMessageMessage'),
             title: t('modalConversationDeleteMessageHeadline'),
           },
+          warning: true,
         });
       });
     }
@@ -154,6 +157,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             message: t('modalConversationDeleteMessageEveryoneMessage'),
             title: t('modalConversationDeleteMessageEveryoneHeadline'),
           },
+          warning: true,
         });
       });
     }
@@ -174,6 +178,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           message: t('modalConversationLeaveMessage'),
           title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
         },
+        warning: true,
       });
     }
   }
@@ -231,6 +236,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             message: t('modalConversationRemoveMessage', userEntity.first_name()),
             title: t('modalConversationRemoveHeadline'),
           },
+          warning: true,
         });
       });
     }
@@ -267,6 +273,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           message: t('modalUserUnblockMessage', userEntity.first_name()),
           title: t('modalUserUnblockHeadline'),
         },
+        warning: true,
       });
     }
   }

@@ -99,6 +99,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
         message: t('modalCallEmptyLogMessage'),
         title: t('modalCallEmptyLogHeadline'),
       },
+      warning: true,
     });
   }
 

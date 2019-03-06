@@ -101,6 +101,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
         message: t('modalConversationRevokeLinkMessage'),
         title: t('modalConversationRevokeLinkHeadline'),
       },
+      warning: true,
     });
   }
 
@@ -135,6 +136,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
           message: t('modalConversationRemoveGuestsMessage'),
           title: t('modalConversationRemoveGuestsHeadline'),
         },
+        warning: true,
       });
     }
   }

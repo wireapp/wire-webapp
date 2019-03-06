@@ -1702,6 +1702,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         message: messageText,
         title: titleText,
       },
+      warning: true,
     });
   }
 
@@ -2682,6 +2683,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                 message: messageString,
                 title: titleString,
               },
+              warning: true,
             });
           })
           .catch(reject);
