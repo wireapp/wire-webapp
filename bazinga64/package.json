@@ -46,5 +46,5 @@
     "test:browser": "karma start",
     "test:node": "cross-env JASMINE_CONFIG_PATH=test/shared/support/jasmine.json jasmine"
   },
-  "version": "5.3.46"
+  "version": "5.3.47"
 }
