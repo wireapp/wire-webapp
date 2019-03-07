@@ -149,7 +149,7 @@ ko.bindingHandlers.background_image = {
         .catch(() => {});
     };
 
-    viewportObserver.addElement(element, loadImage);
+    viewportObserver.onElementInViewport(element, loadImage);
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       viewportObserver.removeElement(element);

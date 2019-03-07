@@ -637,12 +637,36 @@ ko.bindingHandlers.in_viewport = {
     if (!onVisible) {
       return;
     }
-    viewportObserver.addElement(element, () => overlayedObserver.onElementVisible(element, onVisible), true, container);
 
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+    const releaseTrackers = () => {
       overlayedObserver.removeElement(element);
       viewportObserver.removeElement(element);
+    };
+
+    let inViewport = false;
+    let visible = false;
+    const triggerCallbackIfVisible = () => {
+      if (inViewport && visible) {
+        onVisible();
+        releaseTrackers();
+      }
+    };
+
+    viewportObserver.trackElement(
+      element,
+      isInViewport => {
+        inViewport = isInViewport;
+        triggerCallbackIfVisible();
+      },
+      true,
+      container
+    );
+    overlayedObserver.trackElement(element, isVisible => {
+      visible = isVisible;
+      triggerCallbackIfVisible();
     });
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, releaseTrackers);
   },
 };
 
