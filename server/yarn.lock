@@ -187,20 +187,15 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
   integrity sha512-A2TAGbTFdBw9azHbpVd+/FkdW2T6msN1uct1O9bH3vTerEHKZhTXJUQXy+hNq1B0RagfU8U+KBdqiZpxjhOUQA==
 
-"@types/node@*":
-  version "11.9.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.6.tgz#c632bbcc780a1349673a6e2e9b9dfa8c369d3c74"
-  integrity sha512-4hS2K4gwo9/aXIcoYxCtHpdgd8XUeDmo1siRCAH3RziXB65JlPqUFMtfy9VPj+og7dp3w1TFjGwYga4e0m9GwA==
+"@types/node@*", "@types/node@11.10.4":
+  version "11.10.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.10.4.tgz#3f5fc4f0f322805f009e00ab35a2ff3d6b778e42"
+  integrity sha512-wa09itaLE8L705aXd8F80jnFpxz3Y1/KRHfKsYL2bPc0XF+wEWu8sR9n5bmeu8Ba1N9z2GRNzm/YdHcghLkLKg==
 
 "@types/node@10.12.29":
   version "10.12.29"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.29.tgz#c2c8d2d27bb55649fbafe8ea1731658421f38acf"
   integrity sha512-J/tnbnj8HcsBgCe2apZbdUpQ7hs4d7oZNTYA5bekWdP0sr2NGsOpI/HRdDroEi209tEvTcTtxhD0FfED3DhEcw==
-
-"@types/node@11.9.5":
-  version "11.9.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.5.tgz#011eece9d3f839a806b63973e228f85967b79ed3"
-  integrity sha512-vVjM0SVzgaOUpflq4GYBvCpozes8OgIIS5gVXVka+OfK3hvnkC1i93U8WiY2OtNE4XUWyyy/86Kf6e0IHTQw1Q==
 
 "@types/platform@1.3.2":
   version "1.3.2"
@@ -220,13 +215,13 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.11.tgz#207944e137a3a3bedeff8c795795491fd98324fa"
-  integrity sha512-OzCtuZ3HyHQok2dliuC85aRH81jYzVM+dGAXr586slcx9BBoY1g8gjNr1rxjHmQcdwOFe82iugDswVG3rW7e5g==
+"@wireapp/commons@1.0.12":
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.12.tgz#2fd244ae843011a3ffc487ffd6251ed8014d1672"
+  integrity sha512-UiHbONnZCgbnO6+a9wmhf7gI8LcFHECIr+GVVlR8mD3bCKzFVfM5QfUpwLJn+q3TFr0PeQnG7g5DrgjxOfHU/A==
   dependencies:
     "@types/ansi-regex" "4.0.0"
-    "@types/node" "11.9.5"
+    "@types/node" "11.10.4"
     "@types/platform" "1.3.2"
     ansi-regex "4.0.0"
     fs-extra "7.0.1"
