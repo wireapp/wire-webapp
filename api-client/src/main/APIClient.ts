@@ -18,10 +18,11 @@
  */
 
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import EventEmitter from 'events';
 import logdown from 'logdown';
 
 import {AssetAPI} from './asset/';
-import {AccessTokenStore, AuthAPI, Context, LoginData, RegisterData} from './auth/';
+import {AccessTokenStore, AuthAPI, Context, InvalidTokenError, LoginData, RegisterData} from './auth/';
 import {BroadcastAPI} from './broadcast/';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
@@ -45,7 +46,7 @@ const defaultConfig: Config = {
   urls: Backend.PRODUCTION,
 };
 
-class APIClient {
+class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
   private readonly STORE_NAME_PREFIX = 'wire';
@@ -75,9 +76,13 @@ class APIClient {
   public config: Config;
 
   public static BACKEND = Backend;
+  public static TOPIC = {
+    ON_LOGOUT: 'APIClient.TOPIC.ON_LOGOUT',
+  };
   public static VERSION = version;
 
   constructor(config?: Config) {
+    super();
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
     this.logger = logdown('@wireapp/api-client/Client', {
@@ -87,9 +92,16 @@ class APIClient {
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
 
+    const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
+    webSocket.on(WebSocketClient.TOPIC.ON_DISCONNECT, async (error: InvalidTokenError) => {
+      this.logger.warn(`Cannot renew access token because cookie is invalid: ${error.message}`, error);
+      await this.logout();
+      this.emit(APIClient.TOPIC.ON_LOGOUT, error);
+    });
+
     this.transport = {
       http: httpClient,
-      ws: new WebSocketClient(this.config.urls.ws, httpClient),
+      ws: webSocket,
     };
 
     this.asset = {
