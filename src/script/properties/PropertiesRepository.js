@@ -78,7 +78,6 @@ class PropertiesRepository {
               secondary: t('modalImproveWireSecondary'),
               title: t('modalImproveWireHeadline'),
             },
-            warning: false,
           });
         });
   }
