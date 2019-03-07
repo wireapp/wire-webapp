@@ -165,18 +165,26 @@
   text-align: center;
   white-space: pre;
 
-  &__icon {
+  &__content {
     display: flex;
     width: 100%;
     height: 100%;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     opacity: 0.16;
+  }
 
-    svg {
-      width: 100px;
-      height: 100px;
-    }
+  &__icon svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  &__text {
+    padding: 8px 40px;
+    font-size: 16px;
+    font-weight: @font-weight-bold;
+    text-align: center;
   }
 }
 
