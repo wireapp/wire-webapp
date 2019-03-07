@@ -19,11 +19,24 @@
 
 import {SupportedCurrency} from '../payment/';
 
-interface InvoiceData {
-  amount: number;
-  company: string;
-  currency: SupportedCurrency;
-  date: number;
+interface PaymentCoupon {
+  amountOff: number;
+  name: string;
+  percentOff: number;
 }
 
-export {InvoiceData};
+interface InvoiceData {
+  amount: number;
+  balance: number;
+  company: string;
+  coupon: PaymentCoupon;
+  currency: SupportedCurrency;
+  date: number;
+  discount: number;
+  subtotal: number;
+  tax: number;
+  taxPercent: number;
+  total: number;
+}
+
+export {InvoiceData, PaymentCoupon};
