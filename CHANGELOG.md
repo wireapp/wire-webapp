@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.53](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.52...@wireapp/api-client@3.2.53) (2019-03-07)
+
+
+### Bug Fixes
+
+* **api-client:** Disconnect WebSocket when cookie is invalid ([#1613](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1613)) ([461f1cf](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/461f1cf))
+
+
+
+
+
 ## [3.2.52](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.51...@wireapp/api-client@3.2.52) (2019-03-07)
 
 
