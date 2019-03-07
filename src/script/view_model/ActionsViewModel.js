@@ -107,7 +107,6 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             .deleteClient(clientEntity.id, password)
             .then(resolve)
             .catch(error => {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
               reject(error);
             });
         },
@@ -118,7 +117,6 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
           message: t('modalAccountRemoveDeviceMessage'),
           title: t('modalAccountRemoveDeviceHeadline', clientEntity.model),
         },
-        warning: false,
       });
     });
   }

@@ -61,7 +61,9 @@
           #include('content/preferences-options.htm')
         <!-- /ko -->
         <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
-          <watermark-icon class="absolute-center watermark" data-uie-name="no-conversation"></watermark-icon>
+          <div class="watermark">
+            <watermark-icon class="absolute-center" data-uie-name="no-conversation"></watermark-icon>
+          </div>        
         <!-- /ko -->
         #include('modal/group-creation.htm')
         <div class="center-column__overlay"></div>

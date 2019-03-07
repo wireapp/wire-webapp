@@ -475,7 +475,6 @@ z.client.ClientRepository = class ClientRepository {
           option: t('modalAccountLogoutOption'),
           title: t('modalAccountLogoutHeadline'),
         },
-        warning: false,
       });
     }
   }

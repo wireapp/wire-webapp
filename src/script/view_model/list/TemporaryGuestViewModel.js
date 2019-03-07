@@ -60,7 +60,6 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
         message: t('modalAccountCreateMessage'),
         title: t('modalAccountCreateHeadline'),
       },
-      warning: false,
     });
   }
 
