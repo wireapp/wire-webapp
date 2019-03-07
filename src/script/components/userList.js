@@ -89,7 +89,7 @@ z.components.UserList = class UserList {
             return (
               connectedUsers.includes(user) ||
               this.teamRepository.isSelfConnectedTo(user.id) ||
-              (isHandle && user.username() === normalizedQuery)
+              user.username() === normalizedQuery
             );
           });
           return filteredResults;
