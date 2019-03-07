@@ -4,6 +4,6 @@
   "extension": [".ts"],
   "include": ["**/*.ts"],
   "per-file": false,
-  "reporter": ["html"],
+  "reporter": ["text-summary"],
   "require": ["ts-node/register"]
 }
