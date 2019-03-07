@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.52](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.51...@wireapp/api-client@3.2.52) (2019-03-07)
+
+
+### Bug Fixes
+
+* **api-client:** Additional invoice type values ([#1612](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1612)) ([2d1e64a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2d1e64a))
+
+
+
+
+
 ## [3.2.51](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.50...@wireapp/api-client@3.2.51) (2019-03-07)
 
 
