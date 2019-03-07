@@ -142,7 +142,7 @@
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
     "webpack-cli": "3.2.3",
-    "webpack-dev-middleware": "3.6.0",
+    "webpack-dev-middleware": "3.6.1",
     "webpack-hot-middleware": "2.24.3"
   },
   "engines": {
