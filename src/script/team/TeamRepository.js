@@ -246,7 +246,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository.get_user_by_id(userId).then(userEntity => this._addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(this._updateMemberRoles);
+      this.getTeamMember(teamId, userId).then(members => this._updateMemberRoles(members));
     }
   }
 
@@ -286,11 +286,11 @@ z.team.TeamRepository = class TeamRepository {
         .then(() => this.sendAccountInfo());
     }
     if (isLocalTeam && !isSelfUser) {
-      this.getTeamMember(teamId, userId).then(this._updateMemberRoles);
+      this.getTeamMember(teamId, userId).then(members => this._updateMemberRoles(members));
     }
   }
 
-  _updateMemberRoles = (memberEntities = []) => {
+  _updateMemberRoles(memberEntities = []) {
     const memberArray = [].concat(memberEntities);
 
     const memberRoles = memberArray.reduce((accumulator, member) => {
@@ -306,7 +306,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.memberRoles(memberRoles);
     this.memberInviters(memberInvites);
-  };
+  }
 
   _onUnhandled(eventJson) {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
