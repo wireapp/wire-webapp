@@ -8,6 +8,7 @@
 /docs/auth-coverage
 /docs/coverage
 /keys
+coverage
 node_modules
 /package-lock.json
 /tags
