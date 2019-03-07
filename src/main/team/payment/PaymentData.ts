@@ -18,24 +18,42 @@
  */
 
 import {InvoiceData, PaymentPlan} from './';
+import {PaymentPlanID} from './PaymentPlan';
+
+enum PaymentStatus {
+  ACTIVE = 'active',
+  CANCELED = 'canceled',
+  PAST_DUE = 'past_due',
+  TRAILING = 'trialing',
+  UNPAID = 'unpaid',
+}
+
+interface PaymentCardData {
+  brand: string;
+  country: string;
+  digits: string;
+  expMonth: number;
+  expYear: number;
+  holder: string;
+  zip: string;
+}
+
+interface PaymentSuspension {
+  created: number;
+  graceEnding: number;
+  invoice: string;
+}
 
 interface PaymentData {
   bankTransfer: boolean;
-  card: {
-    brand: string;
-    country: string;
-    digits: string;
-    expMonth: number;
-    expYear: number;
-    holder: string;
-    zip: string;
-  };
+  card: PaymentCardData;
   invoice: InvoiceData;
   plan: PaymentPlan;
-  planId: 'wire_annual_plan' | 'wire_monthly_plan';
+  planId: PaymentPlanID;
   seats: number;
-  status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'unpaid';
+  status: PaymentStatus;
+  suspend?: PaymentSuspension;
   trialEndsAt: number;
 }
 
-export {PaymentData};
+export {PaymentData, PaymentStatus, PaymentSuspension, PaymentCardData};

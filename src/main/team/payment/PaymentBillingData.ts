@@ -16,11 +16,13 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {SupportedCurrency} from './SupportedCurrency';
 
 interface PaymentBillingData {
   city: string;
   company: string;
   country: string;
+  currency?: SupportedCurrency;
   firstname: string;
   lastname: string;
   state?: string;
