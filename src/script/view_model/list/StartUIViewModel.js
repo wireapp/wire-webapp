@@ -107,9 +107,10 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       if (this.isTeam()) {
+        const connectedUsers = this.conversationRepository.getConnectedUsers();
         const teamUsersWithoutPartners = this.teamRepository
           .teamUsers()
-          .filter(user => this.teamRepository.isSelfConnectedTo(user.id));
+          .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
 
         return teamUsersWithoutPartners;
       }
@@ -593,7 +594,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         return (
           connectedUsers.includes(user) ||
           this.teamRepository.isSelfConnectedTo(user.id) ||
-          (isHandle && user.username() === normalizedQuery)
+          user.username() === normalizedQuery
         );
       });
 
