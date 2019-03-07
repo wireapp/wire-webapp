@@ -808,7 +808,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
     const initialConnectedUsers = inviter ? [inviter] : [];
     const allUsers = this.conversations().reduce((connectedUsers, conversation) => {
-      const users = conversation.participating_user_ets().filter(user => !user.isService);
+      const users = conversation
+        .participating_user_ets()
+        .filter(user => !user.isService && (user.isTeamMember() || user.isConnected()));
       return [...connectedUsers, ...users];
     }, initialConnectedUsers);
     return [...new Set(allUsers)];
