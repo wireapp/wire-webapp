@@ -1321,14 +1321,13 @@ class AuthViewModel {
   }
 
   /**
-   * Check whether a form has errors and play the alert sound.
+   * Check whether a form has errors.
    * @private
    * @returns {boolean} Form has an error
    */
   _has_errors() {
     let has_error = false;
     if (this.validation_errors().length > 0) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
       has_error = true;
     }
     return has_error;

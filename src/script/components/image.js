@@ -45,7 +45,7 @@ z.components.Image = class Image {
       });
     };
 
-    viewportObserver.addElement(this.element, _onInViewport);
+    viewportObserver.onElementInViewport(this.element, _onInViewport);
   }
 
   dispose() {

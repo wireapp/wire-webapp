@@ -32,7 +32,7 @@ describe('image-asset', () => {
   };
 
   beforeEach(() => {
-    spyOn(viewportObserver, 'addElement').and.callFake((element, callback) => {
+    spyOn(viewportObserver, 'onElementInViewport').and.callFake((element, callback) => {
       callback();
     });
   });
