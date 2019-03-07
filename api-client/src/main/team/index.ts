@@ -23,3 +23,4 @@ export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team/';
 export {PaymentAPI, PaymentData} from './payment/';
 export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
 export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './TeamError';
+export * from './MemberRole';
