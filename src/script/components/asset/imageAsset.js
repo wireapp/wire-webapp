@@ -51,7 +51,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
     });
 
     this.container = element;
-    viewportObserver.addElement(this.container, () => this.isVisible(true));
+    viewportObserver.onElementInViewport(this.container, () => this.isVisible(true));
   }
 
   dispose() {
