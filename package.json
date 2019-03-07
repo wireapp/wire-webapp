@@ -10,7 +10,7 @@
     "@emotion/core": "10.0.7",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "1.0.12",
-    "@wireapp/core": "8.1.36",
+    "@wireapp/core": "8.1.39",
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/react-ui-kit": "5.0.18",
     "amplify": "git+https://git@github.com/wireapp/amplify",
