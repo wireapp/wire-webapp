@@ -130,7 +130,7 @@ after_deploy:
     if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_EVENT_TYPE}" == "push" ]; then
       yarn global add @wireapp/changelog-bot@2.2.1
       wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "a720ce02-c44c-4981-936c-609380884231"
-      wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "4223f57f-0c8d-42fe-bf8a-908d680788ab" -m "Staging bump done! 🏁"
+      wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "4223f57f-0c8d-42fe-bf8a-908d680788ab" -m "Staging bump for commit *${TRAVIS_COMMIT}* (\"${TRAVIS_COMMIT_MESSAGE}\") done! 🏁"
     fi
 
 after_failure:
