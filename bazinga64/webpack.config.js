@@ -24,10 +24,6 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     [pkg.name]: `${__dirname}/${pkg.main}`,
-    [`${pkg.name}.test`]: [
-      `${__dirname}/test/shared/helpers/globalTestValues.js`,
-      `${__dirname}/test/browser/index.js`,
-    ],
   },
   mode: 'production',
   output: {

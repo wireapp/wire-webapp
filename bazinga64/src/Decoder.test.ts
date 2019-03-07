@@ -26,7 +26,7 @@ import {
   numberEncoded,
 } from './test/TestValues';
 
-import * as fixtures from './test/fixtures.json';
+const fixtures = require('./test/fixtures.json');
 
 describe('fromBase64', () => {
   it('decodes arrays', () => {

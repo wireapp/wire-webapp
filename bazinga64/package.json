@@ -2,6 +2,7 @@
   "description": "Base64 encoding and decoding with ASCII string representation.",
   "devDependencies": {
     "@types/jasmine": "3.3.9",
+    "@types/karma": "3.0.2",
     "cross-env": "5.2.0",
     "jasmine": "3.3.1",
     "karma": "4.0.1",
@@ -11,6 +12,7 @@
     "karma-jasmine-diff-reporter": "2.0.0",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
+    "karma-typescript": "4.0.0",
     "libsodium-wrappers": "0.7.4",
     "nyc": "13.3.0",
     "rimraf": "2.6.3",
