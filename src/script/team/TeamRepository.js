@@ -186,21 +186,9 @@ z.team.TeamRepository = class TeamRepository {
   updateTeamMembers(teamEntity) {
     return this.getTeamMembers(teamEntity.id)
       .then(teamMembers => {
-        const memberRoles = teamMembers.reduce((accumulator, teamMember) => {
-          return {
-            ...accumulator,
-            [teamMember.userId]: teamMember.permissions
-              ? roleFromTeamPermissions(teamMember.permissions)
-              : ROLE.INVALID,
-          };
-        }, {});
-
-        const memberInvites = teamMembers.reduce((accumulator, teamMember) => {
-          return {...accumulator, [teamMember.userId]: teamMember.invitedBy};
-        }, {});
-
-        this.memberRoles(memberRoles);
-        this.memberInviters(memberInvites);
+        this.memberRoles({});
+        this.memberInviters({});
+        this._updateMemberRoles(teamMembers);
 
         const memberIds = teamMembers
           .filter(memberEntity => {
@@ -258,6 +246,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository.get_user_by_id(userId).then(userEntity => this._addUserToTeam(userEntity));
+      this.getTeamMember(teamId, userId).then(this._updateMemberRoles);
     }
   }
 
@@ -296,7 +285,28 @@ z.team.TeamRepository = class TeamRepository {
         .then(memberEntity => this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions))
         .then(() => this.sendAccountInfo());
     }
+    if (isLocalTeam && !isSelfUser) {
+      this.getTeamMember(teamId, userId).then(this._updateMemberRoles);
+    }
   }
+
+  _updateMemberRoles = (memberEntities = []) => {
+    const memberArray = [].concat(memberEntities);
+
+    const memberRoles = memberArray.reduce((accumulator, member) => {
+      return {
+        ...accumulator,
+        [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
+      };
+    }, this.memberRoles());
+
+    const memberInvites = memberArray.reduce((accumulator, member) => {
+      return {...accumulator, [member.userId]: member.invitedBy};
+    }, this.memberInviters());
+
+    this.memberRoles(memberRoles);
+    this.memberInviters(memberInvites);
+  };
 
   _onUnhandled(eventJson) {
     this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
