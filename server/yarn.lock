@@ -158,17 +158,12 @@
   dependencies:
     "@types/node" "*"
 
-"@types/handlebars@*":
-  version "4.0.39"
-  resolved "https://registry.yarnpkg.com/@types/handlebars/-/handlebars-4.0.39.tgz#961fb54db68030890942e6aeffe9f93a957807bd"
-  integrity sha512-vjaS7Q0dVqFp85QhyPSZqDKnTTCemcSHNHFvDdalO1s0Ifz5KuE64jQD5xoUkfdWwF4WpqdJEl7LsWH8rzhKJA==
-
-"@types/hbs@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/hbs/-/hbs-4.0.0.tgz#9612e41a3d3701399711508c444c0a23e1f0e9cb"
-  integrity sha512-+/54ItJHsnfg+GylfZF2h67LM91VhK8rFoNMTLYr+jW8MWORHy+w3QdFYT2IX1C2MPzD8NRaSNujsF2FCQSfbQ==
+"@types/hbs@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/hbs/-/hbs-4.0.1.tgz#9231d2d6c18b3eac1cc3140c76990f72a890fb8f"
+  integrity sha512-kbgeYPLGOG8LQhqNlAvMm7vMz6Iu3IaXDEufpkEYT/viTko1ZlIrj+b6lvo4cAIDRkh6eg+JdKVZkriDGTisEw==
   dependencies:
-    "@types/handlebars" "*"
+    handlebars "^4.1.0"
 
 "@types/helmet@0.0.42":
   version "0.0.42"
@@ -1303,6 +1298,17 @@ handlebars@4.0.13:
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.0.13.tgz#89fc17bf26f46fd7f6f99d341d92efaae64f997d"
   integrity sha512-uydY0jy4Z3wy/iGXsi64UtLD4t1fFJe16c/NFxsYE4WdQis8ZCzOXUZaPQNG0e5bgtLQV41QTfqBindhEjnpyQ==
+  dependencies:
+    async "^2.5.0"
+    optimist "^0.6.1"
+    source-map "^0.6.1"
+  optionalDependencies:
+    uglify-js "^3.1.4"
+
+handlebars@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.1.0.tgz#0d6a6f34ff1f63cecec8423aa4169827bf787c3a"
+  integrity sha512-l2jRuU1NAWK6AW5qqcTATWQJvNPEwkM7NEKSiv/gqOsoSQbVoWyqVEY5GS+XPQ88zLNmqASRpzfdm8d79hJS+w==
   dependencies:
     async "^2.5.0"
     optimist "^0.6.1"
