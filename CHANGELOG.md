@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.50](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.49...@wireapp/api-client@3.2.50) (2019-03-07)
+
+
+### Bug Fixes
+
+* **api-client:** Team & Payment type update ([#1611](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1611)) ([2d98f5a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/2d98f5a))
+
+
+
+
+
 ## [3.2.49](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.48...@wireapp/api-client@3.2.49) (2019-03-06)
 
 **Note:** Version bump only for package @wireapp/api-client
