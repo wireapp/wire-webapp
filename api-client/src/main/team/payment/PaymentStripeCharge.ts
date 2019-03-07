@@ -21,6 +21,12 @@
 
 import {SupportedCurrency} from '../payment/';
 
+enum PaymentStripeChargeStatus {
+  FAILED = 'failed',
+  PENDING = 'pending',
+  SUCCEEDED = 'succeeded',
+}
+
 interface PaymentStripeCharge {
   id: string;
   amount: number;
@@ -31,7 +37,7 @@ interface PaymentStripeCharge {
   invoice: string;
   livemode: boolean;
   paid: boolean;
-  status: 'succeeded' | 'pending' | 'failed';
+  status: PaymentStripeChargeStatus;
 }
 
-export {PaymentStripeCharge};
+export {PaymentStripeCharge, PaymentStripeChargeStatus};
