@@ -12486,9 +12486,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2"
 
-"wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.15.0":
-  version "0.15.0"
-  resolved "https://github.com/wireapp/wire-web-config-wire#efa2fdf5da7af7cfa8c7e2f46a32ef6143d5e7cc"
+"wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.15.1":
+  version "0.15.1"
+  uid e607557da64ef53fb9313ea7f7570f7f3e252c67
+  resolved "https://github.com/wireapp/wire-web-config-wire#e607557da64ef53fb9313ea7f7570f7f3e252c67"
   dependencies:
     adm-zip "0.4.13"
 
