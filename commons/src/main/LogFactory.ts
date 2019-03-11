@@ -67,20 +67,24 @@ class LogFactory {
     }
   }
 
-  static async writeToFile(logTransport: logdown.TransportOptions): Promise<void> {
+  static async writeTransport(logTransport: logdown.TransportOptions): Promise<void> {
     const [time] = logTransport.args;
     const logMessage = `${time} ${logTransport.msg}`;
-    const withoutColor = logMessage.replace(ansiRegex(), '');
 
     if (this.logFilePath) {
-      try {
-        await fs.outputFile(this.logFilePath, `${withoutColor}\r\n`, {
-          encoding: 'utf8',
-          flag: 'a',
-        });
-      } catch (error) {
-        console.warn(`Cannot write to log file "${this.logFilePath}": ${error.message}`, error);
-      }
+      await LogFactory.writeMessage(logMessage, this.logFilePath);
+    }
+  }
+
+  static async writeMessage(message: string, logFilePath: string): Promise<void> {
+    const withoutColor = message.replace(ansiRegex(), '');
+    try {
+      await fs.outputFile(logFilePath, `${withoutColor}\r\n`, {
+        encoding: 'utf8',
+        flag: 'a',
+      });
+    } catch (error) {
+      console.warn(`Cannot write to log file "${this.logFilePath}": ${error.message}`, error);
     }
   }
 
@@ -103,7 +107,7 @@ class LogFactory {
 
     if (logdown.transports.length === 0) {
       logdown.transports.push(LogFactory.addTimestamp.bind({namespace: config.namespace}));
-      logdown.transports.push(LogFactory.writeToFile.bind({logFilePath: config.logFilePath}));
+      logdown.transports.push(LogFactory.writeTransport.bind({logFilePath: config.logFilePath}));
     }
     const loggerName = this.createLoggerName(name, config.namespace, config.separator);
 
