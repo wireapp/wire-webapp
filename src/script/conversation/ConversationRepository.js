@@ -2951,15 +2951,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
-        const leavingEventTypes = [
+        const membersUpdateMessages = [
           z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+          z.event.Backend.CONVERSATION.MEMBER_JOIN,
           z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
         ];
-        const isLeaveEvent = leavingEventTypes.includes(eventJson.type);
-        if (isLeaveEvent) {
-          const isFromLeavingUser = eventJson.data.user_ids.includes(sender);
-          if (isFromLeavingUser) {
-            // we ignore leave events that are sent by the user actually leaving
+        const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
+        if (isMembersUpdateEvent) {
+          const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
+          if (isFromUpdatedMember) {
+            // we ignore leave/join events that are sent by the user actually leaving or joining
             return conversationEntity;
           }
         }
