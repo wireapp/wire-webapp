@@ -3,7 +3,7 @@
     "@types/ansi-regex": "4.0.0",
     "@types/node": "11.11.0",
     "@types/platform": "1.3.2",
-    "ansi-regex": "4.0.0",
+    "ansi-regex": "4.1.0",
     "fs-extra": "7.0.1",
     "logdown": "3.2.7",
     "moment": "2.24.0",
