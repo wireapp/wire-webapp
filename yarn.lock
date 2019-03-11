@@ -727,9 +727,10 @@
   dependencies:
     bower "1.8.2"
 
-"@bower_components/webapp-module-logger@wireapp/webapp-module-logger#v1.1.2":
-  version "1.1.2"
-  resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/2281c01352a515f88316962817badb4e9767e273"
+"@bower_components/webapp-module-logger@wireapp/webapp-module-logger#v1.1.4":
+  version "1.1.4"
+  uid ed1f422bf331674098a6862c93f1750741f6db8d
+  resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/ed1f422bf331674098a6862c93f1750741f6db8d"
 
 "@bower_components/webapp-module-namespace@wireapp/webapp-module-namespace#1.0.2":
   version "1.0.2"
