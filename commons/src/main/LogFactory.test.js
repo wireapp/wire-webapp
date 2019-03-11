@@ -25,6 +25,11 @@ describe('LogFactory', () => {
       const loggerName = LogFactory.createLoggerName('LogFactory', '@wireapp/commons', '::');
       expect(loggerName).toBe('@wireapp/commons::LogFactory');
     });
+
+    it('does not add empty strings to the logger name', () => {
+      const loggerName = LogFactory.createLoggerName('LogFactory', '', '::');
+      expect(loggerName).toBe('LogFactory');
+    });
   });
 
   describe('getLogger', () => {

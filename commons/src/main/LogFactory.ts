@@ -88,22 +88,22 @@ class LogFactory {
     }
   }
 
-  static createLoggerName(fileName: string, namespace: string, separator: string): string {
+  static createLoggerName(fileName: string, namespace?: string, separator?: string): string {
     if (typeof window === 'undefined') {
       fileName = path.basename(fileName, path.extname(fileName));
     }
-    return [namespace, fileName].join(separator);
+    return [namespace, fileName].filter(Boolean).join(separator);
   }
 
   static getLogger(name: string, options?: LoggerOptions): logdown.Logger {
-    const defaults = {
+    const defaults: LoggerOptions = {
       color: LogFactory.getColor(),
       forceEnable: false,
       logFilePath: '',
-      namespace: typeof window === 'undefined' ? String(process.env.npm_package_name) : '',
+      namespace: typeof window === 'undefined' ? process.env.npm_package_name || '' : '',
       separator: '::',
     };
-    const config = {...defaults, ...options};
+    const config: LoggerOptions = {...defaults, ...options};
 
     if (logdown.transports.length === 0) {
       logdown.transports.push(LogFactory.addTimestamp.bind({namespace: config.namespace}));
