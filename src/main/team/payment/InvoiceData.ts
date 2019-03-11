@@ -31,6 +31,7 @@ interface InvoiceData {
   company: string;
   coupon: PaymentCoupon;
   currency: SupportedCurrency;
+  custom: boolean;
   date: number;
   discount: number;
   subtotal: number;
