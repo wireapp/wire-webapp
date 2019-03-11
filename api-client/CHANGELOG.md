@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.55](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.54...@wireapp/api-client@3.2.55) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** Make MemberData's created_at and created_by attributes optional ([37243c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/37243c5))
+
+
+
+
+
 ## [3.2.54](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.53...@wireapp/api-client@3.2.54) (2019-03-11)
 
 
