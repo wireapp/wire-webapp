@@ -9,7 +9,7 @@
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
     "@emotion/core": "10.0.9",
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/commons": "1.0.12",
+    "@wireapp/commons": "1.0.14",
     "@wireapp/core": "8.1.43",
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/react-ui-kit": "5.0.18",
