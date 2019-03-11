@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.2.1...@wireapp/commons@1.3.0) (2019-03-11)
+
+
+### Features
+
+* **commons:** Expose log writing errors ([#1624](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1624)) ([9f46f03](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/9f46f03))
+
+
+
+
+
 ## [1.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.2.0...@wireapp/commons@1.2.1) (2019-03-11)
 
 
