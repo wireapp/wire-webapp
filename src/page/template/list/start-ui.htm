@@ -37,7 +37,10 @@
 
           <!-- ko if: showNoSearchResults() -->
             <!-- ko if: showOnlyConnectedUsers() -->
-              <people-icon class="start-ui-no-search-results__icon"></people-icon>
+              <div class="start-ui-no-search-results__content">
+                <message-icon class="start-ui-no-search-results__icon"></message-icon>
+                <div class="start-ui-no-search-results__text" data-bind="text: t('searchNoMatchesPartner')" data-uie-name="label-no-search-result"></div>
+              </div>
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
               <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
