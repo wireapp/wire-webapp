@@ -18,6 +18,7 @@
  */
 
 import 'url-search-params-polyfill';
+import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
 
 function enableLogging(location = window.location.href) {
   /**
@@ -33,7 +34,9 @@ function enableLogging(location = window.location.href) {
     return;
   }
 
-  const namespace = new URL(location).searchParams.get('enableLogging');
+  const namespace = isEnvironment(ENVIRONMENT.LOCAL)
+    ? '@wireapp/webapp'
+    : new URL(location).searchParams.get('enableLogging');
 
   if (namespace) {
     localStorage.setItem('debug', namespace);
