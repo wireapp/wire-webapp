@@ -24,6 +24,7 @@ import * as ArrayUtil from './util/ArrayUtil';
 import * as RandomUtil from './util/RandomUtil';
 import {Runtime} from './util/Runtime';
 import * as StringUtil from './util/StringUtil';
+import * as TypeUtil from './util/TypeUtil';
 import * as UrlUtil from './util/UrlUtil';
 import * as ValidationUtil from './util/ValidationUtil';
 
@@ -36,6 +37,7 @@ export {
   RandomUtil,
   Runtime,
   StringUtil,
+  TypeUtil,
   UrlUtil,
   ValidationUtil,
 };
