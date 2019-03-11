@@ -20,8 +20,8 @@
 import {PermissionsData} from './PermissionsData';
 
 interface MemberData {
-  created_at: Date;
-  created_by: string;
+  created_at?: Date;
+  created_by?: string;
   permissions: PermissionsData;
   user: string;
 }
