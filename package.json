@@ -7,7 +7,7 @@
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.4",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
-    "@emotion/core": "10.0.7",
+    "@emotion/core": "10.0.9",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "1.0.12",
     "@wireapp/core": "8.1.43",
