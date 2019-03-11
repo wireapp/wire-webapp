@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.2.0...@wireapp/commons@1.2.1) (2019-03-11)
+
+
+### Bug Fixes
+
+* **commons:** Don't print undefined namespace in log messages ([#1623](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1623)) ([41f43ad](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/41f43ad))
+
+
+
+
+
 # [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.1.0...@wireapp/commons@1.2.0) (2019-03-11)
 
 
