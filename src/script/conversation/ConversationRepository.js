@@ -124,7 +124,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();

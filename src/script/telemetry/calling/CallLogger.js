@@ -11,19 +11,6 @@ export default class CallLogger {
     };
   }
 
-  static get LOG_LEVEL() {
-    return {
-      DEBUG: 700,
-      ERROR: 1000,
-      INFO: 800,
-      LEVEL_1: 300,
-      LEVEL_2: 400,
-      LEVEL_3: 500,
-      OFF: 0,
-      WARNING: 900,
-    };
-  }
-
   static get OBFUSCATED() {
     return {
       FINGERPRINT: 'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX',
@@ -50,15 +37,13 @@ export default class CallLogger {
     };
   }
 
-  constructor(name, id, options, messageLog) {
+  constructor(name, id, messageLog) {
     name = id ? this._createName(name, id) : name;
 
     this.logger = Logger(name);
-    this.levels = this.logger.levels;
 
     this.messageLog = messageLog;
     this.name = name;
-    this.options = options;
 
     this.obfuscationMode = CallLogger.OBFUSCATION_MODE.SOFT;
   }
@@ -107,32 +92,6 @@ export default class CallLogger {
     });
 
     return sdpTransform.write(decodedSdpMessage);
-  }
-
-  getDebugType(number) {
-    switch (number) {
-      case CallLogger.LOG_LEVEL.LEVEL_1:
-      case CallLogger.LOG_LEVEL.LEVEL_2:
-      case CallLogger.LOG_LEVEL.LEVEL_3: {
-        return 'VERBOSE';
-      }
-
-      case CallLogger.LOG_LEVEL.DEBUG: {
-        return 'DEBUG';
-      }
-
-      case CallLogger.LOG_LEVEL.INFO: {
-        return 'INFO';
-      }
-
-      case CallLogger.LOG_LEVEL.WARNING: {
-        return 'INFO';
-      }
-
-      case CallLogger.LOG_LEVEL.ERROR: {
-        return 'ERROR';
-      }
-    }
   }
 
   logToMemory(obfuscatedMessage) {

@@ -28,7 +28,7 @@ export default class File extends Asset {
     this.cancel_download = this.cancel_download.bind(this);
 
     this.type = AssetType.FILE;
-    this.logger = Logger('z.entity.File', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.entity.File');
 
     // z.assets.AssetTransferState
     this.status = ko.observable();

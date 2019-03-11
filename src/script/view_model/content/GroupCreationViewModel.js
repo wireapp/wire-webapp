@@ -37,7 +37,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = Logger('z.viewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.GroupCreationViewModel');
 
     this.clickOnCreate = this.clickOnCreate.bind(this);
     this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);

@@ -54,7 +54,7 @@ class AuthViewModel {
   constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
-    this.logger = Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.AuthViewModel');
 
     this.authRepository = authComponent.repository;
     this.audio_repository = authComponent.audio;

@@ -31,7 +31,7 @@ export default class AppInitStatistics {
   }
 
   constructor() {
-    this.logger = Logger('AppInitStatistics', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitStatistics');
 
     amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }

@@ -40,7 +40,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     const loggerId = this.id.substr(0, 8);
     const loggerTimestamp = new Date().getMilliseconds();
     const loggerName = `z.telemetry.calling.FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
-    this.logger = Logger(loggerName, z.config.LOGGER.OPTIONS);
+    this.logger = Logger(loggerName);
     this.is_answer = false;
     this.peer_connection = undefined;
 

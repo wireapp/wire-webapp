@@ -68,7 +68,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.permissionRepository = permissionRepository;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.notification.NotificationRepository');
 
     this.notifications = [];
 

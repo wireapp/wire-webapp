@@ -38,7 +38,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   constructor() {
-    this.logger = Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ModalsViewModel');
     this.elementId = 'modals';
 
     this.modals = {};

@@ -51,7 +51,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ContentViewModel');
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);

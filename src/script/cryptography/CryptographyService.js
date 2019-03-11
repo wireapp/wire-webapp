@@ -36,7 +36,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.cryptography.CryptographyService');
   }
 
   /**

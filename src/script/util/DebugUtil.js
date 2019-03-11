@@ -44,7 +44,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.util.DebugUtil');
   }
 
   blockAllConnections() {

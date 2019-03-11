@@ -36,7 +36,7 @@ export default class MediaDevicesHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('MediaDevicesHandler');
 
     this.availableDevices = {
       audioInput: ko.observableArray([]),

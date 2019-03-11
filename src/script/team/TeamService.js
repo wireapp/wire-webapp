@@ -36,7 +36,7 @@ z.team.TeamService = class TeamService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.team.TeamService');
   }
 
   getTeamById(teamId) {

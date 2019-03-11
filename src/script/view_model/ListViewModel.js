@@ -64,7 +64,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ListViewModel');
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);

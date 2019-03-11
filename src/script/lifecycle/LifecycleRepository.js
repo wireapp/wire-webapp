@@ -33,7 +33,7 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
   }
 
   constructor(lifecycleService, userRepository) {
-    this.logger = Logger('z.lifecycle.LifecycleRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.lifecycle.LifecycleRepository');
     this.lifecycleService = lifecycleService;
     this.userRepository = userRepository;
 

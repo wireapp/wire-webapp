@@ -91,7 +91,7 @@ import Conversation from '../entity/Conversation';
 class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
-    this.logger = Logger('ConversationMapper', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('ConversationMapper');
   }
 
   /**

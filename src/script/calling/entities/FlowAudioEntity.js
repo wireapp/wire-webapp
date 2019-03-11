@@ -42,7 +42,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     const id = this.flowEntity.id;
     const loggerName = 'z.calling.entities.FlowAudio';
-    this.callLogger = new CallLogger(loggerName, id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, id, this.messageLog);
 
     this.callLogger.info({
       data: {

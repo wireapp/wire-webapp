@@ -54,7 +54,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.changeAccentColor = this.changeAccentColor.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
-    this.logger = Logger('z.viewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.PreferencesAccountViewModel');
 
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;

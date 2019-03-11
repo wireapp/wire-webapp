@@ -26,7 +26,7 @@ z.connect.ConnectRepository = class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
-    this.logger = Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.connect.ConnectRepository');
   }
 
   /**

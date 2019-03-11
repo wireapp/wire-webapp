@@ -28,7 +28,7 @@ export default class AssetService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('AssetService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AssetService');
   }
 
   /**

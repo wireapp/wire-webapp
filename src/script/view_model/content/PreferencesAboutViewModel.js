@@ -34,7 +34,7 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = Logger('z.viewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.PreferencesAboutViewModel');
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;

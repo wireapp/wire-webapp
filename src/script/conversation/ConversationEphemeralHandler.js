@@ -59,7 +59,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 

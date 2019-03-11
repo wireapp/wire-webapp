@@ -35,7 +35,7 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = Logger('GroupParticipantUserViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('GroupParticipantUserViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
 

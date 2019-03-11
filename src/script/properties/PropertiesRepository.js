@@ -44,7 +44,7 @@ class PropertiesRepository {
   constructor(propertiesService, selfService) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
-    this.logger = Logger('PropertiesRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('PropertiesRepository');
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();

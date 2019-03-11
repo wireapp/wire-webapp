@@ -32,7 +32,7 @@ export default class EventMapper {
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.logger = Logger('EventMapper', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('EventMapper');
   }
 
   /**

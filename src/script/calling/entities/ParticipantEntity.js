@@ -52,7 +52,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.sessionId = undefined;
 
     const loggerName = 'z.calling.entities.ParticipantEntity';
-    this.callLogger = new CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, this.id, this.messageLog);
 
     this.callLogger.info(`Created new participant entity for user ${this.id}`);
 

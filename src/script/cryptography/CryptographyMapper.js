@@ -31,7 +31,7 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.cryptography.CryptographyMapper');
   }
 
   /**

@@ -90,7 +90,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = Logger('MediaStreamHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('MediaStreamHandler');
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();

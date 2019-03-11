@@ -41,7 +41,7 @@ z.storage.StorageRepository = class StorageRepository {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = Logger('z.storage.StorageRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.storage.StorageRepository');
 
     this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

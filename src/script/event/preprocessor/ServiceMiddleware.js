@@ -33,7 +33,7 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('z.event.preprocessor.ServiceMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.event.preprocessor.ServiceMiddleware');
   }
 
   processEvent(event) {

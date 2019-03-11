@@ -34,7 +34,7 @@ export default class PermissionRepository {
    * Construct a new Permission Repository.
    */
   constructor() {
-    this.logger = Logger('z.permission.PermissionRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.permission.PermissionRepository');
 
     this.permissionState = {
       [z.permission.PermissionType.CAMERA]: ko.observable(undefined),

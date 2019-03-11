@@ -38,7 +38,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel');
 
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;

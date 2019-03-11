@@ -19,33 +19,11 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
-
-z.ui.WindowHandler = class WindowHandler {
+export default class WindowHandler {
   constructor() {
-    this.init = this.init.bind(this);
-    this.logger = Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.ui.WindowHandler');
 
-    this.height = 0;
-    this.width = 0;
-
-    this.isVisible = true;
-
-    return this;
-  }
-
-  init() {
-    this.width = $(window).width();
-    this.height = $(window).height();
     this._listenToUnhandledPromiseRejection();
-
-    document.addEventListener('visibilitychange', () => {
-      const isVisible = document.visibilityState === 'visible';
-      this.logger.info(`Webapp is ${isVisible ? 'visible' : 'hidden'}`);
-    });
-
-    return this;
   }
 
   _listenToUnhandledPromiseRejection() {
@@ -62,4 +40,4 @@ z.ui.WindowHandler = class WindowHandler {
       }
     });
   }
-};
+}

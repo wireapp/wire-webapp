@@ -188,7 +188,6 @@ import CallSetupStepsOrderGlobal from '../telemetry/calling/CallSetupStepsOrder.
 import CallSetupTimingsGlobal from '../telemetry/calling/CallSetupTimings.js';
 import FlowTelemetryGlobal from '../telemetry/calling/FlowTelemetry.js';
 import CallTelemetryGlobal from '../telemetry/calling/CallTelemetry.js';
-import CallLoggerGlobal from '../telemetry/calling/CallLogger.js';
 import AvailabilityMapperGlobal from '../user/AvailabilityMapper.js';
 import AvailabilityTypeGlobal from '../user/AvailabilityType.js';
 import UserHandleGeneratorGlobal from '../user/UserHandleGenerator.js';
@@ -301,7 +300,6 @@ import ContextMenuGlobal from '../ui/ContextMenu.js';
 import ModalGlobal from '../ui/Modal.js';
 import ShortcutTypeGlobal from '../ui/ShortcutType.js';
 import ShortcutGlobal from '../ui/Shortcut.js';
-import WindowHandlerGlobal from '../ui/WindowHandler.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';

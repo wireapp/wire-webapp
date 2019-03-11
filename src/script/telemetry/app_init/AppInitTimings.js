@@ -33,7 +33,7 @@ export default class AppInitTimings {
   }
 
   constructor() {
-    this.logger = Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitTimings');
     this.init = window.performance.now();
   }
 

@@ -69,7 +69,7 @@ export default class MediaConstraintsHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.media.MediaConstraintsHandler');
   }
 
   //##############################################################################

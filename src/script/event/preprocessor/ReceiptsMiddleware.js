@@ -36,7 +36,7 @@ export default class ReceiptsMiddleware {
     this.eventService = eventService;
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('ReadReceiptMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('ReadReceiptMiddleware');
   }
 
   /**

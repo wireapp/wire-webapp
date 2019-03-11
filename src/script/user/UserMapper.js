@@ -28,7 +28,7 @@ export default class UserMapper {
    * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    */
   constructor(serverTimeRepository) {
-    this.logger = Logger('UserMapper', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('UserMapper');
     this.serverTimeRepository = serverTimeRepository;
   }
 

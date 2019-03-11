@@ -41,7 +41,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
-    this.logger = Logger('z.viewModel.list.TemporaryGuestViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.TemporaryGuestViewModel');
 
     this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;

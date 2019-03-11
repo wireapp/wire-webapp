@@ -43,7 +43,7 @@ export default class Conversation {
   constructor(conversation_id = '') {
     this.id = conversation_id;
 
-    this.logger = Logger(`Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = Logger(`Conversation (${this.id})`);
 
     this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
     this.accessCode = ko.observable();

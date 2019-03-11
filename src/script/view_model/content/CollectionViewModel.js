@@ -38,7 +38,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.collectionDetails = contentViewModel.collectionDetails;
     this.conversation_repository = repositories.conversation;
-    this.logger = Logger('z.viewModel.CollectionViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.CollectionViewModel');
 
     this.conversationEntity = ko.observable();
 

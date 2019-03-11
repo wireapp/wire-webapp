@@ -30,7 +30,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.serverTimeRepository = serverTimeRepository;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.conversation.ClientMismatchHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ClientMismatchHandler');
   }
 
   /**

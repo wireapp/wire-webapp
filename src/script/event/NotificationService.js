@@ -42,7 +42,7 @@ z.event.NotificationService = class NotificationService {
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.event.NotificationService');
 
     this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

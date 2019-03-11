@@ -48,7 +48,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = Logger('z.viewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.VideoCallingViewModel');
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;

@@ -91,7 +91,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.messageLog = [];
     const loggerName = 'z.calling.CallingRepository';
-    this.callLogger = new CallLogger(loggerName, null, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, null, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {

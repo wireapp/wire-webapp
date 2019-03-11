@@ -34,7 +34,7 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.mainViewModel = mainViewModel;
     this.listViewModel = listViewModel;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.PreferencesListViewModel');
 
     this.contentViewModel = this.mainViewModel.content;
     this.contentState = this.contentViewModel.state;
