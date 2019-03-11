@@ -47,14 +47,14 @@ class PaymentAPI {
     };
   }
 
-  public putPaymentData(teamId: string, paymentData: PaymentDataUpdate): Promise<void> {
+  public putPaymentData(teamId: string, paymentData: PaymentDataUpdate): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
       data: paymentData,
       method: 'put',
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    return this.client.sendJSON<PaymentData>(config).then(response => response.data);
   }
 
   public getPaymentData(teamId: string): Promise<PaymentData> {

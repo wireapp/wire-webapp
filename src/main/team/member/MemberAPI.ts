@@ -41,13 +41,13 @@ class MemberAPI {
     return this.client.sendJSON<Members>(config).then(response => response.data);
   }
 
-  public getMember(teamId: string, userId: string): Promise<void> {
+  public getMember(teamId: string, userId: string): Promise<MemberData> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}/${userId}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    return this.client.sendJSON<MemberData>(config).then(response => response.data);
   }
 
   public deleteMember(teamId: string, userId: string, password: string): Promise<void> {
