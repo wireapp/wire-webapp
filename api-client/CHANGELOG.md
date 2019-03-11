@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.56](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.55...@wireapp/api-client@3.2.56) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** Add Invoice custom flag ([#1620](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1620)) ([604afb3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/604afb3))
+
+
+
+
+
 ## [3.2.55](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.54...@wireapp/api-client@3.2.55) (2019-03-11)
 
 
