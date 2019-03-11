@@ -42,9 +42,8 @@ export interface CopyConfigOptions {
   };
   /**
    * From where to clone the configuration.
-   * If no version is specified, `master` branch is used.
    *
    * @example `https://github.com/wireapp/wire-web-config-default#v0.7.1`
    */
-  repositoryUrl?: string;
+  repositoryUrl: string;
 }

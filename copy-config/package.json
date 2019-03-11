@@ -3,9 +3,11 @@
     "copy-config": "dist/cli.js"
   },
   "dependencies": {
+    "axios": "0.18.0",
     "copy": "0.3.2",
     "cosmiconfig": "5.1.0",
     "fs-extra": "7.0.1",
+    "jszip": "3.2.0",
     "logdown": "3.2.7",
     "rimraf": "2.6.3"
   },
@@ -14,6 +16,7 @@
     "@types/copy": "0.3.1",
     "@types/cosmiconfig": "5.0.3",
     "@types/fs-extra": "5.0.5",
+    "@types/jszip": "3.1.5",
     "@types/rimraf": "2.0.2",
     "jasmine": "3.3.1"
   },

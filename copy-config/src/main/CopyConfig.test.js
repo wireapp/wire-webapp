@@ -25,6 +25,8 @@ const fs = require('fs-extra');
 const {CopyConfig} = require('../../dist');
 const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp/');
 
+const TWENTY_SECONDS = 20000;
+
 describe('CopyConfig', () => {
   afterEach(() => fs.remove(TEMP_DIR));
 
@@ -127,6 +129,27 @@ describe('CopyConfig', () => {
 
       expect(copiedResult.length).toBe(1);
     });
+
+    it(
+      'downloads zip archives',
+      async () => {
+        await fs.ensureDir(TEMP_DIR);
+        await fs.writeFile(path.join(TEMP_DIR, 'test1.txt'), '');
+
+        const copyConfig = new CopyConfig({
+          files: {
+            './package.json': TEMP_DIR,
+          },
+          repositoryUrl: 'https://github.com/wireapp/wire-web-config-default#master',
+        });
+
+        await copyConfig.copy();
+
+        const files = await fs.readdir(copyConfig.baseDir);
+        expect(files).toContain('wire-webapp');
+      },
+      TWENTY_SECONDS
+    );
   });
 
   describe('getFilesFromString', () => {

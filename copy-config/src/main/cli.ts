@@ -19,8 +19,8 @@
  *
  */
 
-import cosmiconfig = require('cosmiconfig');
-import * as logdown from 'logdown';
+import cosmiconfig from 'cosmiconfig';
+import logdown from 'logdown';
 
 import {CopyConfig, CopyConfigOptions} from './';
 

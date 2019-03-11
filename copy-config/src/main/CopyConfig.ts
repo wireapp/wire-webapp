@@ -17,36 +17,17 @@
  *
  */
 
-import {exec} from 'child_process';
-import * as fs from 'fs-extra';
-import * as logdown from 'logdown';
-import * as path from 'path';
-import * as rimraf from 'rimraf';
-import {promisify} from 'util';
+import fs from 'fs-extra';
+import logdown from 'logdown';
+import path from 'path';
 
-import copy = require('copy');
-import File = require('vinyl');
 import {CopyConfigOptions} from './CopyConfigOptions';
-
-const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
-const rimrafAsync = promisify(rimraf);
-const execAsync = promisify(exec);
-const copyAsync = async (source: string, destination: string): Promise<File[]> => {
-  if (isFile(destination)) {
-    await fs.ensureDir(path.dirname(destination));
-  } else {
-    await fs.ensureDir(destination);
-  }
-
-  return new Promise((resolve, reject) =>
-    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files)))
-  );
-};
+import * as utils from './utils';
 
 const defaultOptions: Required<CopyConfigOptions> = {
   externalDir: '',
   files: {},
-  repositoryUrl: 'https://github.com/wireapp/wire-web-config-default#v0.7.1',
+  repositoryUrl: 'https://github.com/wireapp/wire-web-config-default#master',
 };
 
 export class CopyConfig {
@@ -88,7 +69,6 @@ export class CopyConfig {
 
   private getFilesFromString(files: string): {[source: string]: string | string[]} {
     const resolvedPaths: {[source: string]: string | string[]} = {};
-
     const fileArrayRegex = /^\[(.*)\]$/;
 
     files
@@ -136,14 +116,14 @@ export class CopyConfig {
 
     const isGlob = (path: string) => /\*$/.test(path);
 
-    if (isFile(destination) && !isFile(source)) {
+    if (utils.isFile(destination) && !utils.isFile(source)) {
       throw new Error('Cannot copy a directory into a file.');
     }
 
     if (isGlob(source)) {
       this.logger.info(`Resolving "${source}"`);
 
-      const copiedFiles = await copyAsync(source, destination);
+      const copiedFiles = await utils.copyAsync(source, destination);
 
       for (const copiedFile of copiedFiles) {
         const [copiedFrom, copiedTo] = copiedFile.history;
@@ -153,40 +133,53 @@ export class CopyConfig {
       return copiedFiles.map(file => file.path);
     }
 
-    if (isFile(source) && !isFile(destination)) {
+    if (utils.isFile(source) && !utils.isFile(destination)) {
       destination = path.join(destination, path.basename(source));
     }
 
     this.logger.info(`Copying "${source}" -> "${destination}"`);
 
     // Info: "fs.copy" creates all sub-folders which are needed along the way:
-    // @see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
+    // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
     await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
 
     return [destination];
   }
 
   private async clone(): Promise<void> {
-    const [bareUrl, branch = 'master'] = this.options.repositoryUrl.split('#');
+    const repositoryData = this.options.repositoryUrl.split('#');
+    let bareUrl = repositoryData[0];
+    const branch = repositoryData[1] || 'master';
+    const {stderr: stderrVersion} = await utils.execAsync('git --version');
+    let isHttpUrl = bareUrl.startsWith('http');
 
-    const {stderr: stderrVersion} = await execAsync('git --version');
-
-    if (stderrVersion) {
-      throw new Error(`No git installation found: ${stderrVersion}`);
+    if (!isHttpUrl && stderrVersion) {
+      this.logger.error(`No git installation found: ${stderrVersion}. Trying to download the zip file ...`);
+      bareUrl = bareUrl
+        .replace(/^git(@|:\/\/)/, 'https://')
+        .replace(':', '/')
+        .replace(/\.git$/, '');
+      isHttpUrl = true;
     }
 
     if (!this.noCleanup) {
       this.logger.info(`Removing clone directory before cloning ...`);
-      await rimrafAsync(this.baseDir);
+      await utils.rimrafAsync(this.baseDir);
     }
 
-    this.logger.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
-    const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.baseDir}`;
+    if (isHttpUrl) {
+      const url = `${bareUrl}/archive/${branch}.zip`;
+      this.logger.info(`Downloading "${url}" ...`);
+      await utils.downloadFileAsync(url, this.baseDir);
+    } else {
+      this.logger.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
+      const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.baseDir}`;
 
-    const {stderr: stderrClone} = await execAsync(command);
+      const {stderr: stderrClone} = await utils.execAsync(command);
 
-    if (stderrClone.includes('fatal')) {
-      throw new Error(stderrClone);
+      if (stderrClone.includes('fatal')) {
+        throw new Error(stderrClone);
+      }
     }
   }
 
