@@ -78,14 +78,10 @@ class LogFactory {
 
   static async writeMessage(message: string, logFilePath: string): Promise<void> {
     const withoutColor = message.replace(ansiRegex(), '');
-    try {
-      await fs.outputFile(logFilePath, `${withoutColor}\r\n`, {
-        encoding: 'utf8',
-        flag: 'a',
-      });
-    } catch (error) {
-      console.warn(`Cannot write to log file "${this.logFilePath}": ${error.message}`, error);
-    }
+    return fs.outputFile(logFilePath, `${withoutColor}\r\n`, {
+      encoding: 'utf8',
+      flag: 'a',
+    });
   }
 
   static createLoggerName(fileName: string, namespace?: string, separator?: string): string {
