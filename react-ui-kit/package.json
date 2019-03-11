@@ -21,7 +21,7 @@
     "babel-loader": "8.0.5",
     "babel-plugin-emotion": "10.0.7",
     "react-helmet": "5.2.0",
-    "react-hot-loader": "4.7.2",
+    "react-hot-loader": "4.8.0",
     "rimraf": "2.6.3",
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
