@@ -77,7 +77,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         }
 
         if (this.isGuestRoom()) {
-          return this.userRepository.teamUsers();
+          return this.teamRepository.teamUsers();
         }
 
         return this.teamRepository

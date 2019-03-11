@@ -45,6 +45,8 @@ z.components.UserList = class UserList {
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.searchRepository = params.searchRepository;
+    this.teamRepository = params.teamRepository;
+    this.conversationRepository = params.conversationRepository;
     this.userEntities = params.user;
     this.infos = params.infos;
     const highlightedUsers = params.highlightedUsers ? params.highlightedUsers() : [];
@@ -74,6 +76,7 @@ z.components.UserList = class UserList {
 
     // Filter all list items if a filter is provided
     this.filteredUserEntities = ko.pureComputed(() => {
+      const connectedUsers = this.conversationRepository.getConnectedUsers();
       if (typeof this.filter === 'function') {
         const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
         if (normalizedQuery) {
@@ -81,10 +84,20 @@ z.components.UserList = class UserList {
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-          return this.searchRepository.searchUserInSet(normalizedQuery, this.userEntities(), properties);
+          const searchResults = this.searchRepository.searchUserInSet(normalizedQuery, this.userEntities(), properties);
+          const filteredResults = searchResults.filter(user => {
+            return (
+              connectedUsers.includes(user) ||
+              this.teamRepository.isSelfConnectedTo(user.id) ||
+              user.username() === normalizedQuery
+            );
+          });
+          return filteredResults;
         }
       }
-      return this.userEntities();
+      return this.userEntities().filter(user => {
+        return connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id);
+      });
     });
 
     this.isSelected = userEntity => {

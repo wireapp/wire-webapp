@@ -27,11 +27,24 @@
       <!-- ko ifnot: showSpinner() -->
         <!-- ko if: peopleTabActive() -->
           <!-- ko if: showNoMatches() -->
-            <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire')"></div>
+            <!-- ko if: showOnlyConnectedUsers() -->
+              <people-icon class="start-ui-no-contacts__icon"></people-icon>
+            <!-- /ko -->
+            <!-- ko ifnot: showOnlyConnectedUsers() -->
+              <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire')"></div>
+            <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko if: showNoSearchResults() -->
-            <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+            <!-- ko if: showOnlyConnectedUsers() -->
+              <div class="start-ui-no-search-results__content">
+                <message-icon class="start-ui-no-search-results__icon"></message-icon>
+                <div class="start-ui-no-search-results__text" data-bind="text: t('searchNoMatchesPartner')" data-uie-name="label-no-search-result"></div>
+              </div>
+            <!-- /ko -->
+            <!-- ko ifnot: showOnlyConnectedUsers() -->
+              <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+            <!-- /ko -->         
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
@@ -73,7 +86,7 @@
                 <!-- ko ifnot: isTeam() -->
                   <span class="start-ui-list-header" data-bind="text: t('searchConnections')"></span>
                 <!-- /ko -->
-                <user-list class="search-list-theme-black" params="user: contacts, click: clickOnContact, searchRepository: searchRepository"></user-list>
+                <user-list class="search-list-theme-black" params="user: contacts, click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             <!-- /ko -->
           <!-- /ko -->
@@ -87,7 +100,7 @@
                 <!-- ko ifnot: isTeam() -->
                   <span class="start-ui-list-header start-ui-list-header-connections" data-bind="text: t('searchConnections')"></span>
                 <!-- /ko -->
-                <user-list class="search-list-theme-black" params="user: searchResults.contacts, click: clickOnContact, searchRepository: searchRepository"></user-list>
+                <user-list class="search-list-theme-black" params="user: searchResults.contacts, filter: searchInput, click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
               <div class="start-ui-groups" data-bind="visible: searchResults.groups().length > 0">
                 <!-- ko if: isTeam() -->
@@ -100,7 +113,7 @@
               </div>
               <div class="others" data-bind="visible: searchResults.others().length > 0">
                 <span class="start-ui-list-header" data-bind="text: t('searchOthers')"></span>
-                <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS, searchRepository: searchRepository"></user-list>
+                <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             </div>
           <!-- /ko -->

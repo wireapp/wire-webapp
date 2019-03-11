@@ -799,6 +799,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Get all the users that you are directly connected to.
+   * This means that the user either invited you, you are in a conversation with them or they are connected external users
+   * @returns {Array<User>} List of the connected users
+   */
+  getConnectedUsers() {
+    const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+    const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
+    const initialConnectedUsers = inviter ? [inviter] : [];
+    const allUsers = this.conversations().reduce((connectedUsers, conversation) => {
+      const users = conversation
+        .participating_user_ets()
+        .filter(user => !user.isService && (user.isTeamMember() || user.isConnected()));
+      return [...connectedUsers, ...users];
+    }, initialConnectedUsers);
+    return [...new Set(allUsers)];
+  }
+
+  /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
    * @returns {Promise} Resolves with the Conversation entity
