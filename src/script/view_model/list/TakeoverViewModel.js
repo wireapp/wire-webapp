@@ -37,7 +37,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfUser = this.userRepository.self;
 

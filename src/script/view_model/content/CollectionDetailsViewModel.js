@@ -36,7 +36,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.removedFromView = this.removedFromView.bind(this);
     this.setConversation = this.setConversation.bind(this);
 
-    this.logger = new Logger('z.viewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.template = ko.observable();
     this.conversationEntity = ko.observable();

@@ -39,7 +39,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
 
-    this.logger = new Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.HistoryExportViewModel', z.config.LOGGER.OPTIONS);
 
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');

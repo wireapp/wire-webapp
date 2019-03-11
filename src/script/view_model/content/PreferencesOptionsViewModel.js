@@ -19,6 +19,8 @@
 
 import Logger from 'utils/Logger';
 
+import CallLogger from '../../telemetry/calling/CallLogger';
+
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -36,7 +38,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.logger = new Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;
@@ -88,7 +90,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
 
       const selfUserId = this.userRepository.self().id;
-      const truncatedId = selfUserId.substr(0, z.telemetry.calling.CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+      const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
       const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
 
       return z.util.downloadBlob(blob, filename);

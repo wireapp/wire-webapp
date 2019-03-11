@@ -42,7 +42,7 @@ z.client.ClientRepository = class ClientRepository {
     this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = new Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));

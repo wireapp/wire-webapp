@@ -29,7 +29,7 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
     this.log = this.log.bind(this);
     this.call_id = call_id;
 
-    this.logger = new Logger('z.telemetry.calling.CallSetupTimings', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.telemetry.calling.CallSetupTimings', z.config.LOGGER.OPTIONS);
 
     this.is_answer = false;
     this.flowId = undefined;

@@ -39,7 +39,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
     this.mainViewModel = mainViewModel;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userRepository.connect_requests;

@@ -297,7 +297,7 @@ export default class BackendClient {
         .done((responseData, textStatus, {wireRequest}) => {
           const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
           const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
-          this.logger.debug(this.logger.levels.OFF, logMessage, responseData);
+          this.logger.debug(logMessage, responseData);
 
           resolve(responseData);
         })

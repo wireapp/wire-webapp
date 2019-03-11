@@ -55,7 +55,7 @@ class MessageListViewModel {
     this.integrationRepository = repositories.integration;
     this.serverTimeRepository = repositories.serverTime;
     this.userRepository = repositories.user;
-    this.logger = new Logger('MessageListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;

@@ -40,7 +40,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.userRepository = userRepository;
-    this.logger = new Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 

@@ -48,7 +48,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
 
-    this.logger = new Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
     this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable(false);

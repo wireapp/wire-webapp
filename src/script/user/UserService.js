@@ -35,7 +35,7 @@ export default class UserService {
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
-    this.logger = new Logger('UserService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('UserService', z.config.LOGGER.OPTIONS);
     this.storageService = storageService;
 
     this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;

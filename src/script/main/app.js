@@ -77,7 +77,7 @@ class App {
    */
   constructor(authComponent) {
     this.backendClient = authComponent.backendClient;
-    this.logger = new Logger('z.main.App', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.main.App', z.config.LOGGER.OPTIONS);
 
     this.telemetry = new AppInitTelemetry();
     this.windowHandler = new z.ui.WindowHandler().init();

@@ -41,7 +41,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
 
-    this.logger = new Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.panel.ParticipantDevicesViewModel', z.config.LOGGER.OPTIONS);
 
     this.selfClient = this.clientRepository.currentClient;
 

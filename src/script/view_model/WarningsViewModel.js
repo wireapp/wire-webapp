@@ -63,7 +63,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = new Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
 
     // Array of warning banners
     this.warnings = ko.observableArray();

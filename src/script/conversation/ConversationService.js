@@ -40,7 +40,7 @@ z.conversation.ConversationService = class ConversationService {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
-    this.logger = new Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ConversationService', z.config.LOGGER.OPTIONS);
 
     this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;

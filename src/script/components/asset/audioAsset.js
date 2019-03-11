@@ -33,7 +33,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
     this.dispose = this.dispose.bind(this);
-    this.logger = new Logger('AudioAssetComponent', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AudioAssetComponent', z.config.LOGGER.OPTIONS);
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();

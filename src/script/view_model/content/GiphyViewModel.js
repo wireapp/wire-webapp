@@ -44,7 +44,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this.clickToSelectGif = this.clickToSelectGif.bind(this);
 
     this.giphyRepository = repositories.giphy;
-    this.logger = new Logger('z.viewModel.content.GiphyViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.GiphyViewModel', z.config.LOGGER.OPTIONS);
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);

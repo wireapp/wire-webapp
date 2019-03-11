@@ -34,7 +34,7 @@ z.team.TeamRepository = class TeamRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(teamService, userRepository) {
-    this.logger = new Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;

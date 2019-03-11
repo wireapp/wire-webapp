@@ -38,7 +38,7 @@ z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
 
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
-    this.logger = new Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 

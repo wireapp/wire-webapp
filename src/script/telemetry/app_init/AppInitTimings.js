@@ -17,6 +17,7 @@
  *
  */
 
+import {isNumber, isString} from 'underscore';
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -32,7 +33,7 @@ export default class AppInitTimings {
   }
 
   constructor() {
-    this.logger = new Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitTimings', z.config.LOGGER.OPTIONS);
     this.init = window.performance.now();
   }
 
@@ -57,18 +58,10 @@ export default class AppInitTimings {
   }
 
   log() {
-    this.logger.debug('App initialization step durations');
-
-    Object.entries(this).forEach(([key, value]) => {
-      if (key.toString() !== 'init' && _.isNumber(value)) {
-        const placeholderKeyLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
-        const placeholderKey = new Array(placeholderKeyLength).join(' ');
-        const placeholderValueLength = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
-        const placeholderValue = new Array(placeholderValueLength).join(' ');
-
-        this.logger.info(`${placeholderKey}'${key}':${placeholderValue}${value}ms`);
-      }
-    });
+    const statsData = Object.entries(this).reduce((stats, [key, value]) => {
+      return isNumber(value) || isString(value) ? {...stats, [key]: value} : stats;
+    }, {});
+    this.logger.debug('App initialization step durations', statsData);
   }
 
   time_step(step) {

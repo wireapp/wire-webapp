@@ -48,7 +48,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   constructor(cryptographyService, storageRepository) {
     this.cryptographyService = cryptographyService;
     this.storageRepository = storageRepository;
-    this.logger = new Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
 
     this.cryptographyMapper = new CryptographyMapper();
 

@@ -33,7 +33,7 @@ export default class WindowTitleViewModel {
     this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new Logger('WindowTitleViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.updateWindowTitle = ko.observable(false);
 

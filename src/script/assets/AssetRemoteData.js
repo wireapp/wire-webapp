@@ -37,7 +37,7 @@ class AssetRemoteData {
 
     this.loadPromise = undefined;
 
-    this.logger = new Logger('AssetRemoteData', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
   generateUrl() {

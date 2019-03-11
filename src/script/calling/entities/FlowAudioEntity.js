@@ -21,6 +21,7 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
+import CallLogger from '../../telemetry/calling/CallLogger';
 import MediaRepository from '../../media/MediaRepository';
 
 z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
@@ -41,7 +42,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
 
     const id = this.flowEntity.id;
     const loggerName = 'z.calling.entities.FlowAudio';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, id, z.config.LOGGER.OPTIONS, this.messageLog);
 
     this.callLogger.info({
       data: {

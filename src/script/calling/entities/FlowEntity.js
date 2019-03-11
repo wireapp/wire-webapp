@@ -18,6 +18,7 @@
  */
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
+import CallLogger from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
@@ -61,7 +62,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.messageLog = this.participantEntity.messageLog;
 
     const loggerName = 'z.calling.entities.FlowEntity';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
 
     // States
     this.isAnswer = ko.observable(false);

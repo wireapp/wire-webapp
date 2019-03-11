@@ -23,7 +23,7 @@ import AppInitTimings from './AppInitTimings';
 
 export default class AppInitTelemetry {
   constructor() {
-    this.logger = new Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }

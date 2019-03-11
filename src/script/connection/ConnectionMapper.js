@@ -29,7 +29,7 @@ window.z.connection = z.connection || {};
 z.connection.ConnectionMapper = class ConnectionMapper {
   // Construct a new connection mapper.
   constructor() {
-    this.logger = new Logger('z.connection.ConnectionMapper', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.connection.ConnectionMapper', z.config.LOGGER.OPTIONS);
 
     /**
      * Converts JSON connection into connection entity.

@@ -36,7 +36,7 @@ z.broadcast.BroadcastService = class BroadcastService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
   }
 
   /**

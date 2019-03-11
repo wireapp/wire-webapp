@@ -57,7 +57,7 @@ class SearchRepository {
   constructor(searchService, userRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
-    this.logger = new Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
   /**

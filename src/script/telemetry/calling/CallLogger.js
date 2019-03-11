@@ -1,8 +1,9 @@
+import {isObject, isString} from 'underscore';
 import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
 import Logger from 'utils/Logger';
 
-z.telemetry.calling.CallLogger = class CallLogger {
+export default class CallLogger {
   static get CONFIG() {
     return {
       MESSAGE_LOG_LENGTH: 10000,
@@ -52,7 +53,7 @@ z.telemetry.calling.CallLogger = class CallLogger {
   constructor(name, id, options, messageLog) {
     name = id ? this._createName(name, id) : name;
 
-    this.logger = new Logger(name, options);
+    this.logger = Logger(name);
     this.levels = this.logger.levels;
 
     this.messageLog = messageLog;
@@ -134,18 +135,14 @@ z.telemetry.calling.CallLogger = class CallLogger {
     }
   }
 
-  logToMemory(logLevel, obfuscatedMessage) {
+  logToMemory(obfuscatedMessage) {
     while (this.messageLog.length >= CallLogger.CONFIG.MESSAGE_LOG_LENGTH) {
       this.messageLog.shift();
     }
 
-    const shouldLogToMemory = logLevel !== CallLogger.LOG_LEVEL.OFF;
-    if (shouldLogToMemory) {
-      const logType = this.getDebugType(logLevel);
-      let logMessage = `[${new Date().toISOString()}] [${this.name}] (${logType}) ${obfuscatedMessage}`;
-      logMessage = this.safeGuard(logMessage);
-      this.messageLog.push(logMessage);
-    }
+    let logMessage = `[${new Date().toISOString()}] [${this.name}] ${obfuscatedMessage}`;
+    logMessage = this.safeGuard(logMessage);
+    this.messageLog.push(logMessage);
   }
 
   _createName(name, id) {
@@ -157,51 +154,37 @@ z.telemetry.calling.CallLogger = class CallLogger {
   }
 
   debug() {
-    this._log([this.logger.levels.DEBUG].concat(...arguments));
+    this._log('debug', arguments);
   }
 
   error() {
-    this._log([this.logger.levels.ERROR].concat(...arguments));
+    this._log('error', arguments);
   }
 
   info() {
-    this._log([this.logger.levels.INFO].concat(...arguments));
+    this._log('info', arguments);
   }
 
   warn() {
-    this._log([this.logger.levels.WARN].concat(...arguments));
+    this._log('warn', arguments);
   }
 
-  log(logLevel) {
-    if (typeof logLevel === 'function') {
-      return this._log(arguments);
-    }
-    this._log([this.logger.levels.INFO].concat(...arguments));
+  log() {
+    this._log('log', arguments);
   }
 
-  _log(args) {
-    // Use obfuscated format for call logs if possible
-    const [firstArgument, secondArgument] = args;
-    const isLogMessageObject = typeof secondArgument === 'object';
-    if (isLogMessageObject) {
-      const {message, data} = secondArgument;
+  _log(logFunctionName, args) {
+    const [messageData, ...extraArgs] = args;
+    const {message, data} = messageData;
 
-      const isExpectedObjectStructure = typeof message === 'string' && typeof data === 'object';
-      if (isExpectedObjectStructure) {
-        const defaultMessage = z.util.StringUtil.format(message, ...data.default);
-        const obfuscatedMessage = z.util.StringUtil.format(message, ...data.obfuscated);
-        args[1] = defaultMessage;
-
-        this.logToMemory(firstArgument(), obfuscatedMessage);
-        return this.logger.log(...args);
-      }
+    let loggerMessage = messageData;
+    let inMemoryMessage = messageData;
+    if (isString(message) && isObject(data)) {
+      loggerMessage = z.util.StringUtil.format(message, ...data.default);
+      inMemoryMessage = z.util.StringUtil.format(message, ...data.obfuscated);
     }
-
-    const hasMultipleArgs = args.length > 1;
-    const logLevel = hasMultipleArgs ? firstArgument() : CallLogger.LOG_LEVEL.INFO;
-    const logMessage = hasMultipleArgs ? secondArgument : firstArgument;
-    this.logToMemory(logLevel, logMessage);
-    this.logger.log(...args);
+    this.logToMemory(inMemoryMessage);
+    this.logger[logFunctionName](loggerMessage, ...extraArgs);
   }
 
   safeGuard(message) {
@@ -222,4 +205,4 @@ z.telemetry.calling.CallLogger = class CallLogger {
 
     return message;
   }
-};
+}

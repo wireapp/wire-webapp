@@ -25,7 +25,7 @@ window.z.ui = z.ui || {};
 z.ui.WindowHandler = class WindowHandler {
   constructor() {
     this.init = this.init.bind(this);
-    this.logger = new Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
 
     this.height = 0;
     this.width = 0;
