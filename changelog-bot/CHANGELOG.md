@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.2.6...@wireapp/changelog-bot@2.2.7) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** bump @types/node from 11.10.5 to 11.11.0 ([c94a359](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/c94a359))
+
+
+
+
+
 ## [2.2.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@2.2.5...@wireapp/changelog-bot@2.2.6) (2019-03-07)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

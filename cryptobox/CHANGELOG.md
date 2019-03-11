@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.56](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.0.55...@wireapp/cryptobox@9.0.56) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** bump @types/node from 11.10.5 to 11.11.0 ([c94a359](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/c94a359))
+
+
+
+
+
 ## [9.0.55](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.0.54...@wireapp/cryptobox@9.0.55) (2019-03-07)
 
 **Note:** Version bump only for package @wireapp/cryptobox

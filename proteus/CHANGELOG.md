@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.39...@wireapp/proteus@8.0.40) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** bump @types/node from 11.10.5 to 11.11.0 ([c94a359](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/c94a359))
+
+
+
+
+
 ## [8.0.39](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.38...@wireapp/proteus@8.0.39) (2019-03-07)
 
 **Note:** Version bump only for package @wireapp/proteus

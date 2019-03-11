@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.29...@wireapp/store-engine@1.1.30) (2019-03-11)
+
+
+### Bug Fixes
+
+* **api-client:** bump @types/node from 11.10.5 to 11.11.0 ([c94a359](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/c94a359))
+
+
+
+
+
 ## [1.1.29](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.28...@wireapp/store-engine@1.1.29) (2019-03-07)
 
 **Note:** Version bump only for package @wireapp/store-engine
