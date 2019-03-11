@@ -20,6 +20,7 @@
 import {PaymentInterval} from '../payment/';
 
 interface PaymentDataUpdate {
+  coupon?: string;
   interval?: PaymentInterval;
   source?: string;
 }
