@@ -21,7 +21,6 @@ window.z = window.z || {};
 window.z.audio = z.audio || {};
 
 z.audio.AudioType = {
-  ALERT: 'alert',
   CALL_DROP: 'call_drop',
   INCOMING_CALL: 'ringing_from_them',
   INCOMING_PING: 'ping_from_them',

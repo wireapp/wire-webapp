@@ -184,7 +184,7 @@ class ParticipantAvatar {
       }
     };
 
-    viewportObserver.addElement(componentInfo.element, _onInViewport);
+    viewportObserver.onElementInViewport(componentInfo.element, _onInViewport);
 
     this.pictureSubscription = this.participant().mediumPictureResource.subscribe(_loadAvatarPictureIfVisible);
     this.participantSubscription = this.participant.subscribe(_loadAvatarPictureIfVisible);

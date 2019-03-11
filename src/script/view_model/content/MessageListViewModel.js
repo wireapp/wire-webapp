@@ -530,14 +530,14 @@ class MessageListViewModel {
     };
 
     const updateLastRead = () => {
-      const isLastMessage = messageEntity.timestamp() >= conversationEntity.last_server_timestamp();
-      const timestamp = isLastMessage
-        ? conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp())
-        : messageEntity.timestamp();
+      conversationEntity.setTimestamp(messageEntity.timestamp(), Conversation.TIMESTAMP_TYPE.LAST_READ);
+      const hasNoUnread = conversationEntity.unreadState().allMessages.length === 0;
 
-      conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-
-      if (isLastMessage) {
+      if (hasNoUnread) {
+        const lastKnowTimestamp = conversationEntity.get_last_known_timestamp(
+          this.serverTimeRepository.toServerTimestamp()
+        );
+        conversationEntity.setTimestamp(lastKnowTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
         this.conversation_repository.markAsRead(conversationEntity);
       }
     };

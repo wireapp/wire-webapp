@@ -26,8 +26,12 @@ const overlayedElements = new Map();
 let overlayCheckerInterval = undefined;
 
 function checkOverlayedElements() {
-  overlayedElements.forEach((onVisible, element) => {
-    if (!isOverlayed(element)) {
+  overlayedElements.forEach(({onVisible, onChange}, element) => {
+    const isVisible = !isOverlayed(element);
+    if (onChange) {
+      return onChange(isVisible);
+    }
+    if (isVisible) {
       onVisible();
       removeElement(element);
     }
@@ -48,14 +52,22 @@ const isOverlayed = domElement => {
   return elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
-const addElement = (element, onVisible) => {
+const onElementVisible = (element, onVisible) => {
   if (!isOverlayed(element)) {
     return onVisible();
   }
   if (!overlayCheckerInterval) {
     overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
   }
-  overlayedElements.set(element, onVisible);
+  overlayedElements.set(element, {onVisible});
+};
+
+const trackElement = (element, onChange) => {
+  onChange(!isOverlayed(element));
+  if (!overlayCheckerInterval) {
+    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+  }
+  overlayedElements.set(element, {onChange});
 };
 
 const removeElement = element => {
@@ -66,6 +78,10 @@ const removeElement = element => {
   }
 };
 
-const overlayedObserver = {onElementVisible: addElement, removeElement};
+const overlayedObserver = {
+  onElementVisible,
+  removeElement,
+  trackElement,
+};
 
 export default overlayedObserver;
