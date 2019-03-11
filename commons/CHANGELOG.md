@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.0.14...@wireapp/commons@1.1.0) (2019-03-11)
+
+
+### Features
+
+* **commons:** TypeUtil ([#1619](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1619)) ([ebbd83e](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/ebbd83e))
+
+
+
+
+
 ## [1.0.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.0.13...@wireapp/commons@1.0.14) (2019-03-11)
 
 
