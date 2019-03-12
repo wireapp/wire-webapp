@@ -86,10 +86,10 @@
   .text(#fff);
 }
 .text-ephemeral {
-  .accent-color;
+  color: var(--accent-color);
 }
 .svg-ephemeral {
-  .accent-color;
+  color: var(--accent-color);
   svg path {
     fill: currentColor;
   }
@@ -103,7 +103,7 @@
 
 .svg-accent-color {
   svg path {
-    .accent-fill;
+    fill: var(--accent-color);
   }
 }
 
@@ -194,5 +194,5 @@
 }
 
 .bg-color-ephemeral {
-  .accent-background-color(16%);
+  background-color: var(--accent-color-16);
 }

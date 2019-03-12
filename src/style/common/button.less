@@ -19,13 +19,12 @@
 
 // default
 .button {
-  .accent-background-color;
   .button-large; // default size is large
   .label-bold-xs;
-
   display: inline-block;
   padding: 0 16px;
   border: @button-border-size solid transparent;
+  background-color: var(--accent-color);
   border-radius: @button-border-radius;
   color: #fff;
   cursor: pointer;
@@ -44,10 +43,9 @@
 
   // types
   &.button-inverted {
-    .accent-color;
-    .accent-border-color;
-
+    border-color: var(--accent-color);
     background-color: transparent;
+    color: var(--accent-color);
   }
 
   &.button-white {
@@ -201,10 +199,10 @@
 }
 
 .button-theme {
-  .accent-background-color;
   .button-color;
+  background-color: var(--accent-color);
   &.disabled {
-    .accent-color(24%);
+    color: var(--accent-color-24);
   }
 }
 
