@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.0.35...@wireapp/lru-cache@3.1.0) (2019-03-12)
+
+
+### Features
+
+* **lru-cache:** Add functionality to add keys only once ([#1631](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/1631)) ([3d77f24](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/3d77f24))
+
+
+
+
+
 ## [3.0.35](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.0.34...@wireapp/lru-cache@3.0.35) (2019-03-12)
 
 **Note:** Version bump only for package @wireapp/lru-cache
