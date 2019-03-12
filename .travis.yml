@@ -58,7 +58,7 @@ before_deploy:
       yarn global add generate-changelog
       generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
       tail -n +2 "${CHANGELOG_FILE}" > "${CHANGELOG_FILE}.tmp" && mv "${CHANGELOG_FILE}.tmp" "${CHANGELOG_FILE}"
-      printf "\n\n##### Changelog\n- https://github.com/wireapp/wire-webapp/compare/${TRAVIS_COMMIT_RANGE}"
+      printf "\n\n##### Changelog\n- https://github.com/wireapp/wire-webapp/compare/${TRAVIS_COMMIT_RANGE}" >> "${CHANGELOG_FILE}"
     fi
 
 # https://github.com/travis-ci/dpl#elastic-beanstalk
