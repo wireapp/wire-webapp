@@ -18,9 +18,8 @@
  */
 
 import 'url-search-params-polyfill';
-import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
 
-function enableLogging(location = window.location.href) {
+function enableLogging(devMode = false, location = window.location.href) {
   /**
    * If users disable cookies in their browsers, they won't have access to the localStorage API.
    * The following check will fix this error:
@@ -34,12 +33,12 @@ function enableLogging(location = window.location.href) {
     return;
   }
 
-  const namespace = isEnvironment(ENVIRONMENT.LOCAL)
-    ? '@wireapp/webapp'
-    : new URL(location).searchParams.get('enableLogging');
+  const namespace = new URL(location).searchParams.get('enableLogging');
 
   if (namespace) {
     localStorage.setItem('debug', namespace);
+  } else if (devMode) {
+    localStorage.setItem('debug', '@wireapp/webapp*');
   } else {
     localStorage.removeItem('debug');
   }

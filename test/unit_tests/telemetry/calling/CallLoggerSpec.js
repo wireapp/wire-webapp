@@ -17,12 +17,11 @@
  *
  */
 
-// KARMA_SPECS=telemetry/calling/CallLogger yarn test:app
-
 import sdpTransform from 'sdp-transform';
+import CallLogger from 'src/script/telemetry/calling/CallLogger';
 
-describe('z.telemetry.calling.CallLogger', () => {
-  const callLogger = new z.telemetry.calling.CallLogger('test', null, {}, 'test');
+describe('CallLogger', () => {
+  const callLogger = new CallLogger('test', null, {}, 'test');
 
   it('properly obfuscate IPv4 addresses', () => {
     expect(callLogger.safeGuard('test 10.10.12.43 test')).toBe('test 10.10.XXX.XXX test');

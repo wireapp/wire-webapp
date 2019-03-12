@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
+import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
@@ -846,7 +847,7 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging();
+  enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
   if ($('#wire-main-app').length !== 0) {
     wire.app = new App(wire.auth);
   }

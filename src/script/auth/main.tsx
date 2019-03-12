@@ -27,6 +27,7 @@ import {Provider} from 'react-redux';
 import {enableLogging} from '../util/LoggerUtil';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
+import {ENVIRONMENT, isEnvironment} from './Environment';
 import {configureEnvironment} from './configureEnvironment';
 import {configureStore} from './configureStore';
 import actionRoot from './module/action';
@@ -70,5 +71,5 @@ function runApp() {
   }
 }
 
-enableLogging();
+enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
 runApp();
