@@ -158,6 +158,16 @@ class LRUCache<T> {
     return undefined;
   }
 
+  public setOnce(key: string, value: T): T | undefined {
+    const matchedNode = this.map[key];
+
+    if (matchedNode) {
+      return undefined;
+    } else {
+      return this.set(key, value);
+    }
+  }
+
   private setHead(node: Node<T>): void {
     node.next = this.head;
     node.previous = null;

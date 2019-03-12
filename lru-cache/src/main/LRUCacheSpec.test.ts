@@ -193,10 +193,14 @@ describe('set', () => {
   it('overrides existing values', () => {
     const cache = new LRUCache(3);
     const key = 'lang';
-    cache.set(key, 'Java');
-    const removedValue = cache.set(key, 'JavaScript');
-    expect(removedValue).toBe('Java');
+    const value = 'JavaScript';
+    const newValue = 'TypeScript';
+    cache.set(key, value);
+    const removedValue = cache.set(key, newValue);
+    expect(removedValue).toBe(value);
     expect(cache.size()).toBe(1);
+    expect(cache.latest()).toBe(newValue);
+    expect(cache.oldest()).toBe(newValue);
   });
 
   it('properly sets head and tail when overriding values', () => {
@@ -231,6 +235,23 @@ describe('set', () => {
     const cache = new LRUCache(0);
     cache.set('A', 'Apple');
     expect(cache.size()).toBe(0);
+  });
+});
+
+describe('setOnce', () => {
+  it("doesn't add a value when there is already a value with the same key", () => {
+    const cache = new LRUCache(3);
+    const key = 'lang';
+    const value = 'JavaScript';
+    const newValue = 'TypeScript';
+
+    cache.set(key, value);
+    cache.setOnce(key, newValue);
+    expect(cache.get(key)).toBe(value);
+
+    cache.delete(key);
+    cache.setOnce(key, newValue);
+    expect(cache.get(key)).toBe(newValue);
   });
 });
 
