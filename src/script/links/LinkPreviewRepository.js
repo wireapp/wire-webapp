@@ -148,19 +148,26 @@ class LinkPreviewRepository {
       return window
         .openGraphAsync(link)
         .then(mergeOpenGraphData)
-        .catch(() => Promise.resolve());
+        .catch(error => {
+          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+          return Promise.resolve();
+        });
     }
 
     return new Promise(resolve => {
       return window
         .openGraph(link, (error, data) => {
           if (error) {
+            this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
             resolve();
           }
 
           resolve(mergeOpenGraphData(data));
         })
-        .catch(resolve);
+        .catch(error => {
+          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+          resolve(error);
+        });
     });
   }
 
