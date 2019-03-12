@@ -55,7 +55,7 @@ before_deploy:
       git config --local user.name "Wire Travis CI"
       git config --local user.email "webapp+travis@wire.com"
       git tag $TRAVIS_TAG
-      yarn global add generate-changelog
+      yarn global add generate-changelog@1.7.1
       generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
       tail -n +2 "${CHANGELOG_FILE}" > "${CHANGELOG_FILE}.tmp" && mv "${CHANGELOG_FILE}.tmp" "${CHANGELOG_FILE}"
       printf "\n\n##### Changelog\n- https://github.com/${TRAVIS_REPO_SLUG}/compare/${TRAVIS_COMMIT_RANGE}" >> "${CHANGELOG_FILE}"
