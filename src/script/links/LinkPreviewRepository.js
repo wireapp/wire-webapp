@@ -166,7 +166,7 @@ class LinkPreviewRepository {
         })
         .catch(error => {
           this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
-          resolve();
+          resolve(error);
         });
     });
   }
