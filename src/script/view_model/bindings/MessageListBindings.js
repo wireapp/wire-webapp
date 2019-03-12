@@ -83,9 +83,7 @@ ko.bindingHandlers.infinite_scroll = {
     const {onHitTop, onHitBottom, onInit} = params();
     onInit(scrollingElement);
 
-    const onScroll = event => {
-      const element = event.target;
-
+    const onScroll = ({target: element}) => {
       // On some HiDPI screens scrollTop returns a floating point number instead of an integer
       // https://github.com/jquery/api.jquery.com/issues/608
       const scrollPosition = Math.ceil(element.scrollTop);
@@ -100,8 +98,7 @@ ko.bindingHandlers.infinite_scroll = {
       }
     };
 
-    const onMouseWheel = event => {
-      const element = event.currentTarget;
+    const onMouseWheel = ({currentTarget: element}) => {
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (isScrollable) {
         // if the element is scrollable, the scroll event will take the relay
