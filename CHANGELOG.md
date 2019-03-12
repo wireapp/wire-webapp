@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.61](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.60...@wireapp/api-client@3.2.61) (2019-03-12)
+
+
+### Bug Fixes
+
+* **api-client:** Return type of putPaymentBilling ([#1632](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1632)) ([6aa1dcc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6aa1dcc))
+
+
+
+
+
 ## [3.2.60](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.59...@wireapp/api-client@3.2.60) (2019-03-12)
 
 **Note:** Version bump only for package @wireapp/api-client
