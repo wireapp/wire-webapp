@@ -1434,15 +1434,15 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.125.tgz#40397fe8d1299063e2ff1a28362d299065dc9022"
   integrity sha512-FL6fkqqK2M80KoNBXa4l5JN3A98gKlfcxb/mZXgX249l/UFaENX5/SQUNNlUAoMK6XkK5TME4T2t1xuRDW6lhA==
 
-"@wireapp/commons@1.0.14":
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.0.14.tgz#d0b6eceaa8dd28bbc9a98d3d4ff02e384d5242fd"
-  integrity sha512-BT4WsISmfPtkbFkX4TakttGk5oMPmn46ArQkBsFwxi5WtkxF/xnqSg3wkNR/w7hPPaaAqZ4u1eptdsTmSAlwrw==
+"@wireapp/commons@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.3.0.tgz#08b3433f7abd8311ebf39112111ac4bbee2a8e7d"
+  integrity sha512-Lgxm3dUb8nZN0GVur2x7HIMsVGKW17JPpMCpIoLn5HK4zDE9MNVQhvI1eUpNbYcOgZeCrB+AJyopEuXD3R1nyQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/node" "11.11.0"
     "@types/platform" "1.3.2"
-    ansi-regex "4.0.0"
+    ansi-regex "4.1.0"
     fs-extra "7.0.1"
     logdown "3.2.7"
     moment "2.24.0"
@@ -1740,10 +1740,10 @@ ansi-html@0.0.7:
   resolved "https://registry.yarnpkg.com/ansi-html/-/ansi-html-0.0.7.tgz#813584021962a9e9e6fd039f940d12f56ca7859e"
   integrity sha1-gTWEAhliqenm/QOflA0S9WynhZ4=
 
-ansi-regex@4.0.0, ansi-regex@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.0.0.tgz#70de791edf021404c3fd615aa89118ae0432e5a9"
-  integrity sha512-iB5Dda8t/UqpPI/IjsejXu5jOGDrzn41wJyljwPH65VCIbk6+1BzFIMJGFwTNrYXT1CrD+B4l19U7awiQ8rk7w==
+ansi-regex@4.1.0, ansi-regex@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.0.tgz#8b9f8f08cf1acb843756a839ca8c7e3168c51997"
+  integrity sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg==
 
 ansi-regex@^2.0.0:
   version "2.1.1"
