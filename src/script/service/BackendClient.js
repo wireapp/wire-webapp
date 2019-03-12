@@ -294,13 +294,7 @@ export default class BackendClient {
 
     return new Promise((resolve, reject) => {
       $.ajax(ajaxConfig)
-        .done((responseData, textStatus, {wireRequest}) => {
-          const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
-          const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
-          this.logger.debug(logMessage, responseData);
-
-          resolve(responseData);
-        })
+        .done(responseData => resolve(responseData))
         .fail(({responseJSON: response, status: statusCode, wireRequest}) => {
           switch (statusCode) {
             case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
