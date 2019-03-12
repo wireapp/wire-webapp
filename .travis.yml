@@ -57,7 +57,7 @@ before_deploy:
       git tag $TRAVIS_TAG
       yarn global add generate-changelog@1.7.1
       generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
-   sed -i '1,2d' "${CHANGELOG_FILE}"
+      sed -i '1,2d' "${CHANGELOG_FILE}"
       printf "\n\n##### Changelog\n- https://github.com/${TRAVIS_REPO_SLUG}/compare/${TRAVIS_COMMIT_RANGE}" >> "${CHANGELOG_FILE}"
     fi
 
