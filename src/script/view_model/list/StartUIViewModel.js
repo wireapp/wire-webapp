@@ -78,6 +78,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.teamSize = this.teamRepository.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.isVisible = ko.pureComputed(() => listViewModel.state() === z.viewModel.ListViewModel.STATE.START_UI);
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
@@ -95,6 +96,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(this.search);
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
+    this.showMatches = ko.observable(false);
+    const {canInviteTeamMembers, canSearchUnconnectedUsers} = generatePermissionHelpers();
+    this.showOnlyConnectedUsers = ko.pureComputed(() => !canSearchUnconnectedUsers(this.selfUser().teamRole()));
 
     // User lists
     this.contacts = ko.pureComputed(() => {
@@ -103,11 +107,11 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       if (this.showOnlyConnectedUsers()) {
-        return this.conversationRepository.getConnectedUsers();
+        return this.conversationRepository.connectedUsers();
       }
 
       if (this.isTeam()) {
-        const connectedUsers = this.conversationRepository.getConnectedUsers();
+        const connectedUsers = this.conversationRepository.connectedUsers();
         const teamUsersWithoutPartners = this.teamRepository
           .teamUsers()
           .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
@@ -137,15 +141,12 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
-    this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    const {canInviteTeamMembers, canSearchUnconnectedUsers} = generatePermissionHelpers();
     this.showInviteMember = ko.pureComputed(
       () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
     );
 
-    this.showOnlyConnectedUsers = ko.pureComputed(() => !canSearchUnconnectedUsers(this.selfUser().teamRole()));
     this.showContacts = ko.pureComputed(() => this.contacts().length);
 
     this.showNoMatches = ko.pureComputed(() => {
@@ -582,14 +583,14 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
 
       const localSearchSources = this.showOnlyConnectedUsers()
-        ? this.conversationRepository.getConnectedUsers()
+        ? this.conversationRepository.connectedUsers()
         : allLocalUsers;
 
       const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-      const connectedUsers = this.conversationRepository.getConnectedUsers();
+      const connectedUsers = this.conversationRepository.connectedUsers();
       const filteredResults = contactResults.filter(user => {
         return (
           connectedUsers.includes(user) ||

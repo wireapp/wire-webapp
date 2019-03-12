@@ -50,8 +50,9 @@ z.team.TeamRepository = class TeamRepository {
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
 
-    this.isSelfConnectedTo = userId =>
-      this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    this.isSelfConnectedTo = userId => {
+      return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    };
 
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
