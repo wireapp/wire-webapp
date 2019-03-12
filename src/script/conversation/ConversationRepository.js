@@ -212,6 +212,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.eventService,
       {onMessageTimeout: this.handleMessageExpiration.bind(this)}
     );
+
+    this.connectedUsers = ko.pureComputed(() => {
+      const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+      const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
+      const connectedUsers = inviter ? [inviter] : [];
+      for (const conversation of this.conversations()) {
+        for (const user of conversation.participating_user_ets()) {
+          if (!user.isService && !connectedUsers.includes(user) && (user.isTeamMember() || user.isConnected())) {
+            connectedUsers.push(user);
+          }
+        }
+      }
+      return connectedUsers;
+    });
   }
 
   checkMessageTimer(messageEntity) {
@@ -796,24 +810,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.get_conversation_by_id(conversation_id).then(conversation_et =>
       [this.selfUser()].concat(conversation_et.participating_user_ets())
     );
-  }
-
-  /**
-   * Get all the users that you are directly connected to.
-   * This means that the user either invited you, you are in a conversation with them or they are connected external users
-   * @returns {Array<User>} List of the connected users
-   */
-  getConnectedUsers() {
-    const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
-    const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
-    const initialConnectedUsers = inviter ? [inviter] : [];
-    const allUsers = this.conversations().reduce((connectedUsers, conversation) => {
-      const users = conversation
-        .participating_user_ets()
-        .filter(user => !user.isService && (user.isTeamMember() || user.isConnected()));
-      return [...connectedUsers, ...users];
-    }, initialConnectedUsers);
-    return [...new Set(allUsers)];
   }
 
   /**

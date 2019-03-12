@@ -76,7 +76,7 @@ z.components.UserList = class UserList {
 
     // Filter all list items if a filter is provided
     this.filteredUserEntities = ko.pureComputed(() => {
-      const connectedUsers = this.conversationRepository.getConnectedUsers();
+      const connectedUsers = this.conversationRepository.connectedUsers();
       if (typeof this.filter === 'function') {
         const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
         if (normalizedQuery) {
@@ -112,7 +112,7 @@ z.components.UserList = class UserList {
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
+    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities()}">
       <participant-item params="participant: $data, customInfo: $parent.infos && $parent.infos()[$data.id], canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data), mode: $parent.mode" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.noUnderline, 'show-arrow': $parent.arrow, 'highlighted': $parent.highlightedUserIds.includes($data.id)}"></participant-item>
     </div>
 
