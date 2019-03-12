@@ -219,7 +219,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const connectedUsers = inviter ? [inviter] : [];
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
-          if (!user.isService && !connectedUsers.includes(user) && (user.isTeamMember() || user.isConnected())) {
+          const isNotService = !user.isService;
+          const isNotIncluded = !connectedUsers.includes(user);
+          if (isNotService && isNotIncluded && (user.isTeamMember() || user.isConnected())) {
             connectedUsers.push(user);
           }
         }
