@@ -1448,14 +1448,16 @@
     moment "2.24.0"
     platform "1.3.5"
 
-"@wireapp/copy-config@0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.3.1.tgz#f54ec631931a76a7d31a5cc2cb5ede778dc58115"
-  integrity sha512-eS83Ypt+SS7TtJkLMQmeAv9iB+Uzq4ta7o2WGCQWwmYoE+EvQhFgiRhfZZNzKoVBuU0cVz4b8tjCLuZNG6XPBw==
+"@wireapp/copy-config@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.4.0.tgz#f519da00d737386b6d6a819cdb7966f9d345891a"
+  integrity sha512-NKQLjgDa7KcZAueJHAEoY1nQPZZIxEJ/mcc42zQIsOPiDnFSfVDvRpo1Nuyn/3sZg5FtW0ZSgc/AXkPzwpP5rw==
   dependencies:
+    axios "0.18.0"
     copy "0.3.2"
     cosmiconfig "5.1.0"
     fs-extra "7.0.1"
+    jszip "3.2.0"
     logdown "3.2.7"
     rimraf "2.6.3"
 
