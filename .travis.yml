@@ -145,18 +145,20 @@ deploy:
 
   # GitHub Production Releases
   - provider: releases
-    skip_cleanup: true
     api_key: "$GH_TOKEN"
+    draft: true
     file: "CHANGELOG.md"
+    skip_cleanup: true
     on:
       repo: wireapp/wire-webapp
       branch: prod
 
   # GitHub Staging Releases
   - provider: releases
-    skip_cleanup: true
     api_key: "$GH_TOKEN"
+    draft: true
     file: "CHANGELOG.md"
+    skip_cleanup: true
     on:
       tags: true
       condition: $TRAVIS_TAG =~ .*-staging.*
