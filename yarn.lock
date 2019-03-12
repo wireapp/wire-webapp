@@ -1184,10 +1184,10 @@
     "@types/history" "*"
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16.8.6":
-  version "16.8.6"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.6.tgz#fa1de3fe56cc9b6afeddc73d093d7f30fd5e31cc"
-  integrity sha512-bN9qDjEMltmHrl0PZRI4IF2AbB7V5UlRfG+OOduckVnRQ4VzXVSzy/1eLAh778IEqhTnW0mmgL9yShfinNverA==
+"@types/react@*", "@types/react@16.8.7":
+  version "16.8.7"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.7.tgz#7b1c0223dd5494f9b4501ad2a69aa6acb350a29b"
+  integrity sha512-0xbkIyrDNKUn4IJVf8JaCn+ucao/cq6ZB8O6kSzhrJub1cVSqgTArtG0qCfdERWKMEIvUbrwLXeQMqWEsyr9dA==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -1525,20 +1525,20 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.0.18":
-  version "5.0.18"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.18.tgz#34ecaa1903f763244b9abe24c342a10023323ae1"
-  integrity sha512-ZZ116WF3VaU5qZWjU0PvuC1HHpIEwv0LYN70PugL+a3sbsuAgrX4KNIEPfIs9N80iGC8e7tIwDjtzKJKuy+CYA==
+"@wireapp/react-ui-kit@5.0.23":
+  version "5.0.23"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.0.23.tgz#99a64d17fd1e58b559dc9a6de16b4280f9ea2427"
+  integrity sha512-UBPH1tYJu09maYIyYEap9AVJX3yJJ0y2IU7EHTA4cstbPNwujW/Rj8ljl8e2pnt4if90pVKxblCYvHoC1u/krg==
   dependencies:
     "@emotion/core" "10.0.7"
     "@emotion/styled" "10.0.7"
     "@types/color" "3.0.0"
-    "@types/react" "16.8.6"
-    bazinga64 "5.3.45"
+    "@types/react" "16.8.7"
+    bazinga64 "5.3.49"
     color "3.1.0"
     emotion-normalize "10.0.0"
-    react "16.8.3"
-    react-dom "16.8.3"
+    react "16.8.4"
+    react-dom "16.8.4"
     react-transition-group "2.6.0"
 
 "@wireapp/store-engine@1.1.30":
@@ -2297,11 +2297,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bazinga64@5.3.45:
-  version "5.3.45"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.45.tgz#9bfe89dd9634d47bf98b01b357f67c4fcf668d76"
-  integrity sha512-13JkXr/E/ry8U/xmdtfO6i5FskN7BNwFFBZk84sXPnJCn3ZrH+S0RjmVRgFXE/pWoZ6CbhpDqZ5JhEd609+z1w==
 
 bazinga64@5.3.49:
   version "5.3.49"
@@ -9856,16 +9851,6 @@ react-addons-test-utils@15.6.2:
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
   integrity sha1-wStu/cIkfBDae4dw0YUICnsEcVY=
 
-react-dom@16.8.3:
-  version "16.8.3"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.3.tgz#ae236029e66210783ac81999d3015dfc475b9c32"
-  integrity sha512-ttMem9yJL4/lpItZAQ2NTFAbV7frotHk5DZEHXUOws2rMmrsvh1Na7ThGT0dTzUIl6pqTOi5tYREfL8AEna3lA==
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.13.3"
-
 react-dom@16.8.4:
   version "16.8.4"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.4.tgz#1061a8e01a2b3b0c8160037441c3bf00a0e3bc48"
@@ -9988,6 +9973,16 @@ react@16.8.3:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.13.3"
+
+react@16.8.4:
+  version "16.8.4"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.8.4.tgz#fdf7bd9ae53f03a9c4cd1a371432c206be1c4768"
+  integrity sha512-0GQ6gFXfUH7aZcjGVymlPOASTuSjlQL4ZtVC5YKH+3JL6bBLCVO21DknzmaPlI90LN253ojj02nsapy+j7wIjg==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.4"
 
 read-cache@^1.0.0:
   version "1.0.0"
