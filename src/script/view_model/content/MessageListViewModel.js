@@ -193,14 +193,8 @@ class MessageListViewModel {
       });
   }
 
-  _conversationHasExtraMessages(conversationEntity) {
-    const lastMessageEntity = conversationEntity.getLastMessage();
-    if (!lastMessageEntity) {
-      return false;
-    }
-
-    const isLastConversationEvent = lastMessageEntity.timestamp() >= this.conversation().last_event_timestamp();
-    return !isLastConversationEvent && lastMessageEntity.timestamp();
+  _isLastReceivedMessage(messageEntity, conversationEntity) {
+    return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   }
 
   getMessagesContainer() {
@@ -332,10 +326,15 @@ class MessageListViewModel {
    * @returns {Promise<any>} A promise that resolves when the loading is done
    */
   loadFollowingMessages() {
-    const last_message = this.conversation().getLastMessage();
+    const lastMessage = this.conversation().getLastMessage();
 
-    if (last_message && this._conversationHasExtraMessages(this.conversation())) {
-      return this.conversation_repository.getSubsequentMessages(this.conversation(), last_message, false);
+    if (lastMessage) {
+      if (!this._isLastReceivedMessage(lastMessage, this.conversation())) {
+        // if the last loaded message is not the last of the conversation, we load the subsequent messages
+        return this.conversation_repository.getSubsequentMessages(this.conversation(), lastMessage, false);
+      }
+      // is the message is the last of the conversation, then we update the last read timestamp of the conversation
+      this.updateConversationLastRead(this.conversation(), lastMessage);
     }
     return Promise.resolve();
   }
@@ -513,7 +512,6 @@ class MessageListViewModel {
    * @returns {Function|null} Callback or null
    */
   getInViewportCallback(conversationEntity, messageEntity) {
-    const conversationTimestamp = conversationEntity.last_read_timestamp();
     const messageTimestamp = messageEntity.timestamp();
     const callbacks = [];
 
@@ -531,15 +529,6 @@ class MessageListViewModel {
 
     const updateLastRead = () => {
       conversationEntity.setTimestamp(messageEntity.timestamp(), Conversation.TIMESTAMP_TYPE.LAST_READ);
-      const hasNoUnread = conversationEntity.unreadState().allMessages.length === 0;
-
-      if (hasNoUnread) {
-        const lastKnowTimestamp = conversationEntity.get_last_known_timestamp(
-          this.serverTimeRepository.toServerTimestamp()
-        );
-        conversationEntity.setTimestamp(lastKnowTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-        this.conversation_repository.markAsRead(conversationEntity);
-      }
     };
 
     const startTimer = () => {
@@ -552,7 +541,7 @@ class MessageListViewModel {
       callbacks.push(startTimer);
     }
 
-    const isUnreadMessage = messageTimestamp > conversationTimestamp;
+    const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().is_me;
 
     let shouldSendReadReceipt = false;
@@ -563,6 +552,10 @@ class MessageListViewModel {
       } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
         shouldSendReadReceipt = true;
       }
+    }
+
+    if (this._isLastReceivedMessage(messageEntity, conversationEntity)) {
+      callbacks.push(() => this.updateConversationLastRead(conversationEntity, messageEntity));
     }
 
     if (isUnreadMessage && isNotOwnMessage) {
@@ -580,6 +573,18 @@ class MessageListViewModel {
       const trigger = () => callbacks.forEach(callback => callback());
       return document.hasFocus() ? trigger() : $(window).one('focus', trigger);
     };
+  }
+
+  updateConversationLastRead(conversationEntity, messageEntity) {
+    const conversationLastRead = conversationEntity.last_read_timestamp();
+    const lastKnowTimestamp = conversationEntity.get_last_known_timestamp(
+      this.serverTimeRepository.toServerTimestamp()
+    );
+    const needsUpdate = conversationLastRead < lastKnowTimestamp;
+    if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
+      conversationEntity.setTimestamp(lastKnowTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+      this.conversation_repository.markAsRead(conversationEntity);
+    }
   }
 
   handleClickOnMessage(messageEntity, event) {
