@@ -33,7 +33,7 @@ class LRUCache<T> {
   private head: Node<T> | null;
   private end: Node<T> | null;
 
-  constructor(private readonly capacity: number = 100) {
+  constructor(public readonly capacity: number = 100) {
     this.map = {};
     this.head = null;
     this.end = null;

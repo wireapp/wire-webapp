@@ -1,10 +1,12 @@
 {
   "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
   "devDependencies": {
+    "@types/jasmine": "3.3.9",
     "cross-env": "5.2.0",
     "jasmine": "3.3.1",
     "nyc": "13.3.0",
     "rimraf": "2.6.3",
+    "ts-node": "8.0.3",
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
     "webpack-cli": "3.2.3"
