@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@emotion/core": "10.0.7",
-    "@emotion/styled": "10.0.7",
+    "@emotion/styled": "10.0.9",
     "@types/color": "3.0.0",
     "@types/react": "16.8.7",
     "bazinga64": "5.3.49",
