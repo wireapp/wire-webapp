@@ -577,12 +577,12 @@ class MessageListViewModel {
 
   updateConversationLastRead(conversationEntity, messageEntity) {
     const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnowTimestamp = conversationEntity.get_last_known_timestamp(
+    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(
       this.serverTimeRepository.toServerTimestamp()
     );
-    const needsUpdate = conversationLastRead < lastKnowTimestamp;
+    const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
-      conversationEntity.setTimestamp(lastKnowTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
       this.conversation_repository.markAsRead(conversationEntity);
     }
   }
