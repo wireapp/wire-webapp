@@ -27,6 +27,7 @@ import * as utils from './utils';
 const defaultOptions: Required<CopyConfigOptions> = {
   externalDir: '',
   files: {},
+  forceDownload: false,
   repositoryUrl: 'https://github.com/wireapp/wire-web-config-default#master',
 };
 
@@ -151,23 +152,21 @@ export class CopyConfig {
     let bareUrl = repositoryData[0];
     const branch = repositoryData[1] || 'master';
     const {stderr: stderrVersion} = await utils.execAsync('git --version');
-    let isHttpUrl = bareUrl.startsWith('http');
-
-    if (!isHttpUrl && stderrVersion) {
-      this.logger.error(`No git installation found: ${stderrVersion}. Trying to download the zip file ...`);
-      bareUrl = bareUrl
-        .replace(/^git(@|:\/\/)/, 'https://')
-        .replace(':', '/')
-        .replace(/\.git$/, '');
-      isHttpUrl = true;
-    }
 
     if (!this.noCleanup) {
       this.logger.info(`Removing clone directory before cloning ...`);
       await utils.rimrafAsync(this.baseDir);
     }
 
-    if (isHttpUrl) {
+    if (stderrVersion) {
+      this.logger.error(`No git installation found: (error: "${stderrVersion}"). Trying to download the zip file ...`);
+    }
+
+    if (stderrVersion || this.options.forceDownload) {
+      if (bareUrl.startsWith('git')) {
+        const gitProtocolRegex = new RegExp('^git(?::\\/\\/([^@]+@)?|@)([^:]+):(.*)(?:\\.git)?');
+        bareUrl = bareUrl.replace(gitProtocolRegex, 'https://$1$2/$3');
+      }
       const url = `${bareUrl}/archive/${branch}.zip`;
       this.logger.info(`Downloading "${url}" ...`);
       await utils.downloadFileAsync(url, this.baseDir);

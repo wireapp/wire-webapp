@@ -40,6 +40,8 @@ export interface CopyConfigOptions {
   files?: {
     [source: string]: string | string[];
   };
+  /** Force using HTTPS download over `git clone` */
+  forceDownload?: boolean;
   /**
    * From where to clone the configuration.
    *
