@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,25 +24,22 @@ const logger = Logger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 
-const fetchLatestVersion = () => {
-  return fetch(VERSION_URL)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
-    })
-    .then(({version}) => version);
+const fetchLatestVersion = async () => {
+  const response = await fetch(VERSION_URL);
+  if (response.ok) {
+    const {version} = await response.json();
+    return version;
+  }
+  throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
 };
 
-const checkVersion = (currentVersion, onNewVersionAvailable) => {
+const checkVersion = async (currentVersion, onNewVersionAvailable) => {
   if (navigator.onLine) {
-    fetchLatestVersion().then(serverVersion => {
-      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
+    const serverVersion = await fetchLatestVersion();
+    logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
 
-      const isOutdatedVersion = serverVersion > currentVersion;
-      return isOutdatedVersion && onNewVersionAvailable(serverVersion);
-    });
+    const isOutdatedVersion = serverVersion > currentVersion;
+    return isOutdatedVersion && onNewVersionAvailable(serverVersion);
   }
 };
 
