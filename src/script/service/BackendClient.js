@@ -17,6 +17,7 @@
  *
  */
 
+import {AuthRepository} from '../auth/AuthRepository';
 import PromiseQueue from 'utils/PromiseQueue';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -338,7 +339,7 @@ export default class BackendClient {
               if (!config.skipRetry) {
                 this._prependRequestQueue(config, resolve, reject);
 
-                const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
+                const trigger = AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
                 return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
               }
             }

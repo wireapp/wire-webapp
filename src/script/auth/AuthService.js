@@ -17,7 +17,6 @@
  *
  */
 
-import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
 import BackendClient from '../service/BackendClient';
@@ -35,9 +34,9 @@ export class AuthService {
     };
   }
 
-  constructor(backendClient) {
+  constructor(backendClient, logger) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.auth.AuthService');
+    this.logger = logger;
   }
 
   /**

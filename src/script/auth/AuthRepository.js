@@ -17,7 +17,6 @@
  *
  */
 
-import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
@@ -41,12 +40,13 @@ export class AuthRepository {
 
   /**
    * Construct a new AuthService
-   * @param {z.auth.AuthService} authService - Service for authentication interactions with the backend
+   * @param {AuthService} authService - Service for authentication interactions with the backend
+   * @param {Logger} logger - logger configured for this class
    */
-  constructor(authService) {
+  constructor(authService, logger) {
     this.accessTokenRefresh = undefined;
     this.authService = authService;
-    this.logger = Logger('z.auth.AuthRepository');
+    this.logger = logger;
 
     this.queueState = this.authService.backendClient.queueState;
 
