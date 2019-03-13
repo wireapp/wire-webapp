@@ -301,8 +301,6 @@ import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
-import authServiceGlobal from '../auth/AuthService.js';
-import authRepoGlobal from '../auth/AuthRepository.js';
 import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 

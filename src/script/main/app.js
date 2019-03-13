@@ -20,7 +20,7 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
-import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
+import {BACKEND_REST, BACKEND_WS, FEATURE} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
@@ -45,7 +45,6 @@ import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
-import auth from './auth';
 /* eslint-enable no-unused-vars */
 import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from '../util/LoggerUtil';
@@ -76,17 +75,17 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {z.main.Auth} authComponent - Authentication component
+   * @param {BackendClient} backendClient - Configured backend client
    */
-  constructor(authComponent) {
-    this.backendClient = authComponent.backendClient;
+  constructor(backendClient) {
+    this.backendClient = backendClient;
     this.logger = Logger('z.main.App');
 
     this.telemetry = new AppInitTelemetry();
     new WindowHandler();
 
-    this.service = this._setupServices(authComponent);
-    this.repository = this._setupRepositories(authComponent);
+    this.service = this._setupServices();
+    this.repository = this._setupRepositories();
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
@@ -109,14 +108,13 @@ class App {
 
   /**
    * Create all app repositories.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All repositories
    */
-  _setupRepositories(authComponent) {
+  _setupRepositories() {
     const repositories = {};
 
-    repositories.audio = authComponent.audio;
-    repositories.auth = authComponent.repository;
+    repositories.audio = resolve(graph.AudioRepository);
+    repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
     repositories.serverTime = resolve(graph.ServerTimeRepository);
@@ -227,10 +225,9 @@ class App {
 
   /**
    * Create all app services.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All services
    */
-  _setupServices(authComponent) {
+  _setupServices() {
     const storageService = resolve(graph.StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
@@ -238,7 +235,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      auth: authComponent.service,
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
@@ -848,9 +844,14 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
+  enableLogging(FEATURE.ENABLE_DEBUG);
   if ($('#wire-main-app').length !== 0) {
-    wire.app = new App(wire.auth);
+    const backendClient = resolve(graph.BackendClient);
+    backendClient.setSettings({
+      restUrl: BACKEND_REST,
+      webSocketUrl: BACKEND_WS,
+    });
+    wire.app = new App(backendClient);
   }
 });
 
