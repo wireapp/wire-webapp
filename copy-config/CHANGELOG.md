@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.4.0...@wireapp/copy-config@0.4.1) (2019-03-13)
+
+
+### Bug Fixes
+
+* **copy-config:** Download only if git is not available ([#1636](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1636)) ([8e204fb](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/8e204fb))
+
+
+
+
+
 # 0.4.0 (2019-03-11)
 
 
