@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import platform from 'platform';
 import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
+import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
@@ -145,7 +146,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -251,7 +251,6 @@ class App {
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
-      lifecycle: new z.lifecycle.LifecycleService(),
       notification: new z.event.NotificationService(this.backendClient, storageService),
       properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
@@ -284,7 +283,6 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.UPDATE, this.update.bind(this));
   }
 
   //##############################################################################
@@ -378,7 +376,10 @@ class App {
       })
       .then(() => {
         this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        this.repository.lifecycle.init();
+        if (this.repository.user.isActivatedAccount()) {
+          // start regularly polling the server to check if there is a new version of Wire
+          startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
+        }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
