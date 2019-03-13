@@ -28,7 +28,7 @@
     "@types/hbs": "4.0.1",
     "@types/helmet": "0.0.43",
     "@types/jasmine": "3.3.9",
-    "@types/node": "10.12.30",
+    "@types/node": "10.14.1",
     "jasmine": "3.3.1",
     "nyc": "13.3.0",
     "rimraf": "2.6.3",
