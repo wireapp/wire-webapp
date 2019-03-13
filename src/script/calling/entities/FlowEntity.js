@@ -461,16 +461,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return;
     }
 
-    this.peerConnection.oniceconnectionstatechange = () => {
-      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
-    };
-
-    this.peerConnection.onsignalingstatechange = event => {
-      const peerConnection = event.target;
-      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
-      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-    };
-
     const connectionMediaStreamTracks = this.peerConnection.getReceivers
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
       : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
@@ -598,10 +588,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const peerConnection = event.target;
 
       this.callLogger.info('State changed - ICE connection', event);
-      const connectionMessage = `ICE connection state: ${peerConnection.iceConnectionState}`;
-      this.callLogger.log(this.callLogger.levels.LEVEL_1, connectionMessage);
-      const gatheringMessage = `ICE gathering state: ${peerConnection.iceGatheringState}`;
-      this.callLogger.log(this.callLogger.levels.LEVEL_1, gatheringMessage);
+      this.callLogger.log(`ICE connection state: ${peerConnection.iceConnectionState}`);
+      this.callLogger.log(`ICE gathering state: ${peerConnection.iceGatheringState}`);
 
       this.gatheringState(peerConnection.iceGatheringState);
       this.connectionState(peerConnection.iceConnectionState);
