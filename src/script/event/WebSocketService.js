@@ -17,7 +17,6 @@
  *
  */
 
-import {AuthRepository} from '../auth/AuthRepository';
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -156,7 +155,7 @@ z.event.WebSocketService = class WebSocketService {
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
         z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
-        AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
+        z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
       );
     }
 

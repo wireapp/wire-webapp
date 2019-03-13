@@ -50,16 +50,17 @@ class AuthViewModel {
 
   /**
    * View model for the auth page.
-   * @param {BackendClient} backendClient - Configured backend client
+   * @param {z.main.Auth} authComponent - App authentication
    */
-  constructor(backendClient) {
+  constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
     this.logger = Logger('z.viewModel.AuthViewModel');
 
-    this.authRepository = resolveDependency(graph.AuthRepository);
-    this.audio_repository = resolveDependency(graph.AudioRepository);
+    this.authRepository = authComponent.repository;
+    this.audio_repository = authComponent.audio;
 
+    const backendClient = authComponent.backendClient;
     // Cryptography
     this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!

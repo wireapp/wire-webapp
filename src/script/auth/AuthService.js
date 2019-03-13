@@ -17,11 +17,15 @@
  *
  */
 
+import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
 import BackendClient from '../service/BackendClient';
 
-export class AuthService {
+window.z = window.z || {};
+window.z.auth = z.auth || {};
+
+z.auth.AuthService = class AuthService {
   static get CONFIG() {
     return {
       POST_ACCESS_RETRY: {
@@ -34,9 +38,9 @@ export class AuthService {
     };
   }
 
-  constructor(backendClient, logger) {
+  constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = logger;
+    this.logger = Logger('z.auth.AuthService');
   }
 
   /**
@@ -232,4 +236,4 @@ export class AuthService {
     this.backendClient.accessTokenType = tokenType;
     this.backendClient.accessToken = token;
   }
-}
+};
