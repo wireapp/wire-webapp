@@ -39,11 +39,13 @@ window.TestFactory = function() {};
 
 /**
  *
- * @returns {Promise<AuthRepository>} The authentication repository.
+ * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
  */
 window.TestFactory.prototype.exposeAuthActors = function() {
   return Promise.resolve().then(() => {
-    TestFactory.auth_repository = resolve(graph.AuthRepository);
+    TestFactory.authService = new z.auth.AuthService(resolve(graph.BackendClient));
+
+    TestFactory.auth_repository = new z.auth.AuthRepository(TestFactory.authService);
     return TestFactory.auth_repository;
   });
 };

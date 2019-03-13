@@ -27,11 +27,9 @@ export enum ENVIRONMENT {
   PRODUCTION = 'PRODUCTION',
 }
 
-export function isLocalhost() {
-  return window.location.hostname.includes('localhost') || window.location.hostname.startsWith('192.168.');
-}
-
-function getEnvironmentFromQuery() {
+export const APP_ENVIRONMENT = getEnvironmentFromQuery();
+checkEnvironment();
+export function getEnvironmentFromQuery() {
   switch (getURLParameter(QUERY_KEY.ENVIRONMENT)) {
     case 'staging': {
       return ENVIRONMENT.STAGING;
@@ -49,8 +47,31 @@ function getEnvironmentFromQuery() {
   }
 }
 
+export function isLocalhost() {
+  return window.location.hostname.includes('localhost') || window.location.hostname.startsWith('192.168.');
+}
+
+export function isInternalEnvironment() {
+  return window.location.hostname.includes('wire-webapp') || isLocalhost();
+}
+
+export function checkEnvironment() {
+  const environment = getEnvironment();
+  if (![ENVIRONMENT.LOCAL, ENVIRONMENT.STAGING, ENVIRONMENT.PRODUCTION].includes(environment)) {
+    throw new Error(`Invalid environment ${environment}`);
+  }
+}
+
+export function getEnvironment() {
+  return APP_ENVIRONMENT;
+}
+
+export function isEnvironment(environment: ENVIRONMENT) {
+  return APP_ENVIRONMENT === environment;
+}
+
 export function onEnvironment<T>(environmentConditions: {onLocal?: T; onStaging: T; onProduction: T}): T {
-  switch (getEnvironmentFromQuery()) {
+  switch (getEnvironment()) {
     case ENVIRONMENT.LOCAL: {
       return environmentConditions.onLocal === undefined
         ? environmentConditions.onStaging

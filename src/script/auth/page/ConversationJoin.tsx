@@ -43,7 +43,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import WirelessContainer from '../component/WirelessContainer';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
-import {onEnvironment} from '../Environment';
+import * as Environment from '../Environment';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -159,7 +159,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
 
   isPwaSupportedBrowser = () => {
     const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-    return onEnvironment({
+    return Environment.onEnvironment({
       onProduction: false,
       onStaging: pwaAware && (isMobileOs() || isSafari()),
     });

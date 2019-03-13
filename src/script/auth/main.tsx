@@ -25,11 +25,11 @@ import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import {enableLogging} from '../util/LoggerUtil';
-import {FEATURE} from './config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
 import {configureStore} from './configureStore';
+import {ENVIRONMENT, isEnvironment} from './Environment';
 import actionRoot from './module/action';
 import Root from './page/Root';
 
@@ -71,5 +71,5 @@ function runApp() {
   }
 }
 
-enableLogging(FEATURE.ENABLE_DEBUG);
+enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
 runApp();
