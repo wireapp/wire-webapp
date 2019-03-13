@@ -18,7 +18,7 @@
  */
 
 import TimeUtil from 'utils/TimeUtil';
-import CallLogger from '../../telemetry/calling/CallLogger';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';

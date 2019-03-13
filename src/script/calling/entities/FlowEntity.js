@@ -18,7 +18,7 @@
  */
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
-import CallLogger from '../../telemetry/calling/CallLogger';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';

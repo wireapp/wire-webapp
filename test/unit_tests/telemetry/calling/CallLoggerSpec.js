@@ -18,7 +18,7 @@
  */
 
 import sdpTransform from 'sdp-transform';
-import CallLogger from 'src/script/telemetry/calling/CallLogger';
+import {CallLogger} from 'src/script/telemetry/calling/CallLogger';
 
 describe('CallLogger', () => {
   const callLogger = new CallLogger('test', null, {}, 'test');

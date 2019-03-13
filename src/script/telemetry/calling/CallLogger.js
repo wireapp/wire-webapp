@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
 import Logger from 'utils/Logger';
 
-export default class CallLogger {
+export class CallLogger {
   static get CONFIG() {
     return {
       MESSAGE_LOG_LENGTH: 10000,

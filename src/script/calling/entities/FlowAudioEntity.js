@@ -21,7 +21,7 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-import CallLogger from '../../telemetry/calling/CallLogger';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import MediaRepository from '../../media/MediaRepository';
 
 z.calling.entities.FlowAudioEntity = class FlowAudioEntity {

@@ -19,7 +19,7 @@
 
 import Logger from 'utils/Logger';
 
-export default class WindowHandler {
+export class WindowHandler {
   constructor() {
     this.logger = Logger('z.ui.WindowHandler');
 

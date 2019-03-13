@@ -22,7 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
-import CallLogger from '../telemetry/calling/CallLogger';
+import {CallLogger} from '../telemetry/calling/CallLogger';
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';

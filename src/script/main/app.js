@@ -32,7 +32,7 @@ import BackendClient from '../service/BackendClient';
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
-import WindowHandler from '../ui/WindowHandler';
+import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
 import TimeUtil from 'utils/TimeUtil';

@@ -19,7 +19,7 @@
 
 import Logger from 'utils/Logger';
 
-import CallLogger from '../../telemetry/calling/CallLogger';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
