@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import Cookies from 'js-cookie';
+import moment from 'moment';
 
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
