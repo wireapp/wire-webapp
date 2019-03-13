@@ -124,11 +124,21 @@ participant-item {
         overflow: hidden;
         max-width: 100%;
         margin-top: 2px;
-        font-size: 12px;
+        font-size: 0;
         line-height: 16px;
         opacity: 0.56;
         text-overflow: ellipsis;
         white-space: nowrap;
+
+        * {
+          font-size: 12px;
+        }
+      }
+
+      .participant-item-content-badge::before {
+        display: inline-block;
+        margin: 0 4px;
+        content: '\00b7';
       }
     }
   }
