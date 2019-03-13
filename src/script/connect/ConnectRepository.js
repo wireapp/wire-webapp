@@ -17,6 +17,8 @@
  *
  */
 
+import CryptoJS from 'crypto-js';
+
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
