@@ -1,11 +1,17 @@
 import $ from 'jquery';
 import AuthViewModel from '../view_model/AuthViewModel';
-import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
+import {resolve, graph} from '../config/appResolver';
 import {enableLogging} from '../util/LoggerUtil';
+import {BACKEND_REST, BACKEND_WS, FEATURE} from '../auth/config';
 
 $(() => {
-  enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
+  enableLogging(FEATURE.ENABLE_DEBUG);
   if ($('.auth-page').length) {
-    new AuthViewModel(wire.auth);
+    const backendClient = resolve(graph.BackendClient);
+    backendClient.setSettings({
+      restUrl: BACKEND_REST,
+      webSocketUrl: BACKEND_WS,
+    });
+    new AuthViewModel(backendClient);
   }
 });
