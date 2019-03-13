@@ -40,7 +40,7 @@ z.auth.AuthService = class AuthService {
 
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.auth.AuthService');
   }
 
   /**

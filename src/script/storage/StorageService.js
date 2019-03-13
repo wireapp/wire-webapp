@@ -37,7 +37,7 @@ class StorageService {
   }
   // Construct an new StorageService.
   constructor() {
-    this.logger = new Logger('StorageService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('StorageService');
 
     this.db = undefined;
     this.dbName = undefined;

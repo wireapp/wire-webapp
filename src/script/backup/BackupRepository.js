@@ -50,7 +50,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = new Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.backup.BackupRepository');
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;

@@ -29,6 +29,7 @@ import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
 import {configureStore} from './configureStore';
+import {ENVIRONMENT, isEnvironment} from './Environment';
 import actionRoot from './module/action';
 import Root from './page/Root';
 
@@ -70,5 +71,5 @@ function runApp() {
   }
 }
 
-enableLogging();
+enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
 runApp();

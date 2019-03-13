@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
+import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
@@ -31,6 +32,7 @@ import BackendClient from '../service/BackendClient';
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
 import TimeUtil from 'utils/TimeUtil';
@@ -77,10 +79,10 @@ class App {
    */
   constructor(authComponent) {
     this.backendClient = authComponent.backendClient;
-    this.logger = new Logger('z.main.App', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.main.App');
 
     this.telemetry = new AppInitTelemetry();
-    this.windowHandler = new z.ui.WindowHandler().init();
+    new WindowHandler();
 
     this.service = this._setupServices(authComponent);
     this.repository = this._setupRepositories(authComponent);
@@ -368,10 +370,10 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
+        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
@@ -845,7 +847,7 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging();
+  enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
   if ($('#wire-main-app').length !== 0) {
     wire.app = new App(wire.auth);
   }

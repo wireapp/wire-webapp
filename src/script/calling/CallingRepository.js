@@ -22,6 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {CallLogger} from '../telemetry/calling/CallLogger';
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
@@ -90,7 +91,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.messageLog = [];
     const loggerName = 'z.calling.CallingRepository';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, null, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, null, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {

@@ -56,7 +56,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = new Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.event.WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';

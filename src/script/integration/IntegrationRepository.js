@@ -38,7 +38,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   constructor(integrationService, conversationRepository, teamRepository) {
-    this.logger = new Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.integration.IntegrationRepository');
 
     this.integrationService = integrationService;
 

@@ -41,7 +41,7 @@ export default class PromiseQueue {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
     const loggerName = `PromiseQueue${name ? ` (${name})` : ''}`;
-    this.logger = new Logger(loggerName, z.config.LOGGER.OPTIONS);
+    this.logger = Logger(loggerName);
 
     this._blocked = false;
     this._concurrent = concurrent;

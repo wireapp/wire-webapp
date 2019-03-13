@@ -67,7 +67,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.StartUIViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
 

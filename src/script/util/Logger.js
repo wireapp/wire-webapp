@@ -17,11 +17,5 @@
  *
  */
 
-import '../../ext/js/webapp-module-logger/Logger.js';
-import {amplify} from 'amplify';
-import moment from 'moment';
-
-window.amplify = amplify; // The logger needs amplify to be on the root scope
-window.moment = moment; // The logger needs moment to be on the root scope
-
-export default z.util.Logger;
+import {getLogger} from '../auth/LogProvider';
+export default getLogger;

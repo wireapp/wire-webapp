@@ -17,6 +17,7 @@
  *
  */
 
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import PROPERTY_STATE from '../enum/PropertyState';
 import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
@@ -50,8 +51,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.messageLog = this.callEntity.messageLog;
     this.sessionId = undefined;
 
-    const loggerName = 'z.calling.entities.ParticipantEntity';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger('z.calling.entities.ParticipantEntity', this.id, this.messageLog);
 
     this.callLogger.info(`Created new participant entity for user ${this.id}`);
 

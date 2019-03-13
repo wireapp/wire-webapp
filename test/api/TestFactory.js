@@ -21,6 +21,8 @@
 
 import ko from 'knockout';
 
+import 'src/script/main/globals';
+
 import {resolve, graph, backendConfig} from './testResolver';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
@@ -30,23 +32,10 @@ window.testConfig = {
 };
 
 /**
- * @param {function} [logger_level] - A function returning the logger level.
  * @returns {Window.TestFactory} A TestFactory instance.
  * @constructor
  */
-window.TestFactory = function(logger_level) {
-  if (!logger_level) {
-    logger_level = z.util.Logger.prototype.levels.OFF;
-  }
-
-  const initialLoggerOptions = z.config.LOGGER.OPTIONS;
-  Object.keys(initialLoggerOptions.domains).forEach(domain => {
-    initialLoggerOptions.domains[domain] = logger_level;
-  });
-  initialLoggerOptions.level = logger_level;
-
-  return this;
-};
+window.TestFactory = function() {};
 
 /**
  *
@@ -361,7 +350,6 @@ window.TestFactory.prototype.exposeCallingActors = function() {
       resolve(graph.MediaRepository),
       TestFactory.user_repository
     );
-    TestFactory.calling_repository.callLogger.level = z.util.Logger.prototype.levels.OFF;
 
     return TestFactory.calling_repository;
   });

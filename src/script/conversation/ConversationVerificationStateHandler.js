@@ -27,7 +27,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeRepository = serverTimeRepository;
-    this.logger = new Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ConversationVerificationStateHandler');
 
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));

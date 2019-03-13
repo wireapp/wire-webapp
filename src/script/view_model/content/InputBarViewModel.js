@@ -69,7 +69,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.content.InputBarViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.InputBarViewModel');
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfUser = this.userRepository.self;

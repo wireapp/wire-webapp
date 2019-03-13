@@ -18,6 +18,7 @@
  */
 
 import {resolve, graph} from '../config/appResolver';
+import {ENVIRONMENT, isEnvironment} from '../auth/Environment';
 import {enableLogging} from '../util/LoggerUtil';
 
 class Auth {
@@ -41,7 +42,7 @@ class Auth {
 // Setting up the Environment (DIST)
 //##############################################################################
 $(() => {
-  enableLogging();
+  enableLogging(isEnvironment(ENVIRONMENT.LOCAL));
   const defaultEnvironment = z.util.Environment.frontend.isProduction()
     ? z.service.BackendEnvironment.PRODUCTION
     : z.service.BackendEnvironment.DEVELOPMENT;

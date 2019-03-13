@@ -31,7 +31,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ListViewModel');
   }
 
   acceptConnectionRequest(userEntity, showConversation) {

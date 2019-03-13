@@ -49,7 +49,7 @@ z.auth.AuthRepository = class AuthRepository {
   constructor(authService) {
     this.accessTokenRefresh = undefined;
     this.authService = authService;
-    this.logger = new Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.auth.AuthRepository');
 
     this.queueState = this.authService.backendClient.queueState;
 

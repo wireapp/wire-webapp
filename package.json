@@ -4,7 +4,6 @@
   "dependencies": {
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
-    "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.4",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@bower_components/wire-theme": "wireapp/wire-theme#v1.0.6",
     "@emotion/core": "10.0.9",
@@ -214,9 +213,6 @@
     "@bower_components/webapp-module-bubble": {
       "js": "dist/script/*.js",
       "less": "app/style/webapp-module-bubble.less"
-    },
-    "@bower_components/webapp-module-logger": {
-      "js": "dist/js/Logger.js"
     },
     "@bower_components/webapp-module-namespace": {
       "js": "js/*.js"
