@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {resolve, graph} from '../../config/appResolver';

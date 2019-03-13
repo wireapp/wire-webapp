@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
