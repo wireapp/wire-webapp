@@ -729,7 +729,6 @@
 
 "@bower_components/webapp-module-logger@wireapp/webapp-module-logger#v1.1.4":
   version "1.1.4"
-  uid ed1f422bf331674098a6862c93f1750741f6db8d
   resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/ed1f422bf331674098a6862c93f1750741f6db8d"
 
 "@bower_components/webapp-module-namespace@wireapp/webapp-module-namespace#1.0.2":
@@ -1038,20 +1037,6 @@
     "@types/events" "*"
     "@types/node" "*"
     "@types/range-parser" "*"
-
-"@types/express-sitemap-xml@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.0.1.tgz#017e9a3997c990cc6963e6b111a9c82cecfee3a3"
-  integrity sha512-QSVOsSwJgQ1rnK73zSWcHTbVzIhjhUOmej6Fk3woie5Uzoy2JxVUaT2Ie4b9aE3sRXKtNhL/wg3suGwb0sOl6w==
-  dependencies:
-    "@types/express" "*"
-
-"@types/express-useragent@0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-0.2.21.tgz#dbbc684e15aa5dfeef1118eabcbc0084716be59f"
-  integrity sha512-xVZ9GVsrYa5PFghnb9UGiWR0ZOrAWhxSwbTVhqI1tMGU0I1TnAvzCQi15P29GWhc8mR384IUEINlhrPy0mz1Pg==
-  dependencies:
-    "@types/express" "*"
 
 "@types/express@*":
   version "4.16.0"
@@ -12515,7 +12500,6 @@ wide-align@^1.1.0:
 
 "wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.16.1":
   version "0.16.1"
-  uid "394041dc3def1a86c5b80670dc93c64b68bfba64"
   resolved "https://github.com/wireapp/wire-web-config-wire#394041dc3def1a86c5b80670dc93c64b68bfba64"
   dependencies:
     adm-zip "0.4.13"
