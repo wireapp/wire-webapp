@@ -22,10 +22,7 @@ import TimeUtil from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
-
-z.auth.AuthRepository = class AuthRepository {
+export class AuthRepository {
   static get CONFIG() {
     return {
       REFRESH_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
@@ -54,24 +51,6 @@ z.auth.AuthRepository = class AuthRepository {
     this.queueState = this.authService.backendClient.queueState;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
-  }
-
-  /**
-   * Print all cookies for a user in the console.
-   * @returns {undefined} No return value
-   */
-  listCookies() {
-    this.authService
-      .getCookies()
-      .then(({cookies}) => {
-        this.logger.force_log('Backend cookies:');
-        cookies.forEach((cookie, index) => {
-          const expirationDate = TimeUtil.formatTimestamp(cookie.time, false);
-          const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expirationDate}`;
-          this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
-        });
-      })
-      .catch(error => this.logger.force_log('Could not list user cookies', error));
   }
 
   /**
@@ -258,4 +237,4 @@ z.auth.AuthRepository = class AuthRepository {
       this.logger.info(`Access token refresh scheduled for '${refreshDate}' skipped because we are offline`);
     }, callbackTimestamp - Date.now());
   }
-};
+}

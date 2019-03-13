@@ -22,10 +22,7 @@ import TimeUtil from 'utils/TimeUtil';
 
 import BackendClient from '../service/BackendClient';
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
-
-z.auth.AuthService = class AuthService {
+export class AuthService {
   static get CONFIG() {
     return {
       POST_ACCESS_RETRY: {
@@ -236,4 +233,4 @@ z.auth.AuthService = class AuthService {
     this.backendClient.accessTokenType = tokenType;
     this.backendClient.accessToken = token;
   }
-};
+}
