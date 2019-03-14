@@ -77,8 +77,8 @@ export default class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
   }
 
-  triggerVersionCheck() {
-    checkVersion();
+  triggerVersionCheck(baseVersion) {
+    return checkVersion(baseVersion);
   }
 
   /**

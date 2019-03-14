@@ -35,15 +35,23 @@ const fetchLatestVersion = async () => {
   throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
 };
 
-export async function checkVersion() {
+/**
+ * Check all the registered version listeners if the server version is newer than the version they registered.
+ *
+ * @param {string} overrideCurrentVersion - will ignore the version set for the listener and use this one instead
+ * @returns {Promise<number>} - Promise that resolves when the check has been done
+ */
+export async function checkVersion(overrideCurrentVersion) {
   if (navigator.onLine) {
     const serverVersion = await fetchLatestVersion();
     newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
-      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
+      const baseVersion = overrideCurrentVersion || currentVersion;
+      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${baseVersion}'`);
 
-      const isOutdatedVersion = serverVersion > currentVersion;
+      const isOutdatedVersion = serverVersion > baseVersion;
       return isOutdatedVersion && onNewVersionAvailable(serverVersion);
     });
+    return serverVersion;
   }
 }
 
