@@ -23,6 +23,8 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 
+import {checkVersion} from '../lifecycle/newVersionHandler';
+
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
   return z.util.downloadFile(url, filename);
@@ -73,6 +75,10 @@ export default class DebugUtil {
         return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
+  }
+
+  triggerVersionCheck() {
+    checkVersion();
   }
 
   /**

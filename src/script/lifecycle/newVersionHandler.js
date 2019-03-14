@@ -24,6 +24,8 @@ const logger = Logger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 
+const newVersionListeners = [];
+
 const fetchLatestVersion = async () => {
   const response = await fetch(VERSION_URL);
   if (response.ok) {
@@ -33,15 +35,17 @@ const fetchLatestVersion = async () => {
   throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
 };
 
-const checkVersion = async (currentVersion, onNewVersionAvailable) => {
+export async function checkVersion() {
   if (navigator.onLine) {
     const serverVersion = await fetchLatestVersion();
-    logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
+    newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
+      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
 
-    const isOutdatedVersion = serverVersion > currentVersion;
-    return isOutdatedVersion && onNewVersionAvailable(serverVersion);
+      const isOutdatedVersion = serverVersion > currentVersion;
+      return isOutdatedVersion && onNewVersionAvailable(serverVersion);
+    });
   }
-};
+}
 
 /**
  * Will register an interval that will poll the server for the latest version of the app.
@@ -52,5 +56,9 @@ const checkVersion = async (currentVersion, onNewVersionAvailable) => {
  * @returns {void} - nothing
  */
 export function startNewVersionPolling(currentVersion, onNewVersionAvailable) {
-  window.setInterval(() => checkVersion(currentVersion, onNewVersionAvailable), CHECK_INTERVAL);
+  newVersionListeners.push({currentVersion, onNewVersionAvailable});
+  if (newVersionListeners.length === 1) {
+    // starts the interval when we have our first listener
+    window.setInterval(checkVersion, CHECK_INTERVAL);
+  }
 }
