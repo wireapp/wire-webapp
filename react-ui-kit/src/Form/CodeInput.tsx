@@ -19,7 +19,8 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {noop} from '../util';
 import {InputProps, inputStyle} from './Input';
 
 const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
@@ -57,120 +58,108 @@ export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   onCodeComplete?: (completeCode?: string) => void;
 }
 
-interface CodeInputState {
-  values: string[];
-}
+const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}: CodeInputProps) => {
+  const [values, setValues] = useState(Array(digits).fill(''));
+  const inputs = Array.from({length: digits}, () => useRef(null));
 
-class CodeInput extends React.PureComponent<CodeInputProps, CodeInputState> {
-  inputs: HTMLInputElement[];
-
-  static defaultProps = {
-    autoFocus: false,
-    digits: 6,
-    onCodeComplete: () => {},
+  const forceSelection = (
+    event:
+      | React.MouseEvent<HTMLInputElement>
+      | React.TouchEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.FocusEvent<HTMLInputElement>
+  ) => {
+    const target = event.target as HTMLInputElement;
+    target.select();
   };
 
-  constructor(props: CodeInputProps) {
-    super(props);
-    this.state = {
-      values: Array(props.digits).fill(''),
-    };
-    this.inputs = [];
-  }
+  const forceSelectionPreventDefault = (
+    event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>
+  ) => {
+    forceSelection(event);
+    event.preventDefault();
+  };
 
-  setValue = (fieldIndex: number, value: string) => {
+  const nextField = (currentFieldIndex: number) => {
+    const nextFieldIndex = currentFieldIndex + 1;
+    if (nextFieldIndex < digits) {
+      inputs[nextFieldIndex].current.focus();
+    }
+  };
+
+  const previousField = (currentFieldIndex: number) => {
+    if (currentFieldIndex > 0) {
+      inputs[currentFieldIndex - 1].current.focus();
+    }
+  };
+
+  const setValue = (fieldIndex: number, value: string) => {
     if (/^[0-9]?$/.test(value)) {
-      const values = [...this.state.values];
-      values[fieldIndex] = value;
-      this.setState({values}, this.handleCompleteCode);
+      setValues({...[], ...values, [fieldIndex]: value});
       if (value.length) {
-        this.nextField(fieldIndex);
+        nextField(fieldIndex);
       }
     }
   };
 
-  handlePaste = (fieldIndex: number, event: React.ClipboardEvent<HTMLInputElement>) => {
-    const pastedValue = event.clipboardData.getData('Text');
-    const cleanedPaste = pastedValue.replace(/[^0-9]/, '');
-    if (new RegExp(`^[0-9]+$`).test(cleanedPaste)) {
-      const values = [...this.state.values];
-      const newValues = cleanedPaste.split('');
-      values.splice.apply(values, [fieldIndex, newValues.length, ...newValues]);
-      this.setState({values: values.slice(0, this.props.digits)}, this.handleCompleteCode);
-    }
-  };
-
-  handleCompleteCode = () => {
-    const completeCode = this.state.values.join('');
-    if (completeCode.length === this.props.digits && this.props.onCodeComplete) {
-      this.props.onCodeComplete(completeCode);
-    }
-  };
-
-  nextField = (currentFieldIndex: number) => {
-    const nextFieldIndex = currentFieldIndex + 1;
-    if (nextFieldIndex < (this.props.digits || CodeInput.defaultProps.digits)) {
-      this.inputs[nextFieldIndex].focus();
-    }
-  };
-
-  previousField = (currentFieldIndex: number) => {
-    if (currentFieldIndex > 0) {
-      this.inputs[currentFieldIndex - 1].focus();
-    }
-  };
-
-  handleKeyDown = (fieldIndex: number, event: React.KeyboardEvent<HTMLInputElement>) => {
-    switch (event.key) {
+  const handleKeyDown = (fieldIndex: number, {key}: React.KeyboardEvent<HTMLInputElement>) => {
+    switch (key) {
       case 'Backspace':
-        this.setValue(fieldIndex, '');
-        this.previousField(fieldIndex);
+        setValue(fieldIndex, '');
+        previousField(fieldIndex);
         break;
       case 'ArrowLeft':
-        this.previousField(fieldIndex);
+        previousField(fieldIndex);
         break;
       case 'ArrowRight':
-        this.nextField(fieldIndex);
+        nextField(fieldIndex);
         break;
     }
-    if (/^[0-9]$/.test(event.key)) {
-      this.setValue(fieldIndex, event.key);
+    if (/^[0-9]$/.test(key)) {
+      setValue(fieldIndex, key);
     }
   };
 
-  forceSelection(event: any) {
-    const target: HTMLInputElement = event.target;
-    target.select();
-  }
-
-  forceSelectionPreventDefault = (event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
-    this.forceSelection(event);
-    event.preventDefault();
-  };
-
-  render() {
-    const {values} = this.state;
-    const inputs = [];
-    for (let fieldIndex = 0; fieldIndex < (this.props.digits || CodeInput.defaultProps.digits); fieldIndex++) {
-      inputs.push(
-        <DigitInput
-          autoFocus={fieldIndex === 0 && this.props.autoFocus}
-          key={fieldIndex}
-          onPaste={event => this.handlePaste(fieldIndex, event)}
-          onFocus={this.forceSelection}
-          onMouseDown={this.forceSelectionPreventDefault}
-          onTouchStart={this.forceSelectionPreventDefault}
-          onKeyDown={event => this.handleKeyDown(fieldIndex, event)}
-          onKeyUp={this.forceSelection}
-          ref={node => (this.inputs[fieldIndex] = node)}
-          type="text"
-          value={values[fieldIndex]}
-          onChange={() => {}}
-        />
+  const handlePaste = (fieldIndex: number, event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedValue = event.clipboardData.getData('Text');
+    const cleanedPaste = pastedValue.replace(/[^0-9]/g, '');
+    if (/^[0-9]+$/.test(cleanedPaste)) {
+      setValues(
+        values
+          .slice(0, fieldIndex)
+          .concat(cleanedPaste.split(''))
+          .slice(0, digits)
       );
     }
-    return <CodeInputWrapper style={this.props.style}>{inputs}</CodeInputWrapper>;
-  }
-}
+  };
+
+  useEffect(() => {
+    const completeCode = values.join('');
+    if (completeCode.length === digits) {
+      onCodeComplete(completeCode);
+    }
+  }, [values]);
+
+  return (
+    <CodeInputWrapper style={style}>
+      {Array.from({length: digits}, (_, index) => (
+        <DigitInput
+          autoFocus={index === 0 && autoFocus}
+          key={index}
+          onPaste={event => handlePaste(index, event)}
+          onFocus={forceSelection}
+          onMouseDown={forceSelectionPreventDefault}
+          onTouchStart={forceSelectionPreventDefault}
+          onKeyDown={event => handleKeyDown(index, event)}
+          onKeyUp={forceSelection}
+          ref={inputs[index]}
+          type="text"
+          value={values[index]}
+          onChange={() => {}}
+        />
+      ))}
+    </CodeInputWrapper>
+  );
+};
 
 export {CodeInput};
