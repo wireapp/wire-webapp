@@ -22,8 +22,6 @@ import Logger from 'utils/Logger';
 import platform from 'platform';
 import {BACKEND_REST, BACKEND_WS, FEATURE} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
-import PropertiesRepository from '../properties/PropertiesRepository';
-import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
@@ -79,7 +77,7 @@ class App {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.main.App');
+    this.logger = Logger('App');
 
     this.telemetry = new AppInitTelemetry();
     new WindowHandler();
@@ -116,7 +114,7 @@ class App {
     repositories.audio = resolve(graph.AudioRepository);
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
-    repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
+    repositories.properties = resolve(graph.PropertiesRepository);
     repositories.serverTime = resolve(graph.ServerTimeRepository);
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -238,17 +236,13 @@ class App {
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
-      // Can be removed once desktop version with the following PR has been published (probably v3.5):
-      // https://github.com/wireapp/wire-desktop/pull/1938/files
-      connect_google: {},
-      connectGoogle: {},
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new PropertiesService(this.backendClient),
+      properties: resolve(graph.PropertiesService),
       search: new z.search.SearchService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
