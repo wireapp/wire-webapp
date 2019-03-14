@@ -50,8 +50,6 @@ class PropertiesRepository {
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
-
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
 
   checkPrivacyPermission() {
@@ -161,18 +159,6 @@ class PropertiesRepository {
   _publishProperties() {
     amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
     return this.properties;
-  }
-
-  /**
-   * Updated properties handler.
-   * @param {z.properties.Properties} properties - New properties
-   * @returns {boolean} Always returns true to ensure other subscribers handling the event
-   */
-  propertiesUpdated(properties) {
-    if (properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]) {
-      amplify.publish(Logger.prototype.LOG_ON_DEBUG, properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]);
-    }
-    return true;
   }
 
   /**
