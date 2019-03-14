@@ -68,7 +68,7 @@
       <!-- ko if: !conversationEntity().removed_from_conversation() -->
         <div class="controls-center" data-bind="template: {afterRender: setElements}">
           <textarea id="conversation-input-bar-text"
-                    class="conversation-input-bar-text accent-border"
+                    class="conversation-input-bar-text"
                     data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp, 'select click': handleMentionFlow, 'input': updateMentions},
                               focus_on_keydown: true,
                               enter: onInputEnter,

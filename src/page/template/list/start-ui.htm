@@ -3,7 +3,7 @@
     <span class="left-list-header-text" data-bind="text: teamName" data-uie-name="status-team-name-search"></span>
     <close-icon class="left-list-header-close-button button-icon-large" data-bind="clickOrDrag: clickOnClose, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close"></close-icon>
   </div>
-  <div id="start-ui-header" class="start-ui-header accent-border" data-bind="css: {'start-ui-header-integrations': isTeam()}">
+  <div id="start-ui-header" class="start-ui-header" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"
                 params="input: searchInput, placeholder: t('searchPlaceholder'), enter: handleSearchInput"
                 data-uie-name="enter-search">
