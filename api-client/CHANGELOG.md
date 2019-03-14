@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.66...@wireapp/api-client@3.3.0) (2019-03-14)
+
+
+### Features
+
+* **api-client:** Add Permission & Role helpers ([#1642](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1642)) ([0ee7133](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0ee7133))
+
+
+
+
+
 ## [3.2.66](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.2.65...@wireapp/api-client@3.2.66) (2019-03-14)
 
 **Note:** Version bump only for package @wireapp/api-client

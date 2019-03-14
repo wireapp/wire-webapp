@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.1.60...@wireapp/core@8.2.0) (2019-03-14)
+
+
+### Features
+
+* **api-client:** Add Permission & Role helpers ([#1642](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1642)) ([0ee7133](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/0ee7133))
+
+
+
+
+
 ## [8.1.60](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.1.59...@wireapp/core@8.1.60) (2019-03-14)
 
 **Note:** Version bump only for package @wireapp/core
