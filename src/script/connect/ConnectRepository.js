@@ -17,6 +17,8 @@
  *
  */
 
+import CryptoJS from 'crypto-js';
+
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
@@ -26,7 +28,7 @@ z.connect.ConnectRepository = class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
-    this.logger = new Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.connect.ConnectRepository');
   }
 
   /**

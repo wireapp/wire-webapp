@@ -68,7 +68,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.permissionRepository = permissionRepository;
     this.userRepository = userRepository;
 
-    this.logger = new Logger('z.notification.NotificationRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.notification.NotificationRepository');
 
     this.notifications = [];
 
@@ -332,10 +332,6 @@ z.notification.NotificationRepository = class NotificationRepository {
         return t('notificationConnectionRequest');
       case z.message.SystemMessageType.CONVERSATION_CREATE:
         return t('notificationConversationCreate', messageEntity.user().first_name(), {}, true);
-      default:
-        const conversationId = this._getConversationId(connectionEntity, conversationEntity);
-        const message = `No notification for '${messageEntity.id} in '${conversationId}'.`;
-        this.logger.log(this.logger.levels.OFF, message);
     }
   }
 
@@ -483,10 +479,6 @@ z.notification.NotificationRepository = class NotificationRepository {
           return this._createBodyReaction(messageEntity);
         case z.message.SuperType.SYSTEM:
           return this._createBodySystem(messageEntity);
-        default:
-          const conversationId = this._getConversationId(connectionEntity, conversationEntity);
-          const message = `No notification for '${messageEntity.id} in '${conversationId}'.`;
-          this.logger.log(this.logger.levels.OFF, message);
       }
     });
   }
@@ -691,9 +683,6 @@ z.notification.NotificationRepository = class NotificationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
           break;
         }
-
-        default:
-          this.logger.log(this.logger.levels.OFF, `No notification sound for message '${messageEntity.id}.`);
       }
     }
   }

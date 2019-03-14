@@ -59,7 +59,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = new Logger('z.conversation.ConversationEphemeralHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 
@@ -116,9 +116,6 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         this.eventService.updateEvent(messageEntity.primary_key, changes);
         break;
       }
-
-      default:
-        this.logger.info(this.logger.levels.OFF, `Non-ephemeral message of type: ${messageEntity.type}`);
     }
   }
 

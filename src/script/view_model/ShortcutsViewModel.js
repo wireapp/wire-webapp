@@ -30,7 +30,7 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     this.onRejectCall = this.onRejectCall.bind(this);
 
     this.callingRepository = repositories.calling;
-    this.logger = new Logger('z.viewModel.ShortcutsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ShortcutsViewModel');
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));

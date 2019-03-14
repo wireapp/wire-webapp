@@ -20,6 +20,8 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
+import {BACKEND_REST, BACKEND_WS, FEATURE} from '../auth/config';
+import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
@@ -31,6 +33,7 @@ import BackendClient from '../service/BackendClient';
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
 import TimeUtil from 'utils/TimeUtil';
@@ -42,7 +45,6 @@ import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
-import auth from './auth';
 /* eslint-enable no-unused-vars */
 import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from '../util/LoggerUtil';
@@ -73,17 +75,17 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {z.main.Auth} authComponent - Authentication component
+   * @param {BackendClient} backendClient - Configured backend client
    */
-  constructor(authComponent) {
-    this.backendClient = authComponent.backendClient;
-    this.logger = new Logger('z.main.App', z.config.LOGGER.OPTIONS);
+  constructor(backendClient) {
+    this.backendClient = backendClient;
+    this.logger = Logger('z.main.App');
 
     this.telemetry = new AppInitTelemetry();
-    this.windowHandler = new z.ui.WindowHandler().init();
+    new WindowHandler();
 
-    this.service = this._setupServices(authComponent);
-    this.repository = this._setupRepositories(authComponent);
+    this.service = this._setupServices();
+    this.repository = this._setupRepositories();
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
@@ -106,14 +108,13 @@ class App {
 
   /**
    * Create all app repositories.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All repositories
    */
-  _setupRepositories(authComponent) {
+  _setupRepositories() {
     const repositories = {};
 
-    repositories.audio = authComponent.audio;
-    repositories.auth = authComponent.repository;
+    repositories.audio = resolve(graph.AudioRepository);
+    repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
     repositories.serverTime = resolve(graph.ServerTimeRepository);
@@ -143,7 +144,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -225,10 +225,9 @@ class App {
 
   /**
    * Create all app services.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All services
    */
-  _setupServices(authComponent) {
+  _setupServices() {
     const storageService = resolve(graph.StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
@@ -236,7 +235,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      auth: authComponent.service,
       broadcast: new z.broadcast.BroadcastService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
@@ -249,7 +247,6 @@ class App {
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
-      lifecycle: new z.lifecycle.LifecycleService(),
       notification: new z.event.NotificationService(this.backendClient, storageService),
       properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
@@ -282,7 +279,6 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.UPDATE, this.update.bind(this));
   }
 
   //##############################################################################
@@ -368,15 +364,18 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
+        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
         this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        this.repository.lifecycle.init();
+        if (this.repository.user.isActivatedAccount()) {
+          // start regularly polling the server to check if there is a new version of Wire
+          startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
+        }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
@@ -845,9 +844,14 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging();
+  enableLogging(FEATURE.ENABLE_DEBUG);
   if ($('#wire-main-app').length !== 0) {
-    wire.app = new App(wire.auth);
+    const backendClient = resolve(graph.BackendClient);
+    backendClient.setSettings({
+      restUrl: BACKEND_REST,
+      webSocketUrl: BACKEND_WS,
+    });
+    wire.app = new App(backendClient);
   }
 });
 

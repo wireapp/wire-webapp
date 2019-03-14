@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
@@ -38,7 +39,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   constructor() {
-    this.logger = new Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ModalsViewModel');
     this.elementId = 'modals';
 
     this.modals = {};

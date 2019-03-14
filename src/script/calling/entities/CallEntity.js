@@ -18,6 +18,7 @@
  */
 
 import TimeUtil from 'utils/TimeUtil';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';
@@ -65,7 +66,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.id = conversationId;
 
     const loggerName = 'z.calling.entities.CallEntity';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger(loggerName, this.id, this.messageLog);
 
     this.callLogger.info(`Created new call entity in conversation ${this.id}`);
 

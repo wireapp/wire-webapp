@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import moment from 'moment';
 
 import AssetTransferState from '../../assets/AssetTransferState';
 import AssetType from '../../assets/AssetType';

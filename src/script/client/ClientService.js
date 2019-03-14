@@ -39,7 +39,7 @@ z.client.ClientService = class ClientService {
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = new Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.client.ClientService');
 
     this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
   }

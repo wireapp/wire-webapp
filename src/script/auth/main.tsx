@@ -25,6 +25,7 @@ import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import {enableLogging} from '../util/LoggerUtil';
+import {FEATURE} from './config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
@@ -70,5 +71,5 @@ function runApp() {
   }
 }
 
-enableLogging();
+enableLogging(FEATURE.ENABLE_DEBUG);
 runApp();

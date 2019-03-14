@@ -17,6 +17,7 @@
  *
  */
 
+import {AuthRepository} from '../auth/AuthRepository';
 import PromiseQueue from 'utils/PromiseQueue';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -107,13 +108,11 @@ export default class BackendClient {
   /**
    *
    * @param {Object} settings - Settings for different backend environments
-   * @param {string} settings.environment - Backend environment used
    * @param {string} settings.restUrl - Backend REST URL
    * @param {string} settings.webSocketUrl - Backend WebSocket URL
    * @returns {void}
    */
   setSettings(settings) {
-    z.util.Environment.backend.current = settings.environment;
     this.restUrl = settings.restUrl;
     this.webSocketUrl = settings.webSocketUrl;
   }
@@ -294,13 +293,7 @@ export default class BackendClient {
 
     return new Promise((resolve, reject) => {
       $.ajax(ajaxConfig)
-        .done((responseData, textStatus, {wireRequest}) => {
-          const requestId = wireRequest ? wireRequest.requestId : 'ID not set';
-          const logMessage = `Server response to '${config.type}' request '${config.url}' - '${requestId}':`;
-          this.logger.debug(this.logger.levels.OFF, logMessage, responseData);
-
-          resolve(responseData);
-        })
+        .done(responseData => resolve(responseData))
         .fail(({responseJSON: response, status: statusCode, wireRequest}) => {
           switch (statusCode) {
             case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
@@ -346,7 +339,7 @@ export default class BackendClient {
               if (!config.skipRetry) {
                 this._prependRequestQueue(config, resolve, reject);
 
-                const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
+                const trigger = AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
                 return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
               }
             }

@@ -17,6 +17,7 @@
  *
  */
 
+import {AuthRepository} from '../auth/AuthRepository';
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 
@@ -56,7 +57,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = new Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.event.WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';
@@ -155,7 +156,7 @@ z.event.WebSocketService = class WebSocketService {
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
         z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
-        z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
+        AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
       );
     }
 
