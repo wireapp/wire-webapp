@@ -6,7 +6,6 @@ const projectName = pkg.name.replace('@wireapp/', '');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    [`${projectName}.test`]: `${__dirname}/src/main/index.test.browser.js`,
     [projectName]: `${__dirname}/${pkg.main}`,
   },
   externals: {

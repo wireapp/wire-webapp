@@ -9,13 +9,13 @@
     "fs-extra": "7.0.1"
   },
   "devDependencies": {
+    "@types/jasmine": "3.3.9",
+    "@types/karma": "3.0.2",
     "jasmine": "3.3.1",
     "karma": "4.0.1",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "2.0.1",
-    "karma-jasmine-diff-reporter": "2.0.0",
     "karma-sourcemap-loader": "0.3.7",
-    "karma-spec-reporter": "0.0.32",
     "nyc": "13.3.0",
     "rimraf": "2.6.3",
     "ts-node": "8.0.3",
@@ -51,7 +51,7 @@
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
-    "test:browser": "webpack --progress && karma start",
+    "test:browser": "karma start",
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },

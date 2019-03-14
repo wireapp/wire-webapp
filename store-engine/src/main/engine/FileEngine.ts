@@ -80,7 +80,7 @@ export default class FileEngine implements CRUDEngine {
   }
 
   private resolvePath(tableName: string, primaryKey = ''): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
       const primaryKeyPath = FileEngine.enforcePathRestrictions(
         tableNamePath,

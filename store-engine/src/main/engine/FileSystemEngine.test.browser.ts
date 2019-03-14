@@ -17,7 +17,7 @@
  *
  */
 
-import {MemoryEngine} from '../engine';
+import * as fs from 'bro-fs';
 import appendSpec from '../test/appendSpec';
 import createSpec from '../test/createSpec';
 import deleteAllSpec from '../test/deleteAllSpec';
@@ -29,13 +29,14 @@ import readSpec from '../test/readSpec';
 import updateOrCreateSpec from '../test/updateOrCreateSpec';
 import updateSpec from '../test/updateSpec';
 import CRUDEngine from './CRUDEngine';
+import FileSystemEngine from './FileSystemEngine';
 
 const STORE_NAME = 'store-name';
 
 let engine: CRUDEngine;
 
 async function initEngine(shouldCreateNewEngine = true) {
-  const storeEngine = shouldCreateNewEngine ? new MemoryEngine() : engine;
+  const storeEngine = shouldCreateNewEngine ? new FileSystemEngine() : engine;
   await storeEngine.init(STORE_NAME);
   return storeEngine;
 }
@@ -45,11 +46,16 @@ beforeEach(async done => {
   done();
 });
 
+afterEach(async done => {
+  await fs.rmdir(STORE_NAME);
+  done();
+});
+
 describe('init', () => {
-  it('resolves with direct access to the complete in-memory store.', async () => {
-    engine = new MemoryEngine();
-    const inMemory = await engine.init(STORE_NAME);
-    expect(inMemory[STORE_NAME]).toBeDefined();
+  it('resolves with a browser-specific URL to the filesystem.', async done => {
+    const fileSystem = await engine.init('test-store');
+    expect(fileSystem.root.toURL().startsWith('filesystem:')).toBe(true);
+    done();
   });
 });
 

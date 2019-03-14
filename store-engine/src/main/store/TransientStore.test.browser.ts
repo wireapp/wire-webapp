@@ -17,19 +17,22 @@
  *
  */
 
-import {LocalStorageEngine, Store} from '@wireapp/store-engine';
+import CRUDEngine from '../engine/CRUDEngine';
+import {RecordAlreadyExistsError} from '../engine/error';
+import LocalStorageEngine from '../engine/LocalStorageEngine';
+import TransientStore from './TransientStore';
 
 describe('store.TransientStore', () => {
   const STORE_NAME = 'database-name';
   const TABLE_NAME = 'table-name';
 
-  let engine = undefined;
-  let store = undefined;
+  let engine: CRUDEngine;
+  let store: TransientStore;
 
   beforeEach(async done => {
     engine = new LocalStorageEngine();
     await engine.init(STORE_NAME);
-    store = new Store.TransientStore(engine);
+    store = new TransientStore(engine);
     await store.init(TABLE_NAME);
     done();
   });
@@ -38,7 +41,7 @@ describe('store.TransientStore', () => {
     window.localStorage.clear();
   });
 
-  describe('"set"', () => {
+  describe('set', () => {
     const entity = {
       access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==',
     };
@@ -72,14 +75,14 @@ describe('store.TransientStore', () => {
           return store.set(primaryKey, {access_token: 'ABC'}, ttl);
         })
         .catch(error => {
-          expect(error).toEqual(jasmine.any(Store.RecordAlreadyExistsError));
+          expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
           expect(error.code).toBe(1);
           done();
         });
     });
   });
 
-  describe('"get"', () => {
+  describe('get', () => {
     const entity = {
       access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==',
     };
@@ -93,8 +96,15 @@ describe('store.TransientStore', () => {
         .then(() => {
           store
             .get(primaryKey)
-            .then(bundle => expect(bundle.payload).toEqual(entity))
-            .then(done);
+            .then(bundle => {
+              if (bundle) {
+                expect(bundle.payload).toEqual(entity);
+              } else {
+                done.fail();
+              }
+            })
+            .then(done)
+            .catch(error => done.fail(error));
         })
         .catch(error => done.fail(error));
     });
@@ -107,8 +117,15 @@ describe('store.TransientStore', () => {
         .then(() => {
           store
             .get(primaryKey)
-            .then(bundle => expect(bundle.payload).toEqual(entity))
-            .then(done);
+            .then(bundle => {
+              if (bundle) {
+                expect(bundle.payload).toEqual(entity);
+              } else {
+                done.fail();
+              }
+            })
+            .then(done)
+            .catch(error => done.fail(error));
         })
         .catch(error => done.fail(error));
     });
@@ -124,7 +141,7 @@ describe('store.TransientStore', () => {
     });
   });
 
-  describe('"init"', () => {
+  describe('init', () => {
     it('initially reads data from persistent storage.', done => {
       const timeLapse = 2;
 
@@ -157,7 +174,7 @@ describe('store.TransientStore', () => {
     });
   });
 
-  describe('"deleteFromCache"', () => {
+  describe('deleteFromCache', () => {
     it("doesn't fail when deleting non-existent records.", () => {
       const cacheKey = 'non-existent';
       const deletedCacheKey = store.deleteFromCache(cacheKey);
@@ -165,7 +182,7 @@ describe('store.TransientStore', () => {
     });
   });
 
-  describe('"startTimer"', () => {
+  describe('startTimer', () => {
     const entity = {
       access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==',
     };
@@ -180,7 +197,7 @@ describe('store.TransientStore', () => {
     afterEach(() => jasmine.clock().uninstall());
 
     it('publishes an event when an entity expires.', done => {
-      store.on(Store.TransientStore.TOPIC.EXPIRED, expiredBundle => {
+      store.on(TransientStore.TOPIC.EXPIRED, expiredBundle => {
         expect(expiredBundle.payload).toBe(entity);
         expect(expiredBundle.primaryKey).toBe(primaryKey);
         done();
@@ -207,14 +224,14 @@ describe('store.TransientStore', () => {
     });
 
     it('keeps the same timer when being called multiple times.', done => {
-      let timeoutID = undefined;
+      let timeoutID: number;
 
       store
         .set(primaryKey, entity, minuteInMillis)
         .then(bundle => {
-          timeoutID = bundle.timeoutID;
-          const cacheKey = store.constructCacheKey(primaryKey);
-          return store.startTimer(cacheKey, minuteInMillis);
+          timeoutID = bundle.timeoutID as number;
+          const cacheKey = store['constructCacheKey'](primaryKey);
+          return store['startTimer'](cacheKey);
         })
         .then(bundle => {
           expect(bundle.timeoutID).toBe(timeoutID);

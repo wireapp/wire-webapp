@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "noEmitOnError": false,
     "outDir": "dist",
     "rootDir": "src"
   },

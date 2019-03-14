@@ -161,7 +161,7 @@ export default class TransientStore extends EventEmitter {
     return this.engine.delete(this.tableName, primaryKey);
   }
 
-  private deleteFromCache(cacheKey: string): string {
+  public deleteFromCache(cacheKey: string): string {
     const timeoutID = this.bundles[cacheKey] && this.bundles[cacheKey].timeoutID;
     if (timeoutID) {
       clearTimeout(<number>timeoutID);
@@ -180,7 +180,6 @@ export default class TransientStore extends EventEmitter {
     return this.delete(expiredBundle.primaryKey).then(() => expiredBundle);
   }
 
-  // TODO: Change method signature to "cacheKey: string, bundle: TransientBundle"
   private startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     return this.get(primaryKey).then(async (bundle: TransientBundle | undefined) => {
