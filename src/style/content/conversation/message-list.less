@@ -124,7 +124,7 @@
 
   .message-body {
     animation: @animation-timing-slower * 2 @ease-out-quart 1s forwards marked-animation;
-    background-color: var(--accent-color-24);
+    background-color: var(--accent-color-fade-24);
   }
 }
 
@@ -263,6 +263,11 @@
 
   &:not(.message-timestamp-visible) {
     display: none;
+  }
+
+  .message-unread-dot {
+    .dot-md;
+    background-color: var(--accent-color);
   }
 
   &:not(.message-timestamp-unread) {

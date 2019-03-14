@@ -43,21 +43,35 @@
   @accent-color: 'accent_colors-@{accent_id}';
   .main-accent-color-@{accent_id} {
     --accent-color: @@accent-color;
-    --accent-color-16: fade(@@accent-color, 16%);
-    --accent-color-24: fade(@@accent-color, 24%);
+    --accent-color-fade-16: fade(@@accent-color, 16%);
+    --accent-color-fade-24: fade(@@accent-color, 24%);
+    --accent-color-darken-16: darken(@@accent-color, 16%);
   }
 }
 .generate-css-vars(7);
 
 .accent-selection() {
   &::-moz-selection {
-    background-color: var(--accent-color-24);
+    background-color: var(--accent-color-fade-24);
   }
   &::selection {
-    background-color: var(--accent-color-24);
+    background-color: var(--accent-color-fade-24);
   }
 }
 
-.text-theme {
+a,
+.accent-text {
   color: var(--accent-color);
+}
+
+.accent-fill {
+  fill: var(--accent-color);
+}
+
+.accent-stroke {
+  stroke: var(--accent-color);
+}
+
+.accent-border {
+  border-color: var(--accent-color-darken-16);
 }

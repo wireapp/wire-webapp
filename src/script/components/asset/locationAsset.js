@@ -23,7 +23,7 @@ ko.components.register('location-asset', {
   template: `
     <div class="location-asset-icon icon-location"></div>
     <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
-    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: getMapsUrl(asset)}, text: t('conversationLocationLink')"></a>
+    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs accent-text" data-bind="attr: {href: getMapsUrl(asset)}, text: t('conversationLocationLink')"></a>
   `,
   viewModel: function({asset}) {
     this.asset = asset;

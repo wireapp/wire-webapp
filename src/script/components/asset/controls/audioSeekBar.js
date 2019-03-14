@@ -100,7 +100,7 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
   _clear_theme() {
     return $(this.element)
       .children()
-      .removeClass('bg-theme');
+      .removeClass('active');
   }
 
   _add_theme(index) {
@@ -108,7 +108,7 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
       .children()
       .eq(index)
       .prevAll()
-      .addClass('bg-theme');
+      .addClass('active');
   }
 
   dispose() {

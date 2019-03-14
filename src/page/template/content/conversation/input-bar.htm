@@ -68,7 +68,7 @@
       <!-- ko if: !conversationEntity().removed_from_conversation() -->
         <div class="controls-center" data-bind="template: {afterRender: setElements}">
           <textarea id="conversation-input-bar-text"
-                    class="conversation-input-bar-text border-theme"
+                    class="conversation-input-bar-text accent-border"
                     data-bind="event: {'keydown': onInputKeyDown, 'keyup': onInputKeyUp, 'select click': handleMentionFlow, 'input': updateMentions},
                               focus_on_keydown: true,
                               enter: onInputEnter,
@@ -147,7 +147,7 @@
           <span class="conversation-input-bar-paste-cancel button-icon-large" data-bind="click: clickToCancelPastedFile">
             <close-icon></close-icon>
           </span>
-          <span class="conversation-input-bar-paste-send bg-theme" data-bind="click: sendPastedFile">
+          <span class="conversation-input-bar-paste-send" data-bind="click: sendPastedFile">
             <send-icon></send-icon>
           </span>
         </div>

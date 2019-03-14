@@ -3,14 +3,14 @@
   <!-- ko if: warnings().length > 0-->
     <div class="warning" data-bind="css:{'warning-dimmed': warningDimmed}">
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message" data-bind="html: t('warningPermissionRequestCamera', {}, {'icon': '<span class=\'warning-bar-icon icon-camera\'></span>'})"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedCamera')"></span>&nbsp;
             <a class="warning-bar-link" data-bind="supportLink: z.config.SUPPORT.ID.CAMERA_ACCESS_DENIED, text: t('warningLearnMore')" rel="nofollow noopener noreferrer" target="_blank"></a>
@@ -20,14 +20,14 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message" data-bind="html: t('warningPermissionRequestMicrophone', {}, {'icon': '<span class=\'warning-bar-icon icon-microphone\'></span>'})"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedMicrophone')"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED, text: t('warningLearnMore')"></a>
@@ -37,14 +37,14 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message" data-bind="html: t('warningPermissionRequestScreen', {} , {'icon': '<span class=\'warning-bar-icon icon-screensharing\'></span>'})"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: closeWarning"></span>
         </div>
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningPermissionDeniedScreen')"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.SCREEN_ACCESS_DENIED, text: t('warningLearnMore')"></a>
@@ -54,7 +54,7 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningNotFoundCamera')"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
@@ -64,7 +64,7 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningNotFoundMicrophone')"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.DEVICE_NOT_FOUND, text: t('warningLearnMore')"></a>
@@ -74,14 +74,14 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <div class="warning-bar-message" data-bind="html: t('warningPermissionRequestNotification', {}, {'icon': '<span class=\'warning-bar-icon icon-envelope\'></span>'})"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: closeWarning" data-uie-name="do-close-warning"></span>
         </div>
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedIncoming', name())"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
@@ -104,7 +104,7 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL -->
-        <div class="warning-bar warning-bar-feature bg-theme">
+        <div class="warning-bar warning-bar-feature">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedOutgoing')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
@@ -127,7 +127,7 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT -->
-        <div class="warning-bar warning-bar-connection bg-theme">
+        <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningConnectivityConnectionLost')"></span>
             <loading-icon class="warning-bar-spinner" data-uie-name="status-loading"></loading-icon>
@@ -140,13 +140,13 @@
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.NO_INTERNET -->
-        <div class="warning-bar warning-bar-connection bg-theme">
+        <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message" data-bind="text: t('warningConnectivityNoInternet')"></div>
         </div>
       <!-- /ko -->
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE -->
-        <div class="warning-bar warning-bar-connection bg-theme">
+        <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message">
             <span data-bind="text: t('warningLifecycleUpdate')"></span>&nbsp;<a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="text: t('warningLifecycleUpdateNotes')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;<a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, text: t('warningLifecycleUpdateLink')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
           </div>

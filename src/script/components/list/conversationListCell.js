@@ -66,7 +66,7 @@ ko.components.register('conversation-list-cell', {
           </availability-state>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is1to1() && conversation.selfUser().inTeam() -->
-          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'accent-text': is_selected(conversation)}"></span>
         <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
