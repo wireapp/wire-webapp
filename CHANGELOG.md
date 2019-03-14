@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.26...@wireapp/react-ui-kit@5.0.27) (2019-03-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Show values on colors demo ([#1637](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1637)) ([19144ad](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/19144ad))
+
+
+
+
+
 ## [5.0.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.25...@wireapp/react-ui-kit@5.0.26) (2019-03-13)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
