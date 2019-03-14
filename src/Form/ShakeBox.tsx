@@ -19,72 +19,52 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import React from 'react';
+import React, {useEffect, useImperativeHandle, useState} from 'react';
 
-interface ShakeBoxProps {
-  amp?: number;
+export interface ShakeBoxProps extends React.HTMLProps<HTMLDivElement> {
+  amplitude?: number;
   damping?: number;
   speed?: number;
   threshold?: number;
 }
 
-interface ShakeBoxStateProps {
-  isShaking?: boolean;
-  offset?: number;
+export interface ShakeBoxRef {
+  shake: () => void;
 }
 
-class ShakeBox extends React.PureComponent<ShakeBoxProps & React.HTMLProps<HTMLDivElement>, ShakeBoxStateProps> {
-  state = {isShaking: false, offset: 0};
-  currentOffset = 0;
-  targetOffset?: number;
-  reqAni?: number;
-  box?: HTMLDivElement;
+const ShakeBox: React.FC<ShakeBoxProps> = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
+  ({children, amplitude = 8, damping = 0.75, speed = 4, threshold = 1}: ShakeBoxProps, ref) => {
+    const [offset, setOffset] = useState(0);
+    let requestAnimationId = 0;
 
-  static defaultProps = {
-    amp: 8,
-    children: null,
-    damping: 0.75,
-    speed: 4,
-    threshold: 1,
-  };
+    const shakeLoop = (targetOffset, currentOffset = 0) => {
+      if (targetOffset > 0 && currentOffset < targetOffset) {
+        currentOffset += speed;
+      } else if (targetOffset < 0 && currentOffset > targetOffset) {
+        currentOffset -= speed;
+      } else {
+        currentOffset = targetOffset - (currentOffset - targetOffset);
+        targetOffset *= -damping;
+      }
+      if (Math.abs(targetOffset) >= threshold) {
+        requestAnimationId = requestAnimationFrame(() => shakeLoop(targetOffset, currentOffset));
+      } else {
+        currentOffset = 0;
+      }
+      setOffset(currentOffset);
+    };
 
-  shakeLoop = () => {
-    const {speed, threshold} = this.props;
-    if (this.targetOffset > 0 && this.currentOffset < this.targetOffset) {
-      this.currentOffset += speed;
-    } else if (this.targetOffset < 0 && this.currentOffset > this.targetOffset) {
-      this.currentOffset -= speed;
-    } else {
-      this.currentOffset = this.targetOffset - (this.currentOffset - this.targetOffset);
-      this.targetOffset *= -this.props.damping;
-    }
-    if (Math.abs(this.targetOffset) >= threshold) {
-      this.reqAni = requestAnimationFrame(this.shakeLoop);
-    } else {
-      this.currentOffset = 0;
-      this.setState({isShaking: false});
-    }
-    this.setState({offset: this.currentOffset});
-  };
+    useImperativeHandle(ref, () => ({
+      shake: () => {
+        cancelAnimationFrame(requestAnimationId);
+        shakeLoop(amplitude);
+      },
+    }));
 
-  shake = () => {
-    this.setState({isShaking: true});
-    this.targetOffset = this.props.amp;
-    cancelAnimationFrame(this.reqAni);
-    this.shakeLoop();
-  };
+    useEffect(() => () => cancelAnimationFrame(requestAnimationId), []);
 
-  componentWillUnmount() {
-    cancelAnimationFrame(this.reqAni);
+    return <div style={{transform: `translateX(${offset}px)`}}>{children}</div>;
   }
-
-  render() {
-    return (
-      <div ref={node => (this.box = node)} style={{transform: `translateX(${this.state.offset}px)`}}>
-        {this.props.children}
-      </div>
-    );
-  }
-}
+);
 
 export {ShakeBox};
