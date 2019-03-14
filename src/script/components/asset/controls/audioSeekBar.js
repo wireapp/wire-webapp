@@ -16,11 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
+class AudioSeekBarComponent {
   /**
    * Construct a audio seek bar that renders audio levels.
    *
@@ -28,48 +24,54 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
    * @param {HTMLElement} params.media_src - Media source
    * @param {z.entity.File} params.asset - Asset file
    * @param {boolean} params.disabled - Disabled seek bar
-   * @param {Object} component_info - Component information
+   * @param {Object} componentInfo - Component information
    */
-  constructor(params, component_info) {
+  constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
-    this.audio_element = params.src;
+    this.audioElement = params.src;
     this.asset = params.asset;
 
-    this.element = component_info.element;
+    this.element = componentInfo.element;
     this.loudness = [];
+    this.levels = [];
 
     this.disabled = ko.computed(() => {
       if (typeof params.disabled === 'function') {
-        $(this.element).toggleClass('element-disabled', params.disabled());
+        this.element.classList.toggle('element-disabled', params.disabled());
       }
     });
 
     if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
-      this.loudness = this._normalize_loudness(this.asset.meta.loudness, component_info.element.clientHeight);
+      this.loudness = this._normalize_loudness(this.asset.meta.loudness, componentInfo.element.clientHeight);
     }
 
-    this._on_resize_fired = _.debounce(() => {
-      this._render_levels();
-      this._on_time_update();
+    this._onResizeFired = _.debounce(() => {
+      this._renderLevels();
+      this._onTimeUpdate();
     }, 500);
 
-    this._render_levels();
+    this._renderLevels();
 
-    this._on_level_click = this._on_level_click.bind(this);
-    this._on_time_update = this._on_time_update.bind(this);
-    this._on_audio_ended = this._on_audio_ended.bind(this);
-    this.audio_element.addEventListener('ended', this._on_audio_ended);
-    this.audio_element.addEventListener('timeupdate', this._on_time_update);
-    component_info.element.addEventListener('click', this._on_level_click);
-    window.addEventListener('resize', this._on_resize_fired);
+    this._onLevelClick = this._onLevelClick.bind(this);
+    this._onTimeUpdate = this._onTimeUpdate.bind(this);
+    this._onAudioEnded = this._onAudioEnded.bind(this);
+    this.audioElement.addEventListener('ended', this._onAudioEnded);
+    this.audioElement.addEventListener('timeupdate', this._onTimeUpdate);
+    componentInfo.element.addEventListener('click', this._onLevelClick);
+    window.addEventListener('resize', this._onResizeFired);
   }
 
-  _render_levels() {
-    const number_of_levels_fit_on_screen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
-    const scaled_loudness = z.util.ArrayUtil.interpolate(this.loudness, number_of_levels_fit_on_screen);
+  _renderLevels() {
+    const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
+    const scaledLoudness = z.util.ArrayUtil.interpolate(this.loudness, numberOfLevelsFitOnScreen);
+    this.element.innerHTML = '';
 
-    // eslint-disable-next-line no-unsanitized/property
-    this.element.innerHTML = scaled_loudness.map(level => `<span style="height: ${level}px"></span>`).join('');
+    this.levels = scaledLoudness.map(loudness => {
+      const level = document.createElement('span');
+      level.style.height = `${loudness}px`;
+      this.element.appendChild(level);
+      return level;
+    });
   }
 
   _normalize_loudness(loudness, max) {
@@ -78,53 +80,38 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     return peak > max ? loudness.map(level => level * scale) : loudness;
   }
 
-  _on_level_click(event) {
+  _onLevelClick(event) {
     const mouse_x = event.pageX - $(event.currentTarget).offset().left;
-    const calculatedTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
+    const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
 
-    this.audio_element.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.audio_element.duration);
-    this._on_time_update();
+    this.audioElement.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.audioElement.duration);
+    this._onTimeUpdate();
   }
 
-  _on_time_update() {
-    const $levels = this._clear_theme();
-    const index = Math.floor((this.audio_element.currentTime / this.audio_element.duration) * $levels.length);
-    this._add_theme(index);
+  _onTimeUpdate() {
+    const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
+    this.levels.forEach((level, levelIndex) => level.classList.toggle('bg-theme', levelIndex <= index));
   }
 
-  _on_audio_ended() {
-    this._clear_theme();
-  }
-
-  _clear_theme() {
-    return $(this.element)
-      .children()
-      .removeClass('bg-theme');
-  }
-
-  _add_theme(index) {
-    $(this.element)
-      .children()
-      .eq(index)
-      .prevAll()
-      .addClass('bg-theme');
+  _onAudioEnded() {
+    this.levels.forEach(level => level.classList.remove('bg-theme'));
   }
 
   dispose() {
     this.disabled.dispose();
-    this.audio_element.removeEventListener('ended', this._on_audio_ended);
-    this.audio_element.removeEventListener('timeupdate', this._on_time_update);
-    this.element.removeEventListener('click', this._on_level_click);
-    window.removeEventListener('resize', this._on_resize_fired);
+    this.audioElement.removeEventListener('ended', this._onAudioEnded);
+    this.audioElement.removeEventListener('timeupdate', this._onTimeUpdate);
+    this.element.removeEventListener('click', this._onLevelClick);
+    window.removeEventListener('resize', this._onResizeFired);
   }
-};
+}
 
 ko.components.register('audio-seek-bar', {
   template: '<!-- content is generated -->',
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.AudioSeekBarComponent(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new AudioSeekBarComponent(params, componentInfo);
     },
   },
 });
