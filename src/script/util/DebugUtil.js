@@ -297,13 +297,6 @@ export default class DebugUtil {
     this.callingRepository.printLog();
   }
 
-  logConnectionStatus() {
-    this.logger.log('Online Status');
-    this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
-    this.logger.log(`-- IndexedDB open: ${this.storageRepository.storageService.db.isOpen()}`);
-    this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
-  }
-
   reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
     const clientId = this.clientRepository.currentClient().id;
 
