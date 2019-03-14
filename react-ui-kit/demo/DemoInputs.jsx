@@ -45,185 +45,180 @@ import {
   ShakeBox,
   Tooltip,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useRef} from 'react';
 
-let shakebox = null;
+const DemoInputs = () => {
+  const shakeBox = useRef();
 
-class DemoInputs extends React.PureComponent {
-  state = {};
+  return (
+    <Container>
+      <Line />
+      <H1>Inputs</H1>
+      <Line />
 
-  render() {
-    return (
-      <Container>
-        <Line />
-        <H1>Inputs</H1>
-        <Line />
+      <H2>Button</H2>
+      <Line />
+      <Columns>
+        <Column>Button</Column>
+        <Column>
+          <Button backgroundColor={COLOR.BLUE}>Button</Button>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Disabled Button</Column>
+        <Column>
+          <Button disabled onClick={() => alert('This should not work')}>
+            Default Button
+          </Button>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>ButtonLink</Column>
+        <Column>
+          <ButtonLink backgroundColor={COLOR.GREEN}>ButtonLink</ButtonLink>
+        </Column>
+      </Columns>
 
-        <H2>Button</H2>
-        <Line />
-        <Columns>
-          <Column>Button</Column>
-          <Column>
-            <Button backgroundColor={COLOR.BLUE}>Button</Button>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Disabled Button</Column>
-          <Column>
-            <Button disabled onClick={() => alert('This should not work')}>
-              Default Button
+      <H2>Link</H2>
+      <Line />
+      <Columns>
+        <Column>Link</Column>
+        <Column>
+          <Link block href="#">
+            Link
+          </Link>
+          <Link block color={COLOR.RED} href="#">
+            Red Link
+          </Link>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Link with custom component</Column>
+        <Column>
+          <Link component={Button} color={COLOR.GREEN}>
+            CustomLink
+          </Link>
+        </Column>
+      </Columns>
+
+      <H2>Checkbox</H2>
+      <Line />
+      <Columns>
+        <Column>Checkbox</Column>
+        <Column>
+          <Checkbox id="ToU">
+            <CheckboxLabel>{'ToU'}</CheckboxLabel>
+          </Checkbox>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Checkbox</Column>
+        <Column>
+          <Checkbox id="ToULink" defaultChecked={true}>
+            <CheckboxLabel>
+              {'ToU '}
+              <Link href="#">{'Link'}</Link>
+            </CheckboxLabel>
+          </Checkbox>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Disabled Checkbox</Column>
+        <Column>
+          <Checkbox id="disabled" disabled>
+            <CheckboxLabel>{'Disabled'}</CheckboxLabel>
+          </Checkbox>
+        </Column>
+      </Columns>
+
+      <H2>Select</H2>
+      <Line />
+      <Columns>
+        <Column>Select</Column>
+        <Column>
+          <Select>
+            <option>a</option>
+            <option>b</option>
+            <option>c</option>
+            <option>d</option>
+          </Select>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Disabled Select</Column>
+        <Column>
+          <Select disabled>
+            <option>a</option>
+          </Select>
+        </Column>
+      </Columns>
+
+      <H2>TextInput</H2>
+      <Line />
+      <Columns>
+        <Column>TextInput</Column>
+        <Column>
+          <Input placeholder="Placeholder" />
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Disabled TextInput</Column>
+        <Column>
+          <Input disabled placeholder="Placeholder" />
+        </Column>
+      </Columns>
+
+      <H2>Label</H2>
+      <Line />
+      <Label>Label</Label>
+      <LabelLink block>LabelLink</LabelLink>
+
+      <H2>Form</H2>
+      <Line />
+      <ContainerXS>
+        <ShakeBox ref={shakeBox}>
+          <Form
+            onSubmit={event => {
+              event.preventDefault();
+              shakeBox.current.shake();
+            }}
+          >
+            <Tooltip text="This shows a placeholder input">
+              <Input placeholder="Placeholder" type="email" required />
+            </Tooltip>
+            <Button type="submit" formNoValidate>
+              Submit Button
             </Button>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>ButtonLink</Column>
-          <Column>
-            <ButtonLink backgroundColor={COLOR.GREEN}>ButtonLink</ButtonLink>
-          </Column>
-        </Columns>
-
-        <H2>Link</H2>
-        <Line />
-        <Columns>
-          <Column>Link</Column>
-          <Column>
-            <Link block href="#">
-              Link
-            </Link>
-            <Link block color={COLOR.RED} href="#">
-              Red Link
-            </Link>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Link with custom component</Column>
-          <Column>
-            <Link component={Button} color={COLOR.GREEN}>
-              CustomLink
-            </Link>
-          </Column>
-        </Columns>
-
-        <H2>Checkbox</H2>
-        <Line />
-        <Columns>
-          <Column>Checkbox</Column>
-          <Column>
-            <Checkbox id="ToU">
-              <CheckboxLabel>{'ToU'}</CheckboxLabel>
-            </Checkbox>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Checkbox</Column>
-          <Column>
-            <Checkbox id="ToULink" defaultChecked={true}>
-              <CheckboxLabel>
-                {'ToU '}
-                <Link href="#">{'Link'}</Link>
-              </CheckboxLabel>
-            </Checkbox>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Disabled Checkbox</Column>
-          <Column>
-            <Checkbox id="disabled" disabled>
-              <CheckboxLabel>{'Disabled'}</CheckboxLabel>
-            </Checkbox>
-          </Column>
-        </Columns>
-
-        <H2>Select</H2>
-        <Line />
-        <Columns>
-          <Column>Select</Column>
-          <Column>
-            <Select>
-              <option>a</option>
-              <option>b</option>
-              <option>c</option>
-              <option>d</option>
-            </Select>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Disabled Select</Column>
-          <Column>
-            <Select disabled>
-              <option>a</option>
-            </Select>
-          </Column>
-        </Columns>
-
-        <H2>TextInput</H2>
-        <Line />
-        <Columns>
-          <Column>TextInput</Column>
-          <Column>
-            <Input placeholder="Placeholder" />
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Disabled TextInput</Column>
-          <Column>
-            <Input disabled placeholder="Placeholder" />
-          </Column>
-        </Columns>
-
-        <H2>Label</H2>
-        <Line />
-        <Label>Label</Label>
-        <LabelLink block>LabelLink</LabelLink>
-
-        <H2>Form</H2>
-        <Line />
-        <ContainerXS>
-          <ShakeBox ref={node => (shakebox = node)}>
-            <Form
-              onSubmit={event => {
-                shakebox.shake();
-                event.preventDefault();
-              }}
-            >
-              <Tooltip text="This shows a placeholder input">
-                <Input placeholder="Placeholder" type="email" required />
+            <InputBlock>
+              <Input placeholder="InputBlock" markInvalid />
+              <Input placeholder="Second Input" />
+              <Tooltip text="Lots of icons here">
+                <InputSubmitCombo>
+                  <Input placeholder="InputSubmitCombo" name="password" />
+                  <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
+                  <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
+                  <RoundIconButton type="submit" formNoValidate>
+                    M
+                  </RoundIconButton>
+                </InputSubmitCombo>
               </Tooltip>
-              <Button type="submit" formNoValidate>
-                Submit Button
-              </Button>
-              <InputBlock>
-                <Input placeholder="InputBlock" markInvalid />
-                <Input placeholder="Second Input" />
-                <Tooltip text="Lots of icons here">
-                  <InputSubmitCombo>
-                    <Input placeholder="InputSubmitCombo" name="password" />
-                    <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
-                    <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
-                    <RoundIconButton type="submit" formNoValidate>
-                      M
-                    </RoundIconButton>
-                  </InputSubmitCombo>
-                </Tooltip>
-              </InputBlock>
-            </Form>
-          </ShakeBox>
-          <ErrorMessage>Submit form for shake effect</ErrorMessage>
-          <CodeInput onCodeComplete={code => console.info(code)} />
-        </ContainerXS>
-      </Container>
-    );
-  }
-}
-
+            </InputBlock>
+          </Form>
+        </ShakeBox>
+        <ErrorMessage>Submit form for shake effect</ErrorMessage>
+        <CodeInput onCodeComplete={code => console.info(code)} />
+      </ContainerXS>
+    </Container>
+  );
+};
 export default DemoInputs;
