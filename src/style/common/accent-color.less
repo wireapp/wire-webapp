@@ -38,6 +38,13 @@
 @accent_colors-6: @w-pink;
 @accent_colors-7: @w-purple;
 
+body {
+  --accent-color: @w-gray;
+  --accent-color-fade-16: fade(@w-gray, 16%);
+  --accent-color-fade-24: fade(@w-gray, 24%);
+  --accent-color-darken-16: darken(@w-gray, 16%);
+}
+
 .generate-css-vars(@accent_id) when (@accent_id > 0) {
   .generate-css-vars(@accent_id - 1);
   @accent-color: 'accent_colors-@{accent_id}';
