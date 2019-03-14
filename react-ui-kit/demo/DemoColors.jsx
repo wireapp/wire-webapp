@@ -56,8 +56,12 @@ const colorElementStyle = props => ({
   width: '80px',
 });
 
-const ColorElement = ({name, alpha, backgroundColor, ...props}) => (
-  <div css={colorElementStyle({backgroundColor})} data-text={name} α={alpha} {...props} />
+const ColorElement = ({name, value, alpha, backgroundColor, ...props}) => (
+  <div
+    css={colorElementStyle({backgroundColor})}
+    data-text={`${name}\n${value}${alpha ? `\nα: ${alpha}` : ''}`}
+    {...props}
+  />
 );
 
 class DemoColors extends React.PureComponent {
