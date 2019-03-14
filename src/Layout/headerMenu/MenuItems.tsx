@@ -21,6 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../../Identity';
 import media, {QueryKeys} from '../../mediaQueries';
+import {filterProps} from '../../util';
 
 export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
@@ -42,6 +43,8 @@ const menuItemsStyle: <T>(props: MenuItemsProps<T>) => ObjectInterpolation<undef
   },
 });
 
-const MenuItems = (props: MenuItemsProps) => <div css={menuItemsStyle(props)} {...props} />;
+const filterMenuItemProps = (props: MenuItemsProps) => filterProps(props, ['open']);
+
+const MenuItems = (props: MenuItemsProps) => <div css={menuItemsStyle(props)} {...filterMenuItemProps(props)} />;
 
 export {MenuItems, menuItemsStyle};

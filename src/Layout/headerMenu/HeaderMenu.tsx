@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import React from 'react';
+import {useState} from 'react';
 import {MenuContent} from './MenuContent';
 import {MenuItems} from './MenuItems';
 import {MenuOpenButton} from './MenuOpenButton';
@@ -29,51 +29,31 @@ export interface HeaderMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> 
   logoElement?: React.ReactNode;
 }
 
-interface HeaderMenuState {
-  isOpen?: boolean;
-}
+const HeaderMenu = ({children, logoElement = null, ...props}: HeaderMenuProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-class HeaderMenu extends React.PureComponent<HeaderMenuProps, HeaderMenuState> {
-  static defaultProps: HeaderMenuProps = {
-    logoElement: null,
-  };
-
-  state: HeaderMenuState = {
-    isOpen: false,
-  };
-
-  toggleMenu = () => {
+  const toggleMenu = () => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
-      this.setState(({isOpen}) => ({isOpen: !isOpen}));
+      setIsOpen(current => !current);
     }
   };
 
-  closeMenu = () => {
-    this.setState({isOpen: false});
-  };
+  const closeMenu = () => setIsOpen(false);
 
-  render() {
-    const {isOpen} = this.state;
-    const {children, logoElement = null, ...props} = this.props;
-    return (
-      <div style={{height: '64px'}} {...props} data-uie-name="element-header-menu">
-        <MenuContent open={isOpen}>
-          <div style={{zIndex: 2}} onClick={this.closeMenu}>
-            {logoElement}
-          </div>
-          <MenuItems onClick={this.closeMenu} open={isOpen}>
-            <MenuScrollableItems>{children}</MenuScrollableItems>
-          </MenuItems>
-          <MenuOpenButton onClick={this.toggleMenu} open={isOpen} data-uie-name="do-toggle-header-menu">
-            <div />
-            <div />
-            <div />
-          </MenuOpenButton>
-        </MenuContent>
-      </div>
-    );
-  }
-}
+  return (
+    <div style={{height: '64px'}} {...props} data-uie-name="element-header-menu">
+      <MenuContent open={isOpen}>
+        <div style={{zIndex: 2}} onClick={closeMenu}>
+          {logoElement}
+        </div>
+        <MenuItems onClick={closeMenu} open={isOpen}>
+          <MenuScrollableItems>{children}</MenuScrollableItems>
+        </MenuItems>
+        <MenuOpenButton onClick={toggleMenu} open={isOpen} data-uie-name="do-toggle-header-menu" />
+      </MenuContent>
+    </div>
+  );
+};
 
 export {HeaderMenu};

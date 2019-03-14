@@ -21,12 +21,13 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../../Identity';
 import media, {QueryKeys} from '../../mediaQueries';
+import {filterProps} from '../../util';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpolation<undefined> = props => ({
+const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpolation<undefined> = ({open}) => ({
   display: 'block',
   div: {
     backgroundColor: COLOR.TEXT,
@@ -36,14 +37,14 @@ const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpola
     width: '16px',
   },
   'div:nth-child(1)': {
-    transform: props.open ? 'translateY(6px) rotate(-45deg)' : undefined,
+    transform: open ? 'translateY(6px) rotate(-45deg)' : undefined,
   },
   'div:nth-child(2)': {
-    opacity: props.open ? 0 : undefined,
-    transform: props.open ? 'scale(0, 1)' : undefined,
+    opacity: open ? 0 : undefined,
+    transform: open ? 'scale(0, 1)' : undefined,
   },
   'div:nth-child(3)': {
-    transform: props.open ? 'translateY(-6px) rotate(45deg)' : undefined,
+    transform: open ? 'translateY(-6px) rotate(45deg)' : undefined,
   },
   [media[QueryKeys.DESKTOP]]: {
     display: 'none',
@@ -51,6 +52,14 @@ const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpola
   zIndex: 2,
 });
 
-const MenuOpenButton = (props: MenuOpenButtonProps) => <div css={menuOpenButtonStyle(props)} {...props} />;
+const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => filterProps(props, ['open']);
+
+const MenuOpenButton = (props: MenuOpenButtonProps) => (
+  <div css={menuOpenButtonStyle(props)} {...filterMenuOpenButtonProps(props)}>
+    <div />
+    <div />
+    <div />
+  </div>
+);
 
 export {MenuOpenButton, menuOpenButtonStyle};
