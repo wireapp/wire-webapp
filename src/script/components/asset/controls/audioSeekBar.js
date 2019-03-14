@@ -42,7 +42,7 @@ class AudioSeekBarComponent {
     });
 
     if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
-      this.loudness = this._normalize_loudness(this.asset.meta.loudness, componentInfo.element.clientHeight);
+      this.loudness = this._normalizeLoudness(this.asset.meta.loudness, componentInfo.element.clientHeight);
     }
 
     this._onResizeFired = _.debounce(() => {
@@ -74,7 +74,7 @@ class AudioSeekBarComponent {
     });
   }
 
-  _normalize_loudness(loudness, max) {
+  _normalizeLoudness(loudness, max) {
     const peak = Math.max(...loudness);
     const scale = max / peak;
     return peak > max ? loudness.map(level => level * scale) : loudness;
