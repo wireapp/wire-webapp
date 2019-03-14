@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {scrollToBottom} from 'utils/scroll-helpers';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -54,7 +55,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    */
   afterRender(elements, request) {
     if (z.util.ArrayUtil.isLastItem(this.connectRequests(), request)) {
-      window.requestAnimationFrame(() => $('.connect-requests').scrollToBottom());
+      window.requestAnimationFrame(() => scrollToBottom(document.querySelector('.connect-requests')));
     }
   }
 

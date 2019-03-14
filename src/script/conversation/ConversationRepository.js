@@ -212,6 +212,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.eventService,
       {onMessageTimeout: this.handleMessageExpiration.bind(this)}
     );
+
+    this.connectedUsers = ko.pureComputed(() => {
+      const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
+      const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
+      const connectedUsers = inviter ? [inviter] : [];
+      for (const conversation of this.conversations()) {
+        for (const user of conversation.participating_user_ets()) {
+          const isNotService = !user.isService;
+          const isNotIncluded = !connectedUsers.includes(user);
+          if (isNotService && isNotIncluded && (user.isTeamMember() || user.isConnected())) {
+            connectedUsers.push(user);
+          }
+        }
+      }
+      return connectedUsers;
+    });
   }
 
   checkMessageTimer(messageEntity) {
@@ -1112,19 +1128,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Mark conversation as read.
+   * Sends a message to backend that the conversation has been fully read.
+   * The message will allow all the self clients to synchronize conversation read state.
+   *
    * @param {Conversation} conversationEntity - Conversation to be marked as read
    * @returns {undefined} No return value
    */
   markAsRead(conversationEntity) {
-    if (conversationEntity) {
-      const hasUnreadEvents = conversationEntity.last_read_timestamp() < conversationEntity.last_server_timestamp();
-      const isNotMarkedAsRead = hasUnreadEvents || conversationEntity.unreadState().allEvents.length;
-      if (isNotMarkedAsRead && !this.block_event_handling()) {
-        this._updateLastReadTimestamp(conversationEntity);
+    const conversationId = conversationEntity.id;
+    const timestamp = conversationEntity.last_read_timestamp();
+    const protoLastRead = new LastRead({
+      conversationId,
+      lastReadTimestamp: timestamp,
+    });
+    const genericMessage = new GenericMessage({
+      [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
+      messageId: z.util.createRandomUuid(),
+    });
+
+    const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
+    this.sendGenericMessageToConversation(eventInfoEntity)
+      .then(() => {
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
-      }
-    }
+        this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
+      })
+      .catch(error => {
+        const errorMessage = 'Failed to update last read timestamp';
+        this.logger.error(`${errorMessage}: ${error.message}`, error);
+        Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
+      });
   }
 
   /**
@@ -1690,40 +1722,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update last read of conversation using timestamp.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation to update
-   * @returns {undefined} No return value
-   */
-  _updateLastReadTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
-    const conversationId = conversationEntity.id;
-
-    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ)) {
-      const protoLeastRead = new LastRead({
-        conversationId,
-        lastReadTimestamp: conversationEntity.last_read_timestamp(),
-      });
-      const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLeastRead,
-        messageId: z.util.createRandomUuid(),
-      });
-
-      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
-      this.sendGenericMessageToConversation(eventInfoEntity)
-        .then(() => {
-          this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
-        })
-        .catch(error => {
-          const errorMessage = 'Failed to update last read timestamp';
-          this.logger.error(`${errorMessage}: ${error.message}`, error);
-          Raygun.send(new Error(errorMessage), {label: error.label, message: error.message});
-        });
-    }
-  }
-
-  /**
    * Send a read receipt for the last message in a conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to update
@@ -1739,7 +1737,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  send_asset_remotedata(conversationEntity, file, messageId) {
+  send_asset_remotedata(conversationEntity, file, messageId, asImage) {
     let genericMessage;
 
     return this.get_message_in_conversation_by_id(conversationEntity, messageId)
@@ -1750,7 +1748,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           retention,
         };
 
-        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options);
+        const uploadPromise = this.assetUploader.uploadAsset(messageId, file, options, asImage);
         return uploadPromise;
       })
       .then(asset => {
@@ -1793,9 +1791,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that should receive the file
    * @param {File} file - File to send
+   * @param {boolean} allowImageDetection - allow images to be treated as images (not files)
    * @returns {Promise} Resolves when the asset metadata was sent
    */
-  send_asset_metadata(conversation_et, file) {
+  send_asset_metadata(conversation_et, file, allowImageDetection) {
     return AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
@@ -1809,7 +1808,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           assetOriginal.audio = metadata;
         } else if (AssetMetaDataBuilder.isVideo(file)) {
           assetOriginal.video = metadata;
-        } else if (AssetMetaDataBuilder.isImage(file)) {
+        } else if (allowImageDetection && AssetMetaDataBuilder.isImage(file)) {
           assetOriginal.image = metadata;
         }
 
@@ -1997,41 +1996,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Sends image asset in specified conversation using v3 api.
-   *
-   * @param {Conversation} conversationEntity - Conversation to send image in
-   * @param {File|Blob} image - Image
-   * @returns {Promise} Resolves when the image was sent
-   */
-  send_image_asset(conversationEntity, image) {
-    const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
-    const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-      retention,
-    };
-
-    return this.asset_service
-      .uploadImageAsset(image, options)
-      .then(asset => {
-        let genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-          messageId: z.util.createRandomUuid(),
-        });
-
-        if (conversationEntity.messageTimer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
-        }
-
-        return this._send_and_inject_generic_message(conversationEntity, genericMessage);
-      })
-      .catch(error => {
-        const message = `Failed to upload otr asset for conversation ${conversationEntity.id}: ${error.message}`;
-        this.logger.error(message, error);
-        throw error;
-      });
-  }
-
-  /**
    * Send knock in specified conversation.
    * @param {Conversation} conversationEntity - Conversation to send knock in
    * @returns {Promise} Resolves after sending the knock
@@ -2178,9 +2142,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage, false)
       .then(() => {
-        if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
-        }
+        return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
       })
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -2302,9 +2264,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
     return this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity)
       .then(genericMessage => {
-        if (z.util.Environment.desktop) {
-          return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
-        }
+        return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
       })
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -2771,9 +2731,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   upload_images(conversation_et, images) {
-    if (this._can_upload_assets_to_conversation(conversation_et)) {
-      Array.from(images).forEach(image => this.send_image_asset(conversation_et, image));
-    }
+    this.upload_files(conversation_et, images, true);
   }
 
   /**
@@ -2781,11 +2739,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to post the files
    * @param {Array|FileList} files - files
+   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {undefined} No return value
    */
-  upload_files(conversation_et, files) {
+  upload_files(conversation_et, files, asImage) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      Array.from(files).forEach(file => this.upload_file(conversation_et, file));
+      Array.from(files).forEach(file => this.upload_file(conversation_et, file, asImage));
     }
   }
 
@@ -2794,18 +2753,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to post the file
    * @param {Object} file - File object
+   * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {Promise} Resolves when file was uploaded
    */
-  upload_file(conversation_et, file) {
+  upload_file(conversation_et, file, asImage) {
     let message_id;
     const upload_started = Date.now();
 
-    return this.send_asset_metadata(conversation_et, file)
+    return this.send_asset_metadata(conversation_et, file, asImage)
       .then(({id}) => {
         message_id = id;
         return this.sendAssetPreview(conversation_et, file, message_id);
       })
-      .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
+      .then(() => this.send_asset_remotedata(conversation_et, file, message_id, asImage))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
@@ -3007,15 +2967,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
-        const leavingEventTypes = [
+        const membersUpdateMessages = [
           z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+          z.event.Backend.CONVERSATION.MEMBER_JOIN,
           z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
         ];
-        const isLeaveEvent = leavingEventTypes.includes(eventJson.type);
-        if (isLeaveEvent) {
-          const isFromLeavingUser = eventJson.data.user_ids.includes(sender);
-          if (isFromLeavingUser) {
-            // we ignore leave events that are sent by the user actually leaving
+        const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
+        if (isMembersUpdateEvent) {
+          const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
+          if (isFromUpdatedMember) {
+            // we ignore leave/join events that are sent by the user actually leaving or joining
             return conversationEntity;
           }
         }

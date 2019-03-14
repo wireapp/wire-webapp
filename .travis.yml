@@ -43,6 +43,28 @@ after_success:
   - if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then yarn build:prod; fi
   - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
 
+before_deploy:
+  - |
+    if [ "${TRAVIS_BRANCH}" == "prod" ]; then
+      export TRAVIS_TAG="$(date +'%Y-%m-%d-%H-%M')"
+      git config --local user.name "Wire Travis CI"
+      git config --local user.email "webapp+travis@wire.com"
+      git tag $TRAVIS_TAG
+    fi
+
+    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then
+      export LAST_STAGING_TAG="$(git describe --abbrev=0 --tags --match="*-staging*")"
+      export TRAVIS_COMMIT_RANGE="${LAST_STAGING_TAG}...${TRAVIS_TAG}"
+    fi
+
+    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] || [ "${TRAVIS_BRANCH}" == "prod" ]; then
+      export CHANGELOG_FILE="CHANGELOG.md"
+      yarn global add generate-changelog@1.7.1
+      generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
+      sed -i '1,2d' "${CHANGELOG_FILE}"
+      printf "\n\n##### Changelog\n- https://github.com/${TRAVIS_REPO_SLUG}/compare/${TRAVIS_COMMIT_RANGE}" >> "${CHANGELOG_FILE}"
+    fi
+
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
   # https://wire-webapp-edge.zinfra.io/
@@ -125,12 +147,33 @@ deploy:
       repo: wireapp/wire-webapp
       branch: prod
 
+  # GitHub Production Releases
+  - provider: releases
+    api_key: "$GH_TOKEN"
+    draft: true
+    file: "CHANGELOG.md"
+    skip_cleanup: true
+    on:
+      repo: wireapp/wire-webapp
+      branch: prod
+
+  # GitHub Staging Releases
+  - provider: releases
+    api_key: "$GH_TOKEN"
+    draft: true
+    file: "CHANGELOG.md"
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $TRAVIS_TAG =~ .*-staging.*
+
 after_deploy:
   - |
     if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_EVENT_TYPE}" == "push" ]; then
-      yarn global add @wireapp/changelog-bot@2.1.0
+      SHORT_COMMIT_MESSAGE="$(echo $TRAVIS_COMMIT_MESSAGE | head -n 1)"
+      yarn global add @wireapp/changelog-bot@2.2.1
       wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "a720ce02-c44c-4981-936c-609380884231"
-      wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "4223f57f-0c8d-42fe-bf8a-908d680788ab" -m "Staging bump done! 🏁"
+      wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "4223f57f-0c8d-42fe-bf8a-908d680788ab" -m "Staging bump for commit **${TRAVIS_COMMIT}** (\"${SHORT_COMMIT_MESSAGE}\") done! 🏁"
     fi
 
 after_failure:
@@ -139,7 +182,7 @@ after_failure:
       if [[ "${TRAVIS_BRANCH}" =~ ^(dev|prod|staging)$ ]]; then
         LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
         TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
-        yarn global add @wireapp/changelog-bot@2.1.0
+        yarn global add @wireapp/changelog-bot@2.2.1
         wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "b2cc7120-4154-4be4-b0c0-45a8c361c4d1" -m "${LAST_COMMITTER_NAME} broke the \"${TRAVIS_BRANCH}\" branch on \"${TRAVIS_REPO_SLUG}\" (Build #${TRAVIS_BUILD_NUMBER}). 🌵 → ${TRAVIS_BUILD_URL}"
       fi
     fi

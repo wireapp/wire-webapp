@@ -271,7 +271,6 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         message: t('modalAccountLeaveGuestRoomMessage'),
         title: t('modalAccountLeaveGuestRoomHeadline'),
       },
-      warning: false,
     });
   }
 

@@ -162,10 +162,6 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       messageElement.text(messageText || '');
     }
     titleElement.text(titleText || t('modalAcknowledgeHeadline'));
-
-    if (options.warning !== false) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    }
   }
 
   _showModalConfirm(options, titleElement, messageElement, actionElement) {
@@ -178,10 +174,6 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     messageElement.text(messageText || '');
     secondaryElement.text(secondaryText);
     titleElement.text(titleText || '');
-
-    if (options.warning !== false) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    }
   }
 
   _showModalAccountReadReceiptsChanged(newValue) {
@@ -221,10 +213,6 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     optionElement.text(optionText || '');
     secondaryElement.text(secondaryText);
     titleElement.text(titleText || '');
-
-    if (options.warning !== false) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    }
   }
 
   _showModalInput(options, titleElement, messageElement, actionElement) {
@@ -235,9 +223,5 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
     messageElement.text(messageText || '');
     inputElement.attr('placeholder', inputText || '');
     titleElement.text(titleText || '');
-
-    if (options.warning !== false) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    }
   }
 };

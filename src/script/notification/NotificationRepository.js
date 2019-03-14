@@ -146,12 +146,11 @@ z.notification.NotificationRepository = class NotificationRepository {
       ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
       : true;
 
-    return Promise.resolve(notifyInConversation).then(shouldNotifyInConversation => {
-      if (shouldNotifyInConversation) {
-        this._notifySound(messageEntity);
-        return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
-      }
-    });
+    if (notifyInConversation) {
+      this._notifySound(messageEntity);
+      return this._notifyBanner(messageEntity, connectionEntity, conversationEntity);
+    }
+    return Promise.resolve();
   }
 
   // Remove notifications from the queue that are no longer unread

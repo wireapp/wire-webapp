@@ -54,7 +54,6 @@ class AuthViewModel {
   constructor(authComponent) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
-    this.elementId = 'auth-page';
     this.logger = new Logger('z.viewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
     this.authRepository = authComponent.repository;
@@ -214,13 +213,14 @@ class AuthViewModel {
       },
     };
 
-    ko.applyBindings(this, document.getElementById(this.elementId));
+    const elementSelector = '.auth-page';
+    ko.applyBindings(this, document.querySelector(elementSelector));
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
 
     this._init_base();
-    $(`.${this.elementId}`).show();
+    $(elementSelector).show();
     $('.auth-page-container').css({display: 'flex'});
   }
 
@@ -1321,14 +1321,13 @@ class AuthViewModel {
   }
 
   /**
-   * Check whether a form has errors and play the alert sound.
+   * Check whether a form has errors.
    * @private
    * @returns {boolean} Form has an error
    */
   _has_errors() {
     let has_error = false;
     if (this.validation_errors().length > 0) {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
       has_error = true;
     }
     return has_error;

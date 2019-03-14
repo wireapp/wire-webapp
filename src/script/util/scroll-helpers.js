@@ -17,64 +17,35 @@
  *
  */
 
-import $ from 'jquery';
-
-$.fn.scrollEnd = function() {
-  const element = $(this).get(0);
-  if (!element) {
-    return;
-  }
+export function scrollEnd(element) {
   return element.scrollHeight - element.clientHeight;
-};
+}
 
-$.fn.scrollToBottom = function() {
-  const $element = $(this);
-  if ($element.length === 0) {
-    return;
-  }
-  $element.scrollTop($element[0].scrollHeight);
+export function scrollToBottom(element) {
+  element.scrollTop = element.scrollHeight;
   return window.setTimeout(() => {
-    if (!$(this).isScrolledBottom()) {
-      return $element.scrollTop($element[0].scrollHeight);
+    if (!isScrolledBottom(element)) {
+      return (element.scrollTop = element.scrollHeight);
     }
   }, 200);
-};
+}
 
-$.fn.scrollBy = function(distance) {
-  const $element = $(this);
-  if ($element.length === 0) {
-    return;
-  }
-  const scrollTop = $element[0].scrollTop;
-  return $element.scrollTop(scrollTop + distance);
-};
+export function isScrolledBottom(element) {
+  const scrollTop = Math.ceil(element.scrollTop);
+  const scrollHeight = element.scrollHeight;
+  const height = element.clientHeight;
+  return scrollTop + height >= scrollHeight;
+}
 
-$.fn.isScrolledBottom = function(offset) {
-  if (offset == null) {
-    offset = 0;
-  }
-  const $element = $(this);
-  if ($element.length === 0) {
-    return;
-  }
-  const scrollTop = Math.ceil($element.scrollTop());
-  const scrollHeight = $element[0].scrollHeight;
-  const height = $element[0].clientHeight;
-  return scrollTop + height + offset >= scrollHeight;
-};
+export function isScrolledTop(element) {
+  return element.scrollTop === 0;
+}
 
-$.fn.isScrolledTop = function() {
-  const $element = $(this);
-  if ($element.length === 0) {
-    return;
-  }
-  return $element.scrollTop() === 0;
-};
+export function scrollBy(element, distance) {
+  const scrollTop = element.scrollTop;
+  element.scrollTop = scrollTop + distance;
+}
 
-$.fn.isScrollable = function() {
-  const element = $(this).get(0);
-  if (!element) {
-    return;
-  }
+export function isScrollable(element) {
   return element.scrollHeight > element.clientHeight;
-};
+}

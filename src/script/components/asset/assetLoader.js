@@ -25,14 +25,18 @@ class AssetLoader {
 
     const viewBoxSize = 32 * elementScale;
     this.viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
+    this.onCancel = params.onCancel;
   }
 }
 
 ko.components.register('asset-loader', {
   template: `
-  <svg class="svg-theme" data-bind="attr: {viewBox: viewBox}">
-    <circle data-bind="style: {'stroke-dasharray': progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
-  </svg>
+  <div class="media-button" data-bind="click: onCancel" data-uie-name="status-loading-media">
+    <svg class="svg-theme" data-bind="attr: {viewBox: viewBox}">
+      <circle data-bind="style: {'stroke-dasharray': progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>
+    </svg>
+    <close-icon class="media-button__icon"></close-icon>
+  </div>
   `,
   viewModel: AssetLoader,
 });

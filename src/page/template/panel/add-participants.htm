@@ -16,7 +16,7 @@
 
       <div class="add-participants__list panel__content" data-bind="fadingscrollbar">
         <!-- ko if: isStateAddPeople() -->
-          <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts, searchRepository: searchRepository"></user-list>
+          <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
         <!-- /ko -->
         <!-- ko if: isStateAddService() -->
           <!-- ko if: services().length -->

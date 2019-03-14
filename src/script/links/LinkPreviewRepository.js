@@ -17,18 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 
-window.z = window.z || {};
-window.z.links = z.links || {};
-
-z.links.LinkPreviewRepository = class LinkPreviewRepository {
-  constructor(assetService, propertiesRepository) {
+class LinkPreviewRepository {
+  constructor(assetService, propertiesRepository, logger) {
     this.getLinkPreviewFromString = this.getLinkPreviewFromString.bind(this);
     this.updatedSendPreference = this.updatedSendPreference.bind(this);
 
     this.assetService = assetService;
-    this.logger = new Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
+    this.logger = logger;
 
     this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
@@ -46,21 +43,20 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with link preview proto message
    */
   getLinkPreviewFromString(string) {
-    if (this.shouldSendPreviews && z.util.Environment.desktop) {
-      return Promise.resolve().then(() => {
-        const linkData = z.links.LinkPreviewHelpers.getFirstLinkWithOffset(string);
-
-        if (linkData) {
-          return this.getLinkPreview(linkData.url, linkData.offset).catch(error => {
-            const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
-            if (!isLinkPreviewError) {
-              throw error;
-            }
-          });
-        }
-      });
+    if (!this.shouldSendPreviews || !(window.openGraph || window.openGraphAsync)) {
+      return Promise.resolve();
     }
-    return Promise.resolve();
+    const linkData = getFirstLinkWithOffset(string);
+    if (!linkData) {
+      return Promise.resolve();
+    }
+
+    return this._getLinkPreview(linkData.url, linkData.offset).catch(error => {
+      const isLinkPreviewError = error instanceof z.error.LinkPreviewError;
+      if (!isLinkPreviewError) {
+        throw error;
+      }
+    });
   }
 
   /**
@@ -71,7 +67,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @param {number} [offset=0] - starting index of the link
    * @returns {Promise} Resolves with a link preview if generated
    */
-  getLinkPreview(url, offset = 0) {
+  _getLinkPreview(url, offset = 0) {
     let openGraphData;
 
     return Promise.resolve()
@@ -80,11 +76,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
           throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
         }
 
-        if (window.openGraph) {
-          return this._fetchOpenGraphData(url);
-        }
-
-        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NOT_SUPPORTED);
+        return this._fetchOpenGraphData(url);
       })
       .then(fetchedData => {
         if (fetchedData) {
@@ -143,23 +135,39 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with the retrieved open graph data
    */
   _fetchOpenGraphData(link) {
+    const mergeOpenGraphData = data => {
+      if (data) {
+        return Object.entries(data).reduce((result, [key, value]) => {
+          result[key] = Array.isArray(value) ? value[0] : value;
+          return result;
+        }, {});
+      }
+    };
+
+    if (typeof window.openGraphAsync === 'function') {
+      return window
+        .openGraphAsync(link)
+        .then(mergeOpenGraphData)
+        .catch(error => {
+          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+          return Promise.resolve();
+        });
+    }
+
     return new Promise(resolve => {
       return window
         .openGraph(link, (error, data) => {
           if (error) {
+            this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
             resolve();
           }
 
-          if (data) {
-            data = Object.entries(data).reduce((filteredData, [key, value]) => {
-              filteredData[key] = Array.isArray(value) ? value[0] : value;
-              return filteredData;
-            }, {});
-          }
-
-          resolve(data);
+          resolve(mergeOpenGraphData(data));
         })
-        .catch(resolve);
+        .catch(error => {
+          this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+          resolve(error);
+        });
     });
   }
 
@@ -175,4 +183,6 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
       this.assetService.uploadImageAsset(blob, {public: true})
     );
   }
-};
+}
+
+export default LinkPreviewRepository;

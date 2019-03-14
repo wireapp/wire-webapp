@@ -76,7 +76,10 @@ export default class TeamMapper {
 
   updateMemberFromObject(memberData, memberEntity = new z.team.TeamMemberEntity()) {
     if (memberData) {
-      const {permissions, user} = memberData;
+      const {created_by, permissions, user} = memberData;
+      if (created_by) {
+        memberEntity.invitedBy = created_by;
+      }
       if (permissions) {
         memberEntity.permissions = permissions;
       }

@@ -61,18 +61,20 @@
     transform-origin: center;
   }
 
-  .media-button-border-fill {
-    .full-screen;
+  &__icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
 
-    border: 2px solid var(--foreground-fade-40);
-    border-radius: 50%;
+    svg {
+      position: relative;
+      width: 16px;
+      height: 16px;
 
-    &::before {
-      .full-screen;
-
-      border: 1px solid var(--foreground);
-      border-radius: 50%;
-      content: '';
+      path {
+        fill: #fff;
+      }
     }
   }
 

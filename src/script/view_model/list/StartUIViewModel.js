@@ -78,6 +78,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.teamSize = this.teamRepository.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.isVisible = ko.pureComputed(() => listViewModel.state() === z.viewModel.ListViewModel.STATE.START_UI);
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
@@ -95,6 +96,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(this.search);
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
+    this.showMatches = ko.observable(false);
+    const {canInviteTeamMembers, canSearchUnconnectedUsers} = generatePermissionHelpers();
+    this.showOnlyConnectedUsers = ko.pureComputed(() => !canSearchUnconnectedUsers(this.selfUser().teamRole()));
 
     // User lists
     this.contacts = ko.pureComputed(() => {
@@ -102,7 +106,20 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matchedUsers();
       }
 
-      return this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
+      if (this.showOnlyConnectedUsers()) {
+        return this.conversationRepository.connectedUsers();
+      }
+
+      if (this.isTeam()) {
+        const connectedUsers = this.conversationRepository.connectedUsers();
+        const teamUsersWithoutPartners = this.teamRepository
+          .teamUsers()
+          .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
+
+        return teamUsersWithoutPartners;
+      }
+
+      return this.userRepository.connected_users();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -122,16 +139,16 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
-    this.showContacts = ko.pureComputed(() => this.contacts().length);
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
-    this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    const {canInviteTeamMembers} = generatePermissionHelpers();
     this.showInviteMember = ko.pureComputed(
       () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
     );
+
+    this.showContacts = ko.pureComputed(() => this.contacts().length);
+
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
@@ -551,27 +568,39 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       // Contacts, groups and others
       const trimmedQuery = query.trim();
       const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+      if (!this.showOnlyConnectedUsers()) {
+        this.searchRepository
+          .search_by_name(normalizedQuery, isHandle)
+          .then(userEntities => {
+            const isCurrentQuery = normalizedQuery === z.search.SearchRepository.normalizeQuery(this.searchInput());
+            if (isCurrentQuery) {
+              this.searchResults.others(userEntities);
+            }
+          })
+          .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
+      }
 
-      this.searchRepository
-        .search_by_name(normalizedQuery, isHandle)
-        .then(userEntities => {
-          const isCurrentQuery = normalizedQuery === z.search.SearchRepository.normalizeQuery(this.searchInput());
-          if (isCurrentQuery) {
-            this.searchResults.others(userEntities);
-          }
-        })
-        .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
+      const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
 
-      const localSearchSources = this.isTeam()
-        ? this.teamRepository.teamUsers()
-        : this.userRepository.connected_users();
+      const localSearchSources = this.showOnlyConnectedUsers()
+        ? this.conversationRepository.connectedUsers()
+        : allLocalUsers;
 
       const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+      const connectedUsers = this.conversationRepository.connectedUsers();
+      const filteredResults = contactResults.filter(user => {
+        return (
+          connectedUsers.includes(user) ||
+          this.teamRepository.isSelfConnectedTo(user.id) ||
+          user.username() === normalizedQuery
+        );
+      });
 
-      this.searchResults.contacts(contactResults);
+      this.searchResults.contacts(filteredResults);
+
       this.searchResults.groups(this.conversationRepository.getGroupsByName(normalizedQuery, isHandle));
     }
   }

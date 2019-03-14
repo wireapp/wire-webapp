@@ -169,12 +169,12 @@ ko.components.register('mention-suggestions', {
   template: `
   <!-- ko if: isVisible() -->
     <div class="conversation-input-bar-mention-suggestion" data-uie-name="list-mention-suggestions" data-bind="style: position(), simplebar: {trigger: shouldUpdateScrollbar, onInit: onInitSimpleBar}">
-      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion'}">
+      <div class="mention-suggestion-list" data-bind="foreach: {data: suggestions().slice().reverse(), as: 'suggestion', noChildContext: true}">
         <div class="mention-suggestion-list__item" data-bind="
-          click: $parent.onSuggestionClick,
-          event: { mouseenter: $parent.onMouseEnter},
-          css: {'mention-suggestion-list__item--highlighted': suggestion === $parent.selectedSuggestion()},
-          attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === $parent.selectedSuggestion()}" data-uie-name="item-mention-suggestion">
+          click: (data, event) => onSuggestionClick(suggestion, event),
+          event: { mouseenter: onMouseEnter},
+          css: {'mention-suggestion-list__item--highlighted': suggestion === selectedSuggestion()},
+          attr: {'data-uie-value': suggestion.id, 'data-uie-selected': suggestion === selectedSuggestion()}" data-uie-name="item-mention-suggestion">
           <participant-avatar params="participant: suggestion, size: z.components.ParticipantAvatar.SIZE.XXX_SMALL"></participant-avatar>
           <div class="mention-suggestion-list__item__name" data-bind="text: suggestion.name()" data-uie-name="status-name"></div>
           <!-- ko if: suggestion.isTemporaryGuest() -->

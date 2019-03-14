@@ -23,7 +23,7 @@ import AssetTransferState from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
 
 export default class AbstractAssetTransferStateTracker {
-  constructor(message) {
+  constructor(message = {}) {
     this.assetUploader = resolve(graph.AssetUploader);
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
     this.AssetTransferState = AssetTransferState;
@@ -32,6 +32,18 @@ export default class AbstractAssetTransferStateTracker {
       const asset = message.get_first_asset();
       return this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset.status();
     });
+  }
+
+  isDownloading(transferState) {
+    return transferState === AssetTransferState.DOWNLOADING;
+  }
+
+  isUploading(transferState) {
+    return transferState === AssetTransferState.UPLOADING;
+  }
+
+  isUploaded(transferState) {
+    return transferState === AssetTransferState.UPLOADED;
   }
 
   cancelUpload(message) {

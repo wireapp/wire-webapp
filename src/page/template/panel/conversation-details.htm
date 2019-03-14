@@ -131,7 +131,7 @@
           <!-- ko if: activeConversation() && activeConversation().isGroup() -->
             <!-- ko if: userParticipants().length -->
               <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsPeople')"></div>
-              <user-list params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository" data-uie-name="list-users"></user-list>
+              <user-list params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository" data-uie-name="list-users"></user-list>
               <!-- ko if: showAllUsersCount() > 0 -->
                 <div class="panel__action-item panel__action-item--no-border" data-bind="click: clickOnShowAll" data-uie-name="go-conversation-participants">
                   <people-icon class="panel__action-item__icon"></people-icon>

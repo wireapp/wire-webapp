@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import Asset from './Asset';
 import AssetType from '../../assets/AssetType';
+import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 
 export default class Text extends Asset {
   constructor(id, text = '') {
@@ -41,7 +42,7 @@ export default class Text extends Asset {
         return false;
       }
       const has_link_previews = this.previews().length > 0;
-      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.containsOnlyLink(this.text));
+      return !has_link_previews || (has_link_previews && !containsOnlyLink(this.text));
     });
   }
 

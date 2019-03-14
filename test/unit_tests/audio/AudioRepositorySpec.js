@@ -32,7 +32,7 @@ describe('AudioRepository', () => {
 
     it('ignores a sound that should not be played', done => {
       audioRepository
-        ._checkSoundSetting(z.audio.AudioType.ALERT)
+        ._checkSoundSetting(z.audio.AudioType.NEW_MESSAGE)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.error.AudioError));

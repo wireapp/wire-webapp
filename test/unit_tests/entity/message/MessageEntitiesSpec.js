@@ -18,6 +18,7 @@
  */
 
 // KARMA_SPECS=entity/message/MessageEntities yarn test:app
+import MediumImage from 'src/script/entity/message/MediumImage';
 
 describe('Message Entities', () => {
   let message_et = null;
@@ -32,7 +33,7 @@ describe('Message Entities', () => {
 
     it('message with image asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
-      message_et.assets.push(new z.entity.MediumImage());
+      message_et.assets.push(new MediumImage());
 
       expect(message_et.is_downloadable()).toBeTruthy();
     });
@@ -46,7 +47,7 @@ describe('Message Entities', () => {
 
     it('ephemeral message with image asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
-      message_et.assets.push(new z.entity.MediumImage());
+      message_et.assets.push(new MediumImage());
       message_et.ephemeral_expires(12312123);
 
       expect(message_et.is_downloadable()).toBeTruthy();
@@ -54,7 +55,7 @@ describe('Message Entities', () => {
 
     it('expired ephemeral message with image asset should not be downloadable', () => {
       message_et = new z.entity.ContentMessage();
-      message_et.assets.push(new z.entity.MediumImage());
+      message_et.assets.push(new MediumImage());
       message_et.ephemeral_expires(true);
 
       expect(message_et.is_downloadable()).toBeFalsy();
@@ -78,7 +79,7 @@ describe('Message Entities', () => {
 
     describe('medium asset', () => {
       beforeEach(() => {
-        message_et.assets.push(new z.entity.MediumImage());
+        message_et.assets.push(new MediumImage());
       });
 
       it('has_asset_medium_image return true', () => {

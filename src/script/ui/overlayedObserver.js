@@ -18,26 +18,25 @@
  */
 
 /**
- * Keeps track of elements that are overlayed by other elemenst (thus not visible on screen).
+ * Keeps track of elements that are overlayed by other elements (thus not visible on screen).
  *
  */
 // keeps track of all the elements we need to check when there is a mutation
 const overlayedElements = new Map();
+let overlayCheckerInterval = undefined;
 
-const checkOverlayedElements = mutations => {
-  mutations.forEach(({removedNodes}) => {
-    if (removedNodes && removedNodes.length) {
-      overlayedElements.forEach((onVisible, element) => {
-        if (!isOverlayed(element)) {
-          onVisible();
-          removeElement(element);
-        }
-      });
+function checkOverlayedElements() {
+  overlayedElements.forEach(({onVisible, onChange}, element) => {
+    const isVisible = !isOverlayed(element);
+    if (onChange) {
+      return onChange(isVisible);
+    }
+    if (isVisible) {
+      onVisible();
+      removeElement(element);
     }
   });
-};
-
-const mutationObserver = new MutationObserver(checkOverlayedElements);
+}
 
 /**
  * Returns true if an element is above the element being watched.
@@ -53,23 +52,36 @@ const isOverlayed = domElement => {
   return elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
-const addElement = (element, onVisible) => {
+const onElementVisible = (element, onVisible) => {
   if (!isOverlayed(element)) {
     return onVisible();
   }
-  if (overlayedElements.size === 0) {
-    mutationObserver.observe(document.body, {childList: true, subtree: true});
+  if (!overlayCheckerInterval) {
+    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
   }
-  overlayedElements.set(element, onVisible);
+  overlayedElements.set(element, {onVisible});
+};
+
+const trackElement = (element, onChange) => {
+  onChange(!isOverlayed(element));
+  if (!overlayCheckerInterval) {
+    overlayCheckerInterval = setInterval(checkOverlayedElements, 300);
+  }
+  overlayedElements.set(element, {onChange});
 };
 
 const removeElement = element => {
   overlayedElements.delete(element);
-  if (overlayedElements.size < 1) {
-    mutationObserver.disconnect();
+  if (overlayedElements.size < 1 && overlayCheckerInterval) {
+    clearInterval(overlayCheckerInterval);
+    overlayCheckerInterval = undefined;
   }
 };
 
-const overlayedObserver = {onElementVisible: addElement, removeElement};
+const overlayedObserver = {
+  onElementVisible,
+  removeElement,
+  trackElement,
+};
 
 export default overlayedObserver;

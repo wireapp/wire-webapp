@@ -17,43 +17,35 @@
  *
  */
 
-z.util.PeerConnectionUtil = {
-  getIceCandidatesTypes(iceCandidates) {
-    return iceCandidates.reduce((types, candidateStr) => {
-      const typeMatches = candidateStr.match(/typ (\w+)/);
-      if (!typeMatches) {
-        return types;
-      }
-      const candidateType = typeMatches[1];
-      types[candidateType] = types[candidateType] + 1 || 1;
+export function getIceCandidatesTypes(iceCandidates) {
+  return iceCandidates.reduce((types, candidateStr) => {
+    const typeMatches = candidateStr.match(/typ (\w+)/);
+    if (!typeMatches) {
       return types;
-    }, {});
-  },
+    }
+    const candidateType = typeMatches[1];
+    types[candidateType] = types[candidateType] + 1 || 1;
+    return types;
+  }, {});
+}
 
-  /**
-   * Returns true if the number and types of ice candidates gathered are sufficient to start a call
-   *
-   * @param {RTCConfiguration} peerConnectionConfig - the configuration of the peerConnection that initiated the ICE candidate gathering
-   * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
-   * @returns {boolean} True if the candidates gathered are enough to send a SDP
-   */
-  isValidIceCandidatesGathering(peerConnectionConfig, iceCandidates) {
-    if (iceCandidates.length <= 0) {
-      // if there are no candidates, no need to check for more conditions
-      // the call cannot work
-      return false;
-    }
-    const numberOfRelays = iceCandidates.filter(candidate => candidate.toLowerCase().includes('relay')).length;
-    const numberOfIceServers = (peerConnectionConfig.iceServers || []).length;
-    if (numberOfIceServers <= 0) {
-      return true;
-    }
-    if (numberOfIceServers === 1 && numberOfRelays >= 1) {
-      return true;
-    }
-    if (numberOfIceServers >= 2 && numberOfRelays >= 2) {
-      return true;
-    }
+/**
+ * Returns true if the number and types of ice candidates gathered are sufficient to start a call
+ *
+ * @param {RTCConfiguration} peerConnectionConfig - the configuration of the peerConnection that initiated the ICE candidate gathering
+ * @param {Array<string>} iceCandidates - ICE candidate strings from SDP
+ * @returns {boolean} True if the candidates gathered are enough to send a SDP
+ */
+export function isValidIceCandidatesGathering(peerConnectionConfig, iceCandidates) {
+  if (iceCandidates.length <= 0) {
+    // if there are no candidates, no need to check for more conditions
+    // the call cannot work
     return false;
-  },
-};
+  }
+  const numberOfRelays = iceCandidates.filter(candidate => candidate.toLowerCase().includes('relay')).length;
+  const numberOfIceServers = (peerConnectionConfig.iceServers || []).length;
+  if (numberOfIceServers <= 0) {
+    return true;
+  }
+  return numberOfRelays >= 1;
+}

@@ -20,12 +20,17 @@
 import ko from 'knockout';
 
 export function instantiateComponent(componentName, params = {}) {
+  const paramsStr = `{${Object.keys(params).join(',')}}`;
+  const html = `<div data-bind="component: {name: '${componentName}', params: ${paramsStr}}"></div>`;
+  return bindHtml(html, params);
+}
+
+export function bindHtml(htmlStr, context = {}) {
+  const destination = document.body;
+  ko.cleanNode(destination);
+  destination.innerHTML = htmlStr; // eslint-disable-line no-unsanitized/property
+  ko.applyBindings(context, destination);
   return new Promise(resolve => {
-    const destination = document.body;
-    ko.cleanNode(destination);
-    const paramsStr = `{${Object.keys(params).join(',')}}`;
-    destination.innerHTML = `<div data-bind="component: {name: '${componentName}', params: ${paramsStr}}"></div>`; // eslint-disable-line no-unsanitized/property
-    ko.applyBindings(params, destination);
     setImmediate(() => {
       resolve(destination);
     });

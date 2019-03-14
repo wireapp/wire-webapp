@@ -12,6 +12,7 @@ node_modules
 /package-lock.json
 /tags
 /temp
+.nyc_output
 aws-keys.json
 npm-debug.log
 yarn-error.log

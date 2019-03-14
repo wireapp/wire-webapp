@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import TeamMapper from './TeamMapper';
+import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -46,6 +47,13 @@ z.team.TeamRepository = class TeamRepository {
     this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
 
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.memberRoles = ko.observable({});
+    this.memberInviters = ko.observable({});
+
+    this.isSelfConnectedTo = userId => {
+      return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    };
+
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
@@ -179,6 +187,10 @@ z.team.TeamRepository = class TeamRepository {
   updateTeamMembers(teamEntity) {
     return this.getTeamMembers(teamEntity.id)
       .then(teamMembers => {
+        this.memberRoles({});
+        this.memberInviters({});
+        this._updateMemberRoles(teamMembers);
+
         const memberIds = teamMembers
           .filter(memberEntity => {
             const isSelfUser = memberEntity.userId === this.selfUser().id;
@@ -235,6 +247,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository.get_user_by_id(userId).then(userEntity => this._addUserToTeam(userEntity));
+      this.getTeamMember(teamId, userId).then(members => this._updateMemberRoles(members));
     }
   }
 
@@ -273,6 +286,27 @@ z.team.TeamRepository = class TeamRepository {
         .then(memberEntity => this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions))
         .then(() => this.sendAccountInfo());
     }
+    if (isLocalTeam && !isSelfUser) {
+      this.getTeamMember(teamId, userId).then(members => this._updateMemberRoles(members));
+    }
+  }
+
+  _updateMemberRoles(memberEntities = []) {
+    const memberArray = [].concat(memberEntities);
+
+    const memberRoles = memberArray.reduce((accumulator, member) => {
+      return {
+        ...accumulator,
+        [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
+      };
+    }, this.memberRoles());
+
+    const memberInvites = memberArray.reduce((accumulator, member) => {
+      return {...accumulator, [member.userId]: member.invitedBy};
+    }, this.memberInviters());
+
+    this.memberRoles(memberRoles);
+    this.memberInviters(memberInvites);
   }
 
   _onUnhandled(eventJson) {
