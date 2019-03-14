@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,31 @@
  *
  */
 
-enum Permission {
-  ADD_CONVERSATION_MEMBER = 1 << 4,
-  ADD_TEAM_MEMBER = 1 << 2,
+/* tslint:disable:object-literal-sort-keys */
+enum Permissions {
   CREATE_CONVERSATION = 1 << 0,
   DELETE_CONVERSATION = 1 << 1,
-  DELETE_TEAM = 1 << 11,
+  ADD_TEAM_MEMBER = 1 << 2,
+  REMOVE_TEAM_MEMBER = 1 << 3,
+  ADD_CONVERSATION_MEMBER = 1 << 4,
+  REMOVE_CONVERSATION_MEMBER = 1 << 5,
   GET_BILLING = 1 << 6,
+  SET_BILLING = 1 << 7,
+  SET_TEAM_DATA = 1 << 8,
   GET_MEMBER_PERMISSIONS = 1 << 9,
   GET_TEAM_CONVERSATIONS = 1 << 10,
-  NONE = 0,
-  REMOVE_CONVERSATION_MEMBER = 1 << 5,
-  REMOVE_TEAM_MEMBER = 1 << 3,
-  SET_BILLING = 1 << 7,
+  DELETE_TEAM = 1 << 11,
   SET_MEMBER_PERMISSIONS = 1 << 12,
-  SET_TEAM_DATA = 1 << 8,
 }
+/* tslint:enable:object-literal-sort-keys */
 
-export {Permission};
+const hasPermissions = (permissions: Permissions, expectedPermissions: Permissions): boolean => {
+  const validPermissions = Number.isSafeInteger(permissions) && permissions > 0;
+  return validPermissions && (permissions & expectedPermissions) === expectedPermissions;
+};
+
+const combinePermissions = (permissionList: Permissions[]): Permissions => {
+  return permissionList.reduce((acc, permission) => acc | permission, 0);
+};
+
+export {Permissions, hasPermissions, combinePermissions};

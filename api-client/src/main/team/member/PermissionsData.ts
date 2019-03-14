@@ -16,10 +16,11 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {Permissions} from './Permissions';
 
 interface PermissionsData {
-  copy: number;
-  self: number;
+  copy: Permissions;
+  self: Permissions;
 }
 
 export {PermissionsData};

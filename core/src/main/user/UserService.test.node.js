@@ -26,7 +26,7 @@ const {TeamAPI} = require('@wireapp/api-client/dist/commonjs/team/team/');
 const {BroadcastAPI} = require('@wireapp/api-client/dist/commonjs/broadcast/');
 const {StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
 const {Backend} = require('@wireapp/api-client/dist/commonjs/env/');
-const {Permission} = require('@wireapp/api-client/dist/commonjs/team/member/');
+const {Permissions} = require('@wireapp/api-client/dist/commonjs/team/member/');
 
 const PayloadHelper = require('../test/PayloadHelper');
 
@@ -79,8 +79,8 @@ describe('UserService', () => {
           members: [
             {
               permissions: {
-                copy: Permission.DELETE_TEAM | Permission.GET_BILLING | Permission.SET_BILLING,
-                self: Permission.DELETE_TEAM | Permission.GET_BILLING | Permission.SET_BILLING,
+                copy: Permissions.DELETE_TEAM | Permissions.GET_BILLING | Permissions.SET_BILLING,
+                self: Permissions.DELETE_TEAM | Permissions.GET_BILLING | Permissions.SET_BILLING,
               },
               user: PayloadHelper.getUUID(),
             },
