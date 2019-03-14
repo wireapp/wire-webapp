@@ -48,6 +48,11 @@ body {
 .generate-css-vars(@accent_id) when (@accent_id > 0) {
   .generate-css-vars(@accent_id - 1);
   @accent-color: 'accent_colors-@{accent_id}';
+
+  .accent-color-@{accent_id} {
+    color: @@accent-color;
+  }
+
   .main-accent-color-@{accent_id} {
     --accent-color: @@accent-color;
     --accent-color-fade-16: fade(@@accent-color, 16%);
