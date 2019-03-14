@@ -188,7 +188,7 @@ class App {
       repositories.user
     );
     repositories.broadcast = new z.broadcast.BroadcastRepository(
-      this.service.broadcast,
+      resolve(graph.BroadcastService),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
@@ -233,7 +233,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      broadcast: new z.broadcast.BroadcastService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
       connection: new z.connection.ConnectionService(this.backendClient),
@@ -242,7 +241,6 @@ class App {
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: resolve(graph.PropertiesService),
       search: new z.search.SearchService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
