@@ -29,7 +29,6 @@ class AudioSeekBarComponent {
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
     this.audioElement = params.src;
-    this.asset = params.asset;
 
     this.element = componentInfo.element;
     this.loudness = [];
@@ -41,8 +40,9 @@ class AudioSeekBarComponent {
       }
     });
 
-    if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
-      this.loudness = this._normalizeLoudness(this.asset.meta.loudness, componentInfo.element.clientHeight);
+    const assetMeta = params.asset.meta;
+    if (assetMeta !== null && assetMeta.loudness !== null) {
+      this.loudness = this._normalizeLoudness(assetMeta.loudness, componentInfo.element.clientHeight);
     }
 
     this._onResizeFired = _.debounce(() => {
