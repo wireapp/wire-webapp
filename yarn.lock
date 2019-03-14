@@ -1434,10 +1434,10 @@
     moment "2.24.0"
     platform "1.3.5"
 
-"@wireapp/copy-config@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.4.0.tgz#f519da00d737386b6d6a819cdb7966f9d345891a"
-  integrity sha512-NKQLjgDa7KcZAueJHAEoY1nQPZZIxEJ/mcc42zQIsOPiDnFSfVDvRpo1Nuyn/3sZg5FtW0ZSgc/AXkPzwpP5rw==
+"@wireapp/copy-config@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.4.1.tgz#1f5a2183c68d7458a98e61c998f913700a9d1d76"
+  integrity sha512-ovwjT/Ht6XV2Ung29lInCTKZv1T61XSMWX5xlA6tXDaMGh5D4kUMhWS0pi3r3tfQ+knz1LvZgGRL6EK5KMdOKw==
   dependencies:
     axios "0.18.0"
     copy "0.3.2"
