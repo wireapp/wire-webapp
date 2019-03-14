@@ -17,9 +17,11 @@
  *
  */
 
-import {startNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
+import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
 
 describe('newVersionHandler', () => {
+  afterEach(stopNewVersionPolling);
+
   describe('startNewVersionPolling', () => {
     it('starts an interval when called', () => {
       spyOn(window, 'setInterval').and.returnValue(undefined);

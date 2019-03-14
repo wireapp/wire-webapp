@@ -24,7 +24,8 @@ const logger = Logger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 
-const newVersionListeners = [];
+let newVersionListeners = [];
+let pollInterval;
 
 const fetchLatestVersion = async () => {
   const response = await fetch(VERSION_URL);
@@ -67,6 +68,11 @@ export function startNewVersionPolling(currentVersion, onNewVersionAvailable) {
   newVersionListeners.push({currentVersion, onNewVersionAvailable});
   if (newVersionListeners.length === 1) {
     // starts the interval when we have our first listener
-    window.setInterval(checkVersion, CHECK_INTERVAL);
+    pollInterval = window.setInterval(checkVersion, CHECK_INTERVAL);
   }
+}
+
+export function stopNewVersionPolling() {
+  newVersionListeners = [];
+  window.clearInterval(pollInterval);
 }
