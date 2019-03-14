@@ -18,6 +18,7 @@
  */
 
 interface CRUDEngine {
+  [index: string]: any;
   storeName: string;
 
   /**

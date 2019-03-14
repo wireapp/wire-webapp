@@ -17,21 +17,20 @@
  *
  */
 
-const {error: StoreEngineError, LocalStorageEngine} = require('@wireapp/store-engine');
+import {IndexedDBEngine} from '../engine';
+import {UnsupportedError} from '../engine/error';
 
-describe('LocalStorageEngine', () => {
-  const STORE_NAME = 'store-name';
+const STORE_NAME = 'store-name';
 
-  describe('"init"', () => {
-    it('throws an error if the store is not supported by the targeted platform.', async done => {
-      const storeEngine = new LocalStorageEngine();
-      try {
-        await storeEngine.init(STORE_NAME);
-        done.fail('Expected error');
-      } catch (error) {
-        expect(error instanceof StoreEngineError.UnsupportedError).toBe(true);
-        done();
-      }
-    });
+describe('init', () => {
+  it('throws an error if the store is not supported by the targeted platform.', async done => {
+    const storeEngine = new IndexedDBEngine();
+    try {
+      await storeEngine.init(STORE_NAME);
+      done.fail('Expected error');
+    } catch (error) {
+      expect(error instanceof UnsupportedError).toBe(true);
+      done();
+    }
   });
 });

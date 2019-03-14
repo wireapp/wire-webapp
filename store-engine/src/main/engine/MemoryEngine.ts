@@ -66,10 +66,8 @@ export default class MemoryEngine implements CRUDEngine {
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
     this.prepareTable(tableName);
-    const record = this.stores[this.storeName][tableName][primaryKey];
-
-    if (record) {
-      return Promise.resolve(record);
+    if (this.stores[this.storeName][tableName].hasOwnProperty(primaryKey)) {
+      return Promise.resolve(this.stores[this.storeName][tableName][primaryKey]);
     } else {
       const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       return Promise.reject(new RecordNotFoundError(message));
@@ -92,16 +90,12 @@ export default class MemoryEngine implements CRUDEngine {
     return Promise.resolve(Object.keys(this.stores[this.storeName][tableName]));
   }
 
-  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public async update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     this.prepareTable(tableName);
-    return this.read(tableName, primaryKey)
-      .then((entity: Object) => {
-        return {...entity, ...changes};
-      })
-      .then((updatedEntity: Object) => {
-        this.stores[this.storeName][tableName][primaryKey] = updatedEntity;
-        return primaryKey;
-      });
+    const entity: Object = await this.read(tableName, primaryKey);
+    const updatedEntity: Object = {...entity, ...changes};
+    this.stores[this.storeName][tableName][primaryKey] = updatedEntity;
+    return primaryKey;
   }
 
   public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {

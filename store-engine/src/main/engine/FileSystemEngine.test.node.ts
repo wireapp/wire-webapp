@@ -17,21 +17,20 @@
  *
  */
 
-const {error: StoreEngineError, FileSystemEngine} = require('@wireapp/store-engine');
+import {FileSystemEngine} from '../engine';
+import {UnsupportedError} from '../engine/error';
 
-describe('FileSystemEngine', () => {
-  const STORE_NAME = 'store-name';
+const STORE_NAME = 'store-name';
 
-  describe('"init"', () => {
-    it('throws an error if the store is not supported by the targeted platform.', async done => {
-      const storeEngine = new FileSystemEngine();
-      try {
-        await storeEngine.init(STORE_NAME);
-        done.fail('Expected error');
-      } catch (error) {
-        expect(error instanceof StoreEngineError.UnsupportedError).toBe(true);
-        done();
-      }
-    });
+describe('init', () => {
+  it('throws an error if the store is not supported by the targeted platform.', async done => {
+    const storeEngine = new FileSystemEngine();
+    try {
+      await storeEngine.init(STORE_NAME);
+      done.fail('Expected error');
+    } catch (error) {
+      expect(error instanceof UnsupportedError).toBe(true);
+      done();
+    }
   });
 });

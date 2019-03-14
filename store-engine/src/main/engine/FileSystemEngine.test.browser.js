@@ -51,61 +51,61 @@ describe('FileSystemEngine', () => {
   });
 
   describe('"append"', () => {
-    Object.entries(require('../../test/shared/append')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/append')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"create"', () => {
-    Object.entries(require('../../test/shared/create')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/create')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"delete"', () => {
-    Object.entries(require('../../test/shared/delete')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/delete')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"deleteAll"', () => {
-    Object.entries(require('../../test/shared/deleteAll')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/deleteAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"purge"', () => {
-    Object.entries(require('../../test/shared/purge')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/purge')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine, initEngine));
     });
   });
 
   describe('"read"', () => {
-    Object.entries(require('../../test/shared/read')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/read')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"readAll"', () => {
-    Object.entries(require('../../test/shared/readAll')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/readAll')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"readAllPrimaryKeys"', () => {
-    Object.entries(require('../../test/shared/readAllPrimaryKeys')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/readAllPrimaryKeys')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"update"', () => {
-    Object.entries(require('../../test/shared/update')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/update')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
 
   describe('"updateOrCreate"', () => {
-    Object.entries(require('../../test/shared/updateOrCreate')).map(([description, testFunction]) => {
+    Object.entries(require('../test/shared/updateOrCreate')).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
   });
