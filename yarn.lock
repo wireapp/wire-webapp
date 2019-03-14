@@ -12513,16 +12513,16 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2"
 
-"wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.16.1":
-  version "0.16.1"
-  resolved "https://github.com/wireapp/wire-web-config-wire#394041dc3def1a86c5b80670dc93c64b68bfba64"
+"wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.16.4":
+  version "0.16.4"
+  resolved "https://github.com/wireapp/wire-web-config-wire#742ab0fbdb0cfb814fbd55b6c2dca9e72328919a"
   dependencies:
     adm-zip "0.4.13"
+    sort-json "2.0.0"
 
-"wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.16.2":
-  version "0.16.2"
-  uid fa95bebc6738c68229a79a56326f2261f75e3454
-  resolved "https://github.com/wireapp/wire-web-config-default#fa95bebc6738c68229a79a56326f2261f75e3454"
+"wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.16.4":
+  version "0.16.4"
+  resolved "https://github.com/wireapp/wire-web-config-default#742ab0fbdb0cfb814fbd55b6c2dca9e72328919a"
   dependencies:
     adm-zip "0.4.13"
     sort-json "2.0.0"

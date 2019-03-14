@@ -29,6 +29,7 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfUser = window.wire.app.repository.user.self;
     this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+    this.badge = params.badge;
 
     this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
     this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
@@ -37,9 +38,11 @@ z.components.ParticipantItem = class ParticipantItem {
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;
     this.showCamera = params.showCamera;
-    this.hasCustomInfo = !!params.customInfo;
+    const hasCustomInfo = !!params.customInfo;
 
-    if (this.hasCustomInfo) {
+    this.hasUsernameInfo = this.isUser && !params.hideInfo && !hasCustomInfo && !this.isTemporaryGuest;
+
+    if (hasCustomInfo) {
       this.contentInfo = params.customInfo;
     } else if (params.hideInfo) {
       this.contentInfo = null;
@@ -72,7 +75,10 @@ ko.components.register('participant-item', {
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
-            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': isUser && !isTemporaryGuest && !hasCustomInfo}" data-uie-name="status-username"></span>
+            <span class="participant-item-content-username label-username-notext" data-bind="text: contentInfo, css: {'label-username': hasUsernameInfo}" data-uie-name="status-username"></span>
+            <!-- ko if: hasUsernameInfo && badge -->
+              <span class="participant-item-content-badge" data-uie-name="status-partner">Partner</span>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
       </div>

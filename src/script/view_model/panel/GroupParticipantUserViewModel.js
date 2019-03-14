@@ -34,6 +34,7 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
+    this.teamRepository = repositories.team;
 
     this.logger = Logger('GroupParticipantUserViewModel');
 
