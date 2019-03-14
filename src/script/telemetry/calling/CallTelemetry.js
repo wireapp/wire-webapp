@@ -29,7 +29,7 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 // Call traces entity.
 z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor() {
-    this.logger = new Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.telemetry.calling.CallTelemetry');
 
     this.sessions = {};
     this.remote_version = undefined;

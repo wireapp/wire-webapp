@@ -149,9 +149,6 @@ import IntegrationServiceGlobal from '../integration/IntegrationService.js';
 import ProviderEntityGlobal from '../integration/ProviderEntity.js';
 import ServiceEntityGlobal from '../integration/ServiceEntity.js';
 import ServiceTagGlobal from '../integration/ServiceTag.js';
-import LifecycleServiceGlobal from '../lifecycle/LifecycleService.js';
-import LifecycleRepositoryGlobal from '../lifecycle/LifecycleRepository.js';
-import UpdateSourceGlobal from '../lifecycle/UpdateSource.js';
 import LinkPreviewMetaDataTypeGlobal from '../links/LinkPreviewMetaDataType.js';
 import LinkPreviewProtoBuilderGlobal from '../links/LinkPreviewProtoBuilder.js';
 import LinkPreviewBlackListGlobal from '../links/LinkPreviewBlackList.js';
@@ -188,7 +185,6 @@ import CallSetupStepsOrderGlobal from '../telemetry/calling/CallSetupStepsOrder.
 import CallSetupTimingsGlobal from '../telemetry/calling/CallSetupTimings.js';
 import FlowTelemetryGlobal from '../telemetry/calling/FlowTelemetry.js';
 import CallTelemetryGlobal from '../telemetry/calling/CallTelemetry.js';
-import CallLoggerGlobal from '../telemetry/calling/CallLogger.js';
 import AvailabilityMapperGlobal from '../user/AvailabilityMapper.js';
 import AvailabilityTypeGlobal from '../user/AvailabilityType.js';
 import UserHandleGeneratorGlobal from '../user/UserHandleGenerator.js';
@@ -301,13 +297,10 @@ import ContextMenuGlobal from '../ui/ContextMenu.js';
 import ModalGlobal from '../ui/Modal.js';
 import ShortcutTypeGlobal from '../ui/ShortcutType.js';
 import ShortcutGlobal from '../ui/Shortcut.js';
-import WindowHandlerGlobal from '../ui/WindowHandler.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
-import authServiceGlobal from '../auth/AuthService.js';
-import authRepoGlobal from '../auth/AuthRepository.js';
 import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 

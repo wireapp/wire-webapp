@@ -42,7 +42,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.teamRepository = team;
     this.userRepository = user;
 
-    this.logger = new Logger('z.viewModel.panel.AddParticipantsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.panel.AddParticipantsViewModel');
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;

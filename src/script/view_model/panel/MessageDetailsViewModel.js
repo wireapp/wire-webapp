@@ -38,6 +38,8 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
     this.messageId = ko.observable();
 
     const userRepository = params.repositories.user;
+    this.conversationRepository = params.repositories.conversation;
+    this.teamRepository = params.repositories.team;
 
     this.states = {
       LIKES: 'likes',

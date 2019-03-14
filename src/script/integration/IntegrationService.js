@@ -37,7 +37,7 @@ z.integration.IntegrationService = class IntegrationService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.integration.IntegrationService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.integration.IntegrationService');
   }
 
   getProvider(providerId) {

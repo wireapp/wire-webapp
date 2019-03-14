@@ -34,6 +34,10 @@ ko.components.register('panel-user-details', {
 
       <participant-avatar params="participant: participant, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
 
+      <!-- ko if: badge -->
+        <div class="panel-participant__role-label" data-bind="text: badge" data-uie-name="status-partner"></div>
+      <!-- /ko -->
+
       <!-- ko if: participant().isGuest() -->
         <div class="panel-participant__guest-label" data-uie-name="status-guest">
           <guest-icon></guest-icon>
@@ -58,6 +62,7 @@ ko.components.register('panel-user-details', {
     constructor(params) {
       this.participant = params.participant;
       this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
+      this.badge = params.badge;
       this.availabilityLabel = ko.pureComputed(() => {
         const availabilitySetToNone = this.participant().availability() === z.user.AvailabilityType.NONE;
         if (!availabilitySetToNone) {

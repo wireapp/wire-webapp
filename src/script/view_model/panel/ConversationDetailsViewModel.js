@@ -53,7 +53,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = new Logger('z.viewModel.panel.ConversationDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.panel.ConversationDetailsViewModel');
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;

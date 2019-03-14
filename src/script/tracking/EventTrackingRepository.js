@@ -55,7 +55,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = new Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.tracking.EventTrackingRepository');
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;

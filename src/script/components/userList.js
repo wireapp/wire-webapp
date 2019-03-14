@@ -76,7 +76,7 @@ z.components.UserList = class UserList {
 
     // Filter all list items if a filter is provided
     this.filteredUserEntities = ko.pureComputed(() => {
-      const connectedUsers = this.conversationRepository.getConnectedUsers();
+      const connectedUsers = this.conversationRepository.connectedUsers();
       if (typeof this.filter === 'function') {
         const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
         if (normalizedQuery) {
@@ -112,8 +112,11 @@ z.components.UserList = class UserList {
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <participant-item params="participant: $data, customInfo: $parent.infos && $parent.infos()[$data.id], canSelect: $parent.isSelectEnabled, isSelected: $parent.isSelected($data), mode: $parent.mode" data-bind="click: $parent.onUserClick, css: {'no-underline': $parent.noUnderline, 'show-arrow': $parent.arrow, 'highlighted': $parent.highlightedUserIds.includes($data.id)}"></participant-item>
+    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
+      <participant-item 
+        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id)" 
+        data-bind="click: event => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
+      </participant-item>
     </div>
 
     <!-- ko if: typeof filter === 'function' -->

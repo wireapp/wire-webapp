@@ -41,25 +41,6 @@ window.z.config = {
     SHOW_LOADING_INFORMATION: env.FEATURE && env.FEATURE.SHOW_LOADING_INFORMATION,
   },
 
-  LOGGER: {
-    OPTIONS: {
-      domains: {
-        'app.wire.com': () => {
-          const loggerNamespace = localStorage.getItem('debug');
-          if (loggerNamespace && loggerNamespace.startsWith('@wireapp')) {
-            return 300;
-          }
-          return 0;
-        },
-        localhost: () => 300,
-        'wire.ms': () => 300,
-        'wire-webapp-staging.wire.com': () => 300,
-        'zinfra.io': () => 300,
-      },
-      name_length: 65,
-    },
-  },
-
   // 10 seconds until phone code expires
   LOGIN_CODE_EXPIRATION: 10 * 60,
 

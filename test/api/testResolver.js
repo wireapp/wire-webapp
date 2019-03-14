@@ -28,7 +28,7 @@ export const backendConfig = {
   websocket_url: 'wss://localhost',
 };
 
-dependenciesResolver.init(graph.dependencies, {level: z.util.Logger.prototype.levels.OFF});
+dependenciesResolver.init(graph.dependencies);
 
 beforeEach(() => {
   // revoke cache to avoid having statefull entities between tests

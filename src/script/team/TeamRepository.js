@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import TeamMapper from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -34,7 +35,7 @@ z.team.TeamRepository = class TeamRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(teamService, userRepository) {
-    this.logger = new Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.team.TeamRepository');
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;
@@ -50,8 +51,17 @@ z.team.TeamRepository = class TeamRepository {
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
 
-    this.isSelfConnectedTo = userId =>
-      this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    this.isSelfConnectedTo = userId => {
+      return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    };
+
+    this.getRoleBadge = userId => {
+      const userRole = this.memberRoles()[userId];
+      if (userRole === ROLE.PARTNER) {
+        return t('rolePartner');
+      }
+      return '';
+    };
 
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));

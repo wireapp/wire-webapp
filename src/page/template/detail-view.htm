@@ -4,7 +4,7 @@
       <header class="detail-view-header">
         <div class="text-center">
           <div class="label-bold-xs" data-bind="text: messageEntity().unsafeSenderName(), attr: {'data-uie-uid': messageEntity().user().id, 'data-uie-value': messageEntity().user().name}" data-uie-name="fullscreen-picture-sender"></div>
-          <div class="label-xs" data-bind="text: moment(messageEntity().timestamp()).format('DD/MM/YYYY H:mm'), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
+          <div class="label-xs" data-bind="text: formatTimestamp(messageEntity().timestamp()), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
         </div>
         <close-icon class="detail-view-header-close-button icon-button" data-bind="click: clickOnClose" data-uie-name="do-close-detail-view"></close-icon>
       </header>

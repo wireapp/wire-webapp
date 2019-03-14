@@ -4,12 +4,11 @@
   "dependencies": {
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
-    "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#v1.1.4",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@emotion/core": "10.0.9",
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/commons": "1.0.14",
-    "@wireapp/core": "8.1.43",
+    "@wireapp/commons": "1.3.1",
+    "@wireapp/core": "8.1.56",
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/react-ui-kit": "5.0.18",
     "amplify": "git+https://git@github.com/wireapp/amplify",
@@ -23,7 +22,6 @@
     "jszip": "3.2.0",
     "keyboardjs": "2.5.1",
     "knockout": "3.5.0",
-    "lint-staged": "8.1.5",
     "long": "4.0.0",
     "moment": "2.24.0",
     "phoneformat.js": "1.0.7",
@@ -47,8 +45,8 @@
     "url-search-params-polyfill": "5.0.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
-    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.16.1",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.16.1"
+    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.16.4",
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.16.4"
   },
   "devDependencies": {
     "@babel/core": "7.3.4",
@@ -57,8 +55,6 @@
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.3.3",
     "@types/enzyme": "3.9.0",
-    "@types/express-sitemap-xml": "1.0.1",
-    "@types/express-useragent": "0.2.21",
     "@types/helmet": "0.0.43",
     "@types/js-cookie": "2.2.1",
     "@types/platform": "1.3.2",
@@ -71,7 +67,7 @@
     "@types/speakingurl": "13.0.2",
     "@types/uuid": "3.4.4",
     "@types/webpack-env": "1.13.9",
-    "@wireapp/copy-config": "0.3.1",
+    "@wireapp/copy-config": "0.4.1",
     "autoprefixer": "9.4.10",
     "babel-eslint": "10.0.1",
     "babel-loader": "8.0.5",
@@ -86,7 +82,7 @@
     "eslint-config-prettier": "4.1.0",
     "eslint-plugin-babel": "5.3.0",
     "eslint-plugin-jasmine": "2.10.1",
-    "eslint-plugin-jsdoc": "4.1.1",
+    "eslint-plugin-jsdoc": "4.2.0",
     "eslint-plugin-no-unsanitized": "3.0.2",
     "eslint-plugin-prettier": "3.0.1",
     "eslint-plugin-react": "7.12.4",
@@ -116,6 +112,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "3.0.5",
     "less": "3.9.0",
+    "lint-staged": "8.1.5",
     "load-grunt-tasks": "4.0.0",
     "node-sass": "4.11.0",
     "postcss-cssnext": "3.1.0",
@@ -134,7 +131,7 @@
     "stylelint-config-prettier": "5.0.0",
     "svg-inline-loader": "0.8.0",
     "terser-webpack-plugin": "1.2.3",
-    "tslint": "5.13.1",
+    "tslint": "5.14.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
@@ -215,9 +212,6 @@
     "@bower_components/webapp-module-bubble": {
       "js": "dist/script/*.js",
       "less": "app/style/webapp-module-bubble.less"
-    },
-    "@bower_components/webapp-module-logger": {
-      "js": "dist/js/Logger.js"
     },
     "@bower_components/webapp-module-namespace": {
       "js": "js/*.js"

@@ -42,7 +42,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
     const conversationRepository = repositories.conversation;
     this.stateHandler = conversationRepository.stateHandler;
 
-    this.logger = new Logger('z.viewModel.panel.GuestsAndServicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.panel.GuestsAndServicesViewModel');
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);

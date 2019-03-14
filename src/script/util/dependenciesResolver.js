@@ -18,22 +18,19 @@
  */
 
 import {memoize} from 'underscore';
-import Logger from './Logger';
+import logger from './Logger';
 
 let dependencyGraph;
-let loggerConfig;
 
 const resolver = {
   /**
    * Will set the dependencies graph that will be used to resolve dependencies when `resolve` method is called
    *
    * @param {Map} dependencies - The dependencies graph of the app
-   * @param {Object} loggerConf - Configuration for the logger that will be passed to dependencies
    * @returns {void}
    */
-  init(dependencies, loggerConf) {
+  init(dependencies) {
     dependencyGraph = dependencies;
-    loggerConfig = loggerConf;
   },
 
   /**
@@ -53,7 +50,7 @@ const resolver = {
       throw new Error(`No dependencies configuration for class: ${dependencyClass}`);
     }
     const dependencies = config.dependencies.map(resolver.resolve);
-    const dependencyLogger = new Logger(config.name, loggerConfig);
+    const dependencyLogger = logger(config.name);
     return new dependencyClass(...dependencies.concat(dependencyLogger));
   }),
 };

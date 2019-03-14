@@ -17,6 +17,8 @@
  *
  */
 
+import moment from 'moment';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -139,6 +141,10 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
       this.items.remove(messageEntity => messageEntity.id === messageId);
     }
+  }
+
+  formatTimestamp(timestamp) {
+    return moment(timestamp).format('DD/MM/YYYY H:mm');
   }
 
   _loadImage() {
