@@ -24,6 +24,9 @@ const logger = Logger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 
+let newVersionListeners = [];
+let pollInterval;
+
 const fetchLatestVersion = async () => {
   const response = await fetch(VERSION_URL);
   if (response.ok) {
@@ -33,15 +36,25 @@ const fetchLatestVersion = async () => {
   throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
 };
 
-const checkVersion = async (currentVersion, onNewVersionAvailable) => {
+/**
+ * Check all the registered version listeners if the server version is newer than the version they registered.
+ *
+ * @param {string} overrideCurrentVersion - will ignore the version set for the listener and use this one instead
+ * @returns {Promise<number>} - Promise that resolves when the check has been done
+ */
+export async function checkVersion(overrideCurrentVersion) {
   if (navigator.onLine) {
     const serverVersion = await fetchLatestVersion();
-    logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
+    newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
+      const baseVersion = overrideCurrentVersion || currentVersion;
+      logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${baseVersion}'`);
 
-    const isOutdatedVersion = serverVersion > currentVersion;
-    return isOutdatedVersion && onNewVersionAvailable(serverVersion);
+      const isOutdatedVersion = serverVersion > baseVersion;
+      return isOutdatedVersion && onNewVersionAvailable(serverVersion);
+    });
+    return serverVersion;
   }
-};
+}
 
 /**
  * Will register an interval that will poll the server for the latest version of the app.
@@ -52,5 +65,14 @@ const checkVersion = async (currentVersion, onNewVersionAvailable) => {
  * @returns {void} - nothing
  */
 export function startNewVersionPolling(currentVersion, onNewVersionAvailable) {
-  window.setInterval(() => checkVersion(currentVersion, onNewVersionAvailable), CHECK_INTERVAL);
+  newVersionListeners.push({currentVersion, onNewVersionAvailable});
+  if (newVersionListeners.length === 1) {
+    // starts the interval when we have our first listener
+    pollInterval = window.setInterval(checkVersion, CHECK_INTERVAL);
+  }
+}
+
+export function stopNewVersionPolling() {
+  newVersionListeners = [];
+  window.clearInterval(pollInterval);
 }
