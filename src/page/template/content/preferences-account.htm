@@ -81,7 +81,7 @@
             <div class="preferences-account-name" data-bind="text: name" data-uie-name="status-name"></div>
           </div>
           <hr class="preferences-separator">
-          <div class="preferences-link text-theme" data-bind="click: clickOnLeaveGuestRoom, text: t('preferencesAccountLeaveGuestRoom')" data-uie-name="do-leave-guest-room"></div>
+          <div class="preferences-link accent-text" data-bind="click: clickOnLeaveGuestRoom, text: t('preferencesAccountLeaveGuestRoom')" data-uie-name="do-leave-guest-room"></div>
           <div class="preferences-leave-disclaimer" data-bind="text: t('preferencesAccountLeaveGuestRoomDescription')"></div>
         <!-- /ko -->
       </div>
@@ -117,7 +117,7 @@
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesAccountData')"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
+          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionPrivacy}" data-uie-name="status-preference-privacy">
             <input type="checkbox" id="privacy-checkbox" data-bind="checked: optionPrivacy">
             <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="text: t('preferencesAccountDataCheckbox')"></label>
           </div>
@@ -126,7 +126,7 @@
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">
-            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionMarketingConsent}" data-uie-name="status-preference-marketing">
+            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionMarketingConsent}" data-uie-name="status-preference-marketing">
               <input type="checkbox" id="marketing-checkbox" data-bind="checked: optionMarketingConsent, event: {change: onMarketingConsentChange}">
               <label class="preferences-options-checkbox-label" for="marketing-checkbox" data-bind="text: t('preferencesAccountMarketingConsentCheckbox')"></label>
             </div>
@@ -140,7 +140,7 @@
       <hr class="preferences-separator">
       <header class="preferences-header" data-bind="text: t('preferencesAccountPrivacy')"></header>
       <div class="preferences-option">
-        <div class="preferences-option-icon checkbox text-theme" data-uie-name="status-preference-read-receipts">
+        <div class="preferences-option-icon checkbox accent-text" data-uie-name="status-preference-read-receipts">
           <input type="checkbox" id="read-receipts-checkbox" data-bind="checked: optionReadReceipts, event: {change: onReadReceiptsChange}">
           <label class="preferences-options-checkbox-label" for="read-receipts-checkbox" data-bind="text: t('preferencesAccountReadReceiptsCheckbox')"></label>
         </div>
@@ -152,9 +152,9 @@
       <section class="preferences-section preferences-section-conversation-history">
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesOptionsBackupHeader')"></header>
-        <div class="preferences-link text-theme" data-bind="click: clickOnBackupExport, text: t('preferencesOptionsBackupExportHeadline')" data-uie-name="do-backup-export"></div>
+        <div class="preferences-link accent-text" data-bind="click: clickOnBackupExport, text: t('preferencesOptionsBackupExportHeadline')" data-uie-name="do-backup-export"></div>
         <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupExportSecondary')"></div>
-        <label class="preferences-link text-theme preferences-history-backup-import-field" data-uie-name="do-backup-import">
+        <label class="preferences-link accent-text preferences-history-backup-import-field" data-uie-name="do-backup-import">
           <span data-bind="text: t('preferencesOptionsBackupImportHeadline')"></span>
           <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}" data-uie-name="input-import-file"/>
         </label>
@@ -165,26 +165,26 @@
         <hr class="preferences-separator">
 
         <!-- ko if: z.userPermission().canManageTeam() && !!manageTeamUrl -->
-          <div class="preferences-link text-theme" data-bind="click: clickOpenManageTeam, text: t('preferencesAccountManageTeam')" data-uie-name="do-manage-team"></div>
+          <div class="preferences-link accent-text" data-bind="click: clickOpenManageTeam, text: t('preferencesAccountManageTeam')" data-uie-name="do-manage-team"></div>
         <!-- /ko -->
 
         <!-- ko if: !isMacOsWrapper && !!createTeamUrl -->
-          <a class="preferences-link text-theme" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
+          <a class="preferences-link accent-text" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
         <!-- /ko -->
 
         <!-- ko ifnot: selfUser().isSingleSignOn -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), attr: {title: t('tooltipPreferencesPassword')}" data-uie-name="do-reset-password"></div>
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), attr: {title: t('tooltipPreferencesPassword')}" data-uie-name="do-reset-password"></div>
         <!-- /ko -->
 
         <!-- ko ifnot: isTeam() -->
-          <div class="preferences-link text-theme" data-bind="click: clickOnDeleteAccount, text: t('preferencesAccountDelete')" data-uie-name="go-delete-account"></div>
+          <div class="preferences-link accent-text" data-bind="click: clickOnDeleteAccount, text: t('preferencesAccountDelete')" data-uie-name="go-delete-account"></div>
         <!-- /ko -->
       </section>
     <!-- /ko -->
 
     <!-- ko if: isActivatedAccount() && !z.util.Environment.desktop -->
       <section class="preferences-section">
-        <div class="preferences-link text-theme" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
+        <div class="preferences-link accent-text" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
       </section>
     <!-- /ko -->
   </div>

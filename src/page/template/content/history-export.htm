@@ -4,7 +4,7 @@
   <!-- /ko -->
   <!-- ko if: isExporting -->
     <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
-    <div class="cancel-button text-theme" data-bind="click: onCancel, text: t('backupCancel')" data-uie-name="do-cancel-history-export"></div>
+    <div class="cancel-button accent-text" data-bind="click: onCancel, text: t('backupCancel')" data-uie-name="do-cancel-history-export"></div>
   <!-- /ko -->
   <!-- ko if: isDone -->
     <div class="history-message">
@@ -14,7 +14,7 @@
         <button class="button" data-bind="click: downloadArchiveFile, text: t('backupExportSaveFileAction')" data-uie-name="do-save-history-export"></button>
       </div>
     </div>
-    <div class="cancel-button text-theme" data-bind="click: dismissExport, text: t('backupCancel')" data-uie-name="do-cancel-history-export"></div>
+    <div class="cancel-button accent-text" data-bind="click: dismissExport, text: t('backupCancel')" data-uie-name="do-cancel-history-export"></div>
   <!-- /ko -->
   <!-- ko if: hasError -->
     <div class="history-message" data-uie-name="status-history-export-error">

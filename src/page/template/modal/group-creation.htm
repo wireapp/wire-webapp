@@ -7,7 +7,7 @@
         </div>
         <span class="label-xs group-creation-modal-title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></span>
         <div class="group-creation-header-block">
-          <span class="group-creation-modal-action text-theme pull-right enabled" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></span>
+          <span class="group-creation-modal-action accent-text pull-right enabled" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></span>
         </div>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
@@ -16,7 +16,7 @@
         </div>
         <span class="label-xs group-creation-modal-title" data-bind="text: t('groupCreationPreferencesHeader')"></span>
         <div class="group-creation-header-block">
-          <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction')" data-uie-name="go-next"></span>
+          <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction')" data-uie-name="go-next"></span>
         </div>
       <!-- /ko -->
     </div>

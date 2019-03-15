@@ -85,7 +85,7 @@ class AudioSeekBarComponent {
   }
 
   _onLevelClick(event) {
-    const mouse_x = event.pageX - $(event.currentTarget).offset().left;
+    const mouse_x = event.pageX - event.currentTarget.getBoundingClientRect().left;
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
 
@@ -95,11 +95,11 @@ class AudioSeekBarComponent {
 
   _onTimeUpdate() {
     const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
-    this.levels.forEach((level, levelIndex) => level.classList.toggle('bg-theme', levelIndex <= index));
+    this.levels.forEach((level, levelIndex) => level.classList.toggle('active', levelIndex <= index));
   }
 
   _onAudioEnded() {
-    this.levels.forEach(level => level.classList.remove('bg-theme'));
+    this.levels.forEach(level => level.classList.remove('active'));
   }
 
   dispose() {
