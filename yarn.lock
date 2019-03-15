@@ -5451,12 +5451,12 @@ grunt-npm-bower@0.0.4:
     fs-extra "4.0.2"
     glob "7.1.2"
 
-grunt-open@0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/grunt-open/-/grunt-open-0.2.3.tgz#145ac45026a57fcfaa433ffd7398ae46d2bd3957"
-  integrity sha1-FFrEUCalf8+qQz/9c5iuRtK9OVc=
+grunt-open@0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/grunt-open/-/grunt-open-0.2.4.tgz#dd4ff767a04b2ff706d7333696f40ecb0869d218"
+  integrity sha512-3VxPWr6zZBVvEPtCMkjVtP30saT/VDIeUE8nWs8Y2tNgUPROKwWoWFwo1AUTNRM5oufJ2PL1eMVaL7Byv4NhQg==
   dependencies:
-    open "~0.0.4"
+    opn "^5.4.0"
 
 grunt-postcss@0.9.0:
   version "0.9.0"
@@ -6519,6 +6519,11 @@ is-word-character@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-word-character/-/is-word-character-1.0.2.tgz#46a5dac3f2a1840898b91e576cd40d493f3ae553"
   integrity sha512-T3FlsX8rCHAH8e7RE7PfOPZVFQlcV3XRF9eOOBQ1uf70OxO7CjjSOjeImMPCADBdYWcStAbVbYvJ1m2D3tb+EA==
+
+is-wsl@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/is-wsl/-/is-wsl-1.1.0.tgz#1f16e4aa22b04d1336b66188a66af3c600c3a66d"
+  integrity sha1-HxbkqiKwTRM2tmGIpmrzxgDDpm0=
 
 isarray@0.0.1:
   version "0.0.1"
@@ -8409,10 +8414,12 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-open@~0.0.4:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/open/-/open-0.0.5.tgz#42c3e18ec95466b6bf0dc42f3a2945c3f0cad8fc"
-  integrity sha1-QsPhjslUZra/DcQvOilFw/DK2Pw=
+opn@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/opn/-/opn-5.4.0.tgz#cb545e7aab78562beb11aa3bfabc7042e1761035"
+  integrity sha512-YF9MNdVy/0qvJvDtunAOzFw9iasOQHpVthTCvGzxt61Il64AYSGdK+rYwld7NAfk9qJ7dt+hymBNSc9LNYS+Sw==
+  dependencies:
+    is-wsl "^1.1.0"
 
 optimist@^0.6.1:
   version "0.6.1"
