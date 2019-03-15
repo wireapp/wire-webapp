@@ -97,7 +97,7 @@
     "grunt-gitinfo": "0.1.8",
     "grunt-include-replace": "5.0.0",
     "grunt-npm-bower": "0.0.4",
-    "grunt-open": "0.2.3",
+    "grunt-open": "0.2.4",
     "grunt-postcss": "0.9.0",
     "grunt-shell": "3.0.1",
     "husky": "1.3.1",
