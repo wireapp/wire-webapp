@@ -9,7 +9,7 @@
     "emotion-normalize": "10.0.0",
     "react": "16.8.4",
     "react-dom": "16.8.4",
-    "react-transition-group": "2.6.0"
+    "react-transition-group": "2.6.1"
   },
   "devDependencies": {
     "@babel/cli": "7.2.3",
