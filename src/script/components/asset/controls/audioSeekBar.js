@@ -90,11 +90,11 @@ class AudioSeekBarComponent {
     const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
 
     this.audioElement.currentTime = NumberUtil.clamp(currentTime, 0, this.audioElement.duration);
-    this._onTimeUpdate();
+    this._onTimeUpdate(event);
   }
 
-  _onTimeUpdate() {
-    const index = Math.floor((this.audioElement.currentTime / this.audioElement.duration) * this.levels.length);
+  _onTimeUpdate(event) {
+    const index = Math.floor((event.target.currentTime / event.target.duration) * this.levels.length);
     this.levels.forEach((level, levelIndex) => level.classList.toggle('active', levelIndex <= index));
   }
 

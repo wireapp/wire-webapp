@@ -39,8 +39,9 @@ describe('audio-seek-bar', () => {
 
   it('renders level indicators for the audio asset', async () => {
     const audioSeekBar = await instantiateComponent('audio-seek-bar', defaultParams);
+    const numberOfLevels = Math.floor(audioSeekBar.offsetWidth / 3);
 
-    expect(audioSeekBar.children[0].childElementCount).toEqual(261);
+    expect(audioSeekBar.children[0].childElementCount).toEqual(numberOfLevels);
   });
 
   it('updates on audio events', async () => {
@@ -51,7 +52,7 @@ describe('audio-seek-bar', () => {
 
     const audioSeekBar = await instantiateComponent('audio-seek-bar', params);
     const levels = Array.from(audioSeekBar.children[0].children);
-    const halfOfLevels = Math.ceil(levels.length / 2);
+    const halfOfLevels = Math.ceil((levels.length + 1) / 2);
     const activeLevelCount = () => levels.filter(level => level.classList.contains(activeClass)).length;
 
     audioElement.dispatchEvent(new Event('timeupdate'));
@@ -70,11 +71,12 @@ describe('audio-seek-bar', () => {
     const params = Object.assign({}, defaultParams, {src: audioElement});
 
     const audioSeekBar = await instantiateComponent('audio-seek-bar', params);
-    const clickPositionX = audioSeekBar.offsetWidth / 2;
+    const clickPositionX = Math.floor(audioSeekBar.offsetWidth / 2);
+    const expected = (1000 / audioSeekBar.offsetWidth) * clickPositionX;
     const margin = 8;
     const element = audioSeekBar.querySelector('div');
     element.dispatchEvent(new MouseEvent('click', {clientX: clickPositionX + margin}));
 
-    expect(audioElement.currentTime).toEqual(500);
+    expect(audioElement.currentTime).toEqual(expected);
   });
 });
