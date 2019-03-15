@@ -333,8 +333,10 @@ class MessageListViewModel {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         return this.conversation_repository.getSubsequentMessages(this.conversation(), lastMessage, false);
       }
-      // is the message is the last of the conversation, then we update the last read timestamp of the conversation
-      this.updateConversationLastRead(this.conversation(), lastMessage);
+      if (document.hasFocus()) {
+        // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
+        this.updateConversationLastRead(this.conversation(), lastMessage);
+      }
     }
     return Promise.resolve();
   }
