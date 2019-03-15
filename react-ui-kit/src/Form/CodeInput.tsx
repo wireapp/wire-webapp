@@ -60,7 +60,7 @@ export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
 
 const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}: CodeInputProps) => {
   const [values, setValues] = useState(Array(digits).fill(''));
-  const inputs = Array.from({length: digits}, () => useRef(null));
+  const inputs = Array(digits);
 
   const forceSelection = (
     event:
@@ -83,19 +83,21 @@ const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}
   const nextField = (currentFieldIndex: number) => {
     const nextFieldIndex = currentFieldIndex + 1;
     if (nextFieldIndex < digits) {
-      inputs[nextFieldIndex].current.focus();
+      inputs[nextFieldIndex].focus();
     }
   };
 
   const previousField = (currentFieldIndex: number) => {
     if (currentFieldIndex > 0) {
-      inputs[currentFieldIndex - 1].current.focus();
+      inputs[currentFieldIndex - 1].focus();
     }
   };
 
   const setValue = (fieldIndex: number, value: string) => {
     if (/^[0-9]?$/.test(value)) {
-      setValues({...[], ...values, [fieldIndex]: value});
+      const valuesCopy = values.slice();
+      valuesCopy[fieldIndex] = value;
+      setValues(valuesCopy);
       if (value.length) {
         nextField(fieldIndex);
       }
@@ -152,7 +154,7 @@ const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}
           onTouchStart={forceSelectionPreventDefault}
           onKeyDown={event => handleKeyDown(index, event)}
           onKeyUp={forceSelection}
-          ref={inputs[index]}
+          ref={node => (inputs[index] = node)}
           type="text"
           value={values[index]}
           onChange={() => {}}
