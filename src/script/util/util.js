@@ -25,6 +25,7 @@ import CryptoJS from 'crypto-js';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
 import marked from './marked.js';
+import MarkdownIt from 'markdown-it';
 import StringUtilGlobal from './StringUtil';
 /* eslint-enable no-unused-vars */
 
@@ -291,6 +292,11 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
+const markdownit = new MarkdownIt('zero', {
+  breaks: true,
+  linkify: true,
+}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify']);
+
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
   const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
@@ -325,7 +331,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       );
     }, message);
 
-  mentionlessText = marked(mentionlessText, {
+  markdownit.set({
     highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
@@ -338,11 +344,9 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       }
       return hljs.highlightAuto(code).value;
     },
-    sanitize: true,
   });
 
-  // TODO: Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  mentionlessText = mentionlessText.replace(/\n/g, '<br />');
+  mentionlessText = markdownit.renderInline(mentionlessText);
 
   // Remove <br /> if it is the last thing in a message
   if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
