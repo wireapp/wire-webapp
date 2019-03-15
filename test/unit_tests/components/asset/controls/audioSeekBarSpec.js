@@ -77,6 +77,6 @@ describe('audio-seek-bar', () => {
     const element = audioSeekBar.querySelector('div');
     element.dispatchEvent(new MouseEvent('click', {clientX: clickPositionX + margin}));
 
-    expect(audioElement.currentTime).toEqual(expected);
+    expect(Math.round(audioElement.currentTime)).toEqual(Math.round(expected));
   });
 });
