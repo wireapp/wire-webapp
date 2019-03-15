@@ -341,7 +341,7 @@ const unableToDecryptTemplate = `
     <div class="message-header-label ellipsis">
       <span data-bind="html: message.htmlCaption()"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="text: t('conversationUnableToDecryptLink'), attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="accent-text" data-bind="text: t('conversationUnableToDecryptLink'), attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
@@ -349,8 +349,8 @@ const unableToDecryptTemplate = `
     <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
     <!-- ko if: message.is_recoverable -->
       <div class="message-header-decrypt-reset-session">
-        <loading-icon class="svg-accent-color" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
-        <span class="message-header-decrypt-reset-session-action button-label text-theme"
+        <loading-icon class="accent-fill" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
+        <span class="message-header-decrypt-reset-session-action button-label accent-text"
               data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
       </div>
     <!-- /ko -->
@@ -422,15 +422,15 @@ const verificationTemplate = `
       <!-- ko if: message.isTypeUnverified() -->
         <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
         <span class="ellipsis" data-bind="text: t('conversationDeviceUnverified')"></span>
-        <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewDevice() -->
         <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
         <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
+        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="text: t('conversationDeviceNewPeopleJoined')"></span>&nbsp;<span class="message-verification-action text-theme" data-bind="click: () => showDevice(message), text: t('conversationDeviceNewPeopleJoinedVerify')" data-uie-name="go-devices"></span>
+        <span class="ellipsis" data-bind="text: t('conversationDeviceNewPeopleJoined')"></span>&nbsp;<span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: t('conversationDeviceNewPeopleJoinedVerify')" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -471,7 +471,7 @@ const memberTemplate = `
                    data-bind="css: {'avatar-no-badge': message.otherUser().isOutgoingRequest()}"
                    params="participant: message.otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
-        <div class="message-connected-cancel text-theme"
+        <div class="message-connected-cancel accent-text"
              data-bind="click: () => onClickCancelRequest(message),
                         text: t('conversationConnectionCancelRequest')"
              data-uie-name="do-cancel-request"></div>

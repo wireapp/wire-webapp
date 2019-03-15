@@ -39,7 +39,7 @@
 
 .conversation-input-bar-text,
 .shadow-input {
-  .accent-selection-color;
+  .accent-selection;
   .reset-textarea;
 
   width: 100%;
@@ -64,7 +64,7 @@
   }
 
   &--accent::placeholder {
-    .accent-color;
+    color: var(--accent-color);
   }
 }
 
@@ -106,7 +106,7 @@
     white-space: pre-wrap;
 
     .input-mention {
-      .accent-color;
+      color: var(--accent-color);
     }
   }
 }
@@ -174,11 +174,12 @@
 
 .conversation-input-bar-paste-send {
   .circle(32px);
-
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16px;
+
+  background-color: var(--accent-color);
   cursor: pointer;
   line-height: 0;
 

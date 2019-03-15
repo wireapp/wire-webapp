@@ -42,7 +42,16 @@
   display: flex;
   width: 100%;
   justify-content: center;
+  background-color: var(--accent-color);
   color: #fff;
+
+  a {
+    color: @w-white;
+    &:hover,
+    &:focus {
+      color: fade(@w-white, 80%);
+    }
+  }
 }
 
 .warning-bar-feature {

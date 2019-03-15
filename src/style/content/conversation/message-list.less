@@ -38,7 +38,7 @@
   }
 
   & * {
-    .accent-selection-color;
+    .accent-selection;
   }
 
   &:last-child {
@@ -92,8 +92,7 @@
   }
 
   .message-mention {
-    .accent-color;
-
+    color: var(--accent-color);
     font-weight: @font-weight-bold;
 
     .mention-at-sign {
@@ -124,9 +123,8 @@
   }
 
   .message-body {
-    .accent-background-color(24%);
-
     animation: @animation-timing-slower * 2 @ease-out-quart 1s forwards marked-animation;
+    background-color: var(--accent-color-fade-24);
   }
 }
 
@@ -267,6 +265,11 @@
     display: none;
   }
 
+  .message-unread-dot {
+    .dot-md;
+    background-color: var(--accent-color);
+  }
+
   &:not(.message-timestamp-unread) {
     .message-unread-dot {
       display: none;
@@ -308,7 +311,7 @@
 
   .text {
     .text-selection;
-    .accent-selection-color;
+    .accent-selection;
 
     display: inline-block;
     width: 100%;
@@ -777,8 +780,8 @@ image-asset {
 
 // TODO make generic class
 .ephemeral-message-obfuscated {
+  color: var(--accent-color);
   font-family: @font-family-ephemeral;
-  .accent-color;
 }
 
 .ephemeral-asset-expired {

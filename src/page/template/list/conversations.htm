@@ -40,7 +40,7 @@
 
           <div class="conversation-list-cell-center">
             <span class="conversation-list-cell-name"
-                  data-bind="text: connectRequestsText, css: {'text-theme': stateIsRequests()}"
+                  data-bind="text: connectRequestsText, css: {'accent-text': stateIsRequests()}"
                   data-uie-name="item-pending-requests"></span>
           </div>
 
@@ -76,6 +76,6 @@
     <!-- ko if: archivedConversations().length > 0 -->
       <archive-icon class="svg-button" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
     <!-- /ko -->
-    <settings-icon class="conversations-settings button-icon-large text-theme" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
+    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>

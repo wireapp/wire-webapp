@@ -41,7 +41,7 @@ ko.components.register('availability-state', {
         <availability-busy-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="busy"></availability-busy-icon>
       <!-- /ko -->
       <!-- ko if: $data.label -->
-        <div class="availability-state-label" data-bind="css: {'text-theme': theme}, text: $data.label" data-uie-name="status-label"></div>
+        <div class="availability-state-label" data-bind="css: {'accent-text': theme}, text: $data.label" data-uie-name="status-label"></div>
       <!-- /ko -->
       <!-- ko if: $data.showArrow -->
         <span class="availability-state-arrow"></span>

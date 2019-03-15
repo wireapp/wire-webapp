@@ -4,7 +4,7 @@
   <!-- /ko -->
   <!-- ko if: isImporting -->
     <loading-bar params="progress: loadingProgress, message: loadingMessage" class="with-cancel"></loading-bar>
-    <div class="cancel-button text-theme" data-bind="click: onCancel, text: t('backupCancel')" data-uie-name="do-cancel-history-import"></div>
+    <div class="cancel-button accent-text" data-bind="click: onCancel, text: t('backupCancel')" data-uie-name="do-cancel-history-import"></div>
   <!-- /ko -->
   <!-- ko if: isDone -->
     <div class="history-message">

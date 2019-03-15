@@ -86,13 +86,13 @@
 // <div class="button-round button-round-theme icon-plus"></div>
 //
 .button-round-theme {
-  .accent-background-color;
+  background-color: var(--accent-color);
   .button-round-color;
   &.toggled {
-    .accent-color;
+    color: var(--accent-color);
   }
   &.disabled {
-    .accent-color(24%);
+    color: var(--accent-color-fade-24);
   }
 }
 
