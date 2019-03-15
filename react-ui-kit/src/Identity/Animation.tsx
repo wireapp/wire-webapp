@@ -17,7 +17,7 @@
  *
  */
 
-const {CSSTransition} = require('react-transition-group');
+const {CSSTransition, TransitionGroup} = require('react-transition-group');
 import {ClassNames} from '@emotion/core';
 import React from 'react';
 import {DURATION, EASE} from './motions';
@@ -36,6 +36,15 @@ type MovementProps = TransitionProps & {
   startValue?: string;
   endValue?: string;
 };
+
+type TransitionContainerProps = React.HTMLProps<any> & {
+  component?: keyof JSX.IntrinsicElements;
+  appear?: boolean;
+  enter?: boolean;
+  exit?: boolean;
+};
+
+const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
 
 const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => (
   <ClassNames>
@@ -148,12 +157,13 @@ const TopDownMovement = props => <YAxisMovement startValue="-100%" endValue="0%"
 const BottomUpMovement = props => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
 
 export {
-  Slide,
-  Opacity,
-  TopDownMovement,
   BottomUpMovement,
-  YAxisMovement,
   LeftRightMovement,
+  Opacity,
   RightLeftMovement,
+  Slide,
+  TopDownMovement,
+  TransitionContainer,
   XAxisMovement,
+  YAxisMovement,
 };
