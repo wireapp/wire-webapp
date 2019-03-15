@@ -37,3 +37,5 @@ z.util.NumberUtil = {
     return Math.sqrt(sum) / floatArray.length;
   },
 };
+
+export const NumberUtil = z.util.NumberUtil;

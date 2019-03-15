@@ -16,6 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import {ArrayUtil} from 'utils/ArrayUtil';
+import {NumberUtil} from 'utils/NumberUtil';
+
 class AudioSeekBarComponent {
   /**
    * Construct a audio seek bar that renders audio levels.
@@ -42,7 +46,7 @@ class AudioSeekBarComponent {
 
     const assetMeta = params.asset.meta;
     if (assetMeta !== null && assetMeta.loudness !== null) {
-      this.loudness = this._normalizeLoudness(assetMeta.loudness, componentInfo.element.clientHeight);
+      this.loudness = this._normalizeLoudness(assetMeta.loudness, this.element.clientHeight);
     }
 
     this._onResizeFired = _.debounce(() => {
@@ -57,13 +61,13 @@ class AudioSeekBarComponent {
     this._onAudioEnded = this._onAudioEnded.bind(this);
     this.audioElement.addEventListener('ended', this._onAudioEnded);
     this.audioElement.addEventListener('timeupdate', this._onTimeUpdate);
-    componentInfo.element.addEventListener('click', this._onLevelClick);
+    this.element.addEventListener('click', this._onLevelClick);
     window.addEventListener('resize', this._onResizeFired);
   }
 
   _renderLevels() {
     const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
-    const scaledLoudness = z.util.ArrayUtil.interpolate(this.loudness, numberOfLevelsFitOnScreen);
+    const scaledLoudness = ArrayUtil.interpolate(this.loudness, numberOfLevelsFitOnScreen);
     this.element.innerHTML = '';
 
     this.levels = scaledLoudness.map(loudness => {
@@ -85,7 +89,7 @@ class AudioSeekBarComponent {
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
 
-    this.audioElement.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.audioElement.duration);
+    this.audioElement.currentTime = NumberUtil.clamp(currentTime, 0, this.audioElement.duration);
     this._onTimeUpdate();
   }
 

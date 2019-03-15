@@ -128,3 +128,5 @@ z.util.ArrayUtil = {
     }
   },
 };
+
+export const ArrayUtil = z.util.ArrayUtil;
