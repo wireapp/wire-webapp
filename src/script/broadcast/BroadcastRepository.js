@@ -32,47 +32,62 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * @param {ClientRepository} clientRepository - Repository for client interactions
    * @param {ConversationRepository} conversationRepository - Repository for conversation interactions
    * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {UserRepository} userRepository - Repository for all user interactions
+   * @param {MessageSender} messageSender - Responsible for queueing and sending messages
    */
-  constructor(broadcastService, clientRepository, conversationRepository, cryptographyRepository, userRepository) {
+  constructor(broadcastService, clientRepository, conversationRepository, cryptographyRepository, messageSender) {
     this.broadcastService = broadcastService;
     this.clientRepository = clientRepository;
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
-    this.userRepository = userRepository;
+    this.messageSender = messageSender;
     this.logger = Logger('z.broadcast.BroadcastRepository');
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 
-    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, this.broadcastGenericMessage.bind(this));
+    /*
+    FIXME this should not be handled by an event. This an action we want to perform, thus should be a direct method call.
+    To do that, we need to inject the BroadcastRepository into the UserRepository.
+    But this will create a cyclic dependency that we need to resolve first.
+    As of now, the cyclic dependency would go like this:
+      - ConversationRepo needs UserRepository
+      - UserRepostory needs BroadcastRepository
+      - BroadcastRepository needs ConversationRepository
+
+    Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
+    The heavy lifting resides in generalizing the `clientMismatchHandler` so that it doesn't need to directly call the ConversationRepo
+    */
+    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
+      this.broadcastGenericMessage(genericMessage, recipients);
+    });
   }
 
-  broadcastGenericMessage(genericMessage) {
-    return this.conversationRepository.sending_queue.push(() => {
-      return this._createBroadcastRecipients()
-        .then(recipients => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage))
-        .then(payload => {
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
-          this._sendEncryptedMessage(eventInfoEntity, payload);
-        });
+  /**
+   * @param {GenericMessage} genericMessage - Generic message that will be send
+   * @param {Array<User>} userEntities - Recipients of the message
+   * @returns {Promise} - resolves when the message is sent
+   */
+  broadcastGenericMessage(genericMessage, userEntities) {
+    return this.messageSender.queueMessage(() => {
+      const recipients = this._createBroadcastRecipients(userEntities);
+      return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
+        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
+        this._sendEncryptedMessage(eventInfoEntity, payload);
+      });
     });
   }
 
   /**
    * Create a user client map for a broadcast message.
    * @private
+   * @param {Array<User>} userEntities - Recipients of the message
    * @returns {Promise} Resolves with a user client map
    */
-  _createBroadcastRecipients() {
-    return Promise.resolve().then(() => {
-      const recipients = {};
-
-      for (const userEntity of this.userRepository.teamUsers().concat(this.userRepository.self())) {
-        recipients[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
-      }
-
-      return recipients;
-    });
+  _createBroadcastRecipients(userEntities) {
+    return userEntities.reduce((recipientsIndex, userEntity) => {
+      return Object.assign({}, recipientsIndex, {
+        [userEntity.id]: userEntity.devices().map(clientEntity => clientEntity.id),
+      });
+    }, {});
   }
 
   /**
@@ -115,13 +130,13 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
       });
   }
 
-  _getNumberOfClients() {
-    return this.userRepository.teamUsers().reduce((accumulator, userEntity) => {
+  _getNumberOfClients(userEntities) {
+    return userEntities.reduce((accumulator, userEntity) => {
       if (userEntity.devices().length) {
         return accumulator + userEntity.devices().length;
       }
       return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
-    }, this.userRepository.self().devices().length);
+    });
   }
 
   /**

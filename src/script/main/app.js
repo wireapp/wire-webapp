@@ -156,6 +156,7 @@ class App {
       repositories.event,
       repositories.giphy,
       resolve(graph.LinkPreviewRepository),
+      resolve(graph.MessageSender),
       repositories.serverTime,
       repositories.team,
       repositories.user,
@@ -192,6 +193,7 @@ class App {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
+      resolve(graph.MessageSender),
       repositories.user
     );
     repositories.calling = new z.calling.CallingRepository(

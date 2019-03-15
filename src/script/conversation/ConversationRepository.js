@@ -89,6 +89,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {EventRepository} eventRepository - Repository that handles events
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
+   * @param {MessageSender} messageSender - Message sending queue handler
    * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
@@ -104,6 +105,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     eventRepository,
     giphy_repository,
     link_repository,
+    messageSender,
     serverTimeRepository,
     team_repository,
     user_repository,
@@ -187,12 +189,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
-    this.sending_queue = new PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
+    this.messageSender = messageSender;
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     this.conversation_service.backendClient.queueState.subscribe(queueState => {
       const queueReady = queueState === z.service.QUEUE_STATE.READY;
-      this.sending_queue.pause(!queueReady || this.block_event_handling());
+      this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
     });
 
     this.conversations_archived = ko.observableArray([]);
@@ -1206,7 +1208,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (this.block_event_handling() !== updated_handling_state) {
       this.block_event_handling(updated_handling_state);
-      this.sending_queue.pause(this.block_event_handling());
+      this.messageSender.pauseQueue(this.block_event_handling());
       this.logger.info(`Block handling of conversation events: ${this.block_event_handling()}`);
     }
   }
@@ -1947,7 +1949,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       messageId: z.util.createRandomUuid(),
     });
 
-    this.sending_queue.push(() => {
+    this.messageSender.queueMessage(() => {
       return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
@@ -1966,8 +1968,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the confirmation was sent
    */
   sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity) {
-    return this.sending_queue
-      .push(() => {
+    return this.messageSender
+      .queueMessage(() => {
         const options = eventInfoEntity.options;
         const recipientsPromise = options.recipients
           ? Promise.resolve(eventInfoEntity)
@@ -2370,7 +2372,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   sendGenericMessageToConversation(eventInfoEntity) {
-    return this.sending_queue.push(() => {
+    return this.messageSender.queueMessage(() => {
       return this.create_recipients(eventInfoEntity.conversationId).then(recipients => {
         eventInfoEntity.updateOptions({recipients});
         return this._sendGenericMessage(eventInfoEntity);
@@ -2807,7 +2809,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           messageId: z.util.createRandomUuid(),
         });
 
-        return this.sending_queue.push(() => {
+        return this.messageSender.queueMessage(() => {
           return this.create_recipients(conversationId, false, precondition).then(recipients => {
             const options = {precondition, recipients};
             const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationId, options);

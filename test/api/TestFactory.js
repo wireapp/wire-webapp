@@ -324,6 +324,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.event_repository,
         undefined,
         resolve(graph.LinkPreviewRepository),
+        resolve(graph.MessageSender),
         resolve(graph.ServerTimeRepository),
         TestFactory.team_repository,
         TestFactory.user_repository,
