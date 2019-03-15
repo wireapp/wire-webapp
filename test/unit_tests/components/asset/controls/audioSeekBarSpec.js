@@ -24,7 +24,7 @@ import ko from 'knockout';
 import 'src/script/components/asset/controls/audioSeekBar';
 
 describe('audio-seek-bar', () => {
-  const activeClass = 'bg-theme';
+  const activeClass = 'active';
   const loudness = new Uint8Array(Array.from({length: 200}, (item, index) => index));
   const audioAsset = {
     meta: {
