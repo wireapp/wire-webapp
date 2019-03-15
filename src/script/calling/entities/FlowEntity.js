@@ -461,6 +461,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return;
     }
 
+    // disabling connection state and signaling state handlers
+    this.peerConnection.oniceconnectionstatechange = () => {};
+    this.peerConnection.onsignalingstatechange = () => {};
+
     const connectionMediaStreamTracks = this.peerConnection.getReceivers
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
       : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
