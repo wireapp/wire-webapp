@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.31](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.30...@wireapp/react-ui-kit@5.0.31) (2019-03-15)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Wrap TransitionGroup in TransitionContainer ([#1646](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1646)) ([c46c361](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/c46c361))
+
+
+
+
+
 ## [5.0.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.29...@wireapp/react-ui-kit@5.0.30) (2019-03-14)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
