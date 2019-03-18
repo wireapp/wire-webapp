@@ -25,7 +25,7 @@
     "rimraf": "2.6.3",
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
-    "webpack-cli": "3.2.3",
+    "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.2.1"
   },
   "license": "GPL-3.0",
