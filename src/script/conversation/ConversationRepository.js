@@ -54,6 +54,8 @@ import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
 import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
+import {getNextItem} from 'utils/ArrayUtil';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -904,7 +906,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Next conversation
    */
   get_next_conversation(conversation_et) {
-    return z.util.ArrayUtil.getNextItem(this.conversations_unarchived(), conversation_et);
+    return getNextItem(this.conversations_unarchived(), conversation_et);
   }
 
   /**

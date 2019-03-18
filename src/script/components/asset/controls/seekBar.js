@@ -17,6 +17,8 @@
  *
  */
 
+import {clamp} from 'utils/NumberUtil';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -80,7 +82,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
 
   on_change() {
     const currentTime = this.media_element.duration * (this.seek_bar.value / 100);
-    this.media_element.currentTime = z.util.NumberUtil.clamp(currentTime, 0, this.media_element.duration);
+    this.media_element.currentTime = clamp(currentTime, 0, this.media_element.duration);
   }
 
   on_timeupdate() {

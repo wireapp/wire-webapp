@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import {iterateItem} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -156,7 +157,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
       : this.conversationRepository.active_conversation();
 
-    const nextItem = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activeConversationItem, reverse);
+    const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
     const isConnectionRequestItem = nextItem === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isConnectionRequestItem) {
@@ -176,7 +177,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       activePreference = z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
-    const nextPreference = z.util.ArrayUtil.iterateItem(this.visibleListItems(), activePreference, reverse);
+    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse);
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }

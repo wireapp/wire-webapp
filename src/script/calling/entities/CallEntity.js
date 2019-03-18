@@ -23,6 +23,7 @@ import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';
 import TERMINATION_REASON from '../enum/TerminationReason';
+import {getRandomNumber} from 'utils/NumberUtil';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -527,7 +528,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _setSendGroupCheckTimeout() {
     const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
-    const timeoutInSeconds = z.util.NumberUtil.getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
+    const timeoutInSeconds = getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
     const timeout = timeoutInSeconds * TimeUtil.UNITS_IN_MILLIS.SECOND;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);

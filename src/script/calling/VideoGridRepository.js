@@ -17,6 +17,8 @@
  *
  */
 
+import {getDifference} from 'utils/ArrayUtil';
+
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
@@ -100,7 +102,7 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     const previousStreamIds = previousGrid.filter(streamId => streamId !== 0);
     const currentStreamIds = streams.map(stream => stream.id);
 
-    const addedStreamIds = z.util.ArrayUtil.getDifference(previousStreamIds, currentStreamIds);
+    const addedStreamIds = getDifference(previousStreamIds, currentStreamIds);
 
     const filteredGrid = previousGrid.map(id => (currentStreamIds.includes(id) ? id : 0));
 

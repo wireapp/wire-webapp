@@ -18,6 +18,8 @@
  */
 
 import getSlug from 'speakingurl';
+import {inRange} from 'utils/NumberUtil';
+import {randomElement} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -82,11 +84,7 @@ const stringUtil = {
 
   getRandomChar: () => {
     let charIndex;
-    while (
-      !z.util.NumberUtil.inRange(charIndex, 1, 9) &&
-      !z.util.NumberUtil.inRange(charIndex, 65, 90) &&
-      !z.util.NumberUtil.inRange(charIndex, 97, 122)
-    ) {
+    while (!inRange(charIndex, 1, 9) && !inRange(charIndex, 65, 90) && !inRange(charIndex, 97, 122)) {
       charIndex = Math.floor(Math.random() * 122);
     }
 
@@ -120,7 +118,7 @@ const stringUtil = {
       if (character.match(/[\n\r\s]+/gi)) {
         obfuscated += character;
       } else {
-        obfuscated += z.util.ArrayUtil.randomElement(alphabet);
+        obfuscated += randomElement(alphabet);
       }
     }
 

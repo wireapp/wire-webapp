@@ -17,6 +17,8 @@
  *
  */
 
+import {clamp} from 'utils/NumberUtil';
+
 class MentionSuggestions {
   constructor(params) {
     this.onInput = this.onInput.bind(this);
@@ -90,7 +92,7 @@ class MentionSuggestions {
 
   moveSelection(delta) {
     const currentIndex = this.selectedSuggestionIndex();
-    const newIndex = z.util.NumberUtil.clamp(currentIndex + delta, 0, this.suggestions().length - 1);
+    const newIndex = clamp(currentIndex + delta, 0, this.suggestions().length - 1);
     this.selectedSuggestionIndex(newIndex);
     return true;
   }
@@ -146,7 +148,7 @@ class MentionSuggestions {
 
   updateSelectedIndexBoundaries(suggestions) {
     const currentIndex = this.selectedSuggestionIndex();
-    this.selectedSuggestionIndex(z.util.NumberUtil.clamp(currentIndex, 0, suggestions.length - 1));
+    this.selectedSuggestionIndex(clamp(currentIndex, 0, suggestions.length - 1));
   }
 
   teardownList() {

@@ -17,18 +17,20 @@
  *
  */
 
-describe('z.util.NumberUtil', () => {
+import {inRange} from 'utils/NumberUtil';
+
+describe('NumberUtil', () => {
   describe('inRange', () => {
     it('returns true for values inside the specified range', () => {
-      expect(z.util.NumberUtil.inRange(0, 0, 2)).toBeTruthy();
-      expect(z.util.NumberUtil.inRange(1, 0, 2)).toBeTruthy();
-      expect(z.util.NumberUtil.inRange(1, 0, 2)).toBeTruthy();
+      expect(inRange(0, 0, 2)).toBeTruthy();
+      expect(inRange(1, 0, 2)).toBeTruthy();
+      expect(inRange(1, 0, 2)).toBeTruthy();
     });
 
     it('returns false for values outside the specified range', () => {
-      expect(z.util.NumberUtil.inRange(undefined, 0, 2)).toBeFalsy();
-      expect(z.util.NumberUtil.inRange(-1, 0, 2)).toBeFalsy();
-      expect(z.util.NumberUtil.inRange(3, 0, 2)).toBeFalsy();
+      expect(inRange(undefined, 0, 2)).toBeFalsy();
+      expect(inRange(-1, 0, 2)).toBeFalsy();
+      expect(inRange(3, 0, 2)).toBeFalsy();
     });
   });
 });

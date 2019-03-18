@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {iterateItem} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -189,7 +190,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   _iterateImage(reverse) {
-    const messageEntity = z.util.ArrayUtil.iterateItem(this.items(), this.messageEntity(), reverse);
+    const messageEntity = iterateItem(this.items(), this.messageEntity(), reverse);
 
     if (messageEntity) {
       this.messageEntity(messageEntity);

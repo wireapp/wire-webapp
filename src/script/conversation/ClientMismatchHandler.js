@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {getDifference} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -110,7 +111,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
       ? Promise.resolve()
       : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
           const knownUserIds = conversationEntity.participating_user_ids();
-          const unknownUserIds = z.util.ArrayUtil.getDifference(knownUserIds, missingUserIds);
+          const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
           if (unknownUserIds.length) {
             return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
