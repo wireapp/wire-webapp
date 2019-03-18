@@ -136,7 +136,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
         return accumulator + userEntity.devices().length;
       }
       return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
-    });
+    }, 0);
   }
 
   /**
