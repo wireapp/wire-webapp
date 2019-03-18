@@ -17,7 +17,6 @@
  *
  */
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
 import Logger from 'utils/Logger';
 
 window.z = window.z || {};
@@ -128,28 +127,5 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
           return this._sendEncryptedMessage(eventInfoEntity, updatedPayload);
         });
       });
-  }
-
-  _getNumberOfClients(userEntities) {
-    return userEntities.reduce((accumulator, userEntity) => {
-      if (userEntity.devices().length) {
-        return accumulator + userEntity.devices().length;
-      }
-      return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
-    }, 0);
-  }
-
-  /**
-   * Estimate whether message should be send as type external.
-   *
-   * @private
-   * @param {GenericMessage} genericMessage - Generic message that will be send
-   * @returns {boolean} Is payload likely to be too big so that we switch to type external?
-   */
-  _shouldSendAsExternal(genericMessage) {
-    const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
-    const estimatedPayloadInBytes = this._getNumberOfClients() * messageInBytes;
-
-    return estimatedPayloadInBytes > z.conversation.ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
   }
 };
