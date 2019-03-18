@@ -41,7 +41,7 @@
     "sinon-har-server": "0.3.0",
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
-    "webpack-cli": "3.2.3",
+    "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.2.1"
   },
   "description": "Wire API Client to send and receive data.",
