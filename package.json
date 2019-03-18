@@ -33,7 +33,7 @@
     "react-intl-po": "2.2.2",
     "react-redux": "6.0.1",
     "react-router": "4.3.1",
-    "react-router-dom": "4.3.1",
+    "react-router-dom": "4.4.0",
     "redux": "4.0.1",
     "redux-logdown": "1.0.4",
     "redux-thunk": "2.3.0",
