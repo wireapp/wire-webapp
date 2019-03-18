@@ -146,8 +146,8 @@ describe('CopyConfig', () => {
 
         await copyConfig.copy();
 
-        const files = await fs.readdir(copyConfig.baseDir);
-        expect(files).toContain('wire-webapp');
+        const files = await fs.readdir(TEMP_DIR);
+        expect(files).toContain('package.json');
       },
       TWENTY_SECONDS
     );
@@ -169,8 +169,8 @@ describe('CopyConfig', () => {
 
       await copyConfig.copy();
 
-      const files = await fs.readdir(copyConfig.baseDir);
-      expect(files).toContain('wire-webapp');
+      const files = await fs.readdir(TEMP_DIR);
+      expect(files).toContain('package.json');
     },
     TWENTY_SECONDS
   );

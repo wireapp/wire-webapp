@@ -25,6 +25,7 @@ import {CopyConfigOptions} from './CopyConfigOptions';
 import * as utils from './utils';
 
 const defaultOptions: Required<CopyConfigOptions> = {
+  baseDir: 'config',
   externalDir: '',
   files: {},
   forceDownload: false,
@@ -34,7 +35,6 @@ const defaultOptions: Required<CopyConfigOptions> = {
 export class CopyConfig {
   private readonly options: Required<CopyConfigOptions>;
   private readonly logger: logdown.Logger;
-  private readonly baseDir: string = 'config';
   private readonly noClone: boolean = false;
   private readonly noCleanup: boolean = false;
   private readonly filterFiles: string[] = ['.DS_Store'];
@@ -46,9 +46,9 @@ export class CopyConfig {
     if (this.options.externalDir) {
       this.noClone = true;
       this.noCleanup = true;
-      this.baseDir = this.options.externalDir;
+      this.options.baseDir = this.options.externalDir;
     }
-    this.baseDir = path.resolve(this.baseDir);
+    this.options.baseDir = path.resolve(this.options.baseDir);
 
     this.logger = logdown('@wireapp/copy-config/CopyConfig', {
       markdown: false,
@@ -95,7 +95,7 @@ export class CopyConfig {
     filesArray.forEach(source => {
       const destination = this.options.files[source];
 
-      const joinedSource = path.join(this.baseDir, source);
+      const joinedSource = path.join(this.options.baseDir, source);
       const resolvedDestination =
         destination instanceof Array ? destination.map(dest => path.resolve(dest)) : path.resolve(destination);
 
@@ -154,8 +154,7 @@ export class CopyConfig {
     const {stderr: stderrVersion} = await utils.execAsync('git --version');
 
     if (!this.noCleanup) {
-      this.logger.info(`Removing clone directory before cloning ...`);
-      await utils.rimrafAsync(this.baseDir);
+      await this.removeBasedir();
     }
 
     if (stderrVersion) {
@@ -169,10 +168,10 @@ export class CopyConfig {
       }
       const url = `${bareUrl}/archive/${branch}.zip`;
       this.logger.info(`Downloading "${url}" ...`);
-      await utils.downloadFileAsync(url, this.baseDir);
+      await utils.downloadFileAsync(url, this.options.baseDir);
     } else {
       this.logger.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
-      const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.baseDir}`;
+      const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.options.baseDir}`;
 
       const {stderr: stderrClone} = await utils.execAsync(command);
 
@@ -180,6 +179,11 @@ export class CopyConfig {
         throw new Error(stderrClone);
       }
     }
+  }
+
+  private async removeBasedir(): Promise<void> {
+    this.logger.info(`Cleaning up "${this.options.baseDir}" ...`);
+    await utils.rimrafAsync(this.options.baseDir);
   }
 
   public async copy(): Promise<string[]> {
@@ -200,6 +204,10 @@ export class CopyConfig {
         const result = await this.copyDirOrFile(file, destination);
         copiedFiles = copiedFiles.concat(result);
       }
+    }
+
+    if (!this.noCleanup) {
+      await this.removeBasedir();
     }
 
     return copiedFiles.sort();

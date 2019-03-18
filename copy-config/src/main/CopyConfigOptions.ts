@@ -19,6 +19,12 @@
 
 export interface CopyConfigOptions {
   /**
+   * The directory to clone or download into.
+   *
+   * @example `./config`
+   */
+  baseDir?: string;
+  /**
    * An external directory to copy from.
    * Disables cloning to and initial deletion of the source directory.
    *
