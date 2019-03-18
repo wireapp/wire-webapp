@@ -18,22 +18,18 @@
  */
 
 import {CookiesStatic} from 'js-cookie';
-import {onEnvironment} from '../../Environment';
 import {QUERY_KEY} from '../../route';
-import {isFirefox, isMobileOs, isSafari, isSupportedBrowser} from '../../Runtime';
+import {isFirefox, isPwaSupportedBrowser, isSupportedBrowser} from '../../Runtime';
 import {hasURLParameter} from '../../util/urlUtil';
 import {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
-    return dispatch => {
+    return (dispatch, getState, {config}) => {
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaSupportedBrowser = onEnvironment({
-        onProduction: false,
-        onStaging: pwaAware && (isMobileOs() || isSafari()),
-      });
-      if (isSupportedBrowser() || isPwaSupportedBrowser) {
+      const isPwaEnabled = config.URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
+      if (isSupportedBrowser() || isPwaEnabled) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
     };

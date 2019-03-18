@@ -21,7 +21,7 @@ import Logger from 'utils/Logger';
 
 import Dexie from 'dexie';
 
-import {ENVIRONMENT} from '../auth/config';
+import {Config} from '../auth/config';
 import StorageSchemata from '../storage/StorageSchemata';
 
 import * as StorageUtil from 'utils/StorageUtil';
@@ -63,7 +63,7 @@ class StorageService {
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;
-      this.dbName = `wire@${ENVIRONMENT}@${userId}@${clientType}`;
+      this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
 
       this.db = new Dexie(this.dbName);
 

@@ -20,7 +20,7 @@
 import * as React from 'react';
 import {mockStore, mountWithIntl} from '../util/TestUtil';
 import Index from './Index';
-import * as config from '../config';
+import {Config} from '../config';
 
 describe('when visiting the index page', () => {
   let wrapper;
@@ -40,9 +40,9 @@ describe('when visiting the index page', () => {
 
   describe('and the account registration is disabled', () => {
     it('redirects to the login page', () => {
-      config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
+      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountWithIntl(<Index />, mockStore(initialState));
-      config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
+      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
       expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
     });

@@ -22,6 +22,7 @@ import {Account} from '@wireapp/core';
 import {CookiesStatic} from 'js-cookie';
 import {AnyAction} from 'redux';
 import {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
+import {Config} from '../../config';
 import {ActionRoot} from '../action';
 import {AuthState, authReducer} from './authReducer';
 import {ClientState, clientReducer} from './clientReducer';
@@ -33,11 +34,12 @@ import {RuntimeState, runtimeReducer} from './runtimeReducer';
 import {SelfState, selfReducer} from './selfReducer';
 
 export type Api = {
-  apiClient: APIClient;
-  cookieStore: CookiesStatic;
-  localStorage: Storage;
-  core: Account;
   actions: ActionRoot;
+  apiClient: APIClient;
+  config: typeof Config;
+  cookieStore: CookiesStatic;
+  core: Account;
+  localStorage: Storage;
 };
 
 export interface RootState {

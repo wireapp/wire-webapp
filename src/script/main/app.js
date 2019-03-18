@@ -20,7 +20,7 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
-import {BACKEND_REST, BACKEND_WS, FEATURE} from '../auth/config';
+import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
@@ -838,12 +838,12 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging(FEATURE.ENABLE_DEBUG);
+  enableLogging(Config.FEATURE.ENABLE_DEBUG);
   if ($('#wire-main-app').length !== 0) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
-      restUrl: BACKEND_REST,
-      webSocketUrl: BACKEND_WS,
+      restUrl: Config.BACKEND_REST,
+      webSocketUrl: Config.BACKEND_WS,
     });
     wire.app = new App(backendClient);
   }
