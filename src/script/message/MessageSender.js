@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,17 @@
  *
  */
 
-window.z = window.z || {};
-window.z.service = z.service || {};
+import PromiseQueue from 'utils/PromiseQueue';
 
-z.service.QUEUE_STATE = {
-  ACCESS_TOKEN_REFRESH: 'z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH',
-  CONNECTIVITY_PROBLEM: 'z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM',
-  READY: 'z.service.QUEUE_STATE.READY',
-};
+export class MessageSender {
+  constructor() {
+    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
+  }
+  queueMessage(sendingFunction) {
+    return this.sendingQueue.push(sendingFunction);
+  }
 
-export const QUEUE_STATE = z.service.QUEUE_STATE;
+  pauseQueue(pauseState = true) {
+    this.sendingQueue.pause(pauseState);
+  }
+}

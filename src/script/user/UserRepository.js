@@ -332,7 +332,8 @@ export default class UserRepository {
       messageId: z.util.createRandomUuid(),
     });
 
-    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
+    const recipients = this.teamUsers().concat(this.self());
+    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
   /**

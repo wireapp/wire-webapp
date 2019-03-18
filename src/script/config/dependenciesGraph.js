@@ -31,6 +31,7 @@ import GiphyRepository from '../extension/GiphyRepository';
 import GiphyService from '../extension/GiphyService';
 import LinkPreviewRepository from '../links/LinkPreviewRepository';
 import MediaRepository from '../media/MediaRepository';
+import {MessageSender} from '../message/MessageSender';
 import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
@@ -63,6 +64,7 @@ dependencies.set(LinkPreviewRepository, {
   name: 'LinkPreviewRepository',
 });
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
+dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
@@ -87,6 +89,7 @@ export {
   GiphyService,
   LinkPreviewRepository,
   MediaRepository,
+  MessageSender,
   RichProfileRepository,
   PermissionRepository,
   PropertiesRepository,
