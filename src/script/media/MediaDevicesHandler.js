@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import MediaRepository from './MediaRepository';
+import {iterateIndex} from 'utils/ArrayUtil';
 
 export default class MediaDevicesHandler {
   static get CONFIG() {
@@ -332,7 +333,7 @@ export default class MediaDevicesHandler {
 
   _toggleNextDevice(availableDevices, currentDeviceIdObservable, currentDeviceIndex) {
     const {device} = this._getCurrentDevice(availableDevices, currentDeviceIdObservable());
-    const nextIndex = z.util.ArrayUtil.iterateIndex(availableDevices, currentDeviceIndex);
+    const nextIndex = iterateIndex(availableDevices, currentDeviceIndex);
 
     const nextDevice = availableDevices[nextIndex || 0];
     const deviceId = nextDevice.deviceId || nextDevice.id;

@@ -17,25 +17,18 @@
  *
  */
 
-z.util.NumberUtil = {
-  capToByte: value => {
-    const MAX_VALUE = 255;
-    return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
-  },
-
-  clamp: (value, min, max) => {
-    return Math.max(min, Math.min(max, value));
-  },
-
-  getRandomNumber: (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum),
-
-  inRange: (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound,
-
-  rootMeanSquare: floatArray => {
-    const pow = floatArray.map(number => Math.pow(number, 2));
-    const sum = pow.reduce((power, number) => power + number);
-    return Math.sqrt(sum) / floatArray.length;
-  },
+export const capToByte = value => {
+  const MAX_VALUE = 255;
+  return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
 };
 
-export const NumberUtil = z.util.NumberUtil;
+export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+export const getRandomNumber = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+
+export const inRange = (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound;
+
+export const rootMeanSquare = floatArray => {
+  const sum = floatArray.reduce((power, number) => power + number ** 2, 0);
+  return Math.sqrt(sum) / floatArray.length;
+};

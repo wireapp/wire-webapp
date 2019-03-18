@@ -22,6 +22,7 @@ import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import EphemeralStatusType from '../message/EphemeralStatusType';
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
+import {clamp} from 'utils/NumberUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -42,7 +43,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
     const isTimerReset = messageTimer === null;
 
-    return isTimerReset ? messageTimer : z.util.NumberUtil.clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
+    return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
   constructor(conversationMapper, eventService, eventListeners) {

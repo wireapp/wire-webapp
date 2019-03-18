@@ -17,8 +17,8 @@
  *
  */
 
-import {ArrayUtil} from 'utils/ArrayUtil';
-import {NumberUtil} from 'utils/NumberUtil';
+import {interpolate} from 'utils/ArrayUtil';
+import {clamp} from 'utils/NumberUtil';
 
 class AudioSeekBarComponent {
   /**
@@ -67,7 +67,7 @@ class AudioSeekBarComponent {
 
   _renderLevels() {
     const numberOfLevelsFitOnScreen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
-    const scaledLoudness = ArrayUtil.interpolate(this.loudness, numberOfLevelsFitOnScreen);
+    const scaledLoudness = interpolate(this.loudness, numberOfLevelsFitOnScreen);
     this.element.innerHTML = '';
 
     this.levels = scaledLoudness.map(loudness => {
@@ -89,7 +89,7 @@ class AudioSeekBarComponent {
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
     const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
 
-    this.audioElement.currentTime = NumberUtil.clamp(currentTime, 0, this.audioElement.duration);
+    this.audioElement.currentTime = clamp(currentTime, 0, this.audioElement.duration);
     this._onTimeUpdate();
   }
 

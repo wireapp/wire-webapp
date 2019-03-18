@@ -19,6 +19,8 @@
 
 import {Asset} from '@wireapp/protocol-messaging';
 import TimeUtil from 'utils/TimeUtil';
+import {capToByte, rootMeanSquare} from 'utils/NumberUtil';
+import {chunk} from 'utils/ArrayUtil';
 
 /**
  * Constructs corresponding asset metadata depending on the given file type
@@ -140,10 +142,10 @@ const normaliseLoudness = audioBuffer => {
   const AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
   const channel = audioBuffer.getChannelData(0);
   const bucketSize = parseInt(channel.length / MAX_SAMPLES);
-  const buckets = z.util.ArrayUtil.chunk(channel, bucketSize);
+  const buckets = chunk(channel, bucketSize);
 
   const audioPreview = buckets.map(bucket => {
-    return z.util.NumberUtil.capToByte(AMPLIFIER * z.util.NumberUtil.rootMeanSquare(bucket));
+    return capToByte(AMPLIFIER * rootMeanSquare(bucket));
   });
 
   return new Uint8Array(audioPreview);

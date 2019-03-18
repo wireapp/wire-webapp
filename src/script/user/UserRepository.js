@@ -31,6 +31,8 @@ import ConsentType from './ConsentType';
 import User from '../entity/User';
 import UserMapper from './UserMapper';
 
+import {chunk} from 'utils/ArrayUtil';
+
 export default class UserRepository {
   static get CONFIG() {
     return {
@@ -395,7 +397,7 @@ export default class UserRepository {
         });
     };
 
-    const chunksOfUserIds = z.util.ArrayUtil.chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = _.flatten(resolveArray);

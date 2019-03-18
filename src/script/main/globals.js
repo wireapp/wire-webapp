@@ -10,7 +10,6 @@ import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 
 import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';
-import ArrayUtilGlobal from '../util/ArrayUtil.js';
 import CryptoGlobal from '../util/Crypto.js';
 import DebugUtilGlobal from '../util/DebugUtil.js';
 import EmojiUtilGlobal from '../util/EmojiUtil.js';
@@ -20,7 +19,6 @@ import KeyboardUtilGlobal from '../util/KeyboardUtil.js';
 import LocalizerUtilGlobal from '../util/LocalizerUtil.js';
 import linkifyGlobal from '../util/linkify.js';
 import htmlGlobal from '../util/linkify-html.js';
-import NumberUtilGlobal from '../util/NumberUtil.js';
 import helpersGlobal from '../util/scroll-helpers.js';
 import StorageUtilGlobal from '../util/StorageUtil.js';
 import StringUtilGlobal from '../util/StringUtil.js';
