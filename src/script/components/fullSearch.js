@@ -18,6 +18,7 @@
  */
 
 import {isScrolledBottom} from 'utils/scroll-helpers';
+import moment from 'moment';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -125,6 +126,10 @@ z.components.FullSearch = class FullSearch {
     return transformedText;
   }
 
+  resultTimestamp(messageEntity) {
+    return moment(messageEntity.timestamp()).format('MMMM D, YYYY');
+  }
+
   clickOnDismiss() {
     this.input('');
   }
@@ -146,19 +151,19 @@ ko.components.register('full-search', {
     <!-- ko if: showNoResultsText() -->
       <div class="full-search-no-result" data-bind="text: t('fullsearchNoResults')" data-uie-name="full-search-no-results"></div>
     <!-- /ko -->
-    <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities}" data-uie-name="full-search-list">
-      <div class="full-search-item" data-bind="click: $parent.clickOnMessage" data-uie-name="full-search-item">
+    <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities, as: 'messageEntity', noChildContext: true}" data-uie-name="full-search-list">
+      <div class="full-search-item" data-bind="click: () => clickOnMessage(messageEntity)" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <participant-avatar params="participant: user, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+          <participant-avatar params="participant: messageEntity.user, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
-          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.htmlFormatResult($data)" data-uie-name="full-search-item-text"></div>
+          <div class="full-search-item-content-text ellipsis" data-bind="html: htmlFormatResult(messageEntity)" data-uie-name="full-search-item-text"></div>
           <div class="full-search-item-content-info">
-            <span class="font-weight-bold" data-bind="text: user().first_name()" data-uie-name="full-search-item-sender"></span>
-            <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>
+            <span class="font-weight-bold" data-bind="text: messageEntity.user().first_name()" data-uie-name="full-search-item-sender"></span>
+            <span data-bind="text: resultTimestamp(messageEntity)" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>
-        <div class="badge" data-bind="text: matchesCount, visible: matchesCount > 1" data-uie-name="full-search-item-badge"></div>
+        <div class="badge" data-bind="text: messageEntity.matchesCount, visible: messageEntity.matchesCount > 1" data-uie-name="full-search-item-badge"></div>
       </div>
     </div>
   `,
