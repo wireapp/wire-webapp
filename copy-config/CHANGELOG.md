@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.4.1...@wireapp/copy-config@0.5.0) (2019-03-18)
+
+
+### Features
+
+* **copy-config:** Add basedir configuration and cleanup basedir ([#1647](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1647)) ([5356466](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/5356466))
+
+
+
+
+
 ## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.4.0...@wireapp/copy-config@0.4.1) (2019-03-13)
 
 
