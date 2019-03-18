@@ -29,7 +29,6 @@ export const getRandomNumber = (minimum, maximum) => Math.floor(Math.random() * 
 export const inRange = (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound;
 
 export const rootMeanSquare = floatArray => {
-  const pow = floatArray.map(number => Math.pow(number, 2));
-  const sum = pow.reduce((power, number) => power + number);
+  const sum = floatArray.reduce((power, number) => power + number ** 2, 0);
   return Math.sqrt(sum) / floatArray.length;
 };

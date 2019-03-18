@@ -17,7 +17,7 @@
  *
  */
 
-import {inRange} from 'utils/NumberUtil';
+import {inRange, capToByte, clamp, getRandomNumber, rootMeanSquare} from 'utils/NumberUtil';
 
 describe('NumberUtil', () => {
   describe('inRange', () => {
@@ -31,6 +31,45 @@ describe('NumberUtil', () => {
       expect(inRange(undefined, 0, 2)).toBeFalsy();
       expect(inRange(-1, 0, 2)).toBeFalsy();
       expect(inRange(3, 0, 2)).toBeFalsy();
+    });
+  });
+
+  describe('capToByte', () => {
+    it('returns a byte sized number for values from 0 - 1', () => {
+      expect(capToByte(0)).toBe(0);
+      expect(capToByte(0.5)).toBe(127);
+      expect(capToByte(1)).toBe(255);
+    });
+
+    it('returns a normalized byte sized number for values other than 0 - 1', () => {
+      expect(capToByte(-0.5)).toBe(127);
+      expect(capToByte(100)).toBe(255);
+    });
+  });
+
+  describe('clamp', () => {
+    it('returns the value clamped to the specified range', () => {
+      expect(clamp(-100, 0, 10)).toBe(0);
+      expect(clamp(0, 0, 10)).toBe(0);
+      expect(clamp(1, 0, 10)).toBe(1);
+      expect(clamp(10, 0, 10)).toBe(10);
+      expect(clamp(100, 0, 10)).toBe(10);
+    });
+  });
+
+  describe('getRandomNumber', () => {
+    it('returns a random integer in the specified range', () => {
+      expect(getRandomNumber(1, 1)).toBe(1);
+      const randomNumber = getRandomNumber(1, 10);
+
+      expect(randomNumber).toBeGreaterThanOrEqual(1);
+      expect(randomNumber).toBeLessThanOrEqual(10);
+    });
+  });
+
+  describe('rootMeanSquare', () => {
+    it('returns the root mean square of an array of numbers', () => {
+      expect(rootMeanSquare([1, 2, 3, 4, 5, 6, 7])).toBeCloseTo(1.69);
     });
   });
 });
