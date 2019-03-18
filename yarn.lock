@@ -8764,10 +8764,10 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-phoneformat.js@1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.7.tgz#5f33e354f8bb5c0fb808ad0ae3d583c541fb1644"
-  integrity sha512-9SRtgfcYhMZNMcPjH7y1sAPhcsN58hXlY5CXjdCpWvSXG2EihG/XaOjHXht8/k+so98plmSy4pIYWXJf81iC2w==
+phoneformat.js@1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/phoneformat.js/-/phoneformat.js-1.0.8.tgz#1d18748c662264f3cbea26fae44fbbfc39ec8dea"
+  integrity sha512-85I6H/XlIgsr62dUJpgAkZNT/4QpNyUqXYxjwwVXPw2g6tbY+xchjGOub0Y/qcQ4+UFSjZZn67uz1pgtKkBXBA==
 
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
