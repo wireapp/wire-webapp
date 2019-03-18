@@ -17,19 +17,19 @@
  *
  */
 
-import * as config from './config';
+import {Config} from './config';
 
 export default {
   PHONE_LOGIN: `/login/`,
-  PWA: config.URL.MOBILE_BASE,
-  PWA_LOGIN: `${config.URL.MOBILE_BASE}/login/`,
+  PWA: Config.URL.MOBILE_BASE,
+  PWA_LOGIN: `${Config.URL.MOBILE_BASE}/login/`,
   WEBAPP: '/',
-  WIRE_ACCOUNT: config.URL.ACCOUNT_BASE,
-  WIRE_ACCOUNT_PASSWORD_RESET: `${config.URL.ACCOUNT_BASE}/forgot/`,
-  WIRE_PRIVACY_POLICY: `${config.URL.WEBSITE_BASE}/legal/#privacy`,
-  WIRE_SUPPORT: config.URL.SUPPORT_BASE,
-  WIRE_TEAM_FEATURES: `${config.URL.WEBSITE_BASE}/create-team/#features`,
-  WIRE_TERMS_PERSONAL: `${config.URL.WEBSITE_BASE}/legal/terms/#personal`,
-  WIRE_TERMS_TEAMS: `${config.URL.WEBSITE_BASE}/legal/terms/#teams`,
-  WIRE_WEBSITE: config.URL.WEBSITE_BASE,
+  WIRE_ACCOUNT: Config.URL.ACCOUNT_BASE,
+  WIRE_ACCOUNT_PASSWORD_RESET: `${Config.URL.ACCOUNT_BASE}/forgot/`,
+  WIRE_PRIVACY_POLICY: `${Config.URL.WEBSITE_BASE}/legal/#privacy`,
+  WIRE_SUPPORT: Config.URL.SUPPORT_BASE,
+  WIRE_TEAM_FEATURES: `${Config.URL.WEBSITE_BASE}/create-team/#features`,
+  WIRE_TERMS_PERSONAL: `${Config.URL.WEBSITE_BASE}/legal/terms/#personal`,
+  WIRE_TERMS_TEAMS: `${Config.URL.WEBSITE_BASE}/legal/terms/#teams`,
+  WIRE_WEBSITE: Config.URL.WEBSITE_BASE,
 };

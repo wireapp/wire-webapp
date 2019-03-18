@@ -38,7 +38,7 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
-import {BACKEND} from '../Environment';
+import {Config} from '../config';
 import BackendError from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import Page from './Page';
@@ -74,7 +74,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
       };
 
       onReceiveChildWindowMessage = (event: MessageEvent) => {
-        const isExpectedOrigin = event.origin === BACKEND.rest;
+        const isExpectedOrigin = event.origin === Config.BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
           this.ssoWindow.close();
@@ -82,7 +82,9 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
             new BackendError({
               code: 500,
               label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${BACKEND.rest}"`,
+              message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
+                Config.BACKEND_REST
+              }"`,
             })
           );
         }
@@ -123,7 +125,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
       const childPosition = this.calculateChildPosition(POPUP_HEIGHT, POPUP_WIDTH);
 
       this.ssoWindow = window.open(
-        `${BACKEND.rest}/sso/initiate-login/${code}`,
+        `${Config.BACKEND_REST}/sso/initiate-login/${code}`,
         'WIRE_SSO',
         `
           height=${POPUP_HEIGHT},

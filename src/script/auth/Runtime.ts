@@ -80,6 +80,10 @@ const isSupportedBrowser = () => {
   });
 };
 
+const isPwaSupportedBrowser = () => {
+  return isMobileOs() || isSafari();
+};
+
 const isChrome = () => getBrowserName() === BROWSER.CHROME;
 const isEdge = () => getBrowserName() === BROWSER.EDGE;
 const isFirefox = () => getBrowserName() === BROWSER.FIREFOX;
@@ -106,22 +110,23 @@ export {
   getBrowserName,
   getOs,
   getOsFamily,
-  isChrome,
-  isEdge,
-  isInternetExplorer,
-  isOpera,
-  isSafari,
-  isFirefox,
-  isDesktopOs,
-  isElectron,
-  isDesktopApp,
-  isFranz,
-  isMacOS,
-  isWindows,
-  isLinux,
-  isMobileOs,
   isAndroid,
+  isChrome,
+  isDesktopApp,
+  isDesktopOs,
+  isEdge,
+  isElectron,
+  isFirefox,
+  isFranz,
+  isInternetExplorer,
   isIOS,
+  isLinux,
+  isMacOS,
+  isMobileOs,
+  isOpera,
+  isPwaSupportedBrowser,
+  isSafari,
   isSupportedBrowser,
   isSupportingClipboard,
+  isWindows,
 };

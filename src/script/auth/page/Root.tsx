@@ -44,7 +44,7 @@ import * as tr from 'react-intl/locale-data/tr';
 import * as uk from 'react-intl/locale-data/uk';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
-import {APP_INSTANCE_ID, FEATURE} from '../config';
+import {Config} from '../config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import ROOT_ACTIONS from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
@@ -108,7 +108,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
   componentDidMount = () => {
     this.props.startPolling();
     window.onbeforeunload = () => {
-      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID);
+      this.props.safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.APP_INSTANCE_ID);
       this.props.stopPolling();
     };
   };
@@ -129,16 +129,16 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
               <Route path={ROUTE.LOGIN} component={Login} />
               <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              <Route path={ROUTE.CREATE_TEAM} component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
+              <Route path={ROUTE.CREATE_TEAM} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName} />
               <Route
                 path={ROUTE.CREATE_ACCOUNT}
-                component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
+                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
               />
               <Route
                 path={ROUTE.CREATE_TEAM_ACCOUNT}
-                component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
+                component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
               />
-              <Route path={ROUTE.VERIFY} component={FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
+              <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
               <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
               <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />

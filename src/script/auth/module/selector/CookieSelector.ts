@@ -17,7 +17,7 @@
  *
  */
 
-import {APP_INSTANCE_ID} from '../../config';
+import {Config} from '../../config';
 import {RootState} from '../reducer';
 
 export const COOKIE_NAME_APP_OPENED = 'app_opened';
@@ -25,7 +25,7 @@ export const COOKIE_NAME_APP_OPENED = 'app_opened';
 export const isAppAlreadyOpen = (state: RootState) => {
   const selectedCookie: {[key: string]: any} = getCookies(state)[COOKIE_NAME_APP_OPENED];
   // eslint-disable-next-line dot-notation
-  return selectedCookie ? selectedCookie['appInstanceId'] !== APP_INSTANCE_ID : false;
+  return selectedCookie ? selectedCookie['appInstanceId'] !== Config.APP_INSTANCE_ID : false;
 };
 export const getCookies = (state: RootState): {[key: string]: object} => state.cookieState.cookies || {};
 export const isFetching = (state: RootState) => state.cookieState.fetching;
