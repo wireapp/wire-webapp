@@ -24,7 +24,6 @@ import CryptoJS from 'crypto-js';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import marked from './marked.js';
 import MarkdownIt from 'markdown-it';
 import StringUtilGlobal from './StringUtil';
 /* eslint-enable no-unused-vars */
@@ -294,11 +293,22 @@ z.util.alias = {
 // Note: We are using "Underscore.js" to escape HTML in the original message
 const markdownit = new MarkdownIt('zero', {
   breaks: true,
+  html: false,
   linkify: true,
 }).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify']);
 
+markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+  const link = tokens[idx];
+  link.attrPush(['target', '_blank']);
+  link.attrPush(['rel', 'nofollow noopener noreferrer']);
+  if (link.markup !== 'linkify') {
+    link.attrPush(['class', 'dangerLink']);
+  }
+  return self.renderToken(tokens, idx, options);
+};
+
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
-  const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
@@ -346,7 +356,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     },
   });
 
-  mentionlessText = markdownit.renderInline(mentionlessText);
+  mentionlessText = markdownit.render(mentionlessText);
 
   // Remove <br /> if it is the last thing in a message
   if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
@@ -359,7 +369,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
 
-  return parsedText;
+  return parsedText.replace(/^<p>|<\/p>\n$|\n$/g, '');
 };
 
 z.util.koArrayPushAll = (koArray, valuesToPush) => {

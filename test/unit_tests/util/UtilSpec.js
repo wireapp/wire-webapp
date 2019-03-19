@@ -37,8 +37,10 @@ describe('z.util.renderMessage', () => {
 
   it('renders complicated image links', () => {
     const link =
+      'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
+    const escapedLink =
       'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
-    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+    const expected = `<a href="${escapedLink}" target="_blank" rel="nofollow noopener noreferrer">${escapedLink}</a>`;
 
     expect(z.util.renderMessage(link)).toBe(expected);
   });
