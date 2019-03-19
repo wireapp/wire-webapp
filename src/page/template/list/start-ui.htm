@@ -213,7 +213,9 @@
           <div class="invite-content">
             <div class="invite-header" data-bind="text: t('inviteHeadline')"></div>
             <div class="invite-link-box">
-              <textarea data-bind="value: inviteMessage" class="message" dir="auto"></textarea>
+              <div class="fade-wrapper">
+                <textarea data-bind="value: inviteMessage" class="message" dir="auto"></textarea>
+              </div>
             </div>
           </div>
           <div class="invite-footer" data-bind="text: inviteHint"></div>
