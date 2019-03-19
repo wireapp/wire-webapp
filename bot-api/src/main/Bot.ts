@@ -29,6 +29,7 @@ import {BotConfig, BotCredentials} from './Interfaces';
 import {MessageHandler} from './MessageHandler';
 
 const defaultConfig: Required<BotConfig> = {
+  backend: 'production',
   clientType: ClientType.TEMPORARY,
   conversations: [],
   owners: [],
@@ -75,7 +76,10 @@ class Bot {
     };
     const engine = new MemoryEngine();
     await engine.init(this.credentials.email);
-    const apiClient = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
+    const apiClient = new APIClient({
+      store: engine,
+      urls: this.config.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION,
+    });
     this.account = new Account(apiClient);
 
     this.account.on(PayloadBundleType.ASSET, this.handlePayload.bind(this));

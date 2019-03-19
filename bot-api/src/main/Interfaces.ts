@@ -20,6 +20,8 @@
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 
 interface BotConfig {
+  /** Set the backend (staging or production) */
+  backend?: 'production' | 'staging';
   /** Set the client type (permanent or temporary). */
   clientType?: ClientType;
   /** Set allowed conversations (if empty, all conversations are allowed). */
