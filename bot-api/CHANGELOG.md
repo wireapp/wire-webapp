@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.1.64...@wireapp/bot-api@3.2.0) (2019-03-19)
+
+
+### Features
+
+* **bot-api:** Add backend selection ([#1657](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1657)) ([0cafa70](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/0cafa70))
+
+
+
+
+
 ## [3.1.64](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.1.63...@wireapp/bot-api@3.1.64) (2019-03-18)
 
 **Note:** Version bump only for package @wireapp/bot-api
