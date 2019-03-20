@@ -25,6 +25,7 @@ import $ from 'jquery';
 import {groupBy} from 'underscore';
 
 import Conversation from '../../entity/Conversation';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * Message list rendering view model.
@@ -598,9 +599,9 @@ class MessageListViewModel {
           z.util.SanitizationUtil.safeWindowOpen(href);
         },
         text: {
-          action: 'Open link',
-          message: `This will open a new window with location ${href}`,
-          title: 'Unsafe link',
+          action: t('modalOpenLinkAction'),
+          message: t('modalOpenLinkMessage', href),
+          title: t('modalOpenLinkTitle'),
         },
       });
       return false;
