@@ -275,6 +275,21 @@ class App {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
   }
 
+  /**
+   * We need to proxy the replaceState method of history in order to trigger an event and warn the app that something happens.
+   * This is needed because the replaceState method can be called from outside of the app (eg. in the desktop app)
+   * @returns {void}
+   */
+  _proxyHistoryReplaceState() {
+    const originalReplaceState = window.history.replaceState.bind(window.history);
+
+    window.history.replaceState = (...args) => {
+      originalReplaceState(...args);
+      const event = new CustomEvent('replacestate', {detail: window.history.state});
+      window.dispatchEvent(event);
+    };
+  }
+
   //##############################################################################
   // Initialization
   //##############################################################################
@@ -602,17 +617,30 @@ class App {
    * @returns {undefined} No return value
    */
   _showInterface() {
-    const conversationEntity = this.repository.conversation.getMostRecentConversation();
+    const conversationEntity =
+      window.history.state && window.history.state.conversationId
+        ? window.history.state.conversationId
+        : this.repository.conversation.getMostRecentConversation();
+
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
       this.view.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       this.view.list.showTakeover();
     } else if (conversationEntity) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      this.view.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
+
+    // we can now proxy the replacestate method and start listening for replacestate event
+    this._proxyHistoryReplaceState();
+    window.addEventListener('replacestate', event => {
+      const conversationId = event.detail.conversationId;
+      if (conversationId) {
+        this.view.content.showConversation(conversationId);
+      }
+    });
 
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
