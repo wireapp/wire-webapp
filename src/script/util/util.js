@@ -24,7 +24,7 @@ import CryptoJS from 'crypto-js';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import marked from './marked.js';
+import MarkdownIt from 'markdown-it';
 import StringUtilGlobal from './StringUtil';
 /* eslint-enable no-unused-vars */
 
@@ -291,8 +291,40 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
+const markdownit = new MarkdownIt('zero', {
+  breaks: true,
+  html: false,
+  langPrefix: 'lang-',
+  linkify: true,
+}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
+
+markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+  const link = tokens[idx];
+  const href = link.attrGet('href');
+  const isEmail = href.startsWith('mailto:');
+  if (isEmail) {
+    const email = href.replace(/^mailto:/, '');
+    link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+  } else {
+    link.attrPush(['target', '_blank']);
+    link.attrPush(['rel', 'nofollow noopener noreferrer']);
+  }
+  if (link.markup !== 'linkify') {
+    link.attrPush(['class', 'dangerLink']);
+  }
+  return self.renderToken(tokens, idx, options);
+};
+
+markdownit.renderer.rules.softbreak = () => '<br>';
+markdownit.renderer.rules.hardbreak = () => '<br>';
+markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
+  const [count] = tokens[idx].map;
+  return '<br>'.repeat(count);
+};
+markdownit.renderer.rules.paragraph_close = () => '';
+
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
-  const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
@@ -325,7 +357,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       );
     }, message);
 
-  mentionlessText = marked(mentionlessText, {
+  markdownit.set({
     highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
@@ -338,16 +370,12 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       }
       return hljs.highlightAuto(code).value;
     },
-    sanitize: true,
   });
 
-  // TODO: Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  mentionlessText = mentionlessText.replace(/\n/g, '<br />');
+  mentionlessText = markdownit.render(mentionlessText);
 
-  // Remove <br /> if it is the last thing in a message
-  if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
-    mentionlessText = z.util.StringUtil.cutLastChars(mentionlessText, '<br />'.length);
-  }
+  // Remove <br> and \n if it is the last thing in a message
+  mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionMarkup = renderMention(mentionTexts[mentionHash]);
