@@ -76,9 +76,7 @@ const stringUtil = {
     return string;
   },
 
-  getFirstChar: string => [...string][0],
-
-  getLastChars: (string, length) => (string.length < length ? false : string.substring(string.length - length)),
+  getFirstChar: string => string[0],
 
   getRandomChar: () => {
     let charIndex;

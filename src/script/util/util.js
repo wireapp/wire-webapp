@@ -294,18 +294,34 @@ z.util.alias = {
 const markdownit = new MarkdownIt('zero', {
   breaks: true,
   html: false,
+  langPrefix: 'lang-',
   linkify: true,
-}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify']);
+}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
 
 markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   const link = tokens[idx];
-  link.attrPush(['target', '_blank']);
-  link.attrPush(['rel', 'nofollow noopener noreferrer']);
+  const href = link.attrGet('href');
+  const isEmail = href.startsWith('mailto:');
+  if (isEmail) {
+    const email = href.replace(/^mailto:/, '');
+    link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+  } else {
+    link.attrPush(['target', '_blank']);
+    link.attrPush(['rel', 'nofollow noopener noreferrer']);
+  }
   if (link.markup !== 'linkify') {
     link.attrPush(['class', 'dangerLink']);
   }
   return self.renderToken(tokens, idx, options);
 };
+
+markdownit.renderer.rules.softbreak = () => '<br>';
+markdownit.renderer.rules.hardbreak = () => '<br>';
+markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
+  const [count] = tokens[idx].map;
+  return '<br>'.repeat(count);
+};
+markdownit.renderer.rules.paragraph_close = () => '';
 
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
   const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
@@ -358,10 +374,8 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
 
   mentionlessText = markdownit.render(mentionlessText);
 
-  // Remove <br /> if it is the last thing in a message
-  if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
-    mentionlessText = z.util.StringUtil.cutLastChars(mentionlessText, '<br />'.length);
-  }
+  // Remove <br> if it is the last thing in a message
+  mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionMarkup = renderMention(mentionTexts[mentionHash]);
@@ -369,7 +383,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     return text.replace(mentionHash, mentionMarkup);
   }, mentionlessText);
 
-  return parsedText.replace(/^<p>|<\/p>\n$|\n$/g, '');
+  return parsedText;
 };
 
 z.util.koArrayPushAll = (koArray, valuesToPush) => {
