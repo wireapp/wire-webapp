@@ -590,6 +590,21 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
+    const linkTarget = event.target.closest('.danger-link');
+    if (linkTarget) {
+      const href = linkTarget.href;
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        action: () => {
+          z.util.SanitizationUtil.safeWindowOpen(href);
+        },
+        text: {
+          action: 'Open link',
+          message: `This will open a new window with location ${href}`,
+          title: 'Unsafe link',
+        },
+      });
+      return false;
+    }
     const hasMentions = messageEntity.mentions().length;
     const mentionElement = hasMentions && event.target.closest('.message-mention');
     const userId = mentionElement && mentionElement.dataset.userId;

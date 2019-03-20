@@ -174,7 +174,7 @@ describe('z.util.renderMessage', () => {
 
   it('renders a link from markdown notation', () => {
     expect(z.util.renderMessage('[doop](http://www.example.com)')).toBe(
-      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" class="dangerLink">doop</a>'
+      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" class="danger-link">doop</a>'
     );
   });
 
