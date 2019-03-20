@@ -31,7 +31,6 @@ import PopupUtilGlobal from '../util/PopupUtil.js';
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
 import AuthErrorGlobal from '../error/AuthError.js';
-import AudioErrorGlobal from '../error/AudioError.js';
 import BackendClientErrorGlobal from '../error/BackendClientError.js';
 import CallErrorGlobal from '../error/CallError.js';
 import ClientErrorGlobal from '../error/ClientError.js';
