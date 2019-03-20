@@ -45,20 +45,16 @@ after_success:
 
 before_deploy:
   - |
-    if [ "${TRAVIS_BRANCH}" == "prod" ]; then
-      export TRAVIS_TAG="$(date +'%Y-%m-%d-%H-%M')"
+    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] || [ "${TRAVIS_BRANCH}" == "prod" ]; then
+      export CHANGELOG_FILE="CHANGELOG.md"
+      if [ "${TRAVIS_BRANCH}" == "prod" ]; then
+        LAST_PROD_TAG="$(git tag | grep -P '^((?!staging).)*$' | tail -n 1)"
+        export TRAVIS_TAG="${TRAVIS_TAG:-$(date +'%Y-%m-%d-%H-%M')}"
+        export TRAVIS_COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-"${LAST_PROD_TAG}...${TRAVIS_TAG}"}"
+      fi
       git config --local user.name "Wire Travis CI"
       git config --local user.email "webapp+travis@wire.com"
       git tag $TRAVIS_TAG
-    fi
-
-    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then
-      export LAST_STAGING_TAG="$(git describe --abbrev=0 --tags --match="*-staging*")"
-      export TRAVIS_COMMIT_RANGE="${LAST_STAGING_TAG}...${TRAVIS_TAG}"
-    fi
-
-    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] || [ "${TRAVIS_BRANCH}" == "prod" ]; then
-      export CHANGELOG_FILE="CHANGELOG.md"
       yarn global add generate-changelog@1.7.1
       generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
       sed -i '1,2d' "${CHANGELOG_FILE}"
