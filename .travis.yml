@@ -43,24 +43,6 @@ after_success:
   - if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then yarn build:prod; fi
   - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
 
-before_deploy:
-  - |
-    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]] || [ "${TRAVIS_BRANCH}" == "prod" ]; then
-      export CHANGELOG_FILE="CHANGELOG.md"
-      if [ "${TRAVIS_BRANCH}" == "prod" ]; then
-        LAST_PROD_TAG="$(git tag | grep -P '^((?!staging).)*$' | tail -n 1)"
-        export TRAVIS_TAG="${TRAVIS_TAG:-$(date +'%Y-%m-%d-%H-%M')}"
-        export TRAVIS_COMMIT_RANGE="${TRAVIS_COMMIT_RANGE:-"${LAST_PROD_TAG}...${TRAVIS_TAG}"}"
-      fi
-      git config --local user.name "Wire Travis CI"
-      git config --local user.email "webapp+travis@wire.com"
-      git tag $TRAVIS_TAG
-      yarn global add generate-changelog@1.7.1
-      generate-changelog -t ${TRAVIS_COMMIT_RANGE} -x chore,runfix -f "${CHANGELOG_FILE}"
-      sed -i '1,2d' "${CHANGELOG_FILE}"
-      printf "\n\n##### Changelog\n- https://github.com/${TRAVIS_REPO_SLUG}/compare/${TRAVIS_COMMIT_RANGE}" >> "${CHANGELOG_FILE}"
-    fi
-
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
   # https://wire-webapp-edge.zinfra.io/
@@ -142,26 +124,6 @@ deploy:
     on:
       repo: wireapp/wire-webapp
       branch: prod
-
-  # GitHub Production Releases
-  - provider: releases
-    api_key: "$GH_TOKEN"
-    draft: true
-    file: "CHANGELOG.md"
-    skip_cleanup: true
-    on:
-      repo: wireapp/wire-webapp
-      branch: prod
-
-  # GitHub Staging Releases
-  - provider: releases
-    api_key: "$GH_TOKEN"
-    draft: true
-    file: "CHANGELOG.md"
-    skip_cleanup: true
-    on:
-      tags: true
-      condition: $TRAVIS_TAG =~ .*-staging.*
 
 after_deploy:
   - |
