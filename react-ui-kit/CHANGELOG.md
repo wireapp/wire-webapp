@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.32...@wireapp/react-ui-kit@5.1.0) (2019-03-20)
+
+
+### Features
+
+* **react-ui-kit:** Make React a peer dependency ([#1664](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1664)) ([bfb9009](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/bfb9009))
+
+
+
+
+
 ## [5.0.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.0.31...@wireapp/react-ui-kit@5.0.32) (2019-03-18)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
