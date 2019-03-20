@@ -374,7 +374,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
 
   mentionlessText = markdownit.render(mentionlessText);
 
-  // Remove <br> if it is the last thing in a message
+  // Remove <br> and \n if it is the last thing in a message
   mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
