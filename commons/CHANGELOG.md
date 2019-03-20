@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.3.3...@wireapp/commons@1.4.0) (2019-03-20)
+
+
+### Features
+
+* **commons:** Export regular expressions for validations ([#1665](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1665)) ([5b3f508](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/5b3f508))
+
+
+
+
+
 ## [1.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.3.2...@wireapp/commons@1.3.3) (2019-03-18)
 
 **Note:** Version bump only for package @wireapp/commons
