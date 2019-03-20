@@ -19,19 +19,24 @@
 
 const {ValidationUtil} = require('@wireapp/commons');
 
-describe('ValidationUtil', () => {
-  describe('"isUUIDv4"', () => {
-    it('recognizes correct UUIDv4 strings', () => {
-      expect(ValidationUtil.isUUIDv4('22087638-0b00-4e0d-864d-37c08041a2cf')).toBe(true);
-      expect(ValidationUtil.isUUIDv4('c45bc829-f028-4550-a66b-1af2b2ac4801')).toBe(true);
-      expect(ValidationUtil.isUUIDv4('D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(true);
-    });
+describe('isUUIDv4', () => {
+  it('recognizes correct UUIDv4 strings', () => {
+    expect(ValidationUtil.isUUIDv4('22087638-0b00-4e0d-864d-37c08041a2cf')).toBe(true);
+    expect(ValidationUtil.isUUIDv4('c45bc829-f028-4550-a66b-1af2b2ac4801')).toBe(true);
+    expect(ValidationUtil.isUUIDv4('D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(true);
+  });
 
-    it('recognizes incorrect UUIDv4 strings', () => {
-      expect(ValidationUtil.isUUIDv4('d76259eb-25e1-46d-b170-bfcee91a2733')).toBe(false);
-      expect(ValidationUtil.isUUIDv4('d76259eb')).toBe(false);
-      expect(ValidationUtil.isUUIDv4('test D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
-      expect(ValidationUtil.isUUIDv4('0000-D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
-    });
+  it('recognizes incorrect UUIDv4 strings', () => {
+    expect(ValidationUtil.isUUIDv4('d76259eb-25e1-46d-b170-bfcee91a2733')).toBe(false);
+    expect(ValidationUtil.isUUIDv4('d76259eb')).toBe(false);
+    expect(ValidationUtil.isUUIDv4('test D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
+    expect(ValidationUtil.isUUIDv4('0000-D45EDF1F-F1D6-4DC9-A560-84F6603A8CED')).toBe(false);
+  });
+
+  it('exports the regular expression pattern so it can be reused by external applications', () => {
+    const uuid = '221b6959-6d97-483e-bb4a-e9643292a4c1';
+    const url = `wire://conversation/${uuid}`;
+    const actual = url.match(ValidationUtil.PATTERN.UUID_V4)[0];
+    expect(actual).toBe(uuid);
   });
 });

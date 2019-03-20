@@ -17,7 +17,11 @@
  *
  */
 
+export const PATTERN = {
+  UUID_V4: '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}',
+};
+
 export function isUUIDv4(candidate: string): boolean {
-  const uuidv4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidv4Regex = new RegExp(`^${PATTERN.UUID_V4}$`, 'i');
   return uuidv4Regex.test(candidate);
 }
