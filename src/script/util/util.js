@@ -299,33 +299,6 @@ const markdownit = new MarkdownIt('zero', {
   linkify: true,
 }).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
 
-markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-  const link = tokens[idx];
-  const href = link.attrGet('href');
-  const isEmail = href.startsWith('mailto:');
-  const nextToken = tokens[idx + 1];
-  const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
-  if (!href || !text.trim()) {
-    nextToken.content = '';
-    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
-    closeToken.type = 'text';
-    closeToken.content = '';
-    return `[${SanitizationUtil.escapeString(text)}](${SanitizationUtil.escapeString(href)})`;
-  }
-  if (isEmail) {
-    const email = SanitizationUtil.escapeString(href.replace(/^mailto:/, ''));
-    link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
-  } else {
-    link.attrPush(['target', '_blank']);
-    link.attrPush(['rel', 'nofollow noopener noreferrer']);
-  }
-  if (link.markup !== 'linkify') {
-    link.attrPush(['data-md-link', 'true']);
-    link.attrPush(['data-uie-name', 'markdown-link']);
-  }
-  return self.renderToken(tokens, idx, options);
-};
-
 const originalFenceRule = markdownit.renderer.rules.fence;
 
 markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
@@ -349,7 +322,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 markdownit.renderer.rules.paragraph_close = () => '';
 
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
-  const createMentionHash = mention => `@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
@@ -396,6 +369,49 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       return hljs.highlightAuto(code).value;
     },
   });
+
+  markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const cleanString = hashedString =>
+      SanitizationUtil.escapeString(
+        Object.entries(mentionTexts).reduce(
+          (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
+          hashedString
+        )
+      );
+    const link = tokens[idx];
+    const href = cleanString(link.attrGet('href'));
+    const isEmail = href.startsWith('mailto:');
+    const nextToken = tokens[idx + 1];
+    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
+
+    if (!href || !text.trim()) {
+      nextToken.content = '';
+      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+      closeToken.type = 'text';
+      closeToken.content = '';
+      return `[${cleanString(text)}](${cleanString(href)})`;
+    }
+    if (isEmail) {
+      const email = href.replace(/^mailto:/, '');
+      link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+    } else {
+      link.attrPush(['target', '_blank']);
+      link.attrPush(['rel', 'nofollow noopener noreferrer']);
+    }
+    if (link.markup !== 'linkify') {
+      const title = link.attrGet('title');
+      if (title) {
+        link.attrSet('title', cleanString(title));
+      }
+      link.attrSet('href', cleanString(href));
+      if (nextToken && nextToken.type === 'text') {
+        nextToken.content = cleanString(text);
+      }
+      link.attrPush(['data-md-link', 'true']);
+      link.attrPush(['data-uie-name', 'markdown-link']);
+    }
+    return self.renderToken(tokens, idx, options);
+  };
 
   mentionlessText = markdownit.render(mentionlessText);
 
