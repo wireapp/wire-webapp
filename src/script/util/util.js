@@ -392,7 +392,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       return `[${cleanString(text)}](${cleanString(href)})`;
     }
     if (isEmail) {
-      const email = cleanString(href.replace(/^mailto:/, ''));
+      const email = href.replace(/^mailto:/, '');
       link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
     } else {
       link.attrPush(['target', '_blank']);

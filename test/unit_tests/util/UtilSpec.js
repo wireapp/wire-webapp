@@ -195,7 +195,7 @@ describe('z.util.renderMessage', () => {
     );
 
     expect(z.util.renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
-      '<a href="mailto:\');alert(\'pwned\')//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
+      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
   });
 
