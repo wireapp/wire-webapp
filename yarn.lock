@@ -972,10 +972,10 @@
   dependencies:
     tweetnacl "^1.0.0"
 
-"@types/enzyme@3.9.0":
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.9.0.tgz#a81c91e2dfd2d70e67f013f2c0e5efed6df05489"
-  integrity sha512-o0C7ooyBtj9NKyMzn2BWN53W4J21KPhO+/v+qqQX28Pcz0Z1B3DjL9bq2ZR4TN70PVw8O7gkhuFtC7VN3tausg==
+"@types/enzyme@3.9.1":
+  version "3.9.1"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.9.1.tgz#3a0ce07e30066dbc26cd3474c8e680af2d249e26"
+  integrity sha512-CasnOP73BFE3/5JvGkod+oQtGOD1+CVWz9BV2iAqDFJ+sofL5gTiizSr8ZM3lpDY27ptC8yjAdrUCdv8diKKqw==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "*"
