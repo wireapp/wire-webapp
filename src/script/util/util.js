@@ -21,6 +21,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
+import SanitizationUtil from 'utils/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
@@ -302,15 +303,25 @@ markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   const link = tokens[idx];
   const href = link.attrGet('href');
   const isEmail = href.startsWith('mailto:');
+  const nextToken = tokens[idx + 1];
+  const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
+  if (!href || !text.trim()) {
+    nextToken.content = '';
+    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+    closeToken.type = 'text';
+    closeToken.content = '';
+    return `[${text}](${href})`;
+  }
   if (isEmail) {
-    const email = href.replace(/^mailto:/, '');
+    const email = SanitizationUtil.escapeString(href.replace(/^mailto:/, ''));
     link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
   } else {
     link.attrPush(['target', '_blank']);
     link.attrPush(['rel', 'nofollow noopener noreferrer']);
   }
   if (link.markup !== 'linkify') {
-    link.attrPush(['class', 'dangerLink']);
+    link.attrPush(['data-md-link', 'true']);
+    link.attrPush(['data-uie-name', 'markdown-link']);
   }
   return self.renderToken(tokens, idx, options);
 };
