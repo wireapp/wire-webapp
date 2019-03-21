@@ -591,7 +591,7 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
-    const linkTarget = event.target.closest('.danger-link');
+    const linkTarget = event.target.closest('.markdown-link');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {

@@ -174,12 +174,29 @@ describe('z.util.renderMessage', () => {
 
   it('renders a link from markdown notation', () => {
     expect(z.util.renderMessage('[doop](http://www.example.com)')).toBe(
-      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" class="danger-link">doop</a>'
+      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" class="markdown-link" data-uie-name="markdown-link">doop</a>'
     );
   });
 
   it('does not render a js link from markdown notation', () => {
     expect(z.util.renderMessage("[doop](javascript:alert('nope'))")).toBe("[doop](javascript:alert('nope'))");
+  });
+
+  it('does not render markdown links with empty or only whitespace values', () => {
+    expect(z.util.renderMessage('[](http://example.com)')).toBe('[](http://example.com)');
+    expect(z.util.renderMessage('[   ](http://example.com)')).toBe('[   ](http://example.com)');
+    expect(z.util.renderMessage('[link]()')).toBe('[link]()');
+    expect(z.util.renderMessage('[link](    )')).toBe('[link]()');
+  });
+
+  it('renders special escaped email links from markdown notation', () => {
+    expect(z.util.renderMessage('[email](mailto:test@email.com)')).toBe(
+      '<a href="mailto:test@email.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'test@email.com\')" class="markdown-link" data-uie-name="markdown-link">email</a>'
+    );
+
+    expect(z.util.renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
+      '<a href="mailto:\');alert(\'pwned\')//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" class="markdown-link" data-uie-name="markdown-link">email</a>'
+    );
   });
 
   describe('Mentions', () => {
