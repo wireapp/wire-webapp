@@ -320,7 +320,7 @@ markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     link.attrPush(['rel', 'nofollow noopener noreferrer']);
   }
   if (link.markup !== 'linkify') {
-    link.attrPush(['class', 'markdown-link']);
+    link.attrPush(['data-md-link', 'true']);
     link.attrPush(['data-uie-name', 'markdown-link']);
   }
   return self.renderToken(tokens, idx, options);

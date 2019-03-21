@@ -591,7 +591,7 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
-    const linkTarget = event.target.closest('.markdown-link');
+    const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
