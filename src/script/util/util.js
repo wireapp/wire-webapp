@@ -310,7 +310,7 @@ markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
     closeToken.type = 'text';
     closeToken.content = '';
-    return `[${text}](${href})`;
+    return `[${SanitizationUtil.escapeString(text)}](${SanitizationUtil.escapeString(href)})`;
   }
   if (isEmail) {
     const email = SanitizationUtil.escapeString(href.replace(/^mailto:/, ''));
@@ -326,10 +326,24 @@ markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   return self.renderToken(tokens, idx, options);
 };
 
+const originalFenceRule = markdownit.renderer.rules.fence;
+
+markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
+  const highlighted = originalFenceRule(tokens, idx, options, env, self);
+  tokens[idx].map[1] += 1;
+  return highlighted.replace(/\n$/, '');
+};
+
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
 markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
-  const [count] = tokens[idx].map;
+  const [position] = tokens[idx].map;
+  const previousWithMap = tokens
+    .slice(0, idx)
+    .reverse()
+    .find(({map}) => map && map.length);
+  const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
+  const count = position - previousPosition;
   return '<br>'.repeat(count);
 };
 markdownit.renderer.rules.paragraph_close = () => '';
