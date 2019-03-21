@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.2.4...@wireapp/bot-api@3.3.0) (2019-03-21)
+
+
+### Features
+
+* **bot-api:** Expose send text method ([#1670](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1670)) ([0eea3b3](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/0eea3b3))
+
+
+
+
+
 ## [3.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@3.2.3...@wireapp/bot-api@3.2.4) (2019-03-21)
 
 **Note:** Version bump only for package @wireapp/bot-api
