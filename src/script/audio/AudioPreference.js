@@ -25,3 +25,5 @@ z.audio.AudioPreference = {
   NONE: 'none',
   SOME: 'some',
 };
+
+export const AudioPreference = z.audio.AudioPreference;

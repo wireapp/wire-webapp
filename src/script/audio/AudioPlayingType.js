@@ -40,3 +40,5 @@ z.audio.AudioPlayingType = {
     z.audio.AudioType.TALK_LATER,
   ],
 };
+
+export const AudioPlayingType = z.audio.AudioPlayingType;

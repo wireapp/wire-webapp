@@ -31,3 +31,5 @@ z.audio.AudioType = {
   READY_TO_TALK: 'ready_to_talk',
   TALK_LATER: 'talk_later',
 };
+
+export const AudioType = z.audio.AudioType;
