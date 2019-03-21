@@ -334,7 +334,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
     .slice(0, idx)
     .reverse()
     .find(token => token.type === 'paragraph_open');
-  const previousPosition = previousParagraph ? previousParagraph.map[0] : 0;
+  const previousPosition = previousParagraph ? previousParagraph.map[1] - 1 : 0;
   const count = position - previousPosition;
   return '<br>'.repeat(count);
 };
