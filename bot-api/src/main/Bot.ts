@@ -68,6 +68,13 @@ class Bot {
     return this.config.owners.length === 0 ? true : this.config.owners.includes(userId);
   }
 
+  public async sendText(conversationId: string, message: string): Promise<void> {
+    if (this.account && this.account.service) {
+      const textPayload = await this.account.service.conversation.createText(message).build();
+      await this.account.service.conversation.send(conversationId, textPayload);
+    }
+  }
+
   public async start(): Promise<void> {
     const login = {
       clientType: this.config.clientType,
