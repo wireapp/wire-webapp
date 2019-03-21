@@ -382,20 +382,17 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     const href = cleanString(link.attrGet('href'));
     const isEmail = href.startsWith('mailto:');
     const nextToken = tokens[idx + 1];
-    const text = cleanString(nextToken && nextToken.type === 'text' ? nextToken.content : '');
-    link.attrSet('href', href);
-    if (nextToken && nextToken.type === 'text') {
-      nextToken.content = text;
-    }
+    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
+
     if (!href || !text.trim()) {
       nextToken.content = '';
       const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
       closeToken.type = 'text';
       closeToken.content = '';
-      return `[${text}](${href})`;
+      return `[${cleanString(text)}](${cleanString(href)})`;
     }
     if (isEmail) {
-      const email = SanitizationUtil.escapeString(href.replace(/^mailto:/, ''));
+      const email = cleanString(href.replace(/^mailto:/, ''));
       link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
     } else {
       link.attrPush(['target', '_blank']);
@@ -405,6 +402,10 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       const title = link.attrGet('title');
       if (title) {
         link.attrSet('title', cleanString(title));
+      }
+      link.attrSet('href', cleanString(href));
+      if (nextToken && nextToken.type === 'text') {
+        nextToken.content = cleanString(text);
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
