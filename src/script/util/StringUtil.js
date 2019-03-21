@@ -78,7 +78,7 @@ const stringUtil = {
     return string;
   },
 
-  getFirstChar: string => string[0],
+  getFirstChar: string => [...string][0], // the destructuring is needed to properly return unicode characters
 
   getRandomChar: () => {
     let charIndex;
