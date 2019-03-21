@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.2.6...@wireapp/core@8.2.7) (2019-03-21)
+
+**Note:** Version bump only for package @wireapp/core
+
+
+
+
+
 ## [8.2.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.2.5...@wireapp/core@8.2.6) (2019-03-20)
 
 **Note:** Version bump only for package @wireapp/core
