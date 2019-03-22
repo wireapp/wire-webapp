@@ -12539,9 +12539,9 @@ wide-align@^1.1.0:
     adm-zip "0.4.13"
     sort-json "2.0.0"
 
-"wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.16.4":
-  version "0.16.4"
-  resolved "https://github.com/wireapp/wire-web-config-default#742ab0fbdb0cfb814fbd55b6c2dca9e72328919a"
+"wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.16.5":
+  version "0.16.5"
+  resolved "https://github.com/wireapp/wire-web-config-default#d95e36933b6f25da1ec231c07b13f066ae6a0e44"
   dependencies:
     adm-zip "0.4.13"
     sort-json "2.0.0"

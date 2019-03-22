@@ -92,7 +92,16 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
                   {_(indexStrings.createAccountForPersonalUse)}
                 </Bold>
                 <br />
-                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                <Text
+                  block
+                  center
+                  light
+                  fontSize="16px"
+                  color={COLOR.LINK}
+                  style={{
+                    marginTop: 8,
+                  }}
+                >
                   {_(indexStrings.createPersonalAccount)}
                 </Text>
               </Link>
@@ -111,7 +120,16 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
                     {_(indexStrings.createAccountForOrganizations)}
                   </Bold>
                   <br />
-                  <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  <Text
+                    block
+                    center
+                    light
+                    fontSize="16px"
+                    color={COLOR.LINK}
+                    style={{
+                      marginTop: 8,
+                    }}
+                  >
                     {_(indexStrings.createTeam)}
                   </Text>
                 </Link>
