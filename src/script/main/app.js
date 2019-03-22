@@ -34,6 +34,7 @@ import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
+import {Router} from '../router/Router';
 import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
@@ -273,21 +274,6 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-  }
-
-  /**
-   * We need to proxy the replaceState method of history in order to trigger an event and warn the app that something happens.
-   * This is needed because the replaceState method can be called from outside of the app (eg. in the desktop app)
-   * @returns {void}
-   */
-  _proxyHistoryReplaceState() {
-    const originalReplaceState = window.history.replaceState.bind(window.history);
-
-    window.history.replaceState = (...args) => {
-      originalReplaceState(...args);
-      const event = new CustomEvent('replacestate', {detail: window.history.state});
-      window.dispatchEvent(event);
-    };
   }
 
   //##############################################################################
@@ -617,10 +603,7 @@ class App {
    * @returns {undefined} No return value
    */
   _showInterface() {
-    const conversationEntity =
-      window.history.state && window.history.state.conversationId
-        ? window.history.state.conversationId
-        : this.repository.conversation.getMostRecentConversation();
+    const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
@@ -633,13 +616,9 @@ class App {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    // we can now proxy the replacestate method and start listening for replacestate event
-    this._proxyHistoryReplaceState();
-    window.addEventListener('replacestate', event => {
-      const conversationId = event.detail.conversationId;
-      if (conversationId) {
-        this.view.content.showConversation(conversationId);
-      }
+    new Router({
+      '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
+      '/user/:userId': () => {}, // TODO, implement showing the user profile modal
     });
 
     this.view.loading.removeFromView();
