@@ -83,7 +83,6 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.modals = new z.viewModel.ModalsViewModel();
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.loading = new z.viewModel.LoadingViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
