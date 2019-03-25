@@ -24,7 +24,7 @@ import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 import {SessionPayloadBundle} from '../cryptography/';

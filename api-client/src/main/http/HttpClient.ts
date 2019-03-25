@@ -18,7 +18,7 @@
  */
 
 import {PriorityQueue} from '@wireapp/priority-queue';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {CRUDEngine} from '@wireapp/store-engine';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import EventEmitter from 'events';
 import logdown from 'logdown';

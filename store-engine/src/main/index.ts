@@ -1,32 +1,24 @@
-import {FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine/';
-import {
-  LowDiskSpaceError,
-  PathValidationError,
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-  UnsupportedError,
-} from './engine/error/';
-import {ExpiredBundle, TransientBundle, TransientStore} from './store/';
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
-export = {
-  FileEngine,
-  FileSystemEngine,
-  IndexedDBEngine,
-  LocalStorageEngine,
-  MemoryEngine,
-  Store: {
-    ExpiredBundle,
-    RecordAlreadyExistsError,
-    TransientBundle,
-    TransientStore,
-  },
-  error: {
-    LowDiskSpaceError,
-    PathValidationError,
-    RecordAlreadyExistsError,
-    RecordNotFoundError,
-    RecordTypeError,
-    UnsupportedError,
-  },
-};
+import {CRUDEngine, FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine/';
+import * as error from './engine/error/';
+import * as Store from './store/';
+
+export {CRUDEngine, FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine, error, Store};
