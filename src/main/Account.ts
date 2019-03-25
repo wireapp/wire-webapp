@@ -34,7 +34,7 @@ import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
@@ -158,8 +158,8 @@ class Account extends EventEmitter {
         const notFoundInDatabase =
           error instanceof cryptobox.error.CryptoboxError ||
           error.constructor.name === 'CryptoboxError' ||
-          error instanceof RecordNotFoundError ||
-          error.constructor.name === 'RecordNotFoundError';
+          error instanceof StoreEngineError.RecordNotFoundError ||
+          error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name;
         const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
         if (notFoundInDatabase) {
