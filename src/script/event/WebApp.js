@@ -207,6 +207,7 @@ z.event.WebApp = {
     SILENCE: 'wire.webapp.shortcut.silence', // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
     START: 'wire.webapp.shortcut.start',
   },
+  SHOW_USER: 'wire.webapp.show_user',
   SIGN_OUT: 'wire.webapp.logout',
   STORAGE: {
     SAVE_ENTITY: 'wire.webapp.storage.save_entity',

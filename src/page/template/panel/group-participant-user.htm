@@ -15,8 +15,8 @@
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-        <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
-      <panel-actions params="items: getParticipantActions(selectedParticipant(), activeConversation())"></panel-actions>
+      <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
+      <user-actions params="user: selectedParticipant(), conversation: activeConversation(), actionsViewModel: actionsViewModel, onUserRemove: onGoBack, isSelfActivated: userRepository.isActivatedAccount()"></panel-actions>
     </div>
   <!-- /ko -->
 </div>
