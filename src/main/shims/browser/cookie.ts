@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {CRUDEngine} from '@wireapp/store-engine';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {AccessTokenData} from '../../auth/';
 import {HttpClient} from '../../http/';

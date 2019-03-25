@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {CRUDEngine} from '@wireapp/store-engine';
 import {Dexie} from 'dexie';
 
 type SchemaCallbackFunction = (db: Dexie) => void;
