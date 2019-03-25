@@ -21,11 +21,11 @@ import 'url-search-params-polyfill';
 
 export function pathWithParams(
   path: string,
-  additionalParams: Record<string, string>,
+  additionalParams?: Record<string, any>,
   whitelistParams?: string[],
   search = window.location.search
 ) {
-  const params: Record<string, string> = paramsToRecord(search);
+  const params: Record<string, any> = paramsToRecord(search);
 
   if (additionalParams) {
     Object.assign(params, additionalParams);
@@ -43,7 +43,7 @@ export function pathWithParams(
 }
 
 export function paramsToRecord(params: string) {
-  const records: Record<string, string> = {};
+  const records: Record<string, any> = {};
   new URLSearchParams(params).forEach((value, key) => {
     records[key] = value;
   });

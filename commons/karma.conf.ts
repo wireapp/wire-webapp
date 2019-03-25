@@ -17,15 +17,12 @@
  *
  */
 
-const pkg = require('./package.json');
+import {Config} from 'karma';
 
-const dist = 'dist/';
-const projectName = pkg.name.replace('@wireapp/', '');
-
-module.exports = function(config) {
+module.exports = function(config: Config) {
   config.set({
     autoWatch: false,
-    basePath: '',
+    basePath: 'src/main',
     browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
@@ -38,17 +35,14 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}${projectName}.test.bundle.js`],
-    frameworks: ['jasmine'],
+    files: ['config/CommonConfig.ts', 'util/UrlUtil.ts', 'util/Runtime.ts', 'util/UrlUtil.test.browser.ts'],
+    frameworks: ['jasmine', 'karma-typescript'],
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors: {
-      '**/*.js': ['sourcemap'],
+      '**/*.ts': ['karma-typescript'],
     },
-    reporters: ['jasmine-diff', 'spec'],
+    reporters: ['jasmine-diff', 'karma-typescript'],
     singleRun: true,
-    specReporter: {
-      showSpecTiming: true,
-    },
   });
 };

@@ -16,11 +16,18 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+console.log('hello1');
+import * as UrlUtil from './UrlUtil';
+console.log('hello', UrlUtil);
 
-import {UrlUtil} from '@wireapp/commons';
+describe('pathWithParams', () => {
+  it('name', () => {
+    expect(1).toBe(1);
+  });
+});
 
 describe('UrlUtil', () => {
-  describe('"pathWithParams"', () => {
+  describe('pathWithParams', () => {
     it('keeps URL if no additional params are given', done => {
       const path = '/resource/';
       const expected = path;
@@ -60,7 +67,7 @@ describe('UrlUtil', () => {
     });
   });
 
-  describe('"getURLParameter"', () => {
+  describe('getURLParameter', () => {
     it('returns empty string if parameter does not exist', done => {
       const expected = '';
       const actual = UrlUtil.getURLParameter('q');
@@ -76,7 +83,7 @@ describe('UrlUtil', () => {
     });
   });
 
-  describe('"hasURLParameter"', () => {
+  describe('hasURLParameter', () => {
     it('returns false if parameter does not exist', done => {
       const expected = false;
       const actual = UrlUtil.hasURLParameter('q');

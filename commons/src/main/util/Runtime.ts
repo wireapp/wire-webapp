@@ -30,9 +30,16 @@ enum OperatingSystem {
   WINDOWS = 'OperatingSystem.WINDOWS',
 }
 
+export interface OS {
+  architecture: string | number;
+  family: string;
+  version: string;
+}
+
 class Runtime {
-  private static getPlatform(): Platform {
-    return platform || {};
+  public static getPlatform(): Platform {
+    const unsetPlatform: Platform = ({} as unknown) as Platform;
+    return platform || unsetPlatform;
   }
 
   public static getOSFamily(): OperatingSystem {
@@ -80,7 +87,7 @@ class Runtime {
     });
   }
 
-  public static getOS() {
+  public static getOS(): OS {
     return {
       architecture: UNKNOWN_PROPERTY,
       family: UNKNOWN_PROPERTY,
