@@ -119,7 +119,8 @@ export default class AudioRepository {
    */
   _play(audioElement, playInLoop = false) {
     if (!audioElement.paused) {
-      return Promise.reject(new Error());
+      // element already playing, nothing to do
+      return Promise.resolve();
     }
 
     audioElement.loop = playInLoop;
@@ -153,7 +154,7 @@ export default class AudioRepository {
     amplify.subscribe(WebAppEvents.AUDIO.STOP, audioId => {
       const audioElement = this._getSoundById(audioId);
       if (audioElement) {
-        this.stop(audioElement);
+        this.stop(audioElement, audioId);
       }
     });
   }
