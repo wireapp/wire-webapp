@@ -43,5 +43,5 @@
     "test:node": "jasmine --config=jasmine.json"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "1.4.2"
+  "version": "1.4.3"
 }
