@@ -6,11 +6,11 @@ describe('enableLogging', () => {
   it('writes a specified logger namespace into the localStorage API', () => {
     const namespace = '@wireapp';
 
-    enableLogging(false, `https://app.wire.com/auth/?enableLogging=${namespace}`);
+    enableLogging(false, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
 
-    enableLogging(true, `https://app.wire.com/auth/?enableLogging=${namespace}`);
+    enableLogging(true, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
   });
@@ -19,7 +19,7 @@ describe('enableLogging', () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(false, 'https://app.wire.com/auth/');
+    enableLogging(false, '');
 
     expect(localStorage.getItem('debug')).toBe(null);
   });
@@ -28,7 +28,7 @@ describe('enableLogging', () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(true, 'https://app.wire.com/auth/');
+    enableLogging(true, '');
 
     expect(localStorage.getItem('debug')).toBe('@wireapp/webapp*');
   });

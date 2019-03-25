@@ -25,6 +25,7 @@ import $ from 'jquery';
 import {groupBy} from 'underscore';
 
 import Conversation from '../../entity/Conversation';
+import {t} from 'utils/LocalizerUtil';
 
 /**
  * Message list rendering view model.
@@ -590,6 +591,21 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
+    const linkTarget = event.target.closest('[data-md-link]');
+    if (linkTarget) {
+      const href = linkTarget.href;
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        action: () => {
+          z.util.SanitizationUtil.safeWindowOpen(href);
+        },
+        text: {
+          action: t('modalOpenLinkAction'),
+          message: t('modalOpenLinkMessage', href),
+          title: t('modalOpenLinkTitle'),
+        },
+      });
+      return false;
+    }
     const hasMentions = messageEntity.mentions().length;
     const mentionElement = hasMentions && event.target.closest('.message-mention');
     const userId = mentionElement && mentionElement.dataset.userId;

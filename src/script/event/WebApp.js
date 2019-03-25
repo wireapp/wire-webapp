@@ -239,3 +239,5 @@ z.event.WebApp = {
     SHOW: 'wire.webapp.warning.show',
   },
 };
+
+export const WebAppEvents = z.event.WebApp;

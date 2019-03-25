@@ -753,7 +753,7 @@ class App {
     this.logger.info(`Refresh to update started`);
     if (z.util.Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, z.lifecycle.UPDATE_SOURCE.WEBAPP);
+      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART);
     }
 
     window.location.reload(true);
