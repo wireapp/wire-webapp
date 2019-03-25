@@ -45,6 +45,7 @@ export class Router {
       originalReplaceState(...args);
       parseRoute();
     };
+    window.addEventListener('hashchange', parseRoute);
 
     // tigger an initial parsing of the current url
     parseRoute();
