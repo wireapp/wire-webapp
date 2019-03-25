@@ -34,7 +34,6 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, listViewModel, repositories) {
-    this.clickOnConversation = this.clickOnConversation.bind(this);
     this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
     this.callingRepository = repositories.calling;
@@ -129,10 +128,8 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
   }
 
-  clickOnConversation(conversationEntity) {
-    if (!this.isSelectedConversation(conversationEntity)) {
-      this.contentViewModel.showConversation(conversationEntity);
-    }
+  getConversationUrl(conversationEntity) {
+    return `/conversation/${conversationEntity.id}`;
   }
 
   setShowCallsState(handlingNotifications) {
