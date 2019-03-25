@@ -35,6 +35,7 @@ import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
 import {Router} from '../router/Router';
+import {initRouterBindings} from '../router/routerBindings';
 import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
@@ -616,10 +617,11 @@ class App {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    new Router({
+    const router = new Router({
       '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
       '/user/:userId': () => {}, // TODO, implement showing the user profile modal
     });
+    initRouterBindings(router);
 
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
