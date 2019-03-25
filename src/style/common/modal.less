@@ -157,18 +157,6 @@
     }
   }
 
-  .modal-footer {
-    .flex-center;
-
-    margin-top: 24px;
-
-    .button {
-      &:not(:last-child) {
-        margin-right: 16px;
-      }
-    }
-  }
-
   .modal-button-close {
     position: absolute;
     top: -2px;
@@ -231,4 +219,30 @@
   transition-duration: 0.55s, 0.55s;
   transition-property: transform, opacity;
   transition-timing-function: @ease-out-expo, @ease-out-expo;
+}
+
+.modal__buttons {
+  .flex-center;
+  justify-content: right;
+  margin-top: 24px;
+}
+
+.modal__button {
+  .button;
+  .button-medium;
+  --button-color: var(--accent-color);
+
+  &--cancel {
+    border-color: var(--button-color);
+    background: #fff;
+    color: var(--button-color);
+  }
+  &--confirm {
+    border-color: var(--button-color);
+    background: var(--button-color);
+    color: #fff;
+  }
+  &--alert {
+    --button-color: @w-red;
+  }
 }
