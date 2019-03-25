@@ -249,6 +249,7 @@ import guestModeToggleGlobal from '../components/guestModeToggle.js';
 import infoToggleGlobal from '../components/infoToggle.js';
 import iconsGlobal from '../components/icons.js';
 import loadingBarGlobal from '../components/loadingBar.js';
+import modalComponentGlobal from '../components/modalComponent.js';
 import assetHeaderGlobal from '../components/asset/assetHeader.js';
 import audioSeekBarGlobal from '../components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from '../components/asset/controls/seekBar.js';

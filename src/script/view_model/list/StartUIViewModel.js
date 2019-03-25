@@ -271,7 +271,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     if (isUser && participantEntity.isOutgoingRequest()) {
       return this.clickOnContact(participantEntity);
     }
-
+    if (isUser) {
+      return amplify.publish(z.event.WebApp.SHOW_USER, participantEntity.id, participantEntity);
+    }
     const createBubble = elementId => {
       this.userProfile(participantEntity);
       this.userBubbleLastId = elementId;
@@ -414,10 +416,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       .then(userIds => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
-
-  //##############################################################################
-  // User bubble
-  //##############################################################################
 
   clickToAcceptInvite(userEntity) {
     this._closeList();

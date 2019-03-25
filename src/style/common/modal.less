@@ -232,3 +232,52 @@
   transition-property: transform, opacity;
   transition-timing-function: @ease-out-expo, @ease-out-expo;
 }
+
+.modal__overlay {
+  position: fixed;
+  z-index: @z-index-modal;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: fade(#000, 64%);
+  opacity: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: opacity 0.15s @ease-out-quart;
+
+  &--visible {
+    opacity: 1;
+    transition: opacity 0.25s @ease-out-quart;
+  }
+}
+.modal__content {
+  position: relative;
+  overflow: hidden;
+  width: 384px;
+  padding: @modal-padding;
+  margin: auto;
+
+  border: var(--modal-border-color);
+  background-color: var(--app-bg-secondary);
+  border-radius: 4px;
+  cursor: default;
+
+  transform: scale(0.8);
+  transition: transform 0.35s @ease-out-quart;
+
+  .modal__overlay--visible & {
+    transform: scale(1);
+  }
+  &--large {
+  }
+}
+
+.modal__close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  cursor: pointer;
+}

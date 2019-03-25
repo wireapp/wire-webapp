@@ -1,0 +1,22 @@
+<div data-bind="with: $root.userModal" >
+  <modal params="isShown: isVisible, onBgClick: hide, onClosed: onClosed" >
+    <close-icon class="modal__close" data-bind="click: hide"></close-icon>
+    <!-- ko if: user() -->
+      <panel-user-details params="participant: user"></panel-user-details>
+      <enriched-fields params="userId: user().id"></enriched-fields>
+      <!-- ko if: showUnblock() -->
+        <button class="button button-full">unblock</button>
+      <!-- /ko -->
+      <!-- ko if: showAccept() -->
+        <button class="button button-full">ignore</button>
+        <button class="button button-full">accept</button>
+      <!-- /ko -->
+      <!-- ko if: showConnect() -->
+        <button class="button button-full">connect</button> 
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko ifnot: user() -->
+      <!-- show loader -->
+    <!-- /ko -->
+  </modal>
+</div>

@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 import MessageListViewModel from './content/MessageListViewModel';
+import {UserModalViewModel} from './content/UserModalViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -74,6 +75,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       z.message.MessageHasher
     );
     this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
+    this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
 
