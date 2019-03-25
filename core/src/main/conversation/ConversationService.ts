@@ -455,6 +455,7 @@ class ConversationService {
 
     return {
       ...payloadBundle,
+      content: assetMessage,
       conversation: conversationId,
       messageTimer: this.messageTimer.getMessageTimer(conversationId),
       state: PayloadBundleState.OUTGOING_SENT,
