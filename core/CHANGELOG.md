@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.2.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.2.9...@wireapp/core@8.2.10) (2019-03-25)
+
+
+### Bug Fixes
+
+* **core:** Return Asset shape after sending image ([#1680](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1680)) ([14a0790](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/14a0790))
+
+
+
+
+
 ## [8.2.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@8.2.8...@wireapp/core@8.2.9) (2019-03-25)
 
 **Note:** Version bump only for package @wireapp/core
