@@ -78,6 +78,24 @@ describe('Router', () => {
     });
   });
 
+  describe('hash change event listener', () => {
+    it('triggers routing when a hashchange event is triggered', done => {
+      const handlers = {conversation: () => {}};
+      spyOn(handlers, 'conversation');
+
+      new Router({'/conversation/:id': handlers.conversation});
+
+      expect(handlers.conversation).not.toHaveBeenCalled();
+
+      window.location.hash = '#/conversation/uuid';
+
+      setTimeout(() => {
+        expect(handlers.conversation).toHaveBeenCalled();
+        done();
+      });
+    });
+  });
+
   describe('history.replaceState proxy', () => {
     it('calls the matching handler when a new state is replaced', () => {
       const routes = {
