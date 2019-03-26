@@ -14,7 +14,7 @@
   <!-- ko if: showCalls() -->
     <!-- ko foreach: callConversations -->
       <conversation-list-calling-cell
-        data-bind="click: $parent.clickOnConversation, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
+        data-bind="link_to: $parent.getConversationUrl($data), attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
         params="conversation: $data, callingRepository: $parent.callingRepository, permissionRepository: $parent.permissionRepository, multitasking: $parent.multitasking, videoGridRepository: $parent.videoGridRepository"
         data-uie-name="item-call">
       </conversation-list-calling-cell>
@@ -52,7 +52,7 @@
 
       <!-- ko foreach: unarchivedConversations -->
         <conversation-list-cell
-          data-bind="click: $parent.clickOnConversation, event: {'contextmenu': $parent.listViewModel.onContextMenu}"
+          data-bind="link_to: $parent.getConversationUrl($data), event: {'contextmenu': $parent.listViewModel.onContextMenu}"
           data-uie-name="item-conversation"
           params="click: $parent.listViewModel.onContextMenu, conversation: $data, is_selected: $parent.isSelectedConversation">
         </conversation-list-cell>

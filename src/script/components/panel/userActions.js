@@ -20,6 +20,8 @@
 import ko from 'knockout';
 import {t} from 'utils/LocalizerUtil';
 
+import './panelActions';
+
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
   viewModel: function({user, conversation, actionsViewModel, onUserRemove = () => {}, isSelfActivated}) {
