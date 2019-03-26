@@ -34,6 +34,8 @@ import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
+import {Router} from '../router/Router';
+import {initRouterBindings} from '../router/routerBindings';
 import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
@@ -603,16 +605,23 @@ class App {
    */
   _showInterface() {
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
+
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
       this.view.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       this.view.list.showTakeover();
     } else if (conversationEntity) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      this.view.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
+
+    const router = new Router({
+      '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
+      '/user/:userId': () => {}, // TODO, implement showing the user profile modal
+    });
+    initRouterBindings(router);
 
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
