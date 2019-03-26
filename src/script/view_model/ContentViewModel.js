@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 import MessageListViewModel from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -190,35 +191,46 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       ? Promise.resolve(conversation)
       : this.conversationRepository.get_conversation_by_id(conversation);
 
-    conversationPromise.then(conversationEntity => {
-      const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
-      const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
-      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+    conversationPromise
+      .then(conversationEntity => {
+        const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
+        const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
+        const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
-      if (isOpenedConversation) {
-        if (openNotificationSettings) {
-          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        if (isOpenedConversation) {
+          if (openNotificationSettings) {
+            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+          }
+          return;
         }
-        return;
-      }
 
-      this._releaseContent(this.state());
+        this._releaseContent(this.state());
 
-      this.state(ContentViewModel.STATE.CONVERSATION);
+        this.state(ContentViewModel.STATE.CONVERSATION);
 
-      if (!isActiveConversation) {
-        this.conversationRepository.active_conversation(conversationEntity);
-      }
-
-      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-      this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
-        this._showContent(ContentViewModel.STATE.CONVERSATION);
-        this.previousConversation = this.conversationRepository.active_conversation();
-        if (openNotificationSettings) {
-          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        if (!isActiveConversation) {
+          this.conversationRepository.active_conversation(conversationEntity);
         }
+
+        const messageEntity = openFirstSelfMention
+          ? conversationEntity.getFirstUnreadSelfMention()
+          : exposeMessageEntity;
+        this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
+          this._showContent(ContentViewModel.STATE.CONVERSATION);
+          this.previousConversation = this.conversationRepository.active_conversation();
+          if (openNotificationSettings) {
+            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+          }
+        });
+      })
+      .catch(() => {
+        this.mainViewModel.modals.showModal('.modal-template-acknowledge', {
+          text: {
+            message: t('conversationNotFoundMessage'),
+            title: t('conversationNotFoundTitle'),
+          },
+        });
       });
-    });
   }
 
   switchContent(newContentState) {
