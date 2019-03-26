@@ -619,7 +619,7 @@ class App {
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
-      '/user/:userId': () => {}, // TODO, implement showing the user profile modal
+      '/user/:userId': userId => this.view.content.userModal.showUser(userId),
     });
     initRouterBindings(router);
 
