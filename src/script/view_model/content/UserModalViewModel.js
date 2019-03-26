@@ -17,8 +17,6 @@
  *
  */
 
-import {WebAppEvents} from '../../event/WebApp';
-
 export class UserModalViewModel {
   constructor(userRepository, actionsViewModel) {
     this.userRepository = userRepository;
@@ -58,8 +56,6 @@ export class UserModalViewModel {
         this.hide();
       });
     };
-
-    amplify.subscribe(WebAppEvents.SHOW_USER, this.showUser.bind(this));
   }
 
   showUser(userId) {

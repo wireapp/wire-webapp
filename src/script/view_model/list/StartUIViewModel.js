@@ -272,7 +272,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.clickOnContact(participantEntity);
     }
     if (isUser) {
-      return amplify.publish(z.event.WebApp.SHOW_USER, participantEntity.id, participantEntity);
+      return this.mainViewModel.content.userModal.showUser(participantEntity.id);
     }
     const createBubble = elementId => {
       this.userProfile(participantEntity);

@@ -26,7 +26,7 @@ import 'src/script/components/icons';
 import 'src/script/components/panel/userActions';
 
 describe('user-actions', () => {
-  describe('getParticipantActions', () => {
+  describe('Renders actions', () => {
     const tests = [
       {
         expected: ['go-profile', 'do-leave'],
@@ -36,7 +36,7 @@ describe('user-actions', () => {
 
           const conversation = new Conversation();
           spyOn(conversation, 'isGroup').and.returnValue(true);
-          return {conversation: new Conversation(), isSelfActivated: true, user};
+          return {conversation, isSelfActivated: true, user};
         },
         testName: 'generates actions for self user profile',
       },
