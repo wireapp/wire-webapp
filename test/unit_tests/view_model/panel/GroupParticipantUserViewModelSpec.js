@@ -17,8 +17,8 @@
  *
  */
 
+import UUID from 'uuidjs';
 import GroupParticipantUserViewModel from 'src/script/view_model/panel/GroupParticipantUserViewModel';
-import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
 
 describe('GroupParticipantUserViewModel', () => {
@@ -43,53 +43,11 @@ describe('GroupParticipantUserViewModel', () => {
     });
   });
 
-  describe('getParticipantActions', () => {
-    const tests = [
-      {
-        expected: ['go-profile', 'do-leave'],
-        getParams: () => {
-          const user = new User();
-          user.is_me = true;
+  it('returns the id of the entity attached', () => {
+    const userId = UUID.genV4();
+    const user = new User(userId);
+    groupParticipantUserViewModel.initView({entity: user});
 
-          const conversation = new Conversation();
-          spyOn(conversation, 'isGroup').and.returnValue(true);
-          return {conversation, user};
-        },
-        isActivatedAccount: true,
-        testName: 'generates actions for self user profile',
-      },
-      {
-        expected: ['go-profile'],
-        getParams: () => {
-          const user = new User();
-          user.is_me = true;
-          return {conversation: new Conversation(), user};
-        },
-        isActivatedAccount: false,
-        testName: 'generates actions for self user profile when user is not activated',
-      },
-      {
-        expected: ['go-conversation', 'do-block'],
-        getParams: () => {
-          const user = new User();
-          const conversation = new Conversation();
-          user.connection().status(z.connection.ConnectionStatus.ACCEPTED);
-          spyOn(conversation, 'isGroup').and.returnValue(true);
-          return {conversation: conversation, user};
-        },
-        isActivatedAccount: true,
-        testName: 'generates actions for another user profile to which I am connected',
-      },
-    ];
-
-    return tests.forEach(({expected, getParams, isActivatedAccount, testName}) => {
-      it(testName, () => {
-        const {conversation, user} = getParams();
-        spyOn(groupParticipantUserViewModel.userRepository, 'isActivatedAccount').and.returnValue(isActivatedAccount);
-        const items = groupParticipantUserViewModel.getParticipantActions(user, conversation);
-
-        expect(items.map(item => item.identifier)).toEqual(expected);
-      });
-    });
+    expect(groupParticipantUserViewModel.getEntityId()).toBe(userId);
   });
 });
