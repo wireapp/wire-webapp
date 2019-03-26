@@ -20,25 +20,11 @@
 import {Router} from 'src/script/router/Router';
 
 describe('Router', () => {
-  let originalReplaceStateFn;
-
-  beforeEach(() => {
-    originalReplaceStateFn = window.history.replaceState;
-  });
-
   afterEach(() => {
     window.location.hash = '#';
-    window.history.replaceState = originalReplaceStateFn;
   });
 
   describe('constructor', () => {
-    it("overwrites browser's replaceState method", () => {
-      const originalReplaceState = window.history.replaceState;
-      new Router();
-
-      expect(originalReplaceState).not.toBe(window.history.replaceState);
-    });
-
     it('parse the current URL when instantiated', () => {
       const routes = {'/conv': () => {}};
       spyOn(routes, '/conv');
@@ -93,34 +79,6 @@ describe('Router', () => {
         expect(handlers.conversation).toHaveBeenCalled();
         done();
       });
-    });
-  });
-
-  describe('history.replaceState proxy', () => {
-    it('calls the matching handler when a new state is replaced', () => {
-      const routes = {
-        '/conversation/:id': () => {},
-        '/user/:id': () => {},
-      };
-
-      spyOn(routes, '/conversation/:id');
-      spyOn(routes, '/user/:id');
-
-      new Router(routes);
-
-      window.history.replaceState('', '', '#/nomatch');
-
-      expect(routes['/conversation/:id']).not.toHaveBeenCalled();
-      expect(routes['/user/:id']).not.toHaveBeenCalled();
-
-      window.history.replaceState('', '', '#/conversation/uuid');
-
-      expect(routes['/conversation/:id']).toHaveBeenCalled();
-      expect(routes['/user/:id']).not.toHaveBeenCalled();
-
-      window.history.replaceState('', '', '#/user/uuid');
-
-      expect(routes['/user/:id']).toHaveBeenCalled();
     });
   });
 });

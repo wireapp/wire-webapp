@@ -27,32 +27,22 @@ export class Router {
     };
     const routes = Object.assign({}, defaultRoute, routeDefinitions);
 
-    const parseRoute = () => {
+    this.parseRoute = () => {
       const currentPath = window.location.hash.replace('#', '') || '/';
 
       const {value} = switchPath(currentPath, routes);
       return typeof value === 'function' ? value() : value;
     };
 
-    /**
-     * We need to proxy the replaceState method of history in order to trigger an event and warn the app that something happens.
-     * This is needed because the replaceState method can be called from outside of the app (eg. in the desktop app)
-     * @returns {void}
-     */
-    const originalReplaceState = window.history.replaceState.bind(window.history);
-
-    window.history.replaceState = (...args) => {
-      originalReplaceState(...args);
-      parseRoute();
-    };
-    window.addEventListener('hashchange', parseRoute);
+    window.addEventListener('hashchange', this.parseRoute);
 
     // tigger an initial parsing of the current url
-    parseRoute();
+    this.parseRoute();
   }
 
   navigate(path) {
     window.history.replaceState(null, null, `#${path}`);
+    this.parseRoute();
     return this;
   }
 }
