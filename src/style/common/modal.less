@@ -245,6 +245,7 @@
   position: relative;
   overflow: hidden;
   width: 384px;
+  max-height: 480px;
   padding: 16px;
   margin: auto;
 
@@ -252,6 +253,7 @@
   background-color: var(--app-bg-secondary);
   border-radius: 4px;
   cursor: default;
+  overflow-y: auto;
 
   transform: scale(0.8);
   transition: transform 0.35s @ease-out-quart;
@@ -265,8 +267,13 @@
 
 .modal__close {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 16px;
+  left: 352px;
+  display: flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 .modal__buttons {

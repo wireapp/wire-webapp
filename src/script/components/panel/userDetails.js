@@ -38,7 +38,7 @@ ko.components.register('panel-user-details', {
         <div class="panel-participant__role-label" data-bind="text: badge" data-uie-name="status-partner"></div>
       <!-- /ko -->
 
-      <!-- ko if: participant().isGuest() -->
+      <!-- ko if: showGuest && participant().isGuest() -->
         <div class="panel-participant__guest-label" data-uie-name="status-guest">
           <guest-icon></guest-icon>
           <span data-bind="text: t('conversationGuestIndicator')"></span>
@@ -61,6 +61,7 @@ ko.components.register('panel-user-details', {
   viewModel: class {
     constructor(params) {
       this.participant = params.participant;
+      this.showGuest = params.showGuest;
       this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
       this.badge = params.badge;
       this.availabilityLabel = ko.pureComputed(() => {
