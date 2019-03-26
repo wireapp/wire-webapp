@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,45 +17,18 @@
  *
  */
 
+import '../../components/panel/userActions';
+
 export class UserModalViewModel {
   constructor(userRepository, actionsViewModel) {
     this.userRepository = userRepository;
+    this.actionsViewModel = actionsViewModel;
 
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
     this.onClosed = () => this.user(null);
     this.hide = () => this.isVisible(false);
-
-    this.showUnblock = ko.computed(() => this.user() && this.user().isBlocked());
-    this.showAccept = ko.computed(() => {
-      const user = this.user();
-      return !this.showUnblock() && user && (user.isIgnored() || user.isIncomingRequest());
-    });
-
-    this.showConnect = ko.computed(() => {
-      return !this.showUnblock() & !this.showAccept() && this.user() && this.user().isUnknown();
-    });
-
-    this.connectUser = () => {
-      actionsViewModel.sendConnectionRequest(this.user(), true);
-      this.hide();
-    };
-
-    this.unblockUser = () => {
-      actionsViewModel.unblockUser(this.user(), true);
-      this.hide();
-    };
-
-    this.acceptInvite = () => {
-      actionsViewModel.acceptConnectionRequest(this.user(), true);
-      this.hide();
-    };
-
-    this.ignoreInvite = () => {
-      actionsViewModel.ignoreConnectionRequest(this.user()).then(() => {
-        this.hide();
-      });
-    };
+    this.onUserAction = () => this.hide();
   }
 
   showUser(userId) {
