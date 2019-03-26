@@ -20,8 +20,8 @@
 import Logger from 'utils/Logger';
 
 import BasePanelViewModel from './BasePanelViewModel';
+import {Actions} from '../../components/panel/userActions';
 
-import '../../components/panel/userActions';
 import '../../components/panel/enrichedFields';
 import '../../components/panel/userDetails';
 
@@ -40,6 +40,13 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.selectedParticipant = ko.observable(undefined);
 
     this.showActionDevices = ko.pureComputed(() => !this.selectedParticipant().is_me);
+    this.onUserAction = this.onUserAction.bind(this);
+  }
+
+  onUserAction(action) {
+    if (action === Actions.REMOVE) {
+      this.onGoBack();
+    }
   }
 
   getElementId() {

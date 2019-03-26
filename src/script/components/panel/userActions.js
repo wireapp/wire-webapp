@@ -22,9 +22,23 @@ import {t} from 'utils/LocalizerUtil';
 
 import './panelActions';
 
+export const Actions = {
+  ACCEPT_REQUEST: 'UserActions.ACCEPT_REQUEST',
+  BLOCK: 'UserActions.BLOCK',
+  CANCEL_REQUEST: 'UserActions.CANCEL_REQUEST',
+  IGNORE_REQUEST: 'UserActions.IGNORE_REQUEST',
+  LEAVE: 'UserActions.LEAVE',
+  OPEN_CONVERSATION: 'UserActions.OPEN_CONVERSATION',
+  OPEN_PROFILE: 'UserActions.OPEN_PROFILE',
+  OPEN_REQUEST: 'UserActions.OPEN_REQUEST',
+  REMOVE: 'UserActions.REMOVE',
+  SEND_REQUEST: 'UserActions.SEND_REQUEST',
+  UNBLOCK: 'UserActions.UNBLOCK',
+};
+
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function({user, conversation, actionsViewModel, onUserRemove = () => {}, isSelfActivated}) {
+  viewModel: function({user, conversation, actionsViewModel, onAction = () => {}, isSelfActivated}) {
     user = ko.unwrap(user);
     conversation = ko.unwrap(conversation);
     isSelfActivated = ko.unwrap(isSelfActivated);
@@ -36,7 +50,10 @@ ko.components.register('user-actions', {
         // open self profile
         condition: () => isMe,
         item: {
-          click: () => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT),
+          click: () => {
+            amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+            onAction(Actions.OPEN_PROFILE);
+          },
           icon: 'profile-icon',
           identifier: 'go-profile',
           label: t('groupParticipantActionSelfProfile'),
@@ -54,7 +71,7 @@ ko.components.register('user-actions', {
           );
         },
         item: {
-          click: () => actionsViewModel.leaveConversation(conversation),
+          click: () => actionsViewModel.leaveConversation(conversation).then(() => onAction(Actions.LEAVE)),
           icon: 'leave-icon',
           identifier: 'do-leave',
           label: t('groupParticipantActionLeave'),
@@ -64,7 +81,7 @@ ko.components.register('user-actions', {
         // open conversation
         condition: () => isNotMe && (user.isConnected() || user.isTeamMember()),
         item: {
-          click: () => actionsViewModel.open1to1Conversation(user),
+          click: () => actionsViewModel.open1to1Conversation(user).then(() => onAction(Actions.OPEN_CONVERSATION)),
           icon: 'message-icon',
           identifier: 'go-conversation',
           label: t('groupParticipantActionOpenConversation'),
@@ -74,7 +91,8 @@ ko.components.register('user-actions', {
         // accept request
         condition: () => isNotMe && user.isIncomingRequest(),
         item: {
-          click: () => actionsViewModel.acceptConnectionRequest(user, true),
+          click: () =>
+            actionsViewModel.acceptConnectionRequest(user, true).then(() => onAction(Actions.ACCEPT_REQUEST)),
           icon: 'check-icon',
           identifier: 'do-accept-request',
           label: t('groupParticipantActionIncomingRequest'),
@@ -84,7 +102,7 @@ ko.components.register('user-actions', {
         //ignore request
         condition: () => isNotMe && user.isIncomingRequest(),
         item: {
-          click: () => actionsViewModel.ignoreConnectionRequest(user),
+          click: () => actionsViewModel.ignoreConnectionRequest(user).then(() => onAction(Actions.IGNORE_REQUEST)),
           icon: 'close-icon',
           identifier: 'do-ignore-request',
           label: t('groupParticipantActionIgnoreRequest'),
@@ -94,7 +112,7 @@ ko.components.register('user-actions', {
         //open request
         condition: () => isNotMe && user.isOutgoingRequest(),
         item: {
-          click: () => actionsViewModel.open1to1Conversation(user),
+          click: () => actionsViewModel.open1to1Conversation(user).then(() => onAction(Actions.OPEN_REQUEST)),
           icon: 'message-icon',
           identifier: 'go-conversation',
           label: t('groupParticipantActionPending'),
@@ -104,7 +122,7 @@ ko.components.register('user-actions', {
         // cancel request
         condition: () => isNotMe && user.isOutgoingRequest(),
         item: {
-          click: () => actionsViewModel.cancelConnectionRequest(user),
+          click: () => actionsViewModel.cancelConnectionRequest(user).then(() => onAction(Actions.CANCEL_REQUEST)),
           icon: 'undo-icon',
           identifier: 'do-cancel-request',
           label: t('groupParticipantActionCancelRequest'),
@@ -118,7 +136,7 @@ ko.components.register('user-actions', {
           return isNotMe && isNotConnectedUser && canConnect;
         },
         item: {
-          click: () => actionsViewModel.sendConnectionRequest(user),
+          click: () => actionsViewModel.sendConnectionRequest(user).then(() => onAction(Actions.SEND_REQUEST)),
           icon: 'plus-icon',
           identifier: 'do-send-request',
           label: t('groupParticipantActionSendRequest'),
@@ -128,7 +146,7 @@ ko.components.register('user-actions', {
         // block user
         condition: () => isNotMe && (user.isConnected() || user.isRequest()),
         item: {
-          click: () => actionsViewModel.blockUser(user),
+          click: () => actionsViewModel.blockUser(user).then(() => onAction(Actions.BLOCK)),
           icon: 'block-icon',
           identifier: 'do-block',
           label: t('groupParticipantActionBlock'),
@@ -138,7 +156,7 @@ ko.components.register('user-actions', {
         // unblock user
         condition: () => isNotMe && user.isBlocked(),
         item: {
-          click: () => actionsViewModel.unblockUser(user, false),
+          click: () => actionsViewModel.unblockUser(user, false).then(() => onAction(Actions.UNBLOCK)),
           icon: 'block-icon',
           identifier: 'do-unblock',
           label: t('groupParticipantActionUnblock'),
@@ -156,7 +174,7 @@ ko.components.register('user-actions', {
           );
         },
         item: {
-          click: () => actionsViewModel.removeFromConversation(conversation, user).then(onUserRemove),
+          click: () => actionsViewModel.removeFromConversation(conversation, user).then(() => onAction(Actions.REMOVE)),
           icon: 'minus-icon',
           identifier: 'do-remove',
           label: t('groupParticipantActionRemove'),

@@ -4,16 +4,7 @@
     <!-- ko if: user() -->
       <panel-user-details params="participant: user"></panel-user-details>
       <enriched-fields params="userId: user().id"></enriched-fields>
-      <!-- ko if: showUnblock() -->
-        <button class="button button-full">unblock</button>
-      <!-- /ko -->
-      <!-- ko if: showAccept() -->
-        <button class="button button-full">ignore</button>
-        <button class="button button-full">accept</button>
-      <!-- /ko -->
-      <!-- ko if: showConnect() -->
-        <button class="button button-full">connect</button> 
-      <!-- /ko -->
+      <user-actions params="user: user(), actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     <!-- /ko -->
     <!-- ko ifnot: user() -->
       <!-- show loader -->
