@@ -30,7 +30,6 @@ export const Actions = {
   LEAVE: 'UserActions.LEAVE',
   OPEN_CONVERSATION: 'UserActions.OPEN_CONVERSATION',
   OPEN_PROFILE: 'UserActions.OPEN_PROFILE',
-  OPEN_REQUEST: 'UserActions.OPEN_REQUEST',
   REMOVE: 'UserActions.REMOVE',
   SEND_REQUEST: 'UserActions.SEND_REQUEST',
   UNBLOCK: 'UserActions.UNBLOCK',
@@ -106,16 +105,6 @@ ko.components.register('user-actions', {
           icon: 'close-icon',
           identifier: 'do-ignore-request',
           label: t('groupParticipantActionIgnoreRequest'),
-        },
-      },
-      {
-        //open request
-        condition: () => isNotMe && user.isOutgoingRequest(),
-        item: {
-          click: () => actionsViewModel.open1to1Conversation(user).then(() => onAction(Actions.OPEN_REQUEST)),
-          icon: 'message-icon',
-          identifier: 'go-conversation',
-          label: t('groupParticipantActionPending'),
         },
       },
       {
