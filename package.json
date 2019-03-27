@@ -177,6 +177,7 @@
     "bundle:test": "webpack --config webpack.config.test.js",
     "build:prod": "yarn build:server && grunt build_prod",
     "configure": "copy-config",
+    "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
