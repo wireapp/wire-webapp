@@ -146,10 +146,10 @@
     semver "^5.5.0"
     ws "^5.1.0"
 
-"@pm2/io@^4.1.0":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@pm2/io/-/io-4.1.2.tgz#a9bb69bc80fc0848ee2c70b15cd251ebd4750b88"
-  integrity sha512-AS4eIjcBGac+hxq2c1Rb9jaXIn3VBv998vhACi6yD9RLb9+jUZ4Ezs6FsIg2i4rfMoiBn3b9DewjCfLGqhYB4g==
+"@pm2/io@^4.1.2":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@pm2/io/-/io-4.1.3.tgz#ccb8551e3d3bf3c7cdc0f1038d9f83c9d184feb4"
+  integrity sha512-M3bo1h+1neM9iDBk6zN8D/DzuZCAhQXPFcsCi7PDAfpK88wH4eQOP5RW2omdJ2Cv1RKTcZXODRD5Dx73OQNMcA==
   dependencies:
     "@opencensus/core" "^0.0.9"
     "@opencensus/propagation-b3" "^0.0.8"
@@ -2870,13 +2870,13 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.4.0.tgz#d30d05e89f986782e0b0bf011343d46be39c3447"
-  integrity sha512-BLK3zwrCmfE9I9XEvrGweK+/IEkhVlGENc1fgOH0fJHZc1vneC3v6dUmxz32pmsi9aB4DnrYIeZi46RHd6rO3Q==
+pm2@3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.4.1.tgz#4e36646946410105068ee6ef48e06adbc44b1259"
+  integrity sha512-JZCBysgw3Nq3t2M0bQev86sHlvTgzY2eY6HhQQ9AcTt2P6BDH1MtzyEuK1KaJ3Aw455VHNeTv7LvXtFqp/zXNA==
   dependencies:
     "@pm2/agent" "^0.5.22"
-    "@pm2/io" "^4.1.0"
+    "@pm2/io" "^4.1.2"
     "@pm2/js-api" "^0.5.43"
     async "^2.6.1"
     blessed "^0.1.81"
