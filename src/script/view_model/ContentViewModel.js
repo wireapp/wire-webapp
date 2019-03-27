@@ -45,7 +45,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   }
 
   constructor(mainViewModel, repositories) {
-    this.showConversation = this.showConversation.bind(this);
     this.switchContent = this.switchContent.bind(this);
     this.switchPreviousContent = this.switchPreviousContent.bind(this);
 
@@ -135,7 +134,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation);
   }
 
   /**
@@ -170,7 +169,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @param {boolean} [options.openNotificationSettings=false] - Open notification settings of conversation
    * @returns {undefined} No return value
    */
-  showConversation(conversation, options = {}) {
+  showConversation = (conversation, options = {}) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -207,6 +206,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         this._releaseContent(this.state());
 
         this.state(ContentViewModel.STATE.CONVERSATION);
+        this.mainViewModel.list.openConversations();
 
         if (!isActiveConversation) {
           this.conversationRepository.active_conversation(conversationEntity);
@@ -242,7 +242,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
           },
         });
       });
-  }
+  };
 
   switchContent(newContentState) {
     const isStateChange = newContentState !== this.state();
