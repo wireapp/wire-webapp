@@ -215,12 +215,23 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         const messageEntity = openFirstSelfMention
           ? conversationEntity.getFirstUnreadSelfMention()
           : exposeMessageEntity;
-        this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
-          this._showContent(ContentViewModel.STATE.CONVERSATION);
-          this.previousConversation = this.conversationRepository.active_conversation();
-          if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
-          }
+
+        if (conversationEntity.is_cleared()) {
+          conversationEntity.cleared_timestamp(0);
+        }
+
+        const unarchivePromise = conversationEntity.is_archived()
+          ? this.conversationRepository.unarchiveConversation(conversationEntity)
+          : Promise.resolve();
+
+        unarchivePromise.then(() => {
+          this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
+            this._showContent(ContentViewModel.STATE.CONVERSATION);
+            this.previousConversation = this.conversationRepository.active_conversation();
+            if (openNotificationSettings) {
+              this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+            }
+          });
         });
       })
       .catch(() => {
