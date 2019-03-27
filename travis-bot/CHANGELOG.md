@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@3.1.71...@wireapp/travis-bot@4.0.0) (2019-03-27)
+
+
+### Code Refactoring
+
+* **core:** Expect conversation ID when creating messages & Message types [BREAKING] ([#1686](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/1686)) ([2a4a0b9](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/2a4a0b9))
+
+
+### BREAKING CHANGES
+
+* **core:**  - Removed PayloadBundle sub types
+ - Extracted message create functions from ConversationService
+ - Moved conversationId params from message send functions to message create functions
+
+Old API:
+```ts
+const textPayload = await account.service.conversation.createText(this.message).build();
+await account.service.conversation.send(conversationId, textPayload);
+```
+
+New API:
+```ts
+const textPayload = await account.service.conversation.messageBuilder.createText(conversationId, this.message).build();
+await account.service.conversation.send(textPayload);
+```
+
+
+
+
+
 ## [3.1.71](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@3.1.70...@wireapp/travis-bot@3.1.71) (2019-03-25)
 
 **Note:** Version bump only for package @wireapp/travis-bot
