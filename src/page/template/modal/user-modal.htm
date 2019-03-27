@@ -1,13 +1,22 @@
-<div data-bind="with: $root.userModal" >
+<div class="user-modal" data-bind="with: $root.userModal" >
   <modal params="isShown: isVisible, onBgClick: hide, onClosed: onClosed" data-bind="attr: {'data-uie-name': user() ? 'modal-user-profile' : ''}">
     <close-icon class="modal__close" data-bind="click: hide" data-uie-name="do-close"></close-icon>
     <!-- ko if: user() -->
       <panel-user-details params="participant: user"></panel-user-details>
-      <enriched-fields class="bottom-margin" params="userId: user().id"></enriched-fields>
-      <user-actions params="user: user(), actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
+      <enriched-fields params="userId: user().id"></enriched-fields>
+      <user-actions params="user: user(), actionsViewModel: actionsViewModel, onAction: hide, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     <!-- /ko -->
     <!-- ko ifnot: user() -->
-      <!-- show loader -->
+      <div class="loading-wrapper">
+        <loading-icon></loading-icon>
+      </div>
+    <!-- /ko -->
+    <!-- ko if: userNotFound() -->
+      <div class="modal__title" data-bind="text: t('userNotFoundTitle')"></div>
+      <div class="modal__message" data-bind="text: t('userNotFoundMessage')"></div>
+      <div class="modal__buttons">
+        <div class="modal__button" data-bind="text: t('modalAcknowledgeAction'), click: hide"></div>
+      </div>
     <!-- /ko -->
   </modal>
 </div>
