@@ -495,7 +495,7 @@ export default class UserRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
+          this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
         }
         throw error;
       });
