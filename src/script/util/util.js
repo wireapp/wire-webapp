@@ -381,6 +381,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
     const link = tokens[idx];
     const href = cleanString(link.attrGet('href'));
     const isEmail = href.startsWith('mailto:');
+    const isWire = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
 
@@ -398,7 +399,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
     }
-    if (link.markup !== 'linkify') {
+    if (!isWire && link.markup !== 'linkify') {
       const title = link.attrGet('title');
       if (title) {
         link.attrSet('title', cleanString(title));
