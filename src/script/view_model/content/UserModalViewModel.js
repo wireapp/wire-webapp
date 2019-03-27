@@ -17,7 +17,7 @@
  *
  */
 
-import '../../components/panel/userActions';
+import {Actions} from '../../components/panel/userActions';
 
 export class UserModalViewModel {
   constructor(userRepository, actionsViewModel) {
@@ -33,6 +33,16 @@ export class UserModalViewModel {
     };
     this.hide = () => this.isVisible(false);
   }
+
+  onUserAction = userAction => {
+    switch (userAction) {
+      case Actions.UNBLOCK:
+      case Actions.SEND_REQUEST:
+        this.actionsViewModel.open1to1Conversation(this.user());
+        break;
+    }
+    this.hide();
+  };
 
   showUser(userId) {
     this.user(null);

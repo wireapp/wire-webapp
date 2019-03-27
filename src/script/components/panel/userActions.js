@@ -156,7 +156,7 @@ ko.components.register('user-actions', {
         // unblock user
         condition: () => isNotMe && user.isBlocked(),
         item: {
-          click: () => actionsViewModel.unblockUser(user, false).then(() => onAction(Actions.UNBLOCK)),
+          click: () => actionsViewModel.unblockUser(user).then(() => onAction(Actions.UNBLOCK)),
           icon: 'block-icon',
           identifier: 'do-unblock',
           label: t('groupParticipantActionUnblock'),

@@ -8,7 +8,7 @@
       <panel-user-details params="participant: user"></panel-user-details>
       <enriched-fields params="userId: user().id"></enriched-fields>
       <user-actions
-        params="user: user(), actionsViewModel: actionsViewModel, onAction: hide, isSelfActivated: userRepository.isActivatedAccount()"
+        params="user: user(), actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"
       ></user-actions>
     <!-- /ko -->
     <!-- ko if: !user() && !userNotFound()  -->
