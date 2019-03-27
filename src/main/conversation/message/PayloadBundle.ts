@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationContent} from '../conversation/content/';
+import {ConversationContent} from '../content';
 
 enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
@@ -25,25 +25,15 @@ enum PayloadBundleState {
   OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
 }
 
-type PayloadBundleIncoming = PayloadBundle & {
-  conversation: string;
-  messageTimer: number;
-  state: PayloadBundleState.INCOMING;
-};
-type PayloadBundleOutgoing = PayloadBundle & {
-  conversation: string;
-  messageTimer: number;
-  state: PayloadBundleState.OUTGOING_SENT;
-};
-type PayloadBundleOutgoingUnsent = PayloadBundle & {state: PayloadBundleState.OUTGOING_UNSENT};
-
 interface PayloadBundle {
   content?: ConversationContent;
+  conversation: string;
   from: string;
   id: string;
   state: PayloadBundleState;
   timestamp: number;
   type: PayloadBundleType;
+  messageTimer?: number;
 }
 
 enum PayloadBundleType {
@@ -73,11 +63,4 @@ enum PayloadBundleType {
   UNKNOWN = 'PayloadBundleType.UNKNOWN',
 }
 
-export {
-  PayloadBundle,
-  PayloadBundleType,
-  PayloadBundleIncoming,
-  PayloadBundleOutgoing,
-  PayloadBundleOutgoingUnsent,
-  PayloadBundleState,
-};
+export {PayloadBundle, PayloadBundleType, PayloadBundleState};

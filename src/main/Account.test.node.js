@@ -125,7 +125,7 @@ describe('Account', () => {
       expect(account.apiClient.context.userId).toBeDefined();
 
       const text = 'FIFA World Cup';
-      const payload = account.service.conversation.createText(text).build();
+      const payload = account.service.conversation.messageBuilder.createText(text).build();
 
       expect(payload.timestamp).toBeGreaterThan(0);
 

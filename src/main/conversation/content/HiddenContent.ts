@@ -18,7 +18,7 @@
  */
 interface HiddenContent {
   conversationId: string;
-  originalMessageId: string;
+  messageId: string;
 }
 
 export {HiddenContent};

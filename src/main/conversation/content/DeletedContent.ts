@@ -17,7 +17,7 @@
  *
  */
 interface DeletedContent {
-  originalMessageId: string;
+  messageId: string;
 }
 
 export {DeletedContent};

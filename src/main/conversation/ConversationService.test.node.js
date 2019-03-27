@@ -208,7 +208,7 @@ describe('ConversationService', () => {
       };
       const urlOffset = 0;
 
-      const linkPreview = await account.service.conversation.createLinkPreview({
+      const linkPreview = await account.service.conversation.messageBuilder.createLinkPreview({
         permanentUrl,
         summary,
         title,
@@ -216,8 +216,8 @@ describe('ConversationService', () => {
         url,
         urlOffset,
       });
-      const textMessage = account.service.conversation
-        .createText(text)
+      const textMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
         .withLinkPreviews([linkPreview])
         .build();
 
@@ -243,7 +243,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.createText(text).build();
+      const textMessage = account.service.conversation.messageBuilder.createText(undefined, text).build();
 
       expect(textMessage.content.linkPreviews).toBeUndefined();
     });
@@ -273,9 +273,9 @@ describe('ConversationService', () => {
       const text = url;
       const urlOffset = 0;
 
-      const linkPreview = await account.service.conversation.createLinkPreview({image, url, urlOffset});
-      const textMessage = account.service.conversation
-        .createText(text)
+      const linkPreview = await account.service.conversation.messageBuilder.createLinkPreview({image, url, urlOffset});
+      const textMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
         .withLinkPreviews([linkPreview])
         .build();
 
@@ -305,8 +305,8 @@ describe('ConversationService', () => {
         userId: PayloadHelper.getUUID(),
       };
 
-      const textMessage = account.service.conversation
-        .createText(text)
+      const textMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
         .withMentions([mention])
         .build();
 
@@ -323,7 +323,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.createText(text).build();
+      const textMessage = account.service.conversation.messageBuilder.createText(text).build();
 
       expect(textMessage.content.mentions).toBeUndefined();
     });
@@ -343,8 +343,8 @@ describe('ConversationService', () => {
         sha256: textSHA256,
       };
 
-      const replyMessage = account.service.conversation
-        .createText(text)
+      const replyMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
         .withQuote(quote)
         .build();
 
@@ -359,7 +359,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.createText(text).build();
+      const textMessage = account.service.conversation.messageBuilder.createText(undefined, text).build();
 
       expect(textMessage.content.quote).toBeUndefined();
     });
@@ -371,8 +371,8 @@ describe('ConversationService', () => {
 
       const text = 'Please read me';
 
-      const replyMessage = account.service.conversation
-        .createText(text)
+      const replyMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
         .withReadConfirmation(true)
         .build();
 
