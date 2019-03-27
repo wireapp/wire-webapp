@@ -69,6 +69,7 @@ class User {
     this.is_me = false;
     this.isService = false;
     this.isSingleSignOn = false;
+    this.isDeleted = false;
 
     this.joaatHash = -1;
 
