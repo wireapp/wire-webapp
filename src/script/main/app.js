@@ -619,7 +619,9 @@ class App {
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
-      '/user/:userId': userId => this.view.content.userModal.showUser(userId),
+      '/user/:userId': userId => {
+        this.view.content.userModal.showUser(userId, () => router.navigate('/'));
+      },
     });
     initRouterBindings(router);
 

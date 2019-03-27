@@ -27,9 +27,11 @@ export class UserModalViewModel {
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
     this.userNotFound = ko.observable(false);
+    this.onClosedCallback = () => {};
     this.onClosed = () => {
       this.user(null);
       this.userNotFound(false);
+      this.onClosedCallback();
     };
     this.hide = () => this.isVisible(false);
   }
@@ -44,7 +46,8 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId) {
+  showUser(userId, onModalClosed = () => {}) {
+    this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);
     if (userId) {
