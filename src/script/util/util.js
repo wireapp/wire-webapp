@@ -411,6 +411,9 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
     }
+    if (isWire) {
+      link.attrPush(['data-uie-name', 'wire-deep-link']);
+    }
     return self.renderToken(tokens, idx, options);
   };
 
