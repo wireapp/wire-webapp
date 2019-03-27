@@ -6,7 +6,7 @@
       <enriched-fields params="userId: user().id"></enriched-fields>
       <user-actions params="user: user(), actionsViewModel: actionsViewModel, onAction: hide, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     <!-- /ko -->
-    <!-- ko ifnot: user() || userNotFound()  -->
+    <!-- ko if: !user() && !userNotFound()  -->
       <div class="loading-wrapper">
         <loading-icon></loading-icon>
       </div>
