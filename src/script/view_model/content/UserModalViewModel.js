@@ -26,16 +26,20 @@ export class UserModalViewModel {
 
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
-    this.onClosed = () => this.user(null);
+    this.userNotFound = ko.observable(false);
+    this.onClosed = () => {
+      this.user(null);
+      this.userNotFound(false);
+    };
     this.hide = () => this.isVisible(false);
-    this.onUserAction = () => this.hide();
   }
 
   showUser(userId) {
     if (userId) {
-      this.userRepository.get_user_by_id(userId).then(user => {
-        this.user(user);
-      });
+      this.userRepository
+        .get_user_by_id(userId)
+        .then(user => this.user(user))
+        .catch(() => this.userNotFound(true));
       this.isVisible(true);
     }
   }
