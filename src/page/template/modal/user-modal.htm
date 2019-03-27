@@ -1,10 +1,15 @@
-<div class="user-modal" data-bind="with: $root.userModal" >
-  <modal params="isShown: isVisible, onBgClick: hide, onClosed: onClosed" data-bind="attr: {'data-uie-name': user() ? 'modal-user-profile' : ''}">
+<div class="user-modal" data-bind="with: $root.userModal">
+  <modal
+    params="isShown: isVisible, onBgClick: hide, onClosed: onClosed"
+    data-bind="attr: {'data-uie-name': user() ? 'modal-user-profile' : userNotFound() ? 'modal-cannot-open-profile' : ''}"
+  >
     <close-icon class="modal__close" data-bind="click: hide" data-uie-name="do-close"></close-icon>
     <!-- ko if: user() -->
       <panel-user-details params="participant: user"></panel-user-details>
       <enriched-fields params="userId: user().id"></enriched-fields>
-      <user-actions params="user: user(), actionsViewModel: actionsViewModel, onAction: hide, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
+      <user-actions
+        params="user: user(), actionsViewModel: actionsViewModel, onAction: hide, isSelfActivated: userRepository.isActivatedAccount()"
+      ></user-actions>
     <!-- /ko -->
     <!-- ko if: !user() && !userNotFound()  -->
       <div class="loading-wrapper">
@@ -12,10 +17,10 @@
       </div>
     <!-- /ko -->
     <!-- ko if: userNotFound() -->
-      <div class="modal__title" data-bind="text: t('userNotFoundTitle')"></div>
-      <div class="modal__message" data-bind="text: t('userNotFoundMessage')"></div>
+      <div class="modal__title" data-bind="text: t('userNotFoundTitle')" data-uie-name="status-modal-title"></div>
+      <div class="modal__message" data-bind="text: t('userNotFoundMessage')" data-uie-name="status-modal-text"></div>
       <div class="modal__buttons">
-        <div class="modal__button" data-bind="text: t('modalAcknowledgeAction'), click: hide"></div>
+        <div class="modal__button" data-bind="text: t('modalAcknowledgeAction'), click: hide" data-uie-name="do-ok"></div>
       </div>
     <!-- /ko -->
   </modal>
