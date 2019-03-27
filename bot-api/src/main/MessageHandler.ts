@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/event/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleIncoming, ReactionType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, ReactionType} from '@wireapp/core/dist/conversation/';
 import {
   FileContent,
   FileMetaDataContent,
@@ -28,12 +28,12 @@ import {
   LocationContent,
   MentionContent,
 } from '@wireapp/core/dist/conversation/content/';
-import {Asset} from '@wireapp/protocol-messaging';
+import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 
 abstract class MessageHandler {
   public account: Account | undefined = undefined;
 
-  abstract handleEvent(payload: PayloadBundleIncoming): void;
+  abstract handleEvent(payload: PayloadBundle): void;
 
   public async addUser(conversationId: string, userId: string): Promise<void> {
     if (this.account && this.account.service) {
@@ -55,8 +55,12 @@ abstract class MessageHandler {
 
   public async sendConfirmation(conversationId: string, firstMessageId: string): Promise<void> {
     if (this.account && this.account.service) {
-      const confirmationPayload = this.account.service.conversation.createConfirmationDelivered(firstMessageId);
-      await this.account.service.conversation.send(conversationId, confirmationPayload);
+      const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation(
+        conversationId,
+        firstMessageId,
+        Confirmation.Type.DELIVERED
+      );
+      await this.account.service.conversation.send(confirmationPayload);
     }
   }
 
@@ -85,69 +89,83 @@ abstract class MessageHandler {
     userIds?: string[]
   ): Promise<void> {
     if (this.account && this.account.service) {
-      const editedPayload = this.account.service.conversation
-        .createEditedText(newMessageText, originalMessageId)
+      const editedPayload = this.account.service.conversation.messageBuilder
+        .createEditedText(conversationId, newMessageText, originalMessageId)
         .withMentions(newMentions)
         .build();
 
-      const editedMessage = await this.account.service.conversation.send(conversationId, editedPayload, userIds);
+      const editedMessage = await this.account.service.conversation.send(editedPayload, userIds);
 
       if (newLinkPreview) {
-        const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(newLinkPreview);
-        const editedWithPreviewPayload = this.account.service.conversation
-          .createEditedText(newMessageText, originalMessageId, editedMessage.id)
+        const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
+          newLinkPreview
+        );
+        const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
+          .createEditedText(conversationId, newMessageText, originalMessageId, editedMessage.id)
           .withLinkPreviews([linkPreviewPayload])
           .withMentions(newMentions)
           .build();
 
-        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload, userIds);
+        await this.account.service.conversation.send(editedWithPreviewPayload, userIds);
       }
     }
   }
 
   public async sendFile(conversationId: string, file: FileContent, metadata: FileMetaDataContent): Promise<void> {
     if (this.account && this.account.service) {
-      const metadataPayload = this.account.service.conversation.createFileMetadata(metadata);
-      await this.account.service.conversation.send(conversationId, metadataPayload);
+      const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata(
+        conversationId,
+        metadata
+      );
+      await this.account.service.conversation.send(metadataPayload);
 
       try {
-        const filePayload = await this.account.service.conversation.createFileData(file, metadataPayload.id);
-        await this.account.service.conversation.send(conversationId, filePayload);
+        const filePayload = await this.account.service.conversation.messageBuilder.createFileData(
+          conversationId,
+          file,
+          metadataPayload.id
+        );
+        await this.account.service.conversation.send(filePayload);
       } catch (error) {
-        const abortPayload = await this.account.service.conversation.createFileAbort(
+        const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort(
+          conversationId,
           Asset.NotUploaded.FAILED,
           metadataPayload.id
         );
-        await this.account.service.conversation.send(conversationId, abortPayload);
+        await this.account.service.conversation.send(abortPayload);
       }
     }
   }
 
   public async sendImage(conversationId: string, image: ImageContent): Promise<void> {
     if (this.account && this.account.service) {
-      const imagePayload = await this.account.service.conversation.createImage(image);
-      await this.account.service.conversation.send(conversationId, imagePayload);
+      const imagePayload = await this.account.service.conversation.messageBuilder.createImage(conversationId, image);
+      await this.account.service.conversation.send(imagePayload);
     }
   }
 
   public async sendLocation(conversationId: string, location: LocationContent): Promise<void> {
     if (this.account && this.account.service) {
-      const locationPayload = this.account.service.conversation.createLocation(location);
-      await this.account.service.conversation.send(conversationId, locationPayload);
+      const locationPayload = this.account.service.conversation.messageBuilder.createLocation(conversationId, location);
+      await this.account.service.conversation.send(locationPayload);
     }
   }
 
   public async sendPing(conversationId: string): Promise<void> {
     if (this.account && this.account.service) {
-      const pingPayload = this.account.service.conversation.createPing();
-      await this.account.service.conversation.send(conversationId, pingPayload);
+      const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId, {});
+      await this.account.service.conversation.send(pingPayload);
     }
   }
 
   public async sendReaction(conversationId: string, originalMessageId: string, type: ReactionType): Promise<void> {
     if (this.account && this.account.service) {
-      const reactionPayload = this.account.service.conversation.createReaction(originalMessageId, type);
-      await this.account.service.conversation.send(conversationId, reactionPayload);
+      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(
+        conversationId,
+        originalMessageId,
+        type
+      );
+      await this.account.service.conversation.send(reactionPayload);
     }
   }
 
@@ -159,21 +177,23 @@ abstract class MessageHandler {
     userIds?: string[]
   ): Promise<void> {
     if (this.account && this.account.service) {
-      const payload = await this.account.service.conversation
-        .createText(text)
+      const payload = await this.account.service.conversation.messageBuilder
+        .createText(conversationId, text)
         .withMentions(mentions)
         .build();
-      const sentMessage = await this.account.service.conversation.send(conversationId, payload, userIds);
+      const sentMessage = await this.account.service.conversation.send(payload, userIds);
 
       if (linkPreview) {
-        const linkPreviewPayload = await this.account.service.conversation.createLinkPreview(linkPreview);
-        const editedWithPreviewPayload = this.account.service.conversation
-          .createText(text, sentMessage.id)
+        const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
+          linkPreview
+        );
+        const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
+          .createText(conversationId, text, sentMessage.id)
           .withLinkPreviews([linkPreviewPayload])
           .withMentions(mentions)
           .build();
 
-        await this.account.service.conversation.send(conversationId, editedWithPreviewPayload, userIds);
+        await this.account.service.conversation.send(editedWithPreviewPayload, userIds);
       }
     }
   }

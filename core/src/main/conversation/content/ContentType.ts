@@ -67,7 +67,7 @@ export function isConnection(content: ConversationContent): content is Connectio
 }
 
 export function isDeletedContent(content: ConversationContent): content is DeletedContent {
-  return !!(content as DeletedContent).originalMessageId && !(content as any).text;
+  return !!(content as DeletedContent).messageId && !(content as any).text;
 }
 
 export function isEditedTextContent(content: ConversationContent): content is EditedTextContent {

@@ -17,26 +17,20 @@
  *
  */
 
-import {PayloadBundleOutgoingUnsent} from '../conversation/';
-import {
-  LinkPreviewUploadedContent,
-  MentionContent,
-  QuoteContent,
-  QuoteMessageContent,
-  TextContent,
-} from '../conversation/content/';
-import {MessageHashService} from '../cryptography/';
+import {MessageHashService} from '../../cryptography';
+import {LinkPreviewUploadedContent, MentionContent, QuoteContent, QuoteMessageContent, TextContent} from '../content';
+import {EditedTextMessage, TextMessage} from './Message';
 
 class TextContentBuilder {
   private readonly content: TextContent;
-  private readonly payloadBundle: PayloadBundleOutgoingUnsent;
+  private readonly payloadBundle: TextMessage | EditedTextMessage;
 
-  constructor(payloadBundle: PayloadBundleOutgoingUnsent) {
+  constructor(payloadBundle: TextMessage | EditedTextMessage) {
     this.payloadBundle = payloadBundle;
     this.content = this.payloadBundle.content as TextContent;
   }
 
-  public build(): PayloadBundleOutgoingUnsent {
+  public build(): TextMessage | EditedTextMessage {
     this.payloadBundle.content = this.content;
     return this.payloadBundle;
   }

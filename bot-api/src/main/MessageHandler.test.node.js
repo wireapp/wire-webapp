@@ -82,15 +82,28 @@ describe('MessageHandler', () => {
         id: new UUID(UUID_VERSION).format(),
       };
 
-      spyOn(mainHandler.account.service.conversation, 'createFileMetadata').and.returnValue(metadataPayload);
-      spyOn(mainHandler.account.service.conversation, 'createFileData').and.returnValue(Promise.resolve(filePayload));
-      spyOn(mainHandler.account.service.conversation, 'createFileAbort').and.returnValue(Promise.resolve());
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
+        metadataPayload
+      );
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileData').and.returnValue(
+        Promise.resolve(filePayload)
+      );
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileAbort').and.returnValue(
+        Promise.resolve()
+      );
 
       await mainHandler.sendFile(conversationId, file, metadata);
-      expect(mainHandler.account.service.conversation.createFileMetadata).toHaveBeenCalledWith(metadata);
-      expect(mainHandler.account.service.conversation.createFileData).toHaveBeenCalledWith(file, metadataPayload.id);
-      expect(mainHandler.account.service.conversation.createFileAbort).not.toHaveBeenCalled();
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(conversationId, filePayload);
+      expect(mainHandler.account.service.conversation.messageBuilder.createFileMetadata).toHaveBeenCalledWith(
+        conversationId,
+        metadata
+      );
+      expect(mainHandler.account.service.conversation.messageBuilder.createFileData).toHaveBeenCalledWith(
+        conversationId,
+        file,
+        metadataPayload.id
+      );
+      expect(mainHandler.account.service.conversation.messageBuilder.createFileAbort).not.toHaveBeenCalled();
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(filePayload);
     });
 
     it('sends the correct data if uploading fails', async () => {
@@ -105,14 +118,27 @@ describe('MessageHandler', () => {
         id: new UUID(UUID_VERSION).format(),
       };
 
-      spyOn(mainHandler.account.service.conversation, 'createFileMetadata').and.returnValue(metadataPayload);
-      spyOn(mainHandler.account.service.conversation, 'createFileData').and.returnValue(Promise.reject(new Error()));
-      spyOn(mainHandler.account.service.conversation, 'createFileAbort').and.returnValue(Promise.resolve(abortPayload));
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
+        metadataPayload
+      );
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileData').and.returnValue(
+        Promise.reject(new Error())
+      );
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileAbort').and.returnValue(
+        Promise.resolve(abortPayload)
+      );
 
       await mainHandler.sendFile(conversationId, file, metadata);
-      expect(mainHandler.account.service.conversation.createFileMetadata).toHaveBeenCalledWith(metadata);
-      expect(mainHandler.account.service.conversation.createFileData).toHaveBeenCalledWith(file, metadataPayload.id);
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(conversationId, abortPayload);
+      expect(mainHandler.account.service.conversation.messageBuilder.createFileMetadata).toHaveBeenCalledWith(
+        conversationId,
+        metadata
+      );
+      expect(mainHandler.account.service.conversation.messageBuilder.createFileData).toHaveBeenCalledWith(
+        conversationId,
+        file,
+        metadataPayload.id
+      );
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(abortPayload);
     });
   });
 
@@ -126,13 +152,15 @@ describe('MessageHandler', () => {
         },
       ];
 
-      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createText').and.callThrough();
 
       await mainHandler.sendText(conversationId, messageText, mentionData);
 
-      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(messageText);
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+      expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
+        messageText
+      );
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})}),
         undefined
       );
@@ -142,13 +170,15 @@ describe('MessageHandler', () => {
       const conversationId = new UUID(UUID_VERSION).format();
       const message = new UUID(UUID_VERSION).format();
 
-      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createText').and.callThrough();
 
       await mainHandler.sendText(conversationId, message);
 
-      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(message);
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+      expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
+        message
+      );
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
         undefined
       );
@@ -159,13 +189,15 @@ describe('MessageHandler', () => {
       const message = new UUID(UUID_VERSION).format();
       const userIds = [new UUID(UUID_VERSION).format(), new UUID(UUID_VERSION).format()];
 
-      spyOn(mainHandler.account.service.conversation, 'createText').and.callThrough();
+      spyOn(mainHandler.account.service.conversation.messageBuilder, 'createText').and.callThrough();
 
       await mainHandler.sendText(conversationId, message, undefined, undefined, userIds);
 
-      expect(mainHandler.account.service.conversation.createText).toHaveBeenCalledWith(message);
-      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
+      expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
+        message
+      );
+      expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
         userIds
       );

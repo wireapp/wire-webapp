@@ -23,7 +23,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleIncoming, PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {FileEngine} from '@wireapp/store-engine';
 import {AxiosError} from 'axios';
 import * as program from 'commander';
@@ -62,7 +62,7 @@ storeEngine
 
     const account = new Account(apiClient);
 
-    account.on(PayloadBundleType.TEXT, (data: PayloadBundleIncoming) => {
+    account.on(PayloadBundleType.TEXT, (data: PayloadBundle) => {
       console.log(
         `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`
       );
@@ -107,8 +107,8 @@ storeEngine
         stdin.addListener('data', data => {
           const message = data.toString().trim();
           if (account.service) {
-            const payload = account.service.conversation.createText(message).build();
-            return account.service.conversation.send(conversationID, payload);
+            const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
+            return account.service.conversation.send(payload);
           }
           return;
         });

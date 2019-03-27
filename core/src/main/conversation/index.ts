@@ -24,5 +24,5 @@ export * from './ClientActionType';
 export * from './ConversationService';
 export * from './GenericMessageType';
 export * from './MessageTimer';
-export * from './PayloadBundle';
+export * from './message/PayloadBundle';
 export * from './ReactionType';
