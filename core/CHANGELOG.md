@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@9.0.1...@wireapp/core@9.0.2) (2019-03-27)
+
+
+### Bug Fixes
+
+* **core:** Add missing message types ([#1691](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1691)) ([9cbba5d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9cbba5d))
+
+
+
+
+
 ## [9.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@9.0.0...@wireapp/core@9.0.1) (2019-03-27)
 
 **Note:** Version bump only for package @wireapp/core
