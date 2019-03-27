@@ -93,7 +93,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    this.updateConnection(connectionEntity).then(() => {
+    return this.updateConnection(connectionEntity).then(() => {
       const shouldUpdateUser = previousStatus === z.connection.ConnectionStatus.SENT && connectionEntity.isConnected();
       if (shouldUpdateUser) {
         this.userRepository.updateUserById(connectionEntity.userId);
