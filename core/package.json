@@ -10,7 +10,7 @@
     "@wireapp/store-engine": "1.1.38",
     "bazinga64": "5.3.53",
     "hash.js": "1.1.7",
-    "logdown": "3.2.7",
+    "logdown": "3.2.8",
     "protobufjs": "6.8.8",
     "pure-uuid": "1.5.7"
   },

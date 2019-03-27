@@ -11,7 +11,7 @@
   },
   "description": "A changelog notification bot.",
   "devDependencies": {
-    "logdown": "3.2.7",
+    "logdown": "3.2.8",
     "rimraf": "2.6.3",
     "typescript": "3.3.4000"
   },

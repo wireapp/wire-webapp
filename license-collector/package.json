@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "fs-extra": "7.0.1",
-    "logdown": "3.2.7",
+    "logdown": "3.2.8",
     "npm-license-crawler": "0.2.0",
     "npm-registry-package-info": "1.0.5"
   },

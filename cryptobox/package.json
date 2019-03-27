@@ -9,7 +9,7 @@
     "bazinga64": "5.3.53",
     "dexie": "2.0.4",
     "fs-extra": "7.0.1",
-    "logdown": "3.2.7"
+    "logdown": "3.2.8"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
