@@ -35,6 +35,8 @@ export class UserModalViewModel {
   }
 
   showUser(userId) {
+    this.user(null);
+    this.userNotFound(false);
     if (userId) {
       this.userRepository
         .get_user_by_id(userId)

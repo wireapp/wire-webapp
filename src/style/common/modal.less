@@ -243,9 +243,11 @@
 }
 .modal__content {
   position: relative;
+  display: flex;
   overflow: hidden;
   width: 384px;
   max-height: 480px;
+  flex-direction: column;
   padding: 16px;
   margin: auto;
 
@@ -253,6 +255,7 @@
   background-color: var(--app-bg-secondary);
   border-radius: 4px;
   cursor: default;
+  font-size: 14px;
   overflow-y: auto;
 
   transform: scale(0.8);
@@ -315,4 +318,12 @@
   &--alert {
     --button-color: @w-red;
   }
+}
+
+.modal__title {
+  margin: 8px 0;
+  font-weight: @font-weight-bold;
+}
+.modal__message {
+  margin: 8px 0;
 }
