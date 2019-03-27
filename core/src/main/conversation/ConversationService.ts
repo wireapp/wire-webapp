@@ -95,7 +95,6 @@ import {
   TextMessage,
 } from './message/Message';
 import {MessageBuilder} from './message/MessageBuilder';
-import {PayloadBundle} from './message/PayloadBundle';
 
 class ConversationService {
   private clientID: string = '';
@@ -870,7 +869,7 @@ class ConversationService {
     return userId;
   }
 
-  public async send(payloadBundle: Message, userIds?: string[]): Promise<PayloadBundle> {
+  public async send(payloadBundle: Message, userIds?: string[]) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
         return this.sendFileData(payloadBundle, userIds);
@@ -879,7 +878,7 @@ class ConversationService {
       case PayloadBundleType.ASSET_META:
         return this.sendFileMetaData(payloadBundle, userIds);
       case PayloadBundleType.ASSET_IMAGE:
-        return this.sendImage(payloadBundle, userIds);
+        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds);
       case PayloadBundleType.CLIENT_ACTION: {
         if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
           return this.sendSessionReset(payloadBundle, userIds);

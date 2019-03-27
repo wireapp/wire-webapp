@@ -94,16 +94,20 @@ interface DeleteMessage extends PayloadBundle {
 }
 
 type Message =
-  | FileAssetMessage
-  | FileAssetAbortMessage
-  | FileAssetMetaDataMessage
-  | ImageAssetMessageOutgoing
-  | ResetSessionMessage
+  | ClearConversationMessage
   | ConfirmationMessage
-  | LocationMessage
+  | DeleteMessage
   | EditedTextMessage
+  | FileAssetAbortMessage
+  | FileAssetMessage
+  | FileAssetMetaDataMessage
+  | HideMessage
+  | ImageAssetMessage
+  | ImageAssetMessageOutgoing
+  | LocationMessage
   | PingMessage
   | ReactionMessage
+  | ResetSessionMessage
   | TextMessage;
 
 export {
