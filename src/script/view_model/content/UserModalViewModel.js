@@ -53,7 +53,12 @@ export class UserModalViewModel {
     if (userId) {
       this.userRepository
         .get_user_by_id(userId)
-        .then(user => this.user(user))
+        .then(user => {
+          if (user.isDeleted) {
+            return this.userNotFound(true);
+          }
+          this.user(user);
+        })
         .catch(() => this.userNotFound(true));
       this.isVisible(true);
     }

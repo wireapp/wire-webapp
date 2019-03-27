@@ -632,21 +632,22 @@ export default class UserRepository {
 
   /**
    * Add user entities for suspended users.
-   * @param {Array<string>} user_ids - Requested user IDs
-   * @param {Array<User>} user_ets - User entities returned by backend
+   * @param {Array<string>} userIds - Requested user IDs
+   * @param {Array<User>} userEntities - User entities returned by backend
    * @returns {Array<User>} User entities to be returned
    */
-  _add_suspended_users(user_ids, user_ets) {
-    for (const user_id of user_ids) {
-      const matching_user_ids = user_ets.find(user_et => user_et.id === user_id);
+  _add_suspended_users(userIds, userEntities) {
+    for (const userId of userIds) {
+      const matching_userIds = userEntities.find(user_et => user_et.id === userId);
 
-      if (!matching_user_ids) {
-        const user_et = new User(user_id);
-        user_et.name(t('nonexistentUser'));
-        user_ets.push(user_et);
+      if (!matching_userIds) {
+        const userEntity = new User(userId);
+        userEntity.isDeleted = true;
+        userEntity.name(t('nonexistentUser'));
+        userEntities.push(userEntity);
       }
     }
-    return user_ets;
+    return userEntities;
   }
 
   /**
