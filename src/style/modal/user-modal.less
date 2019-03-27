@@ -5,12 +5,21 @@
 
   .loading-wrapper {
     display: flex;
-    height: 400px;
+    height: 448px;
     align-items: center;
     justify-content: center;
   }
 
   loading-icon {
     fill: currentColor;
+  }
+
+  &__wrapper {
+    min-height: 0;
+    transition: all 0.15s linear;
+
+    &--max {
+      min-height: 448px;
+    }
   }
 }
