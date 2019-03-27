@@ -354,7 +354,7 @@ class Login extends React.Component<CombinedProps, State> {
                         ref={this.inputs.email}
                         markInvalid={!validInputs.email}
                         value={email}
-                        autoComplete="section-login email"
+                        autoComplete="username email"
                         placeholder={_(loginStrings.emailPlaceholder)}
                         maxLength={128}
                         type="text"
