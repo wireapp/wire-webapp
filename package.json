@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@emotion/core": "10.0.9",
+    "@emotion/core": "10.0.10",
     "@types/color": "3.0.0",
     "bazinga64": "5.3.53",
     "color": "3.1.0",
