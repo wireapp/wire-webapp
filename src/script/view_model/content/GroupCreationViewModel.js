@@ -23,11 +23,7 @@ import ReceiptMode from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
 import trackingHelpers from '../../tracking/Helpers';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
+export class GroupCreationViewModel {
   static get STATE() {
     return {
       DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
@@ -48,7 +44,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.userRepository = repositories.user;
     this.isTeam = this.teamRepository.isTeam;
 
-    this.modal = undefined;
+    this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
     this.isCreatingConversation = false;
@@ -104,7 +100,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       if (stateIsPreference) {
         return $(document).on('keydown.groupCreation', keyboardEvent => {
           if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-            this._hideModal();
+            this.isShown(false);
           }
         });
       }
@@ -127,20 +123,11 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   showCreateGroup(method, userEntity) {
     this.method = method;
     this.enableReadReceipts(this.isTeam());
-
-    if (!this.modal) {
-      this.modal = new z.ui.Modal('#group-creation-modal', this._afterHideModal.bind(this));
-      this.modal.setAutoclose(false);
-    }
-
+    this.isShown(true);
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
-
-    this.modal.show();
-    $('.group-creation-modal-teamname-input').focus();
-
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
       method: this.method,
     });
@@ -151,7 +138,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   clickOnClose() {
-    this._hideModal();
+    this.isShown(false);
   }
 
   clickOnToggleGuestMode() {
@@ -174,7 +161,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput(), accessState, options)
         .then(conversationEntity => {
-          this._hideModal();
+          this.isShown(false);
 
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
 
@@ -210,7 +197,7 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     }
   }
 
-  _afterHideModal() {
+  afterHideModal() {
     this.isCreatingConversation = false;
     this.method = undefined;
     this.nameError('');
@@ -219,12 +206,6 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
     this.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-  }
-
-  _hideModal() {
-    if (this.modal) {
-      this.modal.hide();
-    }
   }
 
   _trackGroupCreation(conversationEntity) {
@@ -267,4 +248,4 @@ z.viewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
-};
+}

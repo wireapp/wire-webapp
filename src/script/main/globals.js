@@ -205,7 +205,6 @@ import CollectionViewModelGlobal from '../view_model/content/CollectionViewModel
 import ConnectRequestsViewModelGlobal from '../view_model/content/ConnectRequestsViewModel.js';
 import EmojiInputViewModelGlobal from '../view_model/content/EmojiInputViewModel.js';
 import GiphyViewModelGlobal from '../view_model/content/GiphyViewModel.js';
-import GroupCreationViewModelGlobal from '../view_model/content/GroupCreationViewModel.js';
 import HistoryExportViewModelGlobal from '../view_model/content/HistoryExportViewModel.js';
 import HistoryImportViewModelGlobal from '../view_model/content/HistoryImportViewModel.js';
 import InputBarViewModelGlobal from '../view_model/content/InputBarViewModel.js';
