@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.3.9...@wireapp/api-client@3.4.0) (2019-03-28)
+
+
+### Features
+
+* **api-client:** Identity Provider API ([#1699](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1699)) ([b37e2b9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b37e2b9))
+
+
+
+
+
 ## [3.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.3.8...@wireapp/api-client@3.3.9) (2019-03-27)
 
 **Note:** Version bump only for package @wireapp/api-client
