@@ -17,8 +17,6 @@ import utilGlobal from '../util/util.js';
 import SanitizationUtilGlobal from '../util/SanitizationUtil.js';
 import KeyboardUtilGlobal from '../util/KeyboardUtil.js';
 import LocalizerUtilGlobal from '../util/LocalizerUtil.js';
-import linkifyGlobal from '../util/linkify.js';
-import htmlGlobal from '../util/linkify-html.js';
 import helpersGlobal from '../util/scroll-helpers.js';
 import StorageUtilGlobal from '../util/StorageUtil.js';
 import StringUtilGlobal from '../util/StringUtil.js';

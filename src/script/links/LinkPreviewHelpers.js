@@ -18,6 +18,9 @@
  */
 
 const codeBlockRegex = /(`+)[^`]*?\1$/gm;
+import Linkify from 'linkify-it';
+
+const linkify = new Linkify();
 
 /**
  * Check if the text contains only one link
@@ -26,8 +29,8 @@ const codeBlockRegex = /(`+)[^`]*?\1$/gm;
  */
 export function containsOnlyLink(text) {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
-  const urls = linkify.find(textWithoutCode, 'url');
-  return urls.length === 1 && urls[0].value === textWithoutCode;
+  const urls = linkify.match(textWithoutCode) || [];
+  return urls.length === 1 && urls[0].raw === textWithoutCode;
 }
 
 /**
@@ -38,13 +41,13 @@ export function containsOnlyLink(text) {
 export function getFirstLinkWithOffset(text) {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
 
-  const [firstLink] = linkify.find(textWithoutCode, 'url');
+  const links = linkify.match(textWithoutCode) || [];
+  const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));
 
   if (firstLink) {
-    const linkOffset = textWithoutCode.indexOf(firstLink.value);
     return {
-      offset: linkOffset,
-      url: firstLink.value,
+      offset: firstLink.index,
+      url: firstLink.raw,
     };
   }
 }
