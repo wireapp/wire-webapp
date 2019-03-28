@@ -19,13 +19,10 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
 import ThemeViewModel from './ThemeViewModel';
 import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
 
-z.viewModel.MainViewModel = class MainViewModel {
+export class MainViewModel {
   static get CONFIG() {
     return {
       PANEL: {
@@ -66,9 +63,8 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.openPanel = this.openPanel.bind(this);
     this.togglePanel = this.togglePanel.bind(this);
 
-    this.elementId = 'wire-main';
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.MainViewModel');
+    this.logger = Logger('MainViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -95,8 +91,6 @@ z.viewModel.MainViewModel = class MainViewModel {
         return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
       }
     });
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   openPanel() {
@@ -213,4 +207,4 @@ z.viewModel.MainViewModel = class MainViewModel {
   closePanelOnClick() {
     this.panel.closePanel();
   }
-};
+}

@@ -77,7 +77,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
 
   /**
    * View model for the details column.
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, repositories) {

@@ -40,7 +40,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
    * View model for the start UI.
    * @class z.viewModel.list.StartUIViewModel
    *
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */

@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import ko from 'knockout';
 
 import platform from 'platform';
 import {Config} from '../auth/config';
@@ -32,6 +33,7 @@ import BackendClient from '../service/BackendClient';
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {MainViewModel} from '../view_model/MainViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
@@ -77,10 +79,12 @@ class App {
   /**
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
+   * @param {Element} domContainer - DOM element that will hold the app
    */
-  constructor(backendClient) {
+  constructor(backendClient, domContainer) {
     this.backendClient = backendClient;
     this.logger = Logger('App');
+    this.domContainer = domContainer;
 
     this.telemetry = new AppInitTelemetry();
     new WindowHandler();
@@ -598,7 +602,8 @@ class App {
    * @returns {undefined} No return value
    */
   _showInterface() {
-    const mainView = new z.viewModel.MainViewModel(this.repository);
+    const mainView = new MainViewModel(this.repository);
+    ko.applyBindings(mainView, this.domContainer);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
@@ -845,13 +850,13 @@ class App {
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
-  if ($('#wire-main-app').length !== 0) {
+  if (document.getElementById('wire-main-app') !== null) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient);
+    wire.app = new App(backendClient, document.getElementById('wire-main'));
   }
 });
 

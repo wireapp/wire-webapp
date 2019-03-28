@@ -29,7 +29,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   /**
    * View model for the temporary guest experience.
    *
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */
