@@ -608,15 +608,15 @@ class App {
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
-      this.view.content.showConversation(conversationEntity);
+      mainView.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
-      '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
+      '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
       '/user/:userId': userId => {
-        this.view.content.userModal.showUser(userId, () => router.navigate('/'));
+        mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
