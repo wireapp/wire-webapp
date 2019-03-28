@@ -44,7 +44,7 @@
     "switch-path": "1.2.0",
     "uint32": "0.2.1",
     "underscore": "1.9.1",
-    "url-search-params-polyfill": "5.0.1",
+    "url-search-params-polyfill": "5.1.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
     "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.16.4",
