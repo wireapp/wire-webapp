@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import platform from 'platform';
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
@@ -86,7 +87,6 @@ class App {
 
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
-    this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
     this._publishGlobals();
@@ -261,14 +261,6 @@ class App {
   }
 
   /**
-   * Create all app view models.
-   * @returns {Object} All view models
-   */
-  _setupViewModels() {
-    return new z.viewModel.MainViewModel(this.repository);
-  }
-
-  /**
    * Subscribe to amplify events.
    * @returns {undefined} No return value
    */
@@ -292,29 +284,30 @@ class App {
    * @returns {undefined} No return value
    */
   initApp(isReload = this._isReload()) {
+    const loadingView = new LoadingViewModel();
     z.util
       .checkIndexedDb()
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
-        this.view.loading.updateProgress(2.5);
+        loadingView.updateProgress(2.5);
         this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return this._initiateSelfUser();
       })
       .then(() => {
-        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
+        loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
         this.telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        this.view.loading.updateProgress(7.5, t('initValidatedClient'));
+        loadingView.updateProgress(7.5, t('initValidatedClient'));
         this.telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
-        this.view.loading.updateProgress(10);
+        loadingView.updateProgress(10);
         this.telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
@@ -323,7 +316,7 @@ class App {
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
-        this.view.loading.updateProgress(25, t('initReceivedUserData'));
+        loadingView.updateProgress(25, t('initReceivedUserData'));
 
         this.telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
@@ -344,13 +337,13 @@ class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, t('initUpdatedFromNotifications'));
+        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications'));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
       })
       .then(clientEntities => {
-        this.view.loading.updateProgress(99);
+        loadingView.updateProgress(99);
 
         this.telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
         this.telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
@@ -362,6 +355,7 @@ class App {
       .then(() => {
         this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
+        loadingView.removeFromView();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
@@ -604,13 +598,15 @@ class App {
    * @returns {undefined} No return value
    */
   _showInterface() {
+    const mainView = new z.viewModel.MainViewModel(this.repository);
+
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
-      this.view.list.showTemporaryGuest();
+      mainView.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
-      this.view.list.showTakeover();
+      mainView.list.showTakeover();
     } else if (conversationEntity) {
       this.view.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
@@ -625,7 +621,6 @@ class App {
     });
     initRouterBindings(router);
 
-    this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
 
     this.repository.properties.checkPrivacyPermission().then(() => {

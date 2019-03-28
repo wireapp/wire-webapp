@@ -18,23 +18,22 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import ko from 'knockout';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.LoadingViewModel = class LoadingViewModel {
-  constructor(mainViewModel, repositories) {
-    this.elementId = 'loading-screen';
-    this.userRepository = repositories.user;
+export class LoadingViewModel {
+  constructor() {
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
     amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
 
-    ko.applyBindings(this, document.getElementById(this.elementId));
+    const elementId = 'loading-screen';
+    this.element = document.getElementById(elementId);
+    ko.applyBindings(this, this.element);
   }
 
   removeFromView() {
-    $(`#${this.elementId}`).remove();
+    ko.cleanNode(this.element);
+    this.element.remove();
     amplify.unsubscribeAll(z.event.WebApp.APP.UPDATE_PROGRESS);
   }
 
@@ -47,11 +46,6 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
       let updatedLoadingMessage;
 
       switch (message) {
-        case t('initReceivedSelfUser'): {
-          updatedLoadingMessage = t('initReceivedSelfUser', this.userRepository.self().first_name());
-          break;
-        }
-
         case t('initDecryption'):
         case t('initEvents'): {
           if (!z.config.FEATURE.SHOW_LOADING_INFORMATION) {
@@ -76,4 +70,4 @@ z.viewModel.LoadingViewModel = class LoadingViewModel {
       this.loadingMessage(updatedLoadingMessage);
     }
   }
-};
+}
