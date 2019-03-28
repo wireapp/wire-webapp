@@ -22,6 +22,7 @@
     "jszip": "3.2.1",
     "keyboardjs": "2.5.1",
     "knockout": "3.5.0",
+    "linkify-it": "2.1.0",
     "long": "4.0.0",
     "markdown-it": "8.4.2",
     "moment": "2.24.0",
