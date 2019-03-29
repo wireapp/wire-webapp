@@ -90,15 +90,16 @@ class App {
 
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
-    this.util = this._setup_utils();
+    if (Config.FEATURE.ENABLE_DEBUG) {
+      this.util = {debug: new DebugUtil(this.repository)};
+    }
 
     this._publishGlobals();
 
-    this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler(this._onExtraInstanceStarted);
+    const onExtraInstanceStarted = () => this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
-
     this.initApp();
     this.initServiceWorker();
   }
@@ -251,14 +252,6 @@ class App {
       team: new z.team.TeamService(this.backendClient),
       webSocket: new z.event.WebSocketService(this.backendClient),
     };
-  }
-
-  /**
-   * Create all app utils.
-   * @returns {Object} All utils
-   */
-  _setup_utils() {
-    return z.config.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
   }
 
   /**
@@ -830,10 +823,6 @@ class App {
    */
   reportCall() {
     this.repository.calling.reportCall();
-  }
-
-  _onExtraInstanceStarted() {
-    return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
   }
 
   _publishGlobals() {
