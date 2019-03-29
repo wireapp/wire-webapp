@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.4.6...@wireapp/commons@1.4.7) (2019-03-29)
+
+
+### Bug Fixes
+
+* **commons:** Don't add a default namespace ([#1702](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1702)) ([eda9f63](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/eda9f63))
+
+
+
+
+
 ## [1.4.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.4.5...@wireapp/commons@1.4.6) (2019-03-29)
 
 **Note:** Version bump only for package @wireapp/commons
