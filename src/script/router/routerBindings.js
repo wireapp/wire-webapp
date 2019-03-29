@@ -17,29 +17,18 @@
  *
  */
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+import ko from 'knockout';
 
-z.error.AudioError = class AudioError extends z.error.BaseError {
-  constructor(type, message) {
-    super('AudioError', type, message);
-  }
+export function initRouterBindings(routerInstance) {
+  ko.bindingHandlers.link_to = {
+    init(element, valueAccessor) {
+      const navigate = event => {
+        routerInstance.navigate(valueAccessor());
+        event.preventDefault();
+      };
+      element.addEventListener('click', navigate);
 
-  static get MESSAGE() {
-    return {
-      ALREADY_PLAYING: 'Sound is already playing',
-      FAILED_TO_PLAY: 'Failed to play sound',
-      IGNORED_SOUND: 'Ignored request to play sound',
-      NOT_FOUND: 'AudioElement or ID not found',
-    };
-  }
-
-  static get TYPE() {
-    return {
-      ALREADY_PLAYING: 'ALREADY_PLAYING',
-      FAILED_TO_PLAY: 'FAILED_TO_PLAY',
-      IGNORED_SOUND: 'IGNORED_SOUND',
-      NOT_FOUND: 'NOT_FOUND',
-    };
-  }
-};
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => element.removeEventListener('click', navigate));
+    },
+  };
+}

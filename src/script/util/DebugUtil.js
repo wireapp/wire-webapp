@@ -23,6 +23,8 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 
+import {checkVersion} from '../lifecycle/newVersionHandler';
+
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
   return z.util.downloadFile(url, filename);
@@ -44,7 +46,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = new Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.util.DebugUtil');
   }
 
   blockAllConnections() {
@@ -73,6 +75,10 @@ export default class DebugUtil {
         return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
+  }
+
+  triggerVersionCheck(baseVersion) {
+    return checkVersion(baseVersion);
   }
 
   /**
@@ -289,13 +295,6 @@ export default class DebugUtil {
    */
   logCallMessages() {
     this.callingRepository.printLog();
-  }
-
-  logConnectionStatus() {
-    this.logger.log('Online Status');
-    this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
-    this.logger.log(`-- IndexedDB open: ${this.storageRepository.storageService.db.isOpen()}`);
-    this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
   }
 
   reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {

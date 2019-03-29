@@ -18,6 +18,7 @@
  */
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
+import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
 import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
@@ -60,8 +61,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.conversationId = this.callEntity.id;
     this.messageLog = this.participantEntity.messageLog;
 
-    const loggerName = 'z.calling.entities.FlowEntity';
-    this.callLogger = new z.telemetry.calling.CallLogger(loggerName, this.id, z.config.LOGGER.OPTIONS, this.messageLog);
+    this.callLogger = new CallLogger('FlowEntity', this.id, this.messageLog);
 
     // States
     this.isAnswer = ko.observable(false);
@@ -461,15 +461,9 @@ z.calling.entities.FlowEntity = class FlowEntity {
       return;
     }
 
-    this.peerConnection.oniceconnectionstatechange = () => {
-      this.callLogger.log(this.callLogger.levels.OFF, 'State change ignored - ICE connection');
-    };
-
-    this.peerConnection.onsignalingstatechange = event => {
-      const peerConnection = event.target;
-      const logMessage = `State change ignored - signaling state: ${peerConnection.signalingState}`;
-      this.callLogger.log(this.callLogger.levels.OFF, logMessage);
-    };
+    // disabling connection state and signaling state handlers
+    this.peerConnection.oniceconnectionstatechange = () => {};
+    this.peerConnection.onsignalingstatechange = () => {};
 
     const connectionMediaStreamTracks = this.peerConnection.getReceivers
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
@@ -598,10 +592,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
       const peerConnection = event.target;
 
       this.callLogger.info('State changed - ICE connection', event);
-      const connectionMessage = `ICE connection state: ${peerConnection.iceConnectionState}`;
-      this.callLogger.log(this.callLogger.levels.LEVEL_1, connectionMessage);
-      const gatheringMessage = `ICE gathering state: ${peerConnection.iceGatheringState}`;
-      this.callLogger.log(this.callLogger.levels.LEVEL_1, gatheringMessage);
+      this.callLogger.log(`ICE connection state: ${peerConnection.iceConnectionState}`);
+      this.callLogger.log(`ICE gathering state: ${peerConnection.iceGatheringState}`);
 
       this.gatheringState(peerConnection.iceGatheringState);
       this.connectionState(peerConnection.iceConnectionState);

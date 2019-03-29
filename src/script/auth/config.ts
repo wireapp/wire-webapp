@@ -51,26 +51,31 @@ declare global {
     };
   }
 }
+class Configuration {
+  readonly APP_NAME = window.wire.env.APP_NAME || 'Webapp';
+  readonly BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
+  readonly BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+  readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
+  readonly APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
+  readonly URL = window.wire.env.URL || {
+    ACCOUNT_BASE: 'https://account.wire.com',
+    MOBILE_BASE: '',
+    SUPPORT_BASE: 'https://support.wire.com',
+    TEAMS_BASE: 'https://teams.wire.com',
+    WEBSITE_BASE: 'https://wire.com',
+  };
+  readonly VERSION = window.wire.env.VERSION || '0.0.0';
+  readonly FEATURE = window.wire.env.FEATURE || {
+    CHECK_CONSENT: true,
+    ENABLE_ACCOUNT_REGISTRATION: true,
+    ENABLE_DEBUG: false,
+    ENABLE_PHONE_LOGIN: true,
+    ENABLE_SSO: false,
+    SHOW_LOADING_INFORMATION: false,
+  };
+  readonly APP_INSTANCE_ID = UUID();
+}
 
-export const APP_NAME = window.wire.env.APP_NAME || 'Webapp';
-export const BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
-export const BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
-export const ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
-export const APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
-export const URL = window.wire.env.URL || {
-  ACCOUNT_BASE: 'https://account.wire.com',
-  MOBILE_BASE: '/',
-  SUPPORT_BASE: 'https://support.wire.com',
-  TEAMS_BASE: 'https://teams.wire.com',
-  WEBSITE_BASE: 'https://wire.com',
-};
-export const VERSION = window.wire.env.VERSION || '0.0.0';
-export const FEATURE = window.wire.env.FEATURE || {
-  CHECK_CONSENT: true,
-  ENABLE_ACCOUNT_REGISTRATION: true,
-  ENABLE_DEBUG: false,
-  ENABLE_PHONE_LOGIN: true,
-  ENABLE_SSO: false,
-  SHOW_LOADING_INFORMATION: false,
-};
-export const APP_INSTANCE_ID = UUID();
+const Config = new Configuration();
+
+export {Config};

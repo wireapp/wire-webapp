@@ -29,7 +29,7 @@ z.search.SearchService = class SearchService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.search.SearchService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.search.SearchService');
   }
 
   /**

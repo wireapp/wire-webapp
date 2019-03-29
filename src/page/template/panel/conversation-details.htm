@@ -12,7 +12,7 @@
           <panel-service-details params="service: selectedService"></panel-service-details>
         <!-- /ko -->
         <!-- ko ifnot: isServiceMode() -->
-          <panel-user-details params="participant: firstParticipant, isVerified: isVerified"></panel-user-details>
+          <panel-user-details params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"></panel-user-details>
           <div class="conversation-details__devices">
             <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
               <devices-icon class="panel__action-item__icon"></devices-icon>

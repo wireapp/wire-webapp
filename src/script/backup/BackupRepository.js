@@ -24,6 +24,7 @@ import JSZip from 'jszip';
 import StorageSchemata from '../storage/StorageSchemata';
 
 import BackupService from './BackupService';
+import {chunk} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.backup = z.backup || {};
@@ -50,7 +51,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = new Logger('z.backup.BackupRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.backup.BackupRepository');
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
@@ -230,13 +231,13 @@ z.backup.BackupRepository = class BackupRepository {
     const entityCount = conversationEntities.length;
     let importedEntities = [];
 
-    const entityChunks = z.util.ArrayUtil.chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
+    const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = chunk =>
-      this.conversationRepository.updateConversationStates(chunk).then(importedConversationEntities => {
+    const importConversationChunk = conversationChunk =>
+      this.conversationRepository.updateConversationStates(conversationChunk).then(importedConversationEntities => {
         importedEntities = importedEntities.concat(importedConversationEntities);
         this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
-        progressCallback(chunk.length);
+        progressCallback(conversationChunk.length);
       });
 
     return this._chunkImport(importConversationChunk, entityChunks).then(() => importedEntities);
@@ -247,25 +248,25 @@ z.backup.BackupRepository = class BackupRepository {
     let importedEntities = 0;
 
     const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = z.util.ArrayUtil.chunk(entities, BackupService.CONFIG.BATCH_SIZE);
+    const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importEventChunk = chunk =>
-      this.backupService.importEntities(this.EVENTS_STORE_NAME, chunk).then(() => {
-        importedEntities += chunk.length;
+    const importEventChunk = eventChunk =>
+      this.backupService.importEntities(this.EVENTS_STORE_NAME, eventChunk).then(() => {
+        importedEntities += eventChunk.length;
         this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
-        progressCallback(chunk.length);
+        progressCallback(eventChunk.length);
       });
 
     return this._chunkImport(importEventChunk, entityChunks);
   }
 
-  _chunkImport(importFunction, chunks) {
-    return chunks.reduce((promise, chunk) => {
+  _chunkImport(importFunction, importChunks) {
+    return importChunks.reduce((promise, importChunk) => {
       return promise.then(() => {
         if (this.isCanceled) {
           return Promise.reject(new z.backup.CancelError());
         }
-        return importFunction(chunk);
+        return importFunction(importChunk);
       });
     }, Promise.resolve());
   }

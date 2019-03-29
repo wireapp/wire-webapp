@@ -29,7 +29,7 @@ z.connect.ConnectService = class ConnectService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.connect.ConnectService');
   }
 
   /**

@@ -17,65 +17,15 @@
  *
  */
 
-// fills
-.fill(@color) {
-  background-color: @color !important;
-}
-
-.fill-blue {
-  .fill(@w-blue);
-}
-.fill-green {
-  .fill(@w-green);
-}
-.fill-yellow {
-  .fill(@w-yellow);
-}
-.fill-red {
-  .fill(@w-red);
-}
-.fill-orange {
-  .fill(@w-orange);
-}
-.fill-pink {
-  .fill(@w-pink);
-}
-.fill-purple {
-  .fill(@w-purple);
-}
-.fill-foreground {
-  .fill(var(--foreground));
-}
-.fill-background {
-  .fill(var(--background));
-}
-
 // texts
 .text(@color) {
   color: @color !important;
 }
 
-.text-blue {
-  .text(@w-blue);
-}
-.text-green {
-  .text(@w-green);
-}
-.text-yellow {
-  .text(@w-yellow);
-}
 .text-red {
   .text(@w-red);
 }
-.text-orange {
-  .text(@w-orange);
-}
-.text-pink {
-  .text(@w-pink);
-}
-.text-purple {
-  .text(@w-purple);
-}
+
 .text-foreground {
   .text(var(--foreground));
 }
@@ -85,25 +35,10 @@
 .text-white {
   .text(#fff);
 }
-.text-ephemeral {
-  .accent-color;
-}
-.svg-ephemeral {
-  .accent-color;
-  svg path {
-    fill: currentColor;
-  }
-}
 
 .fill-svg(@color) {
   svg > path {
     fill: @color !important;
-  }
-}
-
-.svg-accent-color {
-  svg path {
-    .accent-fill;
   }
 }
 
@@ -157,30 +92,6 @@
 }
 
 // accent colors
-.accent-color-0 {
-  color: @accent_colors-0;
-}
-.accent-color-1 {
-  color: @accent_colors-1;
-}
-.accent-color-2 {
-  color: @accent_colors-2;
-}
-.accent-color-3 {
-  color: @accent_colors-3;
-}
-.accent-color-4 {
-  color: @accent_colors-4;
-}
-.accent-color-5 {
-  color: @accent_colors-5;
-}
-.accent-color-6 {
-  color: @accent_colors-6;
-}
-.accent-color-7 {
-  color: @accent_colors-7;
-}
 .accent-color-service {
   color: #fff;
 }
@@ -189,10 +100,7 @@
 }
 
 // background colors
-.bg-color(@color) {
-  background-color: @color !important;
-}
 
 .bg-color-ephemeral {
-  .accent-background-color(16%);
+  background-color: var(--accent-color-fade-16);
 }

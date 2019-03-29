@@ -49,7 +49,7 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
-import * as config from '../config';
+import {Config} from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -231,7 +231,7 @@ class Login extends React.Component<CombinedProps, State> {
           login.email = email;
         } else if (this.isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
+        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
           login.phone = email;
         }
 
@@ -289,7 +289,7 @@ class Login extends React.Component<CombinedProps, State> {
   };
 
   isValidPhoneNumber = (phoneNumber: string) => {
-    const allowDebugPhoneNumbers = config.FEATURE.ENABLE_DEBUG;
+    const allowDebugPhoneNumbers = Config.FEATURE.ENABLE_DEBUG;
     const e164regex = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
     return e164regex.test(phoneNumber);
@@ -318,7 +318,7 @@ class Login extends React.Component<CombinedProps, State> {
     const isSSOCapable = !isDesktopApp() || (isDesktopApp() && window.wSSOCapable === true);
     return (
       <Page>
-        {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+        {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
           <IsMobile>
             <div style={{margin: 16}}>{backArrow}</div>
           </IsMobile>
@@ -329,7 +329,7 @@ class Login extends React.Component<CombinedProps, State> {
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>
-                {config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
+                {Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && <div style={{margin: 'auto'}}>{backArrow}</div>}
               </Column>
             </IsMobile>
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
@@ -354,7 +354,7 @@ class Login extends React.Component<CombinedProps, State> {
                         ref={this.inputs.email}
                         markInvalid={!validInputs.email}
                         value={email}
-                        autoComplete="section-login email"
+                        autoComplete="username email"
                         placeholder={_(loginStrings.emailPlaceholder)}
                         maxLength={128}
                         type="text"
@@ -424,7 +424,7 @@ class Login extends React.Component<CombinedProps, State> {
                     )}
                   </Form>
                 </div>
-                {config.FEATURE.ENABLE_SSO && isSSOCapable ? (
+                {Config.FEATURE.ENABLE_SSO && isSSOCapable ? (
                   <div style={{marginTop: '36px'}}>
                     <Link center onClick={this.forgotPassword} data-uie-name="go-forgot-password">
                       {_(loginStrings.forgotPassword)}
@@ -435,7 +435,7 @@ class Login extends React.Component<CombinedProps, State> {
                           {_(loginStrings.ssoLogin)}
                         </RouterLink>
                       </Column>
-                      {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                      {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                         <Column>
                           <Link
                             href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}
@@ -454,7 +454,7 @@ class Login extends React.Component<CombinedProps, State> {
                         {_(loginStrings.forgotPassword)}
                       </Link>
                     </Column>
-                    {config.FEATURE.ENABLE_PHONE_LOGIN && (
+                    {Config.FEATURE.ENABLE_PHONE_LOGIN && (
                       <Column>
                         <Link
                           href={URLUtil.pathWithParams(EXTERNAL_ROUTE.PHONE_LOGIN)}

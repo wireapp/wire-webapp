@@ -31,7 +31,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.ListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ListViewModel');
   }
 
   acceptConnectionRequest(userEntity, showConversation) {
@@ -48,27 +48,37 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity),
-        text: {
-          action: t('modalUserBlockAction'),
-          message: t('modalUserBlockMessage', userEntity.first_name()),
-          title: t('modalUserBlockHeadline', userEntity.first_name()),
-        },
+      return new Promise(resolve => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+            resolve();
+          },
+          text: {
+            action: t('modalUserBlockAction'),
+            message: t('modalUserBlockMessage', userEntity.first_name()),
+            title: t('modalUserBlockHeadline', userEntity.first_name()),
+          },
+        });
       });
     }
   }
 
   cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity),
-        text: {
-          action: t('modalConnectCancelAction'),
-          message: t('modalConnectCancelMessage', userEntity.first_name()),
-          secondary: t('modalConnectCancelSecondary'),
-          title: t('modalConnectCancelHeadline'),
-        },
+      return new Promise(resolve => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+            resolve();
+          },
+          text: {
+            action: t('modalConnectCancelAction'),
+            message: t('modalConnectCancelMessage', userEntity.first_name()),
+            secondary: t('modalConnectCancelSecondary'),
+            title: t('modalConnectCancelHeadline'),
+          },
+        });
       });
     }
   }
@@ -165,13 +175,18 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id),
-        text: {
-          action: t('modalConversationLeaveAction'),
-          message: t('modalConversationLeaveMessage'),
-          title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
-        },
+      return new Promise(resolve => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+            resolve();
+          },
+          text: {
+            action: t('modalConversationLeaveAction'),
+            message: t('modalConversationLeaveMessage'),
+            title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
+          },
+        });
       });
     }
   }
@@ -251,20 +266,23 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   unblockUser(userEntity, showConversation) {
     if (userEntity) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          this.connectionRepository
-            .unblockUser(userEntity, showConversation)
-            .then(() => this.conversationRepository.get1To1Conversation(userEntity))
-            .then(conversationEntity => {
-              return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-            });
-        },
-        text: {
-          action: t('modalUserUnblockAction'),
-          message: t('modalUserUnblockMessage', userEntity.first_name()),
-          title: t('modalUserUnblockHeadline'),
-        },
+      return new Promise(resolve => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            this.connectionRepository
+              .unblockUser(userEntity, showConversation)
+              .then(() => this.conversationRepository.get1To1Conversation(userEntity))
+              .then(conversationEntity => {
+                resolve();
+                return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+              });
+          },
+          text: {
+            action: t('modalUserUnblockAction'),
+            message: t('modalUserUnblockMessage', userEntity.first_name()),
+            title: t('modalUserUnblockHeadline'),
+          },
+        });
       });
     }
   }

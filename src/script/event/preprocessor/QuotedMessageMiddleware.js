@@ -36,7 +36,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = new Logger('z.event.preprocessor.QuotedMessageMiddleware', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.event.preprocessor.QuotedMessageMiddleware');
   }
 
   /**

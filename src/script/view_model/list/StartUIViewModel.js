@@ -67,7 +67,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.list.StartUIViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -271,7 +271,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     if (isUser && participantEntity.isOutgoingRequest()) {
       return this.clickOnContact(participantEntity);
     }
-
+    if (isUser) {
+      return this.mainViewModel.content.userModal.showUser(participantEntity.id);
+    }
     const createBubble = elementId => {
       this.userProfile(participantEntity);
       this.userBubbleLastId = elementId;
@@ -415,10 +417,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   }
 
-  //##############################################################################
-  // User bubble
-  //##############################################################################
-
   clickToAcceptInvite(userEntity) {
     this._closeList();
     this.actionsViewModel.acceptConnectionRequest(userEntity, true);
@@ -464,7 +462,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
       this.inviteBubble = new zeta.webapp.module.Bubble({
         host_selector: '#invite-button',
         on_hide: () => {
-          $('.invite-link-box .bg').removeClass('bg-animation');
+          $('.invite-link-box .fade-wrapper').removeClass('bg-animation');
           $('.invite-link-box .message').off('copy blur focus');
           this.inviteBubble = null;
           this.showInviteForm(true);
@@ -492,8 +490,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     $('.invite-link-box .message')
       .on('copy', event => {
         $(event.currentTarget)
-          .parent()
-          .find('.bg')
+          .closest('.fade-wrapper')
           .addClass('bg-animation')
           .on(z.util.alias.animationend, _event => {
             if (_event.originalEvent.animationName === 'message-bg-fadeout') {

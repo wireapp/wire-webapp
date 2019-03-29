@@ -6,7 +6,7 @@
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <!-- ko if: selectedParticipant() -->
-        <panel-user-details params="participant: selectedParticipant"></panel-user-details>
+        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id)"></panel-user-details>
       <!-- /ko -->
       <!-- ko if: showActionDevices() -->
         <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
@@ -15,8 +15,8 @@
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-        <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
-      <panel-actions params="items: getParticipantActions(selectedParticipant(), activeConversation())"></panel-actions>
+      <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
+      <user-actions params="user: selectedParticipant(), conversation: activeConversation(), actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     </div>
   <!-- /ko -->
 </div>

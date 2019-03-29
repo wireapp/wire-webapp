@@ -19,11 +19,10 @@
 
 // mixins
 .seekbar-thumb-style() {
-  .accent-background-color;
   .circle(12px);
-
   border: none;
   appearance: none !important;
+  background-color: var(--accent-color);
   background-color: transparent;
   opacity: 0;
   transition: opacity @animation-timing-slow ease-in-out;
@@ -34,12 +33,11 @@ seek-bar {
   width: 100%;
 
   input {
-    .accent-color;
-
     width: 100%;
     height: 2px;
     appearance: none;
     border-radius: 1px;
+    color: var(--accent-color);
     cursor: pointer;
     outline: none;
 

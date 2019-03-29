@@ -31,6 +31,8 @@ import ConsentType from './ConsentType';
 import User from '../entity/User';
 import UserMapper from './UserMapper';
 
+import {chunk} from 'utils/ArrayUtil';
+
 export default class UserRepository {
   static get CONFIG() {
     return {
@@ -54,7 +56,7 @@ export default class UserRepository {
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
-    this.logger = new Logger('UserRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('UserRepository');
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -332,7 +334,8 @@ export default class UserRepository {
       messageId: z.util.createRandomUuid(),
     });
 
-    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
+    const recipients = this.teamUsers().concat(this.self());
+    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
   /**
@@ -394,7 +397,7 @@ export default class UserRepository {
         });
     };
 
-    const chunksOfUserIds = z.util.ArrayUtil.chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
         const newUserEntities = _.flatten(resolveArray);
@@ -492,7 +495,7 @@ export default class UserRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
+          this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
         }
         throw error;
       });
@@ -629,21 +632,22 @@ export default class UserRepository {
 
   /**
    * Add user entities for suspended users.
-   * @param {Array<string>} user_ids - Requested user IDs
-   * @param {Array<User>} user_ets - User entities returned by backend
+   * @param {Array<string>} userIds - Requested user IDs
+   * @param {Array<User>} userEntities - User entities returned by backend
    * @returns {Array<User>} User entities to be returned
    */
-  _add_suspended_users(user_ids, user_ets) {
-    for (const user_id of user_ids) {
-      const matching_user_ids = user_ets.find(user_et => user_et.id === user_id);
+  _add_suspended_users(userIds, userEntities) {
+    for (const userId of userIds) {
+      const matching_userIds = userEntities.find(user_et => user_et.id === userId);
 
-      if (!matching_user_ids) {
-        const user_et = new User(user_id);
-        user_et.name(t('nonexistentUser'));
-        user_ets.push(user_et);
+      if (!matching_userIds) {
+        const userEntity = new User(userId);
+        userEntity.isDeleted = true;
+        userEntity.name(t('nonexistentUser'));
+        userEntities.push(userEntity);
       }
     }
-    return user_ets;
+    return userEntities;
   }
 
   /**

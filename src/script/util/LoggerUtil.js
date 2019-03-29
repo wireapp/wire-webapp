@@ -19,7 +19,7 @@
 
 import 'url-search-params-polyfill';
 
-function enableLogging(location = window.location.href) {
+function enableLogging(force = false, search = window.location.search) {
   /**
    * If users disable cookies in their browsers, they won't have access to the localStorage API.
    * The following check will fix this error:
@@ -33,10 +33,12 @@ function enableLogging(location = window.location.href) {
     return;
   }
 
-  const namespace = new URL(location).searchParams.get('enableLogging');
+  const namespace = new URLSearchParams(search).get('enableLogging');
 
   if (namespace) {
     localStorage.setItem('debug', namespace);
+  } else if (force) {
+    localStorage.setItem('debug', '@wireapp/webapp*');
   } else {
     localStorage.removeItem('debug');
   }

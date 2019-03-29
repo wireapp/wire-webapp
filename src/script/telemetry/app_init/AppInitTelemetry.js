@@ -23,7 +23,7 @@ import AppInitTimings from './AppInitTimings';
 
 export default class AppInitTelemetry {
   constructor() {
-    this.logger = new Logger('AppInitTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitTelemetry');
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }
@@ -53,7 +53,6 @@ export default class AppInitTelemetry {
 
     statistics.loading_time = this.timings.get_app_load();
     statistics.app_version = z.util.Environment.version(false);
-    this.logger.debug('App initialization telemetry');
     this.logger.info(`App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`);
     this.log_statistics();
     this.log_timings();

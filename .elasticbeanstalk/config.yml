@@ -2,7 +2,7 @@ branch-defaults:
   dev:
     environment: wire-webapp-dev
 deploy:
-  artifact: aws/s3/ebs.zip
+  artifact: server/dist/s3/ebs.zip
 global:
   application_name: Webapp
   default_platform: Node.js

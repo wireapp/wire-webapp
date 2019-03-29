@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
@@ -38,7 +39,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   constructor() {
-    this.logger = new Logger('z.viewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ModalsViewModel');
     this.elementId = 'modals';
 
     this.modals = {};
@@ -60,7 +61,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   showModal(type, options = {}) {
-    const actionElement = $(type).find('.modal-action');
+    const actionElement = $(type).find('.modal__button--confirm');
     const messageElement = $(type).find('.modal-text');
     const titleElement = $(type).find('.modal-title');
 
@@ -94,11 +95,11 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
         .off('click');
 
       $(type)
-        .find('.modal-action')
+        .find('.modal__button--confirm')
         .off('click');
 
       $(type)
-        .find('.modal-secondary')
+        .find('.modal__button--cancel')
         .off('click');
 
       modal.destroy();
@@ -113,7 +114,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       .click(() => modal.hide());
 
     $(type)
-      .find('.modal-secondary')
+      .find('.modal__button--cancel')
       .click(() => {
         modal.hide(() => {
           if (typeof secondaryFn === 'function') {
@@ -123,7 +124,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
       });
 
     $(type)
-      .find('.modal-action')
+      .find('.modal__button--confirm')
       .click(() => {
         if (typeof actionFn === 'function') {
           const checkbox = $(type).find('.modal-checkbox');
@@ -165,7 +166,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalConfirm(options, titleElement, messageElement, actionElement) {
-    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal-secondary');
+    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal__button--cancel');
     const {action: actionText, message: messageText, secondary, title: titleText} = options.text;
 
     const secondaryText = secondary || t('modalConfirmSecondary');
@@ -202,7 +203,7 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _showModalOption(options, titleElement, messageElement, actionElement) {
-    const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-secondary');
+    const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal__button--cancel');
     const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
     const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
 

@@ -42,19 +42,19 @@
         <header class="preferences-header" data-bind="text: t('preferencesOptionsNotifications')"></header>
         <div class="preferences-options-radio">
           <input type="radio" id="preferences-options-notification-on" name="preferences-options-notification" value="on" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-on">
+          <label class="accent-text" for="preferences-options-notification-on">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsNotificationsOn')"></span>
           </label>
           <input type="radio" id="preferences-options-notification-obfuscate-message" name="preferences-options-notification" value="obfuscate-message" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-obfuscate-message">
+          <label class="accent-text" for="preferences-options-notification-obfuscate-message">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsNotificationsObfuscateMessage')"></span>
           </label>
           <input type="radio" id="preferences-options-notification-obfuscate" name="preferences-options-notification" value="obfuscate" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-obfuscate">
+          <label class="accent-text" for="preferences-options-notification-obfuscate">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsNotificationsObfuscate')"></span>
           </label>
           <input type="radio" id="preferences-options-notification-none" name="preferences-options-notification" value="none" data-bind="checked: optionNotifications">
-          <label class="text-theme" for="preferences-options-notification-none">
+          <label class="accent-text" for="preferences-options-notification-none">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsNotificationsNone')"></span>
           </label>
         </div>
@@ -63,13 +63,13 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="text: t('preferencesOptionsPopular')"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionDarkMode}" data-uie-name="status-preference-use-dark-mode">
+          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionDarkMode}" data-uie-name="status-preference-use-dark-mode">
             <input type="checkbox" id="use-dark-mode-checkbox" data-bind="checked: optionDarkMode">
             <label class="preferences-options-checkbox-label" for="use-dark-mode-checkbox" data-bind="text: t('preferencesOptionsUseDarkMode')"></label>
           </div>
         </div>
         <div class="preferences-option">
-          <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionReplaceInlineEmoji}" data-uie-name="status-preference-emoji-replace">
+          <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionReplaceInlineEmoji}" data-uie-name="status-preference-emoji-replace">
             <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="checked: optionReplaceInlineEmoji">
             <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="text: t('preferencesOptionsEmojiReplaceCheckbox')"></label>
           </div>
@@ -77,7 +77,7 @@
         <div class="preferences-detail preferences-detail-emoji" data-bind="html: t('preferencesOptionsEmojiReplaceDetail', {}, {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'})"></div>
         <!-- ko if: z.util.Environment.desktop -->
           <div class="preferences-option preferences-options-multiple">
-            <div class="preferences-option-icon checkbox text-theme" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
+            <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
               <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">
               <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="text: t('preferencesOptionsPreviewsSendCheckbox')"></label>
             </div>
@@ -91,7 +91,7 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="text: t('preferencesOptionsCallLogs')"></header>
         <div class="preferences-option">
-          <div class="preferences-link text-theme" data-bind="click: saveCallLogs, text: t('preferencesOptionsCallLogsGet')" data-uie-name="get-call-logs"></div>
+          <div class="preferences-link accent-text" data-bind="click: saveCallLogs, text: t('preferencesOptionsCallLogsGet')" data-uie-name="get-call-logs"></div>
         </div>
         <div class="preferences-detail" data-bind="text: t('preferencesOptionsCallLogsDetail')"></div>
       </section>

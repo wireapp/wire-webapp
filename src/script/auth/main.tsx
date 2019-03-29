@@ -25,6 +25,7 @@ import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import {enableLogging} from '../util/LoggerUtil';
+import {Config} from './config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
@@ -44,6 +45,7 @@ try {
 const store = configureStore({
   actions: actionRoot,
   apiClient,
+  config: Config,
   cookieStore,
   core,
   localStorage,
@@ -70,5 +72,5 @@ function runApp() {
   }
 }
 
-enableLogging();
+enableLogging(Config.FEATURE.ENABLE_DEBUG);
 runApp();

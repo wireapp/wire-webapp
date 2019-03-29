@@ -26,7 +26,7 @@ export default class MediaElementHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = new Logger('MediaElementHandler', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('MediaElementHandler');
 
     this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
     this.remoteMediaElements = ko.observableArray([]);

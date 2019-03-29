@@ -34,7 +34,7 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {indexStrings} from '../../strings';
-import {FEATURE} from '../config';
+import {Config} from '../config';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
@@ -72,7 +72,7 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
     const isMacOsWrapper = isDesktopApp() && isMacOS();
     return (
       <Page>
-        {!FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+        {!Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
           <Redirect to={pathWithParams(ROUTE.LOGIN)} data-uie-name="redirect-login" />
         )}
         <ContainerXS centerText verticalCenter>
@@ -92,7 +92,16 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
                   {_(indexStrings.createAccountForPersonalUse)}
                 </Bold>
                 <br />
-                <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                <Text
+                  block
+                  center
+                  light
+                  fontSize="16px"
+                  color={COLOR.LINK}
+                  style={{
+                    marginTop: 8,
+                  }}
+                >
                   {_(indexStrings.createPersonalAccount)}
                 </Text>
               </Link>
@@ -111,7 +120,16 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
                     {_(indexStrings.createAccountForOrganizations)}
                   </Bold>
                   <br />
-                  <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
+                  <Text
+                    block
+                    center
+                    light
+                    fontSize="16px"
+                    color={COLOR.LINK}
+                    style={{
+                      marginTop: 8,
+                    }}
+                  >
                     {_(indexStrings.createTeam)}
                   </Text>
                 </Link>

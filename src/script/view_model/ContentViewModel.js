@@ -19,6 +19,8 @@
 
 import Logger from 'utils/Logger';
 import MessageListViewModel from './content/MessageListViewModel';
+import {UserModalViewModel} from './content/UserModalViewModel';
+import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -43,7 +45,6 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   }
 
   constructor(mainViewModel, repositories) {
-    this.showConversation = this.showConversation.bind(this);
     this.switchContent = this.switchContent.bind(this);
     this.switchPreviousContent = this.switchPreviousContent.bind(this);
 
@@ -51,7 +52,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = new Logger('z.viewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.ContentViewModel');
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -74,6 +75,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       z.message.MessageHasher
     );
     this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
+    this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
 
@@ -132,7 +134,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation);
   }
 
   /**
@@ -167,7 +169,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
    * @param {boolean} [options.openNotificationSettings=false] - Open notification settings of conversation
    * @returns {undefined} No return value
    */
-  showConversation(conversation, options = {}) {
+  showConversation = (conversation, options = {}) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -188,36 +190,59 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       ? Promise.resolve(conversation)
       : this.conversationRepository.get_conversation_by_id(conversation);
 
-    conversationPromise.then(conversationEntity => {
-      const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
-      const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
-      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+    conversationPromise
+      .then(conversationEntity => {
+        const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
+        const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
+        const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
-      if (isOpenedConversation) {
-        if (openNotificationSettings) {
-          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        if (isOpenedConversation) {
+          if (openNotificationSettings) {
+            this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+          }
+          return;
         }
-        return;
-      }
 
-      this._releaseContent(this.state());
+        this._releaseContent(this.state());
 
-      this.state(ContentViewModel.STATE.CONVERSATION);
+        this.state(ContentViewModel.STATE.CONVERSATION);
+        this.mainViewModel.list.openConversations();
 
-      if (!isActiveConversation) {
-        this.conversationRepository.active_conversation(conversationEntity);
-      }
-
-      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-      this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
-        this._showContent(ContentViewModel.STATE.CONVERSATION);
-        this.previousConversation = this.conversationRepository.active_conversation();
-        if (openNotificationSettings) {
-          this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+        if (!isActiveConversation) {
+          this.conversationRepository.active_conversation(conversationEntity);
         }
+
+        const messageEntity = openFirstSelfMention
+          ? conversationEntity.getFirstUnreadSelfMention()
+          : exposeMessageEntity;
+
+        if (conversationEntity.is_cleared()) {
+          conversationEntity.cleared_timestamp(0);
+        }
+
+        const unarchivePromise = conversationEntity.is_archived()
+          ? this.conversationRepository.unarchiveConversation(conversationEntity)
+          : Promise.resolve();
+
+        unarchivePromise.then(() => {
+          this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
+            this._showContent(ContentViewModel.STATE.CONVERSATION);
+            this.previousConversation = this.conversationRepository.active_conversation();
+            if (openNotificationSettings) {
+              this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.NOTIFICATIONS);
+            }
+          });
+        });
+      })
+      .catch(() => {
+        this.mainViewModel.modals.showModal('.modal-template-acknowledge', {
+          text: {
+            message: t('conversationNotFoundMessage'),
+            title: t('conversationNotFoundTitle'),
+          },
+        });
       });
-    });
-  }
+  };
 
   switchContent(newContentState) {
     const isStateChange = newContentState !== this.state();

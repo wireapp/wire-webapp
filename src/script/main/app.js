@@ -20,8 +20,8 @@
 import Logger from 'utils/Logger';
 
 import platform from 'platform';
-import PropertiesRepository from '../properties/PropertiesRepository';
-import PropertiesService from '../properties/PropertiesService';
+import {Config} from '../auth/config';
+import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
@@ -31,8 +31,11 @@ import BackendClient from '../service/BackendClient';
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
+import {Router} from '../router/Router';
+import {initRouterBindings} from '../router/routerBindings';
 import TimeUtil from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
@@ -42,7 +45,6 @@ import {t} from 'utils/LocalizerUtil';
 
 /* eslint-disable no-unused-vars */
 import globals from './globals';
-import auth from './auth';
 /* eslint-enable no-unused-vars */
 import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from '../util/LoggerUtil';
@@ -73,17 +75,17 @@ class App {
 
   /**
    * Construct a new app.
-   * @param {z.main.Auth} authComponent - Authentication component
+   * @param {BackendClient} backendClient - Configured backend client
    */
-  constructor(authComponent) {
-    this.backendClient = authComponent.backendClient;
-    this.logger = new Logger('z.main.App', z.config.LOGGER.OPTIONS);
+  constructor(backendClient) {
+    this.backendClient = backendClient;
+    this.logger = Logger('App');
 
     this.telemetry = new AppInitTelemetry();
-    this.windowHandler = new z.ui.WindowHandler().init();
+    new WindowHandler();
 
-    this.service = this._setupServices(authComponent);
-    this.repository = this._setupRepositories(authComponent);
+    this.service = this._setupServices();
+    this.repository = this._setupRepositories();
     this.view = this._setupViewModels();
     this.util = this._setup_utils();
 
@@ -106,16 +108,15 @@ class App {
 
   /**
    * Create all app repositories.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All repositories
    */
-  _setupRepositories(authComponent) {
+  _setupRepositories() {
     const repositories = {};
 
-    repositories.audio = authComponent.audio;
-    repositories.auth = authComponent.repository;
+    repositories.audio = resolve(graph.AudioRepository);
+    repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
-    repositories.properties = new PropertiesRepository(this.service.properties, resolve(graph.SelfService));
+    repositories.properties = resolve(graph.PropertiesRepository);
     repositories.serverTime = resolve(graph.ServerTimeRepository);
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
@@ -143,7 +144,6 @@ class App {
       repositories.serverTime,
       repositories.user
     );
-    repositories.lifecycle = new z.lifecycle.LifecycleRepository(this.service.lifecycle, repositories.user);
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -158,6 +158,7 @@ class App {
       repositories.event,
       repositories.giphy,
       resolve(graph.LinkPreviewRepository),
+      resolve(graph.MessageSender),
       repositories.serverTime,
       repositories.team,
       repositories.user,
@@ -190,10 +191,11 @@ class App {
       repositories.user
     );
     repositories.broadcast = new z.broadcast.BroadcastRepository(
-      this.service.broadcast,
+      resolve(graph.BroadcastService),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
+      resolve(graph.MessageSender),
       repositories.user
     );
     repositories.calling = new z.calling.CallingRepository(
@@ -225,10 +227,9 @@ class App {
 
   /**
    * Create all app services.
-   * @param {z.main.Auth} authComponent - Authentication component
    * @returns {Object} All services
    */
-  _setupServices(authComponent) {
+  _setupServices() {
     const storageService = resolve(graph.StorageService);
     const eventService = z.util.Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
@@ -236,22 +237,14 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      auth: authComponent.service,
-      broadcast: new z.broadcast.BroadcastService(this.backendClient),
       client: new z.client.ClientService(this.backendClient, storageService),
       connect: new z.connect.ConnectService(this.backendClient),
-      // Can be removed once desktop version with the following PR has been published (probably v3.5):
-      // https://github.com/wireapp/wire-desktop/pull/1938/files
-      connect_google: {},
-      connectGoogle: {},
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
-      lifecycle: new z.lifecycle.LifecycleService(),
       notification: new z.event.NotificationService(this.backendClient, storageService),
-      properties: new PropertiesService(this.backendClient),
       search: new z.search.SearchService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
@@ -282,7 +275,6 @@ class App {
   _subscribeToEvents() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.UPDATE, this.update.bind(this));
   }
 
   //##############################################################################
@@ -368,15 +360,18 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
+        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         this.telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
         this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        this.repository.lifecycle.init();
+        if (this.repository.user.isActivatedAccount()) {
+          // start regularly polling the server to check if there is a new version of Wire
+          startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
+        }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
@@ -610,16 +605,25 @@ class App {
    */
   _showInterface() {
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
+
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
       this.view.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       this.view.list.showTakeover();
     } else if (conversationEntity) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+      this.view.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
+
+    const router = new Router({
+      '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
+      '/user/:userId': userId => {
+        this.view.content.userModal.showUser(userId, () => router.navigate('/'));
+      },
+    });
+    initRouterBindings(router);
 
     this.view.loading.removeFromView();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
@@ -751,7 +755,7 @@ class App {
     this.logger.info(`Refresh to update started`);
     if (z.util.Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, z.lifecycle.UPDATE_SOURCE.WEBAPP);
+      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART);
     }
 
     window.location.reload(true);
@@ -845,9 +849,14 @@ class App {
 //##############################################################################
 
 $(() => {
-  enableLogging();
+  enableLogging(Config.FEATURE.ENABLE_DEBUG);
   if ($('#wire-main-app').length !== 0) {
-    wire.app = new App(wire.auth);
+    const backendClient = resolve(graph.BackendClient);
+    backendClient.setSettings({
+      restUrl: Config.BACKEND_REST,
+      webSocketUrl: Config.BACKEND_WS,
+    });
+    wire.app = new App(backendClient);
   }
 });
 

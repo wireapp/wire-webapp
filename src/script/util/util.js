@@ -21,10 +21,11 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
+import SanitizationUtil from 'utils/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import marked from './marked.js';
+import MarkdownIt from 'markdown-it';
 import StringUtilGlobal from './StringUtil';
 /* eslint-enable no-unused-vars */
 
@@ -291,8 +292,37 @@ z.util.alias = {
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
+const markdownit = new MarkdownIt('zero', {
+  breaks: true,
+  html: false,
+  langPrefix: 'lang-',
+  linkify: true,
+}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
+
+const originalFenceRule = markdownit.renderer.rules.fence;
+
+markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
+  const highlighted = originalFenceRule(tokens, idx, options, env, self);
+  tokens[idx].map[1] += 1;
+  return highlighted.replace(/\n$/, '');
+};
+
+markdownit.renderer.rules.softbreak = () => '<br>';
+markdownit.renderer.rules.hardbreak = () => '<br>';
+markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
+  const [position] = tokens[idx].map;
+  const previousWithMap = tokens
+    .slice(0, idx)
+    .reverse()
+    .find(({map}) => map && map.length);
+  const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
+  const count = position - previousPosition;
+  return '<br>'.repeat(count);
+};
+markdownit.renderer.rules.paragraph_close = () => '';
+
 z.util.renderMessage = (message, selfId, mentionEntities = []) => {
-  const createMentionHash = mention => ` @${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
@@ -325,7 +355,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       );
     }, message);
 
-  mentionlessText = marked(mentionlessText, {
+  markdownit.set({
     highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
@@ -338,16 +368,59 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       }
       return hljs.highlightAuto(code).value;
     },
-    sanitize: true,
   });
 
-  // TODO: Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  mentionlessText = mentionlessText.replace(/\n/g, '<br />');
+  markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const cleanString = hashedString =>
+      SanitizationUtil.escapeString(
+        Object.entries(mentionTexts).reduce(
+          (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
+          hashedString
+        )
+      );
+    const link = tokens[idx];
+    const href = cleanString(link.attrGet('href'));
+    const isEmail = href.startsWith('mailto:');
+    const isWireDeepLink = href.toLowerCase().startsWith('wire://');
+    const nextToken = tokens[idx + 1];
+    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
 
-  // Remove <br /> if it is the last thing in a message
-  if (z.util.StringUtil.getLastChars(mentionlessText, '<br />'.length) === '<br />') {
-    mentionlessText = z.util.StringUtil.cutLastChars(mentionlessText, '<br />'.length);
-  }
+    if (!href || !text.trim()) {
+      nextToken.content = '';
+      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+      closeToken.type = 'text';
+      closeToken.content = '';
+      return `[${cleanString(text)}](${cleanString(href)})`;
+    }
+    if (isEmail) {
+      const email = href.replace(/^mailto:/, '');
+      link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+    } else {
+      link.attrPush(['target', '_blank']);
+      link.attrPush(['rel', 'nofollow noopener noreferrer']);
+    }
+    if (!isWireDeepLink && link.markup !== 'linkify') {
+      const title = link.attrGet('title');
+      if (title) {
+        link.attrSet('title', cleanString(title));
+      }
+      link.attrSet('href', cleanString(href));
+      if (nextToken && nextToken.type === 'text') {
+        nextToken.content = cleanString(text);
+      }
+      link.attrPush(['data-md-link', 'true']);
+      link.attrPush(['data-uie-name', 'markdown-link']);
+    }
+    if (isWireDeepLink) {
+      link.attrPush(['data-uie-name', 'wire-deep-link']);
+    }
+    return self.renderToken(tokens, idx, options);
+  };
+
+  mentionlessText = markdownit.render(mentionlessText);
+
+  // Remove <br> and \n if it is the last thing in a message
+  mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionMarkup = renderMention(mentionTexts[mentionHash]);

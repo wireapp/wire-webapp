@@ -23,7 +23,7 @@
       <!-- ko if: showDevicesFound() -->
         <div class="participant-devices__header">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
-          <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+          <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
 
         <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
@@ -42,15 +42,15 @@
       <!-- ko if: showDevicesNotFound() -->
         <div class="participant-devices__header">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
-          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->
 
       <!-- ko if: showDeviceDetails() -->
         <div class="participant-devices__header">
-          <div class="participant-devices__link participant-devices__show-self-fingerprint text-theme" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
+          <div class="participant-devices__link participant-devices__show-self-fingerprint accent-text" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
           <div class="panel__info-text" data-bind="html: detailMessage()"></div>
-          <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+          <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
 
         <device-card class="participant-devices__single-client" params="device: selectedClient()"></device-card>
         <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintRemote()" data-uie-name="status-fingerprint">
@@ -63,8 +63,8 @@
             <label class="button-label" for="toggle" data-bind="click: clickToToggleDeviceVerification, text: t('participantDevicesDetailVerify')"></label>
           </div>
           <div class="participant-devices__actions">
-            <loading-icon class="svg-accent-color" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading"></loading-icon>
-            <span class="button-label text-theme ellipsis"
+            <loading-icon class="accent-fill" data-bind="style: {display : isResettingSession() ? 'initial' : 'none'}" data-uie-name="status-loading"></loading-icon>
+            <span class="button-label accent-text ellipsis"
                   data-bind="click: clickToResetSession, style: {display: isResettingSession() ? 'none' : 'initial'}, text: t('participantDevicesDetailResetSession')"
                   data-uie-name="do-reset-session"></span>
           </div>
@@ -79,7 +79,7 @@
             <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
           </div>
           <div>
-            <span class="participant-devices__link text-theme" data-bind="click: clickOnShowSelfDevices, text: t('participantDevicesSelfAllDevices')"></span>
+            <span class="participant-devices__link accent-text" data-bind="click: clickOnShowSelfDevices, text: t('participantDevicesSelfAllDevices')"></span>
           </div>
         </div>
       <!-- /ko -->

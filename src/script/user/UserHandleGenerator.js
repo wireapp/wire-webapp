@@ -18,6 +18,8 @@
  */
 
 import getSlug from 'speakingurl';
+import {getRandomNumber} from 'utils/NumberUtil';
+import {randomElement} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.user = z.user || {};
@@ -281,7 +283,7 @@ window.z.user = z.user || {};
   }
 
   function get_random_word_combination() {
-    return `${z.util.ArrayUtil.randomElement(RANDOM_WORDS_1)}${z.util.ArrayUtil.randomElement(RANDOM_WORDS_2)}`;
+    return `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;
   }
 
   /**
@@ -303,7 +305,7 @@ window.z.user = z.user || {};
    * @returns {string} String appended with random digits.
    */
   function append_random_digits(handle, additional_numbers) {
-    const random_digits = _.range(additional_numbers).map(() => z.util.NumberUtil.getRandomNumber(1, 8));
+    const random_digits = _.range(additional_numbers).map(() => getRandomNumber(1, 8));
     return `${handle}${random_digits.join('')}`;
   }
 

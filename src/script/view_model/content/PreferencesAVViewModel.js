@@ -39,7 +39,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
-    this.logger = new Logger('z.viewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.viewModel.content.PreferencesAVViewModel');
 
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;

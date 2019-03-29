@@ -18,6 +18,8 @@
  */
 
 import getSlug from 'speakingurl';
+import {inRange} from 'utils/NumberUtil';
+import {randomElement} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -76,17 +78,11 @@ const stringUtil = {
     return string;
   },
 
-  getFirstChar: string => [...string][0],
-
-  getLastChars: (string, length) => (string.length < length ? false : string.substring(string.length - length)),
+  getFirstChar: string => [...string][0], // the destructuring is needed to properly return unicode characters
 
   getRandomChar: () => {
     let charIndex;
-    while (
-      !z.util.NumberUtil.inRange(charIndex, 1, 9) &&
-      !z.util.NumberUtil.inRange(charIndex, 65, 90) &&
-      !z.util.NumberUtil.inRange(charIndex, 97, 122)
-    ) {
+    while (!inRange(charIndex, 1, 9) && !inRange(charIndex, 65, 90) && !inRange(charIndex, 97, 122)) {
       charIndex = Math.floor(Math.random() * 122);
     }
 
@@ -120,7 +116,7 @@ const stringUtil = {
       if (character.match(/[\n\r\s]+/gi)) {
         obfuscated += character;
       } else {
-        obfuscated += z.util.ArrayUtil.randomElement(alphabet);
+        obfuscated += randomElement(alphabet);
       }
     }
 

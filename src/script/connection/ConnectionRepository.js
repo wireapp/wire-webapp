@@ -38,7 +38,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
-    this.logger = new Logger('z.connection.ConnectionRepository', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.connection.ConnectionRepository');
 
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
@@ -93,7 +93,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    this.updateConnection(connectionEntity).then(() => {
+    return this.updateConnection(connectionEntity).then(() => {
       const shouldUpdateUser = previousStatus === z.connection.ConnectionStatus.SENT && connectionEntity.isConnected();
       if (shouldUpdateUser) {
         this.userRepository.updateUserById(connectionEntity.userId);

@@ -17,6 +17,7 @@
  *
  */
 
+import {isNumber, isString} from 'underscore';
 import Logger from 'utils/Logger';
 
 import AppInitStatisticsValue from './AppInitStatisticsValue';
@@ -30,7 +31,7 @@ export default class AppInitStatistics {
   }
 
   constructor() {
-    this.logger = new Logger('AppInitStatistics', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('AppInitStatistics');
 
     amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
@@ -58,18 +59,10 @@ export default class AppInitStatistics {
   }
 
   log() {
-    this.logger.debug('App initialization statistics');
-
-    Object.entries(this).forEach(([key, value]) => {
-      if (_.isNumber(value) || _.isString(value)) {
-        const placeholderKeyLength = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_KEY - key.length, 1);
-        const placeholderKey = new Array(placeholderKeyLength).join(' ');
-        const placeholderValueLength = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
-        const placeholderValue = new Array(placeholderValueLength).join(' ');
-
-        this.logger.info(`${placeholderKey}'${key}':${placeholderValue}${value}`);
-      }
-    });
+    const statsData = Object.entries(this).reduce((stats, [key, value]) => {
+      return isNumber(value) || isString(value) ? {...stats, [key]: value} : stats;
+    }, {});
+    this.logger.debug('App initialization statistics', statsData);
   }
 
   update_backend_requests(number_of_requests) {

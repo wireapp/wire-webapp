@@ -47,7 +47,7 @@ function getIncludedFiles(noLegacy) {
     'test/api/environment.js',
     'test/api/payloads.js',
   ];
-  return noLegacy ? commonFiles : commonFiles.concat([`${SRC_PATH}/script/main/globals.js`, 'test/api/TestFactory.js']);
+  return noLegacy ? commonFiles : commonFiles.concat('test/api/TestFactory.js');
 }
 
 module.exports = function(config) {
@@ -77,7 +77,6 @@ module.exports = function(config) {
     preprocessors: {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
-      [`${SRC_PATH}/script/main/globals.js`]: ['webpack', 'sourcemap'],
     },
 
     webpack: {
@@ -126,6 +125,7 @@ module.exports = function(config) {
         alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
           src: path.resolve(__dirname, 'src'),
         }),
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       },
     },
 

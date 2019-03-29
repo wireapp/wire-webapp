@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,17 @@
  *
  */
 
-window.z = window.z || {};
-window.z.lifecycle = z.lifecycle || {};
+import PromiseQueue from 'utils/PromiseQueue';
 
-z.lifecycle.UPDATE_SOURCE = {
-  WEBAPP: 'webapp',
-};
+export class MessageSender {
+  constructor() {
+    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
+  }
+  queueMessage(sendingFunction) {
+    return this.sendingQueue.push(sendingFunction);
+  }
 
-// @todo Added for wrapper backwards compatibility. Remove after uptake of version > 3.1.
-window.z.announce = z.announce || {};
-z.announce.UPDATE_SOURCE = z.lifecycle.UPDATE_SOURCE;
+  pauseQueue(pauseState = true) {
+    this.sendingQueue.pause(pauseState);
+  }
+}

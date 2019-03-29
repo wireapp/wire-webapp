@@ -43,7 +43,7 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import WirelessContainer from '../component/WirelessContainer';
 import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
-import * as Environment from '../Environment';
+import {Config} from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -53,7 +53,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {isMobileOs, isSafari} from '../Runtime';
+import {isPwaSupportedBrowser} from '../Runtime';
 import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
@@ -109,7 +109,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
   };
 
   readAndUpdateParamsFromUrl = (nextProps: CombinedProps) => {
-    if (this.isPwaSupportedBrowser()) {
+    if (this.isPwaEnabled()) {
       this.setState({forceNewTemporaryGuestAccount: true});
     }
     const conversationCode = getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -157,16 +157,13 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
       .then(() => this.routeToApp());
   };
 
-  isPwaSupportedBrowser = () => {
+  isPwaEnabled = () => {
     const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-    return Environment.onEnvironment({
-      onProduction: false,
-      onStaging: pwaAware && (isMobileOs() || isSafari()),
-    });
+    return Config.URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
   };
 
   routeToApp = () => {
-    const redirectLocation = this.isPwaSupportedBrowser()
+    const redirectLocation = this.isPwaEnabled()
       ? pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, QUERY_KEY.IMMEDIATE_LOGIN)
       : pathWithParams(EXTERNAL_ROUTE.WEBAPP);
     window.location.replace(redirectLocation);
@@ -190,7 +187,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
             name,
           };
           return this.props.doRegisterWireless(registrationData, {
-            shouldInitializeClient: !this.isPwaSupportedBrowser(),
+            shouldInitializeClient: !this.isPwaEnabled(),
           });
         })
         .then(() => this.props.doJoinConversationByCode(this.state.conversationKey, this.state.conversationCode))
@@ -231,7 +228,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
     const {error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
+        <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
         <H2
           style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
           color={COLOR.GRAY}
@@ -276,7 +273,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
     const {enteredName, isValidName, error} = this.state;
     return (
       <ContainerXS style={{margin: 'auto 0'}}>
-        <AppAlreadyOpen fullscreen={this.isPwaSupportedBrowser()} />
+        <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
           <FormattedHTMLMessage {...conversationJoinStrings.headline} />
         </H2>
@@ -315,7 +312,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
             {error ? parseValidationErrors(error) : parseError(this.props.error)}
           </ErrorMessage>
         </Form>
-        {!this.isPwaSupportedBrowser() && (
+        {!this.isPwaEnabled() && (
           <Small block>
             {`${_(conversationJoinStrings.hasAccount)} `}
             <RouterLink

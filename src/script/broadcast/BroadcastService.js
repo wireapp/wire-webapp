@@ -17,13 +17,8 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
-window.z = window.z || {};
-window.z.broadcast = z.broadcast || {};
-
 // Broadcast service for all broadcast calls to the backend REST API.
-z.broadcast.BroadcastService = class BroadcastService {
+export class BroadcastService {
   static get CONFIG() {
     return {
       URL_BROADCAST: '/broadcast',
@@ -33,10 +28,11 @@ z.broadcast.BroadcastService = class BroadcastService {
   /**
    * Construct a new Broadcast Service.
    * @param {BackendClient} backendClient - Client for the API calls
+   * @param {Logger} logger - logger configured for this class
    */
-  constructor(backendClient) {
+  constructor(backendClient, logger) {
     this.backendClient = backendClient;
-    this.logger = new Logger('z.broadcast.BroadcastService', z.config.LOGGER.OPTIONS);
+    this.logger = logger;
   }
 
   /**
@@ -64,4 +60,4 @@ z.broadcast.BroadcastService = class BroadcastService {
       url: url,
     });
   }
-};
+}

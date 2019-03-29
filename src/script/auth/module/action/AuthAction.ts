@@ -21,7 +21,6 @@ import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
-import {APP_INSTANCE_ID} from '../../config';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -66,7 +65,9 @@ export class AuthAction {
         .then(() => onBeforeLogin(dispatch, getState, global))
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
         .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() =>
+          dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}))
+        )
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => onAfterLogin(dispatch, getState, global))
         .then(() => dispatch(clientAction.doInitializeClient(loginData.clientType, String(loginData.password))))
@@ -91,7 +92,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
+      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       dispatch(AuthActionCreator.startLogin());
       return Promise.resolve()
@@ -99,7 +100,7 @@ export class AuthAction {
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
         .then(() => dispatch(selfAction.fetchSelf()))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
           dispatch(AuthActionCreator.successfulLogin());
@@ -171,7 +172,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
+      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -191,7 +192,7 @@ export class AuthAction {
         .then(() => apiClient.register(registration, clientType))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
@@ -212,7 +213,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}}
+      {apiClient, config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}}
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -225,7 +226,7 @@ export class AuthAction {
         .then(() => apiClient.register(registration, clientType))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
@@ -246,7 +247,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}}
+      {apiClient, config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
@@ -259,7 +260,7 @@ export class AuthAction {
         .then(() => apiClient.register(registrationData, clientType))
         .then(() => core.init())
         .then(() => this.persistAuthData(clientType, core, dispatch, localStorageAction))
-        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: APP_INSTANCE_ID})))
+        .then(() => dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: config.APP_INSTANCE_ID})))
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)))
         .then(() => {
@@ -342,11 +343,11 @@ export class AuthAction {
   };
 
   doLogout = (): ThunkAction => {
-    return (dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) => {
+    return (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
       return core
         .logout()
-        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID)))
         .then(() => dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
         .then(() => {
           dispatch(AuthActionCreator.successfulLogout());
@@ -358,11 +359,11 @@ export class AuthAction {
   };
 
   doSilentLogout = (): ThunkAction => {
-    return (dispatch, getState, {core, actions: {cookieAction, localStorageAction}}) => {
+    return (dispatch, getState, {config, core, actions: {cookieAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogout());
       return core
         .logout()
-        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, APP_INSTANCE_ID)))
+        .then(() => dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, config.APP_INSTANCE_ID)))
         .then(() => dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE)))
         .then(() => {
           dispatch(AuthActionCreator.successfulSilentLogout());

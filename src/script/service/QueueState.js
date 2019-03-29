@@ -25,3 +25,5 @@ z.service.QUEUE_STATE = {
   CONNECTIVITY_PROBLEM: 'z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM',
   READY: 'z.service.QUEUE_STATE.READY',
 };
+
+export const QUEUE_STATE = z.service.QUEUE_STATE;

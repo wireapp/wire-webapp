@@ -30,7 +30,7 @@ z.event.EventService = class EventService {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = new Logger('z.conversation.EventService', z.config.LOGGER.OPTIONS);
+    this.logger = Logger('z.conversation.EventService');
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 

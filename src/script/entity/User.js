@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {clamp} from 'utils/NumberUtil';
 
 // Please note: The own user has a "locale"
 class User {
@@ -68,6 +69,7 @@ class User {
     this.is_me = false;
     this.isService = false;
     this.isSingleSignOn = false;
+    this.isDeleted = false;
 
     this.joaatHash = -1;
 
@@ -284,7 +286,7 @@ class User {
   }
 
   _setRemainingExpirationTime(expirationTime) {
-    const remainingTime = z.util.NumberUtil.clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
+    const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / TimeUtil.UNITS_IN_MILLIS.MINUTE);
 
     if (remainingMinutes <= 45) {

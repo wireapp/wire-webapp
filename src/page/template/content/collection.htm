@@ -22,7 +22,7 @@
                 <span class="collection-header-icon icon-library"></span>
                 <span class="label-bold-xs" data-bind="text: t('collectionSectionImages')"></span>
                 <!-- ko if: images().length > 12 -->
-                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('images', images()) }"><span data-bind="html: t('collectionShowAll', images().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
+                  <span class="collection-header-all accent-text" data-bind="click: function() { clickOnSection('images', images()) }"><span data-bind="html: t('collectionShowAll', images().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: images.slice(0, 12), as: 'messageEntity'}">
@@ -37,7 +37,7 @@
                 <span class="collection-header-icon icon-link"></span>
                 <span class="label-bold-xs" data-bind="text: t('collectionSectionLinks')"></span>
                 <!-- ko if: links().length > 4 -->
-                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('links', links()) }"><span data-bind="html: t('collectionShowAll', links().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
+                  <span class="collection-header-all accent-text" data-bind="click: function() { clickOnSection('links', links()) }"><span data-bind="html: t('collectionShowAll', links().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: links.slice(0, 4), as: 'messageEntity'}">
@@ -52,7 +52,7 @@
                 <span class="collection-header-icon icon-microphone"></span>
                 <span class="label-bold-xs" data-bind="text: t('collectionSectionAudio')"></span>
                 <!-- ko if: audio().length > 4 -->
-                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('audio', audio()) }"><span data-bind="html: t('collectionShowAll', audio().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
+                  <span class="collection-header-all accent-text" data-bind="click: function() { clickOnSection('audio', audio()) }"><span data-bind="html: t('collectionShowAll', audio().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: audio.slice(0, 4), as: 'messageEntity'}">
@@ -67,7 +67,7 @@
                 <span class="collection-header-icon icon-file"></span>
                 <span class="label-bold-xs" data-bind="text: t('collectionSectionFiles')"></span>
                 <!-- ko if: files().length > 4 -->
-                  <span class="collection-header-all text-theme" data-bind="click: function() { clickOnSection('files', files()) }"><span data-bind="html: t('collectionShowAll', files().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
+                  <span class="collection-header-all accent-text" data-bind="click: function() { clickOnSection('files', files()) }"><span data-bind="html: t('collectionShowAll', files().length)" data-uie-name="collection-show-all"></span>&nbsp;<span class="icon-forward font-size-xxs"></span></span>
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: files.slice(0, 4), as: 'messageEntity'}">
