@@ -305,10 +305,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.4.4":
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.4.4.tgz#fb2cdc4e934286d6ffb411dacc9d729fae7377bc"
-  integrity sha512-bM11f2MDWGa6V8rEWDOmEpgp8QusX7Flm4FX8dEXJKkCOJyvxee6lgV3kwhceBio19XYsOuomOOV+2RNHHIbYw==
+"@wireapp/commons@1.4.5":
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.4.5.tgz#cc94777af3a2f743403eb37dfba4bae983f6bba0"
+  integrity sha512-m2RaLlueabXb56qeCXND/dfN/JvYrtMWN4x/Us/wEhbD3e83JdADbLIuZrkcswD95Jq6fjxyNM/QAeO8jeWJsA==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/node" "11.12.0"
@@ -318,7 +318,7 @@
     logdown "3.2.8"
     moment "2.24.0"
     platform "1.3.5"
-    url-search-params-polyfill "5.0.1"
+    url-search-params-polyfill "5.1.0"
 
 abbrev@1:
   version "1.1.1"
@@ -3729,10 +3729,10 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-url-search-params-polyfill@5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-5.0.1.tgz#ccf5c10dd55a5d31b6ea8ec0ae814f984fb72a06"
-  integrity sha512-OJRkM8f7rkjn2PLgc41SVnCpoT6QUNL5SGMYkaeEFJ6OPysjk02WnZu/6AAtAVyT8Qh/c0VnrRoXS86ISC1OXw==
+url-search-params-polyfill@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-5.1.0.tgz#f0405dcc2e921bf7f5fdf8c4e616f1e8088ef31b"
+  integrity sha512-yjFY7uw2xRf9e8Mg4ZVkZwtp8dMCC4cbBkEIZiTDpuSY2WJ9+Quw0wRhxncv32qaMQwmBQT+P847rO8PrFhhDA==
 
 use@^3.1.0:
   version "3.1.1"
