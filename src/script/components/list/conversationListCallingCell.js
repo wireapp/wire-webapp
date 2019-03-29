@@ -21,10 +21,7 @@ import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import TERMINATION_REASON from '../../calling/enum/TerminationReason';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ConversationListCallingCell = class ConversationListCallingCell {
+class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
 
@@ -152,7 +149,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
   onToggleVideo() {
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
   }
-};
+}
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
@@ -261,5 +258,5 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
     <!-- /ko -->
  `,
-  viewModel: z.components.ConversationListCallingCell,
+  viewModel: ConversationListCallingCell,
 });

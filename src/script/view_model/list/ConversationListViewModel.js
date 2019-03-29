@@ -50,7 +50,9 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.logger = Logger('z.viewModel.list.ConversationListViewModel');
     this.multitasking = this.contentViewModel.multitasking;
 
-    this.showCalls = ko.observable(false);
+    this.showCalls = ko.observable();
+    this.setShowCallsState(repositories.event.notificationHandlingState());
+    repositories.event.notificationHandlingState.subscribe(this.setShowCallsState.bind(this));
 
     this.contentState = this.contentViewModel.state;
     this.selectedConversation = ko.observable();
@@ -115,7 +117,6 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setShowCallsState.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
   }
