@@ -50,7 +50,7 @@ const messageIdCache = {};
       PayloadBundleType.PING,
       PayloadBundleType.TEXT,
     ];
-    const {conversation: conversationId, content, from, id: messageId, messageTimer = 0, type} = messageData;
+    const {content, conversation: conversationId, from, id: messageId, messageTimer = 0, type} = messageData;
     const additionalContent = [];
 
     if (content.mentions && content.mentions.length) {
@@ -74,17 +74,25 @@ const messageIdCache = {};
     );
 
     if (CONFIRM_TYPES.includes(type)) {
-      const deliveredPayload = account.service.conversation.createConfirmationDelivered(messageId);
+      const deliveredPayload = account.service.conversation.messageBuilder.createConfirmation(
+        conversationId,
+        messageId,
+        0
+      );
       logger.log(
         `Sending: "${deliveredPayload.type}" ("${deliveredPayload.id}") in "${conversationId}"`,
         deliveredPayload.content
       );
-      await account.service.conversation.send(conversationId, deliveredPayload);
+      await account.service.conversation.send(deliveredPayload);
 
       if (content.expectsReadConfirmation) {
-        const readPayload = account.service.conversation.createConfirmationRead(messageId);
+        const readPayload = account.service.conversation.messageBuilder.createConfirmation(
+          conversationId,
+          messageId,
+          1
+        );
         logger.log(`Sending: "${readPayload.type}" ("${readPayload.id}") in "${conversationId}"`, readPayload.content);
-        await account.service.conversation.send(conversationId, readPayload);
+        await account.service.conversation.send(readPayload);
       }
 
       if (messageTimer) {
@@ -107,7 +115,7 @@ const messageIdCache = {};
     );
 
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
-    await account.service.conversation.send(conversationId, payload);
+    await account.service.conversation.send(payload);
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   };
 
@@ -131,7 +139,7 @@ const messageIdCache = {};
         };
       }
 
-      const newLinkPreview = await account.service.conversation.createLinkPreview({
+      const newLinkPreview = await account.service.conversation.messageBuilder.createLinkPreview({
         ...originalLinkPreview,
         image: linkPreviewImage,
       });
@@ -144,6 +152,7 @@ const messageIdCache = {};
   account.on(PayloadBundleType.TEXT, async data => {
     const {
       content: {expectsReadConfirmation, linkPreviews, mentions, quote, text},
+      conversation: conversationId,
       id: messageId,
     } = data;
     let textPayload;
@@ -160,8 +169,8 @@ const messageIdCache = {};
         return;
       }
 
-      textPayload = account.service.conversation
-        .createText(text, cachedMessageId)
+      textPayload = account.service.conversation.messageBuilder
+        .createText(conversationId, text, cachedMessageId)
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
         .withQuote(quote)
@@ -169,8 +178,8 @@ const messageIdCache = {};
         .build();
     } else {
       await handleIncomingMessage(data);
-      textPayload = account.service.conversation
-        .createText(text)
+      textPayload = account.service.conversation.messageBuilder
+        .createText(conversationId, text)
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
@@ -185,7 +194,7 @@ const messageIdCache = {};
   account.on(PayloadBundleType.CONFIRMATION, handleIncomingMessage);
 
   account.on(PayloadBundleType.ASSET, async data => {
-    const {content, id: messageId} = data;
+    const {content, conversation: conversationId, id: messageId} = data;
 
     const cacheOriginal = assetOriginalCache[messageId];
     if (!cacheOriginal) {
@@ -197,7 +206,7 @@ const messageIdCache = {};
 
     await handleIncomingMessage(data);
 
-    const fileMetaDataPayload = await account.service.conversation.createFileMetadata({
+    const fileMetaDataPayload = await account.service.conversation.messageBuilder.createFileMetadata(conversationId, {
       length: fileBuffer.length,
       name: cacheOriginal.name,
       type: cacheOriginal.mimeType,
@@ -206,12 +215,20 @@ const messageIdCache = {};
     await sendMessageResponse(data, fileMetaDataPayload);
 
     try {
-      const filePayload = await account.service.conversation.createFileData({data: fileBuffer}, fileMetaDataPayload.id);
+      const filePayload = await account.service.conversation.messageBuilder.createFileData(
+        conversationId,
+        {data: fileBuffer},
+        fileMetaDataPayload.id
+      );
       messageIdCache[messageId] = filePayload.id;
       await sendMessageResponse(data, filePayload);
     } catch (error) {
       logger.warn(`Error while sending asset: "${error.stack}"`);
-      const fileAbortPayload = await account.service.conversation.createFileAbort(0, fileMetaDataPayload.id);
+      const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
+        conversationId,
+        0,
+        fileMetaDataPayload.id
+      );
       await sendMessageResponse(data, fileAbortPayload);
     }
   });
@@ -228,7 +245,7 @@ const messageIdCache = {};
   });
 
   account.on(PayloadBundleType.ASSET_ABORT, async data => {
-    const {id: messageId} = data;
+    const {conversation: conversationId, id: messageId} = data;
 
     await handleIncomingMessage(data);
 
@@ -238,7 +255,7 @@ const messageIdCache = {};
       return;
     }
 
-    const fileMetaDataPayload = await account.service.conversation.createFileMetadata({
+    const fileMetaDataPayload = await account.service.conversation.messageBuilder.createFileMetadata(conversationId, {
       length: 0,
       name: cacheOriginal.name,
       type: cacheOriginal.mimeType,
@@ -247,7 +264,11 @@ const messageIdCache = {};
     await handleIncomingMessage(data);
     await sendMessageResponse(data, fileMetaDataPayload);
 
-    const fileAbortPayload = await account.service.conversation.createFileAbort(0, fileMetaDataPayload.id);
+    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
+      conversationId,
+      0,
+      fileMetaDataPayload.id
+    );
     await sendMessageResponse(data, fileAbortPayload);
 
     delete assetOriginalCache[messageId];
@@ -257,12 +278,13 @@ const messageIdCache = {};
   account.on(PayloadBundleType.ASSET_IMAGE, async data => {
     const {
       content: {uploaded, original},
+      conversation: conversationId,
       id: messageId,
     } = data;
 
     const imageBuffer = await account.service.conversation.getAsset(uploaded);
 
-    const imagePayload = await account.service.conversation.createImage({
+    const imagePayload = await account.service.conversation.messageBuilder.createImage(conversationId, {
       data: imageBuffer,
       height: original.image.height,
       type: original.mimeType,
@@ -278,7 +300,8 @@ const messageIdCache = {};
   account.on(PayloadBundleType.CLEARED, handleIncomingMessage);
 
   account.on(PayloadBundleType.LOCATION, async data => {
-    const locationPayload = account.service.conversation.createLocation(data.content);
+    const {content, conversation: conversationId} = data;
+    const locationPayload = account.service.conversation.messageBuilder.createLocation(conversationId, content);
 
     await handleIncomingMessage(data);
     await sendMessageResponse(data, locationPayload);
@@ -287,10 +310,11 @@ const messageIdCache = {};
   account.on(PayloadBundleType.PING, async data => {
     const {
       content: {expectsReadConfirmation},
+      conversation: conversationId,
     } = data;
     await handleIncomingMessage(data);
 
-    const pingPayload = account.service.conversation.createPing({
+    const pingPayload = account.service.conversation.messageBuilder.createPing(conversationId, {
       expectsReadConfirmation,
     });
 
@@ -300,11 +324,16 @@ const messageIdCache = {};
   account.on(PayloadBundleType.REACTION, async data => {
     const {
       content: {type, originalMessageId},
+      conversation: conversationId,
     } = data;
 
     await handleIncomingMessage(data);
 
-    const reactionPayload = account.service.conversation.createReaction(originalMessageId, type);
+    const reactionPayload = account.service.conversation.messageBuilder.createReaction(
+      conversationId,
+      originalMessageId,
+      type
+    );
 
     await sendMessageResponse(data, reactionPayload);
   });
@@ -326,8 +355,8 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.MESSAGE_DELETE, async data => {
     const {
-      conversation: conversationId,
       content: {originalMessageId},
+      conversation: conversationId,
     } = data;
 
     await handleIncomingMessage(data);
@@ -342,6 +371,7 @@ const messageIdCache = {};
   account.on(PayloadBundleType.MESSAGE_EDIT, async data => {
     const {
       content: {expectsReadConfirmation, linkPreviews, mentions, originalMessageId, quote, text},
+      conversation: conversationId,
       id: messageId,
     } = data;
     let editedPayload;
@@ -364,8 +394,8 @@ const messageIdCache = {};
         logger.warn(`Link preview for edited message ID "${messageId} was received before the original message."`);
         return;
       }
-      editedPayload = account.service.conversation
-        .createEditedText(text, cachedOriginalMessageId, cachedMessageId)
+      editedPayload = account.service.conversation.messageBuilder
+        .createEditedText(conversationId, text, cachedOriginalMessageId, cachedMessageId)
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
         .withQuote(quote)
@@ -373,8 +403,8 @@ const messageIdCache = {};
         .build();
     } else {
       await handleIncomingMessage(data);
-      editedPayload = account.service.conversation
-        .createEditedText(text, cachedOriginalMessageId)
+      editedPayload = account.service.conversation.messageBuilder
+        .createEditedText(conversationId, text, cachedOriginalMessageId)
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)

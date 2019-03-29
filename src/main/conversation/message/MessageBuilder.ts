@@ -253,7 +253,7 @@ class MessageBuilder {
 
   public createPing(
     conversationId: string,
-    ping: KnockContent,
+    ping: KnockContent = {},
     messageId: string = MessageBuilder.createId()
   ): PingMessage {
     return {
