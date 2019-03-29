@@ -40,6 +40,7 @@ describe('z.notification.NotificationRepository', () => {
 
   const [first_name] = entities.user.john_doe.name.split(' ');
   let notification_content = null;
+  const contentViewModelState = {};
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
@@ -75,21 +76,18 @@ describe('z.notification.NotificationRepository', () => {
       document.hasFocus = () => false;
       TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
       z.util.Environment.browser.supports.notifications = true;
+
       window.wire.app = {
-        service: {
-          asset: {
-            generateAssetUrl: () => Promise.resolve('/image/logo/notification.png'),
-          },
-        },
-        view: {
-          content: {
-            multitasking: {
-              isMinimized: () => true,
-            },
-            state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
-          },
-        },
+        service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
+      contentViewModelState.state = ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.multitasking = {
+        isMinimized: () => true,
+      };
+      TestFactory.notification_repository.setContentViewModelStates(
+        contentViewModelState.state,
+        contentViewModelState.multitasking
+      );
 
       spyOn(TestFactory.notification_repository, '_showNotification');
       spyOn(TestFactory.notification_repository, '_notifySound');
@@ -207,7 +205,7 @@ describe('z.notification.NotificationRepository', () => {
         .then(() => {
           expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
 
-          window.wire.app.view.content.multitasking.isMinimized = () => false;
+          contentViewModelState.multitasking.isMinimized = () => false;
 
           return TestFactory.notification_repository.notify(message_et, undefined, conversation_et);
         })
