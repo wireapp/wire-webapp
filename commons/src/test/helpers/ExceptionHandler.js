@@ -23,8 +23,8 @@ if (typeof window === 'undefined') {
     process.exit(1);
   });
 
-  process.on('unhandledRejection', error => {
-    console.error(`Unhandled Promise rejection: ${error.message}`, error.stack);
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
     process.exit(1);
   });
 }
