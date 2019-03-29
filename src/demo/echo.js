@@ -1,10 +1,10 @@
 //@ts-check
 
-process.on('uncaughtException', (/** @type {any} */ error) =>
+process.on('uncaughtException', (/** @type {Error & {code: number}} */ error) =>
   logger.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error)
 );
-process.on('unhandledRejection', (/** @type {any} */ error) =>
-  logger.error(`Uncaught rejection "${error.constructor.name}" (${error.code}): ${error.message}`, error)
+process.on('unhandledRejection', (reason, promise) =>
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason)
 );
 
 const path = require('path');

@@ -4,8 +4,8 @@
 process.on('uncaughtException', error =>
   console.error(`Uncaught exception "${error.constructor.name}": ${error.message}`, error)
 );
-process.on('unhandledRejection', error =>
-  console.error(`Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
+process.on('unhandledRejection', (reason, promise) =>
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
 );
 
 const crypto = require('crypto');
