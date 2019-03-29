@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 import MessageListViewModel from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
+import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 
 import {t} from 'utils/LocalizerUtil';
 
@@ -68,7 +69,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
     this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
-    this.emojiInput = new z.viewModel.content.EmojiInputViewModel(mainViewModel, this, repositories);
+    this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
     this.inputBar = new z.viewModel.content.InputBarViewModel(
       mainViewModel,
