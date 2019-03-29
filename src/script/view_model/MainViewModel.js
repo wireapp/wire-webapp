@@ -19,13 +19,10 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
 import ThemeViewModel from './ThemeViewModel';
 import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
 
-z.viewModel.MainViewModel = class MainViewModel {
+export class MainViewModel {
   static get CONFIG() {
     return {
       PANEL: {
@@ -60,15 +57,8 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   constructor(repositories) {
-    this.closePanel = this.closePanel.bind(this);
-    this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
-    this.closePanelOnClick = this.closePanelOnClick.bind(this);
-    this.openPanel = this.openPanel.bind(this);
-    this.togglePanel = this.togglePanel.bind(this);
-
-    this.elementId = 'wire-main';
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.MainViewModel');
+    this.logger = Logger('MainViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -95,8 +85,6 @@ z.viewModel.MainViewModel = class MainViewModel {
         return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
       }
     });
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   openPanel() {
@@ -108,12 +96,11 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   closePanelImmediatly() {
-    document.querySelector('.center-column__overlay').removeEventListener('click', this.togglePanel);
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
 
-  togglePanel(forceState) {
+  togglePanel = forceState => {
     const app = document.querySelector('#app');
     const panel = document.querySelector('.right-column');
 
@@ -196,7 +183,7 @@ z.viewModel.MainViewModel = class MainViewModel {
         }
       });
     });
-  }
+  };
 
   _applyStyle(element, style) {
     if (element) {
@@ -210,7 +197,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     }
   }
 
-  closePanelOnClick() {
+  closePanelOnClick = () => {
     this.panel.closePanel();
-  }
-};
+  };
+}

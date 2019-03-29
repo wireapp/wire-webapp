@@ -44,7 +44,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
   /**
    * View model for the list column.
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
