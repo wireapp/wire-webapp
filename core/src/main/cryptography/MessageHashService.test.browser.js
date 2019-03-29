@@ -61,7 +61,7 @@ describe('MessageHashService', () => {
       const content = {
         text: 'This has **markdown**',
       };
-      const timestamp = 1540213965;
+      const timestamp = 1540213965000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -75,7 +75,7 @@ describe('MessageHashService', () => {
       const content = {
         text: 'بغداد',
       };
-      const timestamp = 1540213965;
+      const timestamp = 1540213965000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -89,7 +89,7 @@ describe('MessageHashService', () => {
       const content = {
         text: 'Hello 👩‍💻👨‍👩‍👧!',
       };
-      const timestamp = 1540213769;
+      const timestamp = 1540213769000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -103,7 +103,7 @@ describe('MessageHashService', () => {
       const content = {
         text: 'https://www.youtube.com/watch?v=DLzxrzFCyOs',
       };
-      const timestamp = 1540213769;
+      const timestamp = 1540213769000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -118,7 +118,7 @@ describe('MessageHashService', () => {
         latitude: 52.5166667,
         longitude: 13.4,
       };
-      const timestamp = 1540213769;
+      const timestamp = 1540213769000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -133,7 +133,7 @@ describe('MessageHashService', () => {
         latitude: 51.509143,
         longitude: -0.117277,
       };
-      const timestamp = 1540213769;
+      const timestamp = 1540213769000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -149,7 +149,7 @@ describe('MessageHashService', () => {
           assetId: '3-2-1-38d4f5b9',
         },
       };
-      const timestamp = 1540213769;
+      const timestamp = 1540213769000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 
@@ -165,7 +165,7 @@ describe('MessageHashService', () => {
           assetId: '3-3-3-82a62735',
         },
       };
-      const timestamp = 1540213965;
+      const timestamp = 1540213965000;
 
       const messageHashService = new MessageHashService(content, timestamp);
 

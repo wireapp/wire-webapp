@@ -45,7 +45,6 @@ export default {
 
     try {
       await engine.update(TABLE_NAME, PRIMARY_KEY, updates);
-      console.log('B');
     } catch (error) {
       expect(error).toEqual(jasmine.any(RecordNotFoundError));
       done();

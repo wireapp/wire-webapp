@@ -28,9 +28,10 @@ class MessageHashService {
   private readonly messageContent: AvailableMessageContent;
   private readonly timestamp: number;
 
-  constructor(messageContent: AvailableMessageContent, timestamp?: number) {
+  constructor(messageContent: AvailableMessageContent, timestamp: number = Date.now()) {
     this.messageContent = messageContent;
-    this.timestamp = timestamp || Math.round(new Date().getTime() / 1000);
+    const unixTimestamp = new Date(timestamp).getTime();
+    this.timestamp = Math.floor(unixTimestamp / 1e3);
   }
 
   private createSha256Hash(buffer: Buffer): Buffer {

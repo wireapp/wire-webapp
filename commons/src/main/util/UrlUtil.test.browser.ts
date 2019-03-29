@@ -16,9 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-console.log('hello1');
 import * as UrlUtil from './UrlUtil';
-console.log('hello', UrlUtil);
 
 describe('pathWithParams', () => {
   it('name', () => {

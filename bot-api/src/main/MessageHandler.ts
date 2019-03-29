@@ -153,7 +153,7 @@ abstract class MessageHandler {
 
   public async sendPing(conversationId: string): Promise<void> {
     if (this.account && this.account.service) {
-      const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId, {});
+      const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId);
       await this.account.service.conversation.send(pingPayload);
     }
   }

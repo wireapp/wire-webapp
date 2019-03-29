@@ -145,7 +145,7 @@ xdescribe('Account', () => {
       done();
     });
 
-    it('sends and receive messages.', async done => {
+    it('sends and receives messages.', async done => {
       if (!CAN_RUN) {
         return done();
       }
