@@ -31,9 +31,7 @@ const inputBlockStyle: (props: InputBlockProps) => ObjectInterpolation<undefined
   boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
   marginBottom: '16px',
   [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
-    margin: 0,
-  },
-  [`* + .${INPUT_CLASSNAME}, * + .${INPUT_SUBMIT_COMBO_CLASSNAME}, * + *`]: {
+    marginBottom: 0,
     marginTop: '1px',
   },
 });
