@@ -82,7 +82,7 @@ export class MainViewModel {
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {
         // deprecated - still used on input control hover
-        return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
+        return `main-accent-color-${this.selfUser().accent_id()} show`;
       }
     });
   }
