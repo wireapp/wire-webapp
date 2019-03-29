@@ -57,12 +57,6 @@ export class MainViewModel {
   }
 
   constructor(repositories) {
-    this.closePanel = this.closePanel.bind(this);
-    this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
-    this.closePanelOnClick = this.closePanelOnClick.bind(this);
-    this.openPanel = this.openPanel.bind(this);
-    this.togglePanel = this.togglePanel.bind(this);
-
     this.userRepository = repositories.user;
     this.logger = Logger('MainViewModel');
 
@@ -102,12 +96,11 @@ export class MainViewModel {
   }
 
   closePanelImmediatly() {
-    document.querySelector('.center-column__overlay').removeEventListener('click', this.togglePanel);
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
 
-  togglePanel(forceState) {
+  togglePanel = forceState => {
     const app = document.querySelector('#app');
     const panel = document.querySelector('.right-column');
 
@@ -190,7 +183,7 @@ export class MainViewModel {
         }
       });
     });
-  }
+  };
 
   _applyStyle(element, style) {
     if (element) {
@@ -204,7 +197,7 @@ export class MainViewModel {
     }
   }
 
-  closePanelOnClick() {
+  closePanelOnClick = () => {
     this.panel.closePanel();
-  }
+  };
 }

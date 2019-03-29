@@ -86,7 +86,6 @@ class App {
     this.logger = Logger('App');
     this.domContainer = domContainer;
 
-    this.telemetry = new AppInitTelemetry();
     new WindowHandler();
 
     this.service = this._setupServices();
@@ -94,8 +93,6 @@ class App {
     this.util = this._setup_utils();
 
     this._publishGlobals();
-
-    this.instanceId = z.util.createRandomUuid();
 
     this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
     this.singleInstanceHandler = new z.main.SingleInstanceHandler(this._onExtraInstanceStarted);
@@ -289,30 +286,31 @@ class App {
    */
   initApp(isReload = this._isReload()) {
     const loadingView = new LoadingViewModel();
+    const telemetry = new AppInitTelemetry();
     z.util
       .checkIndexedDb()
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
         loadingView.updateProgress(2.5);
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return this._initiateSelfUser();
       })
       .then(() => {
         loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
         loadingView.updateProgress(7.5, t('initValidatedClient'));
-        this.telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+        telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
+        telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         loadingView.updateProgress(10);
-        this.telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+        telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
 
@@ -322,9 +320,9 @@ class App {
       .then(([conversationEntities, connectionEntities]) => {
         loadingView.updateProgress(25, t('initReceivedUserData'));
 
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
+        telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+        telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
         this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
         this._subscribeToUnloadEvents();
@@ -334,8 +332,8 @@ class App {
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initializeFromStream())
       .then(notificationsCount => {
-        this.telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-        this.telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+        telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+        telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
         this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
@@ -349,23 +347,23 @@ class App {
       .then(clientEntities => {
         loadingView.updateProgress(99);
 
-        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
-        this.telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
+        telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+        telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
 
         this.repository.user.self().devices(clientEntities);
         this.logger.info('App pre-loading completed');
         return this._handleUrlParams();
       })
       .then(() => {
-        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
+        telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         loadingView.removeFromView();
-        this.telemetry.report();
+        telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
-        this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
+        telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
         if (this.repository.user.isActivatedAccount()) {
           // start regularly polling the server to check if there is a new version of Wire
           startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
@@ -584,7 +582,9 @@ class App {
    * @returns {Promise} Resolves when page is the first tab
    */
   _registerSingleInstance() {
-    if (this.singleInstanceHandler.registerInstance(this.instanceId)) {
+    const instanceId = z.util.createRandomUuid();
+
+    if (this.singleInstanceHandler.registerInstance(instanceId)) {
       this._registerSingleInstanceCleaning();
       return Promise.resolve();
     }
