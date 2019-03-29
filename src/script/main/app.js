@@ -579,16 +579,15 @@ class App {
 
   /**
    * Check that this is the single instance tab of the app.
-   * @returns {Promise} Resolves when page is the first tab
+   * @returns {void} Resolves when page is the first tab
    */
   _registerSingleInstance() {
     const instanceId = z.util.createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
-      this._registerSingleInstanceCleaning();
-      return Promise.resolve();
+      return this._registerSingleInstanceCleaning();
     }
-    return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
+    throw new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS);
   }
 
   _registerSingleInstanceCleaning() {
