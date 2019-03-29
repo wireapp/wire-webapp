@@ -18,6 +18,7 @@
  */
 
 import User from 'src/script/entity/User';
+import {ACCENT_ID} from 'src/script/config';
 
 describe('User', () => {
   describe('First Name', () => {
@@ -105,61 +106,21 @@ describe('User', () => {
       expect(user_et.devices().length).toBe(2);
     }));
 
-  describe('accent_theme', () =>
-    it('can change the accent theme', () => {
-      const user_et = new User();
-      user_et.accent_id(z.config.ACCENT_ID.BLUE);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.BLUE);
-      user_et.accent_id(z.config.ACCENT_ID.GREEN);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.GREEN);
-      user_et.accent_id(z.config.ACCENT_ID.ORANGE);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.ORANGE);
-      user_et.accent_id(z.config.ACCENT_ID.PINK);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.PINK);
-      user_et.accent_id(z.config.ACCENT_ID.PURPLE);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.PURPLE);
-      user_et.accent_id(z.config.ACCENT_ID.RED);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.RED);
-      user_et.accent_id(z.config.ACCENT_ID.YELLOW);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.YELLOW);
-      user_et.accent_id(undefined);
-
-      expect(user_et.accent_theme()).toBe(User.THEME.BLUE);
-    }));
-
   describe('accent_color', () =>
     it('can change the accent color', () => {
-      const user_et = new User();
-      user_et.accent_id(z.config.ACCENT_ID.BLUE);
+      const userEntity = new User();
+      userEntity.accent_id(ACCENT_ID.BLUE);
 
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.BLUE);
-      user_et.accent_id(z.config.ACCENT_ID.GREEN);
+      expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
 
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.GREEN);
-      user_et.accent_id(z.config.ACCENT_ID.ORANGE);
+      Object.values(ACCENT_ID).forEach(accentId => {
+        userEntity.accent_id(accentId);
 
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.ORANGE);
-      user_et.accent_id(z.config.ACCENT_ID.PINK);
+        expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[accentId]);
+      });
 
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.PINK);
-      user_et.accent_id(z.config.ACCENT_ID.PURPLE);
+      userEntity.accent_id(undefined);
 
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.PURPLE);
-      user_et.accent_id(z.config.ACCENT_ID.RED);
-
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.RED);
-      user_et.accent_id(z.config.ACCENT_ID.YELLOW);
-
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.YELLOW);
-      user_et.accent_id(undefined);
-
-      expect(user_et.accent_color()).toBe(User.ACCENT_COLOR.BLUE);
+      expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
     }));
 });

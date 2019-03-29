@@ -21,17 +21,17 @@ window.z = window.z || {};
 
 const env = window.wire.env;
 
-window.z.config = {
-  ACCENT_ID: {
-    BLUE: 1,
-    GREEN: 2,
-    ORANGE: 5,
-    PINK: 6,
-    PURPLE: 7,
-    RED: 4,
-    YELLOW: 3,
-  },
+export const ACCENT_ID = {
+  BLUE: 1,
+  GREEN: 2,
+  ORANGE: 5,
+  PINK: 6,
+  PURPLE: 7,
+  RED: 4,
+  YELLOW: 3,
+};
 
+window.z.config = {
   FEATURE: {
     CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
     ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
