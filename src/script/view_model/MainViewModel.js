@@ -19,7 +19,6 @@
 
 import Logger from 'utils/Logger';
 
-import ThemeViewModel from './ThemeViewModel';
 import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
 
 export class MainViewModel {
@@ -68,7 +67,6 @@ export class MainViewModel {
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
-    this.theme = new ThemeViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = new z.viewModel.ModalsViewModel();

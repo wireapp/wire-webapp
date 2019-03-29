@@ -23,28 +23,21 @@ export const THEMES = {
   DEFAULT: 'default',
 };
 
-class ThemeViewModel {
-  constructor(mainViewModel, repositories) {
-    this.propertiesRepository = repositories.properties;
-    this.setTheme = this.setTheme.bind(this);
+export class ThemeViewModel {
+  constructor(propertiesRepository) {
+    this.setTheme(propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME));
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE_TOGGLE, useDarkMode => {
-      const newTheme = useDarkMode ? THEMES.DARK : THEMES.DEFAULT;
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
-    });
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.THEME, this.setTheme);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties =>
       this.setTheme(properties.settings.interface.theme)
     );
   }
 
-  setTheme(newTheme) {
+  setTheme = newTheme => {
     const classes = document.body.className
       .split(' ')
       .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))
       .concat(`${THEMES_CLASS_PREFIX}${newTheme}`);
     document.body.className = classes.join(' ');
-  }
+  };
 }
-
-export default ThemeViewModel;

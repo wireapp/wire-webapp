@@ -34,6 +34,7 @@ import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
 import {MainViewModel} from '../view_model/MainViewModel';
+import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
@@ -278,6 +279,7 @@ class App {
    * @returns {undefined} No return value
    */
   initApp(isReload = this._isReload()) {
+    new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
     z.util

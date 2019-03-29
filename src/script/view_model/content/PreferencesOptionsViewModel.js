@@ -54,8 +54,9 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
 
     this.optionDarkMode = ko.observable();
-    this.optionDarkMode.subscribe(darkModePreference => {
-      amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE_TOGGLE, darkModePreference);
+    this.optionDarkMode.subscribe(useDarkMode => {
+      const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
 
@@ -75,6 +76,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    this.updateProperties(this.propertiesRepository.properties);
   }
 
   connectMacOSContacts() {
@@ -104,11 +106,11 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
   }
 
-  updateProperties(properties) {
-    this.optionAudio(properties.settings.sound.alerts);
-    this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
-    this.optionDarkMode(properties.settings.interface.theme === ThemeViewModelThemes.DARK);
-    this.optionSendPreviews(properties.settings.previews.send);
-    this.optionNotifications(properties.settings.notifications);
-  }
+  updateProperties = ({settings}) => {
+    this.optionAudio(settings.sound.alerts);
+    this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
+    this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
+    this.optionSendPreviews(settings.previews.send);
+    this.optionNotifications(settings.notifications);
+  };
 };

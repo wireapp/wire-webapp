@@ -110,11 +110,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
+    this.updateProperties(this.propertiesRepository.properties);
     this._initSubscriptions();
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties);
   }
 
   changeAccentColor(id) {
@@ -399,7 +400,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return true;
   }
 
-  updateProperties(properties) {
-    this.optionPrivacy(properties.settings.privacy.improve_wire);
-  }
+  updateProperties = ({settings}) => {
+    this.optionPrivacy(settings.privacy.improve_wire);
+  };
 };

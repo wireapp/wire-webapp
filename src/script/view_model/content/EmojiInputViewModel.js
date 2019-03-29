@@ -105,7 +105,6 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
 
   constructor(mainViewModel, contentViewModel, repositories) {
     this.removeEmojiPopup = this.removeEmojiPopup.bind(this);
-    this.updatedReplaceEmojiPreference = this.updatedReplaceEmojiPreference.bind(this);
 
     const EMOJI_DIV_CLASS = 'conversation-input-bar-emoji-list';
     this.INLINE_MAX_LENGTH = EmojiInputViewModel.INLINE_REPLACEMENT.reduce((accumulator, currentItem) => {
@@ -261,9 +260,9 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     });
   }
 
-  updatedReplaceEmojiPreference(preference) {
+  updatedReplaceEmojiPreference = preference => {
     this.shouldReplaceEmoji = preference;
-  }
+  };
 
   _tryReplaceInlineEmoji(input) {
     const {selectionStart: selection, value: text} = input;
