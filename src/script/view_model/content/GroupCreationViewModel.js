@@ -33,16 +33,13 @@ export class GroupCreationViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(conversationRepository, searchRepository, teamRepository, userRepository) {
     this.logger = Logger('z.viewModel.content.GroupCreationViewModel');
 
-    this.clickOnCreate = this.clickOnCreate.bind(this);
-    this.clickOnToggleGuestMode = this.clickOnToggleGuestMode.bind(this);
-
-    this.conversationRepository = repositories.conversation;
-    this.searchRepository = repositories.search;
-    this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
+    this.conversationRepository = conversationRepository;
+    this.searchRepository = searchRepository;
+    this.teamRepository = teamRepository;
+    this.userRepository = userRepository;
     this.isTeam = this.teamRepository.isTeam;
 
     this.isShown = ko.observable(false);
@@ -116,10 +113,10 @@ export class GroupCreationViewModel {
       .computed(() => this.selectedContacts() && this.stateIsPreferences() && this.contacts())
       .extend({notify: 'always', rateLimit: 500});
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
-  showCreateGroup(method, userEntity) {
+  showCreateGroup = (method, userEntity) => {
     this.method = method;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
@@ -130,7 +127,7 @@ export class GroupCreationViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
       method: this.method,
     });
-  }
+  };
 
   clickOnBack() {
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
@@ -140,15 +137,15 @@ export class GroupCreationViewModel {
     this.isShown(false);
   }
 
-  clickOnToggleGuestMode() {
+  clickOnToggleGuestMode = () => {
     const accessState = this.isGuestRoom()
       ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
       : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
 
     this.accessState(accessState);
-  }
+  };
 
-  clickOnCreate() {
+  clickOnCreate = () => {
     if (!this.isCreatingConversation) {
       this.isCreatingConversation = true;
 
@@ -171,7 +168,7 @@ export class GroupCreationViewModel {
           throw error;
         });
     }
-  }
+  };
 
   clickOnNext() {
     if (this.nameInput().length) {

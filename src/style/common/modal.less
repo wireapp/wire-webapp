@@ -270,26 +270,36 @@
   }
 
   &__header {
+    position: relative;
     display: flex;
-    height: 16px;
-    min-height: 16px;
+    height: 24px;
+    min-height: 24px;
+    flex-direction: row-reverse;
     align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 24px;
+    justify-content: space-between;
+    margin-bottom: 16px;
     color: var(--background);
     fill: var(--background);
     font-size: 11px;
     font-weight: @font-weight-bold;
     text-transform: uppercase;
 
-    &__item {
-      &--grow {
-        flex-grow: 1;
-      }
-      &--center {
-        text-align: center;
-      }
+    & > * {
+      position: relative;
     }
+
+    &__title {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
     &__button {
       display: flex;
       width: 16px;
@@ -354,7 +364,7 @@
   &__input {
     width: calc(100% + 16px);
     height: 48px;
-    padding-left: 8px;
+    padding-left: 12px;
     margin: 0 -8px;
     border: none;
     background: var(--app-bg-secondary);

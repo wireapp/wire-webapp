@@ -17,26 +17,38 @@
  *
  */
 
-.group-creation__action {
-  opacity: 0.32;
-  transition: all 0.25s ease-in-out;
+.group-creation {
+  &__modal {
+    .modal__content {
+      height: 480px;
+    }
 
-  &.enabled {
-    cursor: pointer;
-    opacity: 1;
+    .modal__info {
+      margin: 8px 4px 72px;
+    }
   }
-}
 
-.group-creation__error {
-  .label-bold-xs;
+  &__action {
+    opacity: 0.32;
+    transition: all 0.25s ease-in-out;
 
-  margin-top: 8px;
-  color: #fb0807;
-}
+    &.enabled {
+      cursor: pointer;
+      opacity: 1;
+    }
+  }
 
-.group-creation__list {
-  height: 374px;
-  margin: 0 -16px -16px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  &__error {
+    .label-bold-xs;
+
+    margin: 8px 4px 0;
+    color: #fb0807;
+  }
+
+  &__list {
+    height: 374px;
+    margin: 12px -16px -16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }

@@ -1,15 +1,15 @@
-<div id="group-creation-modal" data-bind="with: $root.groupCreation" class="group-creation-modal">
+<div data-bind="with: $root.groupCreation" class="group-creation__modal">
   <modal params="isShown: isShown, onClosed: afterHideModal">
     <div class="modal__header">
       <!-- ko if: stateIsParticipants() -->
+        <div class="modal__header__title"  data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></div>
+        <div class="group-creation__action enabled accent-text" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></div>
         <arrow-left-icon class="modal__header__button" data-bind="click: clickOnBack" data-uie-name="go-back"></arrow-left-icon>
-        <div class="modal__header__item--grow modal__header__item--center"  data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></div>
-        <div class="group-creation__action" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></div>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-        <close-icon class="modal__header__button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
-        <div class="modal__header__item--grow modal__header__item--center" data-bind="text: t('groupCreationPreferencesHeader')"></div>
+        <div class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></div>
         <div class="group-creation__action" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction')" data-uie-name="go-next"></div>
+        <close-icon class="modal__header__button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants() -->
