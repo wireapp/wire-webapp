@@ -20,11 +20,7 @@
 import emojiBindings from './emoji.json';
 import * as StorageUtil from 'utils/StorageUtil';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
-z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
+export class EmojiInputViewModel {
   static get CONFIG() {
     return {
       LIST: {
@@ -103,9 +99,8 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
   }
   /* eslint-enable sort-keys, no-multi-spaces */
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(propertiesRepository) {
     this.removeEmojiPopup = this.removeEmojiPopup.bind(this);
-    this.updatedReplaceEmojiPreference = this.updatedReplaceEmojiPreference.bind(this);
 
     const EMOJI_DIV_CLASS = 'conversation-input-bar-emoji-list';
     this.INLINE_MAX_LENGTH = EmojiInputViewModel.INLINE_REPLACEMENT.reduce((accumulator, currentItem) => {
@@ -121,7 +116,7 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     this.emojiStartPosition = -1;
     this.emojiUsageCount = StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.shouldReplaceEmoji = repositories.properties.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+    this.shouldReplaceEmoji = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
     $(document).on('click', `.${EMOJI_DIV_CLASS}`, event => {
       const clicked = $(event.target);
@@ -261,9 +256,9 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
     });
   }
 
-  updatedReplaceEmojiPreference(preference) {
+  updatedReplaceEmojiPreference = preference => {
     this.shouldReplaceEmoji = preference;
-  }
+  };
 
   _tryReplaceInlineEmoji(input) {
     const {selectionStart: selection, value: text} = input;
@@ -444,4 +439,4 @@ z.viewModel.content.EmojiInputViewModel = class EmojiInputViewModel {
   _escapeRegexp(string) {
     return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
-};
+}
