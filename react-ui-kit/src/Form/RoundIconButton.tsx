@@ -58,7 +58,7 @@ const roundIconButtonStyle: <T>(props: RoundIconButtonProps<T>) => ObjectInterpo
   width: `${props.size}px`,
 });
 
-enum ICON_NAME {
+export enum ICON_NAME {
   ARROW = 'arrow',
   ATTACHMENT = 'attachment',
   CHECK = 'check',
@@ -137,4 +137,4 @@ RoundIconButton.defaultProps = {
   size: 32,
 };
 
-export {RoundIconButton, ICON_NAME, roundIconButtonStyle};
+export {RoundIconButton, roundIconButtonStyle};

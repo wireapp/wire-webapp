@@ -29,7 +29,7 @@ export interface PillProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   type?: PILL_TYPE;
 }
 
-enum PILL_TYPE {
+export enum PILL_TYPE {
   error = 'ERROR',
   success = 'SUCCESS',
   warning = 'WARNING',
@@ -78,4 +78,4 @@ const Pill = (props: PillProps) => (
   <span css={pillStyle(props)} data-uie-name="element-pill" data-uie-status={props.type} {...filterPillProps(props)} />
 );
 
-export {Pill, PILL_TYPE, pillStyle, filterPillProps};
+export {Pill, pillStyle, filterPillProps};
