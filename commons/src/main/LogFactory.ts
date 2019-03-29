@@ -33,7 +33,6 @@ interface LoggerOptions {
 
 class LogFactory {
   private static readonly logFilePath?: string = undefined;
-  private static readonly namespace?: string = undefined;
 
   static COLOR_STEP = {
     B: 97,
@@ -62,9 +61,7 @@ class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    if (this.namespace && ~logTransport.msg.indexOf(this.namespace)) {
-      logTransport.args.unshift(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
-    }
+    logTransport.args.unshift(`[${moment().format('YYYY-MM-DD HH:mm:ss')}]`);
   }
 
   static async writeTransport(logTransport: logdown.TransportOptions): Promise<void> {
@@ -96,7 +93,7 @@ class LogFactory {
       color: LogFactory.getColor(),
       forceEnable: false,
       logFilePath: '',
-      namespace: typeof window === 'undefined' ? process.env.npm_package_name || '' : '',
+      namespace: '',
       separator: '::',
     };
     const config: LoggerOptions = {...defaults, ...options};
