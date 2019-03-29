@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.1.5...@wireapp/react-ui-kit@5.2.0) (2019-03-29)
+
+
+### Features
+
+* **react-ui-kit:** TextArea component, consistent markInvalid behaviour & Box border radius fix ([#1704](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1704)) ([bc7a097](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/bc7a097))
+
+
+
+
+
 ## [5.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.1.4...@wireapp/react-ui-kit@5.1.5) (2019-03-29)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
