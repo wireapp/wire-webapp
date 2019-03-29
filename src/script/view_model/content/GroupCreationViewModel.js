@@ -21,7 +21,7 @@ import Logger from 'utils/Logger';
 
 import ReceiptMode from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
-import {listenToEscKey, unlistenToEscKey} from 'utils/KeyboardUtil';
+import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
 import trackingHelpers from '../../tracking/Helpers';
 
 export class GroupCreationViewModel {
@@ -97,11 +97,12 @@ export class GroupCreationViewModel {
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
     this.nameInput.subscribe(() => this.nameError(''));
+    const onEscape = () => this.isShown(false);
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
-        return listenToEscKey('groupCreation', () => this.isShown(false));
+        return onEscKey(onEscape);
       }
-      return unlistenToEscKey('groupCreation');
+      offEscKey(onEscape);
     });
 
     this.stateIsParticipants.subscribe(stateIsParticipants => {

@@ -143,18 +143,19 @@ z.util.KeyboardUtil = (() => {
   };
 })();
 
-const escKeyListeners = {};
+const escKeyHandlers = [];
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
-    Object.values(escKeyListeners).forEach(handler => handler(event));
+    escKeyHandlers.forEach(handler => handler(event));
   }
 });
 
-export const listenToEscKey = (identifier, handler) => {
-  escKeyListeners[identifier] = handler;
-};
+export const onEscKey = handler => escKeyHandlers.push(handler);
 
-export const unlistenToEscKey = identifier => {
-  delete escKeyListeners[identifier];
+export const offEscKey = handler => {
+  const index = escKeyHandlers.indexOf(handler);
+  if (index >= 0) {
+    escKeyHandlers.splice(index, 1);
+  }
 };
