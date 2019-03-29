@@ -25,6 +25,7 @@ import {InputProps, inputStyle} from './Input';
 
 export interface SelectProps<T = HTMLSelectElement> extends InputProps<T> {
   disabled?: boolean;
+  markInvalid?: boolean;
 }
 
 const ArrowDown = `
@@ -33,7 +34,11 @@ const ArrowDown = `
   </svg>
 `;
 
-const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> = ({disabled = false, ...props}) => ({
+const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> = ({
+  disabled = false,
+  markInvalid,
+  ...props
+}) => ({
   ...inputStyle(props),
   '&:-moz-focusring': {
     color: 'transparent',
@@ -46,6 +51,7 @@ const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> 
   background: disabled
     ? COLOR.shade(COLOR.WHITE, 0.06)
     : `${COLOR.WHITE} center right 16px no-repeat url("${inlineSVG(ArrowDown)}")`,
+  boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
   cursor: disabled ? 'normal' : 'pointer',
   fontWeight: 300,
   paddingRight: '30px',

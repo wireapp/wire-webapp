@@ -25,12 +25,12 @@ import {COLOR} from '../Identity';
 import {TextProps} from '../Text';
 import {filterProps, inlineSVG} from '../util';
 
-export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
+export interface TextAreaProps<T = HTMLTextAreaElement> extends TextProps<T> {
   markInvalid?: boolean;
   placeholderTextTransform?: TextTransformProperty;
 }
 
-const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = ({
+const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<undefined> = ({
   markInvalid = false,
   placeholderTextTransform = 'uppercase',
   disabled = false,
@@ -62,22 +62,23 @@ const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = 
     caretColor: COLOR.BLUE,
     color: COLOR.TEXT,
     fontWeight: 300,
-    height: '56px',
     lineHeight: '24px',
     margin: '0 0 16px',
     outline: 'none',
-    padding: '0 16px',
+    padding: '16px 16px',
+    resize: 'none',
     width: '100%',
   };
 };
 
-const INPUT_CLASSNAME = 'input';
-const filterInputProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+const TEXTAREA_CLASSNAME = 'textarea';
+const filterTextAreaProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
-const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElement>>(
-  ({type, ...props}, ref) => (
-    <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
-  )
-);
+const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forwardRef<
+  HTMLTextAreaElement,
+  TextAreaProps<HTMLTextAreaElement>
+>((props, ref) => (
+  <textarea className={TEXTAREA_CLASSNAME} css={textAreaStyle(props)} ref={ref} {...filterTextAreaProps(props)} />
+));
 
-export {INPUT_CLASSNAME, Input, inputStyle};
+export {TEXTAREA_CLASSNAME, TextArea, textAreaStyle};

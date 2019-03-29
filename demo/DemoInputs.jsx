@@ -43,6 +43,7 @@ import {
   RoundIconButton,
   Select,
   ShakeBox,
+  TextArea,
   Tooltip,
 } from '@wireapp/react-ui-kit';
 import React, {useRef} from 'react';
@@ -130,6 +131,14 @@ const DemoInputs = () => {
           </Checkbox>
         </Column>
       </Columns>
+      <Columns>
+        <Column>Invalid Checkbox</Column>
+        <Column>
+          <Checkbox markInvalid id="ToU">
+            <CheckboxLabel>{'ToU'}</CheckboxLabel>
+          </Checkbox>
+        </Column>
+      </Columns>
 
       <H2>Select</H2>
       <Line />
@@ -152,6 +161,14 @@ const DemoInputs = () => {
           </Select>
         </Column>
       </Columns>
+      <Columns>
+        <Column>Invalid Select</Column>
+        <Column>
+          <Select markInvalid>
+            <option>a</option>
+          </Select>
+        </Column>
+      </Columns>
 
       <H2>TextInput</H2>
       <Line />
@@ -165,6 +182,33 @@ const DemoInputs = () => {
         <Column>Disabled TextInput</Column>
         <Column>
           <Input disabled placeholder="Placeholder" />
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Invalid TextInput</Column>
+        <Column>
+          <Input markInvalid placeholder="Placeholder" />
+        </Column>
+      </Columns>
+
+      <H2>TextArea</H2>
+      <Line />
+      <Columns>
+        <Column>TextArea</Column>
+        <Column>
+          <TextArea rows="6" placeholder="Placeholder" />
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Disabled TextArea</Column>
+        <Column>
+          <TextArea rows="3" disabled placeholder="Placeholder" />
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Invalid TextArea</Column>
+        <Column>
+          <TextArea rows="4" markInvalid placeholder="Placeholder" />
         </Column>
       </Columns>
 
@@ -191,9 +235,9 @@ const DemoInputs = () => {
             </Button>
             <InputBlock>
               <Input placeholder="InputBlock" markInvalid />
-              <Input placeholder="Second Input" />
+              <Input placeholder="Second Input" markInvalid />
               <Tooltip text="Lots of icons here">
-                <InputSubmitCombo>
+                <InputSubmitCombo markInvalid>
                   <Input placeholder="InputSubmitCombo" name="password" />
                   <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
                   <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
@@ -216,7 +260,7 @@ const DemoInputs = () => {
           </Form>
         </ShakeBox>
         <ErrorMessage>Submit form for shake effect</ErrorMessage>
-        <CodeInput onCodeComplete={code => console.info(code)} />
+        <CodeInput markInvalid onCodeComplete={code => console.info(code)} />
       </ContainerXS>
     </Container>
   );

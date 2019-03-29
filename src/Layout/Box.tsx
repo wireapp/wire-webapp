@@ -26,7 +26,7 @@ export interface BoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
 const boxStyle: <T>(props: BoxProps<T>) => ObjectInterpolation<undefined> = props => ({
   border: `2px solid ${COLOR.GRAY_LIGHTEN_72}`,
-  borderradius: '8px',
+  borderRadius: '8px',
   padding: '16px 32px',
 });
 

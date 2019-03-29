@@ -26,6 +26,7 @@ import {INPUT_CLASSNAME, Input, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
+  markInvalid?: boolean;
 }
 
 const StyledLabel = (props: StyledLabelProps) => {
@@ -41,7 +42,7 @@ const StyledLabel = (props: StyledLabelProps) => {
           borderColor: COLOR.BLUE,
         },
         '&::before': {
-          border: '2px solid rgba(0, 0, 0, 0.4)',
+          border: props.markInvalid ? `2px solid ${COLOR.RED}` : '2px solid rgba(0, 0, 0, 0.4)',
           borderRadius: '4px',
           boxSizing: 'border-box',
           content: '""',
@@ -88,7 +89,7 @@ const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
       ref={ref}
       {...props}
     />
-    <StyledLabel htmlFor={id} disabled={disabled}>
+    <StyledLabel htmlFor={id} disabled={disabled} markInvalid={props.markInvalid}>
       {children}
     </StyledLabel>
   </div>

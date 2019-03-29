@@ -55,10 +55,11 @@ const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
   digits?: number;
+  markInvalid?: boolean;
   onCodeComplete?: (completeCode?: string) => void;
 }
 
-const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}: CodeInputProps) => {
+const CodeInput = ({style, digits = 6, autoFocus = false, markInvalid, onCodeComplete = noop}: CodeInputProps) => {
   const [values, setValues] = useState(Array(digits).fill(''));
   const inputs = Array(digits);
 
@@ -154,6 +155,7 @@ const CodeInput = ({style, digits = 6, autoFocus = false, onCodeComplete = noop}
           onTouchStart={forceSelectionPreventDefault}
           onKeyDown={event => handleKeyDown(index, event)}
           onKeyUp={forceSelection}
+          markInvalid={markInvalid}
           ref={node => (inputs[index] = node)}
           type="text"
           value={values[index]}
