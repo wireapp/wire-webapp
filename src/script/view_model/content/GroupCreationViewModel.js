@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import ReceiptMode from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
+import {listenToEscKey, unlistenToEscKey} from 'utils/KeyboardUtil';
 import trackingHelpers from '../../tracking/Helpers';
 
 export class GroupCreationViewModel {
@@ -98,14 +99,11 @@ export class GroupCreationViewModel {
     this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
-        return $(document).on('keydown.groupCreation', keyboardEvent => {
-          if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-            this.isShown(false);
-          }
-        });
+        return listenToEscKey('groupCreation', () => this.isShown(false));
       }
-      return $(document).off('keydown.groupCreation');
+      return unlistenToEscKey('groupCreation');
     });
+
     this.stateIsParticipants.subscribe(stateIsParticipants => {
       if (stateIsParticipants) {
         return window.setTimeout(() => this.showContacts(true));
@@ -197,7 +195,7 @@ export class GroupCreationViewModel {
     }
   }
 
-  afterHideModal() {
+  afterHideModal = () => {
     this.isCreatingConversation = false;
     this.method = undefined;
     this.nameError('');
@@ -206,7 +204,7 @@ export class GroupCreationViewModel {
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
     this.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-  }
+  };
 
   _trackGroupCreation(conversationEntity) {
     this._trackGroupCreationSucceeded(conversationEntity);

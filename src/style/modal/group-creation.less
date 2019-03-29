@@ -25,82 +25,18 @@
     cursor: pointer;
     opacity: 1;
   }
+}
 
-  .group-creation-modal-center {
-    overflow: hidden;
-    width: 100%;
-    flex-grow: 1;
-    margin: 0;
-    background-color: var(--app-bg);
-  }
+.group-creation__error {
+  .label-bold-xs;
 
-  .group-creation-modal-content {
-    display: flex;
-    width: 424px;
-    height: 504px;
-    flex-direction: column;
-    padding: 0;
-  }
-  .group-creation-modal-title,
-  .group-creation-modal-action {
-    .label-bold-xs;
+  margin-top: 8px;
+  color: #fb0807;
+}
 
-    line-height: 12px;
-  }
-
-  .group-creation-modal-teamname-input {
-    height: 56px;
-    margin: 60px 0 0;
-    background-color: var(--group-creation-modal-teamname-input-bg);
-    border-radius: 0;
-    color: var(--background);
-    line-height: 56px;
-
-    &::placeholder {
-      padding: 0 8px;
-      color: var(--foreground);
-      font-size: @font-size-xs;
-      transform: translateY(-2px);
-    }
-  }
-
-  .group-creation-modal-participants-input {
-    margin: 8px;
-  }
-
-  .group-size-info {
-    margin: 16px 16px 0;
-    color: var(--foreground);
-    font-size: @font-size-xs;
-    line-height: @line-height-sm;
-  }
-
-  .group-creation-list-wrapper {
-    position: absolute;
-    right: -16px;
-    left: 16px;
-    height: 100%;
-    padding-right: 16px;
-    user-list {
-      margin-left: -16px;
-      overflow-x: hidden;
-      .search-list-item {
-        align-items: center;
-        margin: 0 16px;
-      }
-    }
-  }
-
-  .group-creation-error {
-    .label-bold-xs;
-
-    margin-top: 16px;
-    color: #fb0807;
-    text-align: center;
-  }
-
-  guest-mode-toggle,
-  info-toggle {
-    margin: 40px 16px 0;
-  }
+.group-creation__list {
+  height: 374px;
+  margin: 0 -16px -16px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

@@ -142,3 +142,19 @@ z.util.KeyboardUtil = (() => {
     isRemovalAction: _isRemovalAction,
   };
 })();
+
+const escKeyListeners = {};
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    Object.values(escKeyListeners).forEach(handler => handler(event));
+  }
+});
+
+export const listenToEscKey = (identifier, handler) => {
+  escKeyListeners[identifier] = handler;
+};
+
+export const unlistenToEscKey = identifier => {
+  delete escKeyListeners[identifier];
+};

@@ -350,4 +350,26 @@
   &__message {
     margin: 8px 0;
   }
+
+  &__input {
+    width: calc(100% + 16px);
+    height: 48px;
+    padding-left: 8px;
+    margin: 0 -8px;
+    border: none;
+    background: var(--app-bg-secondary);
+    border-radius: 4px;
+    outline: none;
+
+    &::placeholder {
+      .label-xs;
+      color: var(--foreground-fade-56);
+    }
+  }
+  &__info {
+    margin: 8px 0 24px;
+    color: var(--foreground);
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
+  }
 }

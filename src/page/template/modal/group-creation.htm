@@ -13,24 +13,25 @@
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants() -->
-      <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: t('groupCreationParticipantsPlaceholder'), enter: clickOnCreate" spellcheck="false"></user-input>
+      <user-input class="modal-style" params="input: participantsInput, selected: selectedContacts, placeholder: t('groupCreationParticipantsPlaceholder'), enter: clickOnCreate" spellcheck="false"></user-input>
     <!-- /ko -->
-    <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
-        <div class="group-creation-list-wrapper" data-bind="antiscroll: shouldUpdateScrollbar">
-          <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
+        <div class="group-creation__list" data-bind="fadingscrollbar">
+          <!-- ko if: contacts().length -->
+            <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, noUnderline: true"></user-list>
+          <!-- /ko -->
         </div>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-        <input class="input group-creation-modal-teamname-input"
+        <input class="modal__input"
                autocomplete="off" autofocus required spellcheck="false" type="text"
                data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
                data-uie-name="enter-group-name">
-        <div class="group-creation-error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
+        <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->
-          <div class="group-size-info" data-bind="text: t('groupSizeInfo', z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info"></div>
-          <guest-mode-toggle params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
-          <info-toggle params="
+          <div class="modal__info" data-bind="text: t('groupSizeInfo', z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info"></div>
+          <guest-mode-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
+          <info-toggle class="modal-style" params="
             dataUieName: 'read-receipts',
             info: t('readReceiptsToogleInfo'),
             isChecked: enableReadReceipts,
@@ -39,6 +40,5 @@
           "></info-toggle>
         <!-- /ko -->
       <!-- /ko -->
-      </div>
     </modal>
 </div>
