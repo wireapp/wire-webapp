@@ -79,12 +79,12 @@ class App {
   /**
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
-   * @param {Element} domContainer - DOM element that will hold the app
+   * @param {Element} appContainer - DOM element that will hold the app
    */
-  constructor(backendClient, domContainer) {
+  constructor(backendClient, appContainer) {
     this.backendClient = backendClient;
     this.logger = Logger('App');
-    this.domContainer = domContainer;
+    this.appContainer = appContainer;
 
     new WindowHandler();
 
@@ -603,7 +603,7 @@ class App {
    */
   _showInterface() {
     const mainView = new MainViewModel(this.repository);
-    ko.applyBindings(mainView, this.domContainer);
+    ko.applyBindings(mainView, this.appContainer);
 
     this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
 
@@ -628,7 +628,7 @@ class App {
     });
     initRouterBindings(router);
 
-    $('#wire-main').attr('data-uie-value', 'is-loaded');
+    this.appContainer.dataset.uieValue = 'is-loaded';
 
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
@@ -852,13 +852,14 @@ class App {
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
-  if (document.getElementById('wire-main-app')) {
+  const appContainer = document.getElementById('wire-main');
+  if (appContainer) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient, document.getElementById('wire-main'));
+    wire.app = new App(backendClient, appContainer);
   }
 });
 
