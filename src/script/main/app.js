@@ -605,6 +605,8 @@ class App {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.domContainer);
 
+    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
+
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
@@ -850,7 +852,7 @@ class App {
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
-  if (document.getElementById('wire-main-app') !== null) {
+  if (document.getElementById('wire-main-app')) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,

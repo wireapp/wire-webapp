@@ -67,6 +67,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
     this.userRepository = userRepository;
+    this.contentViewModelState = {};
 
     this.logger = Logger('z.notification.NotificationRepository');
 
@@ -83,6 +84,10 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     this.permissionState = this.permissionRepository.permissionState[z.permission.PermissionType.NOTIFICATIONS];
     this.selfUser = this.userRepository.self;
+  }
+
+  setContentViewModelStates(state, multitasking) {
+    this.contentViewModelState = {multitasking, state};
   }
 
   subscribeToEvents() {
@@ -739,8 +744,9 @@ z.notification.NotificationRepository = class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = wire.app.view.content.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
-    const inMaximizedCall = this.callingRepository.joinedCall() && !wire.app.view.content.multitasking.isMinimized();
+    const inConversationView = this.contentViewModelState.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
+    const inMaximizedCall =
+      this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
@@ -796,7 +802,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
       window.focus();
-      wire.app.view.content.multitasking.isMinimized(true);
+      this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
