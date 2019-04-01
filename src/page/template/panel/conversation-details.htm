@@ -13,13 +13,15 @@
         <!-- /ko -->
         <!-- ko ifnot: isServiceMode() -->
           <panel-user-details params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"></panel-user-details>
-          <div class="conversation-details__devices">
-            <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-              <devices-icon class="panel__action-item__icon"></devices-icon>
-              <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-              <disclose-icon></disclose-icon>
+          <!-- ko if: firstParticipant().devices().length -->
+            <div class="conversation-details__devices">
+              <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+                <devices-icon class="panel__action-item__icon"></devices-icon>
+                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
+                <disclose-icon></disclose-icon>
+              </div>
             </div>
-          </div>
+          <!-- /ko -->
           <enriched-fields params="userId: firstParticipant().id"></enriched-fields>
         <!-- /ko -->
       <!-- /ko -->
