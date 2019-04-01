@@ -18,6 +18,7 @@
  */
 
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {CallingRepository} from '../calling/CallingRepository';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -208,7 +209,7 @@ z.conversation.EventBuilder = {
       conversation: conversationId,
       from: userId,
       id: z.util.createRandomUuid(),
-      protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
+      protocol_version: CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
@@ -224,7 +225,7 @@ z.conversation.EventBuilder = {
       },
       from: userId,
       id: z.util.createRandomUuid(),
-      protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
+      protocol_version: CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };

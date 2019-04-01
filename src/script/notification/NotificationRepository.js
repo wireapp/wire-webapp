@@ -57,7 +57,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   /**
    * Construct a new Notification Repository.
-   * @param {z.calling.CallingRepository} callingRepository - Repository for all call interactions
+   * @param {CallingRepository} callingRepository - Repository for all call interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users

@@ -106,7 +106,12 @@ z.viewModel.ListViewModel = class ListViewModel {
     // Nested view models
     this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
     this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this, repositories);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(
+      this.contentViewModel,
+      this,
+      repositories.user,
+      repositories.calling
+    );
     this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
     this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);

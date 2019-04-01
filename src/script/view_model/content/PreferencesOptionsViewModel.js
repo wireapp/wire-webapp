@@ -37,7 +37,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(repositories) {
     this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel');
 
     this.callingRepository = repositories.calling;
@@ -47,6 +47,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
+    this.supportsCalling = this.callingRepository.supportsCalling;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {

@@ -52,7 +52,7 @@ z.calling.entities.CallEntity = class CallEntity {
    * @param {Conversation} conversationEntity - Conversation the call takes place in
    * @param {User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
-   * @param {z.calling.CallingRepository} callingRepository - Calling Repository
+   * @param {CallingRepository} callingRepository - Calling Repository
    */
   constructor(conversationEntity, creatingUser, sessionId, callingRepository) {
     this.conversationEntity = conversationEntity;

@@ -24,6 +24,7 @@ import ko from 'knockout';
 import 'src/script/main/globals';
 
 import {resolve, graph, backendConfig} from './testResolver';
+import CallingRepository from 'src/script/calling/CallingRepository';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -341,7 +342,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {
-    TestFactory.calling_repository = new z.calling.CallingRepository(
+    TestFactory.calling_repository = new CallingRepository(
       resolve(graph.CallingService),
       TestFactory.client_repository,
       TestFactory.conversation_repository,

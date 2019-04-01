@@ -29,10 +29,7 @@ import PROPERTY_STATE from './enum/PropertyState';
 import CALL_STATE from './enum/CallState';
 import TERMINATION_REASON from './enum/TerminationReason';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.CallingRepository = class CallingRepository {
+export class CallingRepository {
   static get CONFIG() {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
@@ -41,22 +38,6 @@ z.calling.CallingRepository = class CallingRepository {
       MAX_VIDEO_PARTICIPANTS: 4,
       PROTOCOL_VERSION: '3.0',
     };
-  }
-
-  /**
-   * Extended check for calling support of browser.
-   * @returns {boolean} True if calling is supported
-   */
-  static get supportsCalling() {
-    return z.util.Environment.browser.supports.calling;
-  }
-
-  /**
-   * Extended check for screen sharing support of browser.
-   * @returns {boolean} True if screen sharing is supported
-   */
-  static get supportsScreenSharing() {
-    return z.util.Environment.browser.supports.screenSharing;
   }
 
   /**
@@ -90,8 +71,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.userRepository = userRepository;
 
     this.messageLog = [];
-    const loggerName = 'z.calling.CallingRepository';
-    this.callLogger = new CallLogger(loggerName, null, this.messageLog);
+    this.callLogger = new CallLogger('CallingRepository', null, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -126,6 +106,22 @@ z.calling.CallingRepository = class CallingRepository {
     this.shareCallStates();
     this.subscribeToEvents();
     this._enableDebugging();
+  }
+
+  /**
+   * Extended check for calling support of browser.
+   * @returns {boolean} True if calling is supported
+   */
+  get supportsCalling() {
+    return z.util.Environment.browser.supports.calling;
+  }
+
+  /**
+   * Extended check for screen sharing support of browser.
+   * @returns {boolean} True if screen sharing is supported
+   */
+  get supportsScreenSharing() {
+    return z.util.Environment.browser.supports.screenSharing;
   }
 
   /**
@@ -187,7 +183,7 @@ z.calling.CallingRepository = class CallingRepository {
           conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
         })
         .then(() => {
-          return z.calling.CallingRepository.supportsCalling
+          return this.supportsCalling
             ? this._onCallEventInSupportedBrowsers(callMessageEntity, source)
             : this._onCallEventInUnsupportedBrowsers(callMessageEntity, source);
         });
@@ -987,7 +983,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
-      if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
+      if (isOutgoingCall && !this.supportsCalling) {
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
       }
@@ -1731,4 +1727,4 @@ ${turnServersConfig}`;
     Raygun.send(new Error('Call failure report'), customData);
     this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
   }
-};
+}
