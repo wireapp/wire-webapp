@@ -96,7 +96,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       repositories
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
-    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
+    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
 
     this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
     this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);

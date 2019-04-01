@@ -71,7 +71,7 @@ class ConversationListCallingCell {
       const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
-    this.disableScreenButton = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
+    this.disableScreenButton = ko.pureComputed(() => !callingRepository.supportsScreenSharing);
 
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.callParticipants().length);

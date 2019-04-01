@@ -134,7 +134,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.showToggleVideo = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
-    this.disableToggleScreen = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
+    this.disableToggleScreen = ko.pureComputed(() => !this.callingRepository.supportsScreenSharing);
 
     this.visibleCallId = undefined;
     this.joinedCall.subscribe(callEntity => {

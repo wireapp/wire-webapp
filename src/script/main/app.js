@@ -27,6 +27,7 @@ import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
+import {CallingRepository} from '../calling/CallingRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -201,7 +202,7 @@ class App {
       resolve(graph.MessageSender),
       repositories.user
     );
-    repositories.calling = new z.calling.CallingRepository(
+    repositories.calling = new CallingRepository(
       resolve(graph.CallingService),
       repositories.client,
       repositories.conversation,

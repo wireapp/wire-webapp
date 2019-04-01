@@ -26,19 +26,21 @@ window.z.viewModel.list = z.viewModel.list || {};
 z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   /**
    * View model for the preferences list.
-   * @param {z.viewModel.ListViewModel} mainViewModel - Main view model
+   * @param {z.viewModel.ContentViewModel} contentViewModel - content view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all the repositories
+   * @param {UserRepository} userRepository - Repository managing users
+   * @param {CallingRepository} callingRepository - Repository managing calls
    */
-  constructor(mainViewModel, listViewModel, repositories) {
-    this.mainViewModel = mainViewModel;
+  constructor(contentViewModel, listViewModel, userRepository, callingRepository) {
     this.listViewModel = listViewModel;
-    this.userRepository = repositories.user;
+    this.userRepository = userRepository;
     this.logger = Logger('z.viewModel.list.PreferencesListViewModel');
 
-    this.contentViewModel = this.mainViewModel.content;
+    this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
+
+    this.supportsCalling = callingRepository.supportsCalling;
 
     this.selectedAbout = ko.pureComputed(() => {
       return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT;

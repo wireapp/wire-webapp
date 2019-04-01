@@ -17,7 +17,7 @@
  *
  */
 
-describe('z.calling.CallingRepository', () => {
+describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
 
