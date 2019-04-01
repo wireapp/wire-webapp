@@ -24,7 +24,7 @@ import ko from 'knockout';
 import 'src/script/main/globals';
 
 import {resolve, graph, backendConfig} from './testResolver';
-import CallingRepository from 'src/script/calling/CallingRepository';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 

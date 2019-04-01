@@ -79,7 +79,6 @@ import CallMessageEntityGlobal from '../calling/entities/CallMessageEntity.js';
 import FlowEntityGlobal from '../calling/entities/FlowEntity.js';
 import FlowAudioEntityGlobal from '../calling/entities/FlowAudioEntity.js';
 import ParticipantEntityGlobal from '../calling/entities/ParticipantEntity.js';
-import CallingRepositoryGlobal from '../calling/CallingRepository.js';
 import CallMessageBuilderGlobal from '../calling/CallMessageBuilder.js';
 import CallMessageMapperGlobal from '../calling/CallMessageMapper.js';
 import SDPMapperGlobal from '../calling/SDPMapper.js';
