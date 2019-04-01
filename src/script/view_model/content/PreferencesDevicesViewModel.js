@@ -33,7 +33,6 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.updateDeviceInfo = this.updateDeviceInfo.bind(this);
 
     this.clientRepository = repositories.client;
-    this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
     this.userRepository = repositories.user;
     this.logger = Logger('z.viewModel.content.PreferencesDevicesViewModel');
@@ -44,16 +43,13 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
     this.activationDate = ko.observable();
-    this.devices = ko.observableArray();
+    // all clients except the current client
+    this.devices = ko.pureComputed(() => {
+      return this.clientRepository.clients().filter(clientEntity => clientEntity.id !== this.currentClient().id);
+    });
     this.localFingerprint = ko.observableArray([]);
     this.selfUser = this.userRepository.self;
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
-
-    // All clients except the current client
-    this.clientRepository.clients.subscribe(clientEntities => {
-      const devices = clientEntities.filter(clientEntity => clientEntity.id !== this.currentClient().id);
-      this.devices(devices);
-    });
   }
 
   clickOnShowDevice(clientEntity) {
