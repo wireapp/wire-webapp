@@ -67,7 +67,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
     this.userRepository = userRepository;
-    this.contentViewModelState = {};
+    this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
     this.logger = Logger('z.notification.NotificationRepository');
 
