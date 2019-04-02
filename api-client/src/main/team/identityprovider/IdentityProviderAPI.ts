@@ -69,7 +69,7 @@ class IdentityProviderAPI {
       url: `${IdentityProviderAPI.URL.PROVIDER}`,
     };
 
-    const response = await this.client.sendJSON<IdentityProvider>(config);
+    const response = await this.client.sendXML<IdentityProvider>(config);
     return response.data;
   }
 }

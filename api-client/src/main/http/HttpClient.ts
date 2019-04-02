@@ -190,6 +190,14 @@ class HttpClient extends EventEmitter {
     return this.sendRequest<T>(config);
   }
 
+  public sendXML<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    config.headers = {
+      ...config.headers,
+      'Content-Type': ContentType.APPLICATION_XML,
+    };
+    return this.sendRequest<T>(config);
+  }
+
   public sendProtocolBuffer<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     config.headers['Content-Type'] = ContentType.APPLICATION_PROTOBUF;
     return this.sendRequest<T>(config);
