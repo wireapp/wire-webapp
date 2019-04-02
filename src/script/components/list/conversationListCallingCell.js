@@ -25,18 +25,18 @@ class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
 
-    const callingRepository = params.callingRepository;
+    this.callingRepository = params.callingRepository;
     const permissionRepository = params.permissionRepository;
 
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
     this.videoGridRepository = params.videoGridRepository;
 
-    this.calls = callingRepository.calls;
+    this.calls = this.callingRepository.calls;
     this.call = this.conversation.call;
     this.conversationParticipants = this.conversation.participating_user_ets;
-    this.joinedCall = callingRepository.joinedCall;
-    this.selfStreamState = callingRepository.selfStreamState;
+    this.joinedCall = this.callingRepository.joinedCall;
+    this.selfStreamState = this.callingRepository.selfStreamState;
     this.selfUser = this.conversation.selfUser();
 
     this.isConnected = this.call().isConnected;
@@ -71,7 +71,7 @@ class ConversationListCallingCell {
       const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
-    this.disableScreenButton = ko.pureComputed(() => !callingRepository.supportsScreenSharing);
+    this.disableScreenButton = ko.pureComputed(() => !this.callingRepository.supportsScreenSharing);
 
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.callParticipants().length);
@@ -110,11 +110,11 @@ class ConversationListCallingCell {
   onJoinCall() {
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
     const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
+    this.callingRepository.joinCall(this.conversation.id, mediaType);
   }
 
   onJoinDeclinedCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation.id, z.media.MediaType.AUDIO);
   }
 
   onLeaveCall() {

@@ -19,32 +19,30 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
+export class ArchiveViewModel {
   /**
    * View model for the archive.
    *
-   * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
-   * @param {Object} repositories - Object containing all repositories
+   * @param {ConversationRepository} conversationRepository - Repository responsible for conversations
+   * @param {Function} onJoinCall - Callback called when the user wants to join a call
    */
-  constructor(mainViewModel, listViewModel, repositories) {
+  constructor(listViewModel, conversationRepository, onJoinCall) {
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnClose = this.clickOnClose.bind(this);
     this.updateList = this.updateList.bind(this);
 
     this.listViewModel = listViewModel;
-    this.conversationRepository = repositories.conversation;
-    this.logger = Logger('z.viewModel.list.ArchiveViewModel');
+    this.conversationRepository = conversationRepository;
+    this.logger = Logger('ArchiveViewModel');
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
+
+    this.onJoinCall = onJoinCall;
   }
 
   clickOnConversation(conversationEntity) {
@@ -60,4 +58,4 @@ z.viewModel.list.ArchiveViewModel = class ArchiveViewModel {
   updateList() {
     this.conversationRepository.updateArchivedConversations();
   }
-};
+}
