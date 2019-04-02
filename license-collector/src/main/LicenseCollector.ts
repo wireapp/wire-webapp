@@ -216,7 +216,7 @@ export class LicenseCollector {
   }
 
   private async crawl(): Promise<CrawlerResult> {
-    this.logger.info(`Extracting all licenses ...`);
+    this.logger.info('Extracting all licenses ...');
 
     const opts: pkginfo.Options = {
       packages: this.dependencies,

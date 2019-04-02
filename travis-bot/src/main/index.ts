@@ -94,7 +94,7 @@ class TravisBot {
     await Promise.all(
       conversationIds.map(async id => {
         if (!account.service) {
-          throw new Error(`Account service is not set. Account not listening?`);
+          throw new Error('Account service is not set. Account not listening?');
         }
         if (id) {
           logger.log(`Sending message to conversation ${id} ...`);

@@ -37,14 +37,14 @@ const CONVERSATION_ARGUMENT_INDEX = 2;
 const conversations = process.argv[CONVERSATION_ARGUMENT_INDEX];
 const conversationIds = conversations ? conversations.trim().split(',') : [];
 if (conversationIds.length === 0) {
-  logger.error(`Conversation ID is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".`);
+  logger.error('Conversation ID is not set. Example: status-bot.js "c94a6e69-7718-406b-b834-df4144e5a65b".');
   process.exit(1);
 }
 
 const MESSAGE_INDEX = 3;
 const message = process.argv[MESSAGE_INDEX];
 if (!message) {
-  logger.warn(`Message is not set. Will post a default message.`);
+  logger.warn('Message is not set. Will post a default message.');
 }
 
 ['WIRE_STATUS_BOT_EMAIL', 'WIRE_STATUS_BOT_PASSWORD'].forEach((envVar, index, array) => {

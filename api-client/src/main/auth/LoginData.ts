@@ -1,5 +1,3 @@
-import {ClientType} from '../client/';
-
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -18,6 +16,8 @@ import {ClientType} from '../client/';
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import {ClientType} from '../client/';
 
 interface LoginData {
   code?: string;

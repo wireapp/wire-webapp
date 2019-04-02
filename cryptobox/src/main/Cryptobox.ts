@@ -54,7 +54,7 @@ class Cryptobox extends EventEmitter {
     super();
 
     if (!engine) {
-      throw new Error(`You cannot initialize Cryptobox without a storage component.`);
+      throw new Error('You cannot initialize Cryptobox without a storage component.');
     }
 
     if (minimumAmountOfPreKeys > ProteusKeys.PreKey.MAX_PREKEY_ID) {
@@ -104,7 +104,7 @@ class Cryptobox extends EventEmitter {
   }
 
   public create(): Promise<ProteusKeys.PreKey[]> {
-    this.logger.log(`Initializing Cryptobox. Creating local identity...`);
+    this.logger.log('Initializing Cryptobox. Creating local identity...');
     return this.create_new_identity()
       .then(() => this.create_last_resort_prekey())
       .then((lastResortPreKey: ProteusKeys.PreKey) => {
@@ -114,7 +114,7 @@ class Cryptobox extends EventEmitter {
   }
 
   public load(): Promise<ProteusKeys.PreKey[]> {
-    this.logger.log(`Initializing Cryptobox. Loading local identity...`);
+    this.logger.log('Initializing Cryptobox. Loading local identity...');
     return this.store
       .load_identity()
       .then((identity: ProteusKeys.IdentityKeyPair | undefined) => {
@@ -123,7 +123,7 @@ class Cryptobox extends EventEmitter {
 
           this.logger.log('Initialized Cryptobox with existing local identity.');
           this.logger.log(`Identity fingerprint is "${identity.public_key.fingerprint()}".`);
-          this.logger.log(`Loading PreKeys...`);
+          this.logger.log('Loading PreKeys...');
 
           return this.store.load_prekeys();
         }
@@ -246,7 +246,7 @@ class Cryptobox extends EventEmitter {
         return ProteusKeys.IdentityKeyPair.new();
       })
       .then((identity: ProteusKeys.IdentityKeyPair) => {
-        this.logger.warn(`Cleaned cryptographic items prior to saving a new local identity.`);
+        this.logger.warn('Cleaned cryptographic items prior to saving a new local identity.');
         this.logger.log(`Created new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`);
         return this.save_identity(identity);
       });
@@ -446,7 +446,7 @@ class Cryptobox extends EventEmitter {
   }
 
   private async importIdentity(payload: string): Promise<void> {
-    this.logger.log(`Importing local identity...`);
+    this.logger.log('Importing local identity...');
 
     const identityBuffer = Decoder.fromBase64(payload).asBytes.buffer;
     const identity = ProteusKeys.IdentityKeyPair.deserialise(identityBuffer);

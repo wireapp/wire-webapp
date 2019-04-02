@@ -71,7 +71,7 @@ class ChangelogBot {
     }
 
     if (!account.service) {
-      throw new Error(`Account service is not set. Not logged in?`);
+      throw new Error('Account service is not set. Not logged in?');
     }
 
     for (const conversationId of conversationIds) {

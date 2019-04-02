@@ -35,15 +35,15 @@
         };
 
         alice.desktop.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
-          logger.log(`New PreKeys from "alice_desktop"`, preKeys);
+          logger.log('New PreKeys from "alice_desktop"', preKeys);
         });
 
         bob.desktop.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
-          logger.log(`New PreKeys from "bob_desktop"`, preKeys);
+          logger.log('New PreKeys from "bob_desktop"', preKeys);
         });
 
         bob.mobile.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
-          logger.log(`New PreKeys from "bob_mobile"`, preKeys);
+          logger.log('New PreKeys from "bob_mobile"', preKeys);
         });
 
         const messageFromBob = 'Hello Alice!';
