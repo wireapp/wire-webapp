@@ -29,6 +29,5 @@
     "test": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "types": "dist/index.d.ts",
   "version": "4.0.7"
 }

@@ -30,6 +30,5 @@
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
-  "types": "./dist/commonjs/index.d.ts",
   "version": "5.0.7"
 }

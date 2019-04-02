@@ -35,6 +35,5 @@
     "test": "yarn test:node",
     "test:node": "jasmine --config=jasmine.json"
   },
-  "types": "./dist/index.d.ts",
   "version": "0.5.2"
 }

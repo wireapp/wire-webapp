@@ -34,7 +34,8 @@
   "name": "@wireapp/commons",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/commons",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn build:node",
+    "build:node": "tsc",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
@@ -42,6 +43,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "jasmine --config=jasmine.json"
   },
-  "types": "./dist/commonjs/index.d.ts",
   "version": "1.4.8"
 }

@@ -35,6 +35,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "jasmine"
   },
-  "types": "dist/index.d.ts",
   "version": "8.0.47"
 }
