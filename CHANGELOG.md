@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.4.2...@wireapp/api-client@3.4.3) (2019-04-02)
+
+
+### Bug Fixes
+
+* **api-client:** Send XML data on POST /identity-providers ([#1716](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1716)) ([efafe47](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/efafe47))
+
+
+
+
+
 ## [3.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.4.1...@wireapp/api-client@3.4.2) (2019-03-29)
 
 **Note:** Version bump only for package @wireapp/api-client
