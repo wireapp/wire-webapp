@@ -1,4 +1,5 @@
 const presetEnvConfig = {
+  corejs: 'core-js@2',
   debug: false,
   modules: false,
   targets: {

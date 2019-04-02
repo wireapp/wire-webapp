@@ -3176,6 +3176,11 @@ core-js-pure@3.0.0:
   resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.0.0.tgz#a5679adb4875427c8c0488afc93e6f5b7125859b"
   integrity sha512-yPiS3fQd842RZDgo/TAKGgS0f3p2nxssF1H65DIZvZv0Od5CygP8puHXn3IQiM/39VAvgCbdaMQpresrbGgt9g==
 
+core-js@2:
+  version "2.6.5"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.5.tgz#44bc8d249e7fb2ff5d00e0341a7ffb94fbf67895"
+  integrity sha512-klh/kDpwX8hryYL14M9w/xei6vrv6sE8gTHDG7/T/+SEovB/G4ejwcfE/CBzO6Edsu+OETZMZ3wcX/EjUkrl5A==
+
 core-js@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.0.0.tgz#a8dbfa978d29bfc263bfb66c556d0ca924c28957"
@@ -12544,7 +12549,6 @@ wide-align@^1.1.0:
 
 "wire-web-config-default-prod@https://github.com/wireapp/wire-web-config-wire#v0.17.2":
   version "0.17.2"
-  uid "1588f747e84254dbacf563c551d9706c0f0d64c0"
   resolved "https://github.com/wireapp/wire-web-config-wire#1588f747e84254dbacf563c551d9706c0f0d64c0"
   dependencies:
     adm-zip "0.4.13"
@@ -12552,7 +12556,6 @@ wide-align@^1.1.0:
 
 "wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.17.2":
   version "0.17.2"
-  uid "1588f747e84254dbacf563c551d9706c0f0d64c0"
   resolved "https://github.com/wireapp/wire-web-config-default#1588f747e84254dbacf563c551d9706c0f0d64c0"
   dependencies:
     adm-zip "0.4.13"
