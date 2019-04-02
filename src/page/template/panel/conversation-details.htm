@@ -13,7 +13,7 @@
         <!-- /ko -->
         <!-- ko ifnot: isServiceMode() -->
           <panel-user-details params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id)"></panel-user-details>
-          <!-- ko if: firstParticipant().isConnected() -->
+          <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
             <div class="conversation-details__devices">
               <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
                 <devices-icon class="panel__action-item__icon"></devices-icon>
