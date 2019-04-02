@@ -1400,10 +1400,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.127.tgz#dec0c1f29ff6ff6626fbce6e36e650d40b0b5d01"
   integrity sha512-7rQQ7kvNYZs4+8enaiyxeI6K/cMBQFUX2Hxx3MePxdZcSx/3XdUKrGAUab5d7yO0OlVNPcV0gTRA/4ugGNoAaQ==
 
-"@wireapp/commons@1.4.4":
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.4.4.tgz#fb2cdc4e934286d6ffb411dacc9d729fae7377bc"
-  integrity sha512-bM11f2MDWGa6V8rEWDOmEpgp8QusX7Flm4FX8dEXJKkCOJyvxee6lgV3kwhceBio19XYsOuomOOV+2RNHHIbYw==
+"@wireapp/commons@1.4.7":
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.4.7.tgz#9df403021952cd349c49ecd08a78324930da5745"
+  integrity sha512-V44t6OyHF2dPS6h9klUMIbFhWNsqYPu0MechpNFfZDxeBa9Vt4PtcQMO4DWKfkyoRZ+39kGkeeXIH7HgY/L3aQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/node" "11.12.0"
@@ -1413,7 +1413,7 @@
     logdown "3.2.8"
     moment "2.24.0"
     platform "1.3.5"
-    url-search-params-polyfill "5.0.1"
+    url-search-params-polyfill "5.1.0"
 
 "@wireapp/copy-config@0.5.2":
   version "0.5.2"
@@ -12151,11 +12151,6 @@ url-join@^2.0.2:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/url-join/-/url-join-2.0.5.tgz#5af22f18c052a000a48d7b82c5e9c2e2feeda728"
   integrity sha1-WvIvGMBSoACkjXuCxenC4v7tpyg=
-
-url-search-params-polyfill@5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-5.0.1.tgz#ccf5c10dd55a5d31b6ea8ec0ae814f984fb72a06"
-  integrity sha512-OJRkM8f7rkjn2PLgc41SVnCpoT6QUNL5SGMYkaeEFJ6OPysjk02WnZu/6AAtAVyT8Qh/c0VnrRoXS86ISC1OXw==
 
 url-search-params-polyfill@5.1.0:
   version "5.1.0"
