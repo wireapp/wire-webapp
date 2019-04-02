@@ -1,5 +1,3 @@
-import {SupportedCurrency} from './SupportedCurrency';
-
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -18,6 +16,8 @@ import {SupportedCurrency} from './SupportedCurrency';
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+import {SupportedCurrency} from './SupportedCurrency';
 
 // https://stripe.com/docs/api#invoice_object
 interface PaymentStripeInvoice {
