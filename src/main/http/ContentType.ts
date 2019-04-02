@@ -20,6 +20,7 @@
 class ContentType {
   public static readonly APPLICATION_JSON = 'application/json;charset=UTF-8';
   public static readonly APPLICATION_PROTOBUF = 'application/x-protobuf';
+  public static readonly APPLICATION_XML = 'application/xml';
 }
 
 export {ContentType};
