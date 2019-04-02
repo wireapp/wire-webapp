@@ -10,7 +10,7 @@
   },
   "description": "Wire's internal license collection tool",
   "devDependencies": {
-    "@types/node": "11.12.2",
+    "@types/node": "11.13.0",
     "@types/npm-registry-package-info": "1.0.0"
   },
   "files": [
