@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.5.0...@wireapp/api-client@3.6.0) (2019-04-03)
+
+
+### Features
+
+* **api-client:** Allow URL object when adding identity provider ([#1724](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1724)) ([d80046c](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d80046c))
+
+
+
+
+
 # [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.4.3...@wireapp/api-client@3.5.0) (2019-04-03)
 
 
