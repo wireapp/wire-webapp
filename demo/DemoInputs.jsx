@@ -43,7 +43,9 @@ import {
   RoundIconButton,
   Select,
   ShakeBox,
+  Text,
   TextArea,
+  TextLink,
   Tooltip,
 } from '@wireapp/react-ui-kit';
 import React, {useRef} from 'react';
@@ -94,6 +96,22 @@ const DemoInputs = () => {
         </Column>
       </Columns>
       <Columns>
+        <Column>TextLink</Column>
+        <Column>
+          <Text>
+            You can download it <TextLink>here</TextLink>.
+          </Text>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Plain Link</Column>
+        <Column>
+          <Text>
+            You can download it <a href="#">here</a>.
+          </Text>
+        </Column>
+      </Columns>
+      <Columns>
         <Column>Link with custom component</Column>
         <Column>
           <Link component={Button} color={COLOR.GREEN}>
@@ -118,7 +136,9 @@ const DemoInputs = () => {
           <Checkbox id="ToULink" defaultChecked={true}>
             <CheckboxLabel>
               {'ToU '}
-              <Link href="#">{'Link'}</Link>
+              <Link href="#">{'component link'}</Link>
+              {' text '}
+              <a href="#">{'plain link'}</a>
             </CheckboxLabel>
           </Checkbox>
         </Column>

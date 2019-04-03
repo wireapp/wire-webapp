@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
-import {Text, TextProps, textStyle} from '../Text';
+import {Text, TextProps, linkStyle, textStyle} from '../Text';
 import {INPUT_CLASSNAME, Input, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
@@ -51,6 +51,9 @@ const StyledLabel = (props: StyledLabelProps) => {
           margin: '0 8px 0 -16px',
           opacity: props.disabled ? 0.56 : 1,
           width: '16px',
+        },
+        a: {
+          ...linkStyle({}),
         },
         display: 'flex',
         opacity: props.disabled ? 0.56 : 1,
