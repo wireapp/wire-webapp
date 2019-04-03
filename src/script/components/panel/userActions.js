@@ -37,17 +37,15 @@ export const Actions = {
 
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function({user, conversation, actionsViewModel, onAction = () => {}, isSelfActivated}) {
-    user = ko.unwrap(user);
-    conversation = ko.unwrap(conversation);
+  viewModel: function({user, conversation = () => false, actionsViewModel, onAction = () => {}, isSelfActivated}) {
     isSelfActivated = ko.unwrap(isSelfActivated);
-    const isMe = user.is_me;
-    const isNotMe = !isMe && isSelfActivated;
+    const isMe = ko.computed(() => user().is_me);
+    const isNotMe = ko.computed(() => !isMe() && isSelfActivated);
 
     const allItems = [
       {
         // open self profile
-        condition: () => isMe,
+        condition: () => isMe(),
         item: {
           click: () => {
             amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
@@ -62,15 +60,15 @@ ko.components.register('user-actions', {
         // self leave conversation
         condition: () => {
           return (
-            isMe &&
+            isMe() &&
             isSelfActivated &&
-            conversation &&
-            conversation.isGroup() &&
-            !conversation.removed_from_conversation()
+            conversation() &&
+            conversation().isGroup() &&
+            !conversation().removed_from_conversation()
           );
         },
         item: {
-          click: () => actionsViewModel.leaveConversation(conversation).then(() => onAction(Actions.LEAVE)),
+          click: () => actionsViewModel.leaveConversation(conversation()).then(() => onAction(Actions.LEAVE)),
           icon: 'leave-icon',
           identifier: 'do-leave',
           label: t('groupParticipantActionLeave'),
@@ -78,9 +76,9 @@ ko.components.register('user-actions', {
       },
       {
         // open conversation
-        condition: () => isNotMe && (user.isConnected() || user.isTeamMember()),
+        condition: () => isNotMe() && (user().isConnected() || user().isTeamMember()),
         item: {
-          click: () => actionsViewModel.open1to1Conversation(user).then(() => onAction(Actions.OPEN_CONVERSATION)),
+          click: () => actionsViewModel.open1to1Conversation(user()).then(() => onAction(Actions.OPEN_CONVERSATION)),
           icon: 'message-icon',
           identifier: 'go-conversation',
           label: t('groupParticipantActionOpenConversation'),
@@ -88,7 +86,7 @@ ko.components.register('user-actions', {
       },
       {
         // accept request
-        condition: () => isNotMe && user.isIncomingRequest(),
+        condition: () => isNotMe() && user().isIncomingRequest(),
         item: {
           click: () =>
             actionsViewModel.acceptConnectionRequest(user, true).then(() => onAction(Actions.ACCEPT_REQUEST)),
@@ -99,9 +97,9 @@ ko.components.register('user-actions', {
       },
       {
         //ignore request
-        condition: () => isNotMe && user.isIncomingRequest(),
+        condition: () => isNotMe() && user().isIncomingRequest(),
         item: {
-          click: () => actionsViewModel.ignoreConnectionRequest(user).then(() => onAction(Actions.IGNORE_REQUEST)),
+          click: () => actionsViewModel.ignoreConnectionRequest(user()).then(() => onAction(Actions.IGNORE_REQUEST)),
           icon: 'close-icon',
           identifier: 'do-ignore-request',
           label: t('groupParticipantActionIgnoreRequest'),
@@ -109,9 +107,9 @@ ko.components.register('user-actions', {
       },
       {
         // cancel request
-        condition: () => isNotMe && user.isOutgoingRequest(),
+        condition: () => isNotMe() && user().isOutgoingRequest(),
         item: {
-          click: () => actionsViewModel.cancelConnectionRequest(user).then(() => onAction(Actions.CANCEL_REQUEST)),
+          click: () => actionsViewModel.cancelConnectionRequest(user()).then(() => onAction(Actions.CANCEL_REQUEST)),
           icon: 'undo-icon',
           identifier: 'do-cancel-request',
           label: t('groupParticipantActionCancelRequest'),
@@ -120,12 +118,12 @@ ko.components.register('user-actions', {
       {
         // send request
         condition: () => {
-          const isNotConnectedUser = user.isCanceled() || user.isUnknown();
-          const canConnect = !user.isTeamMember() && !user.isTemporaryGuest();
-          return isNotMe && isNotConnectedUser && canConnect;
+          const isNotConnectedUser = user().isCanceled() || user().isUnknown();
+          const canConnect = !user().isTeamMember() && !user().isTemporaryGuest();
+          return isNotMe() && isNotConnectedUser && canConnect;
         },
         item: {
-          click: () => actionsViewModel.sendConnectionRequest(user).then(() => onAction(Actions.SEND_REQUEST)),
+          click: () => actionsViewModel.sendConnectionRequest(user()).then(() => onAction(Actions.SEND_REQUEST)),
           icon: 'plus-icon',
           identifier: 'do-send-request',
           label: t('groupParticipantActionSendRequest'),
@@ -133,9 +131,9 @@ ko.components.register('user-actions', {
       },
       {
         // block user
-        condition: () => isNotMe && (user.isConnected() || user.isRequest()),
+        condition: () => isNotMe() && (user().isConnected() || user().isRequest()),
         item: {
-          click: () => actionsViewModel.blockUser(user).then(() => onAction(Actions.BLOCK)),
+          click: () => actionsViewModel.blockUser(user()).then(() => onAction(Actions.BLOCK)),
           icon: 'block-icon',
           identifier: 'do-block',
           label: t('groupParticipantActionBlock'),
@@ -143,9 +141,9 @@ ko.components.register('user-actions', {
       },
       {
         // unblock user
-        condition: () => isNotMe && user.isBlocked(),
+        condition: () => isNotMe() && user().isBlocked(),
         item: {
-          click: () => actionsViewModel.unblockUser(user).then(() => onAction(Actions.UNBLOCK)),
+          click: () => actionsViewModel.unblockUser(user()).then(() => onAction(Actions.UNBLOCK)),
           icon: 'block-icon',
           identifier: 'do-unblock',
           label: t('groupParticipantActionUnblock'),
@@ -155,15 +153,18 @@ ko.components.register('user-actions', {
         // remove user from conversation
         condition: () => {
           return (
-            isNotMe &&
-            conversation &&
-            conversation.isActiveParticipant() &&
-            conversation.participating_user_ids().some(id => user.id === id) &&
+            isNotMe() &&
+            conversation() &&
+            conversation().isActiveParticipant() &&
+            conversation()
+              .participating_user_ids()
+              .some(id => user().id === id) &&
             z.userPermission().canUpdateGroupParticipants()
           );
         },
         item: {
-          click: () => actionsViewModel.removeFromConversation(conversation, user).then(() => onAction(Actions.REMOVE)),
+          click: () =>
+            actionsViewModel.removeFromConversation(conversation(), user()).then(() => onAction(Actions.REMOVE)),
           icon: 'minus-icon',
           identifier: 'do-remove',
           label: t('groupParticipantActionRemove'),
@@ -171,6 +172,6 @@ ko.components.register('user-actions', {
       },
     ];
 
-    this.items = ko.computed(() => (user ? allItems.filter(({condition}) => condition()).map(({item}) => item) : []));
+    this.items = ko.computed(() => (user() ? allItems.filter(({condition}) => condition()).map(({item}) => item) : []));
   },
 });
