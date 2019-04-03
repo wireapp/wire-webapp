@@ -28,7 +28,9 @@ class IdentityProviderAPI {
 
   static get URL() {
     return {
-      PROVIDER: 'identity-providers',
+      METADATA: 'metadata',
+      PROVIDER: '/identity-providers',
+      SSO: '/sso',
     };
   }
 
@@ -70,6 +72,16 @@ class IdentityProviderAPI {
     };
 
     const response = await this.client.sendXML<IdentityProvider>(config);
+    return response.data;
+  }
+
+  public async getMetadata(): Promise<string> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${IdentityProviderAPI.URL.SSO}/${IdentityProviderAPI.URL.METADATA}`,
+    };
+
+    const response = await this.client.sendJSON<string>(config);
     return response.data;
   }
 }
