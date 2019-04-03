@@ -18,19 +18,44 @@
  */
 
 /** @jsx jsx */
-import {Global, css, jsx} from '@emotion/core';
+import {Global, ObjectInterpolation, css, jsx} from '@emotion/core';
 import emotionNormalize from 'emotion-normalize';
+import {COLOR} from './Identity';
+import {textLinkStyle} from './Text';
 
-const globalCss = css`
+const globalStyles: () => ObjectInterpolation<undefined> = () => ({
+  '*': {
+    boxSizing: 'border-box',
+  },
+  a: {
+    ...textLinkStyle({}),
+  },
+  'b, strong': {
+    fontWeight: 600,
+  },
+  body: {
+    MozOsxFontSmoothing: 'grayscale',
+    WebkitFontSmoothing: 'antialiased',
+    color: COLOR.TEXT,
+    display: 'flex',
+    flexDirection: 'column',
+    fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+    fontWeight: 300,
+    lineHeight: 1.5,
+    minHeight: '100vh',
+  },
+  p: {
+    marginTop: 0,
+  },
+});
+
+const globalStyle = css`
   ${emotionNormalize}
-
-  p {
-    margin-top: 0;
-  }
+  ${globalStyles()}
 `;
 
 const GlobalStyle = () => {
-  return <Global styles={globalCss} />;
+  return <Global styles={globalStyle} />;
 };
 
 export {GlobalStyle};
