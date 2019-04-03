@@ -39,8 +39,11 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.selectedParticipant = ko.observable(undefined);
 
-    this.showActionDevices = ko.pureComputed(() => !this.selectedParticipant().is_me);
     this.onUserAction = this.onUserAction.bind(this);
+  }
+
+  showActionDevices(userEntity) {
+    return !userEntity.is_me && (userEntity.isConnected() || userEntity.inTeam());
   }
 
   onUserAction(action) {
