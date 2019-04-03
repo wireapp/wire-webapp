@@ -36,7 +36,7 @@ describe('user-actions', () => {
 
           const conversation = new Conversation();
           spyOn(conversation, 'isGroup').and.returnValue(true);
-          return {conversation, isSelfActivated: true, user};
+          return {conversation: () => conversation, isSelfActivated: true, user: () => user};
         },
         testName: 'generates actions for self user profile',
       },
@@ -46,7 +46,7 @@ describe('user-actions', () => {
           const user = new User();
           user.is_me = true;
           const conversation = new Conversation();
-          return {conversation: conversation, isSelfActivated: false, user};
+          return {conversation: () => conversation, isSelfActivated: false, user: () => user};
         },
         testName: 'generates actions for self user profile when user is not activated',
       },
@@ -57,7 +57,7 @@ describe('user-actions', () => {
           const conversation = new Conversation();
           user.connection().status(z.connection.ConnectionStatus.ACCEPTED);
           spyOn(conversation, 'isGroup').and.returnValue(true);
-          return {conversation, isSelfActivated: true, user};
+          return {conversation: () => conversation, isSelfActivated: true, user: () => user};
         },
         testName: 'generates actions for another user profile to which I am connected',
       },
