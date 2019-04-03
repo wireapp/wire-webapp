@@ -17,7 +17,8 @@
  *
  */
 
-export * from './IdentityProvider';
-export * from './IdentityProviderAPI';
-export * from './IdentityProviders';
-export * from './NewIdentityProviderMetadataURL';
+interface NewIdentityProviderMetadataURL {
+  url: string;
+}
+
+export {NewIdentityProviderMetadataURL};
