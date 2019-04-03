@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@wireapp/commons": "1.4.9",
-    "commander": "2.19.0",
+    "commander": "2.20.0",
     "cross-env": "5.2.0",
     "dotenv": "7.0.0",
     "faker": "4.1.0",

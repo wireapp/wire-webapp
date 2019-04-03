@@ -6,7 +6,7 @@
     "@types/generate-changelog": "1.7.0",
     "@types/node": "11.13.0",
     "@wireapp/core": "9.0.9",
-    "commander": "2.19.0",
+    "commander": "2.20.0",
     "generate-changelog": "1.7.1"
   },
   "description": "A changelog notification bot.",
