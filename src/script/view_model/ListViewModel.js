@@ -21,6 +21,8 @@ import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {iterateItem} from 'utils/ArrayUtil';
+import {ArchiveViewModel} from './list/ArchiveViewModel';
+import {ConversationListViewModel} from './list/ConversationListViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -54,6 +56,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
+    this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -104,8 +107,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     });
 
     // Nested view models
-    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
-    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
+    this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
+    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
     this.preferences = new z.viewModel.list.PreferencesListViewModel(
       this.contentViewModel,
       this,
@@ -134,6 +137,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
+
+  joinCall = (conversationId, mediaType) => {
+    this.callingRepository.joinCall(conversationId, mediaType);
+  };
 
   changeNotificationSetting() {
     if (this.isProAccount()) {

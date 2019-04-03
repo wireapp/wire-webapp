@@ -18,22 +18,18 @@
  */
 
 import Logger from 'utils/Logger';
-
 import {t} from 'utils/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
+export class ConversationListViewModel {
   /**
    * View model for conversation list.
    *
    * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
+   * @param {Function} onJoinCall - Callback called when the user wants to join a call
    */
-  constructor(mainViewModel, listViewModel, repositories) {
+  constructor(mainViewModel, listViewModel, repositories, onJoinCall) {
     this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
     this.callingRepository = repositories.calling;
@@ -46,6 +42,7 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;
+    this.onJoinCall = onJoinCall;
 
     this.logger = Logger('z.viewModel.list.ConversationListViewModel');
     this.multitasking = this.contentViewModel.multitasking;
@@ -177,4 +174,4 @@ z.viewModel.list.ConversationListViewModel = class ConversationListViewModel {
       this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.START_UI);
     }
   }
-};
+}

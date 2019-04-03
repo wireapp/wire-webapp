@@ -17,11 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ConversationListCell = class ConversationListCell {
-  constructor({conversation, is_selected = z.util.noop, click = z.util.noop}) {
+class ConversationListCell {
+  constructor({conversation, onJoinCall, is_selected = z.util.noop, click = z.util.noop}) {
     this.conversation = conversation;
     this.is_selected = is_selected;
     this.on_click = click;
@@ -35,15 +32,13 @@ z.components.ConversationListCell = class ConversationListCell {
 
     this.showJoinButton = this.conversation.hasJoinableCall;
 
-    this.onJoinCall = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
-    };
+    this.onJoinCall = () => onJoinCall(conversation.id, z.media.MediaType.AUDIO);
   }
 
   destroy() {
     this.cell_state_observable.dispose();
   }
-};
+}
 
 ko.components.register('conversation-list-cell', {
   template: `
@@ -101,5 +96,5 @@ ko.components.register('conversation-list-cell', {
       </div>
     </div>
   `,
-  viewModel: z.components.ConversationListCell,
+  viewModel: ConversationListCell,
 });
