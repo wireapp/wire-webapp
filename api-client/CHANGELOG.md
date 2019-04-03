@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.4.3...@wireapp/api-client@3.5.0) (2019-04-03)
+
+
+### Features
+
+* **api-client:** GET SSO metadata ([#1725](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1725)) ([ade0768](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ade0768))
+
+
+
+
+
 ## [3.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.4.2...@wireapp/api-client@3.4.3) (2019-04-02)
 
 
