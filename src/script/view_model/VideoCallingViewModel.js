@@ -195,7 +195,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.TimeUtil = TimeUtil;
   }
 
-  chooseSharedScreen(conversationId) {
+  // TODO: Is this method just used for logging purposes?
+  async chooseSharedScreen(conversationId) {
     if (!this.disableToggleScreen()) {
       const skipScreenSelection = this.selfStreamState.screenSend() || z.util.Environment.browser.firefox;
       if (skipScreenSelection) {
@@ -203,7 +204,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         return;
       }
 
-      if (z.util.Environment.desktop) {
+      if (window.desktopCapturer) {
         this.mediaRepository.devicesHandler
           .getScreenSources()
           .then(screenSources => {
@@ -236,6 +237,11 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
           .catch(error => {
             this.logger.error('Unable to get screens sources for sharing', error);
           });
+      }
+
+      if (navigator.mediaDevices.getDisplayMedia) {
+        await navigator.mediaDevices.getDisplayMedia();
+        // TODO: What to do with this media stream?
       }
     }
   }

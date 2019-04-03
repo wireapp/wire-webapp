@@ -138,6 +138,17 @@ export default class MediaConstraintsHandler {
       return Promise.resolve(streamConstraints);
     }
 
+    if (!!navigator.mediaDevices.getDisplayMedia) {
+      this.logger.info('Enabling screen sharing from Chrome');
+
+      const streamConstraints = {
+        audio: false,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
+      };
+
+      return Promise.resolve(streamConstraints);
+    }
+
     return Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
   }
 
