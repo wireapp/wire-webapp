@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.2.2...@wireapp/react-ui-kit@5.3.0) (2019-04-03)
+
+
+### Features
+
+* **react-ui-kit:** TextLink & default styling ([#1727](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1727)) ([aa16cc8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/aa16cc8))
+
+
+
+
+
 ## [5.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.2.1...@wireapp/react-ui-kit@5.2.2) (2019-04-03)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
