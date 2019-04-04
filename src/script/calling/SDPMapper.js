@@ -17,13 +17,7 @@
  *
  */
 
-import SDP_SOURCE from './enum/SDPSource';
-import SDP_NEGOTIATION_MODE from './enum/SDPNegotiationMode';
-
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.SDPMapper = {
+export const SDPMapper = {
   CONFIG: {
     AUDIO_BITRATE: '30',
     AUDIO_PTIME: '60',
@@ -61,11 +55,10 @@ z.calling.SDPMapper = {
    * Rewrite the SDP for compatibility reasons.
    *
    * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
-   * @param {SDP_SOURCE} [sdpSource=SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
+   * @param {Object} config - Gives info on the type of SDP and what is its destination
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
-  rewriteSdp(rtcSdp, sdpSource = SDP_SOURCE.REMOTE, flowEntity) {
+  rewriteSdp(rtcSdp, {isIceRestart, isLocalSdp, isGroup} = {}) {
     if (!rtcSdp) {
       throw new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }
@@ -77,9 +70,7 @@ z.calling.SDPMapper = {
 
     const isFirefox = z.util.Environment.browser.firefox;
 
-    const isIceRestart = flowEntity.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
-    const isLocalSdp = sdpSource === SDP_SOURCE.LOCAL;
-    const isLocalSdpInGroup = isLocalSdp && flowEntity.isGroup;
+    const isLocalSdpInGroup = isLocalSdp && isGroup;
     const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
 
     sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
@@ -112,7 +103,7 @@ z.calling.SDPMapper = {
           const shouldAddBitRate = isLocalSdpInGroup || isIceRestart;
           if (shouldAddBitRate) {
             sdpLines.push(sdpLine);
-            outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
+            outline = `b=AS:${SDPMapper.CONFIG.AUDIO_BITRATE}`;
           }
         } else if (isFirefox && isLocalSdp && isOffer) {
           // Set ports to activate media in outgoing Firefox SDP to ensure enabled media
@@ -122,7 +113,7 @@ z.calling.SDPMapper = {
         const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
         if (shouldAddPTime && z.util.StringUtil.includes(sdpLine, 'opus')) {
           sdpLines.push(sdpLine);
-          outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
+          outline = `a=ptime:${SDPMapper.CONFIG.AUDIO_PTIME}`;
         }
       } else if (isFirefox && !isLocalSdp && sdpLine.startsWith('a=sctpmap:')) {
         outline = 'a=sctp-port:5000';

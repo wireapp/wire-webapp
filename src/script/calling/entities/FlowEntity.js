@@ -27,6 +27,7 @@ import TERMINATION_REASON from '../enum/TerminationReason';
 import TimeUtil from 'utils/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
+import {SDPMapper} from '../SDPMapper';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -806,8 +807,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   saveRemoteSdp(callMessageEntity) {
     let skipNegotiation = false;
 
-    return z.calling.SDPMapper.mapCallMessageToObject(callMessageEntity)
-      .then(rtcSdp => z.calling.SDPMapper.rewriteSdp(rtcSdp, SDP_SOURCE.REMOTE, this))
+    const isIceRestart = this.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
+
+    return SDPMapper.mapCallMessageToObject(callMessageEntity)
+      .then(rtcSdp => SDPMapper.rewriteSdp(rtcSdp, {isGroup: this.isGroup, isIceRestart, isLocalSdp: false}))
       .then(({sdp: remoteSdp}) => {
         const isRemoteOffer = remoteSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
         if (isRemoteOffer) {
@@ -860,7 +863,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     const rawSdp = this.peerConnection.localDescription;
 
-    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rawSdp, SDP_SOURCE.LOCAL, this);
+    const isIceRestart = this.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
+    const mappedSdp = SDPMapper.rewriteSdp(rawSdp, {isGroup: this.isGroup, isIceRestart, isLocalSdp: true});
 
     Promise.resolve(mappedSdp)
       .then(({iceCandidates, sdp: transformedSdp}) => {
