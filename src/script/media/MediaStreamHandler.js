@@ -565,8 +565,16 @@ export default class MediaStreamHandler {
       this._schedulePermissionHint(mediaType);
     }
 
-    return navigator.mediaDevices
-      .getUserMedia(mediaStreamConstraints)
+    const api = mediaType === 'screen' ? navigator.mediaDevices.getDisplayMedia : navigator.mediaDevices.getUserMedia;
+    const constraints =
+      mediaType === 'screen'
+        ? {
+            video: true,
+          }
+        : mediaStreamConstraints;
+
+    return api
+      .call(navigator.mediaDevices, constraints)
       .then(mediaStream => {
         this._clearPermissionRequestHint(mediaType);
         return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);

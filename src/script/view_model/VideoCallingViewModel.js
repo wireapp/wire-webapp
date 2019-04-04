@@ -195,10 +195,12 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.TimeUtil = TimeUtil;
   }
 
-  // TODO: Is this method just used for logging purposes?
   async chooseSharedScreen(conversationId) {
     if (!this.disableToggleScreen()) {
-      const skipScreenSelection = this.selfStreamState.screenSend() || z.util.Environment.browser.firefox;
+      const skipScreenSelection =
+        this.selfStreamState.screenSend() ||
+        z.util.Environment.browser.firefox ||
+        navigator.mediaDevices.getDisplayMedia;
       if (skipScreenSelection) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, z.media.MediaType.SCREEN);
         return;
@@ -237,11 +239,6 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
           .catch(error => {
             this.logger.error('Unable to get screens sources for sharing', error);
           });
-      }
-
-      if (navigator.mediaDevices.getDisplayMedia) {
-        await navigator.mediaDevices.getDisplayMedia();
-        // TODO: What to do with this media stream?
       }
     }
   }
