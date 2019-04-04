@@ -32,7 +32,7 @@ class ConversationListCell {
 
     this.showJoinButton = this.conversation.hasJoinableCall;
 
-    this.onJoinCall = () => onJoinCall(conversation.id, z.media.MediaType.AUDIO);
+    this.onJoinCall = () => onJoinCall(conversation, z.media.MediaType.AUDIO);
   }
 
   destroy() {

@@ -110,11 +110,11 @@ class ConversationListCallingCell {
   onJoinCall() {
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
     const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-    this.callingRepository.joinCall(this.conversation.id, mediaType);
+    this.callingRepository.joinCall(this.conversation, mediaType);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.joinCall(this.conversation.id, z.media.MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation, z.media.MediaType.AUDIO);
   }
 
   onLeaveCall() {
