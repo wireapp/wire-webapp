@@ -19,107 +19,102 @@
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
+const _buildCallMessage = (type, response, sessionId, additionalPayload) => {
+  const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
 
-z.calling.CallMessageBuilder = (() => {
-  const _buildCallMessage = (type, response, sessionId, additionalPayload) => {
-    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
+  if (additionalPayload) {
+    callMessageEntity.addProperties(additionalPayload);
+  }
 
-    if (additionalPayload) {
-      callMessageEntity.addProperties(additionalPayload);
-    }
+  return callMessageEntity;
+};
 
-    return callMessageEntity;
+const _buildCancel = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
+};
+
+const _buildGroupCheck = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
+};
+
+const _buildGroupLeave = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
+};
+
+const _buildGroupSetup = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
+};
+
+const _buildGroupStart = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
+};
+
+const _buildHangup = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
+};
+
+const _buildPropSync = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
+};
+
+const _buildReject = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
+};
+
+const _buildSetup = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
+};
+
+const _buildUpdate = (response, sessionId, additionalPayload) => {
+  return _buildCallMessage(CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
+};
+
+/**
+ * Create additional payload.
+ *
+ * @param {string} conversationId - ID of conversation
+ * @param {string} selfUserId - ID of self user
+ * @param {string} [remoteUserId] - Optional ID of remote user
+ * @param {string} [remoteClientId] - Optional ID of remote client
+ * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
+ */
+const _createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
+  return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
+};
+
+/**
+ * Create properties payload for call events.
+ *
+ * @param {Object} selfState - Current self state
+ * @param {Object} additionalPayload - Optional additional payload to be added
+ * @param {boolean} [videoStateOverwrite] - Forces the videosend property to be this value instead of the one in the selfState
+ * @returns {Object} call message props object
+ */
+const _createPropSync = (selfState, additionalPayload, videoStateOverwrite) => {
+  const payload = {};
+  const {audioSend: audioState, videoSend: videoState, screenSend: screenState} = selfState;
+  const videoSend = _.isBoolean(videoStateOverwrite) ? videoStateOverwrite : videoState();
+
+  payload.properties = {
+    audiosend: `${audioState()}`,
+    screensend: `${screenState()}`,
+    videosend: `${videoSend}`,
   };
 
-  const _buildCancel = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.CANCEL, response, sessionId, additionalPayload);
-  };
+  return additionalPayload ? Object.assign(payload, additionalPayload) : payload;
+};
 
-  const _buildGroupCheck = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_CHECK, response, sessionId, additionalPayload);
-  };
-
-  const _buildGroupLeave = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_LEAVE, response, sessionId, additionalPayload);
-  };
-
-  const _buildGroupSetup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_SETUP, response, sessionId, additionalPayload);
-  };
-
-  const _buildGroupStart = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.GROUP_START, response, sessionId, additionalPayload);
-  };
-
-  const _buildHangup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.HANGUP, response, sessionId, additionalPayload);
-  };
-
-  const _buildPropSync = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.PROP_SYNC, response, sessionId, additionalPayload);
-  };
-
-  const _buildReject = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.REJECT, response, sessionId, additionalPayload);
-  };
-
-  const _buildSetup = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.SETUP, response, sessionId, additionalPayload);
-  };
-
-  const _buildUpdate = (response, sessionId, additionalPayload) => {
-    return _buildCallMessage(CALL_MESSAGE_TYPE.UPDATE, response, sessionId, additionalPayload);
-  };
-
-  /**
-   * Create additional payload.
-   *
-   * @param {string} conversationId - ID of conversation
-   * @param {string} selfUserId - ID of self user
-   * @param {string} [remoteUserId] - Optional ID of remote user
-   * @param {string} [remoteClientId] - Optional ID of remote client
-   * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
-   */
-  const _createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
-    return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
-  };
-
-  /**
-   * Create properties payload for call events.
-   *
-   * @param {Object} selfState - Current self state
-   * @param {Object} additionalPayload - Optional additional payload to be added
-   * @param {boolean} [videoStateOverwrite] - Forces the videosend property to be this value instead of the one in the selfState
-   * @returns {Object} call message props object
-   */
-  const _createPropSync = (selfState, additionalPayload, videoStateOverwrite) => {
-    const payload = {};
-    const {audioSend: audioState, videoSend: videoState, screenSend: screenState} = selfState;
-    const videoSend = _.isBoolean(videoStateOverwrite) ? videoStateOverwrite : videoState();
-
-    payload.properties = {
-      audiosend: `${audioState()}`,
-      screensend: `${screenState()}`,
-      videosend: `${videoSend}`,
-    };
-
-    return additionalPayload ? Object.assign(payload, additionalPayload) : payload;
-  };
-
-  return {
-    buildCancel: _buildCancel,
-    buildGroupCheck: _buildGroupCheck,
-    buildGroupLeave: _buildGroupLeave,
-    buildGroupSetup: _buildGroupSetup,
-    buildGroupStart: _buildGroupStart,
-    buildHangup: _buildHangup,
-    buildPropSync: _buildPropSync,
-    buildReject: _buildReject,
-    buildSetup: _buildSetup,
-    buildUpdate: _buildUpdate,
-    createPayload: _createPayload,
-    createPropSync: _createPropSync,
-  };
-})();
+export const CallMessageBuilder = {
+  buildCancel: _buildCancel,
+  buildGroupCheck: _buildGroupCheck,
+  buildGroupLeave: _buildGroupLeave,
+  buildGroupSetup: _buildGroupSetup,
+  buildGroupStart: _buildGroupStart,
+  buildHangup: _buildHangup,
+  buildPropSync: _buildPropSync,
+  buildReject: _buildReject,
+  buildSetup: _buildSetup,
+  buildUpdate: _buildUpdate,
+  createPayload: _createPayload,
+  createPropSync: _createPropSync,
+};
