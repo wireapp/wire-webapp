@@ -138,8 +138,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
-  joinCall = (conversationId, mediaType) => {
-    this.callingRepository.joinCall(conversationId, mediaType);
+  joinCall = (conversationEntity, mediaType) => {
+    this.callingRepository.joinCall(conversationEntity, mediaType);
   };
 
   changeNotificationSetting() {
