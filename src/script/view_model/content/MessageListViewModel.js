@@ -26,6 +26,7 @@ import {groupBy} from 'underscore';
 
 import Conversation from '../../entity/Conversation';
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 /**
  * Message list rendering view model.
@@ -408,7 +409,7 @@ class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SESSION_RESET);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -594,7 +595,7 @@ class MessageListViewModel {
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
           z.util.SanitizationUtil.safeWindowOpen(href);
         },
