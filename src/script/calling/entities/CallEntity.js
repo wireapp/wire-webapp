@@ -25,6 +25,7 @@ import CALL_STATE_GROUP from '../enum/CallStateGroup';
 import TERMINATION_REASON from '../enum/TerminationReason';
 import {getRandomNumber} from 'utils/NumberUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
+import {SDPMapper} from '../SDPMapper';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -591,7 +592,7 @@ z.calling.entities.CallEntity = class CallEntity {
     const rtcSdp = callMessageEntity.sdp;
 
     if (rtcSdp) {
-      this.telemetry.set_remote_version(z.calling.SDPMapper.getToolVersion(rtcSdp));
+      this.telemetry.set_remote_version(SDPMapper.getToolVersion(rtcSdp));
     }
   }
 
