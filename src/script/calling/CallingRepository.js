@@ -612,7 +612,9 @@ export class CallingRepository {
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
             const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-            this.joinCall(conversationId, mediaType);
+            return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+              this.joinCall(conversationEntity, mediaType);
+            });
           }
         })
         .catch(_error => {
