@@ -78,7 +78,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
@@ -1991,17 +1990,17 @@ export class ConversationRepository {
    * Send call message in specified conversation.
    *
    * @param {EventInfoEntity} eventInfoEntity - Event info to be send
-   * @param {Conversation} conversationEntity - Conversation to send call message to
+   * @param {string} conversationId - id of the conversation to send call message to
    * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity) {
+  sendCallingMessage(eventInfoEntity, conversationId, callMessageEntity) {
     return this.messageSender
       .queueMessage(() => {
         const options = eventInfoEntity.options;
         const recipientsPromise = options.recipients
           ? Promise.resolve(eventInfoEntity)
-          : this.create_recipients(conversationEntity.id, false).then(recipients => {
+          : this.create_recipients(conversationId, false).then(recipients => {
               eventInfoEntity.updateOptions({recipients});
               return eventInfoEntity;
             });
@@ -2009,12 +2008,14 @@ export class ConversationRepository {
         return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
       })
       .then(() => {
+        /* FIXME
         const initiatingCallMessage = [CALL_MESSAGE_TYPE.GROUP_START, CALL_MESSAGE_TYPE.SETUP];
 
         const isCallInitiation = initiatingCallMessage.includes(callMessageEntity.type);
         if (isCallInitiation) {
           return this._trackContributed(conversationEntity, eventInfoEntity.genericMessage, callMessageEntity);
         }
+        */
       })
       .catch(error => {
         if (!this._isUserCancellationError(error)) {

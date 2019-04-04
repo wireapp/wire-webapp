@@ -33,6 +33,7 @@ import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
+import {callStart, callCreate, callConfigUpdate, CALL_TYPE, CONVERSATION_TYPE} from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {PROPERTY_STATE} from './enum/PropertyState';
@@ -83,6 +84,36 @@ export class CallingRepository {
     userRepository,
   ) {
     this.getConfig = this.getConfig.bind(this);
+
+    this.callingAccount = ko.pureComputed(() => {
+      if (userRepository.self() && clientRepository.currentClient()) {
+        return callCreate(userRepository.self().id, clientRepository.currentClient().id, {
+          requestConfig: () => {
+            this.getConfig().then(({ice_servers}) => {
+              callConfigUpdate({
+                bundlePolicy: 'max-bundle',
+                iceServers: ice_servers,
+                rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+              });
+            });
+            return 0;
+          },
+
+          sendMessage: (context, conversationId, userId, clientId, destinationUserId, destinationClientId, payload) => {
+            const protoCalling = new Calling({content: payload});
+            const genericMessage = new GenericMessage({
+              [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+              messageId: z.util.createRandomUuid(),
+            });
+
+            //const options = {precondition, recipients};
+            const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationId /*, options*/);
+            this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+            return 0;
+          },
+        });
+      }
+    });
 
     this.callingService = callingService;
     this.clientRepository = clientRepository;
@@ -761,7 +792,7 @@ export class CallingRepository {
           const options = {precondition, recipients};
           const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
-          return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity);
+          return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity);
         });
       });
   }
@@ -1241,13 +1272,17 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   _joinCall(conversationEntity, mediaType, callState, callEntity) {
-    this._checkCallingSupport(conversationEntity, mediaType, callState)
-      .then(() => this._checkConcurrentJoinedCall(conversationEntity.id, callState))
-      .then(() => callEntity || this._initiateOutgoingCall(conversationEntity.id, mediaType, callState))
-      .then(callEntityToJoin => this._initiatePreJoinCall(callEntityToJoin))
-      .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
-      .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
-      .catch(error => this._handleJoinError(conversationEntity.id, !callEntity, error));
+    if (!window.callv1) {
+      callStart(this.callingAccount(), conversationEntity.id, CALL_TYPE.AUDIO, CONVERSATION_TYPE.ONEONONE, false);
+    } else {
+      this._checkCallingSupport(conversationEntity, mediaType, callState)
+        .then(() => this._checkConcurrentJoinedCall(conversationEntity.id, callState))
+        .then(() => callEntity || this._initiateOutgoingCall(conversationEntity.id, mediaType, callState))
+        .then(callEntityToJoin => this._initiatePreJoinCall(callEntityToJoin))
+        .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
+        .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
+        .catch(error => this._handleJoinError(conversationEntity.id, !callEntity, error));
+    }
   }
 
   /**
