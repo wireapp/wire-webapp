@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "cross-env": "5.2.0",
-    "jasmine": "3.3.1",
+    "jasmine": "3.4.0",
     "rimraf": "2.6.3",
     "typescript": "3.4.1"
   },
