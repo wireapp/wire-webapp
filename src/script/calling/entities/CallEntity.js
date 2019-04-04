@@ -24,6 +24,7 @@ import CALL_STATE from '../enum/CallState';
 import CALL_STATE_GROUP from '../enum/CallStateGroup';
 import TERMINATION_REASON from '../enum/TerminationReason';
 import {getRandomNumber} from 'utils/NumberUtil';
+import {CallMessageBuilder} from '../CallMessageBuilder';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -319,13 +320,13 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {void} No return value
    */
   _joinGroupCall(mediaType = z.media.MediaType.AUDIO) {
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+    const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
 
     const response = !this.isOutgoing();
-    const propSync = z.calling.CallMessageBuilder.createPropSync(this.selfState, additionalPayload, videoSend);
+    const propSync = CallMessageBuilder.createPropSync(this.selfState, additionalPayload, videoSend);
 
-    const callMessageEntity = z.calling.CallMessageBuilder.buildGroupStart(response, this.sessionId, propSync);
+    const callMessageEntity = CallMessageBuilder.buildGroupStart(response, this.sessionId, propSync);
     this.sendCallMessage(callMessageEntity);
   }
 
@@ -340,16 +341,11 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     let callMessageEntity = this.isConnected()
-      ? z.calling.CallMessageBuilder.buildHangup(false, this.sessionId)
-      : z.calling.CallMessageBuilder.buildCancel(false, this.sessionId);
+      ? CallMessageBuilder.buildHangup(false, this.sessionId)
+      : CallMessageBuilder.buildCancel(false, this.sessionId);
 
     const eventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
-      const payload = z.calling.CallMessageBuilder.createPayload(
-        this.id,
-        this.selfUser.id,
-        remoteUserId,
-        remoteClientId
-      );
+      const payload = CallMessageBuilder.createPayload(this.id, this.selfUser.id, remoteUserId, remoteClientId);
       callMessageEntity.addProperties(payload);
       return this.sendCallMessage(callMessageEntity);
     });
@@ -357,10 +353,10 @@ z.calling.entities.CallEntity = class CallEntity {
     Promise.all(eventPromises)
       .then(() => Promise.all(this.participants().map(({id}) => this.resetParticipant(id))))
       .then(() => {
-        const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+        const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
 
         if (this.isGroup) {
-          callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
+          callMessageEntity = CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
           this.sendCallMessage(callMessageEntity);
         } else {
           callMessageEntity.addProperties(additionalPayload);
@@ -403,8 +399,8 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     if (shareRejection) {
-      const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-      const callMessageEntity = z.calling.CallMessageBuilder.buildReject(false, this.sessionId, additionalPayload);
+      const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+      const callMessageEntity = CallMessageBuilder.buildReject(false, this.sessionId, additionalPayload);
       this.sendCallMessage(callMessageEntity);
     }
   }
@@ -445,15 +441,10 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     const callEventPromises = this.getFlows().map(({remoteClientId, remoteUserId}) => {
-      const payload = z.calling.CallMessageBuilder.createPayload(
-        this.id,
-        this.selfUser.id,
-        remoteUserId,
-        remoteClientId
-      );
-      const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
+      const payload = CallMessageBuilder.createPayload(this.id, this.selfUser.id, remoteUserId, remoteClientId);
+      const propSyncPayload = CallMessageBuilder.createPropSync(this.selfState, payload);
 
-      const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, this.sessionId, propSyncPayload);
+      const callMessageEntity = CallMessageBuilder.buildPropSync(false, this.sessionId, propSyncPayload);
       return this.sendCallMessage(callMessageEntity);
     });
 
@@ -494,8 +485,8 @@ z.calling.entities.CallEntity = class CallEntity {
   _onSendGroupCheckTimeout(timeout) {
     if (this.participants().length) {
       this.callLogger.info(`Sending group check after timeout of '${timeout}s' (ID: ${this.groupCheckTimeoutId})`);
-      const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-      const callMessageEntity = z.calling.CallMessageBuilder.buildGroupCheck(true, this.sessionId, additionalPayload);
+      const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
+      const callMessageEntity = CallMessageBuilder.buildGroupCheck(true, this.sessionId, additionalPayload);
 
       this.sendCallMessage(callMessageEntity);
       return this.scheduleGroupCheck();
@@ -511,12 +502,8 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   _onVerifyGroupCheckTimeout() {
     this.callLogger.info(`Removing on group check timeout (ID: ${this.groupCheckTimeoutId})`);
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(
-      this.id,
-      this.selfUser.id,
-      this.creatingUser.id
-    );
-    const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
+    const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id, this.creatingUser.id);
+    const callMessageEntity = CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
 
     this.deactivateCall(callMessageEntity, false, TERMINATION_REASON.GROUP_CHECK);
   }
@@ -561,19 +548,19 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   confirmMessage(incomingCallMessageEntity) {
     const {clientId, type, userId} = incomingCallMessageEntity;
-    const payload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id, userId, clientId);
+    const payload = CallMessageBuilder.createPayload(this.id, this.selfUser.id, userId, clientId);
 
     let callMessageEntity;
     switch (type) {
       case CALL_MESSAGE_TYPE.HANGUP: {
-        callMessageEntity = z.calling.CallMessageBuilder.buildHangup(true, this.sessionId, payload);
+        callMessageEntity = CallMessageBuilder.buildHangup(true, this.sessionId, payload);
         break;
       }
 
       case CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const propSyncPayload = z.calling.CallMessageBuilder.createPropSync(this.selfState, payload);
+        const propSyncPayload = CallMessageBuilder.createPropSync(this.selfState, payload);
 
-        callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);
+        callMessageEntity = CallMessageBuilder.buildPropSync(true, this.sessionId, propSyncPayload);
         break;
       }
 
