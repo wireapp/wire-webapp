@@ -56,14 +56,19 @@ export const SDPMapper = {
     return Promise.resolve(sdp);
   },
 
+  mapMessageContentToRTCSessionDescription(messageContent) {
+    const {resp, sdp} = messageContent;
+    return {sdp, type: resp ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER};
+  },
+
   /**
    * Rewrite the SDP for compatibility reasons.
    *
-   * @param {RTCSessionDescription} rtcSdp - Session Description Protocol to be rewritten
+   * @param {RTCSessionDescriptionInit} rtcSdp - Session Description Protocol to be rewritten
    * @param {Object} config - Gives info on the type of SDP and what is its destination
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
-  rewriteSdp(rtcSdp, {isIceRestart, isLocalSdp, isGroup} = {}) {
+  rewriteSdp(rtcSdp, {isIceRestart, isGroup, isLocalSdp} = {}) {
     if (!rtcSdp) {
       throw new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
     }

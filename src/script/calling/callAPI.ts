@@ -75,6 +75,7 @@ class WCall {
   callType: CALL_TYPE;
   conversationType: CONVERSATION_TYPE;
   audioCbr: boolean;
+  peerConnection: RTCPeerConnection;
 
   constructor(callType: CALL_TYPE, conversationId: string, conversationType: CONVERSATION_TYPE, audioCbr: boolean) {
     this.conversationId = conversationId;
@@ -122,47 +123,54 @@ export function callStart(
   conversationType: CONVERSATION_TYPE,
   audioCbr: boolean
 ): boolean {
-  const callIdentifier = generateCallId(wUser, conversationId);
-  const activeCall = state.activeCalls[callIdentifier];
+  const activeCall = findCallInstance(wUser, conversationId);
   if (activeCall) {
     //Do Stuff
   }
   const wCall = new WCall(callType, conversationId, conversationType, audioCbr);
   wCall.state = CALL_STATE.OUTGOING;
+  wCall.peerConnection = initPeerConnection();
 
   // add the call to the state
-  state.activeCalls[callIdentifier] = wCall;
+  storeCallInstance(wUser, conversationId, wCall);
 
-  const peerConnection = initPeerConnection();
-
-  navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
-    stream.getTracks().forEach(function(track) {
-      peerConnection.addTrack(track, stream);
-    });
-    peerConnection
-      .createOffer({iceRestart: false, voiceActivityDetection: true})
-      .then((sessionDescription: RTCSessionDescription) => {
-        peerConnection.setLocalDescription(sessionDescription);
-        window.setTimeout(() => {
-          const transformedSdp = SDPMapper.rewriteSdp(peerConnection.localDescription, {
-            isGroup: false,
-            isIceRestart: false,
-            isLocalSdp: true,
-          });
-          const message = buildMessagePayload(CALL_MESSAGE_TYPE.SETUP, 'felix', transformedSdp.sdp.sdp, false);
-          wUser.callbacks.sendMessage(
-            'felix',
-            conversationId,
-            wUser.userId,
-            wUser.clientId,
-            undefined,
-            undefined,
-            message,
-            0
-          );
-        }, 500);
+  navigator.mediaDevices
+    .getUserMedia({audio: true})
+    .then(stream => {
+      stream.getTracks().forEach(function(track) {
+        wCall.peerConnection.addTrack(track, stream);
       });
-  });
+    })
+    .then(() => {
+      wCall.peerConnection
+        .createOffer({iceRestart: false, voiceActivityDetection: true})
+        .then((sessionDescription: RTCSessionDescription) => {
+          wCall.peerConnection.setLocalDescription(sessionDescription);
+          window.setTimeout(() => {
+            const transformedSdp = SDPMapper.rewriteSdp(wCall.peerConnection.localDescription, {
+              isGroup: false,
+              isIceRestart: false,
+              isLocalSdp: true,
+            });
+            const message = buildMessagePayload(
+              CALL_MESSAGE_TYPE.SETUP,
+              generateSessionId(),
+              transformedSdp.sdp.sdp,
+              false
+            );
+            wUser.callbacks.sendMessage(
+              'felix',
+              conversationId,
+              wUser.userId,
+              wUser.clientId,
+              undefined,
+              undefined,
+              message,
+              0
+            );
+          }, 500);
+        });
+    });
   return true;
 }
 
@@ -170,18 +178,49 @@ export function callConfigUpdate(config: any) {
   state.callConfig = config;
 }
 
+export function callReceiveMessage(
+  wUser: WUser,
+  content: any,
+  length: number,
+  currentTime: number,
+  messageTime: number,
+  conversationId: string,
+  userId: string,
+  clientId: string
+): number {
+  console.log('felix received msg', content);
+  switch (content.type) {
+    case 'SETUP':
+      if (content.resp) {
+        const sessionDescription = SDPMapper.mapMessageContentToRTCSessionDescription(content);
+        const callInstance = findCallInstance(wUser, conversationId);
+        const transformedSdp = SDPMapper.rewriteSdp(sessionDescription, {
+          isGroup: false,
+          isIceRestart: false,
+          isLocalSdp: false,
+        });
+        callInstance.peerConnection.setRemoteDescription(transformedSdp.sdp);
+      } else {
+      }
+      break;
+  }
+  return 0;
+}
+
 function initPeerConnection(): RTCPeerConnection {
   const peerConnection = new window.RTCPeerConnection(state.callConfig);
 
   peerConnection.createDataChannel('calling-3.0', {ordered: true});
 
+  /*
   peerConnection.onaddstream = console.log.bind(console, 'felix onaddstream ');
-  peerConnection.ontrack = console.log.bind(console, 'felix ontrack ');
   peerConnection.ondatachannel = console.log.bind(console, 'felix ondatachannel ');
+  peerConnection.ontrack = console.log.bind(console, 'felix ontrack');
   peerConnection.onicecandidate = console.log.bind(console, 'felix onicecandidate ');
   peerConnection.oniceconnectionstatechange = console.log.bind(console, 'felix oniceconnectionstatechange ');
   peerConnection.onremovestream = console.log.bind(console, 'felix onremovestream ');
   peerConnection.onsignalingstatechange = console.log.bind(console, 'felix onsignalingstatechange ');
+  */
 
   return peerConnection;
 }
@@ -190,10 +229,6 @@ export function callGetState(wUser: WUser, conversationId: string): CALL_STATE {
   const callIdentifier = generateCallId(wUser, conversationId);
   const foundCall = state.activeCalls[callIdentifier];
   return foundCall ? foundCall.state : CALL_STATE.UNKNOWN;
-}
-
-function generateCallId(call: WUser, conversationId: string) {
-  return call.userId + call.clientId + conversationId;
 }
 
 function buildMessagePayload(type: CALL_MESSAGE_TYPE, sessid: string, sdp: string, isReponse: boolean): string {
@@ -205,4 +240,25 @@ function buildMessagePayload(type: CALL_MESSAGE_TYPE, sessid: string, sdp: strin
     sdp,
     sessid,
   });
+}
+
+function findCallInstance(wUser: WUser, conversationId: string): WCall | undefined {
+  const callIdentifier = generateCallId(wUser, conversationId);
+  return state.activeCalls[callIdentifier];
+}
+
+function storeCallInstance(wUser: WUser, conversationId: string, wCall: WCall): void {
+  const callIdentifier = generateCallId(wUser, conversationId);
+  state.activeCalls[callIdentifier] = wCall;
+}
+
+function generateCallId(call: WUser, conversationId: string): string {
+  return call.userId + call.clientId + conversationId;
+}
+
+function generateSessionId(): string {
+  const sessionIdSize = 4;
+  return Math.random()
+    .toString(36)
+    .substring(sessionIdSize);
 }

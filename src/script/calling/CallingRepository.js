@@ -33,7 +33,7 @@ import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
-import {callStart, callCreate, callConfigUpdate, CALL_TYPE, CONVERSATION_TYPE} from './callAPI';
+import {callStart, callCreate, callConfigUpdate, callReceiveMessage, CALL_TYPE, CONVERSATION_TYPE} from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {PROPERTY_STATE} from './enum/PropertyState';
@@ -214,6 +214,11 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
+    if (!window.callv1) {
+      const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
+      callReceiveMessage(this.callingAccount(), content, content.length, 12, time, conversationId, userId, clientId);
+      return;
+    }
     const {content: eventContent, time: eventDate, type: eventType} = event;
     const isCall = eventType === ClientEvent.CALL.E_CALL;
 
