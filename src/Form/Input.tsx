@@ -52,9 +52,11 @@ const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = 
     '&::-webkit-input-placeholder': {
       ...placeholderStyle,
     },
-    '&:invalid': {
-      boxShadow: 'none',
-    },
+    '&:invalid': !markInvalid
+      ? {
+          boxShadow: 'none',
+        }
+      : {},
     background: disabled ? COLOR.shade(COLOR.WHITE, 0.06) : COLOR.WHITE,
     border: 'none',
     borderRadius: '4px',
