@@ -32,7 +32,12 @@ export default class MediaConstraintsHandler {
           },
         },
         DISPLAY_MEDIA: {
-          video: true,
+          video: {
+            height: {
+              ideal: 1080,
+              max: 1080,
+            },
+          },
         },
         FIREFOX: {
           frameRate: 30,
