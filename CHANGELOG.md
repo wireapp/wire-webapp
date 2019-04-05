@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.3.0...@wireapp/react-ui-kit@5.3.1) (2019-04-05)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Handle browser invalid state for inputs ([#1732](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1732)) ([37fe6d6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/37fe6d6))
+
+
+
+
+
 # [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.2.2...@wireapp/react-ui-kit@5.3.0) (2019-04-03)
 
 
