@@ -89,7 +89,7 @@ ko.components.register('user-actions', {
         condition: () => isNotMe() && user().isIncomingRequest(),
         item: {
           click: () =>
-            actionsViewModel.acceptConnectionRequest(user, true).then(() => onAction(Actions.ACCEPT_REQUEST)),
+            actionsViewModel.acceptConnectionRequest(user(), true).then(() => onAction(Actions.ACCEPT_REQUEST)),
           icon: 'check-icon',
           identifier: 'do-accept-request',
           label: t('groupParticipantActionIncomingRequest'),
