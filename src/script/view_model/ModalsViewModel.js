@@ -149,10 +149,10 @@ export class ModalsViewModel {
   hasOption = () => this.content().currentType === ModalsViewModel.TYPE.OPTION;
 
   confirm = () => {
-    if (this.currentType() === ModalsViewModel.TYPE.OPTION) {
+    if (this.content().currentType === ModalsViewModel.TYPE.OPTION) {
       return this.content().actionFn(this.optionChecked());
     }
-    if (this.currentType() === ModalsViewModel.TYPE.INPUT) {
+    if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
       return this.content().actionFn(this.inputValue());
     }
   };
