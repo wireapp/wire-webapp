@@ -195,7 +195,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.TimeUtil = TimeUtil;
   }
 
-  async chooseSharedScreen(conversationId) {
+  chooseSharedScreen(conversationId) {
     if (!this.disableToggleScreen()) {
       const skipScreenSelection =
         this.selfStreamState.screenSend() ||
