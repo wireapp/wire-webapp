@@ -23,16 +23,32 @@ import moment from 'moment';
 import {t} from 'utils/LocalizerUtil';
 
 const noop = () => {};
+const defaultContent = {
+  actionFn: noop,
+  actionText: '',
+  checkboxLabel: '',
+  closeFn: noop,
+  currentType: null,
+  inputPlaceholder: '',
+  messageHtml: '',
+  messageText: '',
+  modalUie: '',
+  onBgClick: noop,
+  secondaryFn: noop,
+  secondaryText: '',
+  titleText: '',
+};
+
 export class ModalsViewModel {
   static get TYPE() {
     return {
-      ACCOUNT_NEW_DEVICES: '.modal-account-new-devices',
-      ACCOUNT_READ_RECEIPTS_CHANGED: '.modal-account-read-receipts-changed',
-      ACKNOWLEDGE: '.modal-template-acknowledge',
-      CONFIRM: '.modal-template-confirm',
-      INPUT: '.modal-template-input',
-      OPTION: '.modal-template-option',
-      SESSION_RESET: '.modal-session-reset',
+      ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
+      ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
+      ACKNOWLEDGE: 'modal-template-acknowledge',
+      CONFIRM: 'modal-template-confirm',
+      INPUT: 'modal-template-input',
+      OPTION: 'modal-template-option',
+      SESSION_RESET: 'modal-session-reset',
     };
   }
 
@@ -40,25 +56,10 @@ export class ModalsViewModel {
     this.logger = Logger('ModalsViewModel');
     this.elementId = 'modals';
 
-    this.currentType = ko.observable(null);
-
-    this.titleText = ko.observable();
-    this.actionText = ko.observable();
-    this.secondaryText = ko.observable();
-    this.messageText = ko.observable();
-    this.inputText = ko.observable();
-    this.messageHtml = ko.observable();
-    this.optionText = ko.observable();
-    this.modalUie = ko.observable();
     this.isVisible = ko.observable(false);
-    this.onBgClick = ko.observable(noop);
-    this.inputValue = ko.observable('');
     this.optionChecked = ko.observable(false);
-
-    this.actionFn = noop;
-    this.secondaryFn = noop;
-    this.closeFn = noop;
-    this.TYPE = ModalsViewModel.TYPE;
+    this.inputValue = ko.observable('');
+    this.content = ko.observable(defaultContent);
 
     amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal);
 
@@ -82,27 +83,28 @@ export class ModalsViewModel {
     }
 
     const {text = {}, preventClose = false, close = noop, action = noop, secondary = noop, data} = options;
-    this.titleText(text.title);
-    this.actionText(text.action);
-    this.secondaryText(text.secondary);
-    this.messageText(text.message);
-    this.inputText(text.input);
-    this.messageHtml(text.htmlMessage);
-    this.optionText(text.option);
-    this.currentType(type);
-    this.onBgClick(preventClose ? noop : this.hide);
-    this.isVisible(true);
-    this.actionFn = action;
-    this.secondaryFn = secondary;
-    this.closeFn = close;
+    const content = {
+      actionFn: action,
+      actionText: text.action,
+      checkboxLabel: text.option,
+      closeFn: close,
+      currentType: type,
+      inputPlaceholder: text.input,
+      messageHtml: text.htmlMessage,
+      messageText: text.message,
+      modalUie: type,
+      onBgClick: preventClose ? noop : this.hide,
+      secondaryFn: secondary,
+      secondaryText: text.secondary,
+      titleText: text.title,
+    };
 
     switch (type) {
       case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES:
-        this.modalUie('modal-account-new-devices');
-        this.titleText(t('modalAccountNewDevicesHeadline'));
-        this.actionText(t('modalAcknowledgeAction'));
-        this.secondaryText(t('modalAccountNewDevicesSecondary'));
-        this.messageText(t('modalAccountNewDevicesMessage'));
+        content.titleText = t('modalAccountNewDevicesHeadline');
+        content.actionText = t('modalAcknowledgeAction');
+        content.secondaryText = t('modalAccountNewDevicesSecondary');
+        content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
             const deviceTime = moment(device.time).format('MMMM Do YYYY, HH:mm');
@@ -110,52 +112,48 @@ export class ModalsViewModel {
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })
           .join('');
-        this.messageHtml(`<div class="modal__content__device-list">${deviceList}</div>`);
+        content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
         break;
       case ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED:
-        this.modalUie('modal-account-new-devices');
-        this.actionText(t('modalAcknowledgeAction'));
-        this.titleText(
-          data ? t('modalAccountReadReceiptsChangedOnHeadline') : t('modalAccountReadReceiptsChangedOffHeadline')
-        );
+        content.actionText = t('modalAcknowledgeAction');
+        content.titleText = data
+          ? t('modalAccountReadReceiptsChangedOnHeadline')
+          : t('modalAccountReadReceiptsChangedOffHeadline');
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
-        this.modalUie('modal-account-new-devices');
-        this.actionText(text.action || t('modalAcknowledgeAction'));
-        this.titleText(text.title || t('modalAcknowledgeHeadline'));
-        this.messageText(!text.htmlMessage && text.message);
+        content.actionText = text.action || t('modalAcknowledgeAction');
+        content.titleText = text.title || t('modalAcknowledgeHeadline');
+        content.messageText = !text.htmlMessage && text.message;
         break;
       case ModalsViewModel.TYPE.CONFIRM:
-        this.modalUie('modal-account-new-devices');
-        this.secondaryText(t('modalConfirmSecondary'));
-        break;
-      case ModalsViewModel.TYPE.INPUT:
-        this.modalUie('modal-account-new-devices');
+        content.secondaryText = t('modalConfirmSecondary');
         break;
       case ModalsViewModel.TYPE.OPTION:
-        this.modalUie('modal-account-new-devices');
-        this.secondaryText(text.secondary || t('modalOptionSecondary'));
+        content.secondaryText = text.secondary || t('modalOptionSecondary');
         break;
       case ModalsViewModel.TYPE.SESSION_RESET:
-        this.titleText(t('modalSessionResetHeadline'));
-        this.actionText(t('modalAcknowledgeAction'));
+        content.titleText = t('modalSessionResetHeadline');
+        content.actionText = t('modalAcknowledgeAction');
         const supportLink = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.FORM.BUG);
-        this.messageHtml(
-          `${t(
-            'modalSessionResetMessage1'
-          )}<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">${t(
-            'modalSessionResetMessageLink'
-          )}</a>${t('modalSessionResetMessage2')}`
-        );
+        content.messageHtml = `${t(
+          'modalSessionResetMessage1'
+        )}<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">${t(
+          'modalSessionResetMessageLink'
+        )}</a>${t('modalSessionResetMessage2')}`;
     }
+    this.content(content);
+    this.isVisible(true);
   };
+
+  hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
+  hasOption = () => this.content().currentType === ModalsViewModel.TYPE.OPTION;
 
   confirm = () => {
     if (this.currentType() === ModalsViewModel.TYPE.OPTION) {
-      return this.actionFn(this.optionChecked());
+      return this.content().actionFn(this.optionChecked());
     }
     if (this.currentType() === ModalsViewModel.TYPE.INPUT) {
-      return this.actionFn(this.inputValue());
+      return this.content().actionFn(this.inputValue());
     }
   };
 
@@ -165,29 +163,17 @@ export class ModalsViewModel {
   };
 
   doSecondary = () => {
-    this.secondaryFn();
+    this.content().secondaryFn();
     this.hide();
   };
 
   hide = () => {
     this.isVisible(false);
-    this.closeFn();
+    this.content().closeFn();
   };
 
   onModalHidden = () => {
-    this.currentType(null);
-    this.titleText(null);
-    this.actionText(null);
-    this.secondaryText(null);
-    this.messageText(null);
-    this.inputText(null);
-    this.messageHtml(null);
-    this.optionText(null);
-    this.modalUie('');
-    this.onBgClick(noop);
-    this.actionFn = noop;
-    this.secondaryFn = noop;
-    this.closeFn = noop;
+    this.content(defaultContent);
     this.inputValue('');
     this.optionChecked(false);
   };

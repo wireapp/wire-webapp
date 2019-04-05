@@ -1,34 +1,34 @@
 <div id="modals">
   <modal
-    params="isShown: isVisible(), onBgClick: onBgClick(), onClosed: onModalHidden"
-    data-bind="attr: {'data-uie-name': modalUie()}"
+    params="isShown: isVisible(), onBgClick: content().onBgClick, onClosed: onModalHidden"
+    data-bind="attr: {'data-uie-name': content().modalUie}"
   >
     <div class="modal__header" data-uie-name="status-modal-title">
-      <div class="modal__header__title" data-bind="text: titleText()"></div>
+      <div class="modal__header__title" data-bind="text: content().titleText"></div>
     </div>
     <div class="modal__text" data-uie-name="status-modal-text">
-      <div data-bind="html: messageHtml()"></div>
-      <div data-bind="text: messageText()"></div>
+      <div data-bind="html: content().messageHtml"></div>
+      <div data-bind="text: content().messageText"></div>
     </div>
-    <!-- ko if: currentType() === TYPE.INPUT -->
-      <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: inputText()}"/>
+    <!-- ko if: hasInput() -->
+      <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}"/>
     <!-- /ko -->
-    <!-- ko if: currentType() === TYPE.OPTION -->
+    <!-- ko if: hasOption() -->
       <div class="modal-option">
         <div class="checkbox accent-text">
           <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-bind="checked: optionChecked" data-uie-name="do-clear-data" />
           <label class="label-xs" for="clear-data-checkbox">
-            <span class="modal-option-text text-background" data-bind="text: optionText()"></span>
+            <span class="modal-option-text text-background" data-bind="text: content().checkboxLabel"></span>
           </label>
         </div>
       </div>
     <!-- /ko -->
     <div class="modal__buttons">
-      <!-- ko if: secondaryText() -->
-        <div data-bind="text: secondaryText(), click: doSecondary" class="modal__button modal__button--cancel" data-uie-name="do-secondary"></div>
+      <!-- ko if: content().secondaryText -->
+        <div data-bind="text: content().secondaryText, click: doSecondary" class="modal__button modal__button--cancel" data-uie-name="do-secondary"></div>
       <!-- /ko -->
-      <!-- ko if: actionText() -->
-        <div data-bind="text: actionText(), click: doAction" class="modal__button modal__button--confirm" data-uie-name="do-action"></div>
+      <!-- ko if: content().actionText -->
+        <div data-bind="text: content().actionText, click: doAction" class="modal__button modal__button--confirm" data-uie-name="do-action"></div>
       <!-- /ko -->
     </div>
   </modal>
