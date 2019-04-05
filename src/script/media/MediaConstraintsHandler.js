@@ -24,7 +24,7 @@ export default class MediaConstraintsHandler {
     return {
       DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
-        CHROME: {
+        DESKTOP_CAPTURER: {
           mandatory: {
             chromeMediaSource: 'desktop',
             maxHeight: 1080,
@@ -118,7 +118,7 @@ export default class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DESKTOP_CAPTURER,
       };
 
       const chromeMediaSourceId = this.mediaRepository.devicesHandler.currentDeviceId.screenInput();
@@ -143,7 +143,7 @@ export default class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DESKTOP_CAPTURER,
       };
 
       return Promise.resolve(streamConstraints);
