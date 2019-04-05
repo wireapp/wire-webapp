@@ -119,7 +119,7 @@ z.util.Environment = (() => {
   };
   const _supportsScreenSharing = () => {
     const hasScreenCaptureAPI = window.desktopCapturer || !!navigator.mediaDevices.getDisplayMedia;
-    return hasScreenCaptureAPI ? true : _isFirefox();
+    return hasScreenCaptureAPI || _isFirefox();
   };
 
   // add body information
