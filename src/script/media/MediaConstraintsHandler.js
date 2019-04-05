@@ -31,6 +31,9 @@ export default class MediaConstraintsHandler {
             minHeight: 1080,
           },
         },
+        DISPLAY_MEDIA: {
+          video: true,
+        },
         FIREFOX: {
           frameRate: 30,
           height: {exact: 720},
@@ -143,7 +146,7 @@ export default class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DESKTOP_CAPTURER,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DISPLAY_MEDIA,
       };
 
       return Promise.resolve(streamConstraints);

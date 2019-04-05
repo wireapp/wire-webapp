@@ -565,16 +565,13 @@ export default class MediaStreamHandler {
       this._schedulePermissionHint(mediaType);
     }
 
-    const api = mediaType === 'screen' ? navigator.mediaDevices.getDisplayMedia : navigator.mediaDevices.getUserMedia;
-    const constraints =
-      mediaType === 'screen'
-        ? {
-            video: true,
-          }
-        : mediaStreamConstraints;
+    const isScreenSharingFromChrome = mediaType === 'screen' && !!navigator.mediaDevices.getDisplayMedia;
+    const mediaAPI = isScreenSharingFromChrome
+      ? navigator.mediaDevices.getDisplayMedia
+      : navigator.mediaDevices.getUserMedia;
 
-    return api
-      .call(navigator.mediaDevices, constraints)
+    return mediaAPI
+      .call(navigator.mediaDevices, mediaStreamConstraints)
       .then(mediaStream => {
         this._clearPermissionRequestHint(mediaType);
         return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);
