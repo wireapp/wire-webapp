@@ -39,7 +39,7 @@ export default class MediaConstraintsHandler {
             },
           },
         },
-        FIREFOX: {
+        USER_MEDIA: {
           frameRate: 30,
           height: {exact: 720},
           mediaSource: 'screen',
@@ -135,23 +135,23 @@ export default class MediaConstraintsHandler {
       return Promise.resolve(streamConstraints);
     }
 
-    if (z.util.Environment.browser.firefox) {
-      this.logger.info('Enabling screen sharing from Firefox');
-
-      const streamConstraints = {
-        audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.FIREFOX,
-      };
-
-      return Promise.resolve(streamConstraints);
-    }
-
-    if (!!navigator.mediaDevices.getDisplayMedia) {
+    if (navigator.mediaDevices.getDisplayMedia) {
       this.logger.info('Enabling screen sharing from Chrome');
 
       const streamConstraints = {
         audio: false,
         video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DISPLAY_MEDIA,
+      };
+
+      return Promise.resolve(streamConstraints);
+    }
+
+    if (z.util.Environment.browser.firefox) {
+      this.logger.info('Enabling screen sharing from Firefox');
+
+      const streamConstraints = {
+        audio: false,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.USER_MEDIA,
       };
 
       return Promise.resolve(streamConstraints);

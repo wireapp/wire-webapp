@@ -565,8 +565,8 @@ export default class MediaStreamHandler {
       this._schedulePermissionHint(mediaType);
     }
 
-    const supportsGetDisplayMedia = mediaType === 'screen' && !!navigator.mediaDevices.getDisplayMedia;
-    const mediaAPI = isScreenSharingFromChrome
+    const supportsGetDisplayMedia = mediaType === 'screen' && navigator.mediaDevices.getDisplayMedia;
+    const mediaAPI = supportsGetDisplayMedia
       ? navigator.mediaDevices.getDisplayMedia
       : navigator.mediaDevices.getUserMedia;
 

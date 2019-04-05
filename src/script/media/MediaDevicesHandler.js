@@ -251,7 +251,6 @@ export default class MediaDevicesHandler {
   }
 
   /**
-   * TODO: Make it usable for chrome because currently it's a wrapper-only thing.
    * Update list of available screens.
    * @returns {Promise} resolves with all screen sources when the list has been updated
    */
