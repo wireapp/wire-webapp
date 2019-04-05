@@ -92,7 +92,13 @@ class WUser {
   constructor(userId: string, clientId: string, callbacks: WCallCallbacks) {
     this.userId = userId;
     this.clientId = clientId;
-    this.callbacks = callbacks;
+    const logProxy = (fnName: string, fn: Function) => (...args) => {
+      console.log('felix', fnName, args);
+      fn(...args);
+    };
+    this.callbacks = Object.entries(callbacks).reduce((acc, [key, value]) => {
+      return Object.assign({}, acc, {[key]: logProxy(key, value)});
+    }, {});
   }
 }
 
@@ -159,7 +165,7 @@ export function callStart(
               false
             );
             wUser.callbacks.sendMessage(
-              'felix',
+              undefined,
               conversationId,
               wUser.userId,
               wUser.clientId,
@@ -191,18 +197,62 @@ export function callReceiveMessage(
   console.log('felix received msg', content);
   switch (content.type) {
     case 'SETUP':
+      const sessionDescription = SDPMapper.mapMessageContentToRTCSessionDescription(content);
+      const transformedSdp = SDPMapper.rewriteSdp(sessionDescription, {
+        isGroup: false,
+        isIceRestart: false,
+        isLocalSdp: false,
+      });
+
       if (content.resp) {
-        const sessionDescription = SDPMapper.mapMessageContentToRTCSessionDescription(content);
         const callInstance = findCallInstance(wUser, conversationId);
-        const transformedSdp = SDPMapper.rewriteSdp(sessionDescription, {
-          isGroup: false,
-          isIceRestart: false,
-          isLocalSdp: false,
-        });
         callInstance.peerConnection.setRemoteDescription(transformedSdp.sdp);
       } else {
+        const peerConnection = initPeerConnection();
+        peerConnection.setRemoteDescription(transformedSdp.sdp);
+
+        navigator.mediaDevices
+          .getUserMedia({audio: true})
+          .then(stream => {
+            stream.getTracks().forEach(track => {
+              peerConnection.addTrack(track, stream);
+            });
+          })
+          .then(() => {
+            return peerConnection
+              .createAnswer({iceRestart: false, voiceActivityDetection: true})
+              .then((sessionDescription: RTCSessionDescription) => {
+                peerConnection.setLocalDescription(sessionDescription);
+                return peerConnection;
+              });
+          })
+          .then(peerConnection => {
+            setTimeout(() => {
+              const transformedSdp = SDPMapper.rewriteSdp(peerConnection.localDescription, {
+                isGroup: false,
+                isIceRestart: false,
+                isLocalSdp: true,
+              });
+              const message = buildMessagePayload(
+                CALL_MESSAGE_TYPE.SETUP,
+                generateSessionId(),
+                transformedSdp.sdp.sdp,
+                true
+              );
+              wUser.callbacks.sendMessage(
+                undefined,
+                conversationId,
+                wUser.userId,
+                wUser.clientId,
+                undefined,
+                undefined,
+                message,
+                0
+              );
+            }, 500);
+          });
+        break;
       }
-      break;
   }
   return 0;
 }
