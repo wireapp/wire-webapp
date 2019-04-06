@@ -252,7 +252,7 @@ export default class MediaDevicesHandler {
   }
 
   /**
-   * Update list of available Screens.
+   * Update list of available screens.
    * @returns {Promise} resolves with all screen sources when the list has been updated
    */
   getScreenSources() {

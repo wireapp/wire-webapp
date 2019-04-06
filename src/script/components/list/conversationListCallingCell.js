@@ -104,11 +104,13 @@ class ConversationListCallingCell {
     this.TimeUtil = TimeUtil;
   }
 
-  onEndCall() {
+  onEndCall(data, event) {
+    event.stopPropagation();
     return this.isIncoming() ? this.onRejectCall() : this.onLeaveCall();
   }
 
-  onJoinCall() {
+  onJoinCall(data, event) {
+    event.stopPropagation();
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
     const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
     this.callingRepository.joinCall(this.conversation, mediaType);
@@ -139,15 +141,18 @@ class ConversationListCallingCell {
     amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.conversation.id);
   }
 
-  onToggleAudio() {
+  onToggleAudio(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
   }
 
-  onToggleScreen() {
+  onToggleScreen(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
   }
 
-  onToggleVideo() {
+  onToggleVideo(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
   }
 }

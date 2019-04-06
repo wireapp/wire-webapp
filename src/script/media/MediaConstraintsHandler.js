@@ -24,14 +24,22 @@ export default class MediaConstraintsHandler {
     return {
       DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
-        CHROME: {
+        DESKTOP_CAPTURER: {
           mandatory: {
             chromeMediaSource: 'desktop',
             maxHeight: 1080,
             minHeight: 1080,
           },
         },
-        FIREFOX: {
+        DISPLAY_MEDIA: {
+          video: {
+            height: {
+              ideal: 1080,
+              max: 1080,
+            },
+          },
+        },
+        USER_MEDIA: {
           frameRate: 30,
           height: {exact: 720},
           mediaSource: 'screen',
@@ -118,11 +126,22 @@ export default class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.CHROME,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DESKTOP_CAPTURER,
       };
 
       const chromeMediaSourceId = this.mediaRepository.devicesHandler.currentDeviceId.screenInput();
       streamConstraints.video.mandatory = Object.assign(streamConstraints.video.mandatory, {chromeMediaSourceId});
+
+      return Promise.resolve(streamConstraints);
+    }
+
+    if (navigator.mediaDevices.getDisplayMedia) {
+      this.logger.info('Enabling screen sharing from Chrome');
+
+      const streamConstraints = {
+        audio: false,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DISPLAY_MEDIA,
+      };
 
       return Promise.resolve(streamConstraints);
     }
@@ -132,7 +151,7 @@ export default class MediaConstraintsHandler {
 
       const streamConstraints = {
         audio: false,
-        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.FIREFOX,
+        video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.USER_MEDIA,
       };
 
       return Promise.resolve(streamConstraints);
