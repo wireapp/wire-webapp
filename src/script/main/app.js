@@ -38,7 +38,7 @@ import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
-import DebugUtil from '../util/DebugUtil';
+import DebugUtil from 'utils/DebugUtil';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 import TimeUtil from 'utils/TimeUtil';
@@ -52,9 +52,10 @@ import {t} from 'utils/LocalizerUtil';
 import globals from './globals';
 /* eslint-enable no-unused-vars */
 import {getWebsiteUrl} from '../externalRoute';
-import {enableLogging} from '../util/LoggerUtil';
+import {enableLogging} from 'utils/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
+import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
 
 class App {
   static get CONFIG() {
@@ -283,8 +284,8 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
-    z.util
-      .checkIndexedDb()
+
+    checkIndexedDb()
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
@@ -550,7 +551,7 @@ class App {
    * @returns {boolean}  True if it is a page refresh
    */
   _isReload() {
-    const isReload = z.util.isSameLocation(document.referrer, window.location.href);
+    const isReload = isSameLocation(document.referrer, window.location.href);
     const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
     this.logger.debug(log);
     return isReload;
@@ -578,7 +579,7 @@ class App {
    * @returns {void} Resolves when page is the first tab
    */
   _registerSingleInstance() {
-    const instanceId = z.util.createRandomUuid();
+    const instanceId = createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
       return this._registerSingleInstanceCleaning();

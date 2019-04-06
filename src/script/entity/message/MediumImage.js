@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 import File from './File';
 import AssetType from '../../assets/AssetType';
+import {downloadBlob} from 'utils/util';
 
 class MediumImage extends File {
   constructor(id) {
@@ -44,7 +45,7 @@ class MediumImage extends File {
   download(filename) {
     return this.resource()
       .load()
-      .then(blob => z.util.downloadBlob(blob, filename))
+      .then(blob => downloadBlob(blob, filename))
       .catch(error => this.logger.error('Failed to download image', error));
   }
 }

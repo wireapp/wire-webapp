@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import moment from 'moment';
 import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
 import {t} from 'utils/LocalizerUtil';
+import {koPushDeferred} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,7 +53,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
     this.conversationEntity(conversationEntity);
-    z.util.koPushDeferred(this.items, items);
+    koPushDeferred(this.items, items);
   }
 
   itemAdded(messageEntity) {

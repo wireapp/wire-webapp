@@ -22,6 +22,7 @@ import ko from 'knockout';
 import Asset from './Asset';
 import AssetType from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
+import {renderMessage} from 'utils/util';
 
 export default class Text extends Asset {
   constructor(id, text = '') {
@@ -48,7 +49,7 @@ export default class Text extends Asset {
 
   // Process text before rendering it
   render(selfId, themeColor) {
-    const message = z.util.renderMessage(this.text, selfId, this.mentions());
+    const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 

@@ -32,6 +32,7 @@ import User from '../entity/User';
 import UserMapper from './UserMapper';
 
 import {chunk} from 'utils/ArrayUtil';
+import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 
 export default class UserRepository {
   static get CONFIG() {
@@ -331,7 +332,7 @@ export default class UserRepository {
     const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     const recipients = this.teamUsers().concat(this.self());
@@ -599,7 +600,7 @@ export default class UserRepository {
     const find_users = user_ets.map(user_et => _find_users(user_et));
 
     return Promise.all(find_users).then(resolve_array => {
-      z.util.koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
+      koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
       return user_ets;
     });
   }
@@ -797,7 +798,7 @@ export default class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()) {

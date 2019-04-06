@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 import trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
+import {sortObjectByKeys} from 'utils/util';
 
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
@@ -49,7 +50,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {Object} Containing all the sessions
    */
   log_sessions() {
-    const sortedSessions = z.util.sortObjectByKeys(this.sessions, true);
+    const sortedSessions = sortObjectByKeys(this.sessions, true);
 
     this.logger.force_log('Your last session IDs:');
     Object.values(sortedSessions).forEach(trackingInfo => this.logger.force_log(trackingInfo.to_string()));

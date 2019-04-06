@@ -25,6 +25,7 @@ import {t} from 'utils/LocalizerUtil';
 
 import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {base64ToArray} from 'utils/util';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export default class EventMapper {
@@ -724,7 +725,7 @@ export default class EventMapper {
    */
   _mapAssetLinkPreviews(linkPreviews) {
     return linkPreviews
-      .map(encodedLinkPreview => LinkPreview.decode(z.util.base64ToArray(encodedLinkPreview)))
+      .map(encodedLinkPreview => LinkPreview.decode(base64ToArray(encodedLinkPreview)))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => linkPreviewEntity);
   }
@@ -740,7 +741,7 @@ export default class EventMapper {
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => {
-        const protoMention = Mention.decode(z.util.base64ToArray(encodedMention));
+        const protoMention = Mention.decode(base64ToArray(encodedMention));
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {

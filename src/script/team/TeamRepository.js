@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import TeamMapper from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
+import {loadDataUrl} from 'utils/util';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -174,7 +175,7 @@ z.team.TeamRepository = class TeamRepository {
       imagePromise
         .then(imageBlob => {
           if (imageBlob) {
-            return z.util.loadDataUrl(imageBlob);
+            return loadDataUrl(imageBlob);
           }
         })
         .then(imageDataUrl => {

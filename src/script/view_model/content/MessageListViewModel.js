@@ -26,6 +26,7 @@ import {groupBy} from 'underscore';
 
 import Conversation from '../../entity/Conversation';
 import {t} from 'utils/LocalizerUtil';
+import {afterRender} from 'utils/util';
 
 /**
  * Message list rendering view model.
@@ -363,7 +364,7 @@ class MessageListViewModel {
           });
 
     loadMessagePromise.then(() => {
-      z.util.afterRender(() => {
+      afterRender(() => {
         const messagesContainer = this.getMessagesContainer();
         const messageElement = messagesContainer.querySelector(`.message[data-uie-uid="${messageId}"]`);
 

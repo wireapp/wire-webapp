@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 import {t} from 'utils/LocalizerUtil';
 import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
+import {koArrayPushAll} from 'utils/util';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -225,7 +226,7 @@ z.event.EventRepository = class EventRepository {
   _handleBufferedNotifications() {
     this.logger.info(`Received '${this.webSocketBuffer.length}' notifications via WebSocket while handling stream`);
     if (this.webSocketBuffer.length) {
-      z.util.koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
+      koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
       this.webSocketBuffer.length = 0;
     }
   }
@@ -252,7 +253,7 @@ z.event.EventRepository = class EventRepository {
           notificationId = notifications[notifications.length - 1].id;
 
           this.logger.info(`Added '${notifications.length}' notifications to the queue`);
-          z.util.koArrayPushAll(this.notificationsQueue, notifications);
+          koArrayPushAll(this.notificationsQueue, notifications);
 
           if (!this.notificationsPromises) {
             this.notificationsPromises = [resolve, reject];

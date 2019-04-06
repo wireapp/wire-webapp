@@ -35,6 +35,7 @@ import view from '../auth/AuthView';
 import validationError from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
 import {resolve as resolveDependency, graph} from '../config/appResolver';
+import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -330,8 +331,7 @@ class AuthViewModel {
    * @returns {Promise} Resolves when the database check has passed
    */
   _check_database(current_hash) {
-    return z.util
-      .checkIndexedDb()
+    return checkIndexedDb()
       .then(() => {
         if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
           this._set_hash();
@@ -1120,7 +1120,7 @@ class AuthViewModel {
             new Promise(resolve => {
               $(old_component[0])
                 .addClass(`outgoing-${animation_params.direction}`)
-                .one(z.util.alias.animationend, function() {
+                .one(alias.animationend, function() {
                   resolve();
                   $(this).css({
                     display: '',
@@ -1134,12 +1134,10 @@ class AuthViewModel {
         if (new_component.length) {
           animation_promises.push(
             new Promise(resolve => {
-              new_component
-                .addClass(`incoming-${animation_params.direction}`)
-                .one(z.util.alias.animationend, function() {
-                  resolve();
-                  $(this).css({opacity: 1});
-                });
+              new_component.addClass(`incoming-${animation_params.direction}`).one(alias.animationend, function() {
+                resolve();
+                $(this).css({opacity: 1});
+              });
             })
           );
         }
@@ -1154,7 +1152,7 @@ class AuthViewModel {
 
   _clear_animations(type = z.auth.AuthView.TYPE.FORM) {
     $(`.${type}`)
-      .off(z.util.alias.animationend)
+      .off(alias.animationend)
       .removeClass((index, css) => (css.match(/\boutgoing-\S+/g) || []).join(' '))
       .removeClass((index, css) => (css.match(/\bincoming-\S+/g) || []).join(' '));
   }
@@ -1388,7 +1386,7 @@ class AuthViewModel {
       return this._add_error(t('authErrorEmailMissing'), z.auth.AuthView.TYPE.EMAIL);
     }
 
-    if (!z.util.isValidEmail(username)) {
+    if (!isValidEmail(username)) {
       this._add_error(t('authErrorEmailMalformed'), z.auth.AuthView.TYPE.EMAIL);
     }
   }
@@ -1441,7 +1439,7 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validate_phone() {
-    if (!z.util.isValidPhoneNumber(this.phone_number_e164())) {
+    if (!isValidPhoneNumber(this.phone_number_e164())) {
       this._add_error(t('authErrorPhoneNumberInvalid'), z.auth.AuthView.TYPE.PHONE);
     }
   }

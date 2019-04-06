@@ -23,6 +23,7 @@ import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import User from '../../entity/User';
+import {alias} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -492,9 +493,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         $(event.currentTarget)
           .closest('.fade-wrapper')
           .addClass('bg-animation')
-          .on(z.util.alias.animationend, _event => {
+          .on(alias.animationend, _event => {
             if (_event.originalEvent.animationName === 'message-bg-fadeout') {
-              $(this).off(z.util.alias.animationend);
+              $(this).off(alias.animationend);
 
               if (this.inviteBubble) {
                 this.inviteBubble.hide();

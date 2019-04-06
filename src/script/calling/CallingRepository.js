@@ -29,6 +29,7 @@ import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
 import CALL_STATE from './enum/CallState';
 import TERMINATION_REASON from './enum/TerminationReason';
+import {createRandomUuid} from 'utils/util';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -734,7 +735,7 @@ export class CallingRepository {
           const protoCalling = new Calling({content: callMessageEntity.toContentString()});
           const genericMessage = new GenericMessage({
             [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-            messageId: z.util.createRandomUuid(),
+            messageId: createRandomUuid(),
           });
 
           const options = {precondition, recipients};

@@ -25,6 +25,7 @@ import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
 
 import WindowTitleViewModel from 'src/script/view_model/WindowTitleViewModel';
+import {createRandomUuid} from 'utils/util';
 
 describe('WindowTitleViewModel', () => {
   const suffix = t('wire');
@@ -62,7 +63,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name of the conversation (when the conversation is selected)', () => {
-      const selected_conversation = new Conversation(z.util.createRandomUuid());
+      const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.GROUP);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
@@ -75,14 +76,14 @@ describe('WindowTitleViewModel', () => {
 
     it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', () => {
       const message = new z.entity.ContentMessage();
-      message.id = z.util.createRandomUuid();
+      message.id = createRandomUuid();
       message.timestamp(Date.now());
 
-      const conversationEntity = new Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.add_message(message);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(z.conversation.ConversationType.GROUP);
-      conversationEntity.selfUser(new User(z.util.createRandomUuid()));
+      conversationEntity.selfUser(new User(createRandomUuid()));
 
       title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
       title_view_model.conversationRepository.active_conversation(conversationEntity);
@@ -94,16 +95,16 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('does not change the title if muted conversations receive messages', () => {
-      const selfUserEntity = new User(z.util.createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.inTeam(true);
 
-      const selected_conversation = new Conversation(z.util.createRandomUuid());
+      const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.GROUP);
       selected_conversation.selfUser(selfUserEntity);
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
-      const muted_conversation = new Conversation(z.util.createRandomUuid());
+      const muted_conversation = new Conversation(createRandomUuid());
       muted_conversation.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
       muted_conversation.type(z.conversation.ConversationType.GROUP);
@@ -125,7 +126,7 @@ describe('WindowTitleViewModel', () => {
 
       // Add messages to the muted conversation
       const message_in_muted = new z.entity.ContentMessage();
-      message_in_muted.id = z.util.createRandomUuid();
+      message_in_muted.id = createRandomUuid();
       message_in_muted.timestamp(Date.now());
       muted_conversation.add_message(message_in_muted);
 
@@ -140,7 +141,7 @@ describe('WindowTitleViewModel', () => {
 
       // Add messages to the selected conversation
       const message_in_selected = new z.entity.ContentMessage();
-      message_in_selected.id = z.util.createRandomUuid();
+      message_in_selected.id = createRandomUuid();
       message_in_selected.timestamp(Date.now());
       selected_conversation.add_message(message_in_selected);
 
@@ -209,9 +210,9 @@ describe('WindowTitleViewModel', () => {
       title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
       title_view_model.userRepository.connect_requests = ko.observableArray([]);
 
-      const firstConnectedUser = new User(z.util.createRandomUuid());
-      const secondConnectedUser = new User(z.util.createRandomUuid());
-      const thirdConnectedUser = new User(z.util.createRandomUuid());
+      const firstConnectedUser = new User(createRandomUuid());
+      const secondConnectedUser = new User(createRandomUuid());
+      const thirdConnectedUser = new User(createRandomUuid());
 
       const tests = [
         {
@@ -240,14 +241,14 @@ describe('WindowTitleViewModel', () => {
 
     it("publishes the badge count (for Wire's wrapper)", done => {
       const contentMessage = new z.entity.ContentMessage();
-      contentMessage.id = z.util.createRandomUuid();
+      contentMessage.id = createRandomUuid();
       contentMessage.timestamp(Date.now());
 
-      const conversationEntity = new Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.add_message(contentMessage);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(z.conversation.ConversationType.GROUP);
-      conversationEntity.selfUser(new User(z.util.createRandomUuid()));
+      conversationEntity.selfUser(new User(createRandomUuid()));
 
       amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);

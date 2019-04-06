@@ -23,6 +23,7 @@ import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
 import {CallingRepository} from '../calling/CallingRepository';
+import {koArrayPushAll, koArrayUnshiftAll} from 'utils/util';
 
 export default class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -425,7 +426,7 @@ export default class Conversation {
       }
     }
 
-    z.util.koArrayPushAll(this.messages_unordered, message_ets);
+    koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   getFirstUnreadSelfMention() {
@@ -483,7 +484,7 @@ export default class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
+    koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**

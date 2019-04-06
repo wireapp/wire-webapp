@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import * as StorageUtil from 'utils/StorageUtil';
 import MediaRepository from './MediaRepository';
 import {iterateIndex} from 'utils/ArrayUtil';
+import {koArrayPushAll} from 'utils/util';
 
 export default class MediaDevicesHandler {
   static get CONFIG() {
@@ -239,9 +240,9 @@ export default class MediaDevicesHandler {
             }
           });
 
-          z.util.koArrayPushAll(this.availableDevices.audioInput, audioInputDevices);
-          z.util.koArrayPushAll(this.availableDevices.audioOutput, audioOutputDevices);
-          z.util.koArrayPushAll(this.availableDevices.videoInput, videoInputDevices);
+          koArrayPushAll(this.availableDevices.audioInput, audioInputDevices);
+          koArrayPushAll(this.availableDevices.audioOutput, audioOutputDevices);
+          koArrayPushAll(this.availableDevices.videoInput, videoInputDevices);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;

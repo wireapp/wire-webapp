@@ -20,18 +20,19 @@
 import Conversation from 'src/script/entity/Conversation';
 import {ConversationType} from 'src/script/tracking/attribute';
 import trackingHelpers from 'src/script/tracking/Helpers';
+import {createRandomUuid} from 'utils/util';
 
 describe('trackingHelpers', () => {
   describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {
-      const conversation_et = new Conversation(z.util.createRandomUuid());
+      const conversation_et = new Conversation(createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
 
       expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.ONE_TO_ONE);
     });
 
     it('returns correct type for group conversation', () => {
-      const conversation_et = new Conversation(z.util.createRandomUuid());
+      const conversation_et = new Conversation(createRandomUuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
 
       expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.GROUP);

@@ -24,6 +24,7 @@ import * as StorageUtil from 'utils/StorageUtil';
 import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {formatBytes, afterRender, renderMessage} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -188,7 +189,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput.subscribe(() => {
       if (this.textarea && this.shadowInput) {
-        z.util.afterRender(() => {
+        afterRender(() => {
           if (this.shadowInput.scrollTop !== this.textarea.scrollTop) {
             this.shadowInput.scrollTop = this.textarea.scrollTop;
           }
@@ -268,6 +269,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
       }
     });
+
+    this.renderedReplyMessage = ko.computed(
+      () =>
+        this.replyAsset() &&
+        this.replyAsset().is_text() &&
+        renderMessage(this.replyAsset().text, null, this.replyAsset().mentions())
+    );
 
     this._initSubscriptions();
   }
@@ -804,7 +812,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       for (const file of Array.from(files)) {
         const isTooLarge = file.size > uploadLimit;
         if (isTooLarge) {
-          const fileSize = z.util.formatBytes(uploadLimit);
+          const fileSize = formatBytes(uploadLimit);
           const options = {
             text: {
               message: t('modalAssetTooLargeMessage', fileSize),
@@ -840,7 +848,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _moveCursorToEnd() {
-    z.util.afterRender(() => {
+    afterRender(() => {
       if (this.textarea) {
         const endPosition = this.textarea.value.length;
         this.textarea.setSelectionRange(endPosition, endPosition);

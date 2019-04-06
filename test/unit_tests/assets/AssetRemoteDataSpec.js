@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {createRandomUuid} from 'utils/util';
 
 describe('z.assets.AssetRemoteData', () => {
   describe('load unencrypted v1 asset', () => {
@@ -24,8 +25,8 @@ describe('z.assets.AssetRemoteData', () => {
     const video_type = 'video/mp4';
 
     beforeEach(() => {
-      const conversation_id = z.util.createRandomUuid();
-      const asset_id = z.util.createRandomUuid();
+      const conversation_id = createRandomUuid();
+      const asset_id = createRandomUuid();
       remote_data = z.assets.AssetRemoteData.v1(conversation_id, asset_id);
       spyOn(remote_data, '_loadBuffer').and.returnValue(
         Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type})
@@ -46,8 +47,8 @@ describe('z.assets.AssetRemoteData', () => {
 
     beforeEach(() => {
       return z.assets.AssetCrypto.encryptAesAsset(video_bytes).then(({cipherText, keyBytes, sha256}) => {
-        const conversation_id = z.util.createRandomUuid();
-        const asset_id = z.util.createRandomUuid();
+        const conversation_id = createRandomUuid();
+        const asset_id = createRandomUuid();
         remote_data = z.assets.AssetRemoteData.v2(
           conversation_id,
           asset_id,

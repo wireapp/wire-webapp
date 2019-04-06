@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import viewportObserver from '../ui/viewportObserver';
 import User from '../entity/User';
+import {createRandomUuid} from 'utils/util';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -90,7 +91,7 @@ class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.createRandomUuid(),
+      id: createRandomUuid(),
       'user-id': this.participant().id,
     });
 

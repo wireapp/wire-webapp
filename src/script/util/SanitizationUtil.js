@@ -18,6 +18,7 @@
  */
 
 import {t, Declension} from 'utils/LocalizerUtil';
+import {isValidEmail} from './util';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -54,7 +55,7 @@ z.util.SanitizationUtil = (() => {
       event.preventDefault();
       event.stopPropagation();
 
-      if (!z.util.isValidEmail(email)) {
+      if (!isValidEmail(email)) {
         return;
       }
 

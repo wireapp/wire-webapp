@@ -24,10 +24,11 @@ import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
+import {downloadFile} from './util';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return z.util.downloadFile(url, filename);
+  return downloadFile(url, filename);
 }
 
 export default class DebugUtil {
