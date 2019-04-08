@@ -53,7 +53,7 @@
     "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.2"
   },
   "devDependencies": {
-    "@babel/core": "7.4.0",
+    "@babel/core": "7.4.3",
     "@babel/plugin-proposal-class-properties": "7.4.0",
     "@babel/preset-env": "7.4.3",
     "@babel/preset-react": "7.0.0",
