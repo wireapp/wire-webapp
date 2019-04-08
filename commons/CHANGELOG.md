@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.4.10...@wireapp/commons@1.5.0) (2019-04-08)
+
+
+### Features
+
+* **commons:** Add isValidEmail to ValidationUtil ([#1737](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1737)) ([7bbcd51](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/7bbcd51))
+
+
+
+
+
 ## [1.4.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.4.9...@wireapp/commons@1.4.10) (2019-04-05)
 
 **Note:** Version bump only for package @wireapp/commons
