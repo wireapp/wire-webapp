@@ -120,6 +120,17 @@ const DemoInputs = () => {
         </Column>
       </Columns>
 
+      <H2>ErrorMessage</H2>
+      <Line />
+      <Columns>
+        <Column>ErrorMessage with link</Column>
+        <Column>
+          <ErrorMessage>
+            Error. <Link>Learn more</Link>
+          </ErrorMessage>
+        </Column>
+      </Columns>
+
       <H2>Checkbox</H2>
       <Line />
       <Columns>

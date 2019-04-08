@@ -36,6 +36,7 @@ const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation
   a: {
     color: COLOR.LINK,
     textDecoration: 'none',
+    textTransform: 'uppercase',
   },
   display: 'block',
   marginBottom: '12px',
