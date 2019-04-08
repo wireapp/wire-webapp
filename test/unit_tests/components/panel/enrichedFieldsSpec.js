@@ -28,7 +28,8 @@ const entriesListSelector = '.enriched-fields__entry';
 describe('enriched-fields', () => {
   it('displays all the given fields', () => {
     const richProfileRepository = resolve(graph.RichProfileRepository);
-    const params = {userId: UUID.genV4().hexString};
+    const userId = UUID.genV4().hexString;
+    const params = {user: () => ({id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
       Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]})
@@ -39,9 +40,24 @@ describe('enriched-fields', () => {
     });
   });
 
+  it('displays the email if set on user', () => {
+    const richProfileRepository = resolve(graph.RichProfileRepository);
+    const userId = UUID.genV4().hexString;
+    const params = {user: () => ({email: 'user@inter.net', id: userId})};
+
+    spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
+      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]})
+    );
+
+    return instantiateComponent('enriched-fields', params).then(domContainer => {
+      expect(domContainer.querySelectorAll(entriesListSelector).length).toBe(3);
+    });
+  });
+
   it('calls the `onFieldsLoaded` function when fields are loaded', () => {
     const richProfileRepository = resolve(graph.RichProfileRepository);
-    const params = {onFieldsLoaded: () => {}, userId: UUID.genV4().hexString};
+    const userId = UUID.genV4().hexString;
+    const params = {onFieldsLoaded: () => {}, user: () => ({id: userId})};
     const richProfile = {fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]};
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(Promise.resolve(richProfile));
     spyOn(params, 'onFieldsLoaded');
