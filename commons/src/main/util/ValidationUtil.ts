@@ -25,3 +25,8 @@ export function isUUIDv4(candidate: string): boolean {
   const uuidv4Regex = new RegExp(`^${PATTERN.UUID_V4}$`, 'i');
   return uuidv4Regex.test(candidate);
 }
+
+export function isValidEmail(email: string): boolean {
+  const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return regExp.test(email);
+}

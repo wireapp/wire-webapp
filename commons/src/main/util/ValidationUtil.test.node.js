@@ -40,3 +40,18 @@ describe('isUUIDv4', () => {
     expect(actual).toBe(uuid);
   });
 });
+
+describe('isValidEmail', () => {
+  it('recognizes valid emails', () => {
+    expect(ValidationUtil.isValidEmail('test@example.com')).toBe(true);
+    expect(ValidationUtil.isValidEmail('john@gmail.com')).toBe(true);
+  });
+
+  it('recognizes invalid emails', () => {
+    expect(ValidationUtil.isValidEmail('a@a.a')).toBe(false);
+    expect(ValidationUtil.isValidEmail('test')).toBe(false);
+    expect(ValidationUtil.isValidEmail('test@')).toBe(false);
+    expect(ValidationUtil.isValidEmail('test@example')).toBe(false);
+    expect(ValidationUtil.isValidEmail('@example.com')).toBe(false);
+  });
+});
