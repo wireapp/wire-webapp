@@ -74,6 +74,8 @@ class Configuration {
     SHOW_LOADING_INFORMATION: false,
   };
   readonly APP_INSTANCE_ID = UUID();
+  readonly MAX_VIDEO_PARTICIPANTS = 4;
+  readonly CALLING_PROTOCOL_VERSION = '3.0';
 }
 
 const Config = new Configuration();
