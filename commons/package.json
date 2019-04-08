@@ -43,5 +43,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "jasmine --config=jasmine.json"
   },
-  "version": "1.5.0"
+  "version": "1.5.1"
 }
