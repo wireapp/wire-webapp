@@ -155,6 +155,7 @@ export class ModalsViewModel {
     if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
       return this.content().actionFn(this.inputValue());
     }
+    this.content().actionFn();
   };
 
   doAction = () => {
