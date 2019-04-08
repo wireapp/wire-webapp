@@ -271,12 +271,10 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
     });
 
-    this.renderedReplyMessage = ko.computed(
-      () =>
-        this.replyAsset() &&
-        this.replyAsset().is_text() &&
-        renderMessage(this.replyAsset().text, null, this.replyAsset().mentions())
-    );
+    this.renderReplyMessage = () =>
+      this.replyAsset() &&
+      this.replyAsset().is_text() &&
+      renderMessage(this.replyAsset().text, null, this.replyAsset().mentions());
 
     this._initSubscriptions();
   }
