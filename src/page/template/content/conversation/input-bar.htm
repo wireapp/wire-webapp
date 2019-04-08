@@ -15,7 +15,7 @@
           </div>
           <!-- ko if: replyAsset() -->
             <!-- ko if: replyAsset().is_text() -->
-              <div class="input-bar__reply__message input-bar__reply__message__text" data-bind="html: renderReplyMessage()" data-uie-name="media-text-reply-box"></div>
+              <div class="input-bar__reply__message input-bar__reply__message__text" data-bind="html: renderMessage(replyAsset().text, null, replyAsset().mentions()" data-uie-name="media-text-reply-box"></div>
             <!-- /ko -->
 
             <!-- ko if: replyAsset().is_image()-->

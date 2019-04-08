@@ -271,10 +271,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
     });
 
-    this.renderReplyMessage = () =>
-      this.replyAsset() &&
-      this.replyAsset().is_text() &&
-      renderMessage(this.replyAsset().text, null, this.replyAsset().mentions());
+    this.renderMessage = renderMessage;
 
     this._initSubscriptions();
   }

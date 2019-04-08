@@ -198,7 +198,7 @@
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --fix --ignore-path .gitignore \"**/*.less\"",
     "build:style": "node ./bin/less.js",
     "test": "yarn test:types && yarn lint && yarn test:server && yarn test:auth && yarn test:app",
-    "test:app": "karma start karma.conf.js",
+    "test:app": "node --max-old-space-size=4096 ./node_modules/.bin/karma start karma.conf.js",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "yarn tsc --noEmit",
