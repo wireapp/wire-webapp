@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from './ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -49,7 +50,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
             resolve();
@@ -67,7 +68,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
             resolve();
@@ -85,9 +86,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   clearConversation(conversationEntity) {
     if (conversationEntity) {
-      const modalType = conversationEntity.isLeavable()
-        ? z.viewModel.ModalsViewModel.TYPE.OPTION
-        : z.viewModel.ModalsViewModel.TYPE.CONFIRM;
+      const modalType = conversationEntity.isLeavable() ? ModalsViewModel.TYPE.OPTION : ModalsViewModel.TYPE.CONFIRM;
 
       amplify.publish(z.event.WebApp.WARNING.MODAL, modalType, {
         action: (leaveConversation = false) => {
@@ -111,7 +110,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.INPUT, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
         action: password => {
           this.clientRepository
             .deleteClient(clientEntity.id, password)
@@ -134,7 +133,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   deleteMessage(conversationEntity, messageEntity) {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.conversationRepository.deleteMessage(conversationEntity, messageEntity);
             resolve();
@@ -152,7 +151,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   deleteMessageEveryone(conversationEntity, messageEntity) {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.conversationRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
             resolve();
@@ -176,7 +175,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   leaveConversation(conversationEntity) {
     if (conversationEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
             resolve();
@@ -234,7 +233,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       }
 
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.conversationRepository.removeMember(conversationEntity, userEntity.id);
             resolve();
@@ -267,7 +266,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   unblockUser(userEntity, showConversation) {
     if (userEntity) {
       return new Promise(resolve => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             this.connectionRepository
               .unblockUser(userEntity, showConversation)

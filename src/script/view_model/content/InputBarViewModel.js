@@ -24,6 +24,7 @@ import * as StorageUtil from 'utils/StorageUtil';
 import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -512,7 +513,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
-      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      return amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           message: t('modalConversationMessageTooLongMessage', z.config.MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
@@ -812,7 +813,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             },
           };
 
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
 
@@ -833,7 +834,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         },
       };
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
     }
 
     return isHittingUploadLimit;
@@ -862,6 +863,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     };
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

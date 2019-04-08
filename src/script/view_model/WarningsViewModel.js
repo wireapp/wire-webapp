@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from './ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -117,7 +118,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
     switch (warningToClose) {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
             const url = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
             z.util.SanitizationUtil.safeWindowOpen(url);

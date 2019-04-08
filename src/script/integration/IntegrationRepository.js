@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
 window.z.integration = z.integration || {};
@@ -122,7 +123,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .catch(error => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('modalIntegrationUnavailableMessage'),
             title: t('modalIntegrationUnavailableHeadline'),

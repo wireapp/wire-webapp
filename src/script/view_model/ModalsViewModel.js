@@ -22,29 +22,46 @@ import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+const noop = () => {};
+const defaultContent = {
+  actionFn: noop,
+  actionText: '',
+  checkboxLabel: '',
+  closeFn: noop,
+  currentType: null,
+  inputPlaceholder: '',
+  messageHtml: '',
+  messageText: '',
+  modalUie: '',
+  onBgClick: noop,
+  secondaryFn: noop,
+  secondaryText: '',
+  titleText: '',
+};
 
-z.viewModel.ModalsViewModel = class ModalsViewModel {
+export class ModalsViewModel {
   static get TYPE() {
     return {
-      ACCOUNT_NEW_DEVICES: '.modal-account-new-devices',
-      ACCOUNT_READ_RECEIPTS_CHANGED: '.modal-account-read-receipts-changed',
-      ACKNOWLEDGE: '.modal-template-acknowledge',
-      CONFIRM: '.modal-template-confirm',
-      INPUT: '.modal-template-input',
-      OPTION: '.modal-template-option',
-      SESSION_RESET: '.modal-session-reset',
+      ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
+      ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
+      ACKNOWLEDGE: 'modal-template-acknowledge',
+      CONFIRM: 'modal-template-confirm',
+      INPUT: 'modal-template-input',
+      OPTION: 'modal-template-option',
+      SESSION_RESET: 'modal-session-reset',
     };
   }
 
   constructor() {
-    this.logger = Logger('z.viewModel.ModalsViewModel');
+    this.logger = Logger('ModalsViewModel');
     this.elementId = 'modals';
 
-    this.modals = {};
+    this.isVisible = ko.observable(false);
+    this.optionChecked = ko.observable(false);
+    this.inputValue = ko.observable('');
+    this.content = ko.observable(defaultContent);
 
-    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal.bind(this));
+    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -60,169 +77,104 @@ z.viewModel.ModalsViewModel = class ModalsViewModel {
    * @param {Function} options.secondary - Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
-  showModal(type, options = {}) {
-    const actionElement = $(type).find('.modal__button--confirm');
-    const messageElement = $(type).find('.modal-text');
-    const titleElement = $(type).find('.modal-title');
+  showModal = (type, options = {}) => {
+    if (!Object.values(ModalsViewModel.TYPE).includes(type)) {
+      return this.logger.warn(`Modal of type '${type}' is not supported`);
+    }
+
+    const {text = {}, preventClose = false, close = noop, action = noop, secondary = noop, data} = options;
+    const content = {
+      actionFn: action,
+      actionText: text.action,
+      checkboxLabel: text.option,
+      closeFn: close,
+      currentType: type,
+      inputPlaceholder: text.input,
+      messageHtml: text.htmlMessage,
+      messageText: text.message,
+      modalUie: type,
+      onBgClick: preventClose ? noop : this.hide,
+      secondaryFn: secondary,
+      secondaryText: text.secondary,
+      titleText: text.title,
+    };
 
     switch (type) {
       case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES:
-        this._showModalAccountNewDevices(options.data);
+        content.titleText = t('modalAccountNewDevicesHeadline');
+        content.actionText = t('modalAcknowledgeAction');
+        content.secondaryText = t('modalAccountNewDevicesSecondary');
+        content.messageText = t('modalAccountNewDevicesMessage');
+        const deviceList = data
+          .map(device => {
+            const deviceTime = moment(device.time).format('MMMM Do YYYY, HH:mm');
+            const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
+            return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
+          })
+          .join('');
+        content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
         break;
       case ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED:
-        this._showModalAccountReadReceiptsChanged(options.data);
+        content.actionText = t('modalAcknowledgeAction');
+        content.titleText = data
+          ? t('modalAccountReadReceiptsChangedOnHeadline')
+          : t('modalAccountReadReceiptsChangedOffHeadline');
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
-        this._showModalAcknowledge(options, titleElement, messageElement, actionElement);
+        content.actionText = text.action || t('modalAcknowledgeAction');
+        content.titleText = text.title || t('modalAcknowledgeHeadline');
+        content.messageText = !text.htmlMessage && text.message;
         break;
       case ModalsViewModel.TYPE.CONFIRM:
-        this._showModalConfirm(options, titleElement, messageElement, actionElement);
-        break;
-      case ModalsViewModel.TYPE.INPUT:
-        this._showModalInput(options, titleElement, messageElement, actionElement);
+        content.secondaryText = t('modalConfirmSecondary');
         break;
       case ModalsViewModel.TYPE.OPTION:
-        this._showModalOption(options, titleElement, messageElement, actionElement);
+        content.secondaryText = text.secondary || t('modalOptionSecondary');
         break;
-      default:
-        this.logger.warn(`Modal of type '${type}' is not supported`);
+      case ModalsViewModel.TYPE.SESSION_RESET:
+        content.titleText = t('modalSessionResetHeadline');
+        content.actionText = t('modalAcknowledgeAction');
+        const supportLink = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.FORM.BUG);
+        content.messageHtml = `${t(
+          'modalSessionResetMessage1'
+        )}<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">${t(
+          'modalSessionResetMessageLink'
+        )}</a>${t('modalSessionResetMessage2')}`;
     }
+    this.content(content);
+    this.isVisible(true);
+  };
 
-    const {preventClose = false, action: actionFn, close: closeFn, secondary: secondaryFn} = options;
-    const modal = new z.ui.Modal(type, null, () => {
-      $(type)
-        .find('.modal-close')
-        .off('click');
+  hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
+  hasOption = () => this.content().currentType === ModalsViewModel.TYPE.OPTION;
 
-      $(type)
-        .find('.modal__button--confirm')
-        .off('click');
-
-      $(type)
-        .find('.modal__button--cancel')
-        .off('click');
-
-      modal.destroy();
-
-      if (typeof closeFn === 'function') {
-        closeFn();
-      }
-    });
-
-    $(type)
-      .find('.modal-close')
-      .click(() => modal.hide());
-
-    $(type)
-      .find('.modal__button--cancel')
-      .click(() => {
-        modal.hide(() => {
-          if (typeof secondaryFn === 'function') {
-            secondaryFn();
-          }
-        });
-      });
-
-    $(type)
-      .find('.modal__button--confirm')
-      .click(() => {
-        if (typeof actionFn === 'function') {
-          const checkbox = $(type).find('.modal-checkbox');
-          const input = $(type).find('.modal-input');
-
-          let parameter;
-          if (checkbox.length) {
-            parameter = checkbox.is(':checked');
-            checkbox.prop('checked', false);
-          } else if (input.length) {
-            parameter = input.val();
-            input.val('');
-          }
-
-          actionFn(parameter);
-        }
-
-        modal.hide();
-      });
-
-    if (!modal.isShown()) {
-      this.logger.info(`Show modal of type '${type}'`);
+  confirm = () => {
+    if (this.content().currentType === ModalsViewModel.TYPE.OPTION) {
+      return this.content().actionFn(this.optionChecked());
     }
-
-    modal.setAutoclose(!preventClose);
-    modal.toggle();
-  }
-
-  _showModalAcknowledge(options, titleElement, messageElement, actionElement) {
-    const {action: actionText, htmlMessage, message: messageText, title: titleText} = options.text;
-
-    actionElement.text(actionText || t('modalAcknowledgeAction'));
-    if (htmlMessage) {
-      messageElement.html(htmlMessage);
-    } else {
-      messageElement.text(messageText || '');
+    if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
+      return this.content().actionFn(this.inputValue());
     }
-    titleElement.text(titleText || t('modalAcknowledgeHeadline'));
-  }
+  };
 
-  _showModalConfirm(options, titleElement, messageElement, actionElement) {
-    const secondaryElement = $(ModalsViewModel.TYPE.CONFIRM).find('.modal__button--cancel');
-    const {action: actionText, message: messageText, secondary, title: titleText} = options.text;
+  doAction = () => {
+    this.confirm();
+    this.hide();
+  };
 
-    const secondaryText = secondary || t('modalConfirmSecondary');
+  doSecondary = () => {
+    this.content().secondaryFn();
+    this.hide();
+  };
 
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
-    secondaryElement.text(secondaryText);
-    titleElement.text(titleText || '');
-  }
+  hide = () => {
+    this.isVisible(false);
+    this.content().closeFn();
+  };
 
-  _showModalAccountReadReceiptsChanged(newValue) {
-    const titleContainer = $(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED).find('.modal-title');
-    const title = newValue
-      ? t('modalAccountReadReceiptsChangedOnHeadline')
-      : t('modalAccountReadReceiptsChangedOffHeadline');
-
-    titleContainer.text(title);
-  }
-
-  _showModalAccountNewDevices(devices) {
-    const devicesElement = $(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES).find('.modal-new-devices-list');
-
-    devicesElement.empty();
-
-    devices.map(device => {
-      $('<div>')
-        .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
-        .appendTo(devicesElement);
-
-      $('<div>')
-        .text(`${t('modalAccountNewDevicesFrom')} ${device.model}`)
-        .appendTo(devicesElement);
-    });
-  }
-
-  _showModalOption(options, titleElement, messageElement, actionElement) {
-    const secondaryElement = $(ModalsViewModel.TYPE.OPTION).find('.modal__button--cancel');
-    const optionElement = $(ModalsViewModel.TYPE.OPTION).find('.modal-option-text');
-    const {action: actionText, message: messageText, option: optionText, secondary, title: titleText} = options.text;
-
-    const secondaryText = secondary || t('modalOptionSecondary');
-
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
-    optionElement.text(optionText || '');
-    secondaryElement.text(secondaryText);
-    titleElement.text(titleText || '');
-  }
-
-  _showModalInput(options, titleElement, messageElement, actionElement) {
-    const inputElement = $(ModalsViewModel.TYPE.INPUT).find('.modal-input');
-    const {action: actionText, input: inputText, message: messageText, title: titleText} = options.text;
-
-    actionElement.text(actionText || '');
-    messageElement.text(messageText || '');
-    inputElement.attr('placeholder', inputText || '');
-    titleElement.text(titleText || '');
-  }
-};
+  onModalHidden = () => {
+    this.content(defaultContent);
+    this.inputValue('');
+    this.optionChecked(false);
+  };
+}

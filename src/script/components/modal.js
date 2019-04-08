@@ -31,7 +31,6 @@ ko.components.register('modal', {
     this.large = large;
     this.onBgClick = onBgClick;
     this.displayNone = ko.observable(!ko.unwrap(isShown));
-
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
 
     let timeoutId = 0;

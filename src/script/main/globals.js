@@ -185,7 +185,6 @@ import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';
 import LoadingViewModelGlobal from '../view_model/LoadingViewModel.js';
 import MainViewModelGlobal from '../view_model/MainViewModel.js';
-import ModalsViewModelGlobal from '../view_model/ModalsViewModel.js';
 import ShortcutsViewModelGlobal from '../view_model/ShortcutsViewModel.js';
 import WarningsViewModelGlobal from '../view_model/WarningsViewModel.js';
 import VideoCallingViewModelGlobal from '../view_model/VideoCallingViewModel.js';

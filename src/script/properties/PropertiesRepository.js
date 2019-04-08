@@ -24,6 +24,7 @@ import ConsentValue from '../user/ConsentValue';
 import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -59,7 +60,7 @@ class PropertiesRepository {
     return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
             action: () => {
               this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
               this._publishProperties();

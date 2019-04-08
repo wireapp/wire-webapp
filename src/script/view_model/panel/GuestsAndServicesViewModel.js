@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import BasePanelViewModel from './BasePanelViewModel';
 import {copyText} from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 export default class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -87,7 +88,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
   }
 
   revokeAccessCode() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
@@ -127,7 +128,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
         return _changeAccessState();
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => _changeAccessState(),
         preventClose: true,
         text: {

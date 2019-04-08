@@ -29,6 +29,7 @@ import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
 import CALL_STATE from './enum/CallState';
 import TERMINATION_REASON from './enum/TerminationReason';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -1047,7 +1048,7 @@ export class CallingRepository {
           }
         }
 
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
@@ -1289,7 +1290,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   _showModal(title, message) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message,
         title,
