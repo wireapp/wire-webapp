@@ -24,6 +24,7 @@ import platform from 'platform';
 import * as StorageUtil from 'utils/StorageUtil';
 import {t} from 'utils/LocalizerUtil';
 import {murmurhash3} from 'utils/util';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -466,7 +467,7 @@ z.client.ClientRepository = class ClientRepository {
         );
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
         action: clearData => {
           return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
         },

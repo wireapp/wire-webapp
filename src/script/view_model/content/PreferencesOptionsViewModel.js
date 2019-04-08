@@ -30,6 +30,7 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {downloadBlob} from 'utils/util';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
@@ -100,7 +101,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       return downloadBlob(blob, filename);
     }
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: t('modalCallEmptyLogMessage'),
         title: t('modalCallEmptyLogHeadline'),

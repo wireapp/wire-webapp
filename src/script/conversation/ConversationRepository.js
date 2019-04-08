@@ -56,6 +56,7 @@ import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
 import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -1718,7 +1719,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _showModal(messageText, titleText) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: messageText,
         title: titleText,
@@ -2685,7 +2686,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
             }
 
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+            amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
               action: () => {
                 sendAnyway = true;
                 conversationEntity.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);

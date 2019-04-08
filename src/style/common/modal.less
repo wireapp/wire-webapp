@@ -194,15 +194,7 @@
   }
 }
 
-.modal-acount-new-devices {
-  .label-xs;
-
-  margin-bottom: 16px;
-  line-height: @line-height-sm;
-
-  & div:nth-child(even) {
-    margin-bottom: 16px;
-  }
+.modal-account-new-devices {
 }
 
 // mixings
@@ -264,6 +256,17 @@
 
     transform: scale(0.8);
     transition: transform 0.35s @ease-out-quart;
+
+    &__device-list {
+      .label-xs;
+
+      margin-bottom: 16px;
+      line-height: @line-height-sm;
+
+      & div:nth-child(even) {
+        margin-bottom: 16px;
+      }
+    }
 
     .modal__overlay--visible & {
       transform: scale(1);
@@ -362,6 +365,10 @@
 
   &__message {
     margin: 8px 0;
+  }
+
+  &__text {
+    margin-bottom: 16px;
   }
 
   &__input {

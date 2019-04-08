@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,7 +53,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   }
 
   clickToCreateAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => window.location.replace(`/auth/${location.search}`),
       preventClose: true,
       text: {

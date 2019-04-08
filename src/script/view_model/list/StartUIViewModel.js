@@ -24,6 +24,7 @@ import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import User from '../../entity/User';
 import {alias} from 'utils/util';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -533,7 +534,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
             text: {
               action: t('modalUploadContactsAction'),

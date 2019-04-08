@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -138,6 +139,6 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
 
   _showModal(message) {
     const modalOptions = {text: {message}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

@@ -29,6 +29,7 @@ import PropertiesRepository from '../../properties/PropertiesRepository';
 import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
 import {validateProfileImageResolution} from 'utils/util';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -203,7 +204,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   _showNotification(type, aggregatedNotifications, closeAction) {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           close: closeAction,
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
@@ -215,7 +216,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           close: closeAction,
           data: aggregatedNotifications.pop().data,
           preventClose: true,
@@ -254,7 +255,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnDeleteAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
         action: t('modalAccountDeletionAction'),
@@ -265,7 +266,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnLeaveGuestRoom() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
@@ -376,7 +377,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _showUploadWarning(title, message) {
     const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
   }
