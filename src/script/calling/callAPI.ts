@@ -75,12 +75,23 @@ class WCall {
   callType: CALL_TYPE;
   conversationType: CONVERSATION_TYPE;
   audioCbr: boolean;
+  sessionId: string;
   peerConnection: RTCPeerConnection;
+  mediaStream: MediaStream;
 
-  constructor(callType: CALL_TYPE, conversationId: string, conversationType: CONVERSATION_TYPE, audioCbr: boolean) {
+  constructor(
+    callType: CALL_TYPE,
+    conversationId: string,
+    conversationType: CONVERSATION_TYPE,
+    sessionId: string,
+    peerConnection: RTCPeerConnection,
+    audioCbr: boolean
+  ) {
     this.conversationId = conversationId;
     this.conversationType = conversationType;
     this.callType = callType;
+    this.sessionId = sessionId;
+    this.peerConnection = peerConnection;
     this.audioCbr = audioCbr;
   }
 }
@@ -133,9 +144,15 @@ export function callStart(
   if (activeCall) {
     //Do Stuff
   }
-  const wCall = new WCall(callType, conversationId, conversationType, audioCbr);
+  const wCall = new WCall(
+    callType,
+    conversationId,
+    conversationType,
+    generateSessionId(),
+    initPeerConnection(wUser, conversationId),
+    audioCbr
+  );
   wCall.state = CALL_STATE.OUTGOING;
-  wCall.peerConnection = initPeerConnection();
 
   // add the call to the state
   storeCallInstance(wUser, conversationId, wCall);
@@ -143,6 +160,7 @@ export function callStart(
   navigator.mediaDevices
     .getUserMedia({audio: true})
     .then(stream => {
+      wCall.mediaStream = stream;
       stream.getTracks().forEach(function(track) {
         wCall.peerConnection.addTrack(track, stream);
       });
@@ -160,7 +178,7 @@ export function callStart(
             });
             const message = buildMessagePayload(
               CALL_MESSAGE_TYPE.SETUP,
-              generateSessionId(),
+              wCall.sessionId,
               transformedSdp.sdp.sdp,
               false
             );
@@ -180,13 +198,34 @@ export function callStart(
   return true;
 }
 
+export function callEnd(wUser: WUser, conversationId: string): void {
+  const wCall = findCallInstance(wUser, conversationId);
+  releaseCall(wCall);
+  const message = buildMessagePayload(CALL_MESSAGE_TYPE.HANGUP, wCall.sessionId, undefined, false);
+  wUser.callbacks.sendMessage(
+    undefined,
+    conversationId,
+    wUser.userId,
+    wUser.clientId,
+    undefined,
+    undefined,
+    message,
+    0
+  );
+}
+
+function releaseCall(wCall: WCall): void {
+  wCall.peerConnection.close();
+  wCall.mediaStream.getTracks().forEach(track => track.stop());
+}
+
 export function callConfigUpdate(config: any) {
   state.callConfig = config;
 }
 
 export function callReceiveMessage(
   wUser: WUser,
-  content: any,
+  message: string,
   length: number,
   currentTime: number,
   messageTime: number,
@@ -194,9 +233,10 @@ export function callReceiveMessage(
   userId: string,
   clientId: string
 ): number {
+  const content = JSON.parse(message);
   console.log('felix received msg', content);
   switch (content.type) {
-    case 'SETUP':
+    case CALL_MESSAGE_TYPE.SETUP:
       const sessionDescription = SDPMapper.mapMessageContentToRTCSessionDescription(content);
       const transformedSdp = SDPMapper.rewriteSdp(sessionDescription, {
         isGroup: false,
@@ -208,12 +248,23 @@ export function callReceiveMessage(
         const callInstance = findCallInstance(wUser, conversationId);
         callInstance.peerConnection.setRemoteDescription(transformedSdp.sdp);
       } else {
-        const peerConnection = initPeerConnection();
+        const peerConnection = initPeerConnection(wUser, conversationId);
+        const conversationType = CONVERSATION_TYPE.ONEONONE;
+        const wCall = new WCall(
+          CALL_TYPE.FORCED_AUDIO,
+          conversationId,
+          conversationType,
+          content.sessid,
+          peerConnection,
+          false
+        );
+        storeCallInstance(wUser, conversationId, wCall);
         peerConnection.setRemoteDescription(transformedSdp.sdp);
 
         navigator.mediaDevices
           .getUserMedia({audio: true})
           .then(stream => {
+            wCall.mediaStream = stream;
             stream.getTracks().forEach(track => {
               peerConnection.addTrack(track, stream);
             });
@@ -251,20 +302,27 @@ export function callReceiveMessage(
               );
             }, 500);
           });
-        break;
       }
+      break;
+
+    case CALL_MESSAGE_TYPE.HANGUP:
+      const callInstance = findCallInstance(wUser, conversationId);
+      releaseCall(callInstance);
+      break;
   }
   return 0;
 }
 
-function initPeerConnection(): RTCPeerConnection {
+function initPeerConnection(wUser: WUser, conversationId: string): RTCPeerConnection {
   const peerConnection = new window.RTCPeerConnection(state.callConfig);
 
-  peerConnection.createDataChannel('calling-3.0', {ordered: true});
+  const datachannel = peerConnection.createDataChannel('calling-3.0', {ordered: true});
+  datachannel.onmessage = ({data}: {data: string}) => {
+    callReceiveMessage(wUser, data, data.length, Date.now(), Date.now(), conversationId, null, null);
+  };
 
   /*
   peerConnection.onaddstream = console.log.bind(console, 'felix onaddstream ');
-  peerConnection.ondatachannel = console.log.bind(console, 'felix ondatachannel ');
   peerConnection.ontrack = console.log.bind(console, 'felix ontrack');
   peerConnection.onicecandidate = console.log.bind(console, 'felix onicecandidate ');
   peerConnection.oniceconnectionstatechange = console.log.bind(console, 'felix oniceconnectionstatechange ');
