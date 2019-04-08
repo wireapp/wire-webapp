@@ -37,8 +37,6 @@ export class CallingRepository {
       DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
-      MAX_VIDEO_PARTICIPANTS: 4,
-      PROTOCOL_VERSION: '3.0',
     };
   }
 

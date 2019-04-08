@@ -22,7 +22,7 @@ import Logger from 'utils/Logger';
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
-import {CallingRepository} from '../calling/CallingRepository';
+import {Config} from '../auth/config';
 
 export default class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -701,7 +701,7 @@ export default class Conversation {
     }
 
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+    const passesParticipantLimit = participantCount <= Config.MAX_VIDEO_PARTICIPANTS;
 
     if (!passesParticipantLimit) {
       return false;
