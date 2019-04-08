@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.3.1...@wireapp/react-ui-kit@5.3.2) (2019-04-08)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Link style in ErrorMessage component ([#1739](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1739)) ([431eb8a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/431eb8a))
+
+
+
+
+
 ## [5.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.3.0...@wireapp/react-ui-kit@5.3.1) (2019-04-05)
 
 
