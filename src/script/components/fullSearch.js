@@ -127,7 +127,7 @@ z.components.FullSearch = class FullSearch {
   }
 
   resultTimestamp(messageEntity) {
-    return moment(messageEntity.timestamp()).format('MMMM D, YYYY');
+    return moment(messageEntity.timestamp()).format('LL');
   }
 
   clickOnDismiss() {

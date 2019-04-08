@@ -249,7 +249,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
+        const date = moment(blob.lastModifiedDate).format('LL, LTS');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
