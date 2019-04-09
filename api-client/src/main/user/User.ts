@@ -24,6 +24,7 @@ interface User {
   accent_id?: number;
   assets: UserAsset[];
   deleted?: boolean;
+  email?: string;
   expires_at?: string;
   handle?: string;
   id: string;
