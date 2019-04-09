@@ -17,7 +17,7 @@
     "logdown": "3.2.8",
     "maxmind": "2.12.0",
     "opn": "6.0.0",
-    "pm2": "3.4.1"
+    "pm2": "3.5.0"
   },
   "devDependencies": {
     "@types/dotenv": "6.1.1",

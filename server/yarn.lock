@@ -2529,7 +2529,7 @@ npmlog@^4.0.2:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
-nssocket@0.6.0, nssocket@^0.6.0:
+nssocket@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/nssocket/-/nssocket-0.6.0.tgz#59f96f6ff321566f33c70f7dbeeecdfdc07154fa"
   integrity sha1-Wflvb/MhVm8zxw99vu7N/cBxVPo=
@@ -2863,10 +2863,10 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.4.1.tgz#4e36646946410105068ee6ef48e06adbc44b1259"
-  integrity sha512-JZCBysgw3Nq3t2M0bQev86sHlvTgzY2eY6HhQQ9AcTt2P6BDH1MtzyEuK1KaJ3Aw455VHNeTv7LvXtFqp/zXNA==
+pm2@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.5.0.tgz#56930de4c89fe66713f25cf94e374df793cfe831"
+  integrity sha512-/GlQ1cyy97Rw/4pLWXABRzyUkKSj6kmgPx6rygocfvXyLX44bv26RKy89wTOvaL51pb0JOS8v2FM6cRJf1pLrA==
   dependencies:
     "@pm2/agent" "^0.5.22"
     "@pm2/io" "^4.1.2"
@@ -2885,7 +2885,6 @@ pm2@3.4.1:
     mkdirp "0.5.1"
     moment "^2.22.2"
     needle "^2.2.1"
-    nssocket "0.6.0"
     pidusage "^2.0.14"
     pm2-axon "3.3.0"
     pm2-axon-rpc "^0.5.1"
