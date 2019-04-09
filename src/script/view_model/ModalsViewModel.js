@@ -129,6 +129,7 @@ export class ModalsViewModel {
         content.secondaryText = t('modalConfirmSecondary');
         break;
       case ModalsViewModel.TYPE.OPTION:
+      case ModalsViewModel.TYPE.INPUT:
         content.secondaryText = text.secondary || t('modalOptionSecondary');
         break;
       case ModalsViewModel.TYPE.SESSION_RESET:
