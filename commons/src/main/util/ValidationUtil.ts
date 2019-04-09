@@ -38,6 +38,5 @@ export function getNewPasswordPattern(
   minLength = DEFAULT_PASSWORD_MIN_LENGTH,
   maxLength = DEFAULT_PASSWORD_MAX_LENGTH
 ): string {
-  const specialCharacters = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-  return `(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[${specialCharacters}])[0-9a-zA-Z${specialCharacters}]{${minLength},${maxLength}}`;
+  return `(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^0-9a-zA-Z]).{${minLength},${maxLength}}`;
 }
