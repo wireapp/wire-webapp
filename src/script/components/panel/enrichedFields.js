@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {resolve, graph} from '../../config/appResolver';
+import {t} from 'utils/LocalizerUtil';
 
 ko.components.register('enriched-fields', {
   template: `
@@ -39,7 +40,7 @@ ko.components.register('enriched-fields', {
 
     ko.computed(() => {
       if (user()) {
-        const fields = user().email ? [{type: 'Email', value: user().email}] : [];
+        const fields = user().email ? [{type: t('userProfileEmail'), value: user().email}] : [];
         this.richProfileRepository
           .getUserRichProfile(ko.unwrap(user).id)
           .then(richProfile => {
