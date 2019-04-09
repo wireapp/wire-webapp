@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.6.4...@wireapp/api-client@3.7.0) (2019-04-09)
+
+
+### Features
+
+* Add email to user interface ([#1743](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1743)) ([4d7c308](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4d7c308))
+
+
+
+
+
 ## [3.6.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.6.3...@wireapp/api-client@3.6.4) (2019-04-08)
 
 **Note:** Version bump only for package @wireapp/api-client
