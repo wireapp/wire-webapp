@@ -119,6 +119,7 @@ export class ModalsViewModel {
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
           : t('modalAccountReadReceiptsChangedOffHeadline');
+        content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
         content.actionText = text.action || t('modalAcknowledgeAction');
