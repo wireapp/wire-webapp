@@ -22,6 +22,7 @@ import MessageListViewModel from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
+import {ModalsViewModel} from './ModalsViewModel';
 
 import {t} from 'utils/LocalizerUtil';
 
@@ -243,7 +244,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         });
       })
       .catch(() => {
-        this.mainViewModel.modals.showModal('.modal-template-acknowledge', {
+        this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('conversationNotFoundMessage'),
             title: t('conversationNotFoundTitle'),
