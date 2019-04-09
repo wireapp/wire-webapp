@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.6.0...@wireapp/commons@1.6.1) (2019-04-09)
+
+
+### Bug Fixes
+
+* **commons:** Remove duplicated testcases ([d5ec02d](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/d5ec02d))
+
+
+
+
+
 # [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.5.1...@wireapp/commons@1.6.0) (2019-04-09)
 
 
