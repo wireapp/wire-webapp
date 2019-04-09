@@ -55,3 +55,22 @@ describe('isValidEmail', () => {
     expect(ValidationUtil.isValidEmail('@example.com')).toBe(false);
   });
 });
+
+describe('getNewPasswordPattern', () => {
+  it('recognizes valid passwords', () => {
+    const customPasswordLength = 4;
+    expect(new RegExp(ValidationUtil.getNewPasswordPattern(customPasswordLength)).test('aA1_')).toBe(true);
+    expect(new RegExp(ValidationUtil.getNewPasswordPattern()).test('aAAAAA1_')).toBe(true);
+  });
+
+  it('recognizes invalid passwords', () => {
+    const customPasswordLength = 5;
+    const passwordPattern = new RegExp(ValidationUtil.getNewPasswordPattern());
+    expect(new RegExp(ValidationUtil.getNewPasswordPattern(customPasswordLength)).test('aA1_')).toBe(false);
+    expect(passwordPattern.test('aA1_')).toBe(false);
+    expect(passwordPattern.test('AAAAAA1_')).toBe(false);
+    expect(passwordPattern.test('aaaaaa1_')).toBe(false);
+    expect(passwordPattern.test('aaaaaaA1')).toBe(false);
+    expect(passwordPattern.test('aaaaa A1_')).toBe(false);
+  });
+});

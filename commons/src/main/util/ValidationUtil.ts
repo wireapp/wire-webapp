@@ -30,3 +30,14 @@ export function isValidEmail(email: string): boolean {
   const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 }
+
+export const DEFAULT_PASSWORD_MIN_LENGTH = 8;
+export const DEFAULT_PASSWORD_MAX_LENGTH = 1024;
+
+export function getNewPasswordPattern(
+  minLength = DEFAULT_PASSWORD_MIN_LENGTH,
+  maxLength = DEFAULT_PASSWORD_MAX_LENGTH
+): string {
+  const specialCharacters = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+  return `(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[${specialCharacters}])[0-9a-zA-Z${specialCharacters}]{${minLength},${maxLength}}`;
+}
