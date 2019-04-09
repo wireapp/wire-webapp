@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.5.1...@wireapp/commons@1.6.0) (2019-04-09)
+
+
+### Features
+
+* **commons:** Pattern calculation when setting new passwords ([#1738](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1738)) ([4f6a5bc](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/4f6a5bc))
+
+
+
+
+
 ## [1.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.5.0...@wireapp/commons@1.5.1) (2019-04-08)
 
 **Note:** Version bump only for package @wireapp/commons
