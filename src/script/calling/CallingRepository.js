@@ -39,13 +39,14 @@ import {
   callEnd,
   callConfigUpdate,
   callReceiveMessage,
+  setCallStateHandler,
   CALL_TYPE,
+  CALL_STATE,
   CONVERSATION_TYPE,
 } from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {PROPERTY_STATE} from './enum/PropertyState';
-import {CALL_STATE} from './enum/CallState';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -120,6 +121,36 @@ export class CallingRepository {
             return 0;
           },
         });
+      }
+    });
+
+    this.activeCalls = ko.observableArray();
+    setCallStateHandler((conversationId, state) => {
+      const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
+        conversationId,
+        startedAt: ko.observable(),
+        state: ko.observable(state),
+      };
+      const storedCallIndex = this.activeCalls().indexOf(call);
+
+      call.state(state);
+
+      switch (state) {
+        case CALL_STATE.TERM_REMOTE:
+        case CALL_STATE.TERM_LOCAL:
+        case CALL_STATE.NONE:
+          if (storedCallIndex > -1) {
+            this.activeCalls.splice(storedCallIndex, 1);
+          }
+          return;
+
+        case CALL_STATE.MEDIA_ESTAB:
+          call.startedAt(Date.now());
+          break;
+      }
+
+      if (storedCallIndex === -1) {
+        this.activeCalls.push(call);
       }
     });
 
@@ -1111,7 +1142,7 @@ export class CallingRepository {
             break;
           }
 
-          case CALL_STATE.OUTGOING: {
+          case CALL_STATE.ANSWER: {
             actionString = t('modalCallSecondOutgoingAction');
             messageString = t('modalCallSecondOutgoingMessage');
             titleString = t('modalCallSecondOutgoingHeadline');

@@ -120,10 +120,12 @@ interface ActiveCalls {
 interface CallState {
   callConfig: any;
   activeCalls: ActiveCalls;
+  callStateHandler: (conversationId: string, state: CALL_STATE) => void;
 }
 const state: CallState = {
   callConfig: {},
   activeCalls: {},
+  callStateHandler: () => {},
 };
 
 export function callCreate(userId: string, clientId: string, callbacks: WCallCallbacks): WUser {
@@ -166,6 +168,7 @@ export function callStart(
       });
     })
     .then(() => {
+      state.callStateHandler(conversationId, CALL_STATE.OUTGOING);
       wCall.peerConnection
         .createOffer({iceRestart: false, voiceActivityDetection: true})
         .then((sessionDescription: RTCSessionDescription) => {
@@ -198,10 +201,17 @@ export function callStart(
   return true;
 }
 
+export function setCallStateHandler(callStateHandler: (conversationId: string, state: CALL_STATE) => void): void {
+  state.callStateHandler = callStateHandler;
+}
+
 export function callEnd(wUser: WUser, conversationId: string): void {
   const wCall = findCallInstance(wUser, conversationId);
   releaseCall(wCall);
+  // TODO if connected => HANGUP on datachannel
+  // is !connected => OTR CANCEL message
   const message = buildMessagePayload(CALL_MESSAGE_TYPE.HANGUP, wCall.sessionId, undefined, false);
+  state.callStateHandler(conversationId, CALL_STATE.TERM_LOCAL);
   wUser.callbacks.sendMessage(
     undefined,
     conversationId,
@@ -247,6 +257,7 @@ export function callReceiveMessage(
       if (content.resp) {
         const callInstance = findCallInstance(wUser, conversationId);
         callInstance.peerConnection.setRemoteDescription(transformedSdp.sdp);
+        state.callStateHandler(conversationId, CALL_STATE.ANSWERED);
       } else {
         const peerConnection = initPeerConnection(wUser, conversationId);
         const conversationType = CONVERSATION_TYPE.ONEONONE;
@@ -305,9 +316,11 @@ export function callReceiveMessage(
       }
       break;
 
+    case CALL_MESSAGE_TYPE.CANCEL:
     case CALL_MESSAGE_TYPE.HANGUP:
       const callInstance = findCallInstance(wUser, conversationId);
       releaseCall(callInstance);
+      state.callStateHandler(conversationId, CALL_STATE.TERM_REMOTE);
       break;
   }
   return 0;
@@ -320,10 +333,11 @@ function initPeerConnection(wUser: WUser, conversationId: string): RTCPeerConnec
   datachannel.onmessage = ({data}: {data: string}) => {
     callReceiveMessage(wUser, data, data.length, Date.now(), Date.now(), conversationId, null, null);
   };
-
+  peerConnection.ontrack = () => {
+    state.callStateHandler(conversationId, CALL_STATE.MEDIA_ESTAB);
+  };
   /*
   peerConnection.onaddstream = console.log.bind(console, 'felix onaddstream ');
-  peerConnection.ontrack = console.log.bind(console, 'felix ontrack');
   peerConnection.onicecandidate = console.log.bind(console, 'felix onicecandidate ');
   peerConnection.oniceconnectionstatechange = console.log.bind(console, 'felix oniceconnectionstatechange ');
   peerConnection.onremovestream = console.log.bind(console, 'felix onremovestream ');

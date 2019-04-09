@@ -62,6 +62,8 @@ export class ConversationListViewModel {
     this.setShowCallsState(repositories.event.notificationHandlingState());
     repositories.event.notificationHandlingState.subscribe(this.setShowCallsState.bind(this));
 
+    this.activeCalls = this.callingRepository.activeCalls;
+
     this.contentState = this.contentViewModel.state;
     this.selectedConversation = ko.observable();
 
@@ -141,6 +143,14 @@ export class ConversationListViewModel {
 
   getConversationUrl(conversationEntity) {
     return `/conversation/${conversationEntity.id}`;
+  }
+
+  getConversationById(conversationId) {
+    const conversationObs = ko.observable();
+    this.conversationRepository
+      .get_conversation_by_id(conversationId)
+      .then(conversationEntity => conversationObs(conversationEntity));
+    return conversationObs;
   }
 
   setShowCallsState(handlingNotifications) {
