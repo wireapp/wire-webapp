@@ -119,6 +119,7 @@ export class ModalsViewModel {
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
           : t('modalAccountReadReceiptsChangedOffHeadline');
+        content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
         content.actionText = text.action || t('modalAcknowledgeAction');
@@ -128,8 +129,8 @@ export class ModalsViewModel {
       case ModalsViewModel.TYPE.CONFIRM:
         content.secondaryText = t('modalConfirmSecondary');
         break;
-      case ModalsViewModel.TYPE.OPTION:
       case ModalsViewModel.TYPE.INPUT:
+      case ModalsViewModel.TYPE.OPTION:
         content.secondaryText = text.secondary || t('modalOptionSecondary');
         break;
       case ModalsViewModel.TYPE.SESSION_RESET:
