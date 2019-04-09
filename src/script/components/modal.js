@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 ko.components.register('modal', {
   template: `
-    <div class="modal__overlay" data-bind="click: onBgClick, css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
+    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
       <div class="modal__content" data-bind="click: () => true, clickBubble: false, css: {'modal__content--large': large}, fadingscrollbar" >
         <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
       </div>
