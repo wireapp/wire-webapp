@@ -3,7 +3,9 @@
     params="isShown: isVisible, onBgClick: hide, onClosed: onClosed"
     data-bind="attr: {'data-uie-name': user() ? 'modal-user-profile' : userNotFound() ? 'modal-cannot-open-profile' : ''}"
   >
-    <close-icon class="modal__close" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+    <div class="modal__header">
+      <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+    </div>
     <div class="user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
       <!-- ko if: user() -->
         <panel-user-details params="participant: user"></panel-user-details>
