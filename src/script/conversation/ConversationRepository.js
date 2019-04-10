@@ -1032,6 +1032,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversationEntity;
       })
       .then(conversationEntity => {
+        if (!conversationEntity) {
+          return;
+        }
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
