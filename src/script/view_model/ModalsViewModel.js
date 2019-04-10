@@ -26,6 +26,7 @@ const noop = () => {};
 const defaultContent = {
   actionFn: noop,
   actionText: '',
+  afterCloseFn: noop,
   checkboxLabel: '',
   closeFn: noop,
   currentType: null,
@@ -82,10 +83,19 @@ export class ModalsViewModel {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    const {text = {}, preventClose = false, close = noop, action = noop, secondary = noop, data} = options;
+    const {
+      action = noop,
+      afterClose = noop,
+      close = noop,
+      data,
+      preventClose = false,
+      secondary = noop,
+      text = {},
+    } = options;
     const content = {
       actionFn: action,
       actionText: text.action,
+      afterCloseFn: afterClose,
       checkboxLabel: text.option,
       closeFn: close,
       currentType: type,
@@ -176,8 +186,10 @@ export class ModalsViewModel {
   };
 
   onModalHidden = () => {
+    const afterCloseFn = this.content().afterCloseFn;
     this.content(defaultContent);
     this.inputValue('');
     this.optionChecked(false);
+    afterCloseFn();
   };
 }
