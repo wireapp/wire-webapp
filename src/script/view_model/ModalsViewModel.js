@@ -84,13 +84,13 @@ export class ModalsViewModel {
     }
 
     const {
-      text = {},
-      preventClose = false,
-      close = noop,
-      afterClose = noop,
       action = noop,
-      secondary = noop,
+      afterClose = noop,
+      close = noop,
       data,
+      preventClose = false,
+      secondary = noop,
+      text = {},
     } = options;
     const content = {
       actionFn: action,
