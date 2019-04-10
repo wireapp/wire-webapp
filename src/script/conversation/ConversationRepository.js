@@ -167,7 +167,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.self_conversation = ko.pureComputed(() => {
       if (this.selfUser()) {
-        return this._find_conversation_by_id(this.selfUser().id);
+        return this.find_conversation_by_id(this.selfUser().id);
       }
     });
 
@@ -291,20 +291,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}) {
-    this.find_conversation_by_id(updatedEvent.conversation).then(conversationEntity => {
-      const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
-      if (replacedMessageEntity) {
-        this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
-          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
-        });
-      }
-    });
+    const conversationEntity = this.find_conversation_by_id(updatedEvent.conversation);
+    const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
+    if (replacedMessageEntity) {
+      this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+      });
+    }
   }
 
   _deleteLocalMessageEntity({oldObj: deletedEvent}) {
-    return this.find_conversation_by_id(deletedEvent.conversation).then(conversationEntity => {
+    const conversationEntity = this.find_conversation_by_id(deletedEvent.conversation);
+    if (conversationEntity) {
       conversationEntity.remove_message_by_id(deletedEvent.id);
-    });
+    }
   }
 
   /**
@@ -787,29 +787,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Find a local conversation by ID.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the conversation entity
-   */
-  find_conversation_by_id(conversation_id) {
-    return Promise.resolve().then(() => {
-      if (!conversation_id) {
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID);
-      }
-
-      const conversation_et = this._find_conversation_by_id(conversation_id);
-      if (conversation_et) {
-        return conversation_et;
-      }
-
-      throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
-    });
-  }
-
-  /**
-   * Check for conversation locally.
-   * @param {string} conversation_id - ID of conversation to get
    * @returns {Conversation} Conversation is locally available
    */
-  _find_conversation_by_id(conversation_id) {
+  find_conversation_by_id(conversation_id) {
     return this.conversations().find(conversation => conversation.id === conversation_id);
   }
 
@@ -828,24 +808,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!_.isString(conversation_id)) {
       return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID));
     }
+    const conversationEntity = this.find_conversation_by_id(conversation_id);
+    if (conversationEntity) {
+      return Promise.resolve(conversationEntity);
+    }
+    return this.fetch_conversation_by_id(conversation_id).catch(error => {
+      const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (!isConversationNotFound) {
+        this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
+      }
 
-    return this.find_conversation_by_id(conversation_id)
-      .catch(error => {
-        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (isConversationNotFound) {
-          return this.fetch_conversation_by_id(conversation_id);
-        }
-
-        throw error;
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
-        }
-
-        throw error;
-      });
+      throw error;
+    });
   }
 
   /**
@@ -927,7 +901,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   get_most_active_conversations() {
     return this.conversation_service.get_active_conversations_from_db().then(conversation_ids => {
       return conversation_ids
-        .map(conversation_id => this._find_conversation_by_id(conversation_id))
+        .map(conversation_id => this.find_conversation_by_id(conversation_id))
         .filter(conversation_et => conversation_et);
     });
   }
@@ -1048,27 +1022,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when connection was mapped return value
    */
   map_connection(connectionEntity, show_conversation = false) {
-    return this.find_conversation_by_id(connectionEntity.conversationId)
-      .catch(error => {
-        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
+    return Promise.resolve(this.find_conversation_by_id(connectionEntity.conversationId))
+      .then(conversationEntity => {
+        if (!conversationEntity) {
+          if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+            return this.fetch_conversation_by_id(connectionEntity.conversationId);
+          }
         }
-
-        if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-          return this.fetch_conversation_by_id(connectionEntity.conversationId);
-        }
-
-        throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+        return conversationEntity;
       })
-      .then(conversation_et => {
-        conversation_et.connection(connectionEntity);
+      .then(conversationEntity => {
+        conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+          conversationEntity.type(z.conversation.ConversationType.ONE2ONE);
         }
 
-        this.updateParticipatingUserEntities(conversation_et).then(updated_conversation_et => {
+        this.updateParticipatingUserEntities(conversationEntity).then(updated_conversation_et => {
           if (show_conversation) {
             amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
           }
@@ -1076,7 +1046,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           this.conversations.notifySubscribers();
         });
 
-        return conversation_et;
+        return conversationEntity;
       })
       .catch(error => {
         const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -1170,15 +1140,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was saved
    */
   save_conversation(conversation_et) {
-    return this.find_conversation_by_id(conversation_et.id).catch(error => {
-      const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (isConversationNotFound) {
-        this.conversations.push(conversation_et);
-        return this.save_conversation_state_in_db(conversation_et);
-      }
-
-      throw error;
-    });
+    const conversationEntity = this.find_conversation_by_id(conversation_et.id);
+    if (!conversationEntity) {
+      this.conversations.push(conversation_et);
+      return this.save_conversation_state_in_db(conversation_et);
+    }
+    return Promise.resolve(conversationEntity);
   }
 
   /**
@@ -3234,19 +3201,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
 
-    return this.find_conversation_by_id(conversationId)
+    return Promise.resolve(this.find_conversation_by_id(conversationId))
       .then(conversationEntity => {
         if (conversationEntity) {
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
         }
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (isConversationNotFound) {
-          return this.mapConversations(eventData, initialTimestamp);
-        }
-
-        throw error;
+        return this.mapConversations(eventData, initialTimestamp);
       })
       .then(conversationEntity => this.updateParticipatingUserEntities(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
