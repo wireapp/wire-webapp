@@ -387,6 +387,7 @@ class Login extends React.Component<CombinedProps, State> {
                           <Loading size={32} />
                         ) : (
                           <RoundIconButton
+                            style={{marginLeft: 16}}
                             tabIndex={4}
                             disabled={!email || !password}
                             type="submit"
