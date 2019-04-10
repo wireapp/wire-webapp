@@ -55,15 +55,6 @@ const RedirectRoutes = (config: ServerConfig) => [
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     return res.json(parseResult);
   }),
-  router.get('/test/:error/?', (req, res) => {
-    try {
-      const errorCode = parseInt(req.params.error, 10);
-      return res.sendStatus(errorCode);
-    } catch (error) {
-      console.log(error);
-      return res.sendStatus(500);
-    }
-  }),
   router.get('/commit/?', (req, res) => {
     return res.send(config.COMMIT);
   }),
