@@ -47,6 +47,7 @@ describe('message', () => {
         conversation: () => new Conversation(),
         conversationRepository: conversationRepository,
         isLastDeliveredMessage: () => false,
+        isMarked: () => false,
         isSelfTemporaryGuest: false,
         message,
         onClickAvatar: () => {},
@@ -58,6 +59,7 @@ describe('message', () => {
         onClickReceipts: () => {},
         onClickTimestamp: () => {},
         onLike: () => {},
+        onMessageMarked: () => {},
         selfId: () => UUID.genV4().hexString,
         shouldShowAvatar: true,
         shouldShowInvitePeople: true,
@@ -92,5 +94,18 @@ describe('message', () => {
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(domContainer.querySelector('link-preview-asset')).not.toBe(null);
     });
+  });
+
+  it('warns the parent when the message is rendered as marked', done => {
+    spyOn(defaultParams, 'onMessageMarked');
+    const params = Object.assign({}, defaultParams, {isMarked: () => true});
+    return instantiateComponent('message', params)
+      .then(() => {
+        setTimeout(() => {
+          expect(defaultParams.onMessageMarked).toHaveBeenCalled();
+          done();
+        }, 1);
+      })
+      .catch(done.fail);
   });
 });
