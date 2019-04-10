@@ -204,7 +204,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          close: closeAction,
+          afterClose: closeAction,
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
@@ -216,7 +216,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          close: closeAction,
+          afterClose: closeAction,
           data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
