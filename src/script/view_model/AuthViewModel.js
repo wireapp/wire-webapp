@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 
 import Cookies from 'js-cookie';
 import moment from 'moment';
+import {ValidationUtil} from '@wireapp/commons';
 
 import App from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
@@ -665,7 +666,7 @@ class AuthViewModel {
 
   clear_error_password(view_model, input_event) {
     this.failed_validation_password(false);
-    if (!input_event.currentTarget.value.length || input_event.currentTarget.value.length >= 8) {
+    if (this._validatePassword(input_event.currentTarget.value)) {
       this._remove_error(input_event.currentTarget.classList[1]);
     }
   }
@@ -1409,7 +1410,14 @@ class AuthViewModel {
 
     const password_modes = [z.auth.AuthView.MODE.VERIFY_ACCOUNT, z.auth.AuthView.MODE.VERIFY_PASSWORD];
     if (password_modes.includes(mode)) {
-      this._validate_password(mode);
+      const isValidPassword = this._validatePassword(this.password());
+      if (!isValidPassword) {
+        const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
+        const errorMessage = isPasswordVerification
+          ? t('authErrorPasswordWrong', {minLength: ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH})
+          : t('authErrorPasswordShort');
+        this._add_error(errorMessage, z.auth.AuthView.TYPE.PASSWORD);
+      }
     }
 
     const phone_modes = [z.auth.AuthView.MODE.ACCOUNT_LOGIN, z.auth.AuthView.MODE.VERIFY_PASSWORD];
@@ -1424,15 +1432,11 @@ class AuthViewModel {
    * Validate password input.
    *
    * @private
-   * @param {z.auth.AuthView.MODE} mode - View state of the authentication page
+   * @param {string} password - Password to validate
    * @returns {undefined} No return value
    */
-  _validate_password(mode) {
-    if (this.password().length < z.config.MINIMUM_PASSWORD_LENGTH) {
-      const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
-      const errorMessage = isPasswordVerification ? t('authErrorPasswordWrong') : t('authErrorPasswordShort');
-      this._add_error(errorMessage, z.auth.AuthView.TYPE.PASSWORD);
-    }
+  _validatePassword(password) {
+    return new RegExp(ValidationUtil.getNewPasswordPattern()).test(password);
   }
 
   /**

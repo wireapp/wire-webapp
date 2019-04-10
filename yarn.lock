@@ -1432,10 +1432,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.127.tgz#dec0c1f29ff6ff6626fbce6e36e650d40b0b5d01"
   integrity sha512-7rQQ7kvNYZs4+8enaiyxeI6K/cMBQFUX2Hxx3MePxdZcSx/3XdUKrGAUab5d7yO0OlVNPcV0gTRA/4ugGNoAaQ==
 
-"@wireapp/commons@1.4.10":
-  version "1.4.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.4.10.tgz#43c111a85d7c04f55502374ad2da8f531e1439c0"
-  integrity sha512-ypXo4f6zHAMzGo/42KBHDG3P5YAKxVSNuVUfWx6Kj8axRUWClEPuf6LuDQXkyiZ7xu05Kh/8GtSnEvr5mJCtBA==
+"@wireapp/commons@1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.6.1.tgz#966fec9f7755a3daf976c2eec8049562533e327c"
+  integrity sha512-Y9hu2dhH6mYqq7ALdnL09+AyRtjcky4Ng1aD7EQUQldvMmir9GwKKIySQ2hJuJS3PXyf3VdruP2CsnAwWWMvLQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/node" "11.13.0"
@@ -12553,7 +12553,6 @@ wide-align@^1.1.0:
 
 "wire-web-config-default-staging@https://github.com/wireapp/wire-web-config-default#v0.17.9":
   version "0.17.9"
-  uid "970acc9607c15c01ce14307628ce297cd00e4605"
   resolved "https://github.com/wireapp/wire-web-config-default#970acc9607c15c01ce14307628ce297cd00e4605"
   dependencies:
     adm-zip "0.4.13"
