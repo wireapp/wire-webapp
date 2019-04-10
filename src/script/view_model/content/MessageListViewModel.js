@@ -443,27 +443,29 @@ class MessageListViewModel {
       });
   }
 
-  get_timestamp_class(message_et) {
-    const lastReadMessage = this.conversation().get_previous_message(message_et);
-    if (lastReadMessage) {
-      if (message_et.is_call()) {
-        return '';
-      }
+  get_timestamp_class(messageEntity) {
+    const previousMessage = this.conversation().get_previous_message(messageEntity);
+    if (!previousMessage || messageEntity.is_call()) {
+      return '';
+    }
 
-      if (lastReadMessage.timestamp() === this.conversation_last_read_timestamp) {
-        return 'message-timestamp-visible message-timestamp-unread';
-      }
+    const isFirstUnread =
+      previousMessage.timestamp() <= this.conversation_last_read_timestamp &&
+      messageEntity.timestamp() > this.conversation_last_read_timestamp;
 
-      const last = moment(lastReadMessage.timestamp());
-      const current = moment(message_et.timestamp());
+    if (isFirstUnread) {
+      return 'message-timestamp-visible message-timestamp-unread';
+    }
 
-      if (!last.isSame(current, 'day')) {
-        return 'message-timestamp-visible message-timestamp-day';
-      }
+    const last = moment(previousMessage.timestamp());
+    const current = moment(messageEntity.timestamp());
 
-      if (current.diff(last, 'minutes') > 60) {
-        return 'message-timestamp-visible';
-      }
+    if (!last.isSame(current, 'day')) {
+      return 'message-timestamp-visible message-timestamp-day';
+    }
+
+    if (current.diff(last, 'minutes') > 60) {
+      return 'message-timestamp-visible';
     }
   }
 
