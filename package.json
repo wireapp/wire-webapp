@@ -5,7 +5,7 @@
     "bazinga64": "5.3.56",
     "color": "3.1.0",
     "emotion-normalize": "10.0.0",
-    "react-transition-group": "2.8.0"
+    "react-transition-group": "2.9.0"
   },
   "devDependencies": {
     "@babel/cli": "7.4.3",
