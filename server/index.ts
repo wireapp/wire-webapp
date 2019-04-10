@@ -36,6 +36,6 @@ server
 process.on('uncaughtException', error =>
   console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error)
 );
-process.on('unhandledRejection', error =>
-  console.error(`[${formatDate()}] Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
+process.on('unhandledRejection', (reason, promise) =>
+  console.error(`[${formatDate()}] Uncaught rejection at:`, promise, 'reason:', reason)
 );
