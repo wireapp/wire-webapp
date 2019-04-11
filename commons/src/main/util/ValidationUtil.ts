@@ -32,7 +32,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 export const DEFAULT_PASSWORD_MIN_LENGTH = 8;
-export const DEFAULT_PASSWORD_MAX_LENGTH = 1024;
+export const DEFAULT_PASSWORD_MAX_LENGTH = 120;
 
 export function getNewPasswordPattern(
   minLength = DEFAULT_PASSWORD_MIN_LENGTH,
