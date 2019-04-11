@@ -17,16 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.user = z.user || {};
-
 /**
  * Enum for different user availability types.
- * @type {z.user.AvailabilityType} Enum of availability types
+ * @type {AvailabilityType} Enum of availability types
  */
-z.user.AvailabilityType = {
-  AVAILABLE: 1,
-  AWAY: 2,
-  BUSY: 3,
-  NONE: 0,
-};
+export enum AvailabilityType {
+  AVAILABLE = 1,
+  AWAY = 2,
+  BUSY = 3,
+  NONE = 0,
+}

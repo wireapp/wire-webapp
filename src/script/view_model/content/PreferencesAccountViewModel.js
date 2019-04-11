@@ -25,6 +25,7 @@ import {t} from 'utils/LocalizerUtil';
 import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
+import {AvailabilityType} from '../../user/AvailabilityType';
 
 import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
@@ -75,7 +76,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availabilityLabel = ko.pureComputed(() => {
       let label = z.user.AvailabilityMapper.nameFromType(this.availability());
 
-      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {
         label = t('preferencesAccountAvaibilityUnset');
       }

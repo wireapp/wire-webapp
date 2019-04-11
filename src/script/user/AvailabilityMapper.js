@@ -18,6 +18,7 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
+import {AvailabilityType} from './AvailabilityType';
 
 import {t} from 'utils/LocalizerUtil';
 
@@ -34,10 +35,10 @@ z.user.AvailabilityMapper = (() => {
 
   const valueFromType = availabilityType => {
     const TYPE_VALUES = {
-      [z.user.AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
-      [z.user.AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
-      [z.user.AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
-      [z.user.AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
+      [AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+      [AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
+      [AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
+      [AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
     };
 
     const value = TYPE_VALUES[availabilityType];
@@ -50,10 +51,10 @@ z.user.AvailabilityMapper = (() => {
   return {
     nameFromType: availabilityType => {
       const TYPE_STRINGS = {
-        [z.user.AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
-        [z.user.AvailabilityType.AWAY]: t('userAvailabilityAway'),
-        [z.user.AvailabilityType.BUSY]: t('userAvailabilityBusy'),
-        [z.user.AvailabilityType.NONE]: t('userAvailabilityNone'),
+        [AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
+        [AvailabilityType.AWAY]: t('userAvailabilityAway'),
+        [AvailabilityType.BUSY]: t('userAvailabilityBusy'),
+        [AvailabilityType.NONE]: t('userAvailabilityNone'),
       };
 
       const string = TYPE_STRINGS[availabilityType];
