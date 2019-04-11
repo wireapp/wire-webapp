@@ -17,6 +17,7 @@
  *
  */
 
+import {AvailabilityType} from '../user/AvailabilityType';
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -26,18 +27,19 @@ z.components.AvailabilityState = class AvailabilityState {
     this.label = params.label;
     this.showArrow = params.showArrow || false;
     this.theme = params.theme || false;
+    this.AvailabilityType = AvailabilityType;
   }
 };
 
 ko.components.register('availability-state', {
   template: `
-      <!-- ko if: $data.availability() === z.user.AvailabilityType.AVAILABLE -->
+      <!-- ko if: $data.availability() === AvailabilityType.AVAILABLE -->
         <availability-available-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="available"></availability-available-icon>
       <!-- /ko -->
-      <!-- ko if: $data.availability() === z.user.AvailabilityType.AWAY -->
+      <!-- ko if: $data.availability() === AvailabilityType.AWAY -->
         <availability-away-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="away"></availability-away-icon>
       <!-- /ko -->
-      <!-- ko if: $data.availability() === z.user.AvailabilityType.BUSY -->
+      <!-- ko if: $data.availability() === AvailabilityType.BUSY -->
         <availability-busy-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="busy"></availability-busy-icon>
       <!-- /ko -->
       <!-- ko if: $data.label -->

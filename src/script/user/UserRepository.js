@@ -341,7 +341,7 @@ export default class UserRepository {
   /**
    * Track availability action.
    *
-   * @param {z.user.AvailabilityType} availability - Type of availability
+   * @param {AvailabilityType} availability - Type of availability
    * @param {string} method - Method used for availability change
    * @returns {undefined} No return value
    */
