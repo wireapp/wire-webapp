@@ -19,6 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {ValidationUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -377,9 +378,7 @@ class Login extends React.Component<CombinedProps, State> {
                           autoComplete="section-login password"
                           type="password"
                           placeholder={_(loginStrings.passwordPlaceholder)}
-                          maxLength={1024}
-                          minLength={8}
-                          pattern=".{8,1024}"
+                          pattern={`.{1,${ValidationUtil.DEFAULT_PASSWORD_MAX_LENGTH}}`}
                           required
                           data-uie-name="enter-password"
                         />
