@@ -15,7 +15,7 @@
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-      <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
+      <enriched-fields params="user: selectedParticipant"></enriched-fields>
       <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     </div>
   <!-- /ko -->
