@@ -24,6 +24,7 @@ import Conversation from 'src/script/entity/Conversation';
 import MediumImage from 'src/script/entity/message/MediumImage';
 import User from 'src/script/entity/User';
 import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
+import {AvailabilityType} from 'src/script/user/AvailabilityType';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -250,6 +251,19 @@ describe('z.notification.NotificationRepository', () => {
 
     it('if the user permission was denied', () => {
       TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
+
+      return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
+    });
+
+    it('if the user has an "away" availability', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.AWAY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();

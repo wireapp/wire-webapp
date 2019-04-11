@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import {t, Declension} from 'utils/LocalizerUtil';
 import SanitizationUtil from 'utils/SanitizationUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {AvailabilityType} from '../user/AvailabilityType';
 
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
 
@@ -147,6 +148,10 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
+    const selfUser = this.selfUser();
+    if (selfUser.availability() === AvailabilityType.AWAY) {
+      return Promise.resolve();
+    }
     const notifyInConversation = conversationEntity
       ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
       : true;
@@ -429,35 +434,28 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves with the notification content
    */
   _createNotificationContent(messageEntity, connectionEntity, conversationEntity) {
-    let optionsBody = undefined;
-
-    return this._createOptionsBody(messageEntity, connectionEntity, conversationEntity)
-      .then(body => {
-        optionsBody = body;
-        if (optionsBody) {
-          return this._shouldObfuscateNotificationSender(messageEntity);
-        }
-        throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
-      })
-      .then(shouldObfuscateSender => {
-        return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
-          const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
-          return {
-            options: {
-              body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : optionsBody,
-              data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
-              icon: iconUrl,
-              silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-              tag: this._createOptionsTag(connectionEntity, conversationEntity),
-            },
-            timeout: NotificationRepository.CONFIG.TIMEOUT,
-            title: shouldObfuscateSender
-              ? this._createTitleObfuscated()
-              : this._createTitle(messageEntity, conversationEntity),
-            trigger: this._createTrigger(messageEntity, connectionEntity, conversationEntity),
-          };
-        });
-      });
+    const body = this._createOptionsBody(messageEntity, connectionEntity, conversationEntity);
+    if (!body) {
+      throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
+    }
+    const shouldObfuscateSender = this._shouldObfuscateNotificationSender(messageEntity);
+    return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
+      const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
+      return {
+        options: {
+          body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : body,
+          data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
+          icon: iconUrl,
+          silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
+          tag: this._createOptionsTag(connectionEntity, conversationEntity),
+        },
+        timeout: NotificationRepository.CONFIG.TIMEOUT,
+        title: shouldObfuscateSender
+          ? this._createTitleObfuscated()
+          : this._createTitle(messageEntity, conversationEntity),
+        trigger: this._createTrigger(messageEntity, connectionEntity, conversationEntity),
+      };
+    });
   }
 
   /**
@@ -470,22 +468,20 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves with the notification message body
    */
   _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
-    return Promise.resolve().then(() => {
-      switch (messageEntity.super_type) {
-        case z.message.SuperType.CALL:
-          return this._createBodyCall(messageEntity);
-        case z.message.SuperType.CONTENT:
-          return this._createBodyContent(messageEntity);
-        case z.message.SuperType.MEMBER:
-          return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
-        case z.message.SuperType.PING:
-          return this._createBodyPing();
-        case z.message.SuperType.REACTION:
-          return this._createBodyReaction(messageEntity);
-        case z.message.SuperType.SYSTEM:
-          return this._createBodySystem(messageEntity);
-      }
-    });
+    switch (messageEntity.super_type) {
+      case z.message.SuperType.CALL:
+        return this._createBodyCall(messageEntity);
+      case z.message.SuperType.CONTENT:
+        return this._createBodyContent(messageEntity);
+      case z.message.SuperType.MEMBER:
+        return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
+      case z.message.SuperType.PING:
+        return this._createBodyPing();
+      case z.message.SuperType.REACTION:
+        return this._createBodyReaction(messageEntity);
+      case z.message.SuperType.SYSTEM:
+        return this._createBodySystem(messageEntity);
+    }
   }
 
   /**
