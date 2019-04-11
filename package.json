@@ -7,7 +7,7 @@
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@emotion/core": "10.0.10",
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/commons": "1.6.1",
+    "@wireapp/commons": "1.6.2",
     "@wireapp/core": "8.2.2",
     "@wireapp/protocol-messaging": "1.23.0",
     "@wireapp/react-ui-kit": "5.1.4",
@@ -50,7 +50,7 @@
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
     "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.17.2",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.10"
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.17"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
