@@ -17,11 +17,13 @@
  *
  */
 
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock} from '@wireapp/react-ui-kit';
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
+import {Config} from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -259,13 +261,21 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
               autoComplete="section-create-team new-password"
               type="password"
               placeholder={_(accountFormStrings.passwordPlaceholder)}
-              maxLength={1024}
-              minLength={8}
-              pattern=".{8,1024}"
+              pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
               required
               data-uie-name="enter-password"
             />
           </InputBlock>
+          <Small
+            style={{
+              display: this.state.validationErrors.length ? 'none' : 'block',
+              marginBottom: '32px',
+              padding: '0 16px',
+            }}
+            data-uie-name="element-password-help"
+          >
+            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
+          </Small>
           <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>

@@ -102,8 +102,13 @@ export const accountFormStrings = defineMessages({
     defaultMessage: 'Name',
     id: 'accountForm.namePlaceholder',
   },
+  passwordHelp: {
+    defaultMessage:
+      'Use at least {minPasswordLength} characters, with one lowercase letter, one capital letter, a number, and a special character.',
+    id: 'accountForm.passwordHelp',
+  },
   passwordPlaceholder: {
-    defaultMessage: 'Password (at least 8 characters)',
+    defaultMessage: 'Password',
     id: 'accountForm.passwordPlaceholder',
   },
   submitButton: {
@@ -544,7 +549,8 @@ export const validationErrorStrings = defineMessages({
     id: 'ValidationError.FIELD.NAME.VALUE_MISSING',
   },
   [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {
-    defaultMessage: 'Enter a password with at least 8 characters',
+    defaultMessage:
+      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
     id: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
   },
   [ValidationError.FIELD.PASSWORD_LOGIN.PATTERN_MISMATCH]: {
