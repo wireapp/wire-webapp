@@ -378,7 +378,7 @@ class Login extends React.Component<CombinedProps, State> {
                           autoComplete="section-login password"
                           type="password"
                           placeholder={_(loginStrings.passwordPlaceholder)}
-                          pattern={`.{1,${ValidationUtil.DEFAULT_PASSWORD_MAX_LENGTH}}`}
+                          pattern={`.{1,1024}`}
                           required
                           data-uie-name="enter-password"
                         />

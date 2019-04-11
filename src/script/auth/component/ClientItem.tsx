@@ -268,7 +268,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
                         validPassword: true,
                       })
                     }
-                    pattern={`.{1,${ValidationUtil.DEFAULT_PASSWORD_MAX_LENGTH}}`}
+                    pattern={`.{1,1024}`}
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required
                     style={{background: 'transparent'}}
