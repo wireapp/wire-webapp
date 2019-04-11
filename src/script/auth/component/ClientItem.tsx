@@ -18,7 +18,6 @@
  */
 
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
-import {ValidationUtil} from '@wireapp/commons';
 import {
   COLOR,
   ContainerXS,
