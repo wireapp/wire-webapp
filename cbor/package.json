@@ -32,5 +32,5 @@
     "test:browser": "exit 0",
     "test:node": "jasmine --config=jasmine.json"
   },
-  "version": "3.0.134"
+  "version": "3.0.135"
 }

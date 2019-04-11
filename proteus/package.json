@@ -3,7 +3,7 @@
     "@types/chai": "4.1.7",
     "@types/ed2curve": "0.2.2",
     "@types/node": "11.13.2",
-    "@wireapp/cbor": "3.0.134",
+    "@wireapp/cbor": "3.0.135",
     "ed2curve": "0.2.1",
     "libsodium-wrappers-sumo": "0.7.4"
   },
@@ -35,5 +35,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "jasmine"
   },
-  "version": "8.0.50"
+  "version": "8.0.51"
 }
