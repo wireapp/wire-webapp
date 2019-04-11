@@ -260,8 +260,6 @@ class ClientItem extends React.Component<CombinedProps, State> {
                     autoFocus
                     data-uie-name="remove-device-password"
                     ref={this.passwordInput}
-                    maxLength={1024}
-                    minLength={8}
                     name="password"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       this.setState({
@@ -269,7 +267,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
                         validPassword: true,
                       })
                     }
-                    pattern=".{8,1024}"
+                    pattern={`.{1,1024}`}
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required
                     style={{background: 'transparent'}}
