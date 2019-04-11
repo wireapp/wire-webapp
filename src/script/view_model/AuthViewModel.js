@@ -24,6 +24,7 @@ import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 
 import App from '../main/app';
+import {Config} from '../auth/config';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
@@ -1414,7 +1415,7 @@ class AuthViewModel {
       if (!isValidPassword) {
         const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
         const errorMessage = isPasswordVerification
-          ? t('authErrorPasswordWrong', {minLength: ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH})
+          ? t('authErrorPasswordWrong', {minLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})
           : t('authErrorPasswordShort');
         this._add_error(errorMessage, z.auth.AuthView.TYPE.PASSWORD);
       }
@@ -1436,7 +1437,7 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validatePassword(password) {
-    return new RegExp(ValidationUtil.getNewPasswordPattern()).test(password);
+    return new RegExp(ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)).test(password);
   }
 
   /**
