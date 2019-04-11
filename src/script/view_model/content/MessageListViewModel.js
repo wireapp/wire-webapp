@@ -28,7 +28,7 @@ import Conversation from '../../entity/Conversation';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 
-/**
+/*
  * Message list rendering view model.
  *
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
@@ -61,6 +61,7 @@ class MessageListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
+    this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
     this.verticallyCenterMessage = ko.pureComputed(() => {
@@ -353,30 +354,26 @@ class MessageListViewModel {
   focusMessage(messageId) {
     const messageIsLoaded = !!this.conversation().getMessage(messageId);
     const conversationEntity = this.conversation();
+    this.focusedMessage(messageId);
 
-    const loadMessagePromise = messageIsLoaded
-      ? Promise.resolve()
-      : this.conversation_repository
-          .get_message_in_conversation_by_id(conversationEntity, messageId)
-          .then(messageEntity => {
-            conversationEntity.remove_messages();
-            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
-          });
-
-    loadMessagePromise.then(() => {
-      z.util.afterRender(() => {
-        const messagesContainer = this.getMessagesContainer();
-        const messageElement = messagesContainer.querySelector(`.message[data-uie-uid="${messageId}"]`);
-
-        if (messageElement) {
-          messageElement.classList.remove('message-marked');
-          const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
-          scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
-          messageElement.classList.add('message-marked');
-        }
-      });
-    });
+    if (!messageIsLoaded) {
+      this.conversation_repository
+        .get_message_in_conversation_by_id(conversationEntity, messageId)
+        .then(messageEntity => {
+          conversationEntity.remove_messages();
+          return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
+        });
+    }
   }
+
+  onMessageMarked = messageElement => {
+    const messagesContainer = this.getMessagesContainer();
+    messageElement.classList.remove('message-marked');
+    const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
+    scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
+    messageElement.classList.add('message-marked');
+    this.focusedMessage(null);
+  };
 
   /**
    * Triggered when user clicks on an avatar in the message list.

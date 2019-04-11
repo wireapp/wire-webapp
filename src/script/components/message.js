@@ -30,29 +30,34 @@ import './asset/locationAsset';
 import './asset/videoAsset';
 
 class Message {
-  constructor({
-    message,
-    conversation,
-    selfId,
-    isSelfTemporaryGuest,
-    isLastDeliveredMessage,
-    shouldShowAvatar,
-    shouldShowInvitePeople,
-    onContentUpdated,
-    onClickAvatar,
-    onClickImage,
-    onClickInvitePeople,
-    onClickLikes,
-    onClickMessage,
-    onClickTimestamp,
-    onClickParticipants,
-    onClickReceipts,
-    onClickResetSession,
-    onClickCancelRequest,
-    onLike,
-    conversationRepository,
-    actionsViewModel,
-  }) {
+  constructor(
+    {
+      message,
+      conversation,
+      selfId,
+      isSelfTemporaryGuest,
+      isLastDeliveredMessage,
+      isMarked,
+      shouldShowAvatar,
+      shouldShowInvitePeople,
+      onContentUpdated,
+      onClickAvatar,
+      onClickImage,
+      onClickInvitePeople,
+      onClickLikes,
+      onClickMessage,
+      onClickTimestamp,
+      onClickParticipants,
+      onClickReceipts,
+      onClickResetSession,
+      onClickCancelRequest,
+      onLike,
+      onMessageMarked,
+      conversationRepository,
+      actionsViewModel,
+    },
+    componentInfo
+  ) {
     this.message = message;
     this.conversation = conversation;
 
@@ -74,6 +79,15 @@ class Message {
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
+
+    const markedSubscription = ko.computed(() => {
+      const marked = isMarked();
+      if (marked) {
+        setTimeout(() => onMessageMarked(componentInfo.element));
+      }
+    });
+
+    this.dispose = () => markedSubscription.dispose();
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
@@ -574,5 +588,7 @@ ko.components.register('message', {
       ${pingTemplate}
     <!-- /ko -->
     `,
-  viewModel: Message,
+  viewModel: {
+    createViewModel: (params, componentInfo) => new Message(params, componentInfo),
+  },
 });
