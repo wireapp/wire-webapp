@@ -86,7 +86,7 @@ describe('when entering account data', () => {
       const prefilledAccount = {
         email: 'email@email.com',
         name: 'name',
-        password: 'password',
+        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
         termsAccepted: true,
       };
 
@@ -103,7 +103,7 @@ describe('when entering account data', () => {
 
       const prefilledAccount = {
         email: 'email@email.com',
-        password: 'password',
+        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
         termsAccepted: true,
       };
 
@@ -128,7 +128,7 @@ describe('when entering account data', () => {
 
       const prefilledAccount = {
         email: 'email@email.com',
-        password: 'password',
+        password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
         termsAccepted: true,
       };
 
