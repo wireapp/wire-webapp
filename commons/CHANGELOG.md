@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.6.2...@wireapp/commons@1.6.3) (2019-04-12)
+
+
+### Bug Fixes
+
+* **commons:** Max password length regex ([#1749](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1749)) ([b298766](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/b298766))
+
+
+
+
+
 ## [1.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.6.1...@wireapp/commons@1.6.2) (2019-04-11)
 
 
