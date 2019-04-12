@@ -39,7 +39,6 @@ import CryptographyErrorGlobal from '../error/CryptographyError.js';
 import EventErrorGlobal from '../error/EventError.js';
 import LinkPreviewErrorGlobal from '../error/LinkPreviewError.js';
 import MediaErrorGlobal from '../error/MediaError.js';
-import NotificationErrorGlobal from '../error/NotificationError.js';
 import PermissionErrorGlobal from '../error/PermissionError.js';
 import StorageErrorGlobal from '../error/StorageError.js';
 import TeamErrorGlobal from '../error/TeamError.js';

@@ -436,7 +436,7 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createNotificationContent(messageEntity, connectionEntity, conversationEntity) {
     const body = this._createOptionsBody(messageEntity, connectionEntity, conversationEntity);
     if (!body) {
-      throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
+      return Promise.resolve();
     }
     const shouldObfuscateSender = this._shouldObfuscateNotificationSender(messageEntity);
     return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
@@ -647,19 +647,18 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification was handled
    */
   _notifyBanner(messageEntity, connectionEntity, conversationEntity) {
-    return this._shouldShowNotification(messageEntity, conversationEntity)
-      .then(() => this._createNotificationContent(messageEntity, connectionEntity, conversationEntity))
-      .then(notificationContent => {
-        return this.checkPermission().then(isPermitted => {
-          return isPermitted ? this._showNotification(notificationContent) : undefined;
-        });
-      })
-      .catch(error => {
-        const hideNotification = error.type === z.error.NotificationError.TYPE.HIDE_NOTIFICATION;
-        if (!hideNotification) {
-          throw error;
+    if (!this._shouldShowNotification(messageEntity, conversationEntity)) {
+      return Promise.resolve();
+    }
+    return this._createNotificationContent(messageEntity, connectionEntity, conversationEntity).then(
+      notificationContent => {
+        if (notificationContent) {
+          return this.checkPermission().then(isPermitted => {
+            return isPermitted ? this._showNotification(notificationContent) : undefined;
+          });
         }
-      });
+      }
+    );
   }
 
   /**
@@ -753,9 +752,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
 
-    return hideNotification
-      ? Promise.reject(new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION))
-      : Promise.resolve();
+    return !hideNotification;
   }
 
   /**
