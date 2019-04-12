@@ -76,4 +76,13 @@ describe('getNewPasswordPattern', () => {
     expect(passwordPattern.test('aA!aA!aA!aA!')).toBe(false);
     expect(passwordPattern.test('aA1aA1aA1aA1')).toBe(false);
   });
+
+  it('respects min and max values', () => {
+    const minPasswordLength = 5;
+    const maxPasswordLength = 6;
+    const passwordPattern = new RegExp(ValidationUtil.getNewPasswordPattern(minPasswordLength, maxPasswordLength));
+    expect(passwordPattern.test('aA1_1')).toBe(true);
+    expect(passwordPattern.test('aA1_')).toBe(false);
+    expect(passwordPattern.test('aA1_111')).toBe(false);
+  });
 });
