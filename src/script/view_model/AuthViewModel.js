@@ -172,6 +172,7 @@ class AuthViewModel {
     this.failed_validation_password = ko.observable(false);
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
+    this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
@@ -1413,7 +1414,7 @@ class AuthViewModel {
     if (password_modes.includes(mode)) {
       const isValidPassword = this._validatePassword(this.password());
       if (!isValidPassword) {
-        this._add_error(t('authErrorPasswordWrong'), z.auth.AuthView.TYPE.PASSWORD);
+        this._add_error(t('authErrorPasswordWrong', this.minPasswordLength), z.auth.AuthView.TYPE.PASSWORD);
       }
     }
 
@@ -1433,7 +1434,7 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validatePassword(password) {
-    return new RegExp(ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)).test(password);
+    return new RegExp(ValidationUtil.getNewPasswordPattern(this.minPasswordLength)).test(password);
   }
 
   /**

@@ -86,7 +86,7 @@
                        data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, attr: {title: t('authPlaceholderPassword'), placeholder: t('authPlaceholderPassword')}, textInput: password"
                        data-uie-name="enter-password">
               </div>
-              <div class="help" data-bind="css: {'hide': failed_validation_password && validation_errors().length != 0}, text: t('authPasswordHelp')" data-uie-name='element-password-help'></div>
+              <div class="help" data-bind="css: {'hide': failed_validation_password && validation_errors().length != 0}, text: t('authPasswordHelp', minPasswordLength)" data-uie-name='element-password-help'></div>
               <ul class="error-list" data-bind="foreach: validation_errors" data-uie-name="status-error">
                 <li class="error" data-bind="text: message"></li>
               </ul>
