@@ -1,0 +1,8 @@
+{
+  "name": "@wireapp/prettier-config",
+  "version": "0.0.1",
+  "description": "Wire Prettier config",
+  "main": "index.json",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/prettier-config",
+  "license": "GPL-3.0"
+}
