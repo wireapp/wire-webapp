@@ -23,7 +23,7 @@
     "react-hot-loader": "4.8.3",
     "rimraf": "2.6.3",
     "typescript": "3.4.3",
-    "webpack": "4.29.6",
+    "webpack": "4.30.0",
     "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.3.1"
   },
