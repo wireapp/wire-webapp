@@ -26,11 +26,11 @@ Create a configuration file following the [cosmiconfig standard](https://github.
 
 Additionally, some parameters can be set via environment variables (which then take precedence above all other configuration):
 
-| Parameter       | Environment variable              | Example                                                                               |
-| --------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
-| `externalDir`   | `WIRE_CONFIGURATION_EXTERNAL_DIR` | `/home/user/externalDir`                                                              |
-| `files`         | `WIRE_CONFIGURATION_FILES`        | `/path/to/source.txt:/path/to/destination.txt;/path/to/source/:/path/to/destination/` |
-| `repositoryUrl` | `WIRE_CONFIGURATION_REPOSITORY`   | `/path/to/anotherDir/*:[/path/to/thirdDir/,/path/to/destinationDir/]`                 |
+| Parameter | Environment variable | Example |
+| --- | --- | --- |
+| `externalDir` | `WIRE_CONFIGURATION_EXTERNAL_DIR` | `/home/user/externalDir` |
+| `files` | `WIRE_CONFIGURATION_FILES` | `/path/to/source.txt:/path/to/destination.txt;/path/to/source/:/path/to/destination/` |
+| `repositoryUrl` | `WIRE_CONFIGURATION_REPOSITORY` | `/path/to/anotherDir/*:[/path/to/thirdDir/,/path/to/destinationDir/]` |
 
 ### CLI Usage
 
