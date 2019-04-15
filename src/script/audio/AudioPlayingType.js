@@ -17,28 +17,24 @@
  *
  */
 
-window.z = window.z || {};
-window.z.audio = z.audio || {};
+import {AudioType} from './AudioType';
 
-z.audio.AudioPlayingType = {
-  MUTED: [z.audio.AudioType.CALL_DROP, z.audio.AudioType.NETWORK_INTERRUPTION],
-  NONE: [
-    z.audio.AudioType.CALL_DROP,
-    z.audio.AudioType.NETWORK_INTERRUPTION,
-    z.audio.AudioType.OUTGOING_CALL,
-    z.audio.AudioType.READY_TO_TALK,
-    z.audio.AudioType.TALK_LATER,
-  ],
-  SOME: [
-    z.audio.AudioType.CALL_DROP,
-    z.audio.AudioType.INCOMING_CALL,
-    z.audio.AudioType.INCOMING_PING,
-    z.audio.AudioType.NETWORK_INTERRUPTION,
-    z.audio.AudioType.OUTGOING_CALL,
-    z.audio.AudioType.OUTGOING_PING,
-    z.audio.AudioType.READY_TO_TALK,
-    z.audio.AudioType.TALK_LATER,
-  ],
-};
+const audioPlayingType = {};
 
-export const AudioPlayingType = z.audio.AudioPlayingType;
+audioPlayingType.MUTED = [AudioType.CALL_DROP, AudioType.NETWORK_INTERRUPTION];
+
+audioPlayingType.NONE = [
+  ...audioPlayingType.MUTED,
+  AudioType.OUTGOING_CALL,
+  AudioType.READY_TO_TALK,
+  AudioType.TALK_LATER,
+];
+
+audioPlayingType.SOME = [
+  ...audioPlayingType.NONE,
+  AudioType.INCOMING_CALL,
+  AudioType.INCOMING_PING,
+  AudioType.OUTGOING_PING,
+];
+
+export const AudioPlayingType = audioPlayingType;

@@ -148,10 +148,20 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
-    const selfUser = this.selfUser();
-    if (selfUser.availability() === AvailabilityType.AWAY) {
+    const isUserAway = this.selfUser().availability() === AvailabilityType.AWAY;
+
+    if (isUserAway) {
       return Promise.resolve();
     }
+
+    const isUserBusy = this.selfUser().availability() === AvailabilityType.BUSY;
+    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
+    const isCallMessage = messageEntity.super_type === z.message.SuperType.CALL;
+
+    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage) {
+      return Promise.resolve();
+    }
+
     const notifyInConversation = conversationEntity
       ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
       : true;

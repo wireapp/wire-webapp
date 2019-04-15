@@ -44,7 +44,6 @@ import StorageErrorGlobal from '../error/StorageError.js';
 import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
 import AudioTypeGlobal from '../audio/AudioType.js';
-import AudioPlayingTypeGlobal from '../audio/AudioPlayingType.js';
 import SignOutReasonGlobal from '../auth/SignOutReason.js';
 import authUrlParamGlobal from '../auth/URLParameter.js';
 import QueueStateGlobal from '../service/QueueState.js';
