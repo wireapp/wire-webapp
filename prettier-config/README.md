@@ -6,16 +6,16 @@ You can find the published source code at [github.com/wireapp](https://github.co
 
 For licensing information, see the attached LICENSE file and the list of third-party licenses at [wire.com/legal/licenses/](https://wire.com/legal/licenses/).
 
-# prettier-config
+## @wireapp/prettier-config
 
 > Wire's [Prettier](https://prettier.io) config.
 
-## Usage
+### Usage
 
 **Install**:
 
 ```bash
-$ yarn add --dev @wireapp/prettier-config
+yarn add --dev @wireapp/prettier-config
 ```
 
 **Edit `package.json`**:

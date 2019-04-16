@@ -21,14 +21,14 @@ function numbersInArray(count) {
     .map((value, key) => ++key);
 }
 
-/** Creates a Cryptobox with an initialized store. */
+// Creates a Cryptobox with an initialized store.
 async function createCryptobox(storeName, amountOfPreKeys = 1) {
   const engine = new MemoryEngine();
   await engine.init(storeName);
   return new Cryptobox(engine, amountOfPreKeys);
 }
 
-/** Creates participants and establishes sessions between them. */
+// Creates participants and establishes sessions between them.
 async function initialSetup() {
   const alice = await createCryptobox('alice', 1);
   await alice.create();
@@ -47,7 +47,7 @@ async function initialSetup() {
   return {alice, bob};
 }
 
-/** Runs the test scenario and measures times. */
+// Runs the test scenario and measures times.
 async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   const numbers = numbersInArray(messageCount);
 

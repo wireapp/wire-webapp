@@ -32,7 +32,7 @@ module.exports = {
   },
   devtool: 'source-map',
   entry: {
-    bundle: ['react-hot-loader/patch', DEMO_DIR + '/index.jsx'],
+    bundle: ['react-hot-loader/patch', `${DEMO_DIR}/index.jsx`],
   },
   mode: 'development',
   module: {
