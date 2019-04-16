@@ -118,8 +118,7 @@ z.util.Environment = (() => {
     return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
   };
   const _supportsScreenSharing = () => {
-    const hasScreenCaptureAPI = window.desktopCapturer || navigator.mediaDevices.getDisplayMedia;
-    return hasScreenCaptureAPI || _isFirefox();
+    return window.desktopCapturer || _isFirefox();
   };
 
   // add body information
