@@ -20,7 +20,7 @@
 import Logger from 'utils/Logger';
 
 import WindowTitleViewModel from './WindowTitleViewModel';
-import {ModalsViewModel} from './ModalsViewModel';
+import {modals} from './ModalsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -70,7 +70,7 @@ export class MainViewModel {
     this.content = new z.viewModel.ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = new ModalsViewModel();
+    this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);

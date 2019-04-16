@@ -55,6 +55,7 @@ import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from '../util/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
+import {modals} from '../view_model/ModalsViewModel';
 
 class App {
   static get CONFIG() {
@@ -356,6 +357,7 @@ class App {
         loadingView.removeFromView();
         telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        modals.ready();
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
