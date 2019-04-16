@@ -121,7 +121,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
     const {language} = this.props;
     return (
       <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
-        <StyledApp style={{display: 'flex', height: '100vh'}}>
+        <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
           <Router hashType="noslash">
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
