@@ -48,13 +48,13 @@
   },
   "plugins": ["jasmine"],
   "rules": {
-    "id-length": 0,
-    "jasmine/no-expect-in-setup-teardown": 0,
-    "jasmine/no-spec-dupes": 0,
-    "jasmine/no-suite-dupes": 0,
-    "jasmine/prefer-toHaveBeenCalledWith": 0,
-    "jsdoc/require-hyphen-before-param-description": 2,
-    "no-magic-numbers": 0,
-    "sort-imports": 0
+    "id-length": "off",
+    "jasmine/no-expect-in-setup-teardown": "off",
+    "jasmine/no-spec-dupes": "off",
+    "jasmine/no-suite-dupes": "off",
+    "jasmine/prefer-toHaveBeenCalledWith": "off",
+    "jsdoc/require-hyphen-before-param-description": "error",
+    "no-magic-numbers": "off",
+    "sort-imports": "off"
   }
 }
