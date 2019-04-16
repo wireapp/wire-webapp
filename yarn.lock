@@ -1536,14 +1536,14 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.3.4":
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.3.4.tgz#463b547642c007de8ead6bb74d8c7f29eee5de10"
-  integrity sha512-e/OtKDvqI/a2LsIZ10hJwaVkhFITs19FTD7SrIkFBDMBEDKAbxAVONMhIp/qQS5iKkcu/8djkIsHA5bst72yQA==
+"@wireapp/react-ui-kit@5.3.5":
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.3.5.tgz#a703c51f51c0ad8939d9016cb8d7d3123ae80c60"
+  integrity sha512-CUtS44Fc8skF86uYGRCyBNqFKhAS/recFJFdFzGftasuMhYMoKHNt4TKkJ5c1g7Of4fts5uBerJ9mu6HlSBKEA==
   dependencies:
     "@emotion/core" "10.0.10"
     "@types/color" "3.0.0"
-    bazinga64 "5.3.57"
+    bazinga64 "5.3.58"
     color "3.1.0"
     emotion-normalize "10.0.0"
     react-transition-group "2.9.0"
@@ -2295,10 +2295,10 @@ bazinga64@5.3.50:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.50.tgz#0bd635adc13ac3c771bc0bfed3ca48844d1b361b"
   integrity sha512-BJnE8FISivJr0AQOWTHhwdd65qfNMbiOdctLwkXa0jkdl6y9DoTAYelvj73+LEraDpDOrBa05OsVqcnGCB2rlA==
 
-bazinga64@5.3.57:
-  version "5.3.57"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.57.tgz#caef63745ca3c7e9d170be00682384f92ea4cbd0"
-  integrity sha512-/2w9ARXa0ZN9lxlnA4E1FmtKXEKXyxSspYOi3XFmRKMaEAIoEumiUbeLbexAIE36x7OwfQDYwIzrGU2vnq3O6A==
+bazinga64@5.3.58:
+  version "5.3.58"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.58.tgz#007d575d96c103a824e9610b5632b64f5ea85f77"
+  integrity sha512-ycBOgyDfKOQrr1bx8lRQbRBHXdYVXHfNRZUHQBkSGANNEM1+aPgmn7WdYxVe82Vcp54fbl9iiUm8OP2hcZLzGw==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
