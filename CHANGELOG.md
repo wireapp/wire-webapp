@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.3.5...@wireapp/react-ui-kit@5.4.0) (2019-04-16)
+
+
+### Features
+
+* **eslint-config:** Add eslint-config for wireapp ([#1758](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1758)) ([e80e844](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e80e844))
+
+
+
+
+
 ## [5.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@5.3.4...@wireapp/react-ui-kit@5.3.5) (2019-04-15)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
