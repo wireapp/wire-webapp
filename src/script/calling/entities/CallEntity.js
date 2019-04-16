@@ -26,6 +26,7 @@ import TERMINATION_REASON from '../enum/TerminationReason';
 import {getRandomNumber} from 'utils/NumberUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
+import {AvailabilityType} from '../../user/AvailabilityType';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -209,7 +210,11 @@ z.calling.entities.CallEntity = class CallEntity {
         const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
           const isIncomingCall = state === CALL_STATE.INCOMING;
-          this._onStateStartRinging(isIncomingCall);
+          const isUserAway = this.selfUser.availability() === AvailabilityType.AWAY;
+          const dontPlaySound = isIncomingCall && isUserAway;
+          if (!dontPlaySound) {
+            this._onStateStartRinging(isIncomingCall);
+          }
         } else {
           this._onStateStopRinging();
         }
