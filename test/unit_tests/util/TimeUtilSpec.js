@@ -22,11 +22,11 @@ import TimeUtil from 'utils/TimeUtil';
 
 describe('TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;
-  const ONE_MINUTE_IN_MILLIS = 60 * ONE_SECOND_IN_MILLIS;
-  const ONE_HOUR_IN_MILLIS = 60 * ONE_MINUTE_IN_MILLIS;
-  const ONE_DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS;
-  const ONE_WEEK_IN_MILLIS = 7 * ONE_DAY_IN_MILLIS;
-  const ONE_YEAR_IN_MILLIS = 365 * ONE_WEEK_IN_MILLIS;
+  const ONE_MINUTE_IN_MILLIS = 1000 * 60;
+  const ONE_HOUR_IN_MILLIS = 1000 * 60 * 60;
+  const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+  const ONE_WEEK_IN_MILLIS = 1000 * 60 * 60 * 24 * 7;
+  const ONE_YEAR_IN_MILLIS = 1000 * 60 * 60 * 24 * 365;
 
   describe('"formatDuration"', () => {
     it('formats durations in seconds', () => {
