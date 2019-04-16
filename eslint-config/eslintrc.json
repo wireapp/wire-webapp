@@ -15,60 +15,60 @@
   },
   "plugins": ["prettier", "no-unsanitized", "jsdoc", "react"],
   "rules": {
-    "curly": 2,
-    "dot-notation": 2,
-    "id-length": 2,
-    "jsdoc/require-hyphen-before-param-description": 2,
+    "curly": "error",
+    "dot-notation": "error",
+    "id-length": "error",
+    "jsdoc/require-hyphen-before-param-description": "error",
     "no-console": [
-      2,
+      "error",
       {
         "allow": ["error", "info"]
       }
     ],
-    "no-const-assign": 2,
-    "no-dupe-class-members": 2,
-    "no-else-return": 2,
-    "no-inner-declarations": 2,
-    "no-lonely-if": 2,
+    "no-const-assign": "error",
+    "no-dupe-class-members": "error",
+    "no-else-return": "error",
+    "no-inner-declarations": "error",
+    "no-lonely-if": "error",
     "no-magic-numbers": [
-      2,
+      "error",
       {
         "ignore": [-1, 0, 1, 2]
       }
     ],
-    "no-shadow": 2,
-    "no-undef": 2,
-    "no-unneeded-ternary": 2,
-    "no-unused-expressions": 2,
+    "no-shadow": "error",
+    "no-undef": "error",
+    "no-unneeded-ternary": "error",
+    "no-unused-expressions": "error",
     "no-unused-vars": [
-      2,
+      "error",
       {
         "args": "none"
       }
     ],
-    "no-useless-return": 2,
-    "no-var": 2,
-    "one-var": [2, "never"],
-    "prefer-arrow-callback": 2,
-    "prefer-const": 2,
-    "prefer-promise-reject-errors": 2,
-    "prefer-spread": 2,
-    "prefer-template": 2,
-    "prettier/prettier": 2,
-    "react/jsx-uses-vars": 2,
-    "react/prefer-stateless-function": 2,
-    "react/prop-types": 0,
-    "sort-imports": 2,
+    "no-useless-return": "error",
+    "no-var": "error",
+    "one-var": ["error", "never"],
+    "prefer-arrow-callback": "error",
+    "prefer-const": "error",
+    "prefer-promise-reject-errors": "error",
+    "prefer-spread": "error",
+    "prefer-template": "error",
+    "prettier/prettier": "error",
+    "react/jsx-uses-vars": "error",
+    "react/prefer-stateless-function": "error",
+    "react/prop-types": "off",
+    "sort-imports": "error",
     "sort-keys": [
-      2,
+      "error",
       "asc",
       {
         "caseSensitive": true,
         "natural": true
       }
     ],
-    "sort-vars": 2,
-    "strict": [2, "global"],
+    "sort-vars": "error",
+    "strict": ["error", "global"],
     "valid-jsdoc": [
       "error",
       {
