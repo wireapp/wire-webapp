@@ -475,7 +475,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @param {z.entity.Message} messageEntity - Message entity
    * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
    * @param {Conversation} conversationEntity - Conversation entity
-   * @returns {Promise} Resolves with the notification message body
+   * @returns {string} The notification message body
    */
   _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
     switch (messageEntity.super_type) {
