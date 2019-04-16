@@ -70,13 +70,15 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
-    name?: React.RefObject<HTMLInputElement>;
-    email?: React.RefObject<HTMLInputElement>;
-    password?: React.RefObject<HTMLInputElement>;
+    name: React.RefObject<HTMLInputElement>;
+    email: React.RefObject<HTMLInputElement>;
+    password: React.RefObject<HTMLInputElement>;
+    terms: React.RefObject<HTMLInputElement>;
   } = {
     email: React.createRef<HTMLInputElement>(),
     name: React.createRef<HTMLInputElement>(),
     password: React.createRef<HTMLInputElement>(),
+    terms: React.createRef<HTMLInputElement>(),
   };
 
   state: State = {
@@ -91,6 +93,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
       email: true,
       name: true,
       password: true,
+      terms: true,
     },
     validationErrors: [],
   };
@@ -120,60 +123,61 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
     return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${this.props.isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
-  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const validInputs: {[field: string]: boolean} = this.state.validInputs;
     const errors: Error[] = [];
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      currentInput.current.value = currentInput.current.value.trim();
-      if (!currentInput.current.checkValidity()) {
-        errors.push(ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity));
+      const currentInputNode = currentInput.current;
+      if (inputKey !== 'password' && inputKey !== 'terms') {
+        currentInputNode.value = currentInputNode.value.trim();
       }
-      validInputs[inputKey] = currentInput.current.validity.valid;
+      if (!currentInputNode.checkValidity()) {
+        errors.push(ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity));
+      }
+      validInputs[inputKey] = currentInputNode.validity.valid;
     });
 
     this.setState({validInputs, validationErrors: errors});
-    return Promise.resolve()
-      .then(() => {
-        if (errors.length > 0) {
-          throw errors[0];
-        }
-      })
-      .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
-      .then(() => this.props.pushAccountRegistrationData({...this.state.registrationData}))
-      .then(() => this.props.doSendActivationCode(this.state.registrationData.email))
-      .then(() => this.props.onSubmit(event))
-      .catch(error => {
-        if (error.label) {
-          switch (error.label) {
-            case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
-            case BackendError.AUTH_ERRORS.INVALID_EMAIL:
-            case BackendError.AUTH_ERRORS.KEY_EXISTS: {
-              this.inputs.email.current.setCustomValidity(error.label);
-              this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
-              break;
-            }
-            case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
-            case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
-              this.inputs.email.current.setCustomValidity(error.label);
-              this.inputs.password.current.setCustomValidity(error.label);
-              this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
-              break;
-            }
-            default: {
-              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType)
-              );
-              if (!isValidationError) {
-                throw error;
-              }
+    try {
+      if (errors.length > 0) {
+        throw errors[0];
+      }
+      await (this.props.beforeSubmit && this.props.beforeSubmit());
+      await this.props.pushAccountRegistrationData({...this.state.registrationData});
+      await this.props.doSendActivationCode(this.state.registrationData.email);
+      return this.props.onSubmit(event);
+    } catch (error) {
+      if (error.label) {
+        switch (error.label) {
+          case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
+          case BackendError.AUTH_ERRORS.INVALID_EMAIL:
+          case BackendError.AUTH_ERRORS.KEY_EXISTS: {
+            this.inputs.email.current.setCustomValidity(error.label);
+            this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
+            break;
+          }
+          case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
+          case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
+            this.inputs.email.current.setCustomValidity(error.label);
+            this.inputs.password.current.setCustomValidity(error.label);
+            this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
+            break;
+          }
+          default: {
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
             }
           }
-        } else {
-          throw error;
         }
-      });
+      } else {
+        throw error;
+      }
+    }
   };
 
   render() {
@@ -283,14 +287,17 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>
         <Checkbox
+          ref={this.inputs.terms}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             this.setState({
               registrationData: {
                 ...this.state.registrationData,
                 termsAccepted: event.target.checked,
               },
+              validInputs: {...validInputs, terms: true},
             })
           }
+          markInvalid={!validInputs.terms}
           name="accept"
           required
           checked={termsAccepted}
