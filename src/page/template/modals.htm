@@ -7,8 +7,12 @@
       <div class="modal__header__title" data-bind="text: content().titleText"></div>
     </div>
     <div class="modal__text" data-uie-name="status-modal-text">
-      <div data-bind="html: content().messageHtml"></div>
-      <div data-bind="text: content().messageText"></div>
+      <!-- ko if: content().messageHtml -->
+        <div data-bind="html: content().messageHtml"></div>
+      <!-- /ko -->
+      <!-- ko if: content().messageText -->
+        <div data-bind="text: content().messageText"></div>
+      <!-- /ko -->
     </div>
     <!-- ko if: hasInput() -->
       <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}"/>
