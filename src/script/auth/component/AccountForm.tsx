@@ -154,11 +154,14 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
           case BackendError.AUTH_ERRORS.INVALID_EMAIL:
           case BackendError.AUTH_ERRORS.KEY_EXISTS: {
+            this.inputs.email.current.setCustomValidity(error.label);
             this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
             break;
           }
           case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
           case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
+            this.inputs.email.current.setCustomValidity(error.label);
+            this.inputs.password.current.setCustomValidity(error.label);
             this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
             break;
           }
