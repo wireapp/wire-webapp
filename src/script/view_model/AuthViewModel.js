@@ -552,32 +552,34 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   verify_password() {
-    if (!this.pending_server_request() && this._validate_input(z.auth.AuthView.MODE.VERIFY_PASSWORD)) {
-      this.pending_server_request(true);
-      const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
+    if (this.pending_server_request()) {
+      return;
+    }
+    this._clear_errors();
+    this.pending_server_request(true);
+    const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
 
-      this.authRepository
-        .login(payload, this.persist())
-        .then(() => this._authentication_successful())
-        .catch(error => {
-          this.pending_server_request(false);
-          $('#wire-verify-password').focus();
-          if (navigator.onLine) {
-            if (error.label) {
-              if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                this._add_error(t('authErrorPending'));
-              } else {
-                this._add_error(t('authErrorSignIn'), z.auth.AuthView.TYPE.PASSWORD);
-              }
+    this.authRepository
+      .login(payload, this.persist())
+      .then(() => this._authentication_successful())
+      .catch(error => {
+        this.pending_server_request(false);
+        $('#wire-verify-password').focus();
+        if (navigator.onLine) {
+          if (error.label) {
+            if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
+              this._add_error(t('authErrorPending'));
             } else {
-              this._add_error(t('authErrorMisc'));
+              this._add_error(t('authErrorSignIn'), z.auth.AuthView.TYPE.PASSWORD);
             }
           } else {
-            this._add_error(t('authErrorOffline'));
+            this._add_error(t('authErrorMisc'));
           }
-          this._has_errors();
-        });
-    }
+        } else {
+          this._add_error(t('authErrorOffline'));
+        }
+        this._has_errors();
+      });
   }
 
   /**
