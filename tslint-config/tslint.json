@@ -1,0 +1,39 @@
+{
+  "extends": ["tslint-config-prettier", "tslint-plugin-prettier", "tslint-react-hooks", "tslint-react"],
+  "rules": {
+    "array-type": [true, "array"],
+    "ban-comma-operator": true,
+    "curly": true,
+    "file-header": [
+      true,
+      {
+        "allow-single-line-comments": false,
+        "match": "Copyright \\(C\\) \\d{4} Wire Swiss GmbH"
+      }
+    ],
+    "jsdoc-format": [true, "check-multiline-start"],
+    "jsx-boolean-value": false,
+    "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "no-duplicate-imports": true,
+    "no-duplicate-switch-case": true,
+    "no-duplicate-variable": [true, "check-parameters"],
+    "no-floating-promises": true,
+    "no-invalid-template-strings": true,
+    "no-object-literal-type-assertion": true,
+    "no-return-await": true,
+    "no-sparse-arrays": true,
+    "no-this-assignment": true,
+    "no-unused-expression": true,
+    "object-literal-sort-keys": true,
+    "ordered-imports": [true, {"named-imports-order": "lowercase-last"}],
+    "prefer-conditional-expression": true,
+    "prefer-const": true,
+    "prefer-object-spread": true,
+    "prefer-readonly": true,
+    "prefer-template": true,
+    "prettier": true,
+    "react-hooks-nesting": "error",
+    "space-within-parens": [true, 0]
+  }
+}
