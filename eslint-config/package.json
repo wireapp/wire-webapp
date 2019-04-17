@@ -13,5 +13,5 @@
     "prettier": ">=1.17"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

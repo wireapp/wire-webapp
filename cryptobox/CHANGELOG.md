@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.0.75...@wireapp/cryptobox@9.1.0) (2019-04-17)
+
+
+### Features
+
+* **eslint-config:** Add eslint-config for wireapp ([#1758](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/1758)) ([e80e844](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/e80e844))
+
+
+
+
+
 ## [9.0.75](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.0.74...@wireapp/cryptobox@9.0.75) (2019-04-15)
 
 **Note:** Version bump only for package @wireapp/cryptobox
