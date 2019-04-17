@@ -149,7 +149,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
       await this.props.doSendActivationCode(this.state.registrationData.email);
       return this.props.onSubmit(event);
     } catch (error) {
-      if (error.label) {
+      if (error && error.label) {
         switch (error.label) {
           case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
           case BackendError.AUTH_ERRORS.INVALID_EMAIL:
@@ -175,7 +175,8 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           }
         }
       } else {
-        throw error;
+        //tslint:disable:no-console
+        console.error('Account registration error', error);
       }
     }
   };
@@ -197,15 +198,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <InputBlock>
             <Input
               name="name"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.name.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     name: event.target.value,
                   },
                   validInputs: {...validInputs, name: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.name}
               markInvalid={!validInputs.name}
               value={name}
@@ -225,15 +227,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="email"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.email.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     email: event.target.value,
                   },
                   validInputs: {...validInputs, email: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.email}
               markInvalid={!validInputs.email}
               value={email}
@@ -253,15 +256,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="password"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.password.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     password: event.target.value,
                   },
                   validInputs: {...validInputs, password: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.password}
               markInvalid={!validInputs.password}
               value={password}
@@ -288,15 +292,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
         </div>
         <Checkbox
           ref={this.inputs.terms}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            this.inputs.terms.current.setCustomValidity('');
             this.setState({
               registrationData: {
                 ...this.state.registrationData,
                 termsAccepted: event.target.checked,
               },
               validInputs: {...validInputs, terms: true},
-            })
-          }
+            });
+          }}
           markInvalid={!validInputs.terms}
           name="accept"
           required
