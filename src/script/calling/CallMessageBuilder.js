@@ -17,6 +17,7 @@
  *
  */
 
+import {serverTimeHandler} from '../time/serverTimeHandler';
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 
 const buildCallMessage = (type, response, sessionId, additionalPayload) => {
@@ -79,7 +80,8 @@ const buildUpdate = (response, sessionId, additionalPayload) => {
  * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
  */
 const createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
-  return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
+  const time = serverTimeHandler.toServerTimestamp(Date.now());
+  return {conversationId, remoteClientId, remoteUserId, time: new Date(time).toISOString(), userId: selfUserId};
 };
 
 /**

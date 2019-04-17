@@ -27,6 +27,7 @@ import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
+import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 
 import BackendClient from '../service/BackendClient';
@@ -121,7 +122,7 @@ class App {
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = resolve(graph.PropertiesRepository);
-    repositories.serverTime = resolve(graph.ServerTimeRepository);
+    repositories.serverTime = serverTimeHandler;
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -135,7 +136,7 @@ class App {
       this.service.asset,
       resolve(graph.SelfService),
       repositories.client,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
@@ -145,7 +146,7 @@ class App {
       this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
@@ -163,7 +164,7 @@ class App {
       repositories.giphy,
       resolve(graph.LinkPreviewRepository),
       resolve(graph.MessageSender),
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
@@ -208,7 +209,7 @@ class App {
       repositories.conversation,
       repositories.event,
       repositories.media,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(

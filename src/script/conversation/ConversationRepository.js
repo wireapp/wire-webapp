@@ -93,7 +93,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {MessageSender} messageSender - Message sending queue handler
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
@@ -109,7 +109,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     giphy_repository,
     link_repository,
     messageSender,
-    serverTimeRepository,
+    serverTimeHandler,
     team_repository,
     user_repository,
     propertyRepository,
@@ -124,7 +124,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.cryptography_repository = cryptography_repository;
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
@@ -136,13 +136,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
       this.eventRepository,
-      this.serverTimeRepository
+      this.serverTimeHandler
     );
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
-      this.serverTimeRepository,
+      this.serverTimeHandler,
       this.user_repository
     );
 
@@ -236,7 +236,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   checkMessageTimer(messageEntity) {
-    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeRepository.getTimeOffset());
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }
 
   _initStateUpdates() {
@@ -534,7 +534,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const firstMessageEntity = conversationEntity.getFirstMessage();
     const upperBound = firstMessageEntity
       ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeRepository.toServerTimestamp()) + 1);
+      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     return this.eventService
       .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
@@ -689,7 +689,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const lower_bound = new Date(conversation_et.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.serverTimeRepository.toServerTimestamp()) + 1);
+      : new Date(conversation_et.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1332,7 +1332,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateClearedTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
+    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
@@ -1367,7 +1367,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
@@ -1387,7 +1387,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeService(conversationEntity, userId) {
     return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
       const hasResponse = response && response.event;
-      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
@@ -1525,7 +1525,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
-    const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
@@ -1586,7 +1586,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const stateChange = conversationEntity.is_archived() !== newState;
 
-    const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const archiveTimestamp = conversationEntity.get_last_known_timestamp(currentTimestamp);
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
@@ -1751,7 +1751,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: assetData.assetToken,
         };
 
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
@@ -2360,7 +2360,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
@@ -3149,7 +3149,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });

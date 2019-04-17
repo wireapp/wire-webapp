@@ -17,13 +17,13 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
 import {ACCENT_ID} from 'src/script/config.js';
 import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(resolve(graph.ServerTimeRepository));
+  const mapper = new UserMapper(serverTimeHandler);
 
   let self_user_payload = null;
 
@@ -144,7 +144,7 @@ describe('User Mapper', () => {
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
-      spyOn(mapper.serverTimeRepository, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
+      spyOn(mapper.serverTimeHandler, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
       spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp => {
         expect(timestamp).toEqual(adjustedExpirationDate.getTime());
       });
@@ -152,10 +152,10 @@ describe('User Mapper', () => {
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
 
-      expect(mapper.serverTimeRepository.toLocalTimestamp).not.toHaveBeenCalledWith();
-      mapper.serverTimeRepository.timeOffset(10);
+      expect(mapper.serverTimeHandler.toLocalTimestamp).not.toHaveBeenCalledWith();
+      mapper.serverTimeHandler.timeOffset(10);
 
-      expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
+      expect(mapper.serverTimeHandler.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
     it('cannot update the user name of a wrong user', () => {
