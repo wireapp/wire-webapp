@@ -9,7 +9,7 @@
       <!-- /ko -->
       <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
     </div>
-    <div class="user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
+    <div class="modal__body user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
       <!-- ko if: user() -->
         <panel-user-details params="participant: user"></panel-user-details>
         <enriched-fields params="user: user"></enriched-fields>

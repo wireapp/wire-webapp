@@ -252,7 +252,7 @@
     border-radius: 4px;
     cursor: default;
     font-size: 14px;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     transform: scale(0.8);
     transition: transform 0.35s @ease-out-quart;
@@ -314,6 +314,12 @@
       justify-content: center;
       cursor: pointer;
     }
+  }
+
+  &__body {
+    padding: 0 16px 16px;
+    margin: 0 -16px -16px;
+    overflow-y: auto;
   }
 
   &__buttons {
