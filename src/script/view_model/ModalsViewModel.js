@@ -21,6 +21,8 @@ import Logger from 'utils/Logger';
 import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '../event/WebApp';
 
 const noop = () => {};
 const defaultContent = {
@@ -61,11 +63,29 @@ export class ModalsViewModel {
     this.optionChecked = ko.observable(false);
     this.inputValue = ko.observable('');
     this.content = ko.observable(defaultContent);
+    this.queue = [];
+    this.isReady = false;
 
-    amplify.subscribe(z.event.WebApp.WARNING.MODAL, this.showModal);
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
+    amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
+
+  showModal = (type, options) => {
+    this.queue.push({options, type});
+    this.unqueue();
+  };
+
+  ready = () => {
+    ko.applyBindings(this, document.getElementById(this.elementId));
+    this.isReady = true;
+    this.unqueue();
+  };
+
+  unqueue = () => {
+    if (this.isReady && this.queue.length) {
+      const {type, options} = this.queue.shift();
+      this._showModal(type, options);
+    }
+  };
 
   /**
    * Show modal
@@ -78,7 +98,7 @@ export class ModalsViewModel {
    * @param {Function} options.secondary - Called when secondary action in modal is triggered
    * @returns {undefined} No return value
    */
-  showModal = (type, options = {}) => {
+  _showModal = (type, options = {}) => {
     if (!Object.values(ModalsViewModel.TYPE).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
@@ -141,7 +161,8 @@ export class ModalsViewModel {
         break;
       case ModalsViewModel.TYPE.INPUT:
       case ModalsViewModel.TYPE.OPTION:
-        content.secondaryText = text.secondary || t('modalOptionSecondary');
+        // if secondary text is an empty string, keep it that way
+        content.secondaryText = text.secondary !== undefined ? text.secondary : t('modalOptionSecondary');
         break;
       case ModalsViewModel.TYPE.SESSION_RESET:
         content.titleText = t('modalSessionResetHeadline');
@@ -191,5 +212,8 @@ export class ModalsViewModel {
     this.inputValue('');
     this.optionChecked(false);
     afterCloseFn();
+    this.unqueue();
   };
 }
+
+export const modals = new ModalsViewModel();
