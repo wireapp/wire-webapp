@@ -173,7 +173,7 @@ class ParticipantAvatar {
               this.avatarLoadingBlocked = false;
             })
             .catch(error => {
-              this.logger.error('Failed to load avatar picture.', error);
+              this.logger.warn('Failed to load avatar picture.', error);
             });
         } else {
           this.avatarLoadingBlocked = false;
