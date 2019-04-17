@@ -17,15 +17,9 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
+import {serverTimeRepository} from 'src/script/time/ServerTimeRepository';
 
-describe('ServerTimeRepository', () => {
-  let serverTimeRepository;
-
-  beforeEach(() => {
-    serverTimeRepository = resolve(graph.ServerTimeRepository);
-  });
-
+describe('serverTimeRepository', () => {
   describe('getTimeOffset', () => {
     it('warns that offset cannot be retrieved when server time is not set', () => {
       spyOn(serverTimeRepository.logger, 'warn');

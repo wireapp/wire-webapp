@@ -17,13 +17,13 @@
  *
  */
 
-import {resolve, graph} from './../../api/testResolver';
 import {ACCENT_ID} from 'src/script/config.js';
 import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
+import {serverTimeRepository} from 'src/script/time/ServerTimeRepository';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(resolve(graph.ServerTimeRepository));
+  const mapper = new UserMapper(serverTimeRepository);
 
   let self_user_payload = null;
 
