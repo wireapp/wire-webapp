@@ -552,7 +552,8 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   verify_password() {
-    if (!this.pending_server_request() && this._validate_input(z.auth.AuthView.MODE.VERIFY_PASSWORD)) {
+    if (!this.pending_server_request()) {
+      this._clear_errors();
       this.pending_server_request(true);
       const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
 
