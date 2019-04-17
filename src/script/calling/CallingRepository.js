@@ -33,7 +33,7 @@ import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
-import {callEnd, CALL_TYPE, CALL_STATE, CONVERSATION_TYPE} from './callAPI';
+import {CALL_TYPE, CALL_STATE, CONVERSATION_TYPE} from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {PROPERTY_STATE} from './enum/PropertyState';
@@ -1029,7 +1029,7 @@ export class CallingRepository {
    */
   leaveCall(conversationId, terminationReason) {
     if (!window.callv1) {
-      callEnd(this.callingAccount(), conversationId);
+      this.callingApi.end(this.callingAccount, conversationId);
       return;
     }
     this.getCallById(conversationId)
