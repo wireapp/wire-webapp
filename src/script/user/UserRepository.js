@@ -34,7 +34,7 @@ import UserMapper from './UserMapper';
 
 import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export default class UserRepository {
   static get CONFIG() {
@@ -348,7 +348,7 @@ export default class UserRepository {
     function showModal(storageKey, title, message) {
       const hideModal = StorageUtil.getValue(storageKey);
       if (!hideModal) {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+        modals.showModal(ModalsViewModel.TYPE.OPTION, {
           action: dontShowAgain => {
             if (dontShowAgain) {
               StorageUtil.setValue(storageKey, 'true');
