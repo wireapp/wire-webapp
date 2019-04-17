@@ -1504,15 +1504,20 @@
     fs-extra "7.0.1"
     logdown "3.2.7"
 
+"@wireapp/eslint-config@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-0.1.0.tgz#f2e12c61c83d55c7e840f09a3805315e5870657a"
+  integrity sha512-0gz4RNUdGlVxCuR65PoMrVWiafTrTXmUqSFjTYCMN0JAyPkXbT02PNs4f4mYgPfiZWm2gOMj5Ce5XK/aoR0k2w==
+
 "@wireapp/lru-cache@3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-3.1.0.tgz#a3e227d6a8c272f1c97e278e81a246dbbbe9b114"
   integrity sha512-ezztPKzZx3yfiBzmizoMtUvWvMF2lJaK2VwZwoGYpXXix+26P9fdgigch3UB58uGrd73l0W7nXMWRHDJB1uUYA==
 
-"@wireapp/prettier-config@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.0.1.tgz#dbad1985d14487320ff9c8a9bc27ec0869a37b4a"
-  integrity sha512-lzdTQv+bMbDe34TG81fbep/VpNsS4RKc07g1SIVJhXkJbpULI24zw0xrUSaDdCskwBB6Axaw1dZPsvkcwmnWtA==
+"@wireapp/prettier-config@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.2.0.tgz#822f5d1db902550c09c8ef5efda2a36ca263a481"
+  integrity sha512-wgFtwop3vWW1MaXwkcbDiwM9NP1JHRWwr09RLTAMQhCs9J1z8ciBnfpty/LxY2LXTRWZt1gEL2a+am/a0xpVPA==
 
 "@wireapp/priority-queue@0.2.72":
   version "0.2.72"
