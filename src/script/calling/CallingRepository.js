@@ -33,7 +33,7 @@ import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
-import {callEnd, setCallStateHandler, CALL_TYPE, CALL_STATE, CONVERSATION_TYPE} from './callAPI';
+import {callEnd, CALL_TYPE, CALL_STATE, CONVERSATION_TYPE} from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {PROPERTY_STATE} from './enum/PropertyState';
@@ -87,6 +87,7 @@ export class CallingRepository {
 
     this.callingAccount = undefined;
     this.callingApi = undefined;
+    this.activeCalls = ko.observableArray();
 
     ko.computed(() => {
       if (userRepository.self() && clientRepository.currentClient()) {
@@ -139,39 +140,38 @@ export class CallingRepository {
             () => 0, //acbrh,
             () => 0 //vstateh,
           );
+
+          callingApi.set_state_handler(account, (conversationId, state) => {
+            const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
+              conversationId,
+              startedAt: ko.observable(),
+              state: ko.observable(state),
+            };
+            const storedCallIndex = this.activeCalls().indexOf(call);
+
+            call.state(state);
+
+            switch (state) {
+              case CALL_STATE.TERM_REMOTE:
+              case CALL_STATE.TERM_LOCAL:
+              case CALL_STATE.NONE:
+                if (storedCallIndex > -1) {
+                  this.activeCalls.splice(storedCallIndex, 1);
+                }
+                return;
+
+              case CALL_STATE.MEDIA_ESTAB:
+                call.startedAt(Date.now());
+                break;
+            }
+
+            if (storedCallIndex === -1) {
+              this.activeCalls.push(call);
+            }
+          });
           this.callingAccount = account;
           this.callingApi = callingApi;
         });
-      }
-    });
-
-    this.activeCalls = ko.observableArray();
-    setCallStateHandler((conversationId, state) => {
-      const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
-        conversationId,
-        startedAt: ko.observable(),
-        state: ko.observable(state),
-      };
-      const storedCallIndex = this.activeCalls().indexOf(call);
-
-      call.state(state);
-
-      switch (state) {
-        case CALL_STATE.TERM_REMOTE:
-        case CALL_STATE.TERM_LOCAL:
-        case CALL_STATE.NONE:
-          if (storedCallIndex > -1) {
-            this.activeCalls.splice(storedCallIndex, 1);
-          }
-          return;
-
-        case CALL_STATE.MEDIA_ESTAB:
-          call.startedAt(Date.now());
-          break;
-      }
-
-      if (storedCallIndex === -1) {
-        this.activeCalls.push(call);
       }
     });
 
