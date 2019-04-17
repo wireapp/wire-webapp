@@ -29,7 +29,7 @@ import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
 import UserRepository from '../user/UserRepository';
-import {serverTimeRepository} from '../time/ServerTimeRepository';
+import {serverTimeHandler} from '../time/serverTimeHandler';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 /* eslint-disable no-unused-vars */
@@ -83,7 +83,7 @@ class AuthViewModel {
       this.asset_service,
       this.selfService,
       this.client_repository,
-      serverTimeRepository
+      serverTimeHandler
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();

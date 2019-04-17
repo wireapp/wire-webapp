@@ -52,10 +52,10 @@ export default class UserRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
     this.logger = Logger('UserRepository');
 
     this.asset_service = asset_service;
@@ -64,7 +64,7 @@ export default class UserRepository {
     this.selfService = selfService;
     this.user_service = user_service;
 
-    this.user_mapper = new UserMapper(serverTimeRepository);
+    this.user_mapper = new UserMapper(serverTimeHandler);
     this.should_set_username = false;
 
     this.self = ko.observable();

@@ -22,8 +22,8 @@ import ko from 'knockout';
 
 import logger from 'utils/Logger';
 
-export const serverTimeRepository = {
-  logger: logger('serverTimeRepository'),
+export const serverTimeHandler = {
+  logger: logger('serverTimeHandler'),
   timeOffset: ko.observable(undefined),
 
   computeTimeOffset(serverTimeString) {

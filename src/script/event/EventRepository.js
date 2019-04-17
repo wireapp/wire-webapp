@@ -62,7 +62,7 @@ z.event.EventRepository = class EventRepository {
    * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
    * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
@@ -71,7 +71,7 @@ z.event.EventRepository = class EventRepository {
     webSocketService,
     conversationService,
     cryptographyRepository,
-    serverTimeRepository,
+    serverTimeHandler,
     userRepository
   ) {
     this.eventService = eventService;
@@ -79,7 +79,7 @@ z.event.EventRepository = class EventRepository {
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
     this.cryptographyRepository = cryptographyRepository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     this.logger = Logger('z.event.EventRepository');
 
@@ -245,7 +245,7 @@ z.event.EventRepository = class EventRepository {
     return new Promise((resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
-          this.serverTimeRepository.computeTimeOffset(time);
+          this.serverTimeHandler.computeTimeOffset(time);
         }
 
         if (notifications.length > 0) {
@@ -919,7 +919,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const correctedTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const correctedTimestamp = this.serverTimeHandler.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const isForcedEventType = forcedEventTypes.includes(content.type);

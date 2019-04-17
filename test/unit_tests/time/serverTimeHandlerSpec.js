@@ -17,17 +17,17 @@
  *
  */
 
-import {serverTimeRepository} from 'src/script/time/ServerTimeRepository';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
-describe('serverTimeRepository', () => {
+describe('serverTimeHandler', () => {
   describe('getTimeOffset', () => {
     it('warns that offset cannot be retrieved when server time is not set', () => {
-      spyOn(serverTimeRepository.logger, 'warn');
+      spyOn(serverTimeHandler.logger, 'warn');
 
-      const offset = serverTimeRepository.getTimeOffset();
+      const offset = serverTimeHandler.getTimeOffset();
 
       expect(offset).toEqual(0);
-      expect(serverTimeRepository.logger.warn).toHaveBeenCalled();
+      expect(serverTimeHandler.logger.warn).toHaveBeenCalled();
     });
   });
 
@@ -35,9 +35,9 @@ describe('serverTimeRepository', () => {
     it('converts a local timestamp to a server one', () => {
       const timeOffset = 10;
       const timestamp = 100;
-      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
+      spyOn(serverTimeHandler, 'getTimeOffset').and.returnValue(timeOffset);
 
-      const adjustedTimestamp = serverTimeRepository.toServerTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeHandler.toServerTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp - timeOffset);
     });
@@ -47,9 +47,9 @@ describe('serverTimeRepository', () => {
     it('converts a server timestamp to a local one', () => {
       const timeOffset = 10;
       const timestamp = 100;
-      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
+      spyOn(serverTimeHandler, 'getTimeOffset').and.returnValue(timeOffset);
 
-      const adjustedTimestamp = serverTimeRepository.toLocalTimestamp(timestamp);
+      const adjustedTimestamp = serverTimeHandler.toLocalTimestamp(timestamp);
 
       expect(adjustedTimestamp).toEqual(timestamp + timeOffset);
     });
@@ -58,12 +58,12 @@ describe('serverTimeRepository', () => {
   describe('toLocalTimestamp and toServerTimestamp', () => {
     it('should return the initial timestamp if the two reverse operations are applied', () => {
       const timeOffset = 10;
-      spyOn(serverTimeRepository, 'getTimeOffset').and.returnValue(timeOffset);
+      spyOn(serverTimeHandler, 'getTimeOffset').and.returnValue(timeOffset);
 
       const localTime = Date.now();
 
-      const computedServerTime = serverTimeRepository.toServerTimestamp(localTime);
-      const computedLocalTime = serverTimeRepository.toLocalTimestamp(computedServerTime);
+      const computedServerTime = serverTimeHandler.toServerTimestamp(localTime);
+      const computedLocalTime = serverTimeHandler.toLocalTimestamp(computedServerTime);
 
       expect(computedLocalTime).toEqual(localTime);
     });

@@ -25,7 +25,7 @@ import 'src/script/main/globals';
 
 import {resolve, graph, backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {serverTimeRepository} from 'src/script/time/ServerTimeRepository';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -197,7 +197,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        serverTimeRepository,
+        serverTimeHandler,
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -222,7 +222,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.asset_service,
       resolve(graph.SelfService),
       TestFactory.client_repository,
-      serverTimeRepository,
+      serverTimeHandler,
       TestFactory.propertyRepository
     );
     TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
@@ -327,7 +327,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         resolve(graph.LinkPreviewRepository),
         resolve(graph.MessageSender),
-        serverTimeRepository,
+        serverTimeHandler,
         TestFactory.team_repository,
         TestFactory.user_repository,
         TestFactory.propertyRepository
