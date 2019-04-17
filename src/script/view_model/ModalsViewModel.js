@@ -161,6 +161,7 @@ export class ModalsViewModel {
         break;
       case ModalsViewModel.TYPE.INPUT:
       case ModalsViewModel.TYPE.OPTION:
+        // if secondary text is an empty string, keep it that way
         content.secondaryText = text.secondary !== undefined ? text.secondary : t('modalOptionSecondary');
         break;
       case ModalsViewModel.TYPE.SESSION_RESET:
