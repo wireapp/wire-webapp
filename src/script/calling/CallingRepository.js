@@ -276,16 +276,22 @@ export class CallingRepository {
   onCallEvent(event, source) {
     if (!window.callv1) {
       const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
-      this.callingApi.recv_msg(
+      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const toSecond = timestamp => Math.floor(timestamp / 1000);
+      const contentStr = JSON.stringify(content);
+      const res = this.callingApi.recv_msg(
         this.callingAccount,
-        JSON.stringify(content),
-        content.length,
-        12,
-        time,
+        contentStr,
+        contentStr.length,
+        toSecond(currentTimestamp),
+        toSecond(new Date(time).getTime()),
         conversationId,
         userId,
         clientId
       );
+      if (res !== 0) {
+        this.callLogger.warn(`recv_msg failed with code: ${res}`);
+      }
       return;
     }
     const {content: eventContent, time: eventDate, type: eventType} = event;
