@@ -276,7 +276,7 @@ export class CallingRepository {
   onCallEvent(event, source) {
     if (!window.callv1) {
       const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
-      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const toSecond = timestamp => Math.floor(timestamp / 1000);
       const contentStr = JSON.stringify(content);
       const res = this.callingApi.recv_msg(

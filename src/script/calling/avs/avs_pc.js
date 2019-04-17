@@ -113,12 +113,20 @@ function pc_New(self) {
   const hnd = pc2hnd(pc);
   pc.self = self;
 
-  pc.onicegatheringstatechange = function() {
-    gatheringHandler(pc);
-  };
+  pc.onicegatheringstatechange = () => gatheringHandler(pc);
 
-  pc.onconnectionstatechange = function(event) {
-    connectionHandler(pc, event);
+  pc.onconnectionstatechange = event => connectionHandler(pc, event);
+
+  pc.ontrack = ({streams}) => {
+    const stream = streams[0];
+    if (stream.getAudioTracks().length === 0) {
+      // if the stream does not contain audio track, nothing more to do here
+      return;
+    }
+    const audio = new Audio();
+    audio.srcObject = stream;
+    audio.play();
+    console.log('Received remote stream', event.streams);
   };
 
   return hnd;
