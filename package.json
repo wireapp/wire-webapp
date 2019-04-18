@@ -37,7 +37,7 @@
     "optimist": "0.6.1",
     "react-hot-loader": "4.8.4",
     "rimraf": "2.6.3",
-    "sinon": "7.3.1",
+    "sinon": "7.3.2",
     "sinon-har-server": "0.3.0",
     "typescript": "3.4.3",
     "webpack": "4.30.0",
