@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 import {loadUrlBuffer} from 'utils/util';
+import {AssetURLCache} from './AssetURLCache';
 
 class AssetRemoteData {
   /**
@@ -114,13 +115,13 @@ class AssetRemoteData {
    * @returns {Promise<string>} Object URL for asset
    */
   getObjectUrl() {
-    const objectUrl = z.assets.AssetURLCache.getUrl(this.identifier);
+    const objectUrl = AssetURLCache.getUrl(this.identifier);
     return objectUrl
       ? Promise.resolve(objectUrl)
       : this.load().then(blob => {
           if (blob) {
             const url = window.URL.createObjectURL(blob);
-            return z.assets.AssetURLCache.setUrl(this.identifier, url);
+            return AssetURLCache.setUrl(this.identifier, url);
           }
         });
   }
