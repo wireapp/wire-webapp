@@ -25,11 +25,11 @@ export default class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class UserMapper
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    */
-  constructor(serverTimeRepository) {
+  constructor(serverTimeHandler) {
     this.logger = Logger('UserMapper');
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
   }
 
   /**
@@ -136,13 +136,13 @@ export default class UserMapper {
     if (expirationDate) {
       userEntity.isTemporaryGuest(true);
       const setAdjustedTimestamp = () => {
-        const adjustedTimestamp = this.serverTimeRepository.toLocalTimestamp(new Date(expirationDate).getTime());
+        const adjustedTimestamp = this.serverTimeHandler.toLocalTimestamp(new Date(expirationDate).getTime());
         userEntity.setGuestExpiration(adjustedTimestamp);
       };
-      if (this.serverTimeRepository.timeOffset() !== undefined) {
+      if (this.serverTimeHandler.timeOffset() !== undefined) {
         setAdjustedTimestamp();
       } else {
-        this.serverTimeRepository.timeOffset.subscribe_once(setAdjustedTimestamp);
+        this.serverTimeHandler.timeOffset.subscribe_once(setAdjustedTimestamp);
       }
     }
 

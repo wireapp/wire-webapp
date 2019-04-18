@@ -26,6 +26,7 @@ import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {AvailabilityType} from '../../user/AvailabilityType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -203,9 +204,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         const userEntity = this.conversationEntity().firstUserEntity();
         const name = userEntity.first_name();
         const availabilityStrings = {
-          [z.user.AvailabilityType.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
-          [z.user.AvailabilityType.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
-          [z.user.AvailabilityType.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
+          [AvailabilityType.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
+          [AvailabilityType.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
+          [AvailabilityType.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
         };
 
         return availabilityStrings[userEntity.availability()];
@@ -222,7 +223,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is1to1();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
-        const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
+        const availabilityIsNone = firstUserEntity.availability() === AvailabilityType.NONE;
         return this.selfUser().inTeam() && isOne2OneConversation && !availabilityIsNone;
       }
 

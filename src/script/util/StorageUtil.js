@@ -17,7 +17,6 @@
  *
  */
 
-'use strict';
 import {amplify} from 'amplify';
 
 import TimeUtil from 'utils/TimeUtil';

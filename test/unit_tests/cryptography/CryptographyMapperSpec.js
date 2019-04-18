@@ -36,6 +36,7 @@ import {
 
 import CryptographyMapper from 'src/script/cryptography/CryptographyMapper';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {AvailabilityType} from 'src/script/user/AvailabilityType';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -248,7 +249,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.availability).toBe(z.user.AvailabilityType.AVAILABLE);
+        expect(event_json.data.availability).toBe(AvailabilityType.AVAILABLE);
       });
     });
 

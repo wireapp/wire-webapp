@@ -121,7 +121,7 @@ class ConversationListCallingCell {
   }
 
   onLeaveCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, TERMINATION_REASON.SELF_USER);
+    this.callingRepository.leaveCall(this.conversation.id, TERMINATION_REASON.SELF_USER);
   }
 
   onMaximizeVideoGrid() {

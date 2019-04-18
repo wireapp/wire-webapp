@@ -252,7 +252,7 @@
     border-radius: 4px;
     cursor: default;
     font-size: 14px;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     transform: scale(0.8);
     transition: transform 0.35s @ease-out-quart;
@@ -316,6 +316,12 @@
     }
   }
 
+  &__body {
+    padding: 0 16px 16px;
+    margin: 0 -16px -16px;
+    overflow-y: auto;
+  }
+
   &__buttons {
     display: flex;
     justify-content: flex-end;
@@ -369,6 +375,7 @@
 
   &__text {
     margin-bottom: 16px;
+    overflow-wrap: break-word;
   }
 
   &__input {
@@ -379,6 +386,7 @@
     border: none;
     background: var(--app-bg-secondary);
     border-radius: 4px;
+    color: currentColor;
     outline: none;
 
     &::placeholder {

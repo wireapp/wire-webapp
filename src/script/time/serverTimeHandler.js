@@ -17,19 +17,20 @@
  *
  */
 
+/* eslint-disable sort-keys */
 import ko from 'knockout';
 
-export default class ServerTimeRepository {
-  constructor(logger) {
-    this.logger = logger;
-    this.timeOffset = ko.observable(undefined);
-  }
+import logger from 'utils/Logger';
+
+export const serverTimeHandler = {
+  logger: logger('serverTimeHandler'),
+  timeOffset: ko.observable(undefined),
 
   computeTimeOffset(serverTimeString) {
     const timeOffset = new Date() - new Date(serverTimeString);
     this.timeOffset(timeOffset);
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
-  }
+  },
 
   getTimeOffset() {
     if (this.timeOffset() === undefined) {
@@ -37,7 +38,7 @@ export default class ServerTimeRepository {
       return 0;
     }
     return this.timeOffset();
-  }
+  },
 
   /**
    * Converts a local timestamp to a server timestamp.
@@ -46,7 +47,7 @@ export default class ServerTimeRepository {
    */
   toServerTimestamp(localTimestamp = Date.now()) {
     return localTimestamp - this.getTimeOffset();
-  }
+  },
 
   /**
    * Converts a server timestamp to a local timestamp.
@@ -55,5 +56,5 @@ export default class ServerTimeRepository {
    */
   toLocalTimestamp(serverTimestamp = Date.now()) {
     return serverTimestamp + this.getTimeOffset();
-  }
-}
+  },
+};

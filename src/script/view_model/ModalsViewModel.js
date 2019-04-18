@@ -26,6 +26,7 @@ const noop = () => {};
 const defaultContent = {
   actionFn: noop,
   actionText: '',
+  afterCloseFn: noop,
   checkboxLabel: '',
   closeFn: noop,
   currentType: null,
@@ -82,10 +83,19 @@ export class ModalsViewModel {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    const {text = {}, preventClose = false, close = noop, action = noop, secondary = noop, data} = options;
+    const {
+      action = noop,
+      afterClose = noop,
+      close = noop,
+      data,
+      preventClose = false,
+      secondary = noop,
+      text = {},
+    } = options;
     const content = {
       actionFn: action,
       actionText: text.action,
+      afterCloseFn: afterClose,
       checkboxLabel: text.option,
       closeFn: close,
       currentType: type,
@@ -119,6 +129,7 @@ export class ModalsViewModel {
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
           : t('modalAccountReadReceiptsChangedOffHeadline');
+        content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
       case ModalsViewModel.TYPE.ACKNOWLEDGE:
         content.actionText = text.action || t('modalAcknowledgeAction');
@@ -128,6 +139,7 @@ export class ModalsViewModel {
       case ModalsViewModel.TYPE.CONFIRM:
         content.secondaryText = t('modalConfirmSecondary');
         break;
+      case ModalsViewModel.TYPE.INPUT:
       case ModalsViewModel.TYPE.OPTION:
         content.secondaryText = text.secondary || t('modalOptionSecondary');
         break;
@@ -155,6 +167,7 @@ export class ModalsViewModel {
     if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
       return this.content().actionFn(this.inputValue());
     }
+    this.content().actionFn();
   };
 
   doAction = () => {
@@ -173,8 +186,10 @@ export class ModalsViewModel {
   };
 
   onModalHidden = () => {
+    const afterCloseFn = this.content().afterCloseFn;
     this.content(defaultContent);
     this.inputValue('');
     this.optionChecked(false);
+    afterCloseFn();
   };
 }

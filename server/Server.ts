@@ -121,7 +121,7 @@ class Server {
     this.app.use(helmet.xssFilter());
     this.app.use(
       helmet.hsts({
-        includeSubdomains: true,
+        includeSubDomains: true,
         maxAge: 31536000,
         preload: true,
       })

@@ -24,6 +24,7 @@ import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
+import {AvailabilityType} from '../user/AvailabilityType';
 
 // Please note: The own user has a "locale"
 class User {
@@ -128,7 +129,7 @@ class User {
       return this.devices().every(client_et => client_et.meta.isVerified());
     });
 
-    this.availability = ko.observable(z.user.AvailabilityType.NONE);
+    this.availability = ko.observable(AvailabilityType.NONE);
 
     this.expirationRemaining = ko.observable(0);
     this.expirationText = ko.observable('');

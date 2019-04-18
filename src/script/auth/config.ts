@@ -17,6 +17,7 @@
  *
  */
 
+import {ValidationUtil} from '@wireapp/commons';
 import * as UUID from 'uuid/v4';
 
 declare global {
@@ -28,6 +29,15 @@ declare global {
         BACKEND_REST: string;
         BACKEND_WS: string;
         ENVIRONMENT: string;
+        FEATURE: {
+          CHECK_CONSENT: boolean;
+          ENABLE_ACCOUNT_REGISTRATION: boolean;
+          ENABLE_DEBUG: boolean;
+          ENABLE_PHONE_LOGIN: boolean;
+          ENABLE_SSO: boolean;
+          SHOW_LOADING_INFORMATION: boolean;
+        };
+        NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
@@ -39,32 +49,18 @@ declare global {
           TERMS_OF_USE_TEAMS: string;
         };
         VERSION: string;
-        FEATURE: {
-          CHECK_CONSENT: boolean;
-          ENABLE_ACCOUNT_REGISTRATION: boolean;
-          ENABLE_DEBUG: boolean;
-          ENABLE_PHONE_LOGIN: boolean;
-          ENABLE_SSO: boolean;
-          SHOW_LOADING_INFORMATION: boolean;
-        };
       };
     };
   }
 }
 class Configuration {
+  readonly APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
   readonly APP_NAME = window.wire.env.APP_NAME || 'Webapp';
+  readonly APP_INSTANCE_ID = UUID();
   readonly BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+  readonly CALLING_PROTOCOL_VERSION = '3.0';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
-  readonly APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
-  readonly URL = window.wire.env.URL || {
-    ACCOUNT_BASE: 'https://account.wire.com',
-    MOBILE_BASE: '',
-    SUPPORT_BASE: 'https://support.wire.com',
-    TEAMS_BASE: 'https://teams.wire.com',
-    WEBSITE_BASE: 'https://wire.com',
-  };
-  readonly VERSION = window.wire.env.VERSION || '0.0.0';
   readonly FEATURE = window.wire.env.FEATURE || {
     CHECK_CONSENT: true,
     ENABLE_ACCOUNT_REGISTRATION: true,
@@ -73,9 +69,17 @@ class Configuration {
     ENABLE_SSO: false,
     SHOW_LOADING_INFORMATION: false,
   };
-  readonly APP_INSTANCE_ID = UUID();
   readonly MAX_VIDEO_PARTICIPANTS = 4;
-  readonly CALLING_PROTOCOL_VERSION = '3.0';
+  readonly NEW_PASSWORD_MINIMUM_LENGTH =
+    window.wire.env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
+  readonly URL = window.wire.env.URL || {
+    ACCOUNT_BASE: 'https://account.wire.com',
+    MOBILE_BASE: '',
+    SUPPORT_BASE: 'https://support.wire.com',
+    TEAMS_BASE: 'https://teams.wire.com',
+    WEBSITE_BASE: 'https://wire.com',
+  };
+  readonly VERSION = window.wire.env.VERSION || '0.0.0';
 }
 
 const Config = new Configuration();

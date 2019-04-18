@@ -21,6 +21,7 @@ import ko from 'knockout';
 import viewportObserver from '../ui/viewportObserver';
 import User from '../entity/User';
 import {createRandomUuid} from 'utils/util';
+import Logger from 'utils/Logger';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -48,6 +49,8 @@ class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
+    this.logger = Logger('ParticipantAvatar');
+
     const isParticipantObservable = typeof params.participant === 'function';
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
@@ -159,15 +162,20 @@ class ParticipantAvatar {
         if (pictureResource) {
           const isCached = pictureResource.downloadProgress() === 100;
 
-          pictureResource.getObjectUrl().then(url => {
-            if (url) {
-              const image = new Image();
-              image.src = url;
-              this.element.find('.avatar-image').html(image);
-              this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-            }
-            this.avatarLoadingBlocked = false;
-          });
+          pictureResource
+            .getObjectUrl()
+            .then(url => {
+              if (url) {
+                const image = new Image();
+                image.src = url;
+                this.element.find('.avatar-image').html(image);
+                this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
+              }
+              this.avatarLoadingBlocked = false;
+            })
+            .catch(error => {
+              this.logger.warn('Failed to load avatar picture.', error);
+            });
         } else {
           this.avatarLoadingBlocked = false;
         }

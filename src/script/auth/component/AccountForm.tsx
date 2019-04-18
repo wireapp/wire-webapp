@@ -17,11 +17,13 @@
  *
  */
 
-import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock} from '@wireapp/react-ui-kit';
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
+import {Config} from '../config';
 import EXTERNAL_ROUTE from '../externalRoute';
 import ROOT_ACTIONS from '../module/action/';
 import BackendError from '../module/action/BackendError';
@@ -68,13 +70,15 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 class AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
-    name?: React.RefObject<any>;
-    email?: React.RefObject<any>;
-    password?: React.RefObject<any>;
+    name: React.RefObject<HTMLInputElement>;
+    email: React.RefObject<HTMLInputElement>;
+    password: React.RefObject<HTMLInputElement>;
+    terms: React.RefObject<HTMLInputElement>;
   } = {
-    email: React.createRef(),
-    name: React.createRef(),
-    password: React.createRef(),
+    email: React.createRef<HTMLInputElement>(),
+    name: React.createRef<HTMLInputElement>(),
+    password: React.createRef<HTMLInputElement>(),
+    terms: React.createRef<HTMLInputElement>(),
   };
 
   state: State = {
@@ -89,6 +93,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
       email: true,
       name: true,
       password: true,
+      terms: true,
     },
     validationErrors: [],
   };
@@ -118,57 +123,62 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
     return `${EXTERNAL_ROUTE.WIRE_WEBSITE}/legal/terms/${this.props.isPersonalFlow ? 'personal' : 'teams'}/`;
   };
 
-  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const validInputs: {[field: string]: boolean} = this.state.validInputs;
     const errors: Error[] = [];
 
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
-      currentInput.current.value = currentInput.current.value.trim();
-      if (!currentInput.current.checkValidity()) {
-        errors.push(ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity));
+      const currentInputNode = currentInput.current;
+      if (inputKey !== 'password' && inputKey !== 'terms') {
+        currentInputNode.value = currentInputNode.value.trim();
       }
-      validInputs[inputKey] = currentInput.current.validity.valid;
+      if (!currentInputNode.checkValidity()) {
+        errors.push(ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity));
+      }
+      validInputs[inputKey] = currentInputNode.validity.valid;
     });
 
     this.setState({validInputs, validationErrors: errors});
-    return Promise.resolve()
-      .then(() => {
-        if (errors.length > 0) {
-          throw errors[0];
-        }
-      })
-      .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
-      .then(() => this.props.pushAccountRegistrationData({...this.state.registrationData}))
-      .then(() => this.props.doSendActivationCode(this.state.registrationData.email))
-      .then(() => this.props.onSubmit(event))
-      .catch(error => {
-        if (error.label) {
-          switch (error.label) {
-            case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
-            case BackendError.AUTH_ERRORS.INVALID_EMAIL:
-            case BackendError.AUTH_ERRORS.KEY_EXISTS: {
-              this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
-              break;
-            }
-            case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
-            case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
-              this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
-              break;
-            }
-            default: {
-              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType)
-              );
-              if (!isValidationError) {
-                throw error;
-              }
+    try {
+      if (errors.length > 0) {
+        throw errors[0];
+      }
+      await (this.props.beforeSubmit && this.props.beforeSubmit());
+      await this.props.pushAccountRegistrationData({...this.state.registrationData});
+      await this.props.doSendActivationCode(this.state.registrationData.email);
+      return this.props.onSubmit(event);
+    } catch (error) {
+      if (error && error.label) {
+        switch (error.label) {
+          case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
+          case BackendError.AUTH_ERRORS.INVALID_EMAIL:
+          case BackendError.AUTH_ERRORS.KEY_EXISTS: {
+            this.inputs.email.current.setCustomValidity(error.label);
+            this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
+            break;
+          }
+          case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
+          case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
+            this.inputs.email.current.setCustomValidity(error.label);
+            this.inputs.password.current.setCustomValidity(error.label);
+            this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
+            break;
+          }
+          default: {
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType)
+            );
+            if (!isValidationError) {
+              throw error;
             }
           }
-        } else {
-          throw error;
         }
-      });
+      } else {
+        //tslint:disable:no-console
+        console.error('Account registration error', error);
+      }
+    }
   };
 
   render() {
@@ -188,15 +198,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           <InputBlock>
             <Input
               name="name"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.name.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     name: event.target.value,
                   },
                   validInputs: {...validInputs, name: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.name}
               markInvalid={!validInputs.name}
               value={name}
@@ -216,15 +227,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="email"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.email.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     email: event.target.value,
                   },
                   validInputs: {...validInputs, email: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.email}
               markInvalid={!validInputs.email}
               value={email}
@@ -244,40 +256,53 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
             />
             <Input
               name="password"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                this.inputs.password.current.setCustomValidity('');
                 this.setState({
                   registrationData: {
                     ...this.state.registrationData,
                     password: event.target.value,
                   },
                   validInputs: {...validInputs, password: true},
-                })
-              }
+                });
+              }}
               ref={this.inputs.password}
               markInvalid={!validInputs.password}
               value={password}
               autoComplete="section-create-team new-password"
               type="password"
               placeholder={_(accountFormStrings.passwordPlaceholder)}
-              maxLength={1024}
-              minLength={8}
-              pattern=".{8,1024}"
+              pattern={ValidationUtil.getNewPasswordPattern(Config.NEW_PASSWORD_MINIMUM_LENGTH)}
               required
               data-uie-name="enter-password"
             />
           </InputBlock>
+          <Small
+            style={{
+              display: this.state.validationErrors.length ? 'none' : 'block',
+              marginBottom: '32px',
+              padding: '0 16px',
+            }}
+            data-uie-name="element-password-help"
+          >
+            {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.NEW_PASSWORD_MINIMUM_LENGTH})}
+          </Small>
           <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
           <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
         </div>
         <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          ref={this.inputs.terms}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            this.inputs.terms.current.setCustomValidity('');
             this.setState({
               registrationData: {
                 ...this.state.registrationData,
                 termsAccepted: event.target.checked,
               },
-            })
-          }
+              validInputs: {...validInputs, terms: true},
+            });
+          }}
+          markInvalid={!validInputs.terms}
           name="accept"
           required
           checked={termsAccepted}

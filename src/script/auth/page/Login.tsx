@@ -377,9 +377,7 @@ class Login extends React.Component<CombinedProps, State> {
                           autoComplete="section-login password"
                           type="password"
                           placeholder={_(loginStrings.passwordPlaceholder)}
-                          maxLength={1024}
-                          minLength={8}
-                          pattern=".{8,1024}"
+                          pattern={`.{1,1024}`}
                           required
                           data-uie-name="enter-password"
                         />
@@ -387,6 +385,7 @@ class Login extends React.Component<CombinedProps, State> {
                           <Loading size={32} />
                         ) : (
                           <RoundIconButton
+                            style={{marginLeft: 16}}
                             tabIndex={4}
                             disabled={!email || !password}
                             type="submit"

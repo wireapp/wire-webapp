@@ -18,6 +18,7 @@
  */
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
+import {AvailabilityType} from '../user/AvailabilityType';
 
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
@@ -228,13 +229,13 @@ export default class CryptographyMapper {
         availability: (() => {
           switch (availability.type) {
             case Availability.Type.NONE:
-              return z.user.AvailabilityType.NONE;
+              return AvailabilityType.NONE;
             case Availability.Type.AVAILABLE:
-              return z.user.AvailabilityType.AVAILABLE;
+              return AvailabilityType.AVAILABLE;
             case Availability.Type.AWAY:
-              return z.user.AvailabilityType.AWAY;
+              return AvailabilityType.AWAY;
             case Availability.Type.BUSY:
-              return z.user.AvailabilityType.BUSY;
+              return AvailabilityType.BUSY;
             default:
               const message = 'Unhandled availability type';
               throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);

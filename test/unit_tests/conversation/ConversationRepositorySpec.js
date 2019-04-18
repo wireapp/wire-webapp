@@ -909,15 +909,12 @@ describe('ConversationRepository', () => {
         spyOn(conversationEntity, 'remove_message_by_id');
 
         const conversationRepository = TestFactory.conversation_repository;
-        spyOn(conversationRepository, 'find_conversation_by_id').and.returnValue(Promise.resolve(conversationEntity));
+        spyOn(conversationRepository, 'find_conversation_by_id').and.returnValue(conversationEntity);
 
-        return conversationRepository._deleteLocalMessageEntity({oldObj: deletedMessagePayload}).then(() => {
-          expect(conversationRepository.find_conversation_by_id).toHaveBeenCalledWith(
-            deletedMessagePayload.conversation
-          );
+        conversationRepository._deleteLocalMessageEntity({oldObj: deletedMessagePayload});
 
-          expect(conversationEntity.remove_message_by_id).toHaveBeenCalledWith(deletedMessagePayload.id);
-        });
+        expect(conversationRepository.find_conversation_by_id).toHaveBeenCalledWith(deletedMessagePayload.conversation);
+        expect(conversationEntity.remove_message_by_id).toHaveBeenCalledWith(deletedMessagePayload.id);
       });
     });
   });
