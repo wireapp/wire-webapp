@@ -28,7 +28,7 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
-import {BackupRepository} from '/src/script/backup/BackupRepository';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
 
 window.testConfig = {
   connection: backendConfig,

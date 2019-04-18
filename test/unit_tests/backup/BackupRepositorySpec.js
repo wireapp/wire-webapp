@@ -18,8 +18,8 @@
  */
 
 import JSZip from 'jszip';
-import {BackupRepository} from '/src/script/backup/BackupRepository';
-import * as BackupError from '/src/script/backup/Error';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
+import * as BackupError from 'src/script/backup/Error';
 
 const noop = () => {};
 
