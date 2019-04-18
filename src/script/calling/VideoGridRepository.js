@@ -19,10 +19,7 @@
 
 import {getDifference} from 'utils/ArrayUtil';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.VideoGridRepository = class VideoGridRepository {
+class VideoGridRepository {
   /**
    * Construct an new VideoGridRepository.
    * @param {CallingRepository} callingRepository - Repository for the calls
@@ -118,4 +115,6 @@ z.calling.VideoGridRepository = class VideoGridRepository {
     const newGrid = this.computeGrid(this.grid(), streams);
     this.grid(newGrid);
   }
-};
+}
+
+export {VideoGridRepository};

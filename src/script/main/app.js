@@ -29,6 +29,7 @@ import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
+import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 
@@ -228,7 +229,7 @@ class App {
       repositories.user
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
-    repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
+    repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }

@@ -20,10 +20,7 @@
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import {CallMessageEntity} from './entities/CallMessageEntity';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.CallMessageMapper = {
+const CallMessageMapper = {
   /**
    * Map incoming call message into entity.
    *
@@ -83,3 +80,5 @@ z.calling.CallMessageMapper = {
     return callMessageEntity;
   },
 };
+
+export {CallMessageMapper};

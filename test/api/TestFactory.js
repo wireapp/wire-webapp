@@ -340,7 +340,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 
 /**
  *
- * @returns {Promise<z.calling.CallCenter>} The call center.
+ * @returns {Promise<CallingRepository>} The call center.
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {

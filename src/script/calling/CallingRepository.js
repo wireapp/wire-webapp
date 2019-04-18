@@ -38,6 +38,7 @@ import TERMINATION_REASON from './enum/TerminationReason';
 
 import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {CallMessageMapper} from './CallMessageMapper';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -181,7 +182,7 @@ export class CallingRepository {
         throw new z.error.CallError(z.error.CallError.TYPE.UNSUPPORTED_VERSION);
       }
 
-      const callMessageEntity = z.calling.CallMessageMapper.mapEvent(event);
+      const callMessageEntity = CallMessageMapper.mapEvent(event);
       this._logMessage(false, callMessageEntity, eventDate);
 
       this._validateMessageType(callMessageEntity)
