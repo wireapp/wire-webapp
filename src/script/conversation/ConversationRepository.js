@@ -1937,7 +1937,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event info to be send
    * @param {Conversation} conversationEntity - Conversation to send call message to
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Content for call message
+   * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
   sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity) {
@@ -3879,7 +3879,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {GenericMessage} genericMessage - Protobuf message
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Optional call message
+   * @param {CallMessageEntity} callMessageEntity - Optional call message
    * @returns {undefined} No return value
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {

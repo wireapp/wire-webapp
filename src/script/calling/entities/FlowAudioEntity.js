@@ -17,19 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
-
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import MediaRepository from '../../media/MediaRepository';
 
-z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
+class FlowAudioEntity {
   /**
    * Create a new flow audio.
    *
-   * @class z.calling.entities.FlowAudioEntity
-   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
+   * @param {FlowEntity} flowEntity - Flow entity
    * @param {MediaRepository} mediaRepository - Media repository
    */
   constructor(flowEntity, mediaRepository) {
@@ -185,4 +180,6 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
       this.gainNode.connect(this.audioRemote);
     }
   }
-};
+}
+
+export {FlowAudioEntity};

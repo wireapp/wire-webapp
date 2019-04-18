@@ -28,12 +28,10 @@ import TimeUtil from 'utils/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
+import {FlowAudioEntity} from './FlowAudioEntity';
+import {CallEntity} from './CallEntity';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
-
-z.calling.entities.FlowEntity = class FlowEntity {
+class FlowEntity {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
@@ -48,9 +46,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
   /**
    * Construct a new flow entity.
    *
-   * @class z.calling.entities.FlowEntity
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity that the flow belongs to
-   * @param {z.calling.entities.ParticipantEntity} participantEntity - Participant entity that the flow belongs to
+   * @param {CallEntity} callEntity - Call entity that the flow belongs to
+   * @param {ParticipantEntity} participantEntity - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
   constructor(callEntity, participantEntity, timings) {
@@ -77,7 +74,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     this.selfUserId = this.selfUser.id;
 
     // Audio
-    this.audio = new z.calling.entities.FlowAudioEntity(this, this.callingRepository.mediaRepository);
+    this.audio = new FlowAudioEntity(this, this.callingRepository.mediaRepository);
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
@@ -644,7 +641,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
   /**
    * Send a call message through the data channel.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
+   * @param {CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {undefined} No return value
    */
   sendMessage(callMessageEntity) {
@@ -801,7 +798,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * Save the remote SDP received via a call message within the flow.
    *
    * @note The resolving value indicates whether negotiation should be skipped for the current state.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves when the remote SDP was saved
    */
   saveRemoteSdp(callMessageEntity) {
@@ -1163,9 +1160,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {undefined} No return value
    */
   _setNegotiationFailedTimeout(isInitialNegotiation) {
-    const timeout = isInitialNegotiation
-      ? z.calling.entities.CallEntity.CONFIG.STATE_TIMEOUT
-      : FlowEntity.CONFIG.RENEGOTIATION_TIMEOUT;
+    const timeout = isInitialNegotiation ? CallEntity.CONFIG.STATE_TIMEOUT : FlowEntity.CONFIG.RENEGOTIATION_TIMEOUT;
 
     this.negotiationTimeout = window.setTimeout(() => {
       this.callLogger.info('Removing call participant on negotiation timeout');
@@ -1569,4 +1564,6 @@ z.calling.entities.FlowEntity = class FlowEntity {
   reportTimings() {
     this.telemetry.report_timings();
   }
-};
+}
+
+export {FlowEntity};

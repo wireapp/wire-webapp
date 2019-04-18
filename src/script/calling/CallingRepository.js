@@ -24,6 +24,8 @@ import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallMessageBuilder} from './CallMessageBuilder';
+import {CallEntity} from './entities/CallEntity';
+import {CallMessageEntity} from './entities/CallMessageEntity';
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
@@ -168,7 +170,7 @@ export class CallingRepository {
     this.callLogger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
 
     if (isCall) {
-      const isSupportedVersion = eventContent.version === z.calling.entities.CallMessageEntity.CONFIG.VERSION;
+      const isSupportedVersion = eventContent.version === CallMessageEntity.CONFIG.VERSION;
       if (!isSupportedVersion) {
         throw new z.error.CallError(z.error.CallError.TYPE.UNSUPPORTED_VERSION);
       }
@@ -193,7 +195,7 @@ export class CallingRepository {
    * Call event handling for browsers supporting calling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Mapped incoming call message entity
+   * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -251,7 +253,7 @@ export class CallingRepository {
    * Call event handling for browsers not supporting calling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Mapped incoming call message entity
+   * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -287,7 +289,7 @@ export class CallingRepository {
    * Call cancel message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.CANCEL
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.CANCEL
    * @returns {undefined} No return value
    */
   _onCancel(callMessageEntity) {
@@ -319,7 +321,7 @@ export class CallingRepository {
    * Call group check message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -333,7 +335,7 @@ export class CallingRepository {
    * Call group leave message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_LEAVE
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_LEAVE
    * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
    * @returns {undefined} No return value
    */
@@ -362,7 +364,7 @@ export class CallingRepository {
    * Call group setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - call message entity of type CALL_MESSAGE_TYPE.GROUP_SETUP
+   * @param {CallMessageEntity} callMessageEntity - call message entity of type CALL_MESSAGE_TYPE.GROUP_SETUP
    * @returns {undefined} No return value
    */
   _onGroupSetup(callMessageEntity) {
@@ -383,7 +385,7 @@ export class CallingRepository {
    * Call group start message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -414,7 +416,7 @@ export class CallingRepository {
    * Call hangup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.HANGUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.HANGUP
    * @param {TERMINATION_REASON} terminationReason - Reason for the participant to hangup
    * @returns {undefined} No return value
    */
@@ -435,7 +437,7 @@ export class CallingRepository {
    * Call prop-sync message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _onPropSync(callMessageEntity) {
@@ -452,7 +454,7 @@ export class CallingRepository {
    * Call reject message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.REJECT
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.REJECT
    * @returns {undefined} No return value
    */
   _onReject(callMessageEntity) {
@@ -477,7 +479,7 @@ export class CallingRepository {
    * Call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -507,7 +509,7 @@ export class CallingRepository {
    * Call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _onUpdate(callMessageEntity) {
@@ -524,7 +526,7 @@ export class CallingRepository {
    * Handle remote self join message.
    *
    * @private
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @returns {Promise} Resolves when self join was handled
    */
   _remoteSelfJoin(callEntity) {
@@ -579,7 +581,7 @@ export class CallingRepository {
   /**
    * Verify validity of incoming call.
    *
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
+   * @param {CallMessageEntity} callMessageEntity - Call message to validate
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {z.error.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
@@ -629,8 +631,8 @@ export class CallingRepository {
 
   /**
    * Validate that content of call message is targeted at local client.
-   * @param {z.calling.entities.CallEntity} callEntity - Call the message belongs to
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
+   * @param {CallEntity} callEntity - Call the message belongs to
+   * @param {CallMessageEntity} callMessageEntity - Call message to validate
    * @returns {CallEntity} Call entity if message is valid
    */
   _validateMessageDestination(callEntity, callMessageEntity) {
@@ -651,7 +653,7 @@ export class CallingRepository {
 
   /**
    * Validate that type of call message matches conversation type.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to validate
+   * @param {CallMessageEntity} callMessageEntity - Call message to validate
    * @returns {Promise} Resolves if the message is valid
    */
   _validateMessageType(callMessageEntity) {
@@ -691,7 +693,7 @@ export class CallingRepository {
    * Send a call event.
    *
    * @param {Conversation} conversationEntity - Conversation to send message in
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity
+   * @param {CallMessageEntity} callMessageEntity - Call message entity
    * @returns {Promise} Resolves when the event has been sent
    */
   sendCallMessage(conversationEntity, callMessageEntity) {
@@ -747,8 +749,8 @@ export class CallingRepository {
   /**
    *
    * @private
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
-   * @param {z.calling.entities.CallMessageEntity} incomingCallMessageEntity - Incoming call message
+   * @param {CallEntity} callEntity - Call entity
+   * @param {CallMessageEntity} incomingCallMessageEntity - Incoming call message
    * @returns {Promise} Resolves with the call
    */
   _confirmCallMessage(callEntity, incomingCallMessageEntity) {
@@ -772,7 +774,7 @@ export class CallingRepository {
    * Limit the message recipients for a call message.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to target at clients
+   * @param {CallMessageEntity} callMessageEntity - Call message to target at clients
    * @returns {Promise} Resolves with the client user map and precondition option
    */
   _limitMessageRecipients(callMessageEntity) {
@@ -1329,7 +1331,7 @@ export class CallingRepository {
    * Constructs a call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {User} creatingUserEntity - User that created call
    * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
    * @returns {Promise} Resolves with the new call entity
@@ -1340,7 +1342,7 @@ export class CallingRepository {
 
     return this.getCallById(conversationId).catch(() => {
       return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-        const callEntity = new z.calling.entities.CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
+        const callEntity = new CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
 
         callEntity.initiateTelemetry(direction, mediaType);
         this.calls.push(callEntity);
@@ -1353,7 +1355,7 @@ export class CallingRepository {
    * Constructs an incoming call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
@@ -1418,7 +1420,7 @@ export class CallingRepository {
    * Constructs an outgoing call entity.
    *
    * @private
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.PROP_SYNC
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.PROP_SYNC
    * @returns {Promise} Resolves with the new call entity
    */
   _createOutgoingCall(callMessageEntity) {
@@ -1452,7 +1454,7 @@ export class CallingRepository {
 
   /**
    * Inject a call activate event.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to create event from
+   * @param {CallMessageEntity} callMessageEntity - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
@@ -1463,7 +1465,7 @@ export class CallingRepository {
 
   /**
    * Inject a call deactivate event.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to create event from
+   * @param {CallMessageEntity} callMessageEntity - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
@@ -1690,7 +1692,7 @@ ${turnServersConfig}`;
    *
    * @private
    * @param {boolean} isOutgoing - Is message outgoing
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
+   * @param {CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
    * @returns {undefined} No return value
    */
   _logMessage(isOutgoing, callMessageEntity) {

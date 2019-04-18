@@ -18,6 +18,7 @@
  */
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+import {CallMessageEntity} from './entities/CallMessageEntity';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -28,7 +29,7 @@ z.calling.CallMessageMapper = {
    *
    * @private
    * @param {Object} event - Call event object
-   * @returns {z.calling.entities.CallMessageEntity} Call message entity
+   * @returns {CallMessageEntity} Call message entity
    */
   mapEvent(event) {
     const {content: callMessage, conversation: conversationId, from: userId, sender: clientId, time} = event;
@@ -75,7 +76,7 @@ z.calling.CallMessageMapper = {
     }
 
     const {type, resp: response, sessid: sessionId} = callMessage;
-    const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
+    const callMessageEntity = new CallMessageEntity(type, response, sessionId);
 
     callMessageEntity.addProperties(additionalProperties);
 
