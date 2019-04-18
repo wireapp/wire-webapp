@@ -78,9 +78,7 @@ export class ModalsViewModel {
 
   showModal = (type, options) => {
     this.queue.push({options, type});
-    if (this.state() === States.READY) {
-      this.unqueue();
-    }
+    this.unqueue();
   };
 
   ready = () => {
