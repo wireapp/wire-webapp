@@ -18,6 +18,7 @@
  */
 
 import {SDPMapper} from 'src/script/calling/SDPMapper';
+import {SDP_TYPE} from 'src/script/calling/rtc/SDPType';
 
 describe('SDPMapper', () => {
   const envInitialState = Object.assign({}, z.util.Environment);
@@ -46,7 +47,7 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
     it('replaces "UPD/TLS/" only for local SPD', () => {
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
@@ -68,7 +69,7 @@ m=application 0 UDP/DTLS/SCTP webrtc-datachannel`.replace(/\n/g, '\r\n');
 
       const rtcSdp = {
         sdp: firefoxSdp,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
@@ -87,7 +88,7 @@ a=sctpmap:5000 webrtc-datachannel 1024
 
       const rtcSdp = {
         sdp: remoteSdp,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
@@ -102,7 +103,7 @@ a=sctpmap:5000 webrtc-datachannel 1024
     it('adds the browser name and app version for local SDP', () => {
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       spyOn(z.util.Environment, 'version').and.callFake(isDesktop => (isDesktop ? '5.5.5' : '4.4.4'));
@@ -146,7 +147,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
 
       const rtcSdp = {
         sdp: sdpStr + candidates,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       const {sdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
@@ -160,7 +161,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
       const videoChannel = `m=video 0`;
       const rtcSdp = {
         sdp: `${sdpStr}\r\n${dataChannel}\r\n${videoChannel}`,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
@@ -193,7 +194,7 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
 
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       [groupConfig, iceRestartConfig].forEach(config => {
