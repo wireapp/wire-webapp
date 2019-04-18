@@ -19,6 +19,8 @@
 
 import MediaStreamHandler from '../../media/MediaStreamHandler';
 import {CallLogger} from '../../telemetry/calling/CallLogger';
+import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
+import {FlowTelemetry} from '../../telemetry/calling/FlowTelemetry';
 
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import CALL_STATE from '../enum/CallState';
@@ -85,7 +87,7 @@ class FlowEntity {
     this.audio = new FlowAudioEntity(this, this.callingRepository.mediaRepository);
 
     // Telemetry
-    this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
+    this.telemetry = new FlowTelemetry(this.id, this.remoteUserId, this.callEntity, timings);
 
     this.callLogger.info({
       data: {
@@ -123,7 +125,7 @@ class FlowEntity {
         case ICE_CONNECTION_STATE.CONNECTED: {
           this._clearNegotiationTimeout();
           this.negotiationMode(SDP_NEGOTIATION_MODE.DEFAULT);
-          this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
+          this.telemetry.time_step(CallSetupSteps.ICE_CONNECTION_CONNECTED);
 
           this.callEntity.isConnected(true);
           this.participantEntity.isConnected(true);
@@ -513,7 +515,7 @@ class FlowEntity {
     return this._createPeerConnectionConfiguration().then(pcConfiguration => {
       this.peerConnection = new window.RTCPeerConnection(pcConfiguration);
       this.peerConnectionConfiguration = pcConfiguration;
-      this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
+      this.telemetry.time_step(CallSetupSteps.PEER_CONNECTION_CREATED);
       this.signalingState(this.peerConnection.signalingState);
 
       const logMessage = {
@@ -578,7 +580,7 @@ class FlowEntity {
     if (!iceCandidate) {
       if (this.shouldSendLocalSdp()) {
         this.callLogger.info('Generation of ICE candidates completed');
-        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED);
+        this.telemetry.time_step(CallSetupSteps.ICE_GATHERING_COMPLETED);
         this.sendLocalSdp();
       }
     }
@@ -934,7 +936,7 @@ class FlowEntity {
         }
 
         return this.callEntity.sendCallMessage(callMessageEntity).then(() => {
-          this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
+          this.telemetry.time_step(CallSetupSteps.LOCAL_SDP_SEND);
           this.callLogger.debug(`Sending local '${transformedSdp.type}' SDP successful`, transformedSdp.sdp);
         });
       })
@@ -1096,7 +1098,7 @@ class FlowEntity {
       .setLocalDescription(localSdp)
       .then(() => {
         this.callLogger.info(`Setting local '${localSdp.type}' SDP successful`, this.peerConnection.localDescription);
-        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
+        this.telemetry.time_step(CallSetupSteps.LOCAL_SDP_SET);
 
         this.shouldSetLocalSdp(false);
         this.sdpStateChanging(false);
@@ -1120,7 +1122,7 @@ class FlowEntity {
       .then(() => {
         const logMessage = `Setting remote '${remoteSdp.type}' SDP successful`;
         this.callLogger.info(logMessage, this.peerConnection.remoteDescription);
-        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
+        this.telemetry.time_step(CallSetupSteps.REMOTE_SDP_SET);
 
         this.shouldSetRemoteSdp(false);
         this.sdpStateChanging(false);
