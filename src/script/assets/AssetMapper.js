@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetMapper = {
+export default class AssetMapper {
   /**
    * Creates asset entities out of raw asset data.
    *
@@ -28,7 +25,7 @@ z.assets.AssetMapper = {
    * @param {Array<Object>} assets - the assets to map
    * @returns {MappedAssets} Object containing the mapped assets
    */
-  mapProfileAssets: (userId, assets) => {
+  mapProfileAssets(userId, assets) {
     const sizeMap = {
       complete: 'medium',
       preview: 'preview',
@@ -43,7 +40,7 @@ z.assets.AssetMapper = {
           ? mappedAssets
           : Object.assign({}, mappedAssets, {[sizeMap[asset.size]]: assetRemoteData});
       }, {});
-  },
+  }
 
   /**
    * Creates asset entities out of raw asset data.
@@ -52,13 +49,13 @@ z.assets.AssetMapper = {
    * @param {Array<Object>} pictures - the pictures to map
    * @returns {MappedAssets} Object containing the mapped assets
    */
-  mapProfileAssetsV1: (userId, pictures) => {
+  mapProfileAssetsV1(userId, pictures) {
     const [previewPicture, mediumPicture] = pictures;
     const previewAsset = previewPicture ? z.assets.AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
     const mediumAsset = mediumPicture ? z.assets.AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
 
     return {medium: mediumAsset, preview: previewAsset};
-  },
+  }
 
   /**
    * Updates the user entity's assets.
@@ -75,5 +72,5 @@ z.assets.AssetMapper = {
     if (medium) {
       userEntity.mediumPictureResource(medium);
     }
-  },
-};
+  }
+}

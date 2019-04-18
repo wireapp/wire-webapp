@@ -19,6 +19,7 @@
 
 window.z = window.z || {};
 window.z.integration = z.integration || {};
+import AssetMapper from '../assets/AssetMapper';
 
 z.integration.IntegrationMapper = (() => {
   const _mapProviderFromObject = providerData => {
@@ -72,8 +73,8 @@ z.integration.IntegrationMapper = (() => {
       }
 
       if (assets && assets.length) {
-        const mappedAssets = z.assets.AssetMapper.mapProfileAssets(serviceEntity.id, assets);
-        z.assets.AssetMapper.updateUserEntityAssets(serviceEntity, mappedAssets);
+        const mappedAssets = AssetMapper.mapProfileAssets(serviceEntity.id, assets);
+        AssetMapper.updateUserEntityAssets(serviceEntity, mappedAssets);
       }
 
       if (description) {
