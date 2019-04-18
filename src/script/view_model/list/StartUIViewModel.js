@@ -23,6 +23,7 @@ import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import User from '../../entity/User';
+import {ConnectSource} from '../../connect/ConnectSource';
 import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 
@@ -447,7 +448,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   clickOnImportContacts() {
-    this._importContacts(z.connect.ConnectSource.ICLOUD);
+    this._importContacts(ConnectSource.ICLOUD);
   }
 
   clickToCloseGenericInvite() {
@@ -518,7 +519,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   /**
    * Connect with contacts.
-   * @param {z.connect.ConnectSource} source - Source for the contacts import
+   * @param {ConnectSource} source - Source for the contacts import
    * @returns {undefined} No return value
    */
   importContacts(source) {

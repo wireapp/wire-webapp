@@ -17,9 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
-
-z.connect.ConnectSource = {
+const ConnectSource = {
   ICLOUD: 'icloud',
 };
+
+export {ConnectSource};

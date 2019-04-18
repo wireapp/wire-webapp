@@ -17,29 +17,33 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import * as logdown from 'logdown';
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
+import Logger from '../util/Logger';
+import {PhoneBook} from './PhoneBook';
+import BackendClient from '../service/BackendClient';
 
-z.connect.ConnectService = class ConnectService {
+class ConnectService {
+  backendClient: BackendClient;
+  logger: logdown.Logger;
+
   /**
    * Construct an new ConnectService.
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param backendClient Client for the API calls
    */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.connect.ConnectService');
+    this.logger = Logger('ConnectService');
   }
 
   /**
    * Upload address book data for matching.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
    *
-   * @param {z.connect.PhoneBook} phoneBook - Phone book containing the address cards
-   * @returns {Promise} Resolves with the matched contacts from the user's phone book
+   * @param phoneBook - Phone book containing the address cards
+   * @returns Resolves with the matched contacts from the user's phone book
    */
-  postOnboarding(phoneBook) {
+  postOnboarding(phoneBook: PhoneBook): Promise<any> {
     return this.backendClient.sendJson({
       data: phoneBook,
       type: 'POST',
@@ -47,3 +51,5 @@ z.connect.ConnectService = class ConnectService {
     });
   }
 };
+
+export {ConnectService}

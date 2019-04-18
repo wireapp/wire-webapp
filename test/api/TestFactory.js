@@ -28,6 +28,8 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
+import {ConnectService} from 'src/script/connect/ConnectService';
+import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -252,18 +254,15 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
 
 /**
  *
- * @returns {Promise<z.connect.ConnectRepository>} The connect repository.
+ * @returns {Promise<ConnectRepository>} The connect repository.
  */
 window.TestFactory.prototype.exposeConnectActors = function() {
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.connectService = new z.connect.ConnectService(resolve(graph.BackendClient));
+      TestFactory.connectService = new ConnectService(resolve(graph.BackendClient));
 
-      TestFactory.connect_repository = new z.connect.ConnectRepository(
-        TestFactory.connectService,
-        TestFactory.user_repository
-      );
+      TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
 
       return TestFactory.connect_repository;
     });

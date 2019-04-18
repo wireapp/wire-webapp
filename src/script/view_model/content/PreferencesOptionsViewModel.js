@@ -31,6 +31,7 @@ window.z.viewModel.content = z.viewModel.content || {};
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {downloadBlob} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {ConnectSource} from '../../connect/ConnectSource';
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
@@ -83,7 +84,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   connectMacOSContacts() {
-    amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD);
+    amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
   }
 
   saveCallLogs() {

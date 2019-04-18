@@ -31,6 +31,8 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
+import {ConnectService} from '../connect/ConnectService';
+import {ConnectRepository} from '../connect/ConnectRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -152,7 +154,7 @@ class App {
       serverTimeHandler,
       repositories.user
     );
-    repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
+    repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
     repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
@@ -246,7 +248,7 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       client: new z.client.ClientService(this.backendClient, storageService),
-      connect: new z.connect.ConnectService(this.backendClient),
+      connect: new ConnectService(this.backendClient),
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
