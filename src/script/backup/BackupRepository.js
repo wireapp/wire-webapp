@@ -41,7 +41,6 @@ class BackupRepository {
 
   /**
    * Construct a new Backup repository.
-   * @class BackupRepository
    * @param {BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
