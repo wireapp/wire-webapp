@@ -38,7 +38,7 @@ export const SDPMapper = {
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   mapCallMessageToObject(callMessageEntity) {
