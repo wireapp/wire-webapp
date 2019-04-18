@@ -60,7 +60,6 @@ import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetTypeGlobal from '../assets/AssetType.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
-import AssetCryptoGlobal from '../assets/AssetCrypto.js';
 import ErrorGlobal from '../backup/Error.js';
 import BackupRepositoryGlobal from '../backup/BackupRepository.js';
 import DataChannelStateGlobal from '../calling/rtc/DataChannelState.js';

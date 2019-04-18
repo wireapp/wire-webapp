@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 import {loadUrlBuffer} from 'utils/util';
 import {AssetURLCache} from './AssetURLCache';
+import AssetCrypto from '../assets/AssetCrypto';
 
 class AssetRemoteData {
   /**
@@ -142,9 +143,7 @@ class AssetRemoteData {
         type = mimeType;
         this.loadPromise = undefined;
         const isEncryptedAsset = this.otrKey && this.sha256;
-        return isEncryptedAsset
-          ? z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer)
-          : buffer;
+        return isEncryptedAsset ? AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer) : buffer;
       })
       .then(plaintext => new Blob([new Uint8Array(plaintext)], {type}))
       .catch(error => {

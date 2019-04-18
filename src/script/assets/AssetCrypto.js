@@ -17,21 +17,18 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetCrypto = (() => {
+export default class AssetCrypto {
   /**
    * @param {ArrayBuffer} cipherText - Encrypted plaintext
    * @param {ArrayBuffer} keyBytes - AES key used for encryption
    * @param {ArrayBuffer} referenceSha256 - SHA-256 checksum of the cipherText
    * @returns {Promise} Resolves with the decrypted asset
    */
-  const _decryptAesAsset = (cipherText, keyBytes, referenceSha256) => {
+  decryptAesAsset(cipherText, keyBytes, referenceSha256) {
     return window.crypto.subtle
       .digest('SHA-256', cipherText)
       .then(computedSha256 => {
-        if (_equalHashes(referenceSha256, computedSha256)) {
+        if (this._equalHashes(referenceSha256, computedSha256)) {
           return window.crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
         }
 
@@ -42,15 +39,15 @@ z.assets.AssetCrypto = (() => {
         const assetCipherText = cipherText.slice(16);
         return window.crypto.subtle.decrypt({iv: iv, name: 'AES-CBC'}, key, assetCipherText);
       });
-  };
+  }
 
   /**
    * @param {ArrayBuffer} plaintext - Plaintext asset to be encrypted
    * @returns {Promise} Resolves with the encrypted asset
    */
-  const _encryptAesAsset = plaintext => {
-    const iv = _generateRandomBytes(16);
-    const rawKeyBytes = _generateRandomBytes(32);
+  encryptAesAsset(plaintext) {
+    const iv = this._generateRandomBytes(16);
+    const rawKeyBytes = this._generateRandomBytes(32);
     let key = null;
     let ivCipherText = null;
     let computedSha256 = null;
@@ -75,15 +72,15 @@ z.assets.AssetCrypto = (() => {
         return window.crypto.subtle.exportKey('raw', key);
       })
       .then(keyBytes => ({cipherText: ivCipherText.buffer, keyBytes: keyBytes, sha256: computedSha256}));
-  };
+  }
 
-  const _equalHashes = (bufferA, bufferB) => {
+  _equalHashes(bufferA, bufferB) {
     const arrayA = new Uint32Array(bufferA);
     const arrayB = new Uint32Array(bufferB);
     return arrayA.length === arrayB.length && arrayA.every((value, index) => value === arrayB[index]);
-  };
+  }
 
-  const _generateRandomBytes = length => {
+  _generateRandomBytes(length) {
     const getRandomValue = () => {
       const buffer = new Uint32Array(1);
       window.crypto.getRandomValues(buffer);
@@ -96,10 +93,5 @@ z.assets.AssetCrypto = (() => {
       return randomBytes;
     }
     throw Error('Failed to initialize iv with random values');
-  };
-
-  return {
-    decryptAesAsset: _decryptAesAsset,
-    encryptAesAsset: _encryptAesAsset,
-  };
-})();
+  }
+}

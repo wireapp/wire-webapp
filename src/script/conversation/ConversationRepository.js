@@ -58,6 +58,7 @@ import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import AssetUploadFailedReason from '../assets/AssetUploadFailedReason';
+import AssetCrypto from '../assets/AssetCrypto';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -2441,7 +2442,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
+    return AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
       .then(({cipherText, keyBytes, sha256}) => {
         keyBytes = new Uint8Array(keyBytes);
         sha256 = new Uint8Array(sha256);
