@@ -17,15 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
-
 // https://www.w3.org/TR/webrtc/#dom-rtcstatstype
-z.calling.rtc.STATS_TYPE = {
+const STATS_TYPE = {
   CANDIDATE_PAIR: 'candidate-pair',
   GOOGLE_CANDIDATE_PAIR: 'googCandidatePair',
   INBOUND_RTP: 'inbound-rtp',
   OUTBOUND_RTP: 'outbound-rtp',
   SSRC: 'ssrc',
 };
+
+export {STATS_TYPE};

@@ -19,6 +19,8 @@
 
 import Logger from 'utils/Logger';
 
+import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
+
 window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
@@ -88,7 +90,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peer_connection.signalingState === SIGNALING_STATE.CLOSED;
       if (!isSignalingStateClosed) {
         if (this.peer_connection.localDescription) {
           $.extend(report.rtc_peer_connection, {
