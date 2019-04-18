@@ -45,7 +45,7 @@ export default class MediaRepository {
 
   /**
    * Construct a new Media repository.
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {Logger} logger - Logger configured for that class
    */
   constructor(permissionRepository, logger) {

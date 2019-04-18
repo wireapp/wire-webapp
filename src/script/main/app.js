@@ -30,6 +30,7 @@ import UserRepository from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
+import {NotificationRepository} from '../notification/NotificationRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -220,7 +221,7 @@ class App {
       repositories.team
     );
     repositories.permission = resolve(graph.PermissionRepository);
-    repositories.notification = new z.notification.NotificationRepository(
+    repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
       resolve(graph.PermissionRepository),

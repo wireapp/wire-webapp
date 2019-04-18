@@ -28,6 +28,7 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -358,7 +359,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
 
 /**
  *
- * @returns {Promise<z.notification.NotificationRepository>} The repository for system notifications.
+ * @returns {Promise<NotificationRepository>} The repository for system notifications.
  */
 window.TestFactory.prototype.exposeNotificationActors = function() {
   return this.exposeConversationActors()
@@ -366,7 +367,7 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
       return this.exposeCallingActors();
     })
     .then(() => {
-      TestFactory.notification_repository = new z.notification.NotificationRepository(
+      TestFactory.notification_repository = new NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
         resolve(graph.PermissionRepository),

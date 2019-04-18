@@ -19,6 +19,9 @@
 
 import Logger from 'utils/Logger';
 
+import {PermissionStatusState} from './PermissionStatusState';
+import {PermissionType} from './PermissionType';
+
 /**
  * Permission repository to check browser permissions.
  *
@@ -27,20 +30,20 @@ import Logger from 'utils/Logger';
 export default class PermissionRepository {
   static get CONFIG() {
     return {
-      MEDIA_TYPES: [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE],
+      MEDIA_TYPES: [PermissionType.CAMERA, PermissionType.MICROPHONE],
     };
   }
   /**
    * Construct a new Permission Repository.
    */
   constructor() {
-    this.logger = Logger('z.permission.PermissionRepository');
+    this.logger = Logger('PermissionRepository');
 
     this.permissionState = {
-      [z.permission.PermissionType.CAMERA]: ko.observable(undefined),
-      [z.permission.PermissionType.GEO_LOCATION]: ko.observable(undefined),
-      [z.permission.PermissionType.MICROPHONE]: ko.observable(undefined),
-      [z.permission.PermissionType.NOTIFICATIONS]: ko.observable(undefined),
+      [PermissionType.CAMERA]: ko.observable(undefined),
+      [PermissionType.GEO_LOCATION]: ko.observable(undefined),
+      [PermissionType.MICROPHONE]: ko.observable(undefined),
+      [PermissionType.NOTIFICATIONS]: ko.observable(undefined),
     };
   }
 
@@ -81,7 +84,7 @@ export default class PermissionRepository {
     const permissionPromises = permissionTypes.map(permissionType => {
       return this.getPermissionState(permissionType)
         .then(permissionState => ({permissionState, permissionType}))
-        .catch(() => ({permissionState: z.permission.PermissionStatusState.PROMPT, permissionType}));
+        .catch(() => ({permissionState: PermissionStatusState.PROMPT, permissionType}));
     });
 
     return Promise.all(permissionPromises);
