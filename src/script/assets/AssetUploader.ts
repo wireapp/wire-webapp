@@ -21,8 +21,8 @@ import ko from 'knockout';
 import Asset from '../entity/message/Asset';
 
 export default class AssetUploader {
-  private assetService: any;
-  private uploadQueue = ko.observableArray();
+  private readonly assetService: any;
+  private readonly uploadQueue = ko.observableArray();
 
   constructor(assetService: any) {
     this.assetService = assetService;

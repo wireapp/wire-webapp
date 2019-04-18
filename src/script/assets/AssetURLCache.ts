@@ -20,7 +20,7 @@
 import {LRUCache} from '@wireapp/lru-cache';
 
 export default class AssetURLCache {
-  private cache: LRUCache<string> = new LRUCache(100);
+  private readonly cache: LRUCache<string> = new LRUCache(100);
 
   getUrl(identifier: string): string {
     return this.cache.get(identifier);
