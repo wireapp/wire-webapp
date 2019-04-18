@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
+enum AssetUploadFailedReason {
+  CANCELLED = 0,
+  FAILED = 1,
+}
 
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
-};
+export default AssetUploadFailedReason;

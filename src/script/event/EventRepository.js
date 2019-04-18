@@ -22,6 +22,7 @@ import TimeUtil from 'utils/TimeUtil';
 import {t} from 'utils/LocalizerUtil';
 import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
 import {koArrayPushAll} from 'utils/util';
+import AssetUploadFailedReason from '../assets/AssetUploadFailedReason';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -751,7 +752,7 @@ z.event.EventRepository = class EventRepository {
       case z.assets.AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromOther = newEvent.from !== this.userRepository.self().id;
-        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        const selfCancel = !fromOther && newEvent.data.reason === AssetUploadFailedReason.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
         const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent
