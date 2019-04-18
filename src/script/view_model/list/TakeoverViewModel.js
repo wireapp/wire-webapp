@@ -21,11 +21,7 @@ import Logger from 'utils/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
+class TakeoverViewModel {
   /**
    * View model for the username takeover screen.
    *
@@ -37,7 +33,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.TakeoverViewModel');
+    this.logger = Logger('TakeoverViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -67,4 +63,6 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
       .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))
       .then(() => this.listViewModel.dismissModal());
   }
-};
+}
+
+export {TakeoverViewModel};

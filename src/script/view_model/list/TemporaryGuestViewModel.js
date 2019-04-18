@@ -22,11 +22,7 @@ import Logger from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
+class TemporaryGuestViewModel {
   /**
    * View model for the temporary guest experience.
    *
@@ -42,7 +38,7 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
-    this.logger = Logger('z.viewModel.list.TemporaryGuestViewModel');
+    this.logger = Logger('TemporaryGuestViewModel');
 
     this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;
@@ -67,4 +63,6 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   isSelectedConversation() {
     return true;
   }
-};
+}
+
+export {TemporaryGuestViewModel};
