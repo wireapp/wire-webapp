@@ -26,6 +26,7 @@ import CALL_STATE_GROUP from '../enum/CallStateGroup';
 import TERMINATION_REASON from '../enum/TerminationReason';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
+import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {ParticipantEntity} from './ParticipantEntity';
@@ -950,7 +951,7 @@ class CallEntity {
    */
   initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
     this.telemetry.initiateNewCall(direction, mediaType);
-    this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
+    this.timings = new CallSetupTimings(this.id);
   }
 
   /**

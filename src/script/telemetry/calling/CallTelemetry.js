@@ -23,14 +23,10 @@ import trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
 import {sortObjectByKeys} from 'utils/util';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
-
 // Call traces entity.
-z.telemetry.calling.CallTelemetry = class CallTelemetry {
+class CallTelemetry {
   constructor() {
-    this.logger = Logger('z.telemetry.calling.CallTelemetry');
+    this.logger = Logger('CallTelemetry');
 
     this.sessions = {};
     this.remote_version = undefined;
@@ -179,4 +175,6 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   numberOfParticipantsChanged(newNumberOfParticipants) {
     this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
-};
+}
+
+export {CallTelemetry};

@@ -18,12 +18,9 @@
  */
 
 import Logger from 'utils/Logger';
+import {CallSetupTimings} from './CallSetupTimings';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
-
-z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
+class FlowTelemetry {
   /**
    * Construct new flow telemetry entity.
    *
@@ -39,12 +36,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
     const loggerId = this.id.substr(0, 8);
     const loggerTimestamp = new Date().getMilliseconds();
-    const loggerName = `z.telemetry.calling.FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
+    const loggerName = `FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
     this.logger = Logger(loggerName);
     this.is_answer = false;
     this.peer_connection = undefined;
 
-    this.timings = $.extend(new z.telemetry.calling.CallSetupTimings(this.id), timings ? timings.get() : {});
+    this.timings = $.extend(new CallSetupTimings(this.id), timings ? timings.get() : {});
   }
 
   //##############################################################################
@@ -241,4 +238,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     Raygun.send(new Error('Call setup step timings'), custom_data);
     this.logger.info(`Reported setup step timings of flow id '${this.id}' for call analysis`, custom_data);
   }
-};
+}
+
+export {FlowTelemetry};

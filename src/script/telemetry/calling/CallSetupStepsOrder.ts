@@ -17,17 +17,25 @@
  *
  */
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+import {CallSetupSteps} from './CallSetupSteps';
 
-z.telemetry.calling.CallSetupSteps = {
-  ICE_CONNECTION_CONNECTED: 'ice_connection_connected',
-  ICE_GATHERING_COMPLETED: 'ice_gathering_completed',
-  LOCAL_SDP_SEND: 'local_sdp_send',
-  LOCAL_SDP_SET: 'local_sdp_set',
-  PEER_CONNECTION_CREATED: 'peer_connection_created',
-  REMOTE_SDP_SET: 'remote_sdp_set',
-  STARTED: 'started',
-  STREAM_RECEIVED: 'stream_received',
+const CallSetupStepsOrder = {
+  ANSWER: [
+    CallSetupSteps.STREAM_RECEIVED,
+    CallSetupSteps.PEER_CONNECTION_CREATED,
+    CallSetupSteps.REMOTE_SDP_SET,
+    CallSetupSteps.LOCAL_SDP_SET,
+    CallSetupSteps.ICE_GATHERING_COMPLETED,
+    CallSetupSteps.LOCAL_SDP_SEND,
+    CallSetupSteps.ICE_CONNECTION_CONNECTED,
+  ],
+  OFFER: [
+    CallSetupSteps.STREAM_RECEIVED,
+    CallSetupSteps.PEER_CONNECTION_CREATED,
+    CallSetupSteps.LOCAL_SDP_SET,
+    CallSetupSteps.ICE_GATHERING_COMPLETED,
+    CallSetupSteps.LOCAL_SDP_SEND,
+    CallSetupSteps.REMOTE_SDP_SET,
+    CallSetupSteps.ICE_CONNECTION_CONNECTED,
+  ],
 };
