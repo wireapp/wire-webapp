@@ -19,9 +19,9 @@
 
 import * as logdown from 'logdown';
 
+import BackendClient from '../service/BackendClient';
 import Logger from '../util/Logger';
 import {PhoneBook} from './PhoneBook';
-import BackendClient from '../service/BackendClient';
 
 class ConnectService {
   backendClient: BackendClient;
@@ -50,6 +50,6 @@ class ConnectService {
       url: '/onboarding/v3',
     });
   }
-};
+}
 
-export {ConnectService}
+export {ConnectService};

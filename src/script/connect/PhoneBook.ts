@@ -28,6 +28,6 @@ class PhoneBook {
     this.self = [];
     this.cards = [];
   }
-};
+}
 
 export {PhoneBook};
