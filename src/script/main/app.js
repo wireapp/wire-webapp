@@ -33,6 +33,7 @@ import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {ConnectService} from '../connect/ConnectService';
 import {ConnectRepository} from '../connect/ConnectRepository';
+import {NotificationRepository} from '../notification/NotificationRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -223,7 +224,7 @@ class App {
       repositories.team
     );
     repositories.permission = resolve(graph.PermissionRepository);
-    repositories.notification = new z.notification.NotificationRepository(
+    repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
       resolve(graph.PermissionRepository),

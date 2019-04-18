@@ -17,6 +17,8 @@
  *
  */
 
+import {NotificationPreference} from '../notification/NotificationPreference';
+
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
@@ -30,7 +32,7 @@ class WebappProperties {
       interface: {
         theme: 'default',
       },
-      notifications: z.notification.NotificationPreference.ON,
+      notifications: NotificationPreference.ON,
       previews: {
         send: true,
       },

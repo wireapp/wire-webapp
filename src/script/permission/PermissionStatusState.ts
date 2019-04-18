@@ -17,13 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.permission = z.permission || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
-z.permission.PermissionType = {
-  CAMERA: 'camera',
-  GEO_LOCATION: 'geolocation',
-  MICROPHONE: 'microphone',
-  NOTIFICATIONS: 'notifications',
+// https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
+const PermissionStatusState = {
+  DENIED: 'denied',
+  GRANTED: 'granted',
+  PROMPT: 'prompt',
 };
+
+export {PermissionStatusState};

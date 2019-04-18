@@ -17,14 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.notification = z.notification || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
-z.notification.PermissionState = {
-  DEFAULT: 'default',
-  DENIED: 'denied',
-  GRANTED: 'granted',
-  IGNORED: 'ignored',
-  UNSUPPORTED: 'unsupported',
+// Enum of notification preferences.
+const NotificationPreference = {
+  NONE: 'none',
+  OBFUSCATE: 'obfuscate',
+  OBFUSCATE_MESSAGE: 'obfuscate-message',
+  ON: 'on',
 };
+
+export {NotificationPreference};
