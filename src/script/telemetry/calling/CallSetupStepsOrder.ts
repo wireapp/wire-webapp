@@ -39,3 +39,5 @@ const CallSetupStepsOrder = {
     CallSetupSteps.ICE_CONNECTION_CONNECTED,
   ],
 };
+
+export {CallSetupStepsOrder};
