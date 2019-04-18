@@ -73,7 +73,9 @@ export default class UserRepository {
     this.self = ko.observable();
     this.users = ko.observableArray([]);
 
-    this.selfAvailability = ko.computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE));
+    this.selfAvailability = ko
+      .computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE))
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 50}});
     this.selfAvailability.subscribe(this.showAvailabilityModal);
 
     this.connect_requests = ko
