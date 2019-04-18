@@ -29,7 +29,7 @@ import {AvailabilityType} from '../../user/AvailabilityType';
 
 import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
-import {ModalsViewModel} from '../ModalsViewModel';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -194,18 +194,17 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   popNotification() {
-    const notificationData = this.preferenceNotificationRepository.popNotification();
-    if (notificationData) {
+    let notificationData;
+    while ((notificationData = this.preferenceNotificationRepository.popNotification())) {
       const {type, notification} = notificationData;
-      return this._showNotification(type, notification, this.popNotification.bind(this));
+      this._showNotification(type, notification);
     }
   }
 
-  _showNotification(type, aggregatedNotifications, closeAction) {
+  _showNotification(type, aggregatedNotifications) {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          afterClose: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
@@ -216,8 +215,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          afterClose: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
@@ -255,7 +253,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnDeleteAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
         action: t('modalAccountDeletionAction'),
@@ -266,7 +264,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnLeaveGuestRoom() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
@@ -377,7 +375,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _showUploadWarning(title, message) {
     const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
   }

@@ -28,7 +28,6 @@ const noop = () => {};
 const defaultContent = {
   actionFn: noop,
   actionText: '',
-  afterCloseFn: noop,
   checkboxLabel: '',
   closeFn: noop,
   currentType: null,
@@ -65,13 +64,16 @@ export class ModalsViewModel {
     this.content = ko.observable(defaultContent);
     this.queue = [];
     this.isReady = false;
+    this.canUnqueue = true;
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
 
   showModal = (type, options) => {
     this.queue.push({options, type});
-    this.unqueue();
+    if (this.canUnqueue) {
+      this.unqueue();
+    }
   };
 
   ready = () => {
@@ -103,19 +105,10 @@ export class ModalsViewModel {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    const {
-      action = noop,
-      afterClose = noop,
-      close = noop,
-      data,
-      preventClose = false,
-      secondary = noop,
-      text = {},
-    } = options;
+    const {action = noop, close = noop, data, preventClose = false, secondary = noop, text = {}} = options;
     const content = {
       actionFn: action,
       actionText: text.action,
-      afterCloseFn: afterClose,
       checkboxLabel: text.option,
       closeFn: close,
       currentType: type,
@@ -176,6 +169,7 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.isVisible(true);
+    this.canUnqueue = false;
   };
 
   hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
@@ -207,11 +201,10 @@ export class ModalsViewModel {
   };
 
   onModalHidden = () => {
-    const afterCloseFn = this.content().afterCloseFn;
     this.content(defaultContent);
     this.inputValue('');
     this.optionChecked(false);
-    afterCloseFn();
+    this.canUnqueue = true;
     this.unqueue();
   };
 }
