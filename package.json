@@ -165,7 +165,7 @@
       "stylelint --fix",
       "git add"
     ],
-    "app/script/**/*.{ts,tsx}": [
+    "src/script/**/*.{ts,tsx}": [
       "tslint --config tslint.json --project tsconfig.json --fix",
       "git add"
     ],
