@@ -945,7 +945,6 @@ export class CallingRepository {
           if (mediaType === z.media.MediaType.VIDEO || mediaType === z.media.MediaType.AUDIO_VIDEO) {
             this.mediaRepository.showNoCameraModal();
           }
-          this.callLogger.error(`Failed to toggle media of type '${mediaType}'`, error);
         }
       });
   }
