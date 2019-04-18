@@ -40,7 +40,7 @@ class ConnectService {
    * Upload address book data for matching.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
    *
-   * @param phoneBook - Phone book containing the address cards
+   * @param phoneBook Phone book containing the address cards
    * @returns Resolves with the matched contacts from the user's phone book
    */
   postOnboarding(phoneBook: PhoneBook): Promise<any> {
