@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
-
 // http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
-z.calling.rtc.ICE_CONNECTION_STATE = {
+const ICE_CONNECTION_STATE = {
   CHECKING: 'checking',
   CLOSED: 'closed',
   COMPLETED: 'completed',
@@ -32,3 +28,5 @@ z.calling.rtc.ICE_CONNECTION_STATE = {
   FAILED: 'failed',
   NEW: 'new',
 };
+
+export {ICE_CONNECTION_STATE};

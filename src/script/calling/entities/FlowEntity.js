@@ -35,6 +35,12 @@ import {SDPMapper} from '../SDPMapper';
 import {FlowAudioEntity} from './FlowAudioEntity';
 import {CallEntity} from './CallEntity';
 
+import {DATA_CHANNEL_STATE} from '../rtc/DataChannelState';
+import {ICE_CONNECTION_STATE} from '../rtc/ICEConnectionState';
+import {ICE_GATHERING_STATE} from '../rtc/ICEGatheringState';
+import {SDP_TYPE} from '../rtc/SDPType';
+import {SIGNALING_STATE} from '../rtc/SignalingState';
+
 class FlowEntity {
   static get CONFIG() {
     return {
@@ -109,14 +115,14 @@ class FlowEntity {
     this.dataChannel = undefined;
     this.dataChannelOpened = false;
 
-    this.connectionState = ko.observable(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
-    this.gatheringState = ko.observable(z.calling.rtc.ICE_GATHERING_STATE.NEW);
-    this.signalingState = ko.observable(z.calling.rtc.SIGNALING_STATE.NEW);
+    this.connectionState = ko.observable(ICE_CONNECTION_STATE.NEW);
+    this.gatheringState = ko.observable(ICE_GATHERING_STATE.NEW);
+    this.signalingState = ko.observable(SIGNALING_STATE.NEW);
 
     this.connectionState.subscribe(iceConnectionState => {
       switch (iceConnectionState) {
-        case z.calling.rtc.ICE_CONNECTION_STATE.COMPLETED:
-        case z.calling.rtc.ICE_CONNECTION_STATE.CONNECTED: {
+        case ICE_CONNECTION_STATE.COMPLETED:
+        case ICE_CONNECTION_STATE.CONNECTED: {
           this._clearNegotiationTimeout();
           this.negotiationMode(SDP_NEGOTIATION_MODE.DEFAULT);
           this.telemetry.time_step(CallSetupSteps.ICE_CONNECTION_CONNECTED);
@@ -130,7 +136,7 @@ class FlowEntity {
           break;
         }
 
-        case z.calling.rtc.ICE_CONNECTION_STATE.CLOSED: {
+        case ICE_CONNECTION_STATE.CLOSED: {
           this.participantEntity.isConnected(false);
 
           if (this.callEntity.selfClientJoined()) {
@@ -139,19 +145,19 @@ class FlowEntity {
           break;
         }
 
-        case z.calling.rtc.ICE_CONNECTION_STATE.DISCONNECTED: {
+        case ICE_CONNECTION_STATE.DISCONNECTED: {
           this._setNegotiationRestartTimeout();
           break;
         }
 
-        case z.calling.rtc.ICE_CONNECTION_STATE.FAILED: {
+        case ICE_CONNECTION_STATE.FAILED: {
           if (this.callEntity.selfClientJoined()) {
             this._removeDroppedParticipant();
           }
           break;
         }
 
-        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING:
+        case ICE_CONNECTION_STATE.CHECKING:
         default: {
           break;
         }
@@ -160,7 +166,7 @@ class FlowEntity {
 
     this.signalingState.subscribe(signalingState => {
       switch (signalingState) {
-        case z.calling.rtc.SIGNALING_STATE.CLOSED: {
+        case SIGNALING_STATE.CLOSED: {
           const logMessage = {
             data: {
               default: [this.remoteUser.name()],
@@ -174,7 +180,7 @@ class FlowEntity {
           break;
         }
 
-        case z.calling.rtc.SIGNALING_STATE.STABLE: {
+        case SIGNALING_STATE.STABLE: {
           this._clearNegotiationTimeout();
           break;
         }
@@ -214,10 +220,10 @@ class FlowEntity {
     this.sendSdpTimeout = undefined;
 
     this.properLocalSdpState = ko.pureComputed(() => {
-      const isAnswer = this.localSdpType() === z.calling.rtc.SDP_TYPE.ANSWER;
-      const isOffer = this.localSdpType() === z.calling.rtc.SDP_TYPE.OFFER;
-      const inRemoteOfferState = this.signalingState() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
-      const inStableState = this.signalingState() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const isAnswer = this.localSdpType() === SDP_TYPE.ANSWER;
+      const isOffer = this.localSdpType() === SDP_TYPE.OFFER;
+      const inRemoteOfferState = this.signalingState() === SIGNALING_STATE.REMOTE_OFFER;
+      const inStableState = this.signalingState() === SIGNALING_STATE.STABLE;
 
       const isProperAnswerState = isAnswer && inRemoteOfferState;
       const isProperOfferState = isOffer && inStableState;
@@ -225,11 +231,8 @@ class FlowEntity {
     });
 
     this.canSetLocalSdp = ko.pureComputed(() => {
-      const inConnectionProgress = this.connectionState() === z.calling.rtc.ICE_CONNECTION_STATE.CHECKING;
-      const progressGatheringStates = [
-        z.calling.rtc.ICE_GATHERING_STATE.COMPLETE,
-        z.calling.rtc.ICE_GATHERING_STATE.GATHERING,
-      ];
+      const inConnectionProgress = this.connectionState() === ICE_CONNECTION_STATE.CHECKING;
+      const progressGatheringStates = [ICE_GATHERING_STATE.COMPLETE, ICE_GATHERING_STATE.GATHERING];
       const inProgress = inConnectionProgress && progressGatheringStates.includes(this.gatheringState());
 
       const isProperState = this.localSdp() && this.shouldSetLocalSdp() && this.properLocalSdpState();
@@ -260,10 +263,10 @@ class FlowEntity {
     this.shouldSetRemoteSdp = ko.observable(false);
 
     this.properRemoteSdpState = ko.pureComputed(() => {
-      const isAnswer = this.remoteSdpType() === z.calling.rtc.SDP_TYPE.ANSWER;
-      const isOffer = this.remoteSdpType() === z.calling.rtc.SDP_TYPE.OFFER;
-      const inLocalOfferState = this.signalingState() === z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER;
-      const inStableState = this.signalingState() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const isAnswer = this.remoteSdpType() === SDP_TYPE.ANSWER;
+      const isOffer = this.remoteSdpType() === SDP_TYPE.OFFER;
+      const inLocalOfferState = this.signalingState() === SIGNALING_STATE.LOCAL_OFFER;
+      const inStableState = this.signalingState() === SIGNALING_STATE.STABLE;
 
       const isProperAnswerState = isAnswer && inLocalOfferState;
       const isProperOfferState = isOffer && inStableState;
@@ -286,13 +289,13 @@ class FlowEntity {
     //##############################################################################
 
     this.canCreateSdp = ko.pureComputed(() => {
-      const isConnectionClosed = this.signalingState() === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isConnectionClosed = this.signalingState() === SIGNALING_STATE.CLOSED;
       const inStateForCreation = this.negotiationNeeded() && !isConnectionClosed;
       return this.pcInitialized() && inStateForCreation;
     });
 
     this.canCreateSdpAnswer = ko.pureComputed(() => {
-      const answerState = this.isAnswer() && this.signalingState() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
+      const answerState = this.isAnswer() && this.signalingState() === SIGNALING_STATE.REMOTE_OFFER;
       return this.canCreateSdp() && answerState;
     });
 
@@ -303,7 +306,7 @@ class FlowEntity {
     });
 
     this.canCreateSdpOffer = ko.pureComputed(() => {
-      const offerState = !this.isAnswer() && this.signalingState() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const offerState = !this.isAnswer() && this.signalingState() === SIGNALING_STATE.STABLE;
       return this.canCreateSdp() && offerState;
     });
 
@@ -450,7 +453,7 @@ class FlowEntity {
    */
   _closePeerConnection() {
     const peerConnectionInActiveState =
-      this.peerConnection && this.peerConnection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      this.peerConnection && this.peerConnection.signalingState !== SIGNALING_STATE.CLOSED;
 
     if (!peerConnectionInActiveState) {
       const logMessage = {
@@ -682,7 +685,7 @@ class FlowEntity {
    */
   _closeDataChannel() {
     if (this.dataChannel) {
-      const isReadyStateOpen = this.dataChannel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.OPEN;
+      const isReadyStateOpen = this.dataChannel.readyState === DATA_CHANNEL_STATE.OPEN;
       if (isReadyStateOpen) {
         this.dataChannel.close();
       }
@@ -739,7 +742,7 @@ class FlowEntity {
   _onClose({target: dataChannel}) {
     this.callLogger.info(`Data channel '${dataChannel.label}' was closed`, dataChannel);
 
-    if (this.dataChannel && this.dataChannel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.CLOSED) {
+    if (this.dataChannel && this.dataChannel.readyState === DATA_CHANNEL_STATE.CLOSED) {
       delete this.dataChannel;
       this.dataChannelOpened = false;
     }
@@ -813,18 +816,18 @@ class FlowEntity {
     return SDPMapper.mapCallMessageToObject(callMessageEntity)
       .then(rtcSdp => SDPMapper.rewriteSdp(rtcSdp, {isGroup: this.isGroup, isIceRestart, isLocalSdp: false}))
       .then(({sdp: remoteSdp}) => {
-        const isRemoteOffer = remoteSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+        const isRemoteOffer = remoteSdp.type === SDP_TYPE.OFFER;
         if (isRemoteOffer) {
           switch (this.signalingState()) {
-            case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
+            case SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solveCollidingStates()) {
                 return true;
               }
               break;
             }
 
-            case z.calling.rtc.SIGNALING_STATE.NEW:
-            case z.calling.rtc.SIGNALING_STATE.STABLE: {
+            case SIGNALING_STATE.NEW:
+            case SIGNALING_STATE.STABLE: {
               const isUpdate = callMessageEntity.type === CALL_MESSAGE_TYPE.UPDATE;
 
               if (isUpdate) {
@@ -918,7 +921,7 @@ class FlowEntity {
 
         this.shouldSendLocalSdp(false);
 
-        const response = transformedSdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
+        const response = transformedSdp.type === SDP_TYPE.ANSWER;
         let callMessageEntity;
 
         const additionalPayload = this._createAdditionalPayload(transformedSdp);
@@ -992,8 +995,8 @@ class FlowEntity {
 
     const logMessage = {
       data: {
-        default: [z.calling.rtc.SDP_TYPE.ANSWER, this.remoteUser.name()],
-        obfuscated: [z.calling.rtc.SDP_TYPE.ANSWER, this.callLogger.obfuscate(this.remoteUser.id)],
+        default: [SDP_TYPE.ANSWER, this.remoteUser.name()],
+        obfuscated: [SDP_TYPE.ANSWER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
       message: `Creating '{0}' for flow with '{1}'`,
     };
@@ -1002,7 +1005,7 @@ class FlowEntity {
     this.peerConnection
       .createAnswer(this._createOfferAnswerOptions())
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
-      .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.ANSWER));
+      .catch(error => this._createSdpFailure(error, SDP_TYPE.ANSWER));
   }
 
   /**
@@ -1010,7 +1013,7 @@ class FlowEntity {
    *
    * @private
    * @param {Error} error - Error that was thrown
-   * @param {z.calling.rtc.SDP_TYPE} sdpType - Type of SDP
+   * @param {SDP_TYPE} sdpType - Type of SDP
    * @returns {undefined} No return value
    */
   _createSdpFailure(error, sdpType) {
@@ -1049,8 +1052,8 @@ class FlowEntity {
 
     const logMessage = {
       data: {
-        default: [z.calling.rtc.SDP_TYPE.OFFER, this.remoteUser.name()],
-        obfuscated: [z.calling.rtc.SDP_TYPE.OFFER, this.callLogger.obfuscate(this.remoteUser.id)],
+        default: [SDP_TYPE.OFFER, this.remoteUser.name()],
+        obfuscated: [SDP_TYPE.OFFER, this.callLogger.obfuscate(this.remoteUser.id)],
       },
       message: `Creating '{0}' for flow with '{1}'`,
     };
@@ -1059,7 +1062,7 @@ class FlowEntity {
     this.peerConnection
       .createOffer(this._createOfferAnswerOptions(iceRestart))
       .then(rtcSdp => this._createSdpSuccess(rtcSdp))
-      .catch(error => this._createSdpFailure(error, z.calling.rtc.SDP_TYPE.OFFER));
+      .catch(error => this._createSdpFailure(error, SDP_TYPE.OFFER));
   }
 
   /**
@@ -1133,7 +1136,7 @@ class FlowEntity {
    * @private
    * @param {Error} error - Error that was thrown
    * @param {SDP_SOURCE} sdpSource - Source of SDP
-   * @param {z.calling.rtc.SDP_TYPE} sdpType - SDP type
+   * @param {SDP_TYPE} sdpType - SDP type
    * @returns {undefined} No return value
    */
   _setSdpFailure(error, sdpSource, sdpType) {
@@ -1439,13 +1442,13 @@ class FlowEntity {
    */
   _removeMediaStream(mediaStream) {
     if (this.peerConnection) {
-      const signalingStateStable = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const signalingStateStable = this.peerConnection.signalingState === SIGNALING_STATE.STABLE;
       const supportsRemoveTrack = typeof this.peerConnection.removeTrack === 'function';
       if (signalingStateStable && supportsRemoveTrack) {
         return this._removeMediaStreamTracks(mediaStream);
       }
 
-      const isSignalingStateClosed = this.peerConnection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peerConnection.signalingState === SIGNALING_STATE.CLOSED;
       const supportsRemoveStream = typeof this.peerConnection.removeStream === 'function';
       if (!isSignalingStateClosed && supportsRemoveStream) {
         this.peerConnection.removeStream(mediaStream);
@@ -1520,9 +1523,9 @@ class FlowEntity {
    * @returns {undefined} No return value
    */
   _resetSignalingStates() {
-    this.connectionState(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
-    this.gatheringState(z.calling.rtc.ICE_GATHERING_STATE.NEW);
-    this.signalingState(z.calling.rtc.SIGNALING_STATE.NEW);
+    this.connectionState(ICE_CONNECTION_STATE.NEW);
+    this.gatheringState(ICE_GATHERING_STATE.NEW);
+    this.signalingState(SIGNALING_STATE.NEW);
   }
 
   //##############################################################################

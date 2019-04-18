@@ -17,15 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
-
 // https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
-z.calling.rtc.DATA_CHANNEL_STATE = {
+const DATA_CHANNEL_STATE = {
   CLOSED: 'closed',
   CLOSING: 'closing',
   CONNECTING: 'connecting',
   OPEN: 'open',
 };
+
+export {DATA_CHANNEL_STATE};

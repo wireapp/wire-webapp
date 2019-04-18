@@ -18,7 +18,9 @@
  */
 
 import Logger from 'utils/Logger';
+
 import {CallSetupTimings} from './CallSetupTimings';
+import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
 
 class FlowTelemetry {
   /**
@@ -85,7 +87,7 @@ class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peer_connection.signalingState === SIGNALING_STATE.CLOSED;
       if (!isSignalingStateClosed) {
         if (this.peer_connection.localDescription) {
           $.extend(report.rtc_peer_connection, {
