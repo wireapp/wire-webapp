@@ -21,7 +21,7 @@
     <!-- ko foreach: {data: activeCalls, as: 'activeCall'} -->
       <conversation-list-calling-cell
         data-felix-bind="link_to: $parent.getConversationUrl($data), attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
-        params="call: activeCall, conversation: $parent.getConversationById(activeCall.conversationId), callingRepository: $parent.callingRepository, permissionRepository: $parent.permissionRepository, multitasking: $parent.multitasking, videoGridRepository: $parent.videoGridRepository"
+        params="call: activeCall, conversation: $parent.getConversationById(activeCall.conversationId), callingRepository: $parent.callingRepository, audioRepository: $parent.audioRepository, videoGridRepository: $parent.videoGridRepository"
         data-uie-name="item-call">
       </conversation-list-calling-cell>
     <!-- /ko -->

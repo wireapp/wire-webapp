@@ -43,6 +43,7 @@ export class ConversationListViewModel {
   constructor(mainViewModel, listViewModel, repositories, onJoinCall) {
     this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
+    this.audioRepository = repositories.audio;
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.permissionRepository = repositories.permission;

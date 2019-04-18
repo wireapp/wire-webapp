@@ -25,15 +25,17 @@ import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
 import {CALL_STATE} from '../../calling/callAPI';
+import {AudioType} from '../../audio/AudioType';
 
 import 'Components/list/participantItem';
 
 class ConversationListCallingCell {
-  constructor({call, conversation, temporaryUserStyle = false, callingRepository}) {
+  constructor({call, conversation, temporaryUserStyle = false, callingRepository, audioRepository}) {
     this.call = call;
     this.conversation = conversation;
     this.temporaryUserStyle = temporaryUserStyle;
     this.callingRepository = callingRepository;
+    this.audioRepository = audioRepository;
 
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
@@ -67,12 +69,25 @@ class ConversationListCallingCell {
       }
     });
 
+    const ringingSubscription = ko.computed(() => {
+      const isOutgoing = this.isOutgoing();
+      const isIncoming = this.isIncoming();
+      if (isOutgoing || isIncoming) {
+        const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
+        this.audioRepository.loop(audioId);
+      } else {
+        this.audioRepository.stop(AudioType.INCOMING_CALL);
+        this.audioRepository.stop(AudioType.OUTGOING_CALL);
+      }
+    });
+
     this.showParticipantsButton = ko.pureComputed(() => this.isConnected() && this.conversation().isGroup());
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
+      ringingSubscription.dispose();
     };
     /*
     this.conversation = params.conversation;
@@ -174,7 +189,7 @@ class ConversationListCallingCell {
   }
 
   onLeaveCall() {
-    this.callingRepository.leaveCall(this.conversation.id, TERMINATION_REASON.SELF_USER);
+    this.callingRepository.leaveCall(this.conversation().id, TERMINATION_REASON.SELF_USER);
   }
 
   onMaximizeVideoGrid() {

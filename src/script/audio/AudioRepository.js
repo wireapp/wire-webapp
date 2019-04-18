@@ -140,7 +140,7 @@ export class AudioRepository {
    * @returns {undefined}
    */
   _stopAll() {
-    Object.keys(this.audioElements).forEach(audioId => this.stop(this.audioElements[audioId], audioId));
+    Object.keys(this.audioElements).forEach(audioId => this._stop(this.audioElements[audioId], audioId));
   }
 
   /**
@@ -151,12 +151,7 @@ export class AudioRepository {
   _subscribeToAudioEvents() {
     amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
     amplify.subscribe(WebAppEvents.AUDIO.PLAY_IN_LOOP, this.loop.bind(this));
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, audioId => {
-      const audioElement = this._getSoundById(audioId);
-      if (audioElement) {
-        this.stop(audioElement, audioId);
-      }
-    });
+    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
   }
 
   /**
@@ -241,13 +236,20 @@ export class AudioRepository {
     }
   }
 
+  stop(audioId) {
+    const audioElement = this._getSoundById(audioId);
+    if (audioElement) {
+      this._stop(audioElement, audioId);
+    }
+  }
+
   /**
    * Stop playback of a sound.
    * @param {Audio} audioElement - Audio element that is playing the sound
    * @param {AudioType} audioId - Sound identifier
    * @returns {undefined}
    */
-  stop(audioElement, audioId) {
+  _stop(audioElement, audioId) {
     if (!audioElement.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
