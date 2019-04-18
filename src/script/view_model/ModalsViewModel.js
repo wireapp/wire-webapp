@@ -41,6 +41,13 @@ const defaultContent = {
   titleText: '',
 };
 
+const States = {
+  CLOSING: 'ModalState.CLOSING',
+  NONE: 'ModalState.NONE',
+  OPEN: 'ModalState.OPEN',
+  READY: 'ModalState.READY',
+};
+
 export class ModalsViewModel {
   static get TYPE() {
     return {
@@ -58,32 +65,32 @@ export class ModalsViewModel {
     this.logger = Logger('ModalsViewModel');
     this.elementId = 'modals';
 
-    this.isVisible = ko.observable(false);
     this.optionChecked = ko.observable(false);
     this.inputValue = ko.observable('');
     this.content = ko.observable(defaultContent);
+    this.state = ko.observable(States.NONE);
     this.queue = [];
-    this.isReady = false;
-    this.canUnqueue = true;
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
 
+  isModalVisible = () => this.state() === States.OPEN;
+
   showModal = (type, options) => {
     this.queue.push({options, type});
-    if (this.canUnqueue) {
+    if (this.state() === States.READY) {
       this.unqueue();
     }
   };
 
   ready = () => {
     ko.applyBindings(this, document.getElementById(this.elementId));
-    this.isReady = true;
+    this.state(States.READY);
     this.unqueue();
   };
 
   unqueue = () => {
-    if (this.isReady && this.queue.length) {
+    if (this.state() === States.READY && this.queue.length) {
       const {type, options} = this.queue.shift();
       this._showModal(type, options);
     }
@@ -168,8 +175,7 @@ export class ModalsViewModel {
         )}</a>${t('modalSessionResetMessage2')}`;
     }
     this.content(content);
-    this.isVisible(true);
-    this.canUnqueue = false;
+    this.state(States.OPEN);
   };
 
   hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
@@ -196,7 +202,7 @@ export class ModalsViewModel {
   };
 
   hide = () => {
-    this.isVisible(false);
+    this.state(States.CLOSING);
     this.content().closeFn();
   };
 
@@ -204,7 +210,7 @@ export class ModalsViewModel {
     this.content(defaultContent);
     this.inputValue('');
     this.optionChecked(false);
-    this.canUnqueue = true;
+    this.state(States.READY);
     this.unqueue();
   };
 }
