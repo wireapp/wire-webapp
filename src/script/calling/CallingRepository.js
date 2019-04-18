@@ -22,7 +22,11 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+
 import {CallLogger} from '../telemetry/calling/CallLogger';
+import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
+import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
+
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
@@ -31,6 +35,7 @@ import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
 import CALL_STATE from './enum/CallState';
 import TERMINATION_REASON from './enum/TerminationReason';
+
 import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
@@ -87,7 +92,7 @@ export class CallingRepository {
     this.callingConfigTimeout = undefined;
 
     // Telemetry
-    this.telemetry = new z.telemetry.calling.CallTelemetry();
+    this.telemetry = new CallTelemetry();
 
     // Media Handler
     this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
@@ -1161,7 +1166,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   _initiateJoinCall(callEntity, mediaType) {
-    callEntity.timings.time_step(z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED);
+    callEntity.timings.time_step(CallSetupSteps.STREAM_RECEIVED);
     callEntity.joinCall(mediaType);
   }
 
