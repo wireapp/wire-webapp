@@ -30,6 +30,7 @@ import UserRepository from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
+import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -196,7 +197,7 @@ class App {
       repositories.conversation,
       repositories.user
     );
-    repositories.broadcast = new z.broadcast.BroadcastRepository(
+    repositories.broadcast = new BroadcastRepository(
       resolve(graph.BroadcastService),
       repositories.client,
       repositories.conversation,

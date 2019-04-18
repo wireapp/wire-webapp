@@ -19,11 +19,8 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.broadcast = z.broadcast || {};
-
 // Broadcast repository for all broadcast interactions with the broadcast service
-z.broadcast.BroadcastRepository = class BroadcastRepository {
+class BroadcastRepository {
   /**
    * Construct a new Broadcast Repository.
    *
@@ -39,7 +36,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.messageSender = messageSender;
-    this.logger = Logger('z.broadcast.BroadcastRepository');
+    this.logger = Logger('BroadcastRepository');
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 
@@ -128,4 +125,6 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
         });
       });
   }
-};
+}
+
+export {BroadcastRepository};

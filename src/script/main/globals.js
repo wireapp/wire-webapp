@@ -65,7 +65,6 @@ import AssetTypeGlobal from '../assets/AssetType.js';
 import AssetMapperGlobal from '../assets/AssetMapper.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import AssetCryptoGlobal from '../assets/AssetCrypto.js';
-import BroadcastRepositoryGlobal from '../broadcast/BroadcastRepository.js';
 import DataChannelStateGlobal from '../calling/rtc/DataChannelState.js';
 import ICEConnectionStateGlobal from '../calling/rtc/ICEConnectionState.js';
 import ICEGatheringStateGlobal from '../calling/rtc/ICEGatheringState.js';
