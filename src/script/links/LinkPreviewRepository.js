@@ -18,6 +18,7 @@
  */
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {base64ToBlob} from 'utils/util';
 
 class LinkPreviewRepository {
@@ -28,7 +29,7 @@ class LinkPreviewRepository {
     this.assetService = assetService;
     this.logger = logger;
 
-    this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
+    this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {

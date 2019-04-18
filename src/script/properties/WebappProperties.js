@@ -18,13 +18,11 @@
  */
 
 import {NotificationPreference} from '../notification/NotificationPreference';
-
-window.z = window.z || {};
-window.z.properties = z.properties || {};
+import {PROPERTIES_TYPE} from './PropertiesType';
 
 class WebappProperties {
   constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
+    this[PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
       emoji: {
         replace_inline: true,
@@ -47,7 +45,7 @@ class WebappProperties {
     this.contact_import = {
       macos: undefined,
     };
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+    this[PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
   }
 }
 

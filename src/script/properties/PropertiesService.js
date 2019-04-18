@@ -32,7 +32,7 @@ class PropertiesService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.properties.PropertiesService');
+    this.logger = Logger('PropertiesService');
   }
 
   /**

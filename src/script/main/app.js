@@ -32,6 +32,7 @@ import {CallingRepository} from '../calling/CallingRepository';
 import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 import BackendClient from '../service/BackendClient';
 
@@ -813,7 +814,7 @@ class App {
    */
   disableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
+    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
   /**
@@ -822,7 +823,7 @@ class App {
    */
   enableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
+    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
   /**
