@@ -30,6 +30,7 @@ import {AvailabilityType} from '../../user/AvailabilityType';
 import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {validateProfileImageResolution} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -326,7 +327,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
-    return z.util.validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
+    return validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
       if (isValid) {
         return this.userRepository.change_picture(newUserPicture);
       }

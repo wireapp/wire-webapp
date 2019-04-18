@@ -27,7 +27,10 @@ import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
+import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
+import {VideoGridRepository} from '../calling/VideoGridRepository';
+import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -38,7 +41,7 @@ import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
-import DebugUtil from '../util/DebugUtil';
+import DebugUtil from 'utils/DebugUtil';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 import TimeUtil from 'utils/TimeUtil';
@@ -52,10 +55,11 @@ import {t} from 'utils/LocalizerUtil';
 import globals from './globals';
 /* eslint-enable no-unused-vars */
 import {getWebsiteUrl} from '../externalRoute';
-import {enableLogging} from '../util/LoggerUtil';
+import {enableLogging} from 'utils/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
+import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
 
 class App {
   static get CONFIG() {
@@ -122,7 +126,7 @@ class App {
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = resolve(graph.PropertiesRepository);
-    repositories.serverTime = resolve(graph.ServerTimeRepository);
+    repositories.serverTime = serverTimeHandler;
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -136,7 +140,7 @@ class App {
       this.service.asset,
       resolve(graph.SelfService),
       repositories.client,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
@@ -146,7 +150,7 @@ class App {
       this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
@@ -164,7 +168,7 @@ class App {
       repositories.giphy,
       resolve(graph.LinkPreviewRepository),
       resolve(graph.MessageSender),
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
@@ -195,7 +199,7 @@ class App {
       repositories.conversation,
       repositories.user
     );
-    repositories.broadcast = new z.broadcast.BroadcastRepository(
+    repositories.broadcast = new BroadcastRepository(
       resolve(graph.BroadcastService),
       repositories.client,
       repositories.conversation,
@@ -209,7 +213,7 @@ class App {
       repositories.conversation,
       repositories.event,
       repositories.media,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(
@@ -225,7 +229,7 @@ class App {
       repositories.user
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
-    repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
+    repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }
@@ -284,8 +288,8 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
-    z.util
-      .checkIndexedDb()
+
+    checkIndexedDb()
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
@@ -552,7 +556,7 @@ class App {
    * @returns {boolean}  True if it is a page refresh
    */
   _isReload() {
-    const isReload = z.util.isSameLocation(document.referrer, window.location.href);
+    const isReload = isSameLocation(document.referrer, window.location.href);
     const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
     this.logger.debug(log);
     return isReload;
@@ -580,7 +584,7 @@ class App {
    * @returns {void} Resolves when page is the first tab
    */
   _registerSingleInstance() {
-    const instanceId = z.util.createRandomUuid();
+    const instanceId = createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
       return this._registerSingleInstanceCleaning();

@@ -25,6 +25,7 @@ import 'src/script/main/globals';
 
 import {resolve, graph, backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import User from 'src/script/entity/User';
 import UserRepository from 'src/script/user/UserRepository';
 
@@ -196,7 +197,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        resolve(graph.ServerTimeRepository),
+        serverTimeHandler,
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -221,7 +222,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.asset_service,
       resolve(graph.SelfService),
       TestFactory.client_repository,
-      resolve(graph.ServerTimeRepository),
+      serverTimeHandler,
       TestFactory.propertyRepository
     );
     TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
@@ -326,7 +327,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         resolve(graph.LinkPreviewRepository),
         resolve(graph.MessageSender),
-        resolve(graph.ServerTimeRepository),
+        serverTimeHandler,
         TestFactory.team_repository,
         TestFactory.user_repository,
         TestFactory.propertyRepository
@@ -338,7 +339,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 
 /**
  *
- * @returns {Promise<z.calling.CallCenter>} The call center.
+ * @returns {Promise<CallingRepository>} The call center.
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {

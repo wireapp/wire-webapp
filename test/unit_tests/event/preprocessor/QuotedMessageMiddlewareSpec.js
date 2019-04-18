@@ -18,6 +18,7 @@
  */
 
 import {Quote} from '@wireapp/protocol-messaging';
+import {arrayToBase64} from 'utils/util';
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
@@ -63,7 +64,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
@@ -98,7 +99,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -131,7 +132,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,

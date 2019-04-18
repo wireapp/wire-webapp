@@ -35,6 +35,7 @@ import UserMapper from './UserMapper';
 import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
+import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 
 export default class UserRepository {
   static get CONFIG() {
@@ -55,10 +56,10 @@ export default class UserRepository {
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
    * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
     this.logger = Logger('UserRepository');
 
     this.asset_service = asset_service;
@@ -67,7 +68,7 @@ export default class UserRepository {
     this.selfService = selfService;
     this.user_service = user_service;
 
-    this.user_mapper = new UserMapper(serverTimeRepository);
+    this.user_mapper = new UserMapper(serverTimeHandler);
     this.should_set_username = false;
 
     this.self = ko.observable();
@@ -339,7 +340,7 @@ export default class UserRepository {
     const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     const recipients = this.teamUsers().concat(this.self());
@@ -647,7 +648,7 @@ export default class UserRepository {
     const find_users = user_ets.map(user_et => _find_users(user_et));
 
     return Promise.all(find_users).then(resolve_array => {
-      z.util.koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
+      koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
       return user_ets;
     });
   }
@@ -845,7 +846,7 @@ export default class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()) {

@@ -55,7 +55,7 @@ class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
-    this.serverTimeRepository = repositories.serverTime;
+    this.serverTimeHandler = repositories.serverTime;
     this.userRepository = repositories.user;
     this.logger = Logger('MessageListViewModel');
 
@@ -580,9 +580,7 @@ class MessageListViewModel {
 
   updateConversationLastRead(conversationEntity, messageEntity) {
     const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(
-      this.serverTimeRepository.toServerTimestamp()
-    );
+    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);

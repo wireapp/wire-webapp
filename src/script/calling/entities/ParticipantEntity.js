@@ -21,12 +21,9 @@ import {CallLogger} from '../../telemetry/calling/CallLogger';
 import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
 import PROPERTY_STATE from '../enum/PropertyState';
 import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
+import {FlowEntity} from './FlowEntity';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
-
-z.calling.entities.ParticipantEntity = class ParticipantEntity {
+class ParticipantEntity {
   static get CONFIG() {
     return {
       PROPERTY_STATES: {
@@ -38,8 +35,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
   /**
    * Construct a new participant.
    *
-   * @class z.calling.entities.ParticipantEntity
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @param {User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
@@ -51,7 +47,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
     this.messageLog = this.callEntity.messageLog;
     this.sessionId = undefined;
 
-    this.callLogger = new CallLogger('z.calling.entities.ParticipantEntity', this.id, this.messageLog);
+    this.callLogger = new CallLogger('ParticipantEntity', this.id, this.messageLog);
 
     this.callLogger.info(`Created new participant entity for user ${this.id}`);
 
@@ -79,7 +75,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
 
     this.hasActiveVideo = ko.pureComputed(() => this.activeState.screenSend() || this.activeState.videoSend());
 
-    this.flowEntity = new z.calling.entities.FlowEntity(this.callEntity, this, timings);
+    this.flowEntity = new FlowEntity(this.callEntity, this, timings);
 
     this.isConnected.subscribe(isConnected => {
       if (isConnected && !this.wasConnected) {
@@ -109,7 +105,7 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
 
   /**
    * Update the participant state.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update state from.
+   * @param {CallMessageEntity} callMessageEntity - Call message to update state from.
    * @returns {Promise} Resolves when the state was updated
    */
   updateState(callMessageEntity) {
@@ -184,4 +180,6 @@ z.calling.entities.ParticipantEntity = class ParticipantEntity {
       throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
     }
   }
-};
+}
+
+export {ParticipantEntity};

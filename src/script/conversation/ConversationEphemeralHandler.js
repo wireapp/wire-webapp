@@ -23,6 +23,7 @@ import EphemeralStatusType from '../message/EphemeralStatusType';
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
+import {arrayToBase64, noop} from 'utils/util';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -49,7 +50,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   constructor(conversationMapper, eventService, eventListeners) {
     super();
 
-    const defaultEventListeners = {onMessageTimeout: z.util.noop};
+    const defaultEventListeners = {onMessageTimeout: noop};
     this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
     this.eventService = eventService;
 
@@ -212,7 +213,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         url: linkPreview.url,
         urlOffset: 0,
       });
-      return z.util.arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
+      return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
     obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);

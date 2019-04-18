@@ -37,7 +37,6 @@ import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
 import RichProfileRepository from '../user/RichProfileRepository';
 import SelfService from '../self/SelfService';
-import ServerTimeRepository from '../time/ServerTimeRepository';
 import StorageService from '../storage/StorageService';
 import UserService from '../user/UserService';
 
@@ -70,7 +69,6 @@ dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfSe
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
-dependencies.set(ServerTimeRepository, {dependencies: [], name: 'ServerTimeRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
@@ -95,7 +93,6 @@ export {
   PropertiesRepository,
   PropertiesService,
   SelfService,
-  ServerTimeRepository,
   StorageService,
   UserService,
 };

@@ -25,6 +25,7 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import CryptographyMapper from './CryptographyMapper';
+import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -154,7 +155,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   _formatFingerprint(fingerprint) {
-    return z.util.zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
+    return zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   /**
@@ -326,7 +327,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
           const sessionId = this._constructSessionId(userId, clientId);
 
-          return this.cryptobox.session_from_prekey(sessionId, z.util.base64ToArray(preKey.key).buffer);
+          return this.cryptobox.session_from_prekey(sessionId, base64ToArray(preKey.key).buffer);
         }
 
         Raygun.send(new Error('Failed to create session: No pre-key found'));
@@ -376,7 +377,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
             Object.entries(clientPreKeyMap).forEach(([clientId, preKeyPayload]) => {
               if (preKeyPayload) {
                 const sessionId = this._constructSessionId(userId, clientId);
-                const preKeyBundle = z.util.base64ToArray(preKeyPayload.key).buffer;
+                const preKeyBundle = base64ToArray(preKeyPayload.key).buffer;
                 const encryptionPromise = this._encryptPayloadForSession(sessionId, genericMessage, preKeyBundle);
 
                 cipherPayloadPromises.push(encryptionPromise);
@@ -431,7 +432,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   _decryptEvent(event) {
     const {data: eventData, from: userId} = event;
-    const cipherText = z.util.base64ToArray(eventData.text || eventData.key).buffer;
+    const cipherText = base64ToArray(eventData.text || eventData.key).buffer;
     const sessionId = this._constructSessionId(userId, eventData.sender);
 
     return this.cryptobox.decrypt(sessionId, cipherText).then(plaintext => GenericMessage.decode(plaintext));
@@ -450,7 +451,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _encryptPayloadForSession(sessionId, genericMessage, preKeyBundle) {
     return this.cryptobox
       .encrypt(sessionId, GenericMessage.encode(genericMessage).finish(), preKeyBundle)
-      .then(cipherText => ({cipherText: z.util.arrayToBase64(cipherText), sessionId}))
+      .then(cipherText => ({cipherText: arrayToBase64(cipherText), sessionId}))
       .catch(error => {
         if (error instanceof StoreEngine.error.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);

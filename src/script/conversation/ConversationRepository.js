@@ -55,6 +55,7 @@ import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
 import {getNextItem} from 'utils/ArrayUtil';
+import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
@@ -93,7 +94,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {MessageSender} messageSender - Message sending queue handler
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user interactions
    * @param {PropertiesRepository} propertyRepository - Repository that stores all account preferences
@@ -109,7 +110,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     giphy_repository,
     link_repository,
     messageSender,
-    serverTimeRepository,
+    serverTimeHandler,
     team_repository,
     user_repository,
     propertyRepository,
@@ -124,7 +125,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.cryptography_repository = cryptography_repository;
     this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
@@ -136,13 +137,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
       this,
       this.eventRepository,
-      this.serverTimeRepository
+      this.serverTimeHandler
     );
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
-      this.serverTimeRepository,
+      this.serverTimeHandler,
       this.user_repository
     );
 
@@ -188,7 +189,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.sorted_conversations = ko.pureComputed(() => {
-      return this.filtered_conversations().sort(z.util.sortGroupsByLastEvent);
+      return this.filtered_conversations().sort(sortGroupsByLastEvent);
     });
 
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
@@ -236,7 +237,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   checkMessageTimer(messageEntity) {
-    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeRepository.getTimeOffset());
+    this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }
 
   _initStateUpdates() {
@@ -534,7 +535,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const firstMessageEntity = conversationEntity.getFirstMessage();
     const upperBound = firstMessageEntity
       ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeRepository.toServerTimestamp()) + 1);
+      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     return this.eventService
       .loadPrecedingEvents(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
@@ -689,7 +690,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const lower_bound = new Date(conversation_et.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.serverTimeRepository.toServerTimestamp()) + 1);
+      : new Date(conversation_et.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1121,7 +1122,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
@@ -1166,7 +1167,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   save_conversations(conversation_ets) {
-    z.util.koArrayPushAll(this.conversations, conversation_ets);
+    koArrayPushAll(this.conversations, conversation_ets);
   }
 
   /**
@@ -1332,7 +1333,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _updateClearedTimestamp(conversationEntity) {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeRepository.toServerTimestamp());
+    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
@@ -1341,7 +1342,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
       const genericMessage = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
@@ -1367,7 +1368,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
-      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
@@ -1387,7 +1388,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeService(conversationEntity, userId) {
     return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
       const hasResponse = response && response.event;
-      const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
@@ -1479,7 +1480,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = t('extensionsGiphyRandom');
     }
 
-    return z.util.loadUrlBlob(url).then(blob => {
+    return loadUrlBlob(url).then(blob => {
       const textMessage = t('extensionsGiphyMessage', tag);
       this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
@@ -1525,7 +1526,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
-    const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
@@ -1586,7 +1587,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const stateChange = conversationEntity.is_archived() !== newState;
 
-    const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const archiveTimestamp = conversationEntity.get_last_known_timestamp(currentTimestamp);
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
@@ -1751,7 +1752,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: assetData.assetToken,
         };
 
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
@@ -1797,7 +1798,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(asset => {
         let genericMessage = new GenericMessage({
           [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-          messageId: z.util.createRandomUuid(),
+          messageId: createRandomUuid(),
         });
 
         if (conversation_et.messageTimer()) {
@@ -1919,7 +1920,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     this.messageSender.queueMessage(() => {
@@ -1937,7 +1938,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event info to be send
    * @param {Conversation} conversationEntity - Conversation to send call message to
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Content for call message
+   * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
   sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity) {
@@ -1983,7 +1984,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     let genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     if (conversationEntity.messageTimer()) {
@@ -2074,7 +2075,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
@@ -2099,7 +2100,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_MESSAGE_CHANGES));
     }
 
-    const messageId = z.util.createRandomUuid();
+    const messageId = createRandomUuid();
 
     const protoText = this._createTextProto(
       messageId,
@@ -2154,7 +2155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage);
@@ -2175,7 +2176,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   sendSessionReset(userId, clientId, conversationId) {
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
-      messageId: z.util.createRandomUuid(),
+      messageId: createRandomUuid(),
     });
 
     const options = {
@@ -2205,7 +2206,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves after sending the message
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
-    const messageId = z.util.createRandomUuid();
+    const messageId = createRandomUuid();
 
     const protoText = this._createTextProto(
       messageId,
@@ -2360,7 +2361,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
@@ -2448,13 +2449,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const genericMessageExternal = new GenericMessage({
           [z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
-          messageId: z.util.createRandomUuid(),
+          messageId: createRandomUuid(),
         });
 
         return this.cryptography_repository
           .encryptGenericMessage(options.recipients, genericMessageExternal)
           .then(payload => {
-            payload.data = z.util.arrayToBase64(cipherText);
+            payload.data = arrayToBase64(cipherText);
             payload.native_push = options.nativePush;
             return this._sendEncryptedMessage(eventInfoEntity, payload);
           });
@@ -2779,7 +2780,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const protoMessageDelete = new MessageDelete({messageId});
         const genericMessage = new GenericMessage({
           [z.cryptography.GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
-          messageId: z.util.createRandomUuid(),
+          messageId: createRandomUuid(),
         });
 
         return this.messageSender.queueMessage(() => {
@@ -2822,7 +2823,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
         const genericMessage = new GenericMessage({
           [z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
-          messageId: z.util.createRandomUuid(),
+          messageId: createRandomUuid(),
         });
 
         const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
@@ -3149,7 +3150,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
@@ -3879,7 +3880,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {GenericMessage} genericMessage - Protobuf message
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Optional call message
+   * @param {CallMessageEntity} callMessageEntity - Optional call message
    * @returns {undefined} No return value
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {

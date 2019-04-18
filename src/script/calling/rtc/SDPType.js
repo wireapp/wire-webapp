@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
-
 // http://www.w3.org/TR/webrtc/#rtcsdptype
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
-z.calling.rtc.SDP_TYPE = {
+const SDP_TYPE = {
   ANSWER: 'answer',
   LOCAL: 'local',
   OFFER: 'offer',
@@ -31,3 +27,5 @@ z.calling.rtc.SDP_TYPE = {
   REMOTE: 'remote',
   ROLLBACK: 'rollback',
 };
+
+export {SDP_TYPE};

@@ -24,11 +24,11 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
-  constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeRepository, userRepository) {
+  constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.eventRepository = eventRepository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
     this.logger = Logger('z.conversation.ClientMismatchHandler');
@@ -171,7 +171,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         if (noRemainingClients) {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
-            const timestamp = this.serverTimeRepository.toServerTimestamp();
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);

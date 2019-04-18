@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 
+import {afterRender} from 'utils/util';
 import WindowTitleViewModel from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
 
@@ -161,7 +162,7 @@ export class MainViewModel {
         }
       }
 
-      z.util.afterRender(() => {
+      afterRender(() => {
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
         this._applyStyle(panel, {transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)'});
         this._applyStyle(titleBar, {transition: widthTransition});

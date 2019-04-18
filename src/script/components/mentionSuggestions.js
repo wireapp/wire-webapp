@@ -18,6 +18,7 @@
  */
 
 import {clamp} from 'utils/NumberUtil';
+import {noop} from 'utils/util';
 
 class MentionSuggestions {
   constructor(params) {
@@ -27,8 +28,8 @@ class MentionSuggestions {
     this.onMouseEnter = this.onMouseEnter.bind(this);
 
     this.isVisible = ko.observable(false);
-    this.onSelectionValidated = params.onSelectionValidated || z.util.noop;
-    this.onEnd = params.onEnd || z.util.noop;
+    this.onSelectionValidated = params.onSelectionValidated || noop;
+    this.onEnd = params.onEnd || noop;
     this.suggestions = params.suggestions;
     this.targetInputSelector = params.targetInputSelector;
     this.targetInput = undefined;

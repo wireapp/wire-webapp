@@ -21,6 +21,7 @@ import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
@@ -75,7 +76,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       const recipients = {};
@@ -116,7 +117,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const genericMessage = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       const cipherText = await bob.encrypt(
@@ -124,14 +125,14 @@ describe('z.cryptography.CryptographyRepository', () => {
         GenericMessage.encode(genericMessage).finish(),
         aliceBundle.serialise()
       );
-      const encodedCipherText = z.util.arrayToBase64(cipherText);
+      const encodedCipherText = arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {
           text: encodedCipherText,
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);

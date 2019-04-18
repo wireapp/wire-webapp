@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {createRandomUuid} from 'utils/util';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -77,11 +78,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('returns undefined if no event with id is found', () => {
-        return TestFactory[testedServiceName]
-          .loadEvent(conversationId, z.util.createRandomUuid())
-          .then(messageEntity => {
-            expect(messageEntity).not.toBeDefined();
-          });
+        return TestFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
+          expect(messageEntity).not.toBeDefined();
+        });
       });
     });
 

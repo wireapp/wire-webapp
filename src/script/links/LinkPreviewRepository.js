@@ -18,6 +18,7 @@
  */
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
+import {base64ToBlob} from 'utils/util';
 
 class LinkPreviewRepository {
   constructor(assetService, propertiesRepository, logger) {
@@ -179,7 +180,7 @@ class LinkPreviewRepository {
    * @returns {Promise} Resolves with the uploaded asset
    */
   _uploadPreviewImage(dataUri) {
-    return Promise.resolve(z.util.base64ToBlob(dataUri)).then(blob =>
+    return Promise.resolve(base64ToBlob(dataUri)).then(blob =>
       this.assetService.uploadImageAsset(blob, {public: true})
     );
   }

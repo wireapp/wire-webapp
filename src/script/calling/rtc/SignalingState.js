@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
-
 // http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
-z.calling.rtc.SIGNALING_STATE = {
+const SIGNALING_STATE = {
   CLOSED: 'closed',
   LOCAL_OFFER: 'have-local-offer',
   LOCAL_PROVISIONAL_ANSWER: 'have-local-pranswer',
@@ -32,3 +28,5 @@ z.calling.rtc.SIGNALING_STATE = {
   REMOTE_PROVISIONAL_ANSWER: 'have-remote-pranswer',
   STABLE: 'stable',
 };
+
+export {SIGNALING_STATE};

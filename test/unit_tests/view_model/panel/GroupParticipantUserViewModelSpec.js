@@ -20,6 +20,7 @@
 import UUID from 'uuidjs';
 import GroupParticipantUserViewModel from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import User from 'src/script/entity/User';
+import {noop} from 'utils/util';
 
 describe('GroupParticipantUserViewModel', () => {
   const testFactory = new window.TestFactory();
@@ -27,7 +28,6 @@ describe('GroupParticipantUserViewModel', () => {
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(() => {
-      const noop = () => {};
       groupParticipantUserViewModel = new GroupParticipantUserViewModel({
         isVisible: noop,
         mainViewModel: {},
