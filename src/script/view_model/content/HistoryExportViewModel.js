@@ -134,7 +134,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   onError(error) {
     if (error instanceof CancelError) {
-      this.logger.log(`History export was cancelled`);
+      this.logger.log('History export was cancelled');
       return this.dismissExport();
     }
     this.hasError(true);
