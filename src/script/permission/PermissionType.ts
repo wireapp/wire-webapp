@@ -17,13 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.notification = z.notification || {};
-
-// Enum of notification preferences.
-z.notification.NotificationPreference = {
-  NONE: 'none',
-  OBFUSCATE: 'obfuscate',
-  OBFUSCATE_MESSAGE: 'obfuscate-message',
-  ON: 'on',
+// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+const PermissionType = {
+  CAMERA: 'camera',
+  GEO_LOCATION: 'geolocation',
+  MICROPHONE: 'microphone',
+  NOTIFICATIONS: 'notifications',
 };
+
+export {PermissionType};

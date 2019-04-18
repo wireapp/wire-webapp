@@ -17,12 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.permission = z.permission || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
-z.permission.PermissionStatusState = {
+// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
+const PermissionState = {
+  DEFAULT: 'default',
   DENIED: 'denied',
   GRANTED: 'granted',
-  PROMPT: 'prompt',
+  IGNORED: 'ignored',
+  UNSUPPORTED: 'unsupported',
 };
+
+export {PermissionState};
