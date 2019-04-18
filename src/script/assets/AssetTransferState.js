@@ -17,9 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
 const AssetTransferState = {
   DOWNLOADING: 'downloading',
   UPLOAD_FAILED: 'upload-failed',
@@ -29,4 +26,7 @@ const AssetTransferState = {
 };
 
 export default AssetTransferState;
+
+window.z = window.z || {};
+window.z.assets = z.assets || {};
 z.assets.AssetTransferState = AssetTransferState;

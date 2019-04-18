@@ -20,6 +20,7 @@
 import {Asset} from '@wireapp/protocol-messaging';
 import Logger from 'utils/Logger';
 import {loadImage, loadFileBuffer, arrayToMd5Base64} from 'utils/util';
+import AssetRetentionPolicy from '../assets/AssetRetentionPolicy';
 
 // AssetService for all asset handling and the calls to the backend REST API.
 export default class AssetService {
@@ -40,7 +41,7 @@ export default class AssetService {
   uploadProfileImage(image) {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
       .then(([{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}]) => {
-        const assetUploadOptions = {public: true, retention: z.assets.AssetRetentionPolicy.ETERNAL};
+        const assetUploadOptions = {public: true, retention: AssetRetentionPolicy.ETERNAL};
         return Promise.all([
           this.postAsset(previewImageBytes, assetUploadOptions),
           this.postAsset(mediumImageBytes, assetUploadOptions),
@@ -58,7 +59,7 @@ export default class AssetService {
    * @param {ArrayBuffer} bytes - Asset binary data
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise<Asset>} Resolves when asset has been uploaded
    */
@@ -89,7 +90,7 @@ export default class AssetService {
    * @param {Blob|File} file - File asset to be uploaded
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
    * @param {Function} xhrAccessorFunction - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
@@ -105,7 +106,7 @@ export default class AssetService {
    * @param {Blob|File} image - Image asset to be uploaded
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
@@ -196,7 +197,7 @@ export default class AssetService {
       .some(conversationParticipant => conversationParticipant.inTeam());
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
-    return isEternal ? z.assets.AssetRetentionPolicy.ETERNAL : z.assets.AssetRetentionPolicy.PERSISTENT;
+    return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
   /**
@@ -205,7 +206,7 @@ export default class AssetService {
    * @param {Uint8Array} assetData - Asset data
    * @param {Object} options - Asset metadata
    * @param {boolean} options.public - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
@@ -215,7 +216,7 @@ export default class AssetService {
     options = Object.assign(
       {
         public: false,
-        retention: z.assets.AssetRetentionPolicy.PERSISTENT,
+        retention: AssetRetentionPolicy.PERSISTENT,
       },
       options
     );

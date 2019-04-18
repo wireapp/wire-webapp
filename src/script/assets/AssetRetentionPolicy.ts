@@ -17,13 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
+enum AssetRetentionPolicy {
+  ETERNAL = 'eternal',
+  ETERNAL_INFREQUENT_ACCESS = 'eternal-infrequent_access',
+  EXPIRING = 'expiring',
+  PERSISTENT = 'persistent',
+  VOLATILE = 'volatile',
+}
 
-z.assets.AssetRetentionPolicy = {
-  ETERNAL: 'eternal',
-  ETERNAL_INFREQUENT_ACCESS: 'eternal-infrequent_access',
-  EXPIRING: 'expiring',
-  PERSISTENT: 'persistent',
-  VOLATILE: 'volatile',
-};
+export default AssetRetentionPolicy;

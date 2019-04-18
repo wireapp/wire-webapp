@@ -20,6 +20,8 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
+import AssetRetentionPolicy from '../assets/AssetRetentionPolicy';
+
 z.util.ValidationUtil = {
   // ToDo: Move z.util.isValidUsername here
   // ToDo: Move z.util.isValidPhoneNumber here
@@ -35,7 +37,7 @@ z.util.ValidationUtil = {
     },
 
     // https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
-    retentionPolicy: policyId => policyId > 0 && policyId < Object.keys(z.assets.AssetRetentionPolicy).length + 1,
+    retentionPolicy: policyId => policyId > 0 && policyId < Object.keys(AssetRetentionPolicy).length + 1,
 
     v3: (assetKey, assetToken) => {
       if (!assetKey) {
