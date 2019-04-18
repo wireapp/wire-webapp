@@ -194,11 +194,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   popNotification() {
-    let notificationData;
-    while ((notificationData = this.preferenceNotificationRepository.popNotification())) {
-      const {type, notification} = notificationData;
-      this._showNotification(type, notification);
-    }
+    this.preferenceNotificationRepository
+      .getNotifications()
+      .forEach(({type, notification}) => this._showNotification(type, notification));
   }
 
   _showNotification(type, aggregatedNotifications) {
