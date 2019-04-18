@@ -1546,17 +1546,17 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@5.3.4":
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.3.4.tgz#463b547642c007de8ead6bb74d8c7f29eee5de10"
-  integrity sha512-e/OtKDvqI/a2LsIZ10hJwaVkhFITs19FTD7SrIkFBDMBEDKAbxAVONMhIp/qQS5iKkcu/8djkIsHA5bst72yQA==
+"@wireapp/react-ui-kit@5.4.1":
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-5.4.1.tgz#91f2c4653549b699f3945e0bcb1dd8d1dd89939a"
+  integrity sha512-f6AX14DdyBkHU9ny9efV1DosvX+hDpjDxUjhhO0+wInW2+E1j+hMS4w4V2c3RW8SdqrihrWUxWNdYVFVaNH/9A==
   dependencies:
     "@emotion/core" "10.0.10"
     "@types/color" "3.0.0"
-    bazinga64 "5.3.57"
+    bazinga64 "5.3.59"
     color "3.1.0"
     emotion-normalize "10.0.0"
-    react-transition-group "2.9.0"
+    react-transition-group "3.0.0"
 
 "@wireapp/store-engine@1.1.34":
   version "1.1.34"
@@ -2305,10 +2305,10 @@ bazinga64@5.3.50:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.50.tgz#0bd635adc13ac3c771bc0bfed3ca48844d1b361b"
   integrity sha512-BJnE8FISivJr0AQOWTHhwdd65qfNMbiOdctLwkXa0jkdl6y9DoTAYelvj73+LEraDpDOrBa05OsVqcnGCB2rlA==
 
-bazinga64@5.3.57:
-  version "5.3.57"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.57.tgz#caef63745ca3c7e9d170be00682384f92ea4cbd0"
-  integrity sha512-/2w9ARXa0ZN9lxlnA4E1FmtKXEKXyxSspYOi3XFmRKMaEAIoEumiUbeLbexAIE36x7OwfQDYwIzrGU2vnq3O6A==
+bazinga64@5.3.59:
+  version "5.3.59"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.59.tgz#2dda4eda0ae7cb8c41ab5f4fba44171c79febe02"
+  integrity sha512-iPd3j43cfHdyvHW/VeWRM3PRnzYd6rTWQQb8mEutzUPK4XA5ZakJxO4ZePOltQC/LzqH+Nx3M0kaow5SS9PbDQ==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -9997,10 +9997,10 @@ react-test-renderer@^16.0.0-0:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
 
-react-transition-group@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
-  integrity sha512-+HzNTCHpeQyl4MJ/bdE0u6XRMe9+XG/+aL4mCxVN4DnPBQ0/5bfHWPDuOZUzYdMj94daZaZdCCc1Dzt9R/xSSg==
+react-transition-group@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-3.0.0.tgz#36efa4db970d5eec5e3028e0c458931163fa3b9b"
+  integrity sha512-A9ojB/LWECbFj58SNfjK1X9aaAU+1olLS0DFSikvrr2KfMaiBELemHDa5dKNvcTk2t3gUtDL/PJpFrBKDfMpLg==
   dependencies:
     dom-helpers "^3.4.0"
     loose-envify "^1.4.0"
