@@ -281,6 +281,8 @@ export default class MediaStreamHandler {
           ? `Could not enable screen sharing: ${error.message}`
           : `Could not replace '${mediaType}' input source: ${error.message}`;
         this.logger.warn(logMessage, error);
+
+        throw error;
       });
   }
 
