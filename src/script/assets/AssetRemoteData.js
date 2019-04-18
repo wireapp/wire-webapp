@@ -22,7 +22,7 @@ import {loadUrlBuffer} from 'utils/util';
 import {AssetURLCache} from './AssetURLCache';
 import AssetCrypto from '../assets/AssetCrypto';
 
-class AssetRemoteData {
+export default class AssetRemoteData {
   /**
    * Use either AssetRemoteData.v2 or AssetRemoteData.v3 to initialize.
    * @param {Uint8Array} otrKey - Encryption key
@@ -181,8 +181,6 @@ class AssetRemoteData {
       });
   }
 }
-
-export default AssetRemoteData;
 
 window.z = window.z || {};
 window.z.assets = z.assets || {};

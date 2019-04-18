@@ -19,7 +19,7 @@
 
 import {LRUCache} from '@wireapp/lru-cache';
 
-class AssetURLCache {
+export default class AssetURLCache {
   private cache: LRUCache<string> = new LRUCache(100);
 
   getUrl(identifier: string): string {
@@ -43,5 +43,3 @@ class AssetURLCache {
     return url;
   }
 }
-
-export default AssetURLCache;
