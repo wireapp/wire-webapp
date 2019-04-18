@@ -1,10 +1,5 @@
 /*eslint-disable sort-keys, no-console */
 let em_module;
-const pcArray = new Array();
-pcArray.push(null); // so 0 means invalid
-
-const dcArray = new Array();
-dcArray.push(null); // so 0 means invalid
 
 const DC_STATE_CONNECTING = 0;
 const DC_STATE_OPEN = 1;
@@ -12,29 +7,32 @@ const DC_STATE_CLOSING = 2;
 const DC_STATE_CLOSED = 3;
 const DC_STATE_ERROR = 4;
 
-function pc2hnd(pc) {
-  // Handle any addtion of MAGIC here
-  const hnd = pcArray.push(pc);
+const connectionsStore = (() => {
+  const peerConnections = [];
+  const dataChannels = [];
 
-  return hnd - 1;
-}
+  const storeItem = (store, item) => {
+    const index = store.push(item);
+    return index - 1;
+  };
 
-function hnd2pc(hnd) {
-  // Handle any MAGIC here...
-  return pcArray[hnd];
-}
+  const removeItem = (store, index) => {
+    store[index] = null;
+  };
 
-function hnd2dc(hnd) {
-  // Handle any MAGIC here...
-  return dcArray[hnd];
-}
+  const getItem = (store, index) => {
+    return store[index];
+  };
 
-function dc2hnd(dc) {
-  // Handle any addtion of MAGIC here
-  const hnd = dcArray.push(dc);
-
-  return hnd - 1;
-}
+  return {
+    storePeerConnection: peerConnection => storeItem(peerConnections, peerConnection),
+    getPeerConnection: index => getItem(peerConnections, index),
+    removePeerConnection: index => removeItem(peerConnections, index),
+    storeDataChannel: dataChannel => storeItem(dataChannels, dataChannel),
+    getDataChannel: index => getItem(dataChannels, index),
+    removeDataChannel: index => removeItem(dataChannels, index),
+  };
+})();
 
 function ccallLocalSdpHandler(pc, err, type, sdp) {
   const config = pc.getConfiguration();
@@ -110,7 +108,7 @@ function pc_New(self) {
   console.log('pc_New');
   const config = {bundlePolicy: 'max-bundle'};
   const pc = new RTCPeerConnection(config);
-  const hnd = pc2hnd(pc);
+  const hnd = connectionsStore.storePeerConnection(pc);
   pc.self = self;
 
   pc.onicegatheringstatechange = () => gatheringHandler(pc);
@@ -135,18 +133,22 @@ function pc_New(self) {
 function pc_Close(hnd) {
   console.log(`pc_Close: hnd=${hnd}`);
 
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
 
+  pc.getSenders()
+    .map(sender => sender.track)
+    .forEach(track => track.stop());
   pc.close();
+  connectionsStore.removePeerConnection(hnd);
 }
 
 function pc_AddTurnServer(hnd, urlPtr, usernamePtr, passwordPtr) {
   console.log(`pc_AddTurnServer: hnd=${hnd}`);
 
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
@@ -167,7 +169,7 @@ function pc_AddTurnServer(hnd, urlPtr, usernamePtr, passwordPtr) {
 }
 
 function pc_CreateOffer(hnd) {
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   console.log(`pc_CreateOffer: hnd=${hnd} self=${pc.self.toString(16)}`);
   if (pc == null) {
     return;
@@ -205,7 +207,7 @@ function pc_CreateOffer(hnd) {
 
 function pc_CreateAnswer(hnd) {
   console.log(`pc_CreateOffer: ${hnd}`);
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
@@ -242,7 +244,7 @@ function pc_CreateAnswer(hnd) {
 function pc_SetRemoteDescription(hnd, typeStr, sdpStr) {
   console.log(`pc_SetRemoteDescription: hnd=${hnd}`);
 
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
@@ -256,7 +258,7 @@ function pc_SetRemoteDescription(hnd, typeStr, sdpStr) {
 function pc_SetLocalDescription(hnd, typeStr, sdpStr) {
   console.log(`pc_SetLocalDescription: hnd=${hnd}`);
 
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
@@ -274,7 +276,7 @@ function pc_SetLocalDescription(hnd, typeStr, sdpStr) {
 function pc_LocalDescription(hnd, typePtr) {
   console.log(`pc_LocalDescription: hnd=${hnd}`);
 
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
 
   const type = em_module.UTF8ToString(typePtr);
   const sdpDesc = pc.localDescription;
@@ -295,7 +297,7 @@ function pc_LocalDescription(hnd, typePtr) {
 
 function pc_IceGatheringState(hnd) {
   console.log(`pc_IceGatheringState: hnd=${hnd}`);
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (!pc) {
     return 0;
   }
@@ -310,7 +312,7 @@ function pc_IceGatheringState(hnd) {
 
 function pc_SignallingState(hnd) {
   console.log(`pc_SignallingState: hnd=${hnd}`);
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (!pc) {
     return 0;
   }
@@ -325,7 +327,7 @@ function pc_SignallingState(hnd) {
 
 function pc_ConnectionState(hnd) {
   console.log(`pc_ConnectionState: hnd=${hnd}`);
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (!pc) {
     return 0;
   }
@@ -341,7 +343,7 @@ function pc_ConnectionState(hnd) {
 /* Data Channel related */
 function pc_CreateDataChannel(hnd, labelPtr) {
   console.log(`pc_CreateDataChannel: hnd=${hnd}`);
-  const pc = hnd2pc(hnd);
+  const pc = connectionsStore.getPeerConnection(hnd);
   if (pc == null) {
     return;
   }
@@ -350,7 +352,7 @@ function pc_CreateDataChannel(hnd, labelPtr) {
   const dc = pc.createDataChannel(label);
   let dcHnd = null;
   if (dc != null) {
-    dcHnd = dc2hnd(dc);
+    dcHnd = connectionsStore.storeDataChannel(dc);
     dc.onopen = function() {
       console.log('dc-opened');
       ccallDcStateChangeHandler(pc, DC_STATE_OPEN);
@@ -374,7 +376,7 @@ function pc_CreateDataChannel(hnd, labelPtr) {
 
 function pc_DataChannelId(hnd) {
   console.log(`pc_DataChannelId: hnd=${hnd}`);
-  const dc = hnd2dc(hnd);
+  const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
     return;
   }
@@ -384,7 +386,7 @@ function pc_DataChannelId(hnd) {
 
 function pc_DataChannelState(hnd) {
   console.log(`pc_DataChannelState: hnd=${hnd}`);
-  const dc = hnd2dc(hnd);
+  const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
     return;
   }
@@ -408,7 +410,7 @@ function pc_DataChannelState(hnd) {
 function pc_DataChannelSend(hnd, dataPtr, dataLen) {
   console.log(`pc_DataCHannelSend: hnd=${hnd}`);
 
-  const dc = hnd2dc(hnd);
+  const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
     return;
   }
@@ -421,7 +423,7 @@ function pc_DataChannelSend(hnd, dataPtr, dataLen) {
 function pc_DataChannelClose(hnd) {
   console.log(`pc_DataChannelClose: hnd=${hnd}`);
 
-  const dc = hnd2dc(hnd);
+  const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
     return;
   }
@@ -433,63 +435,26 @@ const avspc = {
   avspc_init: function(module) {
     em_module = module;
     console.log('pcwrap_init');
-    const fn_pc_New = em_module.addFunction(pc_New, 'nn');
-    const fn_pc_Close = em_module.addFunction(pc_Close, 'vn');
-    const fn_pc_AddTS = em_module.addFunction(pc_AddTurnServer, 'vnsss');
-    const fn_pc_IceGatheringState = em_module.addFunction(pc_IceGatheringState, 'nn');
-    const fn_pc_SignallingState = em_module.addFunction(pc_SignallingState, 'n');
-    const fn_pc_ConnectionState = em_module.addFunction(pc_ConnectionState, 'n');
-    const fn_pc_CreateDataChannel = em_module.addFunction(pc_CreateDataChannel, 'ns');
-    const fn_pc_CreateOffer = em_module.addFunction(pc_CreateOffer, 'n');
-    const fn_pc_CreateAnswer = em_module.addFunction(pc_CreateAnswer, 'n');
-    const fn_pc_SetRemoteDescription = em_module.addFunction(pc_SetRemoteDescription, 'nss');
-    const fn_pc_SetLocalDescription = em_module.addFunction(pc_SetLocalDescription, 'nss');
-    const fn_pc_LocalDescription = em_module.addFunction(pc_LocalDescription, 'sns');
-    const fn_pc_DataChannelId = em_module.addFunction(pc_DataChannelId, 'nn');
-    const fn_pc_DataChannelState = em_module.addFunction(pc_DataChannelState, 'nn');
-    const fn_pc_DataChannelSend = em_module.addFunction(pc_DataChannelSend, 'vnsn');
-    const fn_pc_DataChannelClose = em_module.addFunction(pc_DataChannelClose, 'vn');
+    const callbacks = [
+      [pc_New, 'nn'],
+      [pc_Close, 'vn'],
+      [pc_AddTurnServer, 'vnsss'],
+      [pc_IceGatheringState, 'nn'],
+      [pc_SignallingState, 'n'],
+      [pc_ConnectionState, 'n'],
+      [pc_CreateDataChannel, 'ns'],
+      [pc_CreateOffer, 'n'],
+      [pc_CreateAnswer, 'n'],
+      [pc_SetRemoteDescription, 'nss'],
+      [pc_SetLocalDescription, 'nss'],
+      [pc_LocalDescription, 'sns'],
+      [pc_DataChannelId, 'nn'],
+      [pc_DataChannelState, 'nn'],
+      [pc_DataChannelSend, 'vnsn'],
+      [pc_DataChannelClose, 'vn'],
+    ].map(([callback, signature]) => em_module.addFunction(callback, signature));
 
-    em_module.ccall(
-      'pc_set_callbacks',
-      'null',
-      [
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-      ],
-      [
-        fn_pc_New,
-        fn_pc_Close,
-        fn_pc_AddTS,
-        fn_pc_IceGatheringState,
-        fn_pc_SignallingState,
-        fn_pc_ConnectionState,
-        fn_pc_CreateDataChannel,
-        fn_pc_CreateOffer,
-        fn_pc_CreateAnswer,
-        fn_pc_SetRemoteDescription,
-        fn_pc_SetLocalDescription,
-        fn_pc_LocalDescription,
-        fn_pc_DataChannelId,
-        fn_pc_DataChannelState,
-        fn_pc_DataChannelSend,
-        fn_pc_DataChannelClose,
-      ]
-    );
+    em_module.ccall('pc_set_callbacks', 'null', callbacks.map(() => 'number'), callbacks);
   },
 };
 
