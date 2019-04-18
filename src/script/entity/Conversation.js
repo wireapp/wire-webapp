@@ -22,6 +22,7 @@ import Logger from 'utils/Logger';
 import ko from 'knockout';
 import ReceiptMode from '../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
+import {koArrayPushAll, koArrayUnshiftAll} from 'utils/util';
 import {Config} from '../auth/config';
 
 export default class Conversation {
@@ -425,7 +426,7 @@ export default class Conversation {
       }
     }
 
-    z.util.koArrayPushAll(this.messages_unordered, message_ets);
+    koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   getFirstUnreadSelfMention() {
@@ -483,7 +484,7 @@ export default class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
+    koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**

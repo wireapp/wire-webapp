@@ -23,6 +23,7 @@ import platform from 'platform';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {t} from 'utils/LocalizerUtil';
+import {murmurhash3} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 window.z = window.z || {};
@@ -237,7 +238,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
+    const loginHash = murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
@@ -248,7 +249,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
+    const loginHash = murmurhash3(login || this.selfUser().id, 42);
     return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 

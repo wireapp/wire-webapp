@@ -20,6 +20,7 @@
 import CryptoJS from 'crypto-js';
 
 import Logger from 'utils/Logger';
+import {phoneNumberToE164, encodeSha256Base64} from 'utils/util';
 
 window.z = window.z || {};
 window.z.connect = z.connect || {};
@@ -49,11 +50,11 @@ z.connect.ConnectRepository = class ConnectRepository {
    */
   _encodePhoneBook(phoneBook) {
     const {cards, self} = phoneBook;
-    self.forEach((contact, contactIndex) => (self[contactIndex] = z.util.encodeSha256Base64(contact)));
+    self.forEach((contact, contactIndex) => (self[contactIndex] = encodeSha256Base64(contact)));
 
     cards.forEach((card, cardIndex) => {
       card.contact.forEach((contact, contactIndex) => {
-        card.contact[contactIndex] = z.util.encodeSha256Base64(contact);
+        card.contact[contactIndex] = encodeSha256Base64(contact);
       });
       cards[cardIndex] = card;
     });
@@ -97,7 +98,7 @@ z.connect.ConnectRepository = class ConnectRepository {
               contact: [],
             };
 
-            numbers.forEach(number => card.contact.push(z.util.phoneNumberToE164(number, navigator.language)));
+            numbers.forEach(number => card.contact.push(phoneNumberToE164(number, navigator.language)));
 
             if (card.contact.length) {
               phoneBook.cards.push(card);

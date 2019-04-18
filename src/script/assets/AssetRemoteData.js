@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {loadUrlBuffer} from 'utils/util';
 
 class AssetRemoteData {
   /**
@@ -163,7 +164,7 @@ class AssetRemoteData {
   _loadBuffer() {
     return this.generateUrl()
       .then(generatedUrl => {
-        return z.util.loadUrlBuffer(generatedUrl, xhr => {
+        return loadUrlBuffer(generatedUrl, xhr => {
           xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
           this.cancelDownload = () => xhr.abort.call(xhr);
         });

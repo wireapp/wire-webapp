@@ -18,6 +18,7 @@
  */
 
 import PROPERTY_STATE from '../calling/enum/PropertyState';
+import {afterRender} from 'utils/util';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -55,7 +56,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
 
     // scale videos when the grid is updated (on the next rendering cycle)
-    this.grid.subscribe(() => z.util.afterRender(this.scaleVideos));
+    this.grid.subscribe(() => afterRender(this.scaleVideos));
 
     this.PROPERTY_STATE = PROPERTY_STATE;
   }
@@ -88,7 +89,7 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     elements.forEach(element => {
       const videoElement = element.querySelector('video');
       if (videoElement.videoWidth > 0) {
-        z.util.afterRender(() => setScale(videoElement, element));
+        afterRender(() => setScale(videoElement, element));
       } else {
         videoElement.addEventListener('loadedmetadata', () => setScale(videoElement, element), {once: true});
       }

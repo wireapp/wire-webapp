@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {zeroPadding} from 'utils/util';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -69,7 +70,7 @@ class ClientEntity {
    * @returns {Array<string>} Client ID in pairs of two as an array
    */
   formatId() {
-    return z.util.zeroPadding(this.id, 16).match(/.{1,2}/g);
+    return zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
   /**

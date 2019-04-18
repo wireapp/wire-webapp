@@ -16,9 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {noop} from 'utils/util';
 
 class ConversationListCell {
-  constructor({conversation, onJoinCall, is_selected = z.util.noop, click = z.util.noop}) {
+  constructor({conversation, onJoinCall, is_selected = noop, click = noop}) {
     this.conversation = conversation;
     this.is_selected = is_selected;
     this.on_click = click;

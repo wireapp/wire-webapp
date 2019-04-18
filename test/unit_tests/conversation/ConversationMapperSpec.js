@@ -20,6 +20,7 @@
 import UUID from 'uuidjs';
 import Conversation from 'src/script/entity/Conversation';
 import ConversationMapper from 'src/script/conversation/ConversationMapper';
+import {createRandomUuid} from 'utils/util';
 
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
@@ -126,7 +127,7 @@ describe('Conversation Mapper', () => {
 
   describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
-      const creator_id = z.util.createRandomUuid();
+      const creator_id = createRandomUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
       const [conversation_et] = conversation_mapper.mapConversations(conversationsData);
       const data = {
@@ -143,7 +144,7 @@ describe('Conversation Mapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -388,7 +389,7 @@ describe('Conversation Mapper', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const remote_data_2 = JSON.parse(JSON.stringify(remote_data));
-      remote_data_2.id = z.util.createRandomUuid();
+      remote_data_2.id = createRandomUuid();
 
       const [merged_conversation, merged_conversation_2] = conversation_mapper.mergeConversation(
         [local_data],

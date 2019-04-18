@@ -25,6 +25,7 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 
 import {t} from 'utils/LocalizerUtil';
+import {alias} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -156,12 +157,12 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     $(contentSelector)
       .removeClass(incomingCssClass)
-      .off(z.util.alias.animationend)
+      .off(alias.animationend)
       .addClass(incomingCssClass)
-      .one(z.util.alias.animationend, function() {
+      .one(alias.animationend, function() {
         $(this)
           .removeClass(incomingCssClass)
-          .off(z.util.alias.animationend);
+          .off(alias.animationend);
       });
   }
 

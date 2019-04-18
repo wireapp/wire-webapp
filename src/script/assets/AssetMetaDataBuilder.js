@@ -21,6 +21,7 @@ import {Asset} from '@wireapp/protocol-messaging';
 import TimeUtil from 'utils/TimeUtil';
 import {capToByte, rootMeanSquare} from 'utils/NumberUtil';
 import {chunk} from 'utils/ArrayUtil';
+import {loadFileBuffer} from 'utils/util';
 
 /**
  * Constructs corresponding asset metadata depending on the given file type
@@ -45,8 +46,7 @@ const buildMetadata = file => {
 };
 
 const buildMetadataAudio = audioFile => {
-  return z.util
-    .loadFileBuffer(audioFile)
+  return loadFileBuffer(audioFile)
     .then(buffer => {
       const audioContext = new AudioContext();
       audioContext.close();

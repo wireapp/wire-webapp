@@ -24,6 +24,7 @@ import Conversation from 'src/script/entity/Conversation';
 import MediumImage from 'src/script/entity/message/MediumImage';
 import User from 'src/script/entity/User';
 import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
+import {createRandomUuid} from 'utils/util';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -51,7 +52,7 @@ describe('z.notification.NotificationRepository', () => {
       user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
-      const selfUserEntity = new User(z.util.createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
@@ -614,13 +615,13 @@ describe('z.notification.NotificationRepository', () => {
     let conversationEntity;
     let messageEntity;
 
-    const userId = z.util.createRandomUuid();
+    const userId = createRandomUuid();
     const shouldNotifyInConversation = z.notification.NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
-      const mentionId = selfMentioned ? userId : z.util.createRandomUuid();
+      const mentionId = selfMentioned ? userId : createRandomUuid();
 
-      const textEntity = new z.entity.Text(z.util.createRandomUuid(), '@Gregor can you take a look?');
+      const textEntity = new z.entity.Text(createRandomUuid(), '@Gregor can you take a look?');
       const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
       textEntity.mentions([mentionEntity]);
 
@@ -632,10 +633,10 @@ describe('z.notification.NotificationRepository', () => {
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
 
-      conversationEntity = new Conversation(z.util.createRandomUuid());
+      conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.selfUser(selfUserEntity);
 
-      messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      messageEntity = new z.entity.ContentMessage(createRandomUuid());
       messageEntity.user(selfUserEntity);
     });
 
@@ -674,7 +675,7 @@ describe('z.notification.NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({messageId: z.util.createRandomUuid(), userId});
+      const quoteEntity = new z.message.QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
@@ -687,8 +688,8 @@ describe('z.notification.NotificationRepository', () => {
       messageEntity.add_asset(generateTextAsset());
 
       const quoteEntity = new z.message.QuoteEntity({
-        messageId: z.util.createRandomUuid(),
-        userId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
+        userId: createRandomUuid(),
       });
       messageEntity.quote(quoteEntity);
 

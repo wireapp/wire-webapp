@@ -22,6 +22,7 @@ import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 import Conversation from 'src/script/entity/Conversation';
 import EventMapper from 'src/script/conversation/EventMapper';
 import AssetType from 'src/script/assets/AssetType';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -39,13 +40,13 @@ describe('Event Mapper', () => {
   });
 
   beforeEach(() => {
-    conversation_et = new Conversation(z.util.createRandomUuid());
+    conversation_et = new Conversation(createRandomUuid());
     event_mapper = new EventMapper();
   });
 
   describe('mapJsonEvent', () => {
     it('maps text messages without link previews', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
       const event = {
         conversation: conversation_et.id,
@@ -53,7 +54,7 @@ describe('Event Mapper', () => {
           content: 'foo',
           nonce: event_id,
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -66,7 +67,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with deprecated link preview format', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
       const article = new Article({
         permanentUrl: 'test.com',
@@ -84,9 +85,9 @@ describe('Event Mapper', () => {
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [z.util.arrayToBase64(LinkPreview.encode(link_preview).finish())],
+          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -101,7 +102,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with link preview', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
       const link_preview = new LinkPreview({
         article: null,
@@ -117,9 +118,9 @@ describe('Event Mapper', () => {
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [z.util.arrayToBase64(LinkPreview.encode(link_preview).finish())],
+          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -169,10 +170,10 @@ describe('Event Mapper', () => {
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
 
-      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
-      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
+      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, createRandomUuid());
+      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, createRandomUuid());
 
-      const conversationEntity = new Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
 
       const event = {
         category: 16,
@@ -180,13 +181,13 @@ describe('Event Mapper', () => {
         data: {
           content: text,
           mentions: [
-            z.util.arrayToBase64(Mention.encode(validMention.toProto()).finish()),
-            z.util.arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
+            arrayToBase64(Mention.encode(validMention.toProto()).finish()),
+            arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
           ],
           previews: [],
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
         primary_key: 5,
         time: '2018-09-27T15:23:14.177Z',
         type: 'conversation.message-add',
@@ -207,13 +208,13 @@ describe('Event Mapper', () => {
 
       const mandyStart = text.indexOf(mandy);
       const sandyStart = text.indexOf(sandy);
-      const validMention1 = new z.message.MentionEntity(mandyStart, mandy.length, z.util.createRandomUuid());
-      const validMention2 = new z.message.MentionEntity(sandyStart, sandy.length, z.util.createRandomUuid());
+      const validMention1 = new z.message.MentionEntity(mandyStart, mandy.length, createRandomUuid());
+      const validMention2 = new z.message.MentionEntity(sandyStart, sandy.length, createRandomUuid());
 
       const overlappingStart = mandyStart + mandy.length - 1;
-      const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, z.util.createRandomUuid());
+      const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, createRandomUuid());
 
-      const conversationEntity = new Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
 
       const event = {
         category: 16,
@@ -221,14 +222,14 @@ describe('Event Mapper', () => {
         data: {
           content: text,
           mentions: [
-            z.util.arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
-            z.util.arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
-            z.util.arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
+            arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
+            arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
+            arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
           ],
           previews: [],
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
         primary_key: 5,
         time: '2018-09-27T15:23:14.177Z',
         type: 'conversation.message-add',

@@ -21,6 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 async function createEncodedCiphertext(
   preKey,
@@ -35,7 +36,7 @@ async function createEncodedCiphertext(
 
   const genericMessage = new GenericMessage({
     [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
-    messageId: z.util.createRandomUuid(),
+    messageId: createRandomUuid(),
   });
 
   const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
@@ -47,7 +48,7 @@ async function createEncodedCiphertext(
     preKeyBundle.serialise()
   );
 
-  return z.util.arrayToBase64(cipherText);
+  return arrayToBase64(cipherText);
 }
 
 describe('Event Repository', () => {
@@ -91,17 +92,14 @@ describe('Event Repository', () => {
           window.setTimeout(() => {
             resolve({
               has_more: false,
-              notifications: [
-                {id: z.util.createRandomUuid(), payload: []},
-                {id: z.util.createRandomUuid(), payload: []},
-              ],
+              notifications: [{id: createRandomUuid(), payload: []}, {id: createRandomUuid(), payload: []}],
             });
           }, 10);
         });
       });
 
       spyOn(TestFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: z.util.createRandomUuid(), payload: [{}]})
+        Promise.resolve({id: createRandomUuid(), payload: [{}]})
       );
 
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
@@ -130,9 +128,9 @@ describe('Event Repository', () => {
     });
 
     it('should buffer notifications when notification stream is not processed', () => {
-      last_notification_id = z.util.createRandomUuid();
+      last_notification_id = createRandomUuid();
       TestFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
+      websocket_service_mock.publish({id: createRandomUuid(), payload: []});
 
       expect(TestFactory.event_repository._bufferWebSocketNotification).toHaveBeenCalled();
       expect(TestFactory.event_repository._handleNotification).not.toHaveBeenCalled();
@@ -141,11 +139,11 @@ describe('Event Repository', () => {
     });
 
     it('should handle buffered notifications after notifications stream was processed', () => {
-      last_notification_id = z.util.createRandomUuid();
-      const last_published_notification_id = z.util.createRandomUuid();
+      last_notification_id = createRandomUuid();
+      const last_published_notification_id = createRandomUuid();
       TestFactory.event_repository.lastNotificationId(last_notification_id);
       TestFactory.event_repository.connectWebSocket();
-      websocket_service_mock.publish({id: z.util.createRandomUuid(), payload: []});
+      websocket_service_mock.publish({id: createRandomUuid(), payload: []});
 
       websocket_service_mock.publish({id: last_published_notification_id, payload: []});
       return TestFactory.event_repository.initializeFromStream().then(() => {
@@ -163,12 +161,12 @@ describe('Event Repository', () => {
     last_notification_id = undefined;
 
     beforeEach(() => {
-      last_notification_id = z.util.createRandomUuid();
+      last_notification_id = createRandomUuid();
       TestFactory.event_repository.lastNotificationId(last_notification_id);
     });
 
     it('should not update last notification id if transient is true', () => {
-      const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: true};
+      const notification_payload = {id: createRandomUuid(), payload: [], transient: true};
 
       return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(last_notification_id);
@@ -176,7 +174,7 @@ describe('Event Repository', () => {
     });
 
     it('should update last notification id if transient is false', () => {
-      const notification_payload = {id: z.util.createRandomUuid(), payload: [], transient: false};
+      const notification_payload = {id: createRandomUuid(), payload: [], transient: false};
 
       return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
@@ -184,7 +182,7 @@ describe('Event Repository', () => {
     });
 
     it('should update last notification id if transient is not present', () => {
-      const notification_payload = {id: z.util.createRandomUuid(), payload: []};
+      const notification_payload = {id: createRandomUuid(), payload: []};
 
       return TestFactory.event_repository._handleNotification(notification_payload).then(() => {
         expect(TestFactory.event_repository.lastNotificationId()).toBe(notification_payload.id);
@@ -351,13 +349,13 @@ describe('Event Repository', () => {
 
     beforeEach(() => {
       event = {
-        conversation: z.util.createRandomUuid(),
+        conversation: createRandomUuid(),
         data: {
           content: 'Lorem Ipsum',
           previews: [],
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
@@ -375,7 +373,7 @@ describe('Event Repository', () => {
 
     it('ignores an event with an ID previously used by another user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.from = z.util.createRandomUuid();
+      previously_stored_event.from = createRandomUuid();
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
       return TestFactory.event_repository
@@ -530,7 +528,7 @@ describe('Event Repository', () => {
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
       originalMessage.primary_key = 12;
-      event.id = z.util.createRandomUuid();
+      event.id = createRandomUuid();
       event.data.content = 'new content';
       event.data.replacing_message_id = originalMessage.id;
       event.time = changed_time;

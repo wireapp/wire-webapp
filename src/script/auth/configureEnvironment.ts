@@ -31,7 +31,6 @@ import '../storage/StorageSchemata';
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
 import '../util/Environment';
 import '../util/URLUtil';
-import '../util/util';
 
 declare global {
   interface Window {
