@@ -20,6 +20,7 @@
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import TERMINATION_REASON from '../../calling/enum/TerminationReason';
+import {afterRender} from 'utils/util';
 
 class ConversationListCallingCell {
   constructor(params) {
@@ -133,7 +134,7 @@ class ConversationListCallingCell {
 
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
-    z.util.afterRender(() => window.dispatchEvent(new Event('resize')));
+    afterRender(() => window.dispatchEvent(new Event('resize')));
   }
 
   onRejectCall() {

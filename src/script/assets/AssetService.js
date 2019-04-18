@@ -19,6 +19,7 @@
 
 import {Asset} from '@wireapp/protocol-messaging';
 import Logger from 'utils/Logger';
+import {loadImage, loadFileBuffer, arrayToMd5Base64} from 'utils/util';
 
 // AssetService for all asset handling and the calls to the backend REST API.
 export default class AssetService {
@@ -94,7 +95,7 @@ export default class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   uploadAsset(file, options, xhrAccessorFunction) {
-    return z.util.loadFileBuffer(file).then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction));
+    return loadFileBuffer(file).then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction));
   }
 
   /**
@@ -230,7 +231,7 @@ export default class AssetService {
       `--${BOUNDARY}`,
       'Content-Type: application/octet-stream',
       `Content-length: ${assetData.length}`,
-      `Content-MD5: ${z.util.arrayToMd5Base64(assetData)}`,
+      `Content-MD5: ${arrayToMd5Base64(assetData)}`,
       '',
       '',
     ].join('\r\n');
@@ -279,8 +280,7 @@ export default class AssetService {
    * @returns {Promise} Resolves with the compressed image
    */
   _compressImageWithWorker(worker, image, filter) {
-    return z.util
-      .loadFileBuffer(image)
+    return loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
@@ -288,9 +288,10 @@ export default class AssetService {
         return new z.util.Worker(worker).post(buffer);
       })
       .then(compressedBytes => {
-        return z.util
-          .loadImage(new Blob([compressedBytes], {type: image.type}))
-          .then(compressedImage => ({compressedBytes, compressedImage}));
+        return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({
+          compressedBytes,
+          compressedImage,
+        }));
       });
   }
 }

@@ -21,9 +21,9 @@
 
 import UUID from 'uuidjs';
 import ReceiptsMiddleware from 'src/script/event/preprocessor/ReceiptsMiddleware';
+import {noop} from 'utils/util';
 
 describe('ReceiptsMiddleware', () => {
-  const noop = () => {};
   const selfId = UUID.genV4();
   let readReceiptMiddleware;
   const eventService = {loadEvents: noop, replaceEvent: noop};

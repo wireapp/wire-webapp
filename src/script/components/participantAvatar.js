@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import viewportObserver from '../ui/viewportObserver';
 import User from '../entity/User';
+import {createRandomUuid} from 'utils/util';
 import Logger from 'utils/Logger';
 
 class ParticipantAvatar {
@@ -93,7 +94,7 @@ class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.createRandomUuid(),
+      id: createRandomUuid(),
       'user-id': this.participant().id,
     });
 

@@ -35,6 +35,7 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import CryptographyMapper from 'src/script/cryptography/CryptographyMapper';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 
 describe('CryptographyMapper', () => {
@@ -44,11 +45,11 @@ describe('CryptographyMapper', () => {
 
   beforeEach(() => {
     event = {
-      conversation: z.util.createRandomUuid(),
+      conversation: createRandomUuid(),
       data: {
-        id: z.util.createRandomUuid(),
+        id: createRandomUuid(),
       },
-      from: z.util.createRandomUuid(),
+      from: createRandomUuid(),
       time: new Date().toISOString(),
     };
   });
@@ -70,7 +71,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -101,7 +102,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -124,10 +125,10 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped uploaded asset message', () => {
       const uploaded = {
-        key: z.util.createRandomUuid(),
+        key: createRandomUuid(),
         otr_key: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),
-        token: z.util.createRandomUuid(),
+        token: createRandomUuid(),
       };
 
       const uploaded_asset = new Asset.RemoteData({
@@ -140,7 +141,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -162,7 +163,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -183,7 +184,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -218,7 +219,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -238,7 +239,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: availability,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -254,7 +255,7 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped cleared message', () => {
       const date = Date.now().toString();
-      const conversation_id = z.util.createRandomUuid();
+      const conversation_id = createRandomUuid();
 
       const cleared = new Cleared({
         clearedTimestamp: date,
@@ -262,7 +263,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED]: cleared,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -278,15 +279,15 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped hidden message', () => {
-      const conversation_id = z.util.createRandomUuid();
-      const message_id = z.util.createRandomUuid();
+      const conversation_id = createRandomUuid();
+      const message_id = createRandomUuid();
       const message_hide = new MessageHide({
         conversationId: conversation_id,
         messageId: message_id,
       });
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN]: message_hide,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -302,10 +303,10 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped deleted message', () => {
-      const message_id = z.util.createRandomUuid();
+      const message_id = createRandomUuid();
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.DELETED]: new MessageDelete({messageId: message_id}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -342,7 +343,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -374,8 +375,8 @@ describe('CryptographyMapper', () => {
       });
 
       const remote_data = new Asset.RemoteData({
-        assetId: z.util.createRandomUuid(),
-        assetToken: z.util.createRandomUuid(),
+        assetId: createRandomUuid(),
+        assetToken: createRandomUuid(),
         otrKey: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),
       });
@@ -387,7 +388,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -429,7 +430,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       delete event.data.id;
@@ -454,7 +455,7 @@ describe('CryptographyMapper', () => {
     it('rejects with an error for a preview image message', done => {
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE]: new ImageAsset({tag: 'preview'}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       mapper
@@ -470,7 +471,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped knock message', () => {
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({hotKnock: false}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -485,12 +486,12 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped last read message', () => {
       const date = Date.now().toString();
-      const conversation_id = z.util.createRandomUuid();
+      const conversation_id = createRandomUuid();
 
       const last_read = new LastRead({conversationId: conversation_id, lastReadTimestamp: date});
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: last_read,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -506,7 +507,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', () => {
-      const messageId = z.util.createRandomUuid();
+      const messageId = createRandomUuid();
 
       const reaction = new Reaction({
         emoji: z.message.ReactionType.LIKE,
@@ -532,7 +533,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped text message', () => {
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -562,18 +563,18 @@ describe('CryptographyMapper', () => {
       const text = new Text({content: plaintext});
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: text,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(generic_message).finish())
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.arrayToBase64(cipherText);
+          event.data.data = arrayToBase64(cipherText);
 
           const external_message = new GenericMessage({
             external: new External({otrKey: keyBytes, sha256}),
-            messageId: z.util.createRandomUuid(),
+            messageId: createRandomUuid(),
           });
 
           return mapper.mapGenericMessage(external_message, event);
@@ -590,18 +591,18 @@ describe('CryptographyMapper', () => {
 
       const genericMessage = new GenericMessage({
         knock: new Knock({hotKnock: false}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.arrayToBase64(cipherText);
+          event.data.data = arrayToBase64(cipherText);
 
           external_message = new GenericMessage({
             external: new External({otrKey: keyBytes, sha256}),
-            messageId: z.util.createRandomUuid(),
+            messageId: createRandomUuid(),
           });
           return mapper.mapGenericMessage(external_message, event);
         })
@@ -624,7 +625,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: location,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -642,7 +643,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', () => {
-      const messageId = z.util.createRandomUuid();
+      const messageId = createRandomUuid();
 
       const reaction = new Reaction({
         emoji: z.message.ReactionType.LIKE,
@@ -676,7 +677,7 @@ describe('CryptographyMapper', () => {
       const calling = new Calling({content: JSON.stringify(content_message)});
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: calling,
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {

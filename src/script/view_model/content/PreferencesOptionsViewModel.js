@@ -29,6 +29,7 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
+import {downloadBlob} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
@@ -97,7 +98,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
       const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
 
-      return z.util.downloadBlob(blob, filename);
+      return downloadBlob(blob, filename);
     }
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {

@@ -22,6 +22,7 @@ import {AvailabilityType} from '../user/AvailabilityType';
 
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
+import {base64ToArray, arrayToBase64, createRandomUuid} from 'utils/util';
 
 export default class CryptographyMapper {
   static get CONFIG() {
@@ -326,7 +327,7 @@ export default class CryptographyMapper {
           throw new Error('Not all expected properties defined');
         }
 
-        const cipherText = z.util.base64ToArray(eventData.data).buffer;
+        const cipherText = base64ToArray(eventData.data).buffer;
         const keyBytes = new Uint8Array(otrKey).buffer;
         const referenceSha256 = new Uint8Array(sha256).buffer;
 
@@ -361,7 +362,7 @@ export default class CryptographyMapper {
 
   _mapImageMedium(image, eventId) {
     // set ID even if asset id is missing
-    eventId = eventId || z.util.createRandomUuid();
+    eventId = eventId || createRandomUuid();
 
     return {
       data: {
@@ -434,11 +435,11 @@ export default class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => z.util.arrayToBase64(Mention.encode(protoMention).finish())),
+        mentions: protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
         previews: protoLinkPreviews.map(protoLinkPreview =>
-          z.util.arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
+          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
         ),
-        quote: protoQuote && z.util.arrayToBase64(Quote.encode(protoQuote).finish()),
+        quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };

@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 import Asset from './Asset';
 import TimeUtil from 'utils/TimeUtil';
 import AssetType from '../../assets/AssetType';
+import {downloadBlob} from 'utils/util';
 
 export default class File extends Asset {
   constructor(id) {
@@ -98,7 +99,7 @@ export default class File extends Asset {
     const download_started = Date.now();
 
     return this.load()
-      .then(blob => z.util.downloadBlob(blob, this.file_name))
+      .then(blob => downloadBlob(blob, this.file_name))
       .then(() => {
         const download_duration = (Date.now() - download_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);

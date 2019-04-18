@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {alias} from 'utils/util';
 
 ko.bindingHandlers.switchBackground = (() => {
   return {
@@ -38,7 +39,7 @@ ko.bindingHandlers.switchBackground = (() => {
                 .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
             }
           })
-          .then(() => backgroundNext.css({opacity: '1'}).one(z.util.alias.animationend, backgroundLast.remove));
+          .then(() => backgroundNext.css({opacity: '1'}).one(alias.animationend, backgroundLast.remove));
       }
     },
   };

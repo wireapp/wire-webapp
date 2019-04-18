@@ -20,6 +20,7 @@
 import {ACCENT_ID} from 'src/script/config.js';
 import User from 'src/script/entity/User';
 import UserMapper from 'src/script/user/UserMapper';
+import {createRandomUuid} from 'utils/util';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 describe('User Mapper', () => {
@@ -172,8 +173,8 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: z.util.createRandomUuid(), size: 'preview', type: 'image'},
-          {key: z.util.createRandomUuid(), size: 'complete', type: 'image'},
+          {key: createRandomUuid(), size: 'preview', type: 'image'},
+          {key: createRandomUuid(), size: 'complete', type: 'image'},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

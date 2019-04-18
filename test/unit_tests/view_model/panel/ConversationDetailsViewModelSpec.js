@@ -19,6 +19,7 @@
 
 import ConversationDetailsViewModel from 'src/script/view_model/panel/ConversationDetailsViewModel';
 import Conversation from 'src/script/entity/Conversation';
+import {noop} from 'utils/util';
 
 describe('ConversationDetailsViewModel', () => {
   const testFactory = new window.TestFactory();
@@ -26,7 +27,6 @@ describe('ConversationDetailsViewModel', () => {
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
-      const noop = () => {};
       conversationDetailsViewModel = new ConversationDetailsViewModel({
         isVisible: noop,
         mainViewModel: {},

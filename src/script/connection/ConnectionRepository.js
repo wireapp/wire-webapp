@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {koArrayPushAll} from 'utils/util';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -266,7 +267,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
           throw z.error.ConnectionError(z.error.BaseError.TYPE.INVALID_PARAMETER);
         }
 
-        z.util.koArrayPushAll(this.connectionEntities, connectionEntities);
+        koArrayPushAll(this.connectionEntities, connectionEntities);
 
         return this.userRepository.updateUsersFromConnections(connectionEntities);
       })

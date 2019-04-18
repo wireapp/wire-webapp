@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {base64ToArray} from 'utils/util';
 
 window.z = window.z || {};
 window.z.storage = z.storage || {};
@@ -239,13 +240,13 @@ class StorageSchemata {
         },
         upgrade: transaction => {
           transaction[StorageSchemata.OBJECT_STORE.KEYS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
           transaction[StorageSchemata.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
           transaction[StorageSchemata.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
         },
         version: 12,

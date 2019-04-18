@@ -18,10 +18,11 @@
  */
 
 import JSZip from 'jszip';
+
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 import * as BackupError from 'src/script/backup/Error';
 
-const noop = () => {};
+import {noop} from 'utils/util';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore

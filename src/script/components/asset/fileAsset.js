@@ -20,6 +20,7 @@ import ko from 'knockout';
 
 import './assetLoader';
 import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {getFileExtension, trimFileExtension, formatBytes} from 'utils/util';
 
 class FileAssetComponent extends AbstractAssetTransferStateTracker {
   /**
@@ -33,11 +34,9 @@ class FileAssetComponent extends AbstractAssetTransferStateTracker {
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
     this.header = params.header || false;
-
-    this.file_extension = ko.pureComputed(() => {
-      const ext = z.util.getFileExtension(this.asset.file_name);
-      return ext.length <= 3 ? ext : '';
-    });
+    this.formattedFileSize = formatBytes(this.asset.file_size);
+    this.fileName = trimFileExtension(this.asset.file_name);
+    this.fileExtension = getFileExtension(this.asset.file_name);
   }
 }
 
@@ -73,12 +72,12 @@ ko.components.register('file-asset', {
           <!-- /ko -->
           <div class="file-desc">
             <div data-uie-name="file-name"
-                 data-bind="text: z.util.trimFileExtension(asset.file_name)"
+                 data-bind="text: fileName"
                  class="label-bold-xs ellipsis"></div>
             <ul class="file-desc-meta label-xs text-foreground">
-              <li data-bind="text: z.util.formatBytes(asset.file_size)" data-uie-name="file-size"></li>
-              <!-- ko if: z.util.getFileExtension(asset.file_name) -->
-                <li data-bind="text: z.util.getFileExtension(asset.file_name)" data-uie-name="file-type"></li>
+              <li data-bind="text: formattedFileSize" data-uie-name="file-size"></li>
+              <!-- ko if: fileExtension -->
+                <li data-bind="text: fileExtension" data-uie-name="file-type"></li>
               <!-- /ko -->
               <!-- ko if: transferState() === AssetTransferState.UPLOADING -->
                 <li data-bind="text: t('conversationAssetUploading')" data-uie-name="file-status"></li>

@@ -19,22 +19,44 @@
 
 import ko from 'knockout';
 import Conversation from 'src/script/entity/Conversation';
+import {
+  renderMessage,
+  createRandomUuid,
+  arrayToMd5Base64,
+  arrayToBase64,
+  encodeSha256Base64,
+  base64ToBlob,
+  formatBytes,
+  getFileExtension,
+  trimFileExtension,
+  koArrayPushAll,
+  koArrayUnshiftAll,
+  base64ToArray,
+  stripDataUri,
+  phoneNumberToE164,
+  getContentTypeFromDataUrl,
+  sortGroupsByLastEvent,
+  stripUrlWrapper,
+  printDevicesId,
+  zeroPadding,
+  isSameLocation,
+} from 'utils/util';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 
-describe('z.util.renderMessage', () => {
+describe('renderMessage', () => {
   it('renders a normal link', () => {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
 
-    expect(z.util.renderMessage('Check this: http://www.wire.com/')).toBe(expected);
+    expect(renderMessage('Check this: http://www.wire.com/')).toBe(expected);
   });
 
   it('renders a normal link without protocol', () => {
     const expected =
       'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>';
 
-    expect(z.util.renderMessage('Check this: wire.com/about/')).toBe(expected);
+    expect(renderMessage('Check this: wire.com/about/')).toBe(expected);
   });
 
   it('renders complicated image links', () => {
@@ -44,14 +66,14 @@ describe('z.util.renderMessage', () => {
       link
     )}</a>`;
 
-    expect(z.util.renderMessage(link)).toBe(expected);
+    expect(renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
     const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
 
-    expect(z.util.renderMessage(`Stormtroopers: ${link} !!!`)).toBe(expected);
+    expect(renderMessage(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
   it('renders links with multiple underscores', () => {
@@ -61,48 +83,48 @@ describe('z.util.renderMessage', () => {
       link
     )}</a>`;
 
-    expect(z.util.renderMessage(link)).toBe(expected);
+    expect(renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs without a trailing slash', () => {
     const link = 'http://www.underscore.com';
     const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
 
-    expect(z.util.renderMessage(`e.g. ${link}.`)).toBe(expected);
+    expect(renderMessage(`e.g. ${link}.`)).toBe(expected);
   });
 
   it('renders localhost links', () => {
     const link = 'http://localhost:8888/';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
 
-    expect(z.util.renderMessage(link)).toBe(expected);
+    expect(renderMessage(link)).toBe(expected);
   });
 
   it('renders links with IP addresses', () => {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
 
-    expect(z.util.renderMessage(link)).toBe(expected);
+    expect(renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', () => {
     const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
 
-    expect(z.util.renderMessage(link)).toBe(expected);
+    expect(renderMessage(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
 
-    expect(z.util.renderMessage(`Just click ${link} and download it`)).toBe(expected);
+    expect(renderMessage(`Just click ${link} and download it`)).toBe(expected);
   });
 
   it('escapes links when they are posted as plain HTML', () => {
     const expected = "&lt;a href=&quot;javascript:alert('ohoh!')&quot;&gt;what?&lt;/a&gt;";
 
-    expect(z.util.renderMessage('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
+    expect(renderMessage('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
   });
 
   it('renders an escaped version of an xss attempt', () => {
@@ -110,7 +132,7 @@ describe('z.util.renderMessage', () => {
       '<a href="http://wire.de/jaVasCript:/" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/</a><em>-/</em><code>/*\\</code>/<em>\'/</em>&quot;/<strong>/(/</strong>/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e';
 
     expect(
-      z.util.renderMessage(
+      renderMessage(
         'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
       )
     ).toBe(expected);
@@ -120,81 +142,81 @@ describe('z.util.renderMessage', () => {
     const expected =
       'send it over to <a href="mailto:hello@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
 
-    expect(z.util.renderMessage('send it over to hello@wire.com')).toBe(expected);
+    expect(renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
       'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
 
-    expect(z.util.renderMessage('send it over to hello+world@wire.com')).toBe(expected);
+    expect(renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
       'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
 
-    expect(z.util.renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
+    expect(renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
       'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
 
-    expect(z.util.renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
+    expect(renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
   // The tag "<br>" is preferred for compatibility sake.
   // @see http://stackoverflow.com/a/1946442/451634
   it('renders endlines to <br>', () => {
-    expect(z.util.renderMessage('Hello,\nworld!\nHow is it going?\n')).toBe('Hello,<br>world!<br>How is it going?');
+    expect(renderMessage('Hello,\nworld!\nHow is it going?\n')).toBe('Hello,<br>world!<br>How is it going?');
   });
 
   it('renders text with more than one newline in between', () => {
-    expect(z.util.renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br><br><br><br><br><br><br>world!');
+    expect(renderMessage('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br><br><br><br><br><br><br>world!');
   });
 
   it('does not render URLs within <code> tags', () => {
-    expect(z.util.renderMessage('```Url url = new Url("wire.com");```')).toBe(
+    expect(renderMessage('```Url url = new Url("wire.com");```')).toBe(
       '<code>Url url = new Url(&quot;wire.com&quot;);</code>'
     );
   });
 
   it('does not render emails within <code> tags', () => {
-    expect(z.util.renderMessage('```this.isValid("opensource@wire.com")```')).toBe(
+    expect(renderMessage('```this.isValid("opensource@wire.com")```')).toBe(
       '<code>this.isValid(&quot;opensource@wire.com&quot;)</code>'
     );
   });
 
   it('renders an emoticon of someone shrugging', () => {
     /* eslint-disable no-useless-escape */
-    expect(z.util.renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
+    expect(renderMessage('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
   /* eslint-enable no-useless-escape */
 
   it('renders a link from markdown notation', () => {
-    expect(z.util.renderMessage('[doop](http://www.example.com)')).toBe(
+    expect(renderMessage('[doop](http://www.example.com)')).toBe(
       '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">doop</a>'
     );
   });
 
   it('does not render a js link from markdown notation', () => {
-    expect(z.util.renderMessage("[doop](javascript:alert('nope'))")).toBe("[doop](javascript:alert('nope'))");
+    expect(renderMessage("[doop](javascript:alert('nope'))")).toBe("[doop](javascript:alert('nope'))");
   });
 
   it('does not render markdown links with empty or only whitespace values', () => {
-    expect(z.util.renderMessage('[](http://example.com)')).toBe('[](http://example.com)');
-    expect(z.util.renderMessage('[   ](http://example.com)')).toBe('[   ](http://example.com)');
-    expect(z.util.renderMessage('[link]()')).toBe('[link]()');
-    expect(z.util.renderMessage('[link](    )')).toBe('[link]()');
+    expect(renderMessage('[](http://example.com)')).toBe('[](http://example.com)');
+    expect(renderMessage('[   ](http://example.com)')).toBe('[   ](http://example.com)');
+    expect(renderMessage('[link]()')).toBe('[link]()');
+    expect(renderMessage('[link](    )')).toBe('[link]()');
   });
 
   it('renders special escaped email links from markdown notation', () => {
-    expect(z.util.renderMessage('[email](mailto:test@email.com)')).toBe(
+    expect(renderMessage('[email](mailto:test@email.com)')).toBe(
       '<a href="mailto:test@email.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'test@email.com\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
 
-    expect(z.util.renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
+    expect(renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
       '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
   });
@@ -252,7 +274,7 @@ describe('z.util.renderMessage', () => {
       });
 
       it(testCase, () => {
-        const result = z.util.renderMessage(text, 'self-id', mentionEntities);
+        const result = renderMessage(text, 'self-id', mentionEntities);
 
         expect(result).toEqual(expected);
       });
@@ -260,141 +282,141 @@ describe('z.util.renderMessage', () => {
   });
 });
 
-describe('z.util.arrayToMd5Base64', () => {
+describe('arrayToMd5Base64', () => {
   it('can convert typed array to base64', () => {
-    expect(z.util.arrayToMd5Base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
+    expect(arrayToMd5Base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
   });
 });
 
-describe('z.util.encode_base64_sha256', () => {
+describe('encodeSha256Base64', () => {
   it('encodes Base64 and SHA-256 empty string', () => {
-    expect(z.util.encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
+    expect(encodeSha256Base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
   });
 
   it('encodes Base64 and SHA-256 text', () => {
-    expect(z.util.encodeSha256Base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
+    expect(encodeSha256Base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
   });
 
   it('encodes Base64 and SHA-256 symbols', () => {
-    expect(z.util.encodeSha256Base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
+    expect(encodeSha256Base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
       'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
     );
   });
 });
 
-describe('z.util.base64ToBlob', () => {
+describe('base64ToBlob', () => {
   it('encodes Base64 data URI to blob', () => {
-    const base64 = z.util.arrayToBase64(new Uint8Array([1, 2, 3]));
+    const base64 = arrayToBase64(new Uint8Array([1, 2, 3]));
     const data_uri = `data:application/octet-binary;base64,${base64}`;
-    const blob = z.util.base64ToBlob(data_uri);
+    const blob = base64ToBlob(data_uri);
 
     expect(blob.type).toBe('application/octet-binary');
   });
 });
 
-describe('z.util.createRandomUuid', () => {
+describe('createRandomUuid', () => {
   it('has the expected format', () => {
-    expect(z.util.createRandomUuid().length).toBe(36);
-    expect(z.util.createRandomUuid().split('-').length).toBe(5);
-    expect(z.util.createRandomUuid()).not.toEqual(z.util.createRandomUuid());
+    expect(createRandomUuid().length).toBe(36);
+    expect(createRandomUuid().split('-').length).toBe(5);
+    expect(createRandomUuid()).not.toEqual(createRandomUuid());
   });
 });
 
-describe('z.util.formatBytes', () => {
+describe('formatBytes', () => {
   it('renders 0 bytes', () => {
-    expect(z.util.formatBytes(0)).toEqual('0B');
+    expect(formatBytes(0)).toEqual('0B');
   });
 
   it('renders 1KB', () => {
-    expect(z.util.formatBytes(1024)).toEqual('1KB');
+    expect(formatBytes(1024)).toEqual('1KB');
   });
 
   it('renders 25MB', () => {
-    expect(z.util.formatBytes(25 * 1024 * 1024)).toEqual('25MB');
+    expect(formatBytes(25 * 1024 * 1024)).toEqual('25MB');
   });
 
   it('renders 25GB', () => {
-    expect(z.util.formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
+    expect(formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
   });
 });
 
-describe('z.util.getFileExtension', () => {
+describe('getFileExtension', () => {
   it('returns common extensions', () => {
-    expect(z.util.getFileExtension('file.jpg')).toEqual('jpg');
-    expect(z.util.getFileExtension('file.png')).toEqual('png');
-    expect(z.util.getFileExtension('file.docx')).toEqual('docx');
-    expect(z.util.getFileExtension('file.exe')).toEqual('exe');
-    expect(z.util.getFileExtension('file.dmg')).toEqual('dmg');
+    expect(getFileExtension('file.jpg')).toEqual('jpg');
+    expect(getFileExtension('file.png')).toEqual('png');
+    expect(getFileExtension('file.docx')).toEqual('docx');
+    expect(getFileExtension('file.exe')).toEqual('exe');
+    expect(getFileExtension('file.dmg')).toEqual('dmg');
   });
 
   it('returns extensions for gzip compressed tar archives', () => {
-    expect(z.util.getFileExtension('archive.tar.gz')).toEqual('tar.gz');
+    expect(getFileExtension('archive.tar.gz')).toEqual('tar.gz');
   });
 
   it('returns an empty string if filename has no extension', () => {
-    expect(z.util.getFileExtension('image')).toEqual('');
+    expect(getFileExtension('image')).toEqual('');
   });
 
   it('returns extension jpg for image.jpg', () => {
-    expect(z.util.getFileExtension('path/to/image.jpg')).toEqual('jpg');
+    expect(getFileExtension('path/to/image.jpg')).toEqual('jpg');
   });
 
   it('does not return .tar.gz when it is not the file extension', () => {
-    expect(z.util.getFileExtension('path/to/image.tar.gz.jpg')).toEqual('jpg');
+    expect(getFileExtension('path/to/image.tar.gz.jpg')).toEqual('jpg');
   });
 });
 
-describe('z.util.trimFileExtension', () => {
+describe('trimFileExtension', () => {
   it('returns the filename without extension', () => {
-    expect(z.util.trimFileExtension('image.jpg')).toEqual('image');
+    expect(trimFileExtension('image.jpg')).toEqual('image');
   });
 
   it('returns the filename when there is no extension', () => {
-    expect(z.util.trimFileExtension('image')).toEqual('image');
+    expect(trimFileExtension('image')).toEqual('image');
   });
 
   it('returns the filename without extension or directory path', () => {
-    expect(z.util.trimFileExtension('foo/bar.exe')).toEqual('foo/bar');
+    expect(trimFileExtension('foo/bar.exe')).toEqual('foo/bar');
   });
 
   it('returns the filename without extension for .tar.gz', () => {
-    expect(z.util.trimFileExtension('archive.tar.gz')).toEqual('archive');
+    expect(trimFileExtension('archive.tar.gz')).toEqual('archive');
   });
 
   it('does not remove .tar.gz when it is not the file extension', () => {
-    expect(z.util.trimFileExtension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
+    expect(trimFileExtension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
   });
 
   it('returns an empty string for undefined', () => {
-    expect(z.util.trimFileExtension(undefined)).toEqual('');
+    expect(trimFileExtension(undefined)).toEqual('');
   });
 
   it('returns an empty string for an object', () => {
-    expect(z.util.trimFileExtension({})).toEqual('');
+    expect(trimFileExtension({})).toEqual('');
   });
 });
 
-describe('z.util.koArrayPushAll', () => {
+describe('koArrayPushAll', () => {
   it('appends multiple items', () => {
     const actual = ko.observableArray([1, 2]);
-    z.util.koArrayPushAll(actual, [3, 4]);
+    koArrayPushAll(actual, [3, 4]);
 
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 
-describe('z.util.koArrayUnshiftAll', () => {
+describe('koArrayUnshiftAll', () => {
   it('prepends multiple items', () => {
     const actual = ko.observableArray([3, 4]);
-    z.util.koArrayUnshiftAll(actual, [1, 2]);
+    koArrayUnshiftAll(actual, [1, 2]);
 
     expect(actual()).toEqual([1, 2, 3, 4]);
   });
 });
 
-describe('z.util.base64ToArray', () => {
+describe('base64ToArray', () => {
   it('can convert a gif', () => {
-    const actual = z.util.base64ToArray(
+    const actual = base64ToArray(
       'data:image/gif;base64,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'
     );
     /* eslint-disable comma-spacing */
@@ -407,22 +429,22 @@ describe('z.util.base64ToArray', () => {
   it('can convert array buffer back and forth', () => {
     const buffer = new ArrayBuffer(8);
     const array = new Uint8Array(buffer);
-    const bufferEncoded = z.util.arrayToBase64(array);
-    const bufferDecoded = z.util.base64ToArray(bufferEncoded);
+    const bufferEncoded = arrayToBase64(array);
+    const bufferDecoded = base64ToArray(bufferEncoded);
 
     expect(bufferDecoded).toEqual(array);
   });
 });
 
-describe('z.util.stripDataUri', () => {
+describe('stripDataUri', () => {
   it('can strip data uri', () => {
     const base64 = 'AAAAAAA';
-    const plainText = z.util.stripDataUri(base64);
-    const textHtml = z.util.stripDataUri(`data:text/html,${base64}`);
-    const base64TextPlain = z.util.stripDataUri(`data:text/plain;base64,${base64}`);
-    const base64Gif = z.util.stripDataUri(`data:image/gif;base64,${base64}`);
-    const base64Png = z.util.stripDataUri(`data:image/png;base64,${base64}`);
-    const base64Jpg = z.util.stripDataUri(`data:image/jpg;base64,${base64}`);
+    const plainText = stripDataUri(base64);
+    const textHtml = stripDataUri(`data:text/html,${base64}`);
+    const base64TextPlain = stripDataUri(`data:text/plain;base64,${base64}`);
+    const base64Gif = stripDataUri(`data:image/gif;base64,${base64}`);
+    const base64Png = stripDataUri(`data:image/png;base64,${base64}`);
+    const base64Jpg = stripDataUri(`data:image/jpg;base64,${base64}`);
 
     expect(plainText).toBe(base64);
     expect(textHtml).toBe(base64);
@@ -433,34 +455,34 @@ describe('z.util.stripDataUri', () => {
   });
 });
 
-describe('z.util.phoneNumberToE164', () => {
+describe('phoneNumberToE164', () => {
   it('can convert a US number', () => {
-    expect(z.util.phoneNumberToE164('555-666-7777', 'US')).toBe('+15556667777');
+    expect(phoneNumberToE164('555-666-7777', 'US')).toBe('+15556667777');
   });
 
   it('can convert a GR number', () => {
-    expect(z.util.phoneNumberToE164('2310 863871', 'GR')).toBe('+302310863871');
+    expect(phoneNumberToE164('2310 863871', 'GR')).toBe('+302310863871');
   });
 
   it('can convert an unknown number', () => {
-    expect(z.util.phoneNumberToE164('2310 863871')).toBe('2310863871');
+    expect(phoneNumberToE164('2310 863871')).toBe('2310863871');
   });
 
   it('can convert an invalid number', () => {
-    expect(z.util.phoneNumberToE164('foo bar', 'earth')).toBe('');
+    expect(phoneNumberToE164('foo bar', 'earth')).toBe('');
   });
 });
 
-describe('z.util.getContentTypeFromDataUrl', () =>
+describe('getContentTypeFromDataUrl', () =>
   it('can extract the type of a an image', () => {
-    const actual = z.util.getContentTypeFromDataUrl(
+    const actual = getContentTypeFromDataUrl(
       'data:image/gif;base64,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'
     );
 
     expect(actual).toEqual('image/gif');
   }));
 
-describe('z.util.sortGroupsByLastEvent', () => {
+describe('sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
     const groupA = new Conversation();
     groupA.name('Latest');
@@ -471,7 +493,7 @@ describe('z.util.sortGroupsByLastEvent', () => {
     groupB.last_event_timestamp(1414505766449);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
@@ -487,7 +509,7 @@ describe('z.util.sortGroupsByLastEvent', () => {
     groupB.last_event_timestamp(1414505857975);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupB.name());
     expect(secondGroup.name()).toEqual(groupA.name());
@@ -503,105 +525,99 @@ describe('z.util.sortGroupsByLastEvent', () => {
     groupB.name('Group B');
     groupB.last_event_timestamp(timestamp);
 
-    expect(z.util.sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
+    expect(sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(z.util.sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
   });
 });
 
-describe('z.util.stripUrlWrapper', () => {
+describe('stripUrlWrapper', () => {
   it('return the string without url wrapper (single quotes)', () => {
-    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (quotes)', () => {
-    expect(z.util.stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(stripUrlWrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
   });
 
   it('return the string without url wrapper (without quotes)', () => {
-    expect(z.util.stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
+    expect(stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
   });
 });
 
 describe('Markdown for bold text', () => {
   it('renders bold text', () => {
-    expect(z.util.renderMessage('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
+    expect(renderMessage('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
   });
 
   it('renders a bold word within a sentence', () => {
-    expect(z.util.renderMessage('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
+    expect(renderMessage('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
   });
 
   it('renders bold text with italic words', () => {
-    expect(z.util.renderMessage('**bold text with *italic* !!**')).toBe(
-      '<strong>bold text with <em>italic</em> !!</strong>'
-    );
+    expect(renderMessage('**bold text with *italic* !!**')).toBe('<strong>bold text with <em>italic</em> !!</strong>');
   });
 
   it('renders text which is partly bold and partly italic', () => {
-    expect(z.util.renderMessage('**part bold,** *part italic*')).toBe(
-      '<strong>part bold,</strong> <em>part italic</em>'
-    );
+    expect(renderMessage('**part bold,** *part italic*')).toBe('<strong>part bold,</strong> <em>part italic</em>');
   });
 
   it('renders mixed text with bold and italic words', () => {
-    expect(z.util.renderMessage('*italic* **bold** *italic* **bold**')).toBe(
+    expect(renderMessage('*italic* **bold** *italic* **bold**')).toBe(
       '<em>italic</em> <strong>bold</strong> <em>italic</em> <strong>bold</strong>'
     );
   });
 
   it('renders words which are just bold', () => {
-    expect(z.util.renderMessage('**A**')).toBe('<strong>A</strong>');
+    expect(renderMessage('**A**')).toBe('<strong>A</strong>');
   });
 });
 
 describe('Markdown for italic text', () => {
   it('renders italic text', () => {
-    expect(z.util.renderMessage('*This text is italic.*')).toBe('<em>This text is italic.</em>');
+    expect(renderMessage('*This text is italic.*')).toBe('<em>This text is italic.</em>');
   });
 
   it('renders partially italic text', () => {
-    expect(z.util.renderMessage('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
+    expect(renderMessage('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
   });
 
   it('renders text with multiple italic words', () => {
-    expect(z.util.renderMessage('This text has *two* *italic* bits')).toBe(
-      'This text has <em>two</em> <em>italic</em> bits'
-    );
+    expect(renderMessage('This text has *two* *italic* bits')).toBe('This text has <em>two</em> <em>italic</em> bits');
   });
 
   it('renders italic text with bold words', () => {
-    expect(z.util.renderMessage('*italic text **with bold***')).toBe('<em>italic text <strong>with bold</strong></em>');
+    expect(renderMessage('*italic text **with bold***')).toBe('<em>italic text <strong>with bold</strong></em>');
   });
 
   it('renders words which are bold-italic', () => {
-    expect(z.util.renderMessage('***A***')).toBe('<em><strong>A</strong></em>');
+    expect(renderMessage('***A***')).toBe('<em><strong>A</strong></em>');
   });
 });
 
 describe('Markdown for code snippets', () => {
   it('renders code blocks', () => {
-    expect(z.util.renderMessage("```console.log('A')```")).toEqual("<code>console.log('A')</code>");
+    expect(renderMessage("```console.log('A')```")).toEqual("<code>console.log('A')</code>");
   });
 
   it('can escape HTML in rendered code blocks', () => {
-    expect(z.util.renderMessage('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
+    expect(renderMessage('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
   });
 
   it('renders code within code spans', () => {
-    expect(z.util.renderMessage('This is `code`.')).toEqual('This is <code>code</code>.');
+    expect(renderMessage('This is `code`.')).toEqual('This is <code>code</code>.');
   });
 
   it('renders code within code blocks', () => {
-    expect(z.util.renderMessage('This is ```code```.')).toEqual('This is <code>code</code>.');
+    expect(renderMessage('This is ```code```.')).toEqual('This is <code>code</code>.');
   });
 
   it('doesn’t render code within a code span', () => {
-    expect(z.util.renderMessage('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
+    expect(renderMessage('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
   });
 
   it('doesn’t render links within code blocks', () => {
@@ -609,7 +625,7 @@ describe('Markdown for code snippets', () => {
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>\n<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>\n</code></pre>';
 
     expect(
-      z.util.renderMessage(
+      renderMessage(
         '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
       )
     ).toEqual(expected);
@@ -620,7 +636,7 @@ describe('Markdown for code snippets', () => {
       '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">\'redcarpet\'</span>\nmarkdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">"Hello World!"</span>)\nputs markdown.to_html\n</code></pre>';
 
     expect(
-      z.util.renderMessage(
+      renderMessage(
         '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```'
       )
     ).toEqual(expected);
@@ -631,7 +647,7 @@ describe('Markdown for code snippets', () => {
       '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{\n  $(<span class="hljs-string">\'pre code\'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{\n    hljs.highlightBlock(block);\n  });\n});\n</code></pre>';
 
     expect(
-      z.util.renderMessage(
+      renderMessage(
         "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});\n```"
       )
     ).toEqual(expected);
@@ -642,7 +658,7 @@ describe('Markdown for code snippets', () => {
       '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span>\n<span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span>\n  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span>\n    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span>\n<span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span>\n</code></pre>';
 
     expect(
-      z.util.renderMessage(
+      renderMessage(
         "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->\n```"
       )
     ).toEqual(expected);
@@ -652,15 +668,13 @@ describe('Markdown for code snippets', () => {
     const expected =
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;\n</code></pre>';
 
-    expect(z.util.renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
-      expected
-    );
+    expect(renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(expected);
   });
 
   it('renders escaped HTML code spans', () => {
     const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
 
-    expect(z.util.renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
+    expect(renderMessage('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
   });
 });
 
@@ -672,42 +686,40 @@ describe('Markdown with mixed markups', () => {
     const expected = `This is <em>italic</em> and <strong>bold</strong> and <em><strong>bold-italic</strong></em> with a ${link_1} and ${link_2}.`;
 
     expect(
-      z.util.renderMessage(
-        'This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.'
-      )
+      renderMessage('This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.')
     ).toEqual(expected);
   });
 });
 
 describe('Ignored Markdown syntax', () => {
   it('only renders correct Markdown syntax', () => {
-    expect(z.util.renderMessage('This text is not italic.')).toBe('This text is not italic.');
+    expect(renderMessage('This text is not italic.')).toBe('This text is not italic.');
   });
 
   it('does not render bold text when there is only a single asterisk', () => {
-    expect(z.util.renderMessage('random *asterisk')).toBe('random *asterisk');
+    expect(renderMessage('random *asterisk')).toBe('random *asterisk');
   });
 
   it('does not render horizontal lines', () => {
-    expect(z.util.renderMessage('***\nNo horizontal lines\n***')).toBe('***<br>No horizontal lines<br>***');
+    expect(renderMessage('***\nNo horizontal lines\n***')).toBe('***<br>No horizontal lines<br>***');
   });
 
   it('does not render headers', () => {
-    expect(z.util.renderMessage('# no header')).toBe('# no header');
-    expect(z.util.renderMessage('no h1\n===')).toBe('no h1<br>===');
-    expect(z.util.renderMessage('no h2\n---')).toBe('no h2<br>---');
+    expect(renderMessage('# no header')).toBe('# no header');
+    expect(renderMessage('no h1\n===')).toBe('no h1<br>===');
+    expect(renderMessage('no h2\n---')).toBe('no h2<br>---');
   });
 
   it('does not render blockquotes', () => {
-    expect(z.util.renderMessage('>no blockquote')).toBe('&gt;no blockquote');
-    expect(z.util.renderMessage('> no blockquote')).toBe('&gt; no blockquote');
+    expect(renderMessage('>no blockquote')).toBe('&gt;no blockquote');
+    expect(renderMessage('> no blockquote')).toBe('&gt; no blockquote');
   });
 
   it('does not render tables', () => {
     const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
     const expected = `First Header | Second Header<br>------------ | -------------<br>Cell 1 | Cell 2`;
 
-    expect(z.util.renderMessage(input)).toBe(expected);
+    expect(renderMessage(input)).toBe(expected);
   });
 });
 
@@ -716,118 +728,114 @@ describe('Markdown exceptions', () => {
   it('handles the URLs that start with : after the protocol', () => {
     const text = 'http://:';
 
-    expect(z.util.renderMessage(text)).toBe(text);
+    expect(renderMessage(text)).toBe(text);
   });
 
   it('does not render underscores to italic when they are within a sentence', () => {
     const text = 'calling__voice_channel__fulltitle';
 
-    expect(z.util.renderMessage(text)).toBe(text);
+    expect(renderMessage(text)).toBe(text);
   });
 });
 
-describe('z.util.printDevicesId', () => {
+describe('printDevicesId', () => {
   it('can print device id', () => {
-    expect(z.util.printDevicesId('66e66c79e8d1dea4')).toBe(
+    expect(printDevicesId('66e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
 
   it('can print device id and apply padding', () => {
-    expect(z.util.printDevicesId('6e66c79e8d1dea4')).toBe(
+    expect(printDevicesId('6e66c79e8d1dea4')).toBe(
       "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
     );
   });
 });
 
-describe('z.util.zeroPadding', () => {
+describe('zeroPadding', () => {
   it('should add zero padding when string length is smaller then max', () => {
-    expect(z.util.zeroPadding('1', 10)).toBe('0000000001');
+    expect(zeroPadding('1', 10)).toBe('0000000001');
   });
 
   it('returns string if max is smaller then string length', () => {
-    expect(z.util.zeroPadding('1000000000', 8)).toBe('1000000000');
+    expect(zeroPadding('1000000000', 8)).toBe('1000000000');
   });
 
   it('returns string if max is equal string length', () => {
-    expect(z.util.zeroPadding('1000000000', 10)).toBe('1000000000');
+    expect(zeroPadding('1000000000', 10)).toBe('1000000000');
   });
 
   it('should handle numbers', () => {
-    expect(z.util.zeroPadding(42, 10)).toBe('0000000042');
+    expect(zeroPadding(42, 10)).toBe('0000000042');
   });
 
   it('can add one zero to 6', () => {
-    expect(z.util.zeroPadding(6)).toEqual('06');
+    expect(zeroPadding(6)).toEqual('06');
   });
 
   it('can add 13 zeros to 6', () => {
-    expect(z.util.zeroPadding(6, 14)).toEqual('00000000000006');
+    expect(zeroPadding(6, 14)).toEqual('00000000000006');
   });
 
   it('can transform 666 to a string', () => {
-    expect(z.util.zeroPadding(666)).toEqual('666');
+    expect(zeroPadding(666)).toEqual('666');
   });
 });
 
-describe('z.util.is_same_location', () => {
+describe('is_same_location', () => {
   it('returns false if page was accessed directly', () => {
-    expect(z.util.isSameLocation('', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com', () => {
-    expect(z.util.isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com/download', () => {
-    expect(z.util.isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://get.wire.com', () => {
-    expect(z.util.isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if page was accessed from an external link', () => {
-    expect(z.util.isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth', () => {
-    expect(z.util.isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
+    expect(isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
   });
 
   it('returns false if redirected from auth with parameter', () => {
-    expect(
-      z.util.isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
-    ).toBeFalsy();
+    expect(isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')).toBeFalsy();
   });
 
   it('returns false if redirected from auth with history hashtag', () => {
-    expect(
-      z.util.isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
-    ).toBeFalsy();
+    expect(isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')).toBeFalsy();
   });
 
   it('returns false if redirected from auth with login hashtag', () => {
     expect(
-      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+      isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with registration hashtag', () => {
     expect(
-      z.util.isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+      isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
     ).toBeFalsy();
   });
 
   it('returns true if auth with login hashtag was reloaded', () => {
-    expect(z.util.isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
+    expect(isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
   });
 
   it('returns true if page was reloaded', () => {
-    expect(z.util.isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
+    expect(isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
   });
 
   it('returns true if page was reloaded with parameters', () => {
-    expect(z.util.isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
+    expect(isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
   });
 });

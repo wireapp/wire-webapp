@@ -20,6 +20,7 @@
 import {backendConfig} from '../../api/testResolver';
 import Conversation from 'src/script/entity/Conversation';
 import User from 'src/script/entity/User';
+import {createRandomUuid} from 'utils/util';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -43,8 +44,8 @@ describe('z.connection.ConnectionRepository', () => {
     let userEntity = undefined;
 
     beforeEach(() => {
-      const userId = z.util.createRandomUuid();
-      const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
+      const userId = createRandomUuid();
+      const connectionEntity = new z.connection.ConnectionEntity(createRandomUuid());
       connectionEntity.userId = userId;
 
       userEntity = new User(userId);
@@ -77,11 +78,11 @@ describe('z.connection.ConnectionRepository', () => {
 
     beforeEach(() => {
       firstConnectionEntity = new z.connection.ConnectionEntity();
-      firstConnectionEntity.conversationId = z.util.createRandomUuid();
+      firstConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(firstConnectionEntity);
 
       secondConnectionEntity = new z.connection.ConnectionEntity();
-      secondConnectionEntity.conversationId = z.util.createRandomUuid();
+      secondConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(secondConnectionEntity);
     });
 

@@ -21,6 +21,7 @@ import Logger from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {CancelError} from '../../backup/Error';
+import {downloadBlob} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -119,7 +120,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     const filename = `Wire-${userName}-Backup_${TimeUtil.getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
-    z.util.downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
+    downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
