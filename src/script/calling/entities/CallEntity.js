@@ -49,7 +49,6 @@ class CallEntity {
   /**
    * Construct a new call entity.
    *
-   * @class z.calling.entities.Call
    * @param {Conversation} conversationEntity - Conversation the call takes place in
    * @param {User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
