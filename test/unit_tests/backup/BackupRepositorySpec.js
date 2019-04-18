@@ -18,6 +18,8 @@
  */
 
 import JSZip from 'jszip';
+import {BackupRepository} from '/src/script/backup/BackupRepository';
+import * as BackupError from '/src/script/backup/Error';
 
 const noop = () => {};
 
@@ -33,7 +35,7 @@ const messages = [
   ];
 /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-describe('z.backup.BackupRepository', () => {
+describe('BackupRepository', () => {
   const test_factory = new TestFactory();
   let backupRepository = undefined;
 
@@ -74,10 +76,7 @@ describe('z.backup.BackupRepository', () => {
     afterEach(() => TestFactory.storage_service.clearStores());
 
     it('generates an archive of the database', () => {
-      const filesToCheck = [
-        z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS,
-        z.backup.BackupRepository.CONFIG.FILENAME.EVENTS,
-      ];
+      const filesToCheck = [BackupRepository.CONFIG.FILENAME.CONVERSATIONS, BackupRepository.CONFIG.FILENAME.EVENTS];
 
       const archivePromise = backupRepository.generateHistory(noop);
 
@@ -87,14 +86,14 @@ describe('z.backup.BackupRepository', () => {
         expect(fileNames).toContain('export.json');
         filesToCheck.map(filename => expect(fileNames).toContain(filename));
 
-        const validateConversationsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
+        const validateConversationsPromise = zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
           .async('string')
           .then(conversationsStr => JSON.parse(conversationsStr))
           .then(conversations => {
             expect(conversations).toEqual([conversation]);
           });
 
-        const validateEventsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.EVENTS]
+        const validateEventsPromise = zip.files[BackupRepository.CONFIG.FILENAME.EVENTS]
           .async('string')
           .then(eventsStr => JSON.parse(eventsStr))
           .then(events => {
@@ -137,7 +136,7 @@ describe('z.backup.BackupRepository', () => {
           throw new Error('Export should fail with a CancelError');
         })
         .catch(error => {
-          expect(error instanceof z.backup.CancelError).toBe(true);
+          expect(error instanceof BackupError.CancelError).toBe(true);
         });
 
       backupRepository.cancelAction();
@@ -150,15 +149,15 @@ describe('z.backup.BackupRepository', () => {
     it('fails if metadata doesn´t match', () => {
       const tests = [
         {
-          expectedError: z.backup.DifferentAccountError,
+          expectedError: BackupError.DifferentAccountError,
           metaChanges: {user_id: 'fail'},
         },
         {
-          expectedError: z.backup.IncompatibleBackupError,
+          expectedError: BackupError.IncompatibleBackupError,
           metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
         {
-          expectedError: z.backup.IncompatiblePlatformError,
+          expectedError: BackupError.IncompatiblePlatformError,
           metaChanges: {platform: 'random'},
         },
       ];
@@ -170,7 +169,7 @@ describe('z.backup.BackupRepository', () => {
           ...testDescription.metaChanges,
         };
 
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
+        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
         return backupRepository
           .importHistory(archive, noop, noop)
@@ -190,9 +189,9 @@ describe('z.backup.BackupRepository', () => {
 
       const archives = metadataArray.map(metadata => {
         const archive = new JSZip();
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
+        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
+        archive.file(BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
+        archive.file(BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
 
         return archive;
       });

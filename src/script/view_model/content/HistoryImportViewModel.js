@@ -23,6 +23,8 @@ import JSZip from 'jszip';
 
 import {t} from 'utils/LocalizerUtil';
 
+import * as BackupError from '../../backup/Error';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -78,10 +80,10 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       if (!error) {
         this.errorHeadline('');
         this.errorSecondary('');
-      } else if (error instanceof z.backup.DifferentAccountError) {
+      } else if (error instanceof BackupError.DifferentAccountError) {
         this.errorHeadline(t('backupImportAccountErrorHeadline'));
         this.errorSecondary(t('backupImportAccountErrorSecondary'));
-      } else if (error instanceof z.backup.IncompatibleBackupError) {
+      } else if (error instanceof BackupError.IncompatibleBackupError) {
         this.errorHeadline(t('backupImportVersionErrorHeadline'));
         this.errorSecondary(t('backupImportVersionErrorSecondary'));
       } else {
@@ -128,7 +130,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   onError(error) {
-    if (error instanceof z.backup.CancelError) {
+    if (error instanceof BackupError.CancelError) {
       this.logger.log(`History import was cancelled`);
       return this.dismissImport();
     }

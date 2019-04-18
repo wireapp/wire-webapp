@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
+import {CancelError} from '../../backup/Error';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -132,7 +133,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   onError(error) {
-    if (error instanceof z.backup.CancelError) {
+    if (error instanceof CancelError) {
       this.logger.log(`History export was cancelled`);
       return this.dismissExport();
     }

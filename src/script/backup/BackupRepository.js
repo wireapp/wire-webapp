@@ -25,11 +25,9 @@ import StorageSchemata from '../storage/StorageSchemata';
 
 import BackupService from './BackupService';
 import {chunk} from 'utils/ArrayUtil';
+import * as BackupError from './Error';
 
-window.z = window.z || {};
-window.z.backup = z.backup || {};
-
-z.backup.BackupRepository = class BackupRepository {
+class BackupRepository {
   static get CONFIG() {
     return {
       FILENAME: {
@@ -43,7 +41,7 @@ z.backup.BackupRepository = class BackupRepository {
 
   /**
    * Construct a new Backup repository.
-   * @class z.backup.BackupRepository
+   * @class BackupRepository
    * @param {BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
@@ -51,7 +49,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = Logger('z.backup.BackupRepository');
+    this.logger = Logger('BackupRepository');
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
@@ -102,8 +100,8 @@ z.backup.BackupRepository = class BackupRepository {
       .catch(error => {
         this.logger.error(`Could not export history: ${error.message}`, error);
 
-        const isCancelError = error instanceof z.backup.CancelError;
-        throw isCancelError ? error : new z.backup.ExportError();
+        const isCancelError = error instanceof BackupError.CancelError;
+        throw isCancelError ? error : new BackupError.ExportError();
       });
   }
 
@@ -160,7 +158,7 @@ z.backup.BackupRepository = class BackupRepository {
     return this.backupService
       .exportTable(table, tableRows => {
         if (this.isCanceled) {
-          throw new z.backup.CancelError();
+          throw new BackupError.CancelError();
         }
         exportedEntitiesCount += tableRows.length;
 
@@ -193,7 +191,7 @@ z.backup.BackupRepository = class BackupRepository {
     this.isCanceled = false;
     const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
-      throw new z.backup.InvalidMetaDataError();
+      throw new BackupError.InvalidMetaDataError();
     }
 
     return this.verifyMetadata(files)
@@ -264,7 +262,7 @@ z.backup.BackupRepository = class BackupRepository {
     return importChunks.reduce((promise, importChunk) => {
       return promise.then(() => {
         if (this.isCanceled) {
-          return Promise.reject(new z.backup.CancelError());
+          return Promise.reject(new BackupError.CancelError());
         }
         return importFunction(importChunk);
       });
@@ -309,13 +307,13 @@ z.backup.BackupRepository = class BackupRepository {
       const fromUserId = archiveMetadata.user_id;
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-      throw new z.backup.DifferentAccountError(message);
+      throw new BackupError.DifferentAccountError(message);
     }
 
     const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
     if (!isExpectedPlatform) {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
-      throw new z.backup.IncompatiblePlatformError(message);
+      throw new BackupError.IncompatiblePlatformError(message);
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
@@ -328,7 +326,9 @@ z.backup.BackupRepository = class BackupRepository {
 
     if (involvesDatabaseMigration) {
       const message = `History cannot be restored: Database version mismatch`;
-      throw new z.backup.IncompatibleBackupError(message);
+      throw new BackupError.IncompatibleBackupError(message);
     }
   }
-};
+}
+
+export {BackupRepository};

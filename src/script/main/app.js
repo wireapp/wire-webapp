@@ -29,6 +29,7 @@ import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
+import {BackupRepository} from '../backup/BackupRepository';
 
 import BackendClient from '../service/BackendClient';
 
@@ -188,7 +189,7 @@ class App {
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
-    repositories.backup = new z.backup.BackupRepository(
+    repositories.backup = new BackupRepository(
       resolve(graph.BackupService),
       repositories.client,
       repositories.connection,
