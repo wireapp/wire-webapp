@@ -38,7 +38,7 @@
                           data-uie-name="enter-country">
                     <option value="X0" style="display:none;" data-bind="text: t('authAccountCountryCode')"></option>
                     <option value="X1" style="display:none;" data-bind="text: t('authErrorCountryCodeInvalid')"></option>
-                    <!-- ko foreach: z.util.CountryCodes.COUNTRY_CODES -->
+                    <!-- ko foreach: COUNTRY_CODES -->
                       <option data-bind="value: iso, text: name"></option>
                     <!-- /ko -->
                   </select>
