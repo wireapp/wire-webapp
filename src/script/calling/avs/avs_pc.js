@@ -8,8 +8,8 @@ const DC_STATE_CLOSED = 3;
 const DC_STATE_ERROR = 4;
 
 const connectionsStore = (() => {
-  const peerConnections = [];
-  const dataChannels = [];
+  const peerConnections = [null]; // we need 1 element in there, cause index 0 is invalid
+  const dataChannels = [null]; // we need 1 element in there, cause index 0 is invalid
 
   const storeItem = (store, item) => {
     const index = store.push(item);
@@ -389,7 +389,7 @@ function pc_DataChannelId(hnd) {
   console.log(`pc_DataChannelId: hnd=${hnd}`);
   const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
-    return;
+    return -1;
   }
 
   return dc.id;
@@ -426,7 +426,7 @@ function pc_DataChannelSend(hnd, dataPtr, dataLen) {
     return;
   }
 
-  const data = new Uint8Array(em_module.HEAPU8.buffer, dataPtr, dataLen);
+  const data = em_module.UTF8ToString(dataPtr);
 
   dc.send(data);
 }
