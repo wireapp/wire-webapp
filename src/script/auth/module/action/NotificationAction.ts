@@ -48,7 +48,7 @@ export class NotificationAction {
     return (dispatch, getState, {core}) => {
       return Promise.resolve().then(() => {
         // TODO: Update call to private method once core v6 is inside!
-        // eslint-disable-next-line dot-notation
+        // @ts-ignore
         core.service.notification['setLastEventDate'](lastEventDate);
       });
     };

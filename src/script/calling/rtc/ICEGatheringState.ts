@@ -17,17 +17,12 @@
  *
  */
 
-const CALL_MESSAGE_TYPE = {
-  CANCEL: 'CANCEL',
-  GROUP_CHECK: 'GROUPCHECK',
-  GROUP_LEAVE: 'GROUPLEAVE',
-  GROUP_SETUP: 'GROUPSETUP',
-  GROUP_START: 'GROUPSTART',
-  HANGUP: 'HANGUP',
-  PROP_SYNC: 'PROPSYNC',
-  REJECT: 'REJECT',
-  SETUP: 'SETUP',
-  UPDATE: 'UPDATE',
-};
-
-export default CALL_MESSAGE_TYPE;
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcicegatheringstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceGatheringState#Value
+ */
+export enum ICE_GATHERING_STATE {
+  COMPLETE = 'complete',
+  GATHERING = 'gathering',
+  NEW = 'new',
+}

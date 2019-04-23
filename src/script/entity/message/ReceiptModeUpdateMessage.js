@@ -17,10 +17,10 @@
  *
  */
 
-import SystemMessage from './SystemMessage';
+import {SystemMessage} from './SystemMessage';
 import {t} from 'utils/LocalizerUtil';
 
-export default class ReceiptModeUpdateMessage extends SystemMessage {
+export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled) {
     super();
 

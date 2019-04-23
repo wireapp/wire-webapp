@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import CALL_STATE from '../calling/enum/CallState';
+import {CALL_STATE} from '../calling/enum/CallState';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -30,7 +30,7 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
     this.onRejectCall = this.onRejectCall.bind(this);
 
     this.callingRepository = repositories.calling;
-    this.logger = Logger('z.viewModel.ShortcutsViewModel');
+    this.logger = getLogger('z.viewModel.ShortcutsViewModel');
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));

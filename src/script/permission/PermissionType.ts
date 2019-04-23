@@ -17,12 +17,10 @@
  *
  */
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
-const PermissionType = {
-  CAMERA: 'camera',
-  GEO_LOCATION: 'geolocation',
-  MICROPHONE: 'microphone',
-  NOTIFICATIONS: 'notifications',
-};
-
-export {PermissionType};
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query */
+export enum PermissionType {
+  CAMERA = 'camera',
+  GEO_LOCATION = 'geolocation',
+  MICROPHONE = 'microphone',
+  NOTIFICATIONS = 'notifications',
+}

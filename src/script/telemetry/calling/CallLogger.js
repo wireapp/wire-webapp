@@ -1,7 +1,7 @@
 import {isObject, isString} from 'underscore';
 import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 export class CallLogger {
   static get CONFIG() {
@@ -40,7 +40,7 @@ export class CallLogger {
   constructor(name, id, messageLog) {
     name = id ? this._createName(name, id) : name;
 
-    this.logger = Logger(name);
+    this.logger = getLogger(name);
 
     this.messageLog = messageLog;
     this.name = name;

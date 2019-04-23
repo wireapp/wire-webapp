@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import ReceiptMode from '../../conversation/ReceiptMode';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
 import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
-import trackingHelpers from '../../tracking/Helpers';
+import * as trackingHelpers from '../../tracking/Helpers';
 
 export class GroupCreationViewModel {
   static get STATE() {
@@ -34,7 +34,7 @@ export class GroupCreationViewModel {
   }
 
   constructor(conversationRepository, searchRepository, teamRepository, userRepository) {
-    this.logger = Logger('z.viewModel.content.GroupCreationViewModel');
+    this.logger = getLogger('z.viewModel.content.GroupCreationViewModel');
 
     this.conversationRepository = conversationRepository;
     this.searchRepository = searchRepository;

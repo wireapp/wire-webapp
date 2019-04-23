@@ -18,7 +18,7 @@
  */
 
 import {Quote} from '@wireapp/protocol-messaging';
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {base64ToArray} from 'utils/util';
 
 window.z = window.z || {};
@@ -37,7 +37,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = Logger('z.event.preprocessor.QuotedMessageMiddleware');
+    this.logger = getLogger('z.event.preprocessor.QuotedMessageMiddleware');
   }
 
   /**

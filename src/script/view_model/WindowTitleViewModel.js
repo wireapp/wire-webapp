@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import ko from 'knockout';
 
-export default class WindowTitleViewModel {
+export class WindowTitleViewModel {
   static get TITLE_DEBOUNCE() {
     return 250;
   }
@@ -33,7 +33,7 @@ export default class WindowTitleViewModel {
     this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('WindowTitleViewModel');
+    this.logger = getLogger('WindowTitleViewModel');
 
     this.updateWindowTitle = ko.observable(false);
 

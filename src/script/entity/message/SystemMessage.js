@@ -17,7 +17,7 @@
  *
  */
 
-import Message from './Message';
+import {Message} from './Message';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -34,5 +34,5 @@ class SystemMessage extends Message {
   }
 }
 
-export default SystemMessage;
+export {SystemMessage};
 z.entity.SystemMessage = SystemMessage;

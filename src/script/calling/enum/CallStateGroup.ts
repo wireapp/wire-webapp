@@ -17,15 +17,18 @@
  *
  */
 
-/* eslint-disable sort-keys */
-export default {
-  RECEIVED_ACCESS_TOKEN: 'received_access_token',
-  RECEIVED_SELF_USER: 'received_self_user',
-  INITIALIZED_CRYPTOGRAPHY: 'initialized_cryptography',
-  VALIDATED_CLIENT: 'validated_client',
-  RECEIVED_USER_DATA: 'received_user_data',
-  UPDATED_FROM_NOTIFICATIONS: 'updated_from_notifications',
-  APP_PRE_LOADED: 'app_pre_loaded',
-  APP_LOADED: 'app_loaded',
-  UPDATED_CONVERSATIONS: 'updated_conversations',
+import {CALL_STATE} from './CallState';
+
+export const CALL_STATE_GROUP = {
+  CAN_CONNECT: [CALL_STATE.INCOMING, CALL_STATE.ONGOING, CALL_STATE.REJECTED],
+  CAN_JOIN: [CALL_STATE.INCOMING, CALL_STATE.REJECTED],
+  IS_ACTIVE: [
+    CALL_STATE.CONNECTING,
+    CALL_STATE.DISCONNECTING,
+    CALL_STATE.INCOMING,
+    CALL_STATE.ONGOING,
+    CALL_STATE.OUTGOING,
+  ],
+  IS_ENDED: [CALL_STATE.ENDED, CALL_STATE.UNKNOWN],
+  UNANSWERED: [CALL_STATE.INCOMING, CALL_STATE.OUTGOING],
 };

@@ -19,9 +19,9 @@
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import EphemeralStatusType from '../message/EphemeralStatusType';
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
 import {arrayToBase64, noop} from 'utils/util';
 
@@ -61,7 +61,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = Logger('z.conversation.ConversationEphemeralHandler');
+    this.logger = getLogger('z.conversation.ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 

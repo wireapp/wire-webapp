@@ -19,7 +19,7 @@
 
 import CryptoJS from 'crypto-js';
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {phoneNumberToE164, encodeSha256Base64} from 'utils/util';
 import {PhoneBook} from './PhoneBook';
 
@@ -27,7 +27,7 @@ class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
-    this.logger = Logger('ConnectRepository');
+    this.logger = getLogger('ConnectRepository');
   }
 
   /**

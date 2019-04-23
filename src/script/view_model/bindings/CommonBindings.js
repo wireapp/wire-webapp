@@ -26,9 +26,9 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
-import TimeUtil from 'utils/TimeUtil';
-import overlayedObserver from '../../ui/overlayedObserver';
-import viewportObserver from '../../ui/viewportObserver';
+import {TimeUtil} from 'utils/TimeUtil';
+import {overlayedObserver} from '../../ui/overlayedObserver';
+import {viewportObserver} from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
 import {stripUrlWrapper} from 'utils/util';
 

@@ -28,4 +28,4 @@ const EphemeralStatusType = {
   TIMED_OUT: 3,
 };
 
-export default EphemeralStatusType;
+export {EphemeralStatusType};

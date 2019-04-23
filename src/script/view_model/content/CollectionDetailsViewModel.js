@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import moment from 'moment';
 import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
@@ -37,7 +37,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.removedFromView = this.removedFromView.bind(this);
     this.setConversation = this.setConversation.bind(this);
 
-    this.logger = Logger('z.viewModel.CollectionDetailsViewModel');
+    this.logger = getLogger('z.viewModel.CollectionDetailsViewModel');
 
     this.template = ko.observable();
     this.conversationEntity = ko.observable();

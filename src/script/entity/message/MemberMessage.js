@@ -18,7 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
-import User from '../User';
+import {User} from '../User';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

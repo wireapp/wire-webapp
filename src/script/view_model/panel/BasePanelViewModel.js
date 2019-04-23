@@ -17,7 +17,7 @@
  *
  */
 
-export default class BasePanelViewModel {
+export class BasePanelViewModel {
   constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}) {
     this.onClose = onClose;
     this.onGoBack = onGoBack;

@@ -17,14 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 
-import Conversation from '../../entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 
@@ -57,7 +57,7 @@ class MessageListViewModel {
     this.integrationRepository = repositories.integration;
     this.serverTimeHandler = repositories.serverTime;
     this.userRepository = repositories.user;
-    this.logger = Logger('MessageListViewModel');
+    this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
@@ -637,4 +637,4 @@ class MessageListViewModel {
   }
 }
 
-export default MessageListViewModel;
+export {MessageListViewModel};

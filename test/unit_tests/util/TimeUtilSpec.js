@@ -18,7 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 describe('TimeUtil', () => {
   const ONE_SECOND_IN_MILLIS = 1000;

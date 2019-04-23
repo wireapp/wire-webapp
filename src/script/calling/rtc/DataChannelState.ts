@@ -17,16 +17,13 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
-const ICE_CONNECTION_STATE = {
-  CHECKING: 'checking',
-  CLOSED: 'closed',
-  COMPLETED: 'completed',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-  FAILED: 'failed',
-  NEW: 'new',
-};
-
-export {ICE_CONNECTION_STATE};
+/**
+ * @see https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+ */
+export enum DATA_CHANNEL_STATE {
+  CLOSED = 'closed',
+  CLOSING = 'closing',
+  CONNECTING = 'connecting',
+  OPEN = 'open',
+}

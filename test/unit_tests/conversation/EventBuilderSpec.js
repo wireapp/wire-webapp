@@ -17,9 +17,9 @@
  *
  */
 
-import EventMapper from 'src/script/conversation/EventMapper';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {EventMapper} from 'src/script/conversation/EventMapper';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.EventBuilder', () => {

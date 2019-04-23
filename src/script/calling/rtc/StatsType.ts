@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,11 @@
  *
  */
 
-import {getLogger} from '../auth/LogProvider';
-export default getLogger;
+/** @see https://www.w3.org/TR/webrtc/#dom-rtcstatstype */
+export enum STATS_TYPE {
+  CANDIDATE_PAIR = 'candidate-pair',
+  GOOGLE_CANDIDATE_PAIR = 'googCandidatePair',
+  INBOUND_RTP = 'inbound-rtp',
+  OUTBOUND_RTP = 'outbound-rtp',
+  SSRC = 'ssrc',
+}

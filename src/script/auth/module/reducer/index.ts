@@ -56,7 +56,7 @@ export interface RootState {
 export type ThunkAction<T = Promise<void>> = ReduxThunkAction<T, RootState, Api, AnyAction>;
 export type ThunkDispatch = ReduxThunkDispatch<RootState, Api, AnyAction>;
 
-const reducers = {
+export const reducers = {
   authState: authReducer,
   clientState: clientReducer,
   conversationState: conversationReducer,
@@ -66,5 +66,3 @@ const reducers = {
   runtimeState: runtimeReducer,
   selfState: selfReducer,
 };
-
-export default reducers;

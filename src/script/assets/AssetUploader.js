@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 const uploadQueue = ko.observableArray();
 
-export default class AssetUploader {
+export class AssetUploader {
   constructor(assetService) {
     this.assetService = assetService;
   }

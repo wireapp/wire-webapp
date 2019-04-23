@@ -24,10 +24,10 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {accountFormStrings} from '../../strings';
 import {Config} from '../config';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -68,7 +68,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class AccountForm extends React.PureComponent<CombinedProps, State> {
+class _AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
     name: React.RefObject<HTMLInputElement>;
     email: React.RefObject<HTMLInputElement>;
@@ -332,7 +332,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
   }
 }
 
-export default injectIntl(
+export const AccountForm = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -350,5 +350,5 @@ export default injectIntl(
         },
       };
     }
-  )(AccountForm)
+  )(_AccountForm)
 );

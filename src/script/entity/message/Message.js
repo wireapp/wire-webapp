@@ -20,11 +20,11 @@
 import ko from 'knockout';
 import moment from 'moment';
 
-import AssetTransferState from '../../assets/AssetTransferState';
-import AssetType from '../../assets/AssetType';
-import EphemeralStatusType from '../../message/EphemeralStatusType';
-import User from '../User';
-import TimeUtil from 'utils/TimeUtil';
+import {AssetTransferState} from '../../assets/AssetTransferState';
+import {AssetType} from '../../assets/AssetType';
+import {EphemeralStatusType} from '../../message/EphemeralStatusType';
+import {User} from '../User';
+import {TimeUtil} from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -364,5 +364,5 @@ class Message {
   }
 }
 
-export default Message;
+export {Message};
 z.entity.Message = Message;

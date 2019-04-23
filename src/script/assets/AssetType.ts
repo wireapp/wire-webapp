@@ -17,9 +17,9 @@
  *
  */
 
-export default {
-  FILE: 'File',
-  IMAGE: 'Image',
-  LOCATION: 'Location',
-  TEXT: 'Text',
-};
+export enum AssetType {
+  FILE = 'File',
+  IMAGE = 'Image',
+  LOCATION = 'Location',
+  TEXT = 'Text',
+}

@@ -18,8 +18,8 @@
  */
 
 import {AuthRepository} from '../auth/AuthRepository';
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
@@ -57,7 +57,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = Logger('z.event.WebSocketService');
+    this.logger = getLogger('z.event.WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';

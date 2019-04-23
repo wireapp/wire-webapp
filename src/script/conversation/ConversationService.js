@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -40,7 +40,7 @@ z.conversation.ConversationService = class ConversationService {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
-    this.logger = Logger('z.conversation.ConversationService');
+    this.logger = getLogger('z.conversation.ConversationService');
 
     this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;

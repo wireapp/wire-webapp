@@ -18,7 +18,7 @@
  */
 
 import {memoize} from 'underscore';
-import logger from './Logger';
+import {getLogger} from './Logger';
 
 let dependencyGraph;
 
@@ -50,9 +50,9 @@ const resolver = {
       throw new Error(`No dependencies configuration for class: ${dependencyClass}`);
     }
     const dependencies = config.dependencies.map(resolver.resolve);
-    const dependencyLogger = logger(config.name);
+    const dependencyLogger = getLogger(config.name);
     return new dependencyClass(...dependencies.concat(dependencyLogger));
   }),
 };
 
-export default resolver;
+export {resolver};

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,7 @@
  *
  */
 
-const PROPERTY_STATE = {
-  FALSE: 'false',
-  PAUSED: 'paused',
-  TRUE: 'true',
-};
-
-export default PROPERTY_STATE;
+export enum ReceiptMode {
+  DELIVERY = 0,
+  DELIVERY_AND_READ = 1,
+}

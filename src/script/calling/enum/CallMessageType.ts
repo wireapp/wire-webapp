@@ -17,13 +17,15 @@
  *
  */
 
-// https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
-const DATA_CHANNEL_STATE = {
-  CLOSED: 'closed',
-  CLOSING: 'closing',
-  CONNECTING: 'connecting',
-  OPEN: 'open',
-};
-
-export {DATA_CHANNEL_STATE};
+export enum CALL_MESSAGE_TYPE {
+  CANCEL = 'CANCEL',
+  GROUP_CHECK = 'GROUPCHECK',
+  GROUP_LEAVE = 'GROUPLEAVE',
+  GROUP_SETUP = 'GROUPSETUP',
+  GROUP_START = 'GROUPSTART',
+  HANGUP = 'HANGUP',
+  PROP_SYNC = 'PROPSYNC',
+  REJECT = 'REJECT',
+  SETUP = 'SETUP',
+  UPDATE = 'UPDATE',
+}

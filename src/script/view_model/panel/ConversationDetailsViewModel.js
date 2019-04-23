@@ -17,18 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-/* eslint-disable no-unused-vars */
-import receiptModeToggle from 'components/receiptModeToggle';
-/* eslint-enable no-unused-vars */
-import BasePanelViewModel from './BasePanelViewModel';
+import '../../components/receiptModeToggle';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import '../../components/panel/panelActions';
 
-export default class ConversationDetailsViewModel extends BasePanelViewModel {
+export class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 7,
@@ -53,7 +51,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = Logger('z.viewModel.panel.ConversationDetailsViewModel');
+    this.logger = getLogger('z.viewModel.panel.ConversationDetailsViewModel');
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;

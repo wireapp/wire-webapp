@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {CallSetupStepsOrder} from './CallSetupStepsOrder';
 
 class CallSetupTimings {
@@ -26,7 +26,7 @@ class CallSetupTimings {
     this.log = this.log.bind(this);
     this.call_id = call_id;
 
-    this.logger = Logger('CallSetupTimings');
+    this.logger = getLogger('CallSetupTimings');
 
     this.is_answer = false;
     this.flowId = undefined;

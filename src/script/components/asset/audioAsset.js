@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   /**
@@ -33,7 +33,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
     this.dispose = this.dispose.bind(this);
-    this.logger = Logger('AudioAssetComponent');
+    this.logger = getLogger('AudioAssetComponent');
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();

@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -27,7 +27,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
-    this.logger = Logger('z.conversation.ConversationVerificationStateHandler');
+    this.logger = getLogger('z.conversation.ConversationVerificationStateHandler');
 
     amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
     amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));

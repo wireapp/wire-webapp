@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
@@ -62,7 +62,7 @@ export class ModalsViewModel {
   }
 
   constructor() {
-    this.logger = Logger('ModalsViewModel');
+    this.logger = getLogger('ModalsViewModel');
     this.elementId = 'modals';
 
     this.optionChecked = ko.observable(false);

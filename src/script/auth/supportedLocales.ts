@@ -17,7 +17,7 @@
  *
  */
 
-const supportedLocales: string[] = [
+export const supportedLocales: string[] = [
   'cs-CZ',
   'da-DK',
   'de-DE',
@@ -41,5 +41,3 @@ const supportedLocales: string[] = [
   'tr-TR',
   'uk-UA',
 ];
-
-export default supportedLocales;

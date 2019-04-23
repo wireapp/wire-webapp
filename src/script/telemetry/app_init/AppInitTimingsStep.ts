@@ -17,12 +17,15 @@
  *
  */
 
-export default {
-  BACKEND_REQUESTS: 'backend_requests',
-  CLIENT_TYPE: 'client_type',
-  CLIENTS: 'clients',
-  CONNECTIONS: 'connections',
-  CONVERSATIONS: 'conversations',
-  NOTIFICATIONS: 'notifications',
-  SESSIONS: 'sessions',
-};
+/* tslint:disable:object-literal-sort-keys */
+export enum AppInitTimingsStep {
+  RECEIVED_ACCESS_TOKEN = 'received_access_token',
+  RECEIVED_SELF_USER = 'received_self_user',
+  INITIALIZED_CRYPTOGRAPHY = 'initialized_cryptography',
+  VALIDATED_CLIENT = 'validated_client',
+  RECEIVED_USER_DATA = 'received_user_data',
+  UPDATED_FROM_NOTIFICATIONS = 'updated_from_notifications',
+  APP_PRE_LOADED = 'app_pre_loaded',
+  APP_LOADED = 'app_loaded',
+  UPDATED_CONVERSATIONS = 'updated_conversations',
+}

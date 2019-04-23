@@ -17,25 +17,25 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 
-import App from '../main/app';
+import {App} from '../main/app';
 import {Config} from '../auth/config';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
-import AssetService from '../assets/AssetService';
-import StorageService from '../storage/StorageService';
-import UserRepository from '../user/UserRepository';
+import {AssetService} from '../assets/AssetService';
+import {StorageService} from '../storage/StorageService';
+import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import view from '../auth/AuthView';
-import validationError from '../auth/ValidationError';
+import {view} from '../auth/AuthView';
+import {validationError} from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
@@ -59,7 +59,7 @@ class AuthViewModel {
   constructor(backendClient) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
 
-    this.logger = Logger('z.viewModel.AuthViewModel');
+    this.logger = getLogger('z.viewModel.AuthViewModel');
 
     this.authRepository = resolveDependency(graph.AuthRepository);
     this.audio_repository = resolveDependency(graph.AudioRepository);
@@ -1641,4 +1641,4 @@ $.fn.extend({
   },
 });
 
-export default AuthViewModel;
+export {AuthViewModel};

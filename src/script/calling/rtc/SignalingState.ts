@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,16 @@
  *
  */
 
-export default {
-  DELIVERY: 0,
-  DELIVERY_AND_READ: 1,
-};
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
+ */
+export enum SIGNALING_STATE {
+  CLOSED = 'closed',
+  LOCAL_OFFER = 'have-local-offer',
+  LOCAL_PROVISIONAL_ANSWER = 'have-local-pranswer',
+  NEW = 'new',
+  REMOTE_OFFER = 'have-remote-offer',
+  REMOTE_PROVISIONAL_ANSWER = 'have-remote-pranswer',
+  STABLE = 'stable',
+}

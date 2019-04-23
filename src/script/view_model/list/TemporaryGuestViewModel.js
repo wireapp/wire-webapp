@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -38,7 +38,7 @@ class TemporaryGuestViewModel {
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
-    this.logger = Logger('TemporaryGuestViewModel');
+    this.logger = getLogger('TemporaryGuestViewModel');
 
     this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;

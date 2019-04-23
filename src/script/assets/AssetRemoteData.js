@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {loadUrlBuffer} from 'utils/util';
 
 class AssetRemoteData {
@@ -38,7 +38,7 @@ class AssetRemoteData {
 
     this.loadPromise = undefined;
 
-    this.logger = Logger('AssetRemoteData');
+    this.logger = getLogger('AssetRemoteData');
   }
 
   generateUrl() {
@@ -182,7 +182,7 @@ class AssetRemoteData {
   }
 }
 
-export default AssetRemoteData;
+export {AssetRemoteData};
 
 window.z = window.z || {};
 window.z.assets = z.assets || {};

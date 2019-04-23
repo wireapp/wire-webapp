@@ -17,15 +17,19 @@
  *
  */
 
-const CALL_STATE = {
-  CONNECTING: 'connecting',
-  DISCONNECTING: 'disconnecting',
-  ENDED: 'ended',
-  INCOMING: 'incoming',
-  ONGOING: 'ongoing',
-  OUTGOING: 'outgoing',
-  REJECTED: 'rejected',
-  UNKNOWN: 'unknown',
-};
-
-export default CALL_STATE;
+export enum TERMINATION_REASON {
+  COMPLETED = 'completed',
+  CONCURRENT_CALL = 'concurrent',
+  CONNECTION_DROP = 'drop',
+  CONNECTION_FAILED = 'failed_ice',
+  GROUP_CHECK = 'group_check',
+  MEMBER_LEAVE = 'member_leave',
+  MISSED = 'missed',
+  OTHER_USER = 'other',
+  PAGE_NAVIGATION = 'page_navigation',
+  RENEGOTIATION = 'renegotiation',
+  SDP_FAILED = 'failed_sdp',
+  SELF_USER = 'self',
+  TIMEOUT = 'timeout',
+  UNKNOWN = 'unknown',
+}

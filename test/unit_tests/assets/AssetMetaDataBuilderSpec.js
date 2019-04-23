@@ -17,7 +17,7 @@
  *
  */
 
-import AssetMetaDataBuilder from 'src/script/assets/AssetMetaDataBuilder';
+import * as AssetMetaDataBuilder from 'src/script/assets/AssetMetaDataBuilder';
 
 describe('AssetMetaDataBuilder', () => {
   describe('isVideo', () => {

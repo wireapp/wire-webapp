@@ -53,4 +53,4 @@ const Root = (config: ServerConfig) => [
   Router().get('/demo', (req, res) => res.render('demo/index')),
 ];
 
-export default Root;
+export {Root};

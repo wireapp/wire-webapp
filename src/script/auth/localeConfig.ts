@@ -18,7 +18,7 @@
  */
 
 import {QUERY_KEY} from './route';
-import Locales from './supportedLocales';
+import {supportedLocales as Locales} from './supportedLocales';
 import {getURLParameter} from './util/urlUtil';
 
 // TODO: Use "Currency.EUR" here once core v6 is in.

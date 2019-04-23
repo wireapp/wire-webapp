@@ -17,15 +17,16 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcsdptype
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
-const SDP_TYPE = {
-  ANSWER: 'answer',
-  LOCAL: 'local',
-  OFFER: 'offer',
-  PROVISIONAL_ANSWER: 'pranswer',
-  REMOTE: 'remote',
-  ROLLBACK: 'rollback',
-};
-
-export {SDP_TYPE};
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
+ */
+export enum ICE_CONNECTION_STATE {
+  CHECKING = 'checking',
+  CLOSED = 'closed',
+  COMPLETED = 'completed',
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  FAILED = 'failed',
+  NEW = 'new',
+}

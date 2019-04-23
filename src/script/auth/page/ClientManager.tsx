@@ -24,13 +24,13 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps} from 'react-router';
 import {clientManagerStrings} from '../../strings';
-import ClientList from '../component/ClientList';
-import ROOT_ACTIONS from '../module/action/';
+import {ClientList} from '../component/ClientList';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {ROUTE} from '../route';
-import Page from './Page';
+import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<ClientManager>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_ClientManager>, RouteComponentProps {}
 
 interface ConnectedProps {}
 
@@ -41,7 +41,7 @@ interface DispatchProps {
 
 interface State {}
 
-class ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class _ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   componentWillMount = () => this.props.doGetAllClients();
 
   logout = () =>
@@ -81,7 +81,7 @@ class ClientManager extends React.Component<Props & ConnectedProps & DispatchPro
   }
 }
 
-export default injectIntl(
+export const ClientManager = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {};
@@ -92,5 +92,5 @@ export default injectIntl(
         doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
       };
     }
-  )(ClientManager)
+  )(_ClientManager)
 );

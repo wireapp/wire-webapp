@@ -17,21 +17,12 @@
  *
  */
 
-const TERMINATION_REASON = {
-  COMPLETED: 'completed',
-  CONCURRENT_CALL: 'concurrent',
-  CONNECTION_DROP: 'drop',
-  CONNECTION_FAILED: 'failed_ice',
-  GROUP_CHECK: 'group_check',
-  MEMBER_LEAVE: 'member_leave',
-  MISSED: 'missed',
-  OTHER_USER: 'other',
-  PAGE_NAVIGATION: 'page_navigation',
-  RENEGOTIATION: 'renegotiation',
-  SDP_FAILED: 'failed_sdp',
-  SELF_USER: 'self',
-  TIMEOUT: 'timeout',
-  UNKNOWN: 'unknown',
-};
-
-export default TERMINATION_REASON;
+export enum AppInitStatisticsValue {
+  BACKEND_REQUESTS = 'backend_requests',
+  CLIENT_TYPE = 'client_type',
+  CLIENTS = 'clients',
+  CONNECTIONS = 'connections',
+  CONVERSATIONS = 'conversations',
+  NOTIFICATIONS = 'notifications',
+  SESSIONS = 'sessions',
+}

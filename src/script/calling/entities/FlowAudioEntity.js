@@ -18,7 +18,7 @@
  */
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
-import MediaRepository from '../../media/MediaRepository';
+import {MediaRepository} from '../../media/MediaRepository';
 
 class FlowAudioEntity {
   /**

@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from './Helpers';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+import * as trackingHelpers from './Helpers';
 
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
@@ -55,7 +55,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = Logger('z.tracking.EventTrackingRepository');
+    this.logger = getLogger('z.tracking.EventTrackingRepository');
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;

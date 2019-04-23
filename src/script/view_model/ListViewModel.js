@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {iterateItem} from 'utils/ArrayUtil';
@@ -73,7 +73,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = Logger('z.viewModel.ListViewModel');
+    this.logger = getLogger('z.viewModel.ListViewModel');
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);

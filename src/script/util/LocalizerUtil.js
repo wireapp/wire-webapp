@@ -17,10 +17,15 @@
  *
  */
 
-import SanitizationUtil from './SanitizationUtil';
+import {SanitizationUtil} from './SanitizationUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
+
+export const DEFAULT_LOCALE = 'en';
+
+let locale = DEFAULT_LOCALE;
+let strings = {};
 
 const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
 
@@ -39,12 +44,7 @@ const replaceSubstitute = (string, regex, substitute) => {
   return string.replace(regex, replacement);
 };
 
-export const DEFAULT_LOCALE = 'en';
-
-let locale = DEFAULT_LOCALE;
-let strings = {};
-
-const LocalizerUtil = {
+export const LocalizerUtil = {
   joinNames: (userEntities, declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.is_me);
     if (containsSelfUser) {
@@ -119,7 +119,5 @@ export function t(identifier, substitutions, dangerousSubstitutions, skipEscape 
 }
 
 export const joinNames = LocalizerUtil.joinNames;
-
-export default LocalizerUtil;
 
 window.t = LocalizerUtil.translate;

@@ -18,7 +18,7 @@
  */
 
 import {backendConfig} from '../../api/testResolver';
-import User from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
 
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();

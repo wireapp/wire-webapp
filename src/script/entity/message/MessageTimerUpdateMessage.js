@@ -18,7 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

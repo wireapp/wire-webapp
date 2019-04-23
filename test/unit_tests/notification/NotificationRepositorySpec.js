@@ -20,11 +20,11 @@
 import {t} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
 
-import Conversation from 'src/script/entity/Conversation';
-import MediumImage from 'src/script/entity/message/MediumImage';
-import ContentMessage from 'src/script/entity/message/ContentMessage';
-import User from 'src/script/entity/User';
-import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
+import {Conversation} from 'src/script/entity/Conversation';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {User} from 'src/script/entity/User';
+import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';

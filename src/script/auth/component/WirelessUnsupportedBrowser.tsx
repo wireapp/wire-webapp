@@ -25,7 +25,7 @@ import {unsupportedJoinStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';
-import WirelessContainer from './WirelessContainer';
+import {WirelessContainer} from './WirelessContainer';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -35,7 +35,7 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-export const WirelessUnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
+export const _WirelessUnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
   children,
   isSupportedBrowser,
   intl: {formatMessage: _},
@@ -61,7 +61,7 @@ export const WirelessUnsupportedBrowser: React.SFC<Props & ConnectedProps & Inje
     </WirelessContainer>
   );
 
-export default injectIntl(
+export const WirelessUnsupportedBrowser = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -71,5 +71,5 @@ export default injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {};
     }
-  )(WirelessUnsupportedBrowser)
+  )(_WirelessUnsupportedBrowser)
 );

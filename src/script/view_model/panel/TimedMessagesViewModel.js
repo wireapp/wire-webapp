@@ -17,10 +17,10 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
-import TimeUtil from 'utils/TimeUtil';
+import {BasePanelViewModel} from './BasePanelViewModel';
+import {TimeUtil} from 'utils/TimeUtil';
 
-export default class TimedMessagesViewModel extends BasePanelViewModel {
+export class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 

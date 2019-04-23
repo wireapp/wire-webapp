@@ -17,13 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {roleFromTeamPermissions} from './../user/UserPermission';
 
-export default class TeamMapper {
+export class TeamMapper {
   constructor() {
-    this.logger = Logger('TeamMapper');
+    this.logger = getLogger('TeamMapper');
   }
 
   mapTeamFromObject(data) {

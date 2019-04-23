@@ -30,8 +30,8 @@ import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
 import {configureEnvironment} from './configureEnvironment';
 import {configureStore} from './configureStore';
-import actionRoot from './module/action';
-import Root from './page/Root';
+import {actionRoot} from './module/action';
+import {Root} from './page/Root';
 
 configureEnvironment();
 const apiClient = configureClient();

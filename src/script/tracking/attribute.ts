@@ -17,11 +17,20 @@
  *
  */
 
-const SDP_NEGOTIATION_MODE = {
-  DEFAULT: 'default',
-  ICE_RESTART: 'iceRestart',
-  STATE_COLLISION: 'stateCollision',
-  STREAM_CHANGE: 'streamChange',
-};
+export enum PlatformType {
+  BROWSER_APP = 'web',
+  DESKTOP_LINUX = 'linux',
+  DESKTOP_MACOS = 'mac',
+  DESKTOP_WINDOWS = 'windows',
+}
 
-export default SDP_NEGOTIATION_MODE;
+export enum UserType {
+  GUEST = 'guest',
+  TEMPORARY_GUEST = 'temporary_guest',
+  USER = 'user',
+}
+
+export enum ConversationType {
+  GROUP = 'group',
+  ONE_TO_ONE = 'one_to_one',
+}

@@ -24,7 +24,7 @@ import {connect} from 'react-redux';
 import {unsupportedStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import WirelessContainer from './WirelessContainer';
+import {WirelessContainer} from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   headline: FormattedMessage.MessageDescriptor;
@@ -56,7 +56,7 @@ interface DispatchProps {}
 
 type CombinedProps = Props & DispatchProps & ConnectedProps & InjectedIntlProps;
 
-export const UnsupportedBrowser = ({
+export const _UnsupportedBrowser = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -104,7 +104,7 @@ export const UnsupportedBrowser = ({
   return <>{children}</>;
 };
 
-export default injectIntl(
+export const UnsupportedBrowser = injectIntl(
   connect(
     (state: RootState) => ({
       hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
@@ -113,5 +113,5 @@ export default injectIntl(
       isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
     }),
     (dispatch: ThunkDispatch): DispatchProps => ({})
-  )(UnsupportedBrowser)
+  )(_UnsupportedBrowser)
 );

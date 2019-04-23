@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {koArrayPushAll} from 'utils/util';
 
 window.z = window.z || {};
@@ -39,7 +39,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.connection.ConnectionRepository');
+    this.logger = getLogger('z.connection.ConnectionRepository');
 
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
