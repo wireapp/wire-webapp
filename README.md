@@ -83,7 +83,7 @@ The command to run is:
 
 ```bash
 git checkout 90fda951916f0d60a5bffce69a7267830e313391
-git tag 2019-04-23-staging.1
+git tag 2019-04-23-staging.0
 git push origin --tags
 ```
 
