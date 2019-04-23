@@ -25,6 +25,7 @@ import {t} from 'utils/LocalizerUtil';
 import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {AvailabilityType} from '../../user/AvailabilityType';
 
 import User from '../../entity/User';
@@ -100,7 +101,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;

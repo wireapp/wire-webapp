@@ -20,6 +20,7 @@
 import Logger from 'utils/Logger';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
@@ -53,29 +54,29 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
     });
 
     this.optionDarkMode = ko.observable();
     this.optionDarkMode.subscribe(useDarkMode => {
       const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
 
     this.optionReplaceInlineEmoji = ko.observable();
     this.optionReplaceInlineEmoji.subscribe(emojiPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
     });
 
     this.optionNotifications = ko.observable();
     this.optionNotifications.subscribe(notificationsPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     });
 
     this.optionSendPreviews = ko.observable();
     this.optionSendPreviews.subscribe(sendPreviewsPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));

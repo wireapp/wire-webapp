@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
-
-z.properties.PROPERTIES_TYPE = {
+const PROPERTIES_TYPE = {
   CONTACT_IMPORT: {
     MACOS: 'contact_import.macos',
   },
@@ -39,3 +36,5 @@ z.properties.PROPERTIES_TYPE = {
   SOUND_ALERTS: 'settings.sound.alerts',
   VERSION: 'version',
 };
+
+export {PROPERTIES_TYPE};
