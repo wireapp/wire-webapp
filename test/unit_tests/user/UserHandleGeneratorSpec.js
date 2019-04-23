@@ -17,12 +17,21 @@
  *
  */
 
+import {
+  normalizeName,
+  validateCharacter,
+  validateHandle,
+  generateHandleVariations,
+  appendRandomDigits,
+  createSuggestions,
+} from 'src/script/user/UserHandleGenerator';
+
 describe('UserHandleGenerator', () => {
   describe('generate_handle_variations', () => {
     it('generates handle variations', () => {
       const handle = 'superman';
       const number_of_variations = 10;
-      const variations = z.user.UserHandleGenerator.generate_handle_variations(handle, number_of_variations);
+      const variations = generateHandleVariations(handle, number_of_variations);
 
       expect(variations.length).toBe(number_of_variations);
       variations.forEach(variation => expect(variation).not.toBe(handle));
@@ -31,27 +40,23 @@ describe('UserHandleGenerator', () => {
 
   describe('normalize_name', () => {
     it('should normalize user names', () => {
-      expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe('marialarochelle');
-      expect(z.user.UserHandleGenerator.normalize_name('Mêrié "LaRöche\'lle"')).toBe('merielaroechelle');
-      expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe('mariai');
-      expect(z.user.UserHandleGenerator.normalize_name('.-/Maria-.')).toBe('maria');
-      // expect(z.user.UserHandleGenerator.normalize_name('苹果')).toBe 'pingguo'
-      // expect(z.user.UserHandleGenerator.normalize_name('תפוח ')).toBe 'tpwh'
-      // expect(z.user.UserHandleGenerator.normalize_name('सेवफलम्')).toBe 'sevaphalam'
-      // expect(z.user.UserHandleGenerator.normalize_name('μήλο')).toBe 'melo'
-      // expect(z.user.UserHandleGenerator.normalize_name('Яблоко')).toBe 'abloko'
-      // expect(z.user.UserHandleGenerator.normalize_name('خطای سطح دسترسی')).toBe 'khtaysthdstrsy'
-      expect(z.user.UserHandleGenerator.normalize_name('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
-      expect(z.user.UserHandleGenerator.normalize_name('    Maria LaRochelle Von Schwerigstein ')).toBe(
-        'marialarochellevonsch'
-      );
+      expect(normalizeName('Maria LaRochelle')).toBe('marialarochelle');
+      expect(normalizeName('Mêrié "LaRöche\'lle"')).toBe('merielaroechelle');
+      expect(normalizeName('Maria I ❤️🍕')).toBe('mariai');
+      expect(normalizeName('.-/Maria-.')).toBe('maria');
+      // expect(normalizeName('苹果')).toBe 'pingguo'
+      // expect(normalizeName('תפוח ')).toBe 'tpwh'
+      // expect(normalizeName('सेवफलम्')).toBe 'sevaphalam'
+      // expect(normalizeName('μήλο')).toBe 'melo'
+      // expect(normalizeName('Яблоко')).toBe 'abloko'
+      // expect(normalizeName('خطای سطح دسترسی')).toBe 'khtaysthdstrsy'
+      expect(normalizeName('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
+      expect(normalizeName('    Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
 
-      expect(z.user.UserHandleGenerator.normalize_name(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe(
-        'marialarochellevonsch'
-      );
+      expect(normalizeName(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
 
-      expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe('');
-      expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe('namemailcom');
+      expect(normalizeName('🐙☀️')).toBe('');
+      expect(normalizeName('name@mail.com')).toBe('namemailcom');
     });
   });
 
@@ -89,22 +94,22 @@ describe('UserHandleGenerator', () => {
       const allowed_symbols = ['_'];
 
       latin_alphabet.concat(numbers, allowed_symbols).forEach(character => {
-        expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy();
+        expect(validateCharacter(character)).toBeTruthy();
       });
     });
 
     it('returns false if character is not a string', () => {
-      expect(z.user.UserHandleGenerator.validate_character()).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character(null)).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character({})).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character(1)).toBeFalsy();
+      expect(validateCharacter()).toBeFalsy();
+      expect(validateCharacter(null)).toBeFalsy();
+      expect(validateCharacter({})).toBeFalsy();
+      expect(validateCharacter(1)).toBeFalsy();
     });
 
     it('returns false if character contains other than alphanumeric characters and underscores', () => {
-      expect(z.user.UserHandleGenerator.validate_character('A')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character('太')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character('شمس')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_character('!')).toBeFalsy();
+      expect(validateCharacter('A')).toBeFalsy();
+      expect(validateCharacter('太')).toBeFalsy();
+      expect(validateCharacter('شمس')).toBeFalsy();
+      expect(validateCharacter('!')).toBeFalsy();
     });
   });
 
@@ -112,7 +117,7 @@ describe('UserHandleGenerator', () => {
     it('appends random digits to the end of the string', () => {
       const handle = 'foo';
       const additional_numbers = 5;
-      const string_with_digits = z.user.UserHandleGenerator.append_random_digits('foo', additional_numbers);
+      const string_with_digits = appendRandomDigits('foo', additional_numbers);
 
       expect(string_with_digits.length).toBe(handle.length + additional_numbers);
       expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe(additional_numbers);
@@ -122,7 +127,7 @@ describe('UserHandleGenerator', () => {
   describe('create_suggestions', () => {
     it('appends random digits to the end of the string', () => {
       const username = 'memphis';
-      const suggestions = z.user.UserHandleGenerator.create_suggestions(username);
+      const suggestions = createSuggestions(username);
 
       expect(suggestions.length).toBe(12);
       expect(suggestions.shift()).toBe(username);
@@ -132,24 +137,24 @@ describe('UserHandleGenerator', () => {
 
   describe('validate_handle', () => {
     it('returns true for valid handles', () => {
-      expect(z.user.UserHandleGenerator.validate_handle('valid1')).toBeTruthy();
-      expect(z.user.UserHandleGenerator.validate_handle('1valid')).toBeTruthy();
-      expect(z.user.UserHandleGenerator.validate_handle('val1d')).toBeTruthy();
-      expect(z.user.UserHandleGenerator.validate_handle('still_valid')).toBeTruthy();
+      expect(validateHandle('valid1')).toBeTruthy();
+      expect(validateHandle('1valid')).toBeTruthy();
+      expect(validateHandle('val1d')).toBeTruthy();
+      expect(validateHandle('still_valid')).toBeTruthy();
     });
 
     it('returns false for invalid handles', () => {
-      expect(z.user.UserHandleGenerator.validate_handle()).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle(1)).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('Invalid')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('invaliD')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('invAlid')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('!invalid')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('invalid!')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('inva!lid')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('inva!lid')).toBeFalsy();
-      expect(z.user.UserHandleGenerator.validate_handle('thisisaverylongandthusinvalidhandle')).toBeFalsy();
+      expect(validateHandle()).toBeFalsy();
+      expect(validateHandle('')).toBeFalsy();
+      expect(validateHandle(1)).toBeFalsy();
+      expect(validateHandle('Invalid')).toBeFalsy();
+      expect(validateHandle('invaliD')).toBeFalsy();
+      expect(validateHandle('invAlid')).toBeFalsy();
+      expect(validateHandle('!invalid')).toBeFalsy();
+      expect(validateHandle('invalid!')).toBeFalsy();
+      expect(validateHandle('inva!lid')).toBeFalsy();
+      expect(validateHandle('inva!lid')).toBeFalsy();
+      expect(validateHandle('thisisaverylongandthusinvalidhandle')).toBeFalsy();
     });
   });
 });

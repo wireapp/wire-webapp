@@ -26,6 +26,7 @@ import User from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {validateHandle} from '../../user/UserHandleGenerator';
 
 class StartUIViewModel {
   static get STATE() {
@@ -563,7 +564,7 @@ class StartUIViewModel {
 
       // Contacts, groups and others
       const trimmedQuery = query.trim();
-      const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+      const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
       if (!this.showOnlyConnectedUsers()) {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)

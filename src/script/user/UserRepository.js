@@ -36,6 +36,7 @@ import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
+import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 
 export default class UserRepository {
@@ -741,7 +742,7 @@ export default class UserRepository {
 
     return Promise.resolve()
       .then(() => {
-        suggestions = z.user.UserHandleGenerator.create_suggestions(this.self().name());
+        suggestions = createSuggestions(this.self().name());
         return this.verify_usernames(suggestions);
       })
       .then(valid_suggestions => {
