@@ -27,6 +27,7 @@ import {User} from 'src/script/entity/User';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -296,7 +297,7 @@ describe('ConversationRepository', () => {
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
-      group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
+      group_removed.status(ConversationStatus.PAST_MEMBER);
 
       return Promise.all([
         TestFactory.conversation_repository.save_conversation(group_a),

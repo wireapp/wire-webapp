@@ -17,11 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-// Enum of a user's participation status in a conversation.
-z.conversation.ConversationStatus = {
-  CURRENT_MEMBER: 0,
-  PAST_MEMBER: 1,
-};
+export enum ConversationStatusIcon {
+  ACTIVE_CALL = 'active-call',
+  MISSED_CALL = 'missed-call',
+  MUTED = 'muted',
+  NONE = 'none',
+  PENDING_CONNECTION = 'pending',
+  TYPING = 'typing',
+  UNREAD_MENTION = 'mention',
+  UNREAD_MESSAGES = 'messages',
+  UNREAD_PING = 'ping',
+  UNREAD_REPLY = 'reply',
+}

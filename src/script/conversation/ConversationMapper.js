@@ -24,8 +24,7 @@ import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {NotificationSetting} from './NotificationSetting';
 import {ConversationType} from './ConversationType';
-
-// @ts-check
+import {ConversationStatus} from './ConversationStatus';
 
 /**
  * @typedef {object} ConversationBackendData
@@ -368,7 +367,7 @@ class ConversationMapper {
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
         mergedConversation.others = othersStates
-          .filter(otherState => otherState.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+          .filter(otherState => otherState.status === ConversationStatus.CURRENT_MEMBER)
           .map(otherState => otherState.id);
       }
 

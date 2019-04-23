@@ -81,8 +81,6 @@ import ConversationMapperGlobal from '../conversation/ConversationMapper.js';
 import ConversationRepositoryGlobal from '../conversation/ConversationRepository.js';
 import ConversationServiceGlobal from '../conversation/ConversationService.js';
 import ConversationStateHandlerGlobal from '../conversation/ConversationStateHandler.js';
-import ConversationStatusGlobal from '../conversation/ConversationStatus.js';
-import ConversationStatusIconGlobal from '../conversation/ConversationStatusIcon.js';
 import EventBuilderGlobal from '../conversation/EventBuilder.js';
 import CryptographyMapperGlobal from '../cryptography/CryptographyMapper.js';
 import CryptographyRepositoryGlobal from '../cryptography/CryptographyRepository.js';

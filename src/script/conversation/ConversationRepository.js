@@ -52,6 +52,7 @@ import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
+import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {NotificationSetting} from './NotificationSetting';
@@ -726,7 +727,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   unblocked_user(user_et) {
     this.get1To1Conversation(user_et).then(conversation_et =>
-      conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER)
+      conversation_et.status(ConversationStatus.CURRENT_MEMBER)
     );
   }
 
@@ -1320,7 +1321,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const next_conversation_et = this.get_next_conversation(conversation_et);
 
     if (leave_conversation) {
-      conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+      conversation_et.status(ConversationStatus.PAST_MEMBER);
     }
 
     this._updateClearedTimestamp(conversation_et);
@@ -3295,7 +3296,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     // Self user joins again
     const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
     if (selfUserRejoins) {
-      conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
+      conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
 
     const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
@@ -3324,7 +3325,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
-      conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
+      conversationEntity.status(ConversationStatus.PAST_MEMBER);
 
       if (conversationEntity.call()) {
         const reason = TERMINATION_REASON.MEMBER_LEAVE;

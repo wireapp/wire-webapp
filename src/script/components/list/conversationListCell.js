@@ -16,7 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {noop} from 'utils/util';
+import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 
 class ConversationListCell {
   constructor({conversation, onJoinCall, is_selected = noop, click = noop}) {
@@ -32,6 +34,7 @@ class ConversationListCell {
       .extend({rateLimit: 500});
 
     this.showJoinButton = this.conversation.hasJoinableCall;
+    this.ConversationStatusIcon = ConversationStatusIcon;
 
     this.onJoinCall = () => onJoinCall(conversation, z.media.MediaType.AUDIO);
   }
@@ -69,25 +72,25 @@ ko.components.register('conversation-list-cell', {
       <div class="conversation-list-cell-right">
         <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
         <!-- ko ifnot: showJoinButton -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.PENDING_CONNECTION -->
             <span class="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending"><pending-icon class="svg-icon"></pending-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MENTION -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.UNREAD_MENTION -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention"><mention-icon class="svg-icon"></mention-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_REPLY -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.UNREAD_REPLY -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-reply"><reply-icon class="svg-icon"></reply-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.UNREAD_PING -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping"><ping-icon class="svg-icon"></ping-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MISSED_CALL -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.MISSED_CALL -->
             <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-missed-call"><hangup-icon class="svg-icon"></hangup-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.MUTED -->
             <span class="conversation-list-cell-badge cell-badge-dark conversation-muted" data-uie-name="status-silence"><mute-icon class="svg-icon"></mute-icon></span>
           <!-- /ko -->
-          <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadState().allMessages.length > 0 -->
+          <!-- ko if: cell_state().icon === ConversationStatusIcon.UNREAD_MESSAGES && conversation.unreadState().allMessages.length > 0 -->
             <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unreadState().allMessages.length" data-uie-name="status-unread"></span>
           <!-- /ko -->
         <!-- /ko -->

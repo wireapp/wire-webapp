@@ -29,6 +29,7 @@ import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NotificationSetting} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
+import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
 export class Conversation {
@@ -171,9 +172,9 @@ export class Conversation {
       return this.notificationState() === NotificationSetting.STATE.MENTIONS_AND_REPLIES;
     });
 
-    this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
+    this.status = ko.observable(ConversationStatus.CURRENT_MEMBER);
     this.removed_from_conversation = ko.pureComputed(() => {
-      return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
+      return this.status() === ConversationStatus.PAST_MEMBER;
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());

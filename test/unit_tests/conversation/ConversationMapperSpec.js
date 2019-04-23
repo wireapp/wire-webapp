@@ -22,6 +22,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {createRandomUuid} from 'utils/util';
 
 describe('Conversation Mapper', () => {
@@ -179,14 +180,14 @@ describe('Conversation Mapper', () => {
     });
 
     it('can update the self status if the user leaves a conversation', () => {
-      const self_status = {status: z.conversation.ConversationStatus.PAST_MEMBER};
+      const self_status = {status: ConversationStatus.PAST_MEMBER};
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
       expect(updated_conversation_et.removed_from_conversation()).toBeTruthy();
     });
 
     it('can update the self status if the user joins a conversation', () => {
-      const self_status = {status: z.conversation.ConversationStatus.CURRENT_MEMBER};
+      const self_status = {status: ConversationStatus.CURRENT_MEMBER};
       const updated_conversation_et = conversation_mapper.updateSelfStatus(conversation_et, self_status);
 
       expect(updated_conversation_et.removed_from_conversation()).toBeFalsy();
