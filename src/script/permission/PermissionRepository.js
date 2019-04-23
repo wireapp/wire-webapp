@@ -18,7 +18,6 @@
  */
 
 import Logger from 'utils/Logger';
-
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
 
