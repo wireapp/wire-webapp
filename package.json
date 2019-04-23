@@ -49,8 +49,8 @@
     "url-search-params-polyfill": "5.1.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8",
-    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.17.25-0",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.24"
+    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.17.27-0",
+    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.26"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
