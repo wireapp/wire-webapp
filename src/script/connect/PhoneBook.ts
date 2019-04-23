@@ -17,10 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
+class PhoneBook {
+  self: string[];
+  cards: string[];
 
-z.connect.PhoneBook = class PhoneBook {
   /**
    * Construct a new Phone book.
    */
@@ -28,4 +28,6 @@ z.connect.PhoneBook = class PhoneBook {
     this.self = [];
     this.cards = [];
   }
-};
+}
+
+export {PhoneBook};
