@@ -32,6 +32,7 @@ import {User} from '../../entity/User';
 import {UserRepository} from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {validateProfileImageResolution} from 'utils/util';
+import {nameFromType} from '../../user/AvailabilityMapper';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -76,7 +77,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+      let label = nameFromType(this.availability());
 
       const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {
