@@ -20,6 +20,10 @@
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
+import {ACCESS_MODE} from './AccessMode';
+import {ACCESS_ROLE} from './AccessRole';
+import {ACCESS_STATE} from './AccessState';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -51,14 +55,14 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         let accessModes;
         let accessRole;
 
-        const changeToGuestRoom = accessState === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
-        const changeToTeamOnly = accessState === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+        const changeToGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
+        const changeToTeamOnly = accessState === ACCESS_STATE.TEAM.TEAM_ONLY;
         if (changeToGuestRoom) {
-          accessModes = [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE];
-          accessRole = z.conversation.ACCESS_ROLE.NON_ACTIVATED;
+          accessModes = [ACCESS_MODE.INVITE, ACCESS_MODE.CODE];
+          accessRole = ACCESS_ROLE.NON_ACTIVATED;
         } else if (changeToTeamOnly) {
-          accessModes = [z.conversation.ACCESS_MODE.INVITE];
-          accessRole = z.conversation.ACCESS_ROLE.TEAM;
+          accessModes = [ACCESS_MODE.INVITE];
+          accessRole = ACCESS_ROLE.TEAM;
         }
 
         if (accessModes && accessRole) {

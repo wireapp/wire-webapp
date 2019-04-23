@@ -20,10 +20,11 @@
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'utils/util';
+import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 
 describe('z.conversation.ConversationCellState', () => {
   const conversationCellState = z.conversation.ConversationCellState;
-  const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
+  const NOTIFICATION_STATES = NotificationSetting.STATE;
 
   describe('Notification state icon', () => {
     const conversationEntity = new Conversation(createRandomUuid());

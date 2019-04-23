@@ -20,6 +20,8 @@
 import UUID from 'uuidjs';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {ConversationType} from 'src/script/conversation/ConversationType';
 import {createRandomUuid} from 'utils/util';
 
 describe('Conversation Mapper', () => {
@@ -84,7 +86,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.name()).toBe(conversation.name);
       expect(conversation_et.mutedState()).toBe(false);
       expect(conversation_et.team_id).toEqual(conversation.team);
-      expect(conversation_et.type()).toBe(z.conversation.ConversationType.GROUP);
+      expect(conversation_et.type()).toBe(ConversationType.GROUP);
 
       const expectedMutedTimestamp = new Date(conversation.members.self.otr_muted_ref).getTime();
 
@@ -267,7 +269,7 @@ describe('Conversation Mapper', () => {
 
       expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
       expect(updated_conversation_et.mutedTimestamp()).toBe(timestamp);
-      expect(updated_conversation_et.notificationState()).toBe(z.conversation.NotificationSetting.STATE.NOTHING);
+      expect(updated_conversation_et.notificationState()).toBe(NotificationSetting.STATE.NOTHING);
     });
 
     it('accepts string values which must be parsed later on', () => {
@@ -358,7 +360,7 @@ describe('Conversation Mapper', () => {
     it('incorporates remote data from backend into local data', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": z.conversation.NotificationSetting.STATE.EVERYTHING, "muted_timestamp": 0, "verification_state": 0};
+      const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": NotificationSetting.STATE.EVERYTHING, "muted_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const [merged_conversation] = conversation_mapper.mergeConversation([local_data], [remote_data]);
@@ -452,7 +454,7 @@ describe('Conversation Mapper', () => {
     it('updates local archive and muted timestamps if time of remote data is newer', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const local_data = {"archived_state": false, "archived_timestamp": 1487066801118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": z.conversation.NotificationSetting.STATE.EVERYTHING, "muted_timestamp": 0, "verification_state": 0};
+      const local_data = {"archived_state": false, "archived_timestamp": 1487066801118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": NotificationSetting.STATE.EVERYTHING, "muted_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const self_update = {
@@ -538,7 +540,7 @@ describe('Conversation Mapper', () => {
 
   describe('getMutedState', () => {
     let expectedState;
-    const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
+    const NOTIFICATION_STATE = NotificationSetting.STATE;
 
     it('returns states if only a muted state is given', () => {
       expectedState = conversation_mapper.getMutedState(true);

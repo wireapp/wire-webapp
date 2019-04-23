@@ -17,8 +17,9 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
 import 'src/script/localization/Localizer';
+import {t} from 'utils/LocalizerUtil';
+import {createRandomUuid} from 'utils/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
@@ -28,8 +29,9 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {createRandomUuid} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
+import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {ConversationType} from 'src/script/conversation/ConversationType';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -229,7 +231,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the conversation is muted', () => {
-      conversation_et.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversation_et.mutedState(NotificationSetting.STATE.NOTHING);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -359,7 +361,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -379,7 +381,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -405,7 +407,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -433,7 +435,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -461,7 +463,7 @@ describe('NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -643,7 +645,7 @@ describe('NotificationRepository', () => {
     const expected_title = '…';
 
     beforeEach(() => {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       const connectionMapper = new z.connection.ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
@@ -687,7 +689,7 @@ describe('NotificationRepository', () => {
     });
 
     it('in a 1:1 conversation', () => {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
       return verify_notification(conversation_et, message_et, expected_body);
     });
 
@@ -732,7 +734,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for all notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -740,7 +742,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for no notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -748,7 +750,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset(true));
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -756,7 +758,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for non-self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -768,7 +770,7 @@ describe('NotificationRepository', () => {
       const quoteEntity = new z.message.QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -783,7 +785,7 @@ describe('NotificationRepository', () => {
       });
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);

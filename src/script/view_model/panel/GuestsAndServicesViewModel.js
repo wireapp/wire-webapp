@@ -18,11 +18,12 @@
  */
 
 import {getLogger} from 'utils/Logger';
-
-import {BasePanelViewModel} from './BasePanelViewModel';
 import {copyText} from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
+
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {ACCESS_STATE} from '../../conversation/AccessState';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -76,7 +77,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     // Handle conversations in legacy state
     const accessStatePromise = this.isGuestRoom()
       ? Promise.resolve()
-      : this.stateHandler.changeAccessState(this.activeConversation(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+      : this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM);
 
     accessStatePromise.then(() => {
       if (!this.requestOngoing()) {
@@ -108,9 +109,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   toggleAccessState() {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
-      const newAccessState = this.isTeamOnly()
-        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
-        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+      const newAccessState = this.isTeamOnly() ? ACCESS_STATE.TEAM.GUEST_ROOM : ACCESS_STATE.TEAM.TEAM_ONLY;
 
       const _changeAccessState = () => {
         if (!this.requestOngoing()) {

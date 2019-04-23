@@ -40,11 +40,22 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {PromiseQueue} from 'utils/PromiseQueue';
-import {EventMapper} from './EventMapper';
 import {Conversation} from '../entity/Conversation';
-import {ConversationMapper} from './ConversationMapper';
+
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import * as trackingHelpers from '../tracking/Helpers';
+
+import {ConversationMapper} from './ConversationMapper';
+import {ConversationType} from './ConversationType';
+import {EventBuilder} from './EventBuilder';
+import {EventInfoEntity} from './EventInfoEntity';
+import {EventMapper} from './EventMapper';
+import {ACCESS_MODE} from './AccessMode';
+import {ACCESS_ROLE} from './AccessRole';
+import {ACCESS_STATE} from './AccessState';
+import {ConversationVerificationState} from './ConversationVerificationState';
+import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {NotificationSetting} from './NotificationSetting';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
@@ -134,7 +145,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
-    this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(
+    this.verification_state_handler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
@@ -356,16 +367,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let accessPayload;
 
         switch (accessState) {
-          case z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM:
+          case ACCESS_STATE.TEAM.GUEST_ROOM:
             accessPayload = {
-              access: [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE],
-              access_role: z.conversation.ACCESS_ROLE.NON_ACTIVATED,
+              access: [ACCESS_MODE.INVITE, ACCESS_MODE.CODE],
+              access_role: ACCESS_ROLE.NON_ACTIVATED,
             };
             break;
-          case z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY:
+          case ACCESS_STATE.TEAM.TEAM_ONLY:
             accessPayload = {
-              access: [z.conversation.ACCESS_MODE.INVITE],
-              access_role: z.conversation.ACCESS_ROLE.TEAM,
+              access: [ACCESS_MODE.INVITE],
+              access_role: ACCESS_ROLE.TEAM,
             };
             break;
           default:
@@ -391,7 +402,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   createGuestRoom() {
     const groupName = t('guestRoomConversationName');
-    return this.createGroupConversation([], groupName, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    return this.createGroupConversation([], groupName, ACCESS_STATE.TEAM.GUEST_ROOM);
   }
 
   /**
@@ -590,8 +601,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const creationEvent = conversationEntity.isGroup()
-      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : EventBuilder.build1to1Creation(conversationEntity);
 
     this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1039,7 +1050,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversationEntity.connection(connectionEntity);
 
         if (connectionEntity.isConnected()) {
-          conversationEntity.type(z.conversation.ConversationType.ONE2ONE);
+          conversationEntity.type(ConversationType.ONE2ONE);
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updated_conversation_et => {
@@ -1125,7 +1136,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
     this.sendGenericMessageToConversation(eventInfoEntity)
       .then(() => {
         amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
@@ -1237,7 +1248,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   addMissingMember(conversationId, userIds, timestamp) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const [sender] = userIds;
-      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+      const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
       return this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.INJECTED);
     });
   }
@@ -1345,7 +1356,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1371,7 +1382,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1391,7 +1402,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1503,7 +1514,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
-          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
           this.eventRepository.injectEvent(leaveEvent);
         });
     });
@@ -1513,7 +1524,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Set the notification state of a conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to change notification state off
-   * @param {z.conversation.NotificationSetting} notificationState - New notification state
+   * @param {NotificationSetting} notificationState - New notification state
    * @returns {Promise} Resolves when the notification stated was change
    */
   setNotificationState(conversationEntity, notificationState) {
@@ -1521,13 +1532,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    const validNotificationStates = Object.values(z.conversation.NotificationSetting.STATE);
+    const validNotificationStates = Object.values(NotificationSetting.STATE);
     if (!validNotificationStates.includes(notificationState)) {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== z.conversation.NotificationSetting.STATE.EVERYTHING;
+    const otrMuted = notificationState !== NotificationSetting.STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(currentTimestamp)).toISOString(),
@@ -1737,7 +1748,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(payload => {
@@ -1753,7 +1764,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         };
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
+        const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -1926,7 +1937,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.messageSender.queueMessage(() => {
       return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
         return this._sendGenericMessage(eventInfoEntity);
       });
@@ -1936,7 +1947,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send call message in specified conversation.
    *
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event info to be send
+   * @param {EventInfoEntity} eventInfoEntity - Event info to be send
    * @param {Conversation} conversationEntity - Conversation to send call message to
    * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
@@ -2078,7 +2089,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
     return this.sendGenericMessageToConversation(eventInfoEntity);
   }
 
@@ -2183,7 +2194,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       precondition: true,
       recipients: {[userId]: [clientId]},
     };
-    const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationId, options);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     return this._sendGenericMessage(eventInfoEntity)
       .then(response => {
@@ -2362,7 +2373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -2378,7 +2389,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent))
       .then(injectedEvent => {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         eventInfoEntity.setTimestamp(injectedEvent.time);
         return this.sendGenericMessageToConversation(eventInfoEntity).then(sentPayload => {
           return {event: injectedEvent, sentPayload};
@@ -2432,7 +2443,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send encrypted external message
    *
    * @private
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event to be send
+   * @param {EventInfoEntity} eventInfoEntity - Event to be send
    * @returns {Promise} Resolves after sending the external message
    */
   _sendExternalGenericMessage(eventInfoEntity) {
@@ -2470,7 +2481,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Sends a generic message to a conversation.
    *
    * @private
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves when the message was sent
    */
   _sendGenericMessage(eventInfoEntity) {
@@ -2504,7 +2515,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about message to be sent
+   * @param {EventInfoEntity} eventInfoEntity - Info about message to be sent
    * @param {Object} payload - Payload
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
@@ -2584,7 +2595,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   grantMessage(eventInfoEntity, consentType, userIds) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
       const verificationState = conversationEntity.verification_state();
-      const conversationDegraded = verificationState === z.conversation.ConversationVerificationState.DEGRADED;
+      const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
       if (!conversationDegraded) {
         return false;
@@ -2659,7 +2670,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
               action: () => {
                 sendAnyway = true;
-                conversationEntity.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
 
                 resolve(true);
               },
@@ -2685,7 +2696,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Estimate whether message should be send as type external.
    *
    * @private
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity - Info about event
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(eventInfoEntity) {
@@ -2786,7 +2797,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.messageSender.queueMessage(() => {
           return this.create_recipients(conversationId, false, precondition).then(recipients => {
             const options = {precondition, recipients};
-            const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationId, options);
+            const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
             this._sendGenericMessage(eventInfoEntity);
           });
         });
@@ -2826,7 +2837,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           messageId: createRandomUuid(),
         });
 
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, this.self_conversation().id);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
@@ -3151,7 +3162,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
+        const missed_event = EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -3800,7 +3811,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
-    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

@@ -19,10 +19,17 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
+import {createRandomUuid} from 'utils/util';
+
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'utils/util';
+
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
+import {ConversationType} from 'src/script/conversation/ConversationType';
+
+const eventBuilderMock = EventBuilder;
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -37,7 +44,7 @@ describe('ConversationRepository', () => {
   };
 
   const _generate_conversation = (
-    conversation_type = z.conversation.ConversationType.GROUP,
+    conversation_type = ConversationType.GROUP,
     connection_status = z.connection.ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new Conversation(createRandomUuid());
@@ -61,7 +68,7 @@ describe('ConversationRepository', () => {
       ({storageService: storage_service} = conversation_repository.conversation_service);
 
       spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
-      conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
+      conversation_et = _generate_conversation(ConversationType.SELF);
       conversation_et.id = payload.conversations.knock.post.conversation;
 
       const ping_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/knock`;
@@ -89,7 +96,7 @@ describe('ConversationRepository', () => {
     let message_et = null;
 
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new z.entity.File();
@@ -135,7 +142,7 @@ describe('ConversationRepository', () => {
 
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et = _generate_conversation(ConversationType.GROUP);
       spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
@@ -179,7 +186,7 @@ describe('ConversationRepository', () => {
 
   describe('filtered_conversations', () => {
     it('should not contain the self conversation', () => {
-      const self_conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
+      const self_conversation_et = _generate_conversation(ConversationType.SELF);
 
       return TestFactory.conversation_repository.save_conversation(self_conversation_et).then(() => {
         expect(
@@ -194,7 +201,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain a blocked conversations', () => {
       const blocked_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.BLOCKED
       );
 
@@ -211,7 +218,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain the conversation for a cancelled connection request', () => {
       const cancelled_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.CANCELLED
       );
 
@@ -228,7 +235,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain the conversation for a pending connection request', () => {
       const pending_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.PENDING
       );
 
@@ -272,23 +279,23 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(() => {
-      const group_a = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_a = _generate_conversation(ConversationType.GROUP);
       group_a.name('Web Dudes');
 
-      const group_b = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_b = _generate_conversation(ConversationType.GROUP);
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_c = _generate_conversation(ConversationType.GROUP);
       self_user_et = new User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_cleared = _generate_conversation(ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_removed = _generate_conversation(ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
@@ -416,7 +423,7 @@ describe('ConversationRepository', () => {
 
   describe('"_handleConversationEvent"', () => {
     it('detects events send by a user not in the conversation', () => {
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const conversationEntity = _generate_conversation(ConversationType.GROUP);
       const event = {
         conversation: conversationEntity.id,
         from: createRandomUuid(),
@@ -703,7 +710,7 @@ describe('ConversationRepository', () => {
       let message_et = undefined;
 
       beforeEach(() => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+        conversation_et = _generate_conversation(ConversationType.GROUP);
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
           message_et = new z.entity.Message(createRandomUuid());
           message_et.from = TestFactory.user_repository.self().id;
@@ -817,7 +824,7 @@ describe('ConversationRepository', () => {
       let messageId = null;
 
       beforeEach(() => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+        conversation_et = _generate_conversation(ConversationType.GROUP);
 
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
           const messageToHideEt = new z.entity.Message(createRandomUuid());
@@ -936,7 +943,7 @@ describe('ConversationRepository', () => {
             messageId: createRandomUuid(),
           });
 
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
@@ -956,7 +963,7 @@ describe('ConversationRepository', () => {
             messageId: createRandomUuid(),
           });
 
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
@@ -1042,18 +1049,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const dudes = _generate_conversation(ConversationType.GROUP);
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const gals = _generate_conversation(ConversationType.GROUP);
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const mixed_group = _generate_conversation(ConversationType.GROUP);
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);
@@ -1094,7 +1101,7 @@ describe('ConversationRepository', () => {
       const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
-      spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
+      spyOn(eventBuilderMock, 'buildMemberJoin').and.returnValue(event);
 
       return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
         expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
@@ -1112,7 +1119,7 @@ describe('ConversationRepository', () => {
       TestFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.ONE2ONE);
+      const conversationEntity = _generate_conversation(ConversationType.ONE2ONE);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the account-level preference wins
@@ -1127,7 +1134,7 @@ describe('ConversationRepository', () => {
       TestFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const conversationEntity = _generate_conversation(ConversationType.GROUP);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the conversation-level preference wins

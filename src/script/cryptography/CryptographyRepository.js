@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
 
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
@@ -25,7 +26,7 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {CryptographyMapper} from './CryptographyMapper';
-import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
+import {EventBuilder} from '../conversation/EventBuilder';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -298,7 +299,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const externalMessageIsTooBig = isExternal && eventData.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
-      const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
+      const errorEvent = EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
       return Promise.resolve(errorEvent);
     }
 
@@ -504,7 +505,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     );
     this._reportDecryptionFailure(error, event);
 
-    return z.conversation.EventBuilder.buildUnableToDecrypt(event, error, errorCode);
+    return EventBuilder.buildUnableToDecrypt(event, error, errorCode);
   }
 
   /**
