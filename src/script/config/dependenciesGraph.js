@@ -17,28 +17,28 @@
  *
  */
 
-import AssetService from '../assets/AssetService';
-import AssetUploader from '../assets/AssetUploader';
-import AudioRepository from '../audio/AudioRepository';
+import {AssetService} from '../assets/AssetService';
+import {AssetUploader} from '../assets/AssetUploader';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
-import BackendClient from '../service/BackendClient';
-import BackupService from '../backup/BackupService';
+import {BackendClient} from '../service/BackendClient';
+import {BackupService} from '../backup/BackupService';
 import {BroadcastService} from '../broadcast/BroadcastService';
-import CacheRepository from '../cache/CacheRepository';
-import CallingService from '../calling/CallingService';
-import GiphyRepository from '../extension/GiphyRepository';
-import GiphyService from '../extension/GiphyService';
-import LinkPreviewRepository from '../links/LinkPreviewRepository';
-import MediaRepository from '../media/MediaRepository';
+import {CacheRepository} from '../cache/CacheRepository';
+import {CallingService} from '../calling/CallingService';
+import {GiphyRepository} from '../extension/GiphyRepository';
+import {GiphyService} from '../extension/GiphyService';
+import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {MediaRepository} from '../media/MediaRepository';
 import {MessageSender} from '../message/MessageSender';
-import PermissionRepository from '../permission/PermissionRepository';
-import PropertiesRepository from '../properties/PropertiesRepository';
-import PropertiesService from '../properties/PropertiesService';
-import RichProfileRepository from '../user/RichProfileRepository';
-import SelfService from '../self/SelfService';
-import StorageService from '../storage/StorageService';
-import UserService from '../user/UserService';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesService} from '../properties/PropertiesService';
+import {RichProfileRepository} from '../user/RichProfileRepository';
+import {SelfService} from '../self/SelfService';
+import {StorageService} from '../storage/StorageService';
+import {UserService} from '../user/UserService';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app

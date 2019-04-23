@@ -28,7 +28,7 @@ interface ErrorTypes {
   [key: string]: string;
 }
 
-export default class ValidationError extends Error {
+export class ValidationError extends Error {
   public label: string;
   constructor(label: string) {
     super(label);

@@ -17,72 +17,72 @@
  *
  */
 
-import Conversation from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 import {ConversationType, UserType, PlatformType} from './attribute';
 
-export default {
-  /**
-   * Get corresponding tracking attribute for conversation type.
-   * @param {Conversation} conversationEntity - Conversation to map type of
-   * @returns {ConversationType} Mapped conversation type
-   */
-  getConversationType(conversationEntity) {
-    if (conversationEntity instanceof Conversation) {
-      return conversationEntity.is1to1() ? ConversationType.ONE_TO_ONE : ConversationType.GROUP;
-    }
-  },
+/**
+ * Get corresponding tracking attribute for conversation type.
+ * @param {Conversation} conversationEntity - Conversation to map type of
+ * @returns {ConversationType} Mapped conversation type
+ */
+function getConversationType(conversationEntity) {
+  if (conversationEntity instanceof Conversation) {
+    return conversationEntity.is1to1() ? ConversationType.ONE_TO_ONE : ConversationType.GROUP;
+  }
+}
 
-  getGuestAttributes(conversationEntity) {
-    const isTeamConversation = !!conversationEntity.team_id;
-    if (isTeamConversation) {
-      const isAllowGuests = !conversationEntity.isTeamOnly();
-      const _getUserType = _conversationEntity => {
-        if (_conversationEntity.selfUser().isTemporaryGuest()) {
-          return UserType.TEMPORARY_GUEST;
-        }
-
-        return _conversationEntity.isGuest() ? UserType.GUEST : UserType.USER;
-      };
-
-      return {
-        is_allow_guests: isAllowGuests,
-        user_type: _getUserType(conversationEntity),
-      };
-    }
-
-    return {
-      is_allow_guests: false,
-      user_type: UserType.USER,
-    };
-  },
-
-  getParticipantTypes(userEntities, countSelf) {
-    const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
-    return userEntities.reduce((accumulator, userEntity) => {
-      if (userEntity.isTemporaryGuest()) {
-        accumulator.temporaryGuests += 1;
-      } else if (userEntity.isGuest()) {
-        accumulator.guests += 1;
-      } else {
-        accumulator.users += 1;
+function getGuestAttributes(conversationEntity) {
+  const isTeamConversation = !!conversationEntity.team_id;
+  if (isTeamConversation) {
+    const isAllowGuests = !conversationEntity.isTeamOnly();
+    const _getUserType = _conversationEntity => {
+      if (_conversationEntity.selfUser().isTemporaryGuest()) {
+        return UserType.TEMPORARY_GUEST;
       }
 
-      return accumulator;
-    }, initialValue);
-  },
+      return _conversationEntity.isGuest() ? UserType.GUEST : UserType.USER;
+    };
 
-  /**
-   * Get the platform identifier.
-   * @returns {PlatformType} Mapped platform type
-   */
-  getPlatform() {
-    if (!z.util.Environment.desktop) {
-      return PlatformType.BROWSER_APP;
+    return {
+      is_allow_guests: isAllowGuests,
+      user_type: _getUserType(conversationEntity),
+    };
+  }
+
+  return {
+    is_allow_guests: false,
+    user_type: UserType.USER,
+  };
+}
+
+function getParticipantTypes(userEntities, countSelf) {
+  const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
+  return userEntities.reduce((accumulator, userEntity) => {
+    if (userEntity.isTemporaryGuest()) {
+      accumulator.temporaryGuests += 1;
+    } else if (userEntity.isGuest()) {
+      accumulator.guests += 1;
+    } else {
+      accumulator.users += 1;
     }
 
-    if (z.util.Environment.os.win) {
-      return PlatformType.DESKTOP_WINDOWS;
-    }
-    return z.util.Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
-  },
-};
+    return accumulator;
+  }, initialValue);
+}
+
+/**
+ * Get the platform identifier.
+ * @returns {PlatformType} Mapped platform type
+ */
+function getPlatform() {
+  if (!z.util.Environment.desktop) {
+    return PlatformType.BROWSER_APP;
+  }
+
+  if (z.util.Environment.os.win) {
+    return PlatformType.DESKTOP_WINDOWS;
+  }
+  return z.util.Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
+}
+
+export {getConversationType, getGuestAttributes, getParticipantTypes, getPlatform};

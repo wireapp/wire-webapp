@@ -17,12 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
+import {NotificationPreference} from '../notification/NotificationPreference';
+import {PROPERTIES_TYPE} from './PropertiesType';
 
 class WebappProperties {
   constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
+    this[PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
       emoji: {
         replace_inline: true,
@@ -30,7 +30,7 @@ class WebappProperties {
       interface: {
         theme: 'default',
       },
-      notifications: z.notification.NotificationPreference.ON,
+      notifications: NotificationPreference.ON,
       previews: {
         send: true,
       },
@@ -45,8 +45,8 @@ class WebappProperties {
     this.contact_import = {
       macos: undefined,
     };
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+    this[PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
   }
 }
 
-export default WebappProperties;
+export {WebappProperties};

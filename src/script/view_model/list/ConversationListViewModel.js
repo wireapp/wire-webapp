@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
 export class ConversationListViewModel {
@@ -44,7 +44,7 @@ export class ConversationListViewModel {
     this.listViewModel = listViewModel;
     this.onJoinCall = onJoinCall;
 
-    this.logger = Logger('z.viewModel.list.ConversationListViewModel');
+    this.logger = getLogger('z.viewModel.list.ConversationListViewModel');
     this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable();

@@ -18,6 +18,7 @@
  */
 
 import {AvailabilityType} from '../../user/AvailabilityType';
+import {nameFromType} from '../../user/AvailabilityMapper';
 
 ko.components.register('panel-user-details', {
   template: `
@@ -68,7 +69,7 @@ ko.components.register('panel-user-details', {
       this.availabilityLabel = ko.pureComputed(() => {
         const availabilitySetToNone = this.participant().availability() === AvailabilityType.NONE;
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(this.participant().availability());
+          return nameFromType(this.participant().availability());
         }
       });
     }

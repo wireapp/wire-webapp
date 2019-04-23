@@ -17,9 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-export default class MediaStreamHandler {
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
+
+export class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
    * @param {MediaStream} mediaStream - MediaStream to detect the type off
@@ -82,7 +85,7 @@ export default class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    */
   constructor(mediaRepository, permissionRepository) {
     this._toggleScreenSend = this._toggleScreenSend.bind(this);
@@ -90,7 +93,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = Logger('MediaStreamHandler');
+    this.logger = getLogger('MediaStreamHandler');
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();
@@ -360,13 +363,13 @@ export default class MediaStreamHandler {
       return this.permissionRepository.getPermissionStates(typesToCheck).then(permissions => {
         for (const permission of permissions) {
           const {permissionState, permissionType} = permission;
-          const isPermissionPrompt = permissionState === z.permission.PermissionStatusState.PROMPT;
+          const isPermissionPrompt = permissionState === PermissionStatusState.PROMPT;
           if (isPermissionPrompt) {
             this.logger.info(`Need to prompt for '${permissionType}' permission`, permissions);
             return Promise.resolve(false);
           }
 
-          const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
+          const isPermissionDenied = permissionState === PermissionStatusState.DENIED;
           if (isPermissionDenied) {
             this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
             return Promise.reject(new z.error.PermissionError(z.error.PermissionError.TYPE.DENIED));
@@ -387,20 +390,20 @@ export default class MediaStreamHandler {
    *
    * @private
    * @param {z.media.MediaType} mediaType - Requested media type
-   * @returns {Array<z.permission.PermissionType>} Array containing the necessary permission types
+   * @returns {Array<PermissionType>} Array containing the necessary permission types
    */
   _getPermissionTypes(mediaType) {
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
-        return [z.permission.PermissionType.MICROPHONE];
+        return [PermissionType.MICROPHONE];
       }
 
       case z.media.MediaType.AUDIO_VIDEO: {
-        return [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE];
+        return [PermissionType.CAMERA, PermissionType.MICROPHONE];
       }
 
       case z.media.MediaType.VIDEO: {
-        return [z.permission.PermissionType.CAMERA];
+        return [PermissionType.CAMERA];
       }
     }
   }

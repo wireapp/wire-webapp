@@ -19,7 +19,7 @@
 
 import moment from 'moment';
 
-import EphemeralStatusType from '../message/EphemeralStatusType';
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {t} from 'utils/LocalizerUtil';
 
 import './asset/audioAsset';

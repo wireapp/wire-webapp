@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -26,7 +26,7 @@ z.components.UserProfile = class UserProfile {
   constructor(params) {
     this.dispose = this.dispose.bind(this);
 
-    this.logger = Logger('z.components.UserProfile');
+    this.logger = getLogger('z.components.UserProfile');
 
     this.userEntity = params.user;
 

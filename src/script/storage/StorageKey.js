@@ -44,5 +44,5 @@ const StorageKey = {
   },
 };
 
-export default StorageKey;
+export {StorageKey};
 z.storage.StorageKey = StorageKey;

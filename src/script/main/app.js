@@ -17,47 +17,51 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import ko from 'knockout';
 
 import platform from 'platform';
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
-import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
-import UserRepository from '../user/UserRepository';
+import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
+import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
+import {ConnectService} from '../connect/ConnectService';
+import {ConnectRepository} from '../connect/ConnectRepository';
+import {NotificationRepository} from '../notification/NotificationRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
-import BackendClient from '../service/BackendClient';
+import {BackendClient} from '../service/BackendClient';
 
-import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
-import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
-import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
+import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
-import DebugUtil from 'utils/DebugUtil';
+import {DebugUtil} from 'utils/DebugUtil';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
 
-import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
+import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {t} from 'utils/LocalizerUtil';
 
-/* eslint-disable no-unused-vars */
-import globals from './globals';
-/* eslint-enable no-unused-vars */
+import './globals';
 import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from 'utils/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
+import {modals} from '../view_model/ModalsViewModel';
 import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
 
 class App {
@@ -89,7 +93,7 @@ class App {
    */
   constructor(backendClient, appContainer) {
     this.backendClient = backendClient;
-    this.logger = Logger('App');
+    this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
@@ -152,7 +156,7 @@ class App {
       serverTimeHandler,
       repositories.user
     );
-    repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
+    repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
     repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
@@ -221,14 +225,14 @@ class App {
       repositories.team
     );
     repositories.permission = resolve(graph.PermissionRepository);
-    repositories.notification = new z.notification.NotificationRepository(
+    repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
       resolve(graph.PermissionRepository),
       repositories.user
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
-    repositories.videoGrid = new z.calling.VideoGridRepository(repositories.calling, repositories.media);
+    repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }
@@ -246,7 +250,7 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       client: new z.client.ClientService(this.backendClient, storageService),
-      connect: new z.connect.ConnectService(this.backendClient),
+      connect: new ConnectService(this.backendClient),
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
@@ -360,6 +364,7 @@ class App {
         loadingView.removeFromView();
         telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        modals.ready();
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
@@ -812,7 +817,7 @@ class App {
    */
   disableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
+    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
   /**
@@ -821,7 +826,7 @@ class App {
    */
   enableDebugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
+    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
   /**
@@ -858,4 +863,4 @@ $(() => {
   }
 });
 
-export default App;
+export {App};

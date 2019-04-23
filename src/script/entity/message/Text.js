@@ -19,12 +19,12 @@
 
 import ko from 'knockout';
 
-import Asset from './Asset';
-import AssetType from '../../assets/AssetType';
+import {Asset} from './Asset';
+import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 import {renderMessage} from 'utils/util';
 
-export default class Text extends Asset {
+export class Text extends Asset {
   constructor(id, text = '') {
     super(id);
     this.type = AssetType.TEXT;

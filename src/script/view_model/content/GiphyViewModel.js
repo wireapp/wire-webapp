@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -44,7 +44,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this.clickToSelectGif = this.clickToSelectGif.bind(this);
 
     this.giphyRepository = repositories.giphy;
-    this.logger = Logger('z.viewModel.content.GiphyViewModel');
+    this.logger = getLogger('z.viewModel.content.GiphyViewModel');
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);

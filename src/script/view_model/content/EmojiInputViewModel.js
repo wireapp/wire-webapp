@@ -19,6 +19,7 @@
 
 import emojiBindings from './emoji.json';
 import * as StorageUtil from 'utils/StorageUtil';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 export class EmojiInputViewModel {
   static get CONFIG() {
@@ -116,7 +117,7 @@ export class EmojiInputViewModel {
     this.emojiStartPosition = -1;
     this.emojiUsageCount = StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.shouldReplaceEmoji = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+    this.shouldReplaceEmoji = propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
     $(document).on('click', `.${EMOJI_DIV_CLASS}`, event => {
       const clicked = $(event.target);

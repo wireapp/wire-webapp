@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {
   /**
@@ -32,7 +32,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
    */
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
-    this.logger = Logger('VideoAssetComponent');
+    this.logger = getLogger('VideoAssetComponent');
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();

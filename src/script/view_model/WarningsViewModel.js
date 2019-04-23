@@ -17,10 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
+import {PermissionState} from '../notification/PermissionState';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -64,7 +65,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = Logger('z.viewModel.WarningsViewModel');
+    this.logger = getLogger('z.viewModel.WarningsViewModel');
 
     // Array of warning banners
     this.warnings = ko.observableArray();
@@ -134,7 +135,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
       case WarningsViewModel.TYPE.REQUEST_NOTIFICATION: {
         // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionState.IGNORED);
+        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
         break;
       }
 

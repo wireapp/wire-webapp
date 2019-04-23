@@ -18,11 +18,11 @@
  */
 
 import 'src/script/localization/Localizer';
-import Conversation from 'src/script/entity/Conversation';
-import ContentMessage from 'src/script/entity/message/ContentMessage';
-import Message from 'src/script/entity/message/Message';
-import User from 'src/script/entity/User';
-import ConversationMapper from 'src/script/conversation/ConversationMapper';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Message} from 'src/script/entity/message/Message';
+import {User} from 'src/script/entity/User';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {createRandomUuid} from 'utils/util';
 
 describe('Conversation', () => {

@@ -17,8 +17,8 @@
  *
  */
 
-import config from './config';
-import Server from './Server';
+import {config} from './config';
+import {Server} from './Server';
 import {formatDate} from './util/TimeUtil';
 
 const server = new Server(config);

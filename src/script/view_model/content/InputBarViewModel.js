@@ -17,13 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {resolve, graph} from '../../config/appResolver';
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {AvailabilityType} from '../../user/AvailabilityType';
@@ -73,7 +73,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.InputBarViewModel');
+    this.logger = getLogger('z.viewModel.content.InputBarViewModel');
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfUser = this.userRepository.self;

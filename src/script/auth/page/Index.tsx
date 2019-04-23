@@ -40,9 +40,9 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
 import {pathWithParams} from '../util/urlUtil';
-import Page from './Page';
+import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<Index>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_Index>, RouteComponentProps {}
 
 interface ConnectedProps {
   language: string;
@@ -52,7 +52,7 @@ interface DispatchProps {}
 
 interface State {}
 
-class Index extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class _Index extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   onRegisterPersonalClick = () => {
     this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
@@ -147,7 +147,7 @@ class Index extends React.Component<Props & ConnectedProps & DispatchProps & Inj
   }
 }
 
-export default injectIntl(
+export const Index = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {language: LanguageSelector.getLanguage(state)};
@@ -155,5 +155,5 @@ export default injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {};
     }
-  )(Index)
+  )(_Index)
 );

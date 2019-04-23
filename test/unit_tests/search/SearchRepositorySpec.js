@@ -17,7 +17,7 @@
  *
  */
 
-import User from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
 
 describe('z.search.SearchRepository', () => {
   const test_factory = new TestFactory();

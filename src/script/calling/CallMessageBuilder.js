@@ -18,10 +18,11 @@
  */
 
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CallMessageEntity} from './entities/CallMessageEntity';
 
 const buildCallMessage = (type, response, sessionId, additionalPayload) => {
-  const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
+  const callMessageEntity = new CallMessageEntity(type, response, sessionId);
 
   if (additionalPayload) {
     callMessageEntity.addProperties(additionalPayload);

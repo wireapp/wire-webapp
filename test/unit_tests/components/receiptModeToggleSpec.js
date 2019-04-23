@@ -19,7 +19,7 @@
 
 import {instantiateComponent} from '../../api/knockoutHelpers';
 
-import Conversation from 'src/script/entity/Conversation';
+import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/receiptModeToggle';
 
 describe('read-receipt-toggle', () => {

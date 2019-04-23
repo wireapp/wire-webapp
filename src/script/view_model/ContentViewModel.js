@@ -17,8 +17,8 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import MessageListViewModel from './content/MessageListViewModel';
+import {getLogger} from 'utils/Logger';
+import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
@@ -57,7 +57,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.ContentViewModel');
+    this.logger = getLogger('z.viewModel.ContentViewModel');
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);

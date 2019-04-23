@@ -25,9 +25,9 @@ import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import BackendError from './BackendError';
+import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
-import LabeledError from './LabeledError';
+import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;
@@ -144,7 +144,7 @@ export class AuthAction {
   ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;
     // TODO: Fixed once core v6 is inside
-    // eslint-disable-next-line dot-notation
+    // @ts-ignore
     const accessToken = core['apiClient'].accessTokenStore.accessToken;
     const expiresMillis = accessToken.expires_in * 1000;
     const expireTimestamp = Date.now() + expiresMillis;
@@ -181,7 +181,6 @@ export class AuthAction {
       registration.team.icon = 'default';
       registration.team.binding = true;
       // TODO: Fixed once core v6 is inside
-      // eslint-disable-next-line dot-notation
       // @ts-ignore
       registration.team['currency'] = currentCurrency();
       registration.team.name = registration.team.name.trim();

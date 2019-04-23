@@ -17,20 +17,23 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from '../../user/ConsentValue';
-import ReceiptMode from '../../conversation/ReceiptMode';
-import PropertiesRepository from '../../properties/PropertiesRepository';
+import {ConsentValue} from '../../user/ConsentValue';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {AvailabilityType} from '../../user/AvailabilityType';
 
-import User from '../../entity/User';
-import UserRepository from '../../user/UserRepository';
+import {User} from '../../entity/User';
+import {UserRepository} from '../../user/UserRepository';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {validateProfileImageResolution} from 'utils/util';
-import {ModalsViewModel} from '../ModalsViewModel';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import {nameFromType} from '../../user/AvailabilityMapper';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -57,7 +60,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.changeAccentColor = this.changeAccentColor.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
-    this.logger = Logger('z.viewModel.content.PreferencesAccountViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesAccountViewModel');
 
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;
@@ -75,7 +78,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+      let label = nameFromType(this.availability());
 
       const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {
@@ -100,7 +103,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
@@ -191,22 +194,19 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     // Automation: KeyboardEvent triggered during tests is missing key property
     const inputChar = keyboardEvent.key || String.fromCharCode(event.charCode);
-    return z.user.UserHandleGenerator.validate_character(inputChar.toLowerCase());
+    return validateCharacter(inputChar.toLowerCase());
   }
 
   popNotification() {
-    const notificationData = this.preferenceNotificationRepository.popNotification();
-    if (notificationData) {
-      const {type, notification} = notificationData;
-      return this._showNotification(type, notification, this.popNotification.bind(this));
-    }
+    this.preferenceNotificationRepository
+      .getNotifications()
+      .forEach(({type, notification}) => this._showNotification(type, notification));
   }
 
-  _showNotification(type, aggregatedNotifications, closeAction) {
+  _showNotification(type, aggregatedNotifications) {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          afterClose: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
@@ -217,8 +217,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          afterClose: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
@@ -256,7 +255,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnDeleteAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
         action: t('modalAccountDeletionAction'),
@@ -267,7 +266,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnLeaveGuestRoom() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
@@ -357,7 +356,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.enteredUsername(enteredUsername);
 
-    if (z.user.UserHandleGenerator.validate_handle(enteredUsername)) {
+    if (validateHandle(enteredUsername)) {
       this.userRepository
         .verify_username(enteredUsername)
         .then(() => {
@@ -378,7 +377,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _showUploadWarning(title, message) {
     const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
   }

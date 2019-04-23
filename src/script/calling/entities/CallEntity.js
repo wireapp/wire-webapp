@@ -17,21 +17,22 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
-import {CallLogger} from '../../telemetry/calling/CallLogger';
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import CALL_STATE from '../enum/CallState';
-import CALL_STATE_GROUP from '../enum/CallStateGroup';
-import TERMINATION_REASON from '../enum/TerminationReason';
+import {TimeUtil} from 'utils/TimeUtil';
 import {getRandomNumber} from 'utils/NumberUtil';
+
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
+import {CALL_STATE} from '../enum/CallState';
+import {CALL_STATE_GROUP} from '../enum/CallStateGroup';
+import {TERMINATION_REASON} from '../enum/TerminationReason';
+
+import {CallLogger} from '../../telemetry/calling/CallLogger';
+import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
+import {AvailabilityType} from '../../user/AvailabilityType';
+import {ParticipantEntity} from './ParticipantEntity';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
-
-z.calling.entities.CallEntity = class CallEntity {
+class CallEntity {
   static get CONFIG() {
     return {
       GROUP_CHECK: {
@@ -50,7 +51,6 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Construct a new call entity.
    *
-   * @class z.calling.entities.Call
    * @param {Conversation} conversationEntity - Conversation the call takes place in
    * @param {User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
@@ -68,8 +68,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.id = conversationId;
 
-    const loggerName = 'z.calling.entities.CallEntity';
-    this.callLogger = new CallLogger(loggerName, this.id, this.messageLog);
+    this.callLogger = new CallLogger('CallEntity', this.id, this.messageLog);
 
     this.callLogger.info(`Created new call entity in conversation ${this.id}`);
 
@@ -209,7 +208,11 @@ z.calling.entities.CallEntity = class CallEntity {
         const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
           const isIncomingCall = state === CALL_STATE.INCOMING;
-          this._onStateStartRinging(isIncomingCall);
+          const isUserAway = this.selfUser.availability() === AvailabilityType.AWAY;
+          const dontPlaySound = isIncomingCall && isUserAway;
+          if (!dontPlaySound) {
+            this._onStateStartRinging(isIncomingCall);
+          }
         } else {
           this._onStateStopRinging();
         }
@@ -237,7 +240,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Deactivate the call.
    *
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message for deactivation
+   * @param {CallMessageEntity} callMessageEntity - Call message for deactivation
    * @param {boolean} fromSelf - Deactivation triggered by self user change
    * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {Promise<boolean>} Resolves with a boolean whether the call was deleted
@@ -376,7 +379,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Check if group call should continue after participant left.
    *
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Last member leaving call
+   * @param {CallMessageEntity} callMessageEntity - Last member leaving call
    * @param {TERMINATION_REASON} terminationReason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
@@ -544,7 +547,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Confirm an incoming message.
-   * @param {z.calling.entities.CallMessageEntity} incomingCallMessageEntity - Incoming call message to be confirmed
+   * @param {CallMessageEntity} incomingCallMessageEntity - Incoming call message to be confirmed
    * @returns {Promise} Resolves when message was confirmed
    */
   confirmMessage(incomingCallMessageEntity) {
@@ -576,7 +579,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Send call message.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
+   * @param {CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {Promise} Resolves when the event has been send
    */
   sendCallMessage(callMessageEntity) {
@@ -585,7 +588,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Set remote version of call
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to get remote version from
+   * @param {CallMessageEntity} callMessageEntity - Call message to get remote version from
    * @returns {undefined} No return value
    */
   setRemoteVersion(callMessageEntity) {
@@ -708,7 +711,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - User ID of the call participant
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message for participant change
+   * @param {CallMessageEntity} [callMessageEntity] - Call message for participant change
    * @returns {Promise} Resolves with participant entity
    */
   addOrUpdateParticipant(userId, negotiate, callMessageEntity) {
@@ -818,7 +821,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Verify call message belongs to call by session id.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity
+   * @param {CallMessageEntity} callMessageEntity - Call message entity
    * @returns {Promise} Resolves with the Call entity if verification passed
    */
   verifySessionId(callMessageEntity) {
@@ -844,7 +847,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message entity for participant change
+   * @param {CallMessageEntity} [callMessageEntity] - Call message entity for participant change
    * @returns {Promise} Resolves with the added participant
    */
   _addParticipant(userId, negotiate, callMessageEntity) {
@@ -855,7 +858,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     return this.userRepository.get_user_by_id(userId).then(userEntity => {
-      const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
+      const participantEntity = new ParticipantEntity(this, userEntity, this.timings);
 
       this.participants.push(participantEntity);
 
@@ -875,9 +878,9 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Update call participant with call message.
    *
-   * @param {z.calling.entities.ParticipantEntity} participantEntity - Participant entity to be updated in the call
+   * @param {ParticipantEntity} participantEntity - Participant entity to be updated in the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update user with
+   * @param {CallMessageEntity} callMessageEntity - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _updateParticipant(participantEntity, negotiate, callMessageEntity) {
@@ -900,9 +903,9 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Update call participant state.
    *
-   * @param {z.calling.entities.ParticipantEntity} participantEntity - User ID to be added to the call
+   * @param {ParticipantEntity} participantEntity - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message to update user with
+   * @param {CallMessageEntity} [callMessageEntity] - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _updateParticipantState(participantEntity, negotiate, callMessageEntity) {
@@ -929,7 +932,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Get all flows of the call.
-   * @returns {Array<z.calling.entities.FlowEntity>} Array of flows
+   * @returns {Array<FlowEntity>} Array of flows
    */
   getFlows() {
     return this.participants()
@@ -953,7 +956,7 @@ z.calling.entities.CallEntity = class CallEntity {
    */
   initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
     this.telemetry.initiateNewCall(direction, mediaType);
-    this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
+    this.timings = new CallSetupTimings(this.id);
   }
 
   /**
@@ -1076,4 +1079,6 @@ z.calling.entities.CallEntity = class CallEntity {
   logTimings() {
     this.getFlows().forEach(flowEntity => flowEntity.logTimings());
   }
-};
+}
+
+export {CallEntity};

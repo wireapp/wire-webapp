@@ -17,20 +17,18 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
-import User from '../../entity/User';
+import {User} from '../../entity/User';
+import {ConnectSource} from '../../connect/ConnectSource';
 import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {validateHandle} from '../../user/UserHandleGenerator';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.StartUIViewModel = class StartUIViewModel {
+class StartUIViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -69,7 +67,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.StartUIViewModel');
+    this.logger = getLogger('z.viewModel.list.StartUIViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -447,7 +445,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   clickOnImportContacts() {
-    this._importContacts(z.connect.ConnectSource.ICLOUD);
+    this._importContacts(ConnectSource.ICLOUD);
   }
 
   clickToCloseGenericInvite() {
@@ -518,7 +516,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   /**
    * Connect with contacts.
-   * @param {z.connect.ConnectSource} source - Source for the contacts import
+   * @param {ConnectSource} source - Source for the contacts import
    * @returns {undefined} No return value
    */
   importContacts(source) {
@@ -566,7 +564,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
       // Contacts, groups and others
       const trimmedQuery = query.trim();
-      const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+      const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
       if (!this.showOnlyConnectedUsers()) {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)
@@ -607,4 +605,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   dispose() {
     this.renderAvatarComputed.dispose();
   }
-};
+}
+
+export {StartUIViewModel};

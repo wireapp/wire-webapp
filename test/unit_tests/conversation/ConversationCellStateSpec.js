@@ -17,8 +17,8 @@
  *
  */
 
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.ConversationCellState', () => {

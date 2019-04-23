@@ -19,22 +19,20 @@
 
 import CryptoJS from 'crypto-js';
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {phoneNumberToE164, encodeSha256Base64} from 'utils/util';
+import {PhoneBook} from './PhoneBook';
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
-
-z.connect.ConnectRepository = class ConnectRepository {
+class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
-    this.logger = Logger('z.connect.ConnectRepository');
+    this.logger = getLogger('ConnectRepository');
   }
 
   /**
    * Get user's contacts for matching.
-   * @param {z.connect.ConnectSource} source - Source for phone book retrieval
+   * @param {ConnectSource} source - Source for phone book retrieval
    * @returns {Promise} Resolves with the matched user IDs
    */
   getContacts(source) {
@@ -45,8 +43,8 @@ z.connect.ConnectRepository = class ConnectRepository {
    * Encode phone book
    *
    * @private
-   * @param {z.connect.PhoneBook} phoneBook - Object containing un-encoded phone book data
-   * @returns {z.connect.PhoneBook} Object containing encoded phone book data
+   * @param {PhoneBook} phoneBook - Object containing un-encoded phone book data
+   * @returns {PhoneBook} Object containing encoded phone book data
    */
   _encodePhoneBook(phoneBook) {
     const {cards, self} = phoneBook;
@@ -82,7 +80,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         return reject(new z.error.ConnectError(z.error.ConnectError.TYPE.NOT_SUPPORTED));
       }
       const addressBook = window.wAddressBook;
-      const phoneBook = new z.connect.PhoneBook();
+      const phoneBook = new PhoneBook();
 
       const {numbers: selfNumbers} = addressBook.getMe();
       selfNumbers.forEach(number => phoneBook.self.push(number));
@@ -115,8 +113,8 @@ z.connect.ConnectRepository = class ConnectRepository {
    * Upload hashed phone booked to backend for matching.
    *
    * @private
-   * @param {z.connect.PhoneBook} phoneBook - Encoded phone book data
-   * @param {z.connect.ConnectSource} source - Source of phone book data
+   * @param {PhoneBook} phoneBook - Encoded phone book data
+   * @param {ConnectSource} source - Source of phone book data
    * @returns {Promise} Resolves when phone book was uploaded
    */
   _uploadContacts(phoneBook, source) {
@@ -148,4 +146,6 @@ z.connect.ConnectRepository = class ConnectRepository {
         }
       });
   }
-};
+}
+
+export {ConnectRepository};

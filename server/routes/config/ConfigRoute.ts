@@ -19,7 +19,7 @@
 import {Router} from 'express';
 import {ServerConfig} from '../../ServerConfig';
 
-const ConfigRoute = (config: ServerConfig) =>
+export const ConfigRoute = (config: ServerConfig) =>
   Router().get('/config.js', (req, res) => {
     const clientConfig = {
       ...config.CLIENT,
@@ -31,5 +31,3 @@ const ConfigRoute = (config: ServerConfig) =>
       window.wire.env = ${JSON.stringify(clientConfig)};
     `);
   });
-
-export default ConfigRoute;

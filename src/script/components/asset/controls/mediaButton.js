@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import AbstractAssetTransferStateTracker from '../AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';
 import {noop} from 'utils/util';
 
 import '../assetLoader';

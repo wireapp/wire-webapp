@@ -17,13 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import JSZip from 'jszip';
 
-import StorageSchemata from '../storage/StorageSchemata';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
-import BackupService from './BackupService';
+import {BackupService} from './BackupService';
 import {chunk} from 'utils/ArrayUtil';
 import * as BackupError from './Error';
 
@@ -48,7 +48,7 @@ class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = Logger('BackupRepository');
+    this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;

@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.storage = z.storage || {};
@@ -41,7 +41,7 @@ z.storage.StorageRepository = class StorageRepository {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = Logger('z.storage.StorageRepository');
+    this.logger = getLogger('z.storage.StorageRepository');
 
     this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

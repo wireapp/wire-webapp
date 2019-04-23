@@ -17,20 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from '../../tracking/Helpers';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
 import {sortObjectByKeys} from 'utils/util';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
-
 // Call traces entity.
-z.telemetry.calling.CallTelemetry = class CallTelemetry {
+class CallTelemetry {
   constructor() {
-    this.logger = Logger('z.telemetry.calling.CallTelemetry');
+    this.logger = getLogger('CallTelemetry');
 
     this.sessions = {};
     this.remote_version = undefined;
@@ -117,7 +113,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Reports call events for call tracking to Localytics.
    * @param {z.tracking.EventName} eventName - String for call event
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
@@ -154,7 +150,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Track the call duration.
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @returns {undefined} No return value
    */
   track_duration(callEntity) {
@@ -179,4 +175,6 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   numberOfParticipantsChanged(newNumberOfParticipants) {
     this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
-};
+}
+
+export {CallTelemetry};

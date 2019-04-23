@@ -24,15 +24,15 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {verifyStrings} from '../../strings';
+import {getLogger} from '../../util/Logger';
 import {RouterLink} from '../component/RouterLink';
-import {getLogger} from '../LogProvider';
-import ROOT_ACTIONS from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import Page from './Page';
+import {Page} from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -54,7 +54,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+const _Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
   account,
   authError,
   history,
@@ -117,7 +117,7 @@ const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPro
   );
 };
 
-export default withRouter(
+export const Verify = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -136,6 +136,6 @@ export default withRouter(
           doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
         };
       }
-    )(Verify)
+    )(_Verify)
   )
 );

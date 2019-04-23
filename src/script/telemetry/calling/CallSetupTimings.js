@@ -17,19 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
+import {CallSetupStepsOrder} from './CallSetupStepsOrder';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
-
-z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
+class CallSetupTimings {
   constructor(call_id) {
     this.get = this.get.bind(this);
     this.log = this.log.bind(this);
     this.call_id = call_id;
 
-    this.logger = Logger('z.telemetry.calling.CallSetupTimings');
+    this.logger = getLogger('CallSetupTimings');
 
     this.is_answer = false;
     this.flowId = undefined;
@@ -82,8 +79,8 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
   }
 
   _steps_order() {
-    return this.is_answer
-      ? z.telemetry.calling.CallSetupStepsOrder.ANSWER
-      : z.telemetry.calling.CallSetupStepsOrder.OFFER;
+    return this.is_answer ? CallSetupStepsOrder.ANSWER : CallSetupStepsOrder.OFFER;
   }
-};
+}
+
+export {CallSetupTimings};

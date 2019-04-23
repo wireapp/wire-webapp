@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import Conversation from 'src/script/entity/Conversation';
+import {Conversation} from 'src/script/entity/Conversation';
 import {
   renderMessage,
   createRandomUuid,

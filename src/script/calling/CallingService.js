@@ -17,7 +17,7 @@
  *
  */
 
-export default class CallingService {
+export class CallingService {
   /**
    * Construct an new CallingService.
    * @param {BackendClient} backendClient - Client for the API calls

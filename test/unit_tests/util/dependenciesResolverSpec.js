@@ -17,7 +17,7 @@
  *
  */
 
-import dependenciesResolver from 'src/script/util/dependenciesResolver';
+import {resolver as dependenciesResolver} from 'src/script/util/dependenciesResolver';
 
 describe('dependenciesResolver', () => {
   it('throws if no dependency graph was provided', () => {

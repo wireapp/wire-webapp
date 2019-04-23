@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 // @ts-check
 
@@ -85,13 +85,13 @@ import Logger from 'utils/Logger';
  */
 
 import ko from 'knockout';
-import Conversation from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
-    this.logger = Logger('ConversationMapper');
+    this.logger = getLogger('ConversationMapper');
   }
 
   /**
@@ -453,4 +453,4 @@ class ConversationMapper {
   }
 }
 
-export default ConversationMapper;
+export {ConversationMapper};

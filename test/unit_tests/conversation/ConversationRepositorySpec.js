@@ -20,8 +20,8 @@
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {backendConfig} from '../../api/testResolver';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'utils/util';
 
 describe('ConversationRepository', () => {

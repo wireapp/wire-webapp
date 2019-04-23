@@ -17,13 +17,9 @@
  *
  */
 
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
-
-z.calling.entities.CallMessageEntity = class CallMessageEntity {
+class CallMessageEntity {
   static get CONFIG() {
     return {
       PAYLOAD_TYPES: {
@@ -45,7 +41,6 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
   /**
    * Construct a new call message entity.
    *
-   * @class z.calling.entities.CallMessageEntity
    * @param {CALL_MESSAGE_TYPE} type - Type of call message
    * @param {boolean} [response=false] - Is message a response, defaults to false
    * @param {string} sessionId - Optional session ID
@@ -118,4 +113,6 @@ z.calling.entities.CallMessageEntity = class CallMessageEntity {
       .map(() => z.util.StringUtil.getRandomChar())
       .join('');
   }
-};
+}
+
+export {CallMessageEntity};

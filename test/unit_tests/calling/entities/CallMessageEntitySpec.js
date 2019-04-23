@@ -19,9 +19,11 @@
 
 // KARMA_SPECS=calling/entities/CallMessageEntity yarn test:app
 
-describe('z.calling.entities.CallMessageEntity', () => {
+import {CallMessageEntity} from 'src/script/calling/entities/CallMessageEntity';
+
+describe('CallMessageEntity', () => {
   describe('_create_session_id', () => {
-    const callMessageEntity = new z.calling.entities.CallMessageEntity();
+    const callMessageEntity = new CallMessageEntity();
 
     it('always returns an alphanumeric string of length four', () => {
       _.range(100).map(() => {

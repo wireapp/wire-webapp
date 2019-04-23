@@ -17,7 +17,7 @@
  *
  */
 
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {createRandomUuid} from 'utils/util';
 import {Config} from '../auth/config';
 

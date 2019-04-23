@@ -19,9 +19,9 @@
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import Conversation from 'src/script/entity/Conversation';
-import EventMapper from 'src/script/conversation/EventMapper';
-import AssetType from 'src/script/assets/AssetType';
+import {Conversation} from 'src/script/entity/Conversation';
+import {EventMapper} from 'src/script/conversation/EventMapper';
+import {AssetType} from 'src/script/assets/AssetType';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 describe('Event Mapper', () => {

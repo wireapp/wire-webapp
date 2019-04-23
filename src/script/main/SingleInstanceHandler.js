@@ -19,7 +19,7 @@
 
 //@ts-check
 
-import TimeUtil from '../util/TimeUtil';
+import {TimeUtil} from '../util/TimeUtil';
 import Cookies from 'js-cookie';
 
 window.z = window.z || {};

@@ -19,10 +19,10 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
-import AssetTransferState from '../../assets/AssetTransferState';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
 
-export default class AbstractAssetTransferStateTracker {
+export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
     this.assetUploader = resolve(graph.AssetUploader);
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);

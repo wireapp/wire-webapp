@@ -18,9 +18,11 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
-import TERMINATION_REASON from '../../calling/enum/TerminationReason';
+import {TimeUtil} from 'utils/TimeUtil';
 import {afterRender} from 'utils/util';
+
+import {PermissionState} from '../../notification/PermissionState';
+import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 
 class ConversationListCallingCell {
   constructor(params) {
@@ -91,7 +93,7 @@ class ConversationListCallingCell {
     });
 
     this.showNoCameraPreview = ko.computed(() => {
-      const isNotGranted = permissionRepository.permissionState.camera() !== z.notification.PermissionState.GRANTED;
+      const isNotGranted = permissionRepository.permissionState.camera() !== PermissionState.GRANTED;
       return this.call().isRemoteVideoCall() && !this.showVideoPreview() && !this.isConnected() && isNotGranted;
     });
 

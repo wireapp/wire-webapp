@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import File from './File';
-import AssetType from '../../assets/AssetType';
+import {getLogger} from 'utils/Logger';
+import {File} from './File';
+import {AssetType} from '../../assets/AssetType';
 import {downloadBlob} from 'utils/util';
 
 class MediumImage extends File {
@@ -34,7 +34,7 @@ class MediumImage extends File {
 
     // z.assets.AssetRemoteData
     this.resource = ko.observable();
-    this.logger = Logger('MediumImage');
+    this.logger = getLogger('MediumImage');
   }
 
   /**
@@ -50,4 +50,4 @@ class MediumImage extends File {
   }
 }
 
-export default MediumImage;
+export {MediumImage};

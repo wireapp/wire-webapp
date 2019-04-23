@@ -17,12 +17,17 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {iterateItem} from 'utils/ArrayUtil';
+
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
+import {PreferencesListViewModel} from './list/PreferencesListViewModel';
+import {StartUIViewModel} from './list/StartUIViewModel';
+import {TakeoverViewModel} from './list/TakeoverViewModel';
+import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -68,7 +73,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = Logger('z.viewModel.ListViewModel');
+    this.logger = getLogger('z.viewModel.ListViewModel');
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
@@ -109,15 +114,15 @@ z.viewModel.ListViewModel = class ListViewModel {
     // Nested view models
     this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
     this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(
+    this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
       repositories.user,
       repositories.calling
     );
-    this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);
+    this.start = new StartUIViewModel(mainViewModel, this, repositories);
+    this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
 

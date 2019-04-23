@@ -18,7 +18,7 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {capToByte, rootMeanSquare} from 'utils/NumberUtil';
 import {chunk} from 'utils/ArrayUtil';
 import {loadFileBuffer} from 'utils/util';
@@ -152,4 +152,4 @@ const normaliseLoudness = audioBuffer => {
 };
 
 // Builder for creating all kinds of asset metadata
-export default {buildMetadata, isAudio, isImage, isVideo};
+export {buildMetadata, isAudio, isImage, isVideo};

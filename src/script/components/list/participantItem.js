@@ -17,7 +17,7 @@
  *
  */
 
-import User from '../../entity/User';
+import {User} from '../../entity/User';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

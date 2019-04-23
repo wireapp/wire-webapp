@@ -28,5 +28,5 @@ const URLParameter = {
   TRACKING: 'tracking',
 };
 
-export default URLParameter;
+export {URLParameter};
 z.auth.URLParameter = URLParameter;
