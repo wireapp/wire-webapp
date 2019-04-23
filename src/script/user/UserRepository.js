@@ -31,7 +31,7 @@ import {ConsentType} from './ConsentType';
 
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
-import {AssetMapper} from '../assets/AssetMapper';
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
 
 import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
@@ -520,7 +520,7 @@ export class UserRepository {
     if (hasPicture) {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
-        const {medium} = AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+        const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
         medium.load().then(imageBlob => this.change_picture(imageBlob));
       } else {
         // if an asset is already there, remove the pointer to the old picture

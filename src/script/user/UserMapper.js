@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetMapper} from '../assets/AssetMapper';
+import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {getLogger} from 'utils/Logger';
 import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
@@ -121,11 +121,11 @@ export class UserMapper {
     const hasPicture = picture && picture.length;
     let mappedAssets;
     if (hasAsset) {
-      mappedAssets = AssetMapper.mapProfileAssets(userEntity.id, userData.assets);
+      mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      mappedAssets = AssetMapper.mapProfileAssetsV1(userEntity.id, userData.picture);
+      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
-    AssetMapper.updateUserEntityAssets(userEntity, mappedAssets);
+    updateUserEntityAssets(userEntity, mappedAssets);
 
     if (email) {
       userEntity.email(email);
