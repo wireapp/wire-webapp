@@ -20,6 +20,7 @@
 import {getLogger} from 'utils/Logger';
 import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
+import {joaatHash} from 'utils/Crypto';
 
 export class UserMapper {
   /**
@@ -93,7 +94,7 @@ export class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser) {
       userEntity.id = userData.id;
-      userEntity.joaatHash = z.util.Crypto.Hashing.joaatHash(userData.id);
+      userEntity.joaatHash = joaatHash(userData.id);
     }
 
     const {
