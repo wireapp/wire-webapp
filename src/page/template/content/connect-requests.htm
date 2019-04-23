@@ -1,0 +1,15 @@
+<div class="connect-request-wrapper">
+  <div id="connect-requests" class="connect-requests" data-bind="with: $root.connectRequests, antiscroll: $root.connectRequests.shouldUpdateScrollbar">
+    <div class="connect-requests-inner" data-bind="foreach: {data: connectRequests, afterRender: afterRender}">
+      <div class="connect-request" data-bind="attr: {'data-uie-uid': id}" data-uie-name="connect-request">
+        <div class="connect-request-name ellipsis" data-bind="text: name()"></div>
+        <div class="connect-request-username label-username" data-bind="text: username()"></div>
+        <participant-avatar class="connect-request-avatar avatar-no-badge avatar-no-filter cursor-default" params="participant: $data, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+        <div class="button-group">
+          <div class="button button-inverted" data-bind="click: $parent.clickOnIgnore, text: t('connectionRequestIgnore')" data-uie-name="do-ignore"></div>
+          <div class="button" data-bind="click: $parent.clickOnAccept, text: t('connectionRequestConnect')" data-uie-name="do-accept"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

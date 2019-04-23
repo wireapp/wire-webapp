@@ -17,10 +17,14 @@
  *
  */
 
-// KARMA_SPECS=user/UserMapper yarn test:app
+import {ACCENT_ID} from 'src/script/config.js';
+import User from 'src/script/entity/User';
+import UserMapper from 'src/script/user/UserMapper';
+import {createRandomUuid} from 'utils/util';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 describe('User Mapper', () => {
-  const mapper = new z.user.UserMapper(new z.time.ServerTimeRepository());
+  const mapper = new UserMapper(serverTimeHandler);
 
   let self_user_payload = null;
 
@@ -36,7 +40,7 @@ describe('User Mapper', () => {
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.phone()).toBe('+49177123456');
       expect(user_et.is_me).toBeFalsy();
-      expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.YELLOW);
+      expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     });
 
     it('returns undefined if input was undefined', () => {
@@ -58,7 +62,7 @@ describe('User Mapper', () => {
       const user_et = mapper.mapUserFromJson(self_user_payload);
 
       expect(user_et.name()).toBe('John Doe');
-      expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
+      expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
 
     it('will return default accent color if backend returns 0', () => {
@@ -67,7 +71,7 @@ describe('User Mapper', () => {
 
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.joaatHash).toBe(526273169);
-      expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
+      expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
   });
 
@@ -80,7 +84,7 @@ describe('User Mapper', () => {
       expect(user_et.phone()).toBe('+49177123456');
       expect(user_et.is_me).toBeTruthy();
       expect(user_et.locale).toBe('en');
-      expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.YELLOW);
+      expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     }));
 
   describe('mapUsersFromJson', () => {
@@ -109,16 +113,16 @@ describe('User Mapper', () => {
 
   describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
-      expect(updated_user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
+      expect(updated_user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
 
     it('can update the user name', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
@@ -127,7 +131,7 @@ describe('User Mapper', () => {
     });
 
     it('can update the user handle', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.updateUserFromObject(user_et, data);
@@ -136,12 +140,12 @@ describe('User Mapper', () => {
     });
 
     it("converts user's expiration date to local timestamp", () => {
-      const userEntity = new z.entity.User();
+      const userEntity = new User();
       userEntity.id = entities.user.john_doe.id;
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
-      spyOn(mapper.serverTimeRepository, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
+      spyOn(mapper.serverTimeHandler, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
       spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp => {
         expect(timestamp).toEqual(adjustedExpirationDate.getTime());
       });
@@ -149,11 +153,14 @@ describe('User Mapper', () => {
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
 
-      expect(mapper.serverTimeRepository.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
+      expect(mapper.serverTimeHandler.toLocalTimestamp).not.toHaveBeenCalledWith();
+      mapper.serverTimeHandler.timeOffset(10);
+
+      expect(mapper.serverTimeHandler.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
     it('cannot update the user name of a wrong user', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
       const functionCall = () => mapper.updateUserFromObject(user_et, data);
@@ -162,12 +169,12 @@ describe('User Mapper', () => {
     });
 
     it('can update user with v3 assets', () => {
-      const user_et = new z.entity.User();
+      const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: z.util.createRandomUuid(), size: 'preview', type: 'image'},
-          {key: z.util.createRandomUuid(), size: 'complete', type: 'image'},
+          {key: createRandomUuid(), size: 'preview', type: 'image'},
+          {key: createRandomUuid(), size: 'complete', type: 'image'},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

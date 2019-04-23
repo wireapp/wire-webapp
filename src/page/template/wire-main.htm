@@ -1,0 +1,90 @@
+<div id="wire-main"
+     class="off"
+     data-bind="css: mainClasses(), ignore_drop_file: true"
+     data-uie-name="status-webapp"
+     data-uie-value="is-loading">
+  <!-- ko stopBinding: true -->
+    <div id="app" class="app">
+      <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
+        <!-- ko if: webappLoaded -->
+          #include('list/background.htm')
+          <!-- ko ifnot: modal() -->
+            #include('list/archive.htm')
+            #include('list/conversations.htm')
+            #include('list/preferences.htm')
+            #include('list/start-ui.htm')
+          <!-- /ko -->
+          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TAKEOVER -->
+            #include('list/takeover.htm')
+          <!-- /ko -->
+          <!-- ko if: modal() === z.viewModel.ListViewModel.MODAL_TYPE.TEMPORARY_GUEST -->
+            #include('list/temporary-guest.htm')
+            #include('list/preferences.htm')
+          <!-- /ko -->
+        <!-- /ko -->
+      </div>
+      <div id="center-column" class="center-column">
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
+          #include('content/connect-requests.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONVERSATION -->
+          #include('content/conversation.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION -->
+          #include('content/collection.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
+          #include('content/collection-details.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT -->
+          #include('content/history-export.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT -->
+          #include('content/history-import.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT -->
+          #include('content/preferences-about.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT -->
+          #include('content/preferences-account.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_AV -->
+          #include('content/preferences-av.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS -->
+          #include('content/preferences-device-details.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES -->
+          #include('content/preferences-devices.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS -->
+          #include('content/preferences-options.htm')
+        <!-- /ko -->
+        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
+          <div class="watermark">
+            <watermark-icon class="absolute-center" data-uie-name="no-conversation"></watermark-icon>
+          </div>
+        <!-- /ko -->
+        #include('modal/group-creation.htm')
+        #include('modal/user-modal.htm')
+        <div class="center-column__overlay"></div>
+      </div>
+      <div id="right-column" class="right-column">
+        #include('panel/conversation-details.htm')
+        #include('panel/conversation-participants.htm')
+        #include('panel/add-participants.htm')
+        #include('panel/group-participant-user.htm')
+        #include('panel/group-participant-service.htm')
+        #include('panel/guest-options.htm')
+        #include('panel/notifications.htm')
+        #include('panel/participant-devices.htm')
+        #include('panel/timed-messages.htm')
+        #include('panel/message-details.htm')
+      </div>
+    </div>
+    #include('detail-view.htm')
+    #include('video-calling.htm')
+    #include('warning.htm')
+    #include('modals.htm')
+  <!-- /ko -->
+</div>

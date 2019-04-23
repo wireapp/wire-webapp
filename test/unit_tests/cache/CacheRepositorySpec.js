@@ -17,17 +17,18 @@
  *
  */
 
-// KARMA_SPECS=cache/CacheRepository yarn test:app
+import {resolve, graph} from './../../api/testResolver';
+import {createRandomUuid} from 'utils/util';
 
-describe('z.cache.CacheRepository', () => {
-  const cache_repository = new z.cache.CacheRepository();
+describe('CacheRepository', () => {
+  const cache_repository = resolve(graph.CacheRepository);
   const TEMP_KEY = 'should_be_deleted';
 
   describe('clearCache', () => {
     beforeEach(() => {
       cache_repository.clearCache();
 
-      const conversationInputKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${z.util.createRandomUuid()}`;
+      const conversationInputKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${createRandomUuid()}`;
       amplify.store(conversationInputKey, {mentions: [], reply: {}, text: 'test'});
       amplify.store(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);

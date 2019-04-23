@@ -17,20 +17,17 @@
  *
  */
 
-// KARMA_SPECS=connection/ConnectionService yarn test:app
+import {resolve, graph, backendConfig} from './../../api/testResolver';
 
-describe('User Service', () => {
+describe('ConnectionService', () => {
   let server = null;
-  const urls = {
-    restUrl: 'http://localhost.com',
-    websocket_url: 'wss://localhost',
-  };
+  const urls = backendConfig;
   let connectionService = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    const backendClient = new z.service.BackendClient(urls);
+    const backendClient = resolve(graph.BackendClient);
     connectionService = new z.connection.ConnectionService(backendClient);
   });
 

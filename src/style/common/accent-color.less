@@ -1,0 +1,85 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@w-black: #000000;
+@w-white: #ffffff;
+
+@w-blue: #2391d3;
+@w-green: #00c800;
+@w-gray: #bac8d1;
+@w-orange: #ff8900;
+@w-pink: #fe5ebd;
+@w-purple: #9c00fe;
+@w-red: #fb0807;
+@w-yellow: #febf02;
+
+@accent_colors-0: transparent;
+@accent_colors-1: @w-blue;
+@accent_colors-2: @w-green;
+@accent_colors-3: @w-yellow;
+@accent_colors-4: @w-red;
+@accent_colors-5: @w-orange;
+@accent_colors-6: @w-pink;
+@accent_colors-7: @w-purple;
+
+body {
+  --accent-color: @w-gray;
+  --accent-color-fade-16: fade(@w-gray, 16%);
+  --accent-color-fade-24: fade(@w-gray, 24%);
+  --accent-color-darken-16: darken(@w-gray, 16%);
+}
+
+.generate-css-vars(@accent_id) when (@accent_id > 0) {
+  .generate-css-vars(@accent_id - 1);
+  @accent-color: 'accent_colors-@{accent_id}';
+
+  .accent-color-@{accent_id} {
+    color: @@accent-color;
+  }
+
+  .main-accent-color-@{accent_id} {
+    --accent-color: @@accent-color;
+    --accent-color-fade-16: fade(@@accent-color, 16%);
+    --accent-color-fade-24: fade(@@accent-color, 24%);
+    --accent-color-darken-16: darken(@@accent-color, 16%);
+  }
+}
+.generate-css-vars(7);
+
+.accent-selection() {
+  &::-moz-selection {
+    background-color: var(--accent-color-fade-24);
+  }
+  &::selection {
+    background-color: var(--accent-color-fade-24);
+  }
+}
+
+a,
+.accent-text {
+  color: var(--accent-color);
+}
+
+.accent-fill {
+  fill: var(--accent-color);
+}
+
+.accent-stroke {
+  stroke: var(--accent-color);
+}

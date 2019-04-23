@@ -17,9 +17,7 @@
  *
  */
 
-// KARMA_SPECS=calling/CallingRepository yarn test:app
-
-describe('z.calling.CallingRepository', () => {
+describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
 

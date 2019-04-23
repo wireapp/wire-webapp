@@ -17,13 +17,10 @@
  *
  */
 
-// KARMA_SPECS=view_model/bindings yarn test:app
-
 import ko from 'knockout';
 import $ from 'jquery';
-/* eslint-disable no-unused-vars */
-import bindingHandlersGlobal from '../../../app/script/view_model/bindings/CommonBindings';
-/* eslint-enable no-unused-vars */
+
+import '../../../src/script/view_model/bindings/CommonBindings';
 
 describe('ko.bindingHandlers', () => {
   describe('ko.bindingHandlers.enter', () => {

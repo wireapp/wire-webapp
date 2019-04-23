@@ -17,27 +17,20 @@
  *
  */
 
-// KARMA_SPECS=properties/PropertiesRepository yarn test:app
-
-import PropertiesRepository from 'app/script/properties/PropertiesRepository';
-import PropertiesService from 'app/script/properties/PropertiesService';
+import {resolve, graph} from './../../api/testResolver';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
 
   beforeEach(() => {
-    const urls = {
-      restUrl: 'http://localhost.com',
-      websocket_url: 'wss://localhost',
-    };
-    const backendClient = new z.service.BackendClient(urls);
-    const propertiesService = new PropertiesService(backendClient);
+    const propertiesService = resolve(graph.PropertiesService);
     propertiesRepository = new PropertiesRepository(propertiesService);
   });
 
   describe('deleteProperty', () => {
     it('resets a known property to its default value', () => {
-      const property = PropertiesRepository.CONFIG.ENABLE_READ_RECEIPTS;
+      const property = PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE;
       const defaultValue = property.defaultValue;
 
       propertiesRepository.setProperty(property.key, !defaultValue);

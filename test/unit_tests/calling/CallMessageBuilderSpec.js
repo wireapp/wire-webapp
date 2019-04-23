@@ -17,11 +17,9 @@
  *
  */
 
-// KARMA_SPECS=calling/CallMessageBuilder yarn test:app
+import {CallMessageBuilder} from 'src/script/calling/CallMessageBuilder';
 
-describe('z.calling.CallMessageBuilder', () => {
-  const callMessageBuilder = z.calling.CallMessageBuilder;
-
+describe('CallMessageBuilder', () => {
   describe('createPropSync', () => {
     it('generates prop sync message with the raw stream properties', () => {
       const tests = [
@@ -40,7 +38,7 @@ describe('z.calling.CallMessageBuilder', () => {
       ];
 
       tests.forEach(({props, expected}) => {
-        const propSyncMessage = callMessageBuilder.createPropSync(props);
+        const propSyncMessage = CallMessageBuilder.createPropSync(props);
 
         expect(propSyncMessage.properties).toEqual(expected);
       });
@@ -50,7 +48,7 @@ describe('z.calling.CallMessageBuilder', () => {
       const state = {audioSend: () => true, screenSend: () => false, videoSend: () => true};
       const extraPayload = {extra: 'hey'};
 
-      const propSyncMessage = callMessageBuilder.createPropSync(state, extraPayload);
+      const propSyncMessage = CallMessageBuilder.createPropSync(state, extraPayload);
 
       expect(propSyncMessage).toEqual(jasmine.objectContaining(extraPayload));
     });
@@ -58,12 +56,12 @@ describe('z.calling.CallMessageBuilder', () => {
     it('forces video state if given', () => {
       const noVideoState = {audioSend: () => true, screenSend: () => false, videoSend: () => false};
 
-      const propSyncMessageWithVideo = callMessageBuilder.createPropSync(noVideoState, {}, true);
+      const propSyncMessageWithVideo = CallMessageBuilder.createPropSync(noVideoState, {}, true);
 
       expect(propSyncMessageWithVideo.properties.videosend).toEqual('true');
 
       const videoState = {audioSend: () => true, screenSend: () => false, videoSend: () => true};
-      const propSyncMessageWithoutVideo = callMessageBuilder.createPropSync(videoState, {}, false);
+      const propSyncMessageWithoutVideo = CallMessageBuilder.createPropSync(videoState, {}, false);
 
       expect(propSyncMessageWithoutVideo.properties.videosend).toEqual('false');
     });

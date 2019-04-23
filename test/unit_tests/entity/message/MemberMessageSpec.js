@@ -17,7 +17,9 @@
  *
  */
 
-// KARMA_SPECS=entity/message/MemberMessage yarn test:app
+import User from 'src/script/entity/User';
+import 'src/script/localization/Localizer';
+import {createRandomUuid} from 'utils/util';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
@@ -27,30 +29,30 @@ describe('Member Message', () => {
       message_et = new z.entity.MemberMessage();
     });
 
-    it('can return correct string for more than one user', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+    it('can return correct string for one user', () => {
+      const user_a = new User(createRandomUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
 
       expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
     });
 
-    it('can return correct string for more than one user', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+    it('can return correct string for two users', () => {
+      const user_a = new User(createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(createRandomUuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
 
       expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
-    it('can return correct string for more than one user', () => {
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+    it('can return correct string for more than two users', () => {
+      const user_a = new User(createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.createRandomUuid());
+      const user_c = new User(createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
 
@@ -58,15 +60,15 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for more than one user without sender', () => {
-      const user_sender = new z.entity.User(z.util.createRandomUuid());
+      const user_sender = new User(createRandomUuid());
       user_sender.name('Sender');
       message_et.user(user_sender);
 
-      const user_a = new z.entity.User(z.util.createRandomUuid());
+      const user_a = new User(createRandomUuid());
       user_a.name('John');
-      const user_b = new z.entity.User(z.util.createRandomUuid());
+      const user_b = new User(createRandomUuid());
       user_b.name('Jim');
-      const user_c = new z.entity.User(z.util.createRandomUuid());
+      const user_c = new User(createRandomUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 

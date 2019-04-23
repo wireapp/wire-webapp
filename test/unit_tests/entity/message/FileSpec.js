@@ -26,15 +26,6 @@ describe('z.entity.File', () => {
     file = new z.entity.File();
   });
 
-  describe('pending_upload', () => {
-    it('should be true if status is uploading and uploaded on this client', () => {
-      file.uploaded_on_this_client(true);
-      file.status(z.assets.AssetTransferState.UPLOADING);
-
-      expect(file.pending_upload()).toBeTruthy();
-    });
-  });
-
   describe('is_video', () => {
     it('should treat mp4 as video file', () => {
       file.file_type = 'video/mp4';

@@ -1,0 +1,47 @@
+ <div id="message-list" class="message-list" data-bind="with: $root.messageList, fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated}">
+  <div class="messages"
+        data-bind="css: {'flex-center': verticallyCenterMessage},
+                   foreach: {data: conversation().messages_visible, as: 'message', noChildContext: true}">
+    <div class="message"
+         data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()[0]},
+                    attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
+         data-uie-name="item-message">
+
+      <div class="message-header message-timestamp" data-bind="css: get_timestamp_class(message)">
+        <div class="message-header-icon">
+          <span class="message-unread-dot"></span>
+        </div>
+        <div class="message-header-label">
+          <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp(), attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+          <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp(), relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}, showAllTimestamps"></time>
+        </div>
+      </div>
+
+      <message params="
+          message: message,
+          conversation: conversation,
+          shouldShowAvatar: !should_hide_user_avatar(message),
+          shouldShowInvitePeople: showInvitePeople(),
+          selfId: selfUser().id,
+          isMarked: focusedMessage() === message.id,
+          isSelfTemporaryGuest: selfUser().isTemporaryGuest(),
+          isLastDeliveredMessage: is_last_delivered_message(message),
+          conversationRepository: conversation_repository,
+          onContentUpdated: _adjustScroll,
+          onClickAvatar: showUserDetails,
+          onClickImage: show_detail,
+          onClickInvitePeople: clickOnInvitePeople,
+          onClickMessage: handleClickOnMessage,
+          onClickTimestamp: focusMessage,
+          onClickParticipants: showParticipants,
+          onClickResetSession: on_session_reset_click,
+          onClickCancelRequest: click_on_cancel_request,
+          onClickReceipts: view => showMessageDetails(view, false),
+          onClickLikes: view => showMessageDetails(view, true),
+          onLike: click_on_like,
+          onMessageMarked: onMessageMarked,
+          actionsViewModel: actionsViewModel"
+        data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
+    </div>
+  </div>
+</div>

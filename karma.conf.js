@@ -21,6 +21,7 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const {SRC_PATH} = require('./locations');
 
 const rootWebpackConfig = require('./webpack.config.common.js');
 
@@ -29,6 +30,24 @@ function getSpecs(specList) {
     return specList.split(',').map(specPath => `test/unit_tests/${specPath}Spec.js`);
   }
   return ['test/unit_tests/**/*.js'];
+}
+
+/**
+ * Returns the files to load in Karma before running the tests.
+ * If the 'nolegacy' param is given, it will skip all the globals import
+ *
+ * @param {boolean} noLegacy - Prevents loading globals dependencies which slows down the load time
+ * @returns {Array} - The files to load in Karma
+ */
+function getIncludedFiles(noLegacy) {
+  const commonFiles = [
+    {included: false, nocache: false, pattern: path.resolve(SRC_PATH, 'ext/audio/*.mp3'), served: true},
+    {included: false, nocache: true, pattern: path.resolve(SRC_PATH, 'worker/*.js'), served: true},
+    'node_modules/sinon/pkg/sinon.js',
+    'test/api/environment.js',
+    'test/api/payloads.js',
+  ];
+  return noLegacy ? commonFiles : commonFiles.concat('test/api/TestFactory.js');
 }
 
 module.exports = function(config) {
@@ -45,27 +64,7 @@ module.exports = function(config) {
     },
 
     // list of files / patterns to load in the browser
-    files: [
-      {
-        included: false,
-        nocache: true,
-        pattern: 'node_modules/@wireapp/protocol-messaging/proto/messages.proto',
-        served: true,
-      },
-      {included: false, nocache: false, pattern: 'app/ext/audio/*.mp3', served: true},
-      {included: false, nocache: true, pattern: 'app/worker/*.js', served: true},
-
-      'node_modules/jasmine-ajax/lib/mock-ajax.js',
-      'node_modules/sinon/pkg/sinon.js',
-      'test/api/environment.js',
-      'test/api/payloads.js',
-      'test/api/SDP_payloads.js',
-      'test/config.test.js',
-      'app/script/main/globals.js',
-      'test/api/OpenGraphMocks.js',
-      'test/js/calling/CallRequestResponseMock.js',
-      'test/api/TestFactory.js',
-    ].concat(getSpecs(process.env.KARMA_SPECS)),
+    files: getIncludedFiles(config.nolegacy).concat(getSpecs(config.specs)),
 
     proxies: {
       '/audio/': '/base/audio/',
@@ -78,8 +77,6 @@ module.exports = function(config) {
     preprocessors: {
       'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
       'test/api/TestFactory.js': ['webpack', 'sourcemap'],
-      'app/script/main/globals.js': ['webpack', 'sourcemap'],
-      // FIXME fails because of import statements 'app/script/**/*.js': ['coverage'],
     },
 
     webpack: {
@@ -91,6 +88,31 @@ module.exports = function(config) {
       externals: {
         'fs-extra': '{}',
       },
+      module: {
+        rules: [
+          {
+            exclude: /node_modules/,
+            include: path.resolve('src/script/'),
+            loader: 'babel-loader',
+            test: /\.[tj]sx?$/,
+          },
+          {
+            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+            test: /\.svg$/,
+          },
+          {
+            exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
+            include: [path.resolve('src/script/')],
+            test: /\.js$/,
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              query: {
+                esModules: true,
+              },
+            },
+          },
+        ],
+      },
       plugins: [
         new webpack.ProvidePlugin({
           $: 'jquery',
@@ -101,8 +123,9 @@ module.exports = function(config) {
       ],
       resolve: {
         alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
-          app: path.resolve(__dirname, 'app'),
+          src: path.resolve(__dirname, 'src'),
         }),
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       },
     },
 
@@ -114,7 +137,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['coverage', 'progress'],
+    reporters: ['progress', 'coverage-istanbul'],
 
     // web server port
     port: 9876,
@@ -132,6 +155,7 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['ChromeNoSandbox'],
+    browserNoActivityTimeout: 60000,
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -147,31 +171,20 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-
-    coverageReporter: {
-      reporters: [
-        {
-          dir: 'docs/coverage',
-          type: 'html',
-        },
-        {
-          dir: 'docs/coverage',
-          file: 'coverage-summary.txt',
-          type: 'text-summary',
-        },
-      ],
-      check: {
+    coverageIstanbulReporter: {
+      dir: path.resolve('docs/coverage/'),
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: {subdir: 'html'},
+      },
+      reports: ['html', 'lcovonly'],
+      thresholds: {
+        emitWarning: false,
         global: {
-          statements: 40,
-          branches: 25,
-          functions: 20,
-          lines: 40,
-        },
-        each: {
-          statements: 0,
-          branches: 0,
-          functions: 0,
-          lines: 0,
+          branches: 35,
+          functions: 40,
+          lines: 45,
+          statements: 45,
         },
       },
     },
@@ -180,7 +193,8 @@ module.exports = function(config) {
   if (process.env.TRAVIS) {
     config.set({
       port: 9877,
-      reporters: ['dots', 'coverage'],
+      reporters: ['spec', 'coverage-istanbul'],
+      specReporter: {suppressPassed: true},
     });
   }
 };

@@ -17,9 +17,17 @@
  *
  */
 
-import overlayedObserver from 'app/script/ui/overlayedObserver';
+import overlayedObserver from 'src/script/ui/overlayedObserver';
 
 describe('overlayedObserver', () => {
+  beforeEach(() => {
+    jasmine.clock().install();
+  });
+
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
+
   describe('addElement', () => {
     it('calls the callback right away if the element is not overlayed', () => {
       const callbackSpy = {
@@ -60,9 +68,10 @@ describe('overlayedObserver', () => {
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
+      overlayedObserver.removeElement(element);
     });
 
-    it('calls the callback when an overlayed element becomes visible', done => {
+    it('calls the callback when an overlayed element becomes visible', () => {
       const callbackSpy = {
         onVisible: () => {},
       };
@@ -88,11 +97,9 @@ describe('overlayedObserver', () => {
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
 
       document.body.removeChild(overlay);
+      jasmine.clock().tick(301);
 
-      window.setTimeout(() => {
-        expect(callbackSpy.onVisible).toHaveBeenCalled();
-        done();
-      });
+      expect(callbackSpy.onVisible).toHaveBeenCalled();
     });
   });
 });

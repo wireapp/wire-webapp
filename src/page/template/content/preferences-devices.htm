@@ -1,0 +1,53 @@
+<div id="preferences-devices" class="preferences-page preferences-devices" data-bind="with: $root.preferencesDevices">
+  <div class="preferences-titlebar" data-bind="text: t('preferencesDevices')"></div>
+  <div class="preferences-content" data-bind="fadingscrollbar">
+    <section class="preferences-section" data-uie-name="preferences-device-current">
+      <header class="preferences-header" data-bind="text: t('preferencesDevicesCurrent')"></header>
+      <div class="preferences-devices-model" data-bind="text: currentClient().model"></div>
+      <div class="preferences-devices-id"><span data-bind="text: t('preferencesDevicesId')"></span>
+        <span data-bind="foreach: displayClientId()" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+      </div>
+      <div class="preferences-devices-activated">
+        <div data-bind="html: activationDate()"></div>
+      </div>
+      <div class="preferences-devices-fingerprint-label" data-bind="text: t('preferencesDevicesFingerprint')"></div>
+      <div class="preferences-devices-fingerprint" data-bind="foreach: localFingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
+    </section>
+
+    <hr class="preferences-devices-separator preferences-separator">
+
+    <!-- ko if: devices().length -->
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="text: t('preferencesDevicesActive')"></header>
+        <!-- ko foreach: devices -->
+          <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
+            <div class="preferences-devices-card-data">
+              <div class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
+                <!-- ko if: meta.isVerified()-->
+                  <verified-icon data-uie-name="user-device-verified"></verified-icon>
+                <!-- /ko -->
+                <!-- ko ifnot: meta.isVerified()-->
+                  <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
+                <!-- /ko -->
+              </div>
+              <div class="preferences-devices-card-info">
+                <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
+                <div class="preferences-devices-id">
+                  <span data-bind="text: t('preferencesDevicesId')"></span>
+                  <span data-bind="foreach: formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+                </div>
+              </div>
+            </div>
+            <div class="preferences-devices-card-action">
+              <div class="preferences-devices-card-action__delete" data-bind="click: $parent.clickOnRemoveDevice, css: {'svg-red': $parent.isSSO()}" data-uie-name="do-device-remove">
+                <delete-icon></delete-icon>
+              </div>
+              <div class="icon-forward" data-uie-name="go-device-details"></div>
+            </div>
+          </div>
+        <!-- /ko -->
+        <div class="preferences-detail" data-bind="text: t('preferencesDevicesActiveDetail')"></div>
+      </section>
+    <!-- /ko -->
+  </div>
+</div>

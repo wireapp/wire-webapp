@@ -1,0 +1,134 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/* container */
+.conversation-list-cell {
+  position: relative;
+  display: flex;
+  height: 56px;
+  cursor: pointer;
+  font-weight: @font-weight-regular;
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: @left-list-item-left-width;
+    height: 1px;
+    background-color: #fff;
+    content: '';
+    opacity: 0.06;
+  }
+}
+
+.conversation-list-cell-left {
+  .flex-center;
+
+  width: @left-list-item-left-width;
+  flex: 0 0 auto;
+}
+
+.conversation-list-cell-center {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+
+  &.conversation-list-cell-center-no-left {
+    padding-left: 16px;
+  }
+}
+
+.conversation-list-cell-right {
+  .flex-center;
+
+  padding-right: 16px;
+}
+
+/* elements */
+.conversation-list-cell-availability {
+  .availability-state-icon {
+    svg {
+      margin: 1px 8px 1px 0;
+    }
+  }
+
+  .availability-state-label {
+    .ellipsis-nowrap;
+
+    padding-bottom: 2px;
+    margin-right: 4px;
+    margin-bottom: -2px;
+    font-size: 14px;
+    line-height: 16px;
+  }
+}
+
+.conversation-list-cell-name {
+  .ellipsis-nowrap;
+
+  padding-bottom: 2px;
+  margin-right: 4px;
+  margin-bottom: -2px;
+  font-size: 14px;
+  line-height: 16px;
+  user-select: none;
+}
+
+.conversation-list-cell-description {
+  .ellipsis-nowrap;
+
+  margin-top: 2px;
+  margin-right: 4px;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  line-height: 16px;
+  opacity: 0.64;
+}
+
+.conversation-list-cell-badge {
+  font-size: 12px;
+}
+
+.conversation-list-cell-context-menu {
+  .flex-center;
+  .square(20px);
+
+  &::before {
+    width: 0;
+    height: 0;
+    border-top: 4px solid #fff;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    content: '';
+    opacity: 0;
+    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
+
+    .conversation-list-cell:hover & {
+      opacity: 1;
+    }
+  }
+}
+
+/* states */
+
+.conversation-list-cell-left-opaque {
+  opacity: 0.32;
+}

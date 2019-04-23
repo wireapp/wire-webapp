@@ -1,0 +1,49 @@
+<div id="giphy-modal" data-bind="with: $root.giphy" class="giphy-modal modal modal-large">
+  <div class="modal-content">
+    <div class="giphy-modal-header modal-header">
+      <!-- ko if: isStateResult() -->
+        <span class="button-icon icon-grid" data-bind="click: clickOnGrid"></span>
+      <!-- /ko -->
+      <!-- ko if: isStateResults() -->
+        <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="do-close"></span>
+      <!-- /ko -->
+      <!-- ko ifnot: isResultState() -->
+        <span class="giphy-modal-header-button"></span>
+      <!-- /ko -->
+      <span class="label-xs" data-bind="text: query" data-uie-name="giphy-query"></span>
+      <span class="button-icon icon-close pull-right" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
+    </div>
+    <div class="giphy-modal-center modal-center">
+      <div class="gif-container-spinner" data-bind="visible: isStateLoading()">
+        <div class="icon-spinner spin"></div>
+      </div>
+      <div class="gif-container"
+           data-bind="foreach: gifs, visible: isResultState(), css: {'gif-container-grid': gifs().length > 1}">
+        <!-- ko if: $parent.gifs().length === 1 -->
+          <div class="gif-container-item"
+               data-bind="loadImage: $data.animated, style: {backgroundImage: 'url(\'' + $data.static + '\')'}">
+          </div>
+        <!-- /ko -->
+        <!-- ko if: $parent.gifs().length > 1 -->
+          <div class="gif-container-item"
+               data-bind="click: $parent.clickToSelectGif,
+                          style: {backgroundImage: 'url(\'' + $data.static + '\')'},
+                          attr: {'data-src': $data.static, 'data-hover': $data.animated},
+                          load_image_on_hover: true,">
+          </div>
+        <!-- /ko -->
+      </div>
+      <div class="gif-container-error" data-bind="visible: isStateError()">
+        <span class="gif-container-error-message" data-bind="text: t('extensionsGiphyNoGifs')"></span>
+      </div>
+    </div>
+    <div class="giphy-modal-footer modal-footer">
+      <div class="button button-inverted"
+           data-bind="click: clickOnTryAnother, text: t('extensionsGiphyButtonMore'), css: {'button-disabled': gifs().length === 0}"
+           data-uie-name="do-try-another"></div>
+      <div class="button"
+           data-bind="click: clickToSend, text: t('extensionsGiphyButtonOk'), css: {'button-disabled': !selectedGif()}"
+           data-uie-name="do-send-gif"></div>
+    </div>
+  </div>
+</div>

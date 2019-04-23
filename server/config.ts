@@ -17,7 +17,7 @@
  *
  */
 
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
 import {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
 import * as logdown from 'logdown';
@@ -32,9 +32,7 @@ const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
 const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
 const VERSION_FILE = path.join(__dirname, 'version');
 
-if (nodeEnvironment === 'development') {
-  dotenv.config();
-}
+dotenv.load();
 
 const defaultCSP: HelmetCSP = {
   connectSrc: [
@@ -135,6 +133,8 @@ const config: ServerConfig = {
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
     },
+    NEW_PASSWORD_MINIMUM_LENGTH:
+      (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,

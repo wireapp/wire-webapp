@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "declaration": false,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
@@ -10,8 +12,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "app/script/auth",
-    "rootDirs": ["app/script"],
+    "outDir": "src/script/auth",
+    "rootDirs": ["src/script"],
     "sourceMap": true,
     "target": "es6"
   },

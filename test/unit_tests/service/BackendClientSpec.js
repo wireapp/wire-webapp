@@ -17,19 +17,14 @@
  *
  */
 
-// KARMA_SPECS=service/BackendClient yarn test:app
+import {resolve, graph} from './../../api/testResolver';
 
-describe('z.service.BackendClient', () => {
+describe('BackendClient', () => {
   let backend_client = null;
   let server = null;
 
-  const urls = {
-    restUrl: 'http://localhost',
-    websocket_url: 'wss://localhost',
-  };
-
   beforeEach(() => {
-    backend_client = new z.service.BackendClient(urls);
+    backend_client = resolve(graph.BackendClient);
   });
 
   afterEach(() => {

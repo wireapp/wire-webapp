@@ -17,14 +17,14 @@
  *
  */
 
-// KARMA_SPECS=util/ArrayUtil yarn test:app
+import {chunk, getNextItem, interpolate, isLastItem, iterateIndex} from 'utils/ArrayUtil';
 
-describe('z.util.ArrayUtil', () => {
+describe('ArrayUtil', () => {
   describe('chunk', () => {
     const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     it('returns one chunk with all items when the size is bigger than the array', () => {
-      const actual = z.util.ArrayUtil.chunk(array, 10);
+      const actual = chunk(array, 10);
 
       expect(actual.length).toBe(1);
       expect(actual[0].length).toBe(10);
@@ -33,7 +33,7 @@ describe('z.util.ArrayUtil', () => {
     });
 
     it('returns the correct chunks', () => {
-      const actual = z.util.ArrayUtil.chunk(array, 3);
+      const actual = chunk(array, 3);
 
       expect(actual.length).toBe(4);
       expect(actual[0].length).toBe(3);
@@ -43,7 +43,7 @@ describe('z.util.ArrayUtil', () => {
     });
 
     it('does not effect the original array', () => {
-      const actual = z.util.ArrayUtil.chunk(array, 3);
+      const actual = chunk(array, 3);
 
       expect(actual.length).toBe(4);
       expect(actual[0].length).toBe(3);
@@ -62,26 +62,26 @@ describe('z.util.ArrayUtil', () => {
     const array = [firstItem, secondItem, thirdItem];
 
     it('returns the second item when first item was given', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, firstItem)).toEqual(secondItem);
+      expect(getNextItem(array, firstItem)).toEqual(secondItem);
     });
 
     it('returns the second item when last item was given', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, thirdItem)).toEqual(secondItem);
+      expect(getNextItem(array, thirdItem)).toEqual(secondItem);
     });
 
     it('returns undefined when item is not in the array', () => {
-      expect(z.util.ArrayUtil.getNextItem(array, unknownItem)).toBeUndefined();
+      expect(getNextItem(array, unknownItem)).toBeUndefined();
     });
   });
 
   describe('interpolate', () => {
     it('interpolates arrays with bigger lengths', () => {
-      expect(z.util.ArrayUtil.interpolate([1, 5, 3], 5)).toEqual([1, 3, 5, 4, 3]);
-      expect(z.util.ArrayUtil.interpolate([1, 3, 5, 4, 3], 3)).toEqual([1, 5, 3]);
+      expect(interpolate([1, 5, 3], 5)).toEqual([1, 3, 5, 4, 3]);
+      expect(interpolate([1, 3, 5, 4, 3], 3)).toEqual([1, 5, 3]);
     });
 
     it('keeps the first and the last value', () => {
-      const interpolated_array = z.util.ArrayUtil.interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5);
+      const interpolated_array = interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5);
 
       expect(interpolated_array[0]).toEqual(0);
       expect(interpolated_array[interpolated_array.length - 1]).toEqual(9);
@@ -96,34 +96,34 @@ describe('z.util.ArrayUtil', () => {
     const array = [firstItem, secondItem, thirdItem];
 
     it('returns true for the last item', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, thirdItem)).toBeTruthy();
+      expect(isLastItem(array, thirdItem)).toBeTruthy();
     });
 
     it('returns false for any item that is not the last', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, firstItem)).toBeFalsy();
-      expect(z.util.ArrayUtil.isLastItem(array, secondItem)).toBeFalsy();
+      expect(isLastItem(array, firstItem)).toBeFalsy();
+      expect(isLastItem(array, secondItem)).toBeFalsy();
     });
 
     it('returns false for an item that is not in the array', () => {
-      expect(z.util.ArrayUtil.isLastItem(array, unknownItem)).toBeFalsy();
+      expect(isLastItem(array, unknownItem)).toBeFalsy();
     });
   });
 
   describe('iterateIndex', () => {
     it('returns undefined in case of wrong input parameters', () => {
-      expect(z.util.ArrayUtil.iterateIndex('Test', 0)).toBe(undefined);
-      expect(z.util.ArrayUtil.iterateIndex([1, 2, 3], 'Test')).toBe(undefined);
-      expect(z.util.ArrayUtil.iterateIndex([], 0)).toBe(undefined);
+      expect(iterateIndex('Test', 0)).toBe(undefined);
+      expect(iterateIndex([1, 2, 3], 'Test')).toBe(undefined);
+      expect(iterateIndex([], 0)).toBe(undefined);
     });
 
     it('iterates through the array index', () => {
       const array = [1, 2, 3, 4, 5];
 
-      expect(z.util.ArrayUtil.iterateIndex(array, 0)).toBe(1);
-      expect(z.util.ArrayUtil.iterateIndex(array, 1)).toBe(2);
-      expect(z.util.ArrayUtil.iterateIndex(array, 2)).toBe(3);
-      expect(z.util.ArrayUtil.iterateIndex(array, 3)).toBe(4);
-      expect(z.util.ArrayUtil.iterateIndex(array, 4)).toBe(0);
+      expect(iterateIndex(array, 0)).toBe(1);
+      expect(iterateIndex(array, 1)).toBe(2);
+      expect(iterateIndex(array, 2)).toBe(3);
+      expect(iterateIndex(array, 3)).toBe(4);
+      expect(iterateIndex(array, 4)).toBe(0);
     });
   });
 });

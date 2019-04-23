@@ -1,0 +1,17 @@
+<div id="archive" class="left-list left-list-archive" data-bind="with: $root.archive">
+  <div class="left-list-header">
+    <span class="left-list-header-text" data-bind="text: t('archiveHeader')"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClose, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close-archive"></span>
+  </div>
+  <div class="left-list-center">
+    <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: archivedConversations, foreach: {data: archivedConversations, as: 'conversation', noChildContext: true}">
+      <li>
+        <conversation-list-cell
+          data-bind="click: () => clickOnConversation(conversation), event: {'contextmenu': listViewModel.onContextMenu}"
+          data-uie-name="item-conversation-archived"
+          params="click: listViewModel.onContextMenu, conversation: conversation, onJoinCall: onJoinCall">
+        </conversation-list-cell>
+      </li>
+    </ul>
+  </div>
+</div>

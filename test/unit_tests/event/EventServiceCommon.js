@@ -16,8 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-// KARMA_SPECS=conversation/ConversationService yarn test:app
+import {createRandomUuid} from 'utils/util';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -79,11 +78,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('returns undefined if no event with id is found', () => {
-        return TestFactory[testedServiceName]
-          .loadEvent(conversationId, z.util.createRandomUuid())
-          .then(messageEntity => {
-            expect(messageEntity).not.toBeDefined();
-          });
+        return TestFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
+          expect(messageEntity).not.toBeDefined();
+        });
       });
     });
 
@@ -450,7 +447,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
         spyOn(TestFactory.storage_service, 'update').and.returnValue(Promise.resolve('ok'));
         spyOn(TestFactory.storage_service.db, 'transaction').and.callThrough();
 
-        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(result => {
+        return TestFactory[testedServiceName].updateEventSequentially(12, updates).then(() => {
           expect(TestFactory.storage_service.update).toHaveBeenCalledWith(eventStoreName, 12, updates);
           expect(TestFactory.storage_service.db.transaction).toHaveBeenCalled();
         });

@@ -1,0 +1,106 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// texts
+.text(@color) {
+  color: @color !important;
+}
+
+.text-red {
+  .text(@w-red);
+}
+
+.text-foreground {
+  .text(var(--foreground));
+}
+.text-background {
+  .text(var(--background));
+}
+.text-white {
+  .text(#fff);
+}
+
+.fill-svg(@color) {
+  svg > path {
+    fill: @color !important;
+  }
+}
+
+.svg-green {
+  .fill-svg(@w-green);
+}
+
+.svg-red {
+  .fill-svg(@w-red);
+}
+
+// fonts
+.font-size(@size) {
+  font-size: @size !important;
+}
+
+.font-size-xxs {
+  .font-size(@font-size-xxs);
+}
+.font-size-xs {
+  .font-size(@font-size-xs);
+}
+.font-size-sm {
+  .font-size(@font-size-sm);
+}
+.font-size-md {
+  .font-size(@font-size-md);
+}
+.font-size-lg {
+  .font-size(@font-size-lg);
+}
+.font-size-xl {
+  .font-size(@font-size-xl);
+}
+.font-size-xxl {
+  .font-size(@font-size-xxl);
+}
+
+.font-weight(@weight) {
+  font-weight: @weight !important;
+}
+
+.font-weight-bold {
+  .font-weight(@font-weight-bold);
+}
+.font-weight-regular {
+  .font-weight(@font-weight-regular);
+}
+.font-weight-light {
+  .font-weight(@font-weight-light);
+}
+
+// accent colors
+.accent-color-service {
+  color: #fff;
+}
+.accent-color-temporary {
+  color: var(--background-fade-8);
+}
+
+// background colors
+
+.bg-color-ephemeral {
+  background-color: var(--accent-color-fade-16);
+}

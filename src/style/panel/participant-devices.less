@@ -1,0 +1,94 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.participant-devices {
+  &__fingerprint {
+    height: 72px;
+    margin-bottom: 32px;
+    font-family: monospace;
+    font-weight: @font-weight-bold;
+
+    &__part {
+      line-height: 22px;
+
+      &:nth-child(2n) {
+        font-weight: @font-weight-regular;
+      }
+
+      &:nth-child(12),
+      &:nth-child(23) {
+        margin-left: 0;
+      }
+    }
+  }
+
+  &__header {
+    padding: 16px;
+
+    & > * + * {
+      margin-top: 8px;
+    }
+  }
+
+  &__link {
+    margin: 8px 0;
+    color: @w-blue;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  &__device-list {
+    margin-top: 8px;
+  }
+
+  &__device-item {
+    display: flex;
+    height: 64px;
+    align-items: center;
+    margin: 0 16px;
+    border-bottom: 1px solid var(--background-fade-8);
+    cursor: pointer;
+
+    device-card {
+      flex-grow: 1;
+      margin-left: 16px;
+    }
+  }
+
+  &__show-self-fingerprint {
+    margin-bottom: 56px;
+  }
+
+  &__single-client {
+    margin-top: 40px;
+  }
+
+  &__verify {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__actions {
+    .flex-center;
+
+    width: 50%;
+  }
+}

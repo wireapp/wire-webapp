@@ -1,0 +1,22 @@
+<script type="text/html" id="user-profile-footer-add">
+  <div class="button-icon pull-left" data-bind="click: clickToSendRequest, attr: {title: t('userProfileButtonConnect')}" data-uie-name="do-connect">
+    <div class="button-icon icon-plus"></div>
+    <span data-bind="text: t('userProfileButtonConnect')"></span>
+  </div>
+</script>
+
+<script type="text/html" id="user-profile-footer-empty"></script>
+
+<script type="text/html" id="user-profile-footer-ignore-accept">
+  <div class="footer-controls-buttons">
+    <div class="button button-medium button-inverted" data-bind="click: clickToIgnoreInvite, text: t('userProfileButtonIgnore')" data-uie-name="do-ignore"></div>
+    <div class="button button-medium" data-bind="click: clickToAcceptInvite, text: t('userProfileButtonConnect')" data-uie-name="do-connect"></div>
+  </div>
+</script>
+
+<script type="text/html" id="user-profile-footer-unblock">
+  <div class="button-icon pull-left" data-bind="click: clickToUnblock, attr: {title: t('userProfileButtonUnblock')}" data-uie-name="do-unblock">
+    <div class="button-icon icon-block"></div>
+    <span data-bind="text: t('userProfileButtonUnblock')"></span>
+  </div>
+</script>

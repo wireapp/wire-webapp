@@ -17,14 +17,14 @@
  *
  */
 
-// KARMA_SPECS=calling/videoGridRepository yarn test:app
+import {VideoGridRepository} from 'src/script/calling/VideoGridRepository';
 
-describe('z.calling.VideoGridRepository', () => {
+describe('VideoGridRepository', () => {
   let groupVideoGrid;
   const initialGrid = [0, 0, 0, 0];
 
   beforeEach(() => {
-    groupVideoGrid = new z.calling.VideoGridRepository(generateCallingRepository(), generateMediaRepository());
+    groupVideoGrid = new VideoGridRepository(generateCallingRepository(), generateMediaRepository());
   });
 
   describe('computeGrid', () => {
@@ -136,7 +136,7 @@ describe('z.calling.VideoGridRepository', () => {
     it("doesn't contain the user's self video if there is only a single remote stream", () => {
       const selfVideo = {self: true};
       const remoteVideos = [{flowId: 'user-1', stream: {}}];
-      groupVideoGrid = new z.calling.VideoGridRepository(
+      groupVideoGrid = new VideoGridRepository(
         generateCallingRepository({
           calls: ko.observableArray([{participants: () => [generateParticipant('user-1', true)]}]),
         }),
@@ -166,7 +166,7 @@ describe('z.calling.VideoGridRepository', () => {
         {flowId: 'user-2', stream: {}},
         {flowId: 'user-3', stream: {}},
       ];
-      groupVideoGrid = new z.calling.VideoGridRepository(
+      groupVideoGrid = new VideoGridRepository(
         generateCallingRepository({
           calls: ko.observableArray([
             {
@@ -203,7 +203,7 @@ describe('z.calling.VideoGridRepository', () => {
 
       nbOfRemoteStreams.forEach(nbOfStreams => {
         const remoteStreams = new Array(nbOfStreams).fill({remote: true, stream: {}});
-        groupVideoGrid = new z.calling.VideoGridRepository(
+        groupVideoGrid = new VideoGridRepository(
           generateCallingRepository(),
           generateMediaRepository({
             streamHandler: {
@@ -228,7 +228,7 @@ describe('z.calling.VideoGridRepository', () => {
 
     it('contains the self stream only if video or screen is send', () => {
       const selfStream = {self: true};
-      groupVideoGrid = new z.calling.VideoGridRepository(
+      groupVideoGrid = new VideoGridRepository(
         generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
@@ -248,7 +248,7 @@ describe('z.calling.VideoGridRepository', () => {
 
       expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
 
-      groupVideoGrid = new z.calling.VideoGridRepository(
+      groupVideoGrid = new VideoGridRepository(
         generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {
@@ -268,7 +268,7 @@ describe('z.calling.VideoGridRepository', () => {
 
       expect(groupVideoGrid.streams()).toEqual([]);
 
-      groupVideoGrid = new z.calling.VideoGridRepository(
+      groupVideoGrid = new VideoGridRepository(
         generateCallingRepository(),
         generateMediaRepository({
           streamHandler: {

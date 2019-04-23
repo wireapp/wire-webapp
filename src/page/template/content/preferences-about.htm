@@ -1,0 +1,31 @@
+<div id="preferences-about" class="preferences-page preferences-about" data-bind="with: $root.preferencesAbout">
+  <div class="preferences-titlebar" data-bind="text: t('preferencesAbout')"></div>
+  <div class="preferences-content" data-bind="fadingscrollbar">
+    <!-- ko if: showSupportSection() -->
+    <section class="preferences-section">
+      <header class="preferences-header" data-bind="text: t('preferencesAboutSupport')"></header>
+      <a class="preferences-link" data-bind="attr: {href: supportUrl}, text: t('preferencesAboutSupportWebsite')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-support"></a>
+      <a class="preferences-link" data-bind="attr: {href: supportContactUrl}, text: t('preferencesAboutSupportContact')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-contact-support"></a>
+    </section>
+    <!-- /ko -->
+    <!-- ko if: showWireSection() -->
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="text: t('wire')"></header>
+        <!-- ko if: termsOfUseUrl() -->
+          <a class="preferences-link" data-bind="attr: {href: termsOfUseUrl()}, text: t('preferencesAboutTermsOfUse')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
+        <!-- /ko -->
+        <!-- ko if: privacyPolicyUrl -->
+          <a class="preferences-link" data-bind="attr: {href: privacyPolicyUrl}, text: t('preferencesAboutPrivacyPolicy')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
+        <!-- /ko -->
+        <!-- ko if: websiteUrl -->
+          <a class="preferences-link" data-bind="attr: {href: websiteUrl}, text: t('preferencesAboutWebsite')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
+        <!-- /ko -->
+      </section>
+    <!-- /ko -->
+    <section class="preferences-section">
+      <header class="preferences-header"><hr class="preferences-separator"></header>
+      <div class="preferences-detail" data-bind="text: t('preferencesAboutVersion', '{{@config.VERSION}}')"></div>
+      <div class="preferences-detail" data-bind="text: t('preferencesAboutCopyright')"></div>
+    </section>
+  </div>
+</div>

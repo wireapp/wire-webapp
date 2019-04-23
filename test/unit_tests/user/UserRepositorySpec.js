@@ -17,9 +17,13 @@
  *
  */
 
-// KARMA_SPECS=user/UserRepository yarn test:app
+import {backendConfig} from '../../api/testResolver';
+import ConsentValue from 'src/script/user/ConsentValue';
+import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import ReceiptMode from 'src/script/conversation/ReceiptMode';
+import User from 'src/script/entity/User';
 
-describe('z.user.UserRepository', () => {
+describe('UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();
 
@@ -35,7 +39,110 @@ describe('z.user.UserRepository', () => {
     server.restore();
   });
 
-  describe('users', () => {
+  describe('Account preferences ', () => {
+    beforeEach(() => {
+      spyOn(TestFactory.user_repository.propertyRepository, '_publishProperties').and.callFake(properties => {
+        return properties;
+      });
+    });
+
+    describe('Data usage permissions', () => {
+      it('syncs the "Send anonymous data" preference through WebSocket events', () => {
+        const turnOnErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: true,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const turnOffErrorReporting = {
+          key: 'webapp',
+          type: 'user.properties-set',
+          value: {
+            settings: {
+              privacy: {
+                improve_wire: false,
+              },
+            },
+            version: 1,
+          },
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const errorReporting = () =>
+          TestFactory.user_repository.propertyRepository.properties.settings.privacy.improve_wire;
+
+        expect(errorReporting()).toBeUndefined();
+
+        TestFactory.user_repository.on_user_event(turnOnErrorReporting, source);
+
+        expect(errorReporting()).toBe(true);
+
+        TestFactory.user_repository.on_user_event(turnOffErrorReporting, source);
+
+        expect(errorReporting()).toBe(false);
+      });
+
+      it('syncs the "Receive newsletter" preference through WebSocket events', () => {
+        const giveOnMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-set',
+          value: ConsentValue.GIVEN,
+        };
+        const revokeMarketingConsent = {
+          key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+          type: 'user.properties-delete',
+        };
+
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const marketingConsent = TestFactory.user_repository.propertyRepository.marketingConsent;
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+
+        TestFactory.user_repository.on_user_event(giveOnMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.GIVEN);
+
+        TestFactory.user_repository.on_user_event(revokeMarketingConsent, source);
+
+        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+      });
+    });
+
+    describe('Privacy', () => {
+      it('syncs the "Read receipts" preference through WebSocket events', () => {
+        const turnOnReceiptMode = {
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+          type: 'user.properties-set',
+          value: ReceiptMode.DELIVERY_AND_READ,
+        };
+        const turnOffReceiptMode = {
+          key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+          type: 'user.properties-delete',
+        };
+        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+
+        TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY_AND_READ);
+
+        TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
+
+        expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
+      });
+    });
+  });
+
+  describe('User handling', () => {
     describe('fetchUsersById', () => {
       it('should handle malformed input', () => {
         return TestFactory.user_repository
@@ -54,7 +161,7 @@ describe('z.user.UserRepository', () => {
       let user = null;
 
       beforeEach(() => {
-        user = new z.entity.User(entities.user.john_doe.id);
+        user = new User(entities.user.john_doe.id);
         return TestFactory.user_repository.save_user(user);
       });
 
@@ -83,7 +190,7 @@ describe('z.user.UserRepository', () => {
       afterEach(() => TestFactory.user_repository.users.removeAll());
 
       it('saves a user', () => {
-        const user = new z.entity.User();
+        const user = new User();
         user.id = entities.user.jane_roe.id;
 
         return TestFactory.user_repository.save_user(user).then(() => {
@@ -93,7 +200,7 @@ describe('z.user.UserRepository', () => {
       });
 
       it('saves self user', () => {
-        const user = new z.entity.User();
+        const user = new User();
         user.id = entities.user.jane_roe.id;
 
         return TestFactory.user_repository.save_user(user, true).then(() => {
@@ -109,8 +216,9 @@ describe('z.user.UserRepository', () => {
       let user_john_doe = null;
 
       beforeEach(() => {
-        user_jane_roe = new z.entity.User(entities.user.jane_roe.id);
-        user_john_doe = new z.entity.User(entities.user.john_doe.id);
+        TestFactory.user_repository.users.removeAll();
+        user_jane_roe = new User(entities.user.jane_roe.id);
+        user_john_doe = new User(entities.user.john_doe.id);
 
         return TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]).then(() => {
           const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
@@ -146,7 +254,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_usernames', () => {
       it('resolves with username when username is not taken', () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
+        server.respondWith('POST', `${backendConfig.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(usernames),
@@ -159,7 +267,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.restUrl}/users/handles`, [
+        server.respondWith('POST', `${backendConfig.restUrl}/users/handles`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify([]),
@@ -174,11 +282,7 @@ describe('z.user.UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', () => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
-          404,
-          {},
-          '',
-        ]);
+        server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [404, {}, '']);
 
         return TestFactory.user_repository.verify_username(username).then(_username => {
           expect(_username).toBe(username);
@@ -187,11 +291,7 @@ describe('z.user.UserRepository', () => {
 
       it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.restUrl}/users/handles/${username}`, [
-          200,
-          {},
-          '',
-        ]);
+        server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [200, {}, '']);
 
         TestFactory.user_repository
           .verify_username(username)

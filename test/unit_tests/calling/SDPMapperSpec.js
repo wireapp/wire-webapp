@@ -17,16 +17,16 @@
  *
  */
 
-// KARMA_SPECS=calling/SDPMapper yarn test:app
+import {SDPMapper} from 'src/script/calling/SDPMapper';
+import {SDP_TYPE} from 'src/script/calling/rtc/SDPType';
 
-describe('z.calling.SDPMapper', () => {
+describe('SDPMapper', () => {
   const envInitialState = Object.assign({}, z.util.Environment);
+  const defaultConfig = {isGroup: false, isIceRestart: false, isLocalSdp: true};
 
   afterEach(() => {
     z.util.Environment = Object.assign({}, envInitialState);
   });
-
-  const sdpMapper = z.calling.SDPMapper;
 
   const sdpStr = `v=0
 o=alice 2890844526 2890844526 IN IP4 host.atlanta.example.com
@@ -41,26 +41,22 @@ a=tcap:5 UDP/TLS/RTP/SAVP`.replace(/\n/g, '\r\n');
     it('fails if no SDP given', () => {
       const expectedError = new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
 
-      expect(() => sdpMapper.rewriteSdp(undefined)).toThrow(expectedError);
+      expect(() => SDPMapper.rewriteSdp(undefined)).toThrow(expectedError);
     });
 
     it('replaces "UPD/TLS/" only for local SPD', () => {
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
-      const flowEntity = {
-        negotiationMode: () => '',
-      };
-
-      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(localSdp.sdp).not.toContain('UDP/TLS/');
       expect(localSdp.sdp).toContain('RTP/SAVP');
       checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
 
-      const {sdp: remoteSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
+      const {sdp: remoteSdp} = SDPMapper.rewriteSdp(rtcSdp, {isGroup: false, isIceRestart: false, isLocalSdp: false});
 
       expect(remoteSdp.sdp).toContain('UDP/TLS/');
       checkUntouchedLines(rtcSdp.sdp, remoteSdp.sdp);
@@ -73,16 +69,12 @@ m=application 0 UDP/DTLS/SCTP webrtc-datachannel`.replace(/\n/g, '\r\n');
 
       const rtcSdp = {
         sdp: firefoxSdp,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
 
-      const flowEntity = {
-        negotiationMode: () => '',
-      };
-
-      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(localSdp.sdp).not.toContain('UDP/DTLS/');
       expect(localSdp.sdp).toContain('DTLS/SCTP');
@@ -96,16 +88,12 @@ a=sctpmap:5000 webrtc-datachannel 1024
 
       const rtcSdp = {
         sdp: remoteSdp,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
 
-      const flowEntity = {
-        negotiationMode: () => '',
-      };
-
-      const {sdp: localSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.REMOTE, flowEntity);
+      const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, {isGroup: false, isIceRestart: false, isLocalSdp: false});
 
       expect(localSdp.sdp).not.toContain('a=sctpmap:5000 webrtc-datachannel 1024');
       expect(localSdp.sdp).toContain('a=sctp-port:5000');
@@ -115,11 +103,7 @@ a=sctpmap:5000 webrtc-datachannel 1024
     it('adds the browser name and app version for local SDP', () => {
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
-      };
-
-      const flowEntity = {
-        negotiationMode: () => '',
+        type: SDP_TYPE.OFFER,
       };
 
       spyOn(z.util.Environment, 'version').and.callFake(isDesktop => (isDesktop ? '5.5.5' : '4.4.4'));
@@ -131,7 +115,7 @@ a=sctpmap:5000 webrtc-datachannel 1024
         version: '12',
       };
 
-      const {sdp: browserSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: browserSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(browserSdp.sdp).toContain('a=tool:webapp 4.4.4 (firefox 12)');
       expect(browserSdp.sdp).toContain('t=0 0');
@@ -142,7 +126,7 @@ a=sctpmap:5000 webrtc-datachannel 1024
         name: 'chrome',
         version: '12',
       };
-      const {sdp: electronSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: electronSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(electronSdp.sdp).toContain('a=tool:electron 5.5.5 4.4.4 (chrome 12)');
       expect(electronSdp.sdp).toContain('t=0 0');
@@ -161,16 +145,12 @@ a=candidate:750991856 2 udp 25108222 237.30.30.30 51472 typ relay raddr 47.61.61
 a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61.61 rport 54761 generation 0
 `.replace(/\n/g, '\r\n');
 
-      const flowEntity = {
-        negotiationMode: () => '',
-      };
-
       const rtcSdp = {
         sdp: sdpStr + candidates,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
-      const {sdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(sdp.sdp.match(/a=candidate/g).length).toEqual(8);
       checkUntouchedLines(rtcSdp.sdp, sdp.sdp);
@@ -179,24 +159,20 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
     it('changes the data channel and video channel port number for firefox only', () => {
       const dataChannel = `m=application 0`;
       const videoChannel = `m=video 0`;
-      const flowEntity = {
-        negotiationMode: () => '',
-      };
-
       const rtcSdp = {
         sdp: `${sdpStr}\r\n${dataChannel}\r\n${videoChannel}`,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
       z.util.Environment.browser.firefox = true;
-      const {sdp: firefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: firefoxSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(firefoxSdp.sdp).toContain('m=application 9');
       expect(firefoxSdp.sdp).toContain('m=video 9');
       checkUntouchedLines(rtcSdp.sdp, firefoxSdp.sdp);
 
       z.util.Environment.browser.firefox = false;
-      const {sdp: noFirefoxSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      const {sdp: noFirefoxSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(noFirefoxSdp.sdp).toContain('m=application 0');
       expect(noFirefoxSdp.sdp).toContain('m=video 0');
@@ -204,22 +180,25 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
     });
 
     it('adds audio bitrate and PTime for group and restarted ICE', () => {
-      const groupFlowEntity = {
+      const groupConfig = {
         isGroup: true,
-        negotiationMode: () => '',
+        isIceRestart: false,
+        isLocalSdp: true,
       };
 
-      const restartedICEFlowEntity = {
-        negotiationMode: () => z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART,
+      const iceRestartConfig = {
+        isGroup: false,
+        isIceRestart: true,
+        isLocalSdp: true,
       };
 
       const rtcSdp = {
         sdp: sdpStr,
-        type: z.calling.rtc.SDP_TYPE.OFFER,
+        type: SDP_TYPE.OFFER,
       };
 
-      [groupFlowEntity, restartedICEFlowEntity].forEach(flowEntity => {
-        const {sdp: groupSdp} = sdpMapper.rewriteSdp(rtcSdp, z.calling.enum.SDP_SOURCE.LOCAL, flowEntity);
+      [groupConfig, iceRestartConfig].forEach(config => {
+        const {sdp: groupSdp} = SDPMapper.rewriteSdp(rtcSdp, config);
 
         expect(groupSdp.sdp).toContain('b=AS:');
         expect(groupSdp.sdp).toContain('a=ptime:');

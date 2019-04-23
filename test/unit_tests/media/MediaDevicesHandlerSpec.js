@@ -17,40 +17,38 @@
  *
  */
 /* eslint-disable */
-// KARMA_SPECS=media/MediaDevicesHandler yarn test:app
 
-describe('z.media.MediaDevicesHandler', () => {
-  const test_factory = new TestFactory();
+import {resolve, graph} from '../../api/testResolver';
+
+describe('MediaDevicesHandler', () => {
   const screens = [{id: 'screen1', name: 'Screen 1'}, {id: 'screen2', name: 'Screen 2'}];
-  const cameras = [{deviceId: 'camera1', label: 'Camera 1'}, {deviceId: 'camera2', label: 'Camera 2'}];
+  const cameras = [
+    {deviceId: 'camera1', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
+    {deviceId: 'camera2', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
+  ];
   let devicesHandler;
 
-  beforeAll(() => test_factory.exposeMediaActors());
-
   beforeEach(() => {
-    devicesHandler = TestFactory.media_repository.devicesHandler;
+    devicesHandler = resolve(graph.MediaRepository).devicesHandler;
     spyOn(devicesHandler, 'getScreenSources').and.callFake(() => {
       devicesHandler.availableDevices.screenInput(screens);
       return Promise.resolve();
     });
-    spyOn(devicesHandler, 'getMediaDevices').and.callFake(() => {
-      devicesHandler.availableDevices.videoInput(cameras);
-      return Promise.resolve();
-    });
+    spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(Promise.resolve(cameras));
   });
 
   describe('toggleNextScreen', () => {
     it('returns second screen if the first is currently selected', () => {
       devicesHandler.currentDeviceId.screenInput(screens[0].id);
       devicesHandler.currentDeviceIndex.screenInput(0);
-      devicesHandler.toggleNextScreen().then(() => {
+      return devicesHandler.toggleNextScreen().then(() => {
         expect(devicesHandler.currentDeviceId.screenInput()).toEqual(screens[1].id);
       });
     });
     it('returns first screen if the second is currently selected', () => {
       devicesHandler.currentDeviceId.screenInput(screens[1].id);
       devicesHandler.currentDeviceIndex.screenInput(1);
-      devicesHandler.toggleNextScreen().then(() => {
+      return devicesHandler.toggleNextScreen().then(() => {
         expect(devicesHandler.currentDeviceId.screenInput()).toEqual(screens[0].id);
       });
     });
@@ -59,13 +57,15 @@ describe('z.media.MediaDevicesHandler', () => {
   describe('toggleNextCamera', () => {
     it('returns second camera if the first is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
-      devicesHandler.toggleNextCamera().then(() => {
+      devicesHandler.currentDeviceIndex.videoInput(0);
+      return devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[1].deviceId);
       });
     });
-    xit('returns first camera if the second is currently selected', () => {
+    it('returns first camera if the second is currently selected', () => {
       devicesHandler.currentDeviceId.videoInput(cameras[1].deviceId);
-      devicesHandler.toggleNextCamera().then(() => {
+      devicesHandler.currentDeviceIndex.videoInput(1);
+      return devicesHandler.toggleNextCamera().then(() => {
         expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[0].deviceId);
       });
     });

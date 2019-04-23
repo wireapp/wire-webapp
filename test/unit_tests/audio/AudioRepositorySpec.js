@@ -17,115 +17,112 @@
  *
  */
 
-// KARMA_SPECS=audio/AudioRepository yarn test:app
+import {difference} from 'underscore';
 
-describe('z.audio.AudioRepository', () => {
-  const test_factory = new TestFactory();
+import {resolve, graph} from './../../api/testResolver';
+import {AudioPreference} from 'src/script/audio/AudioPreference';
+import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
+import {AudioType} from 'src/script/audio/AudioType';
+import {NotificationHandlingState} from 'src/script/event/NotificationHandlingState';
 
-  beforeAll(() => test_factory.exposeAudioActors().then(() => TestFactory.audio_repository.init(true)));
+describe('AudioRepository', () => {
+  const audioRepository = resolve(graph.AudioRepository);
 
-  describe('_checkSoundSetting', () => {
-    beforeAll(() => TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME));
+  describe('init', () => {
+    it('inits all the sounds without preload', () => {
+      spyOn(window, 'Audio').and.callFake(function() {
+        this.load = () => {};
+        spyOn(this, 'load');
+      });
+      audioRepository.init();
 
-    it('plays a sound that should be played', () => {
-      return TestFactory.audio_repository._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION);
-    });
-
-    it('ignores a sound that should not be played', done => {
-      TestFactory.audio_repository
-        ._checkSoundSetting(z.audio.AudioType.ALERT)
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.AudioError));
-          expect(error.type).toBe(z.error.AudioError.TYPE.IGNORED_SOUND);
-          done();
-        });
-    });
-  });
-
-  describe('_getSoundById', () => {
-    it('finds an available sound', () => {
-      return TestFactory.audio_repository._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION).then(audio_element => {
-        expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
+      expect(window.Audio).toHaveBeenCalledTimes(Object.keys(AudioType).length);
+      Object.values(audioRepository.audioElements).forEach(audioElement => {
+        expect(audioElement.load).not.toHaveBeenCalled();
       });
     });
 
-    it('handles a missing sound', done => {
-      TestFactory.audio_repository
-        ._getSoundById('foo')
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.AudioError));
-          expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
-          done();
-        });
+    it('inits all the sounds with preload', () => {
+      spyOn(window, 'Audio').and.callFake(function() {
+        this.load = () => {};
+        spyOn(this, 'load');
+      });
+      audioRepository.init(true);
+
+      expect(window.Audio).toHaveBeenCalledTimes(Object.keys(AudioType).length);
+
+      Object.values(audioRepository.audioElements).forEach(audioElement => {
+        expect(audioElement.load).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
-  describe('_play', () => {
+  describe('play', () => {
     beforeEach(() => {
-      const audioElement = new Audio(`/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`);
-
-      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL] = audioElement;
-      spyOn(audioElement, 'play').and.returnValue(Promise.resolve());
-    });
-
-    it('plays an available sound', () => {
-      return TestFactory.audio_repository
-        ._play(
-          z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL],
-          false
-        )
-        .then(audio_element => {
-          expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
-          expect(audio_element.loop).toBeFalsy();
-          expect(audio_element.play).toHaveBeenCalled();
-        });
-    });
-
-    it('plays an available sound in loop', () => {
-      TestFactory.audio_repository
-        ._play(
-          z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL],
-          true
-        )
-        .then(audio_element => {
-          expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
-          expect(audio_element.loop).toBeTruthy();
-        });
-    });
-
-    it('does not play a sound twice concurrently', () => {
-      const audioElement = TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL];
-      spyOnProperty(audioElement, 'paused', 'get').and.returnValue(false);
-      return TestFactory.audio_repository
-        ._play(
-          z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
-        )
-        .then(() => fail('should throw an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.AudioError));
-          expect(error.type).toBe(z.error.AudioError.TYPE.ALREADY_PLAYING);
-        });
-    });
-
-    it('handles a missing audio id sound', () => {
-      return TestFactory.audio_repository
-        ._play(undefined, TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL])
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.AudioError));
-          expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
-        });
-    });
-
-    it('handles a missing audio element', () => {
-      return TestFactory.audio_repository._play(z.audio.AudioType.OUTGOING_CALL, undefined).catch(error => {
-        expect(error).toEqual(jasmine.any(z.error.AudioError));
-        expect(error.type).toBe(z.error.AudioError.TYPE.NOT_FOUND);
+      spyOn(window, 'Audio').and.callFake(function() {
+        this.load = () => {};
+        this.play = () => {};
+        this.paused = true;
+        spyOn(this, 'play');
       });
+      audioRepository.init();
+      audioRepository.setMutedState(NotificationHandlingState.WEB_SOCKET);
+    });
+
+    it('only plays muted allowed sounds when in muted state', () => {
+      audioRepository.setAudioPreference(AudioPreference.NONE);
+      audioRepository.setMutedState('whatever');
+      const forcedSounds = AudioPlayingType.MUTED;
+
+      const forcedPromises = forcedSounds.map(audioId => {
+        return audioRepository.play(audioId).then(() => {
+          expect(audioRepository.audioElements[audioId].play).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      const ignoredSounds = difference(Object.values(AudioType), AudioPlayingType.MUTED);
+
+      const ignoredPromises = ignoredSounds.map(audioId => {
+        return audioRepository.play(audioId).then(() => {
+          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalledTimes(1);
+        });
+      });
+
+      return Promise.all(forcedPromises.concat(ignoredPromises));
+    });
+
+    it("only plays sounds allowed by user's preference (SOME)", () => {
+      audioRepository.setAudioPreference(AudioPreference.SOME);
+      const allowedSounds = AudioPlayingType.SOME;
+
+      const allowedPromises = allowedSounds.map(audioId => {
+        return audioRepository.play(audioId).then(() => {
+          expect(audioRepository.audioElements[audioId].play).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      const ignoredSounds = difference(Object.values(AudioType), AudioPlayingType.SOME);
+
+      const ignoredPromises = ignoredSounds.map(audioId => {
+        return audioRepository.play(audioId).then(() => {
+          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalledTimes(1);
+        });
+      });
+
+      return Promise.all(allowedPromises.concat(ignoredPromises));
+    });
+
+    it("ignores sounds that are not allowed by user's preferences", () => {
+      audioRepository.setAudioPreference(AudioPreference.NONE);
+      const sounds = difference(AudioPlayingType.SOME, AudioPlayingType.NONE);
+
+      const testPromises = sounds.map(audioId => {
+        return audioRepository.play(audioId).then(() => {
+          expect(audioRepository.audioElements[audioId].play).not.toHaveBeenCalled();
+        });
+      });
+
+      return Promise.all(testPromises);
     });
   });
 });

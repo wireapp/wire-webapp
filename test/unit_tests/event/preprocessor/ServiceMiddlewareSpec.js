@@ -17,7 +17,7 @@
  *
  */
 
-// KARMA_SPECS=event/preprocessor/ServiceMiddleware yarn test:app
+import Conversation from 'src/script/entity/Conversation';
 
 describe('z.event.preprocessor.ServiceMiddleware', () => {
   const testFactory = new TestFactory();
@@ -59,7 +59,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
         };
 
         spyOn(TestFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
-        const conversation = new z.entity.Conversation();
+        const conversation = new Conversation();
         spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
           Promise.resolve(conversation)
         );

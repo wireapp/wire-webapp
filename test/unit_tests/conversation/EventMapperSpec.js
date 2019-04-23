@@ -17,9 +17,12 @@
  *
  */
 
-// KARMA_SPECS=conversation/EventMapper yarn test:app
+import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import EventMapper from 'app/script/conversation/EventMapper';
+import Conversation from 'src/script/entity/Conversation';
+import EventMapper from 'src/script/conversation/EventMapper';
+import AssetType from 'src/script/assets/AssetType';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -27,26 +30,23 @@ describe('Event Mapper', () => {
   let event_mapper = null;
 
   beforeAll(() => {
-    return z.util.protobuf
-      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
-      .then(() => test_factory.exposeUserActors())
-      .then(() => {
-        wire.app = {
-          service: {
-            asset: TestFactory.asset_service,
-          },
-        };
-      });
+    return test_factory.exposeUserActors().then(() => {
+      wire.app = {
+        service: {
+          asset: TestFactory.asset_service,
+        },
+      };
+    });
   });
 
   beforeEach(() => {
-    conversation_et = new z.entity.Conversation(z.util.createRandomUuid());
+    conversation_et = new Conversation(createRandomUuid());
     event_mapper = new EventMapper();
   });
 
   describe('mapJsonEvent', () => {
     it('maps text messages without link previews', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
       const event = {
         conversation: conversation_et.id,
@@ -54,7 +54,7 @@ describe('Event Mapper', () => {
           content: 'foo',
           nonce: event_id,
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -67,19 +67,27 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with deprecated link preview format', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
-      const article = new z.proto.Article('test.com', 'Test title', 'Test description');
-      const link_preview = new z.proto.LinkPreview('test.com', 0, article);
+      const article = new Article({
+        permanentUrl: 'test.com',
+        summary: 'Test description',
+        title: 'Test title',
+      });
+      const link_preview = new LinkPreview({
+        article,
+        url: 'test.com',
+        urlOffset: 0,
+      });
 
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()],
+          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -94,25 +102,25 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with link preview', () => {
-      const event_id = z.util.createRandomUuid;
+      const event_id = createRandomUuid;
 
-      const link_preview = new z.proto.LinkPreview(
-        'test.com',
-        0,
-        null,
-        'test.com/perm',
-        'Test title',
-        'Test description'
-      );
+      const link_preview = new LinkPreview({
+        article: null,
+        permanentUrl: 'test.com/perm',
+        summary: 'Test description',
+        title: 'Test title',
+        url: 'test.com',
+        urlOffset: 0,
+      });
 
       const event = {
         conversation: conversation_et.id,
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()],
+          previews: [arrayToBase64(LinkPreview.encode(link_preview).finish())],
         },
-        from: z.util.createRandomUuid,
+        from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
@@ -137,7 +145,7 @@ describe('Event Mapper', () => {
         expect(messageEntity.get_first_asset().height).toBe(event.data.info.height);
         expect(messageEntity.get_first_asset().file_size).toBe(event.data.content_length);
         expect(messageEntity.get_first_asset().file_type).toBe(event.data.content_type);
-        expect(messageEntity.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
+        expect(messageEntity.get_first_asset().type).toBe(AssetType.IMAGE);
         expect(messageEntity.get_first_asset().resource().otrKey).toBe(event.data.otr_key);
         expect(messageEntity.get_first_asset().resource().sha256).toBe(event.data.sha256);
         expect(messageEntity).toBeDefined();
@@ -162,21 +170,24 @@ describe('Event Mapper', () => {
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
 
-      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, z.util.createRandomUuid());
-      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, z.util.createRandomUuid());
+      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, createRandomUuid());
+      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, createRandomUuid());
 
-      const conversationEntity = new z.entity.Conversation(z.util.createRandomUuid());
+      const conversationEntity = new Conversation(createRandomUuid());
 
       const event = {
         category: 16,
         conversation: conversationEntity.id,
         data: {
           content: text,
-          mentions: [validMention.toProto().encode64(), outOfRangeMention.toProto().encode64()],
+          mentions: [
+            arrayToBase64(Mention.encode(validMention.toProto()).finish()),
+            arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
+          ],
           previews: [],
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
         primary_key: 5,
         time: '2018-09-27T15:23:14.177Z',
         type: 'conversation.message-add',
@@ -186,6 +197,48 @@ describe('Event Mapper', () => {
         const mentions = messageEntity.get_first_asset().mentions();
 
         expect(mentions.length).toBe(1);
+      });
+    });
+
+    it('filters mentions that are overlapping', () => {
+      const mandy = '@Mandy';
+      const randy = '@Randy';
+      const sandy = '@Sandy';
+      const text = `Hi ${mandy}, ${randy} and ${sandy}.`;
+
+      const mandyStart = text.indexOf(mandy);
+      const sandyStart = text.indexOf(sandy);
+      const validMention1 = new z.message.MentionEntity(mandyStart, mandy.length, createRandomUuid());
+      const validMention2 = new z.message.MentionEntity(sandyStart, sandy.length, createRandomUuid());
+
+      const overlappingStart = mandyStart + mandy.length - 1;
+      const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, createRandomUuid());
+
+      const conversationEntity = new Conversation(createRandomUuid());
+
+      const event = {
+        category: 16,
+        conversation: conversationEntity.id,
+        data: {
+          content: text,
+          mentions: [
+            arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
+            arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
+            arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
+          ],
+          previews: [],
+        },
+        from: createRandomUuid(),
+        id: createRandomUuid(),
+        primary_key: 5,
+        time: '2018-09-27T15:23:14.177Z',
+        type: 'conversation.message-add',
+      };
+
+      event_mapper.mapJsonEvent(event, conversationEntity).then(messageEntity => {
+        const mentions = messageEntity.get_first_asset().mentions();
+
+        expect(mentions.length).toBe(2);
       });
     });
   });

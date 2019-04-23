@@ -17,15 +17,14 @@
  *
  */
 
-// KARMA_SPECS=util/ValidationUtil yarn test:app
-
 import UUID from 'uuidjs';
+import {createRandomUuid} from 'utils/util';
 
 describe('z.util.ValidationUtil', () => {
   describe('"asset.legacy"', () => {
     it('detects a valid asset below v3', () => {
-      const assetId = z.util.createRandomUuid();
-      const conversationId = z.util.createRandomUuid();
+      const assetId = createRandomUuid();
+      const conversationId = createRandomUuid();
 
       const actual = z.util.ValidationUtil.asset.legacy(assetId, conversationId);
 
@@ -33,7 +32,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects an invalid asset below v3', done => {
-      const assetId = z.util.createRandomUuid();
+      const assetId = createRandomUuid();
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
         z.util.ValidationUtil.asset.legacy(assetId, conversationId);
@@ -47,7 +46,7 @@ describe('z.util.ValidationUtil', () => {
 
   describe('"asset.v3"', () => {
     it('detects a valid v3 asset (assetKey only)', () => {
-      const assetKey = `3-1-${z.util.createRandomUuid()}`;
+      const assetKey = `3-1-${createRandomUuid()}`;
 
       const actual = z.util.ValidationUtil.asset.v3(assetKey);
 
@@ -55,7 +54,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects a valid v3 asset (assetKey & assetToken)', () => {
-      const assetKey = `3-1-${z.util.createRandomUuid()}`;
+      const assetKey = `3-1-${createRandomUuid()}`;
       const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
       const actual = z.util.ValidationUtil.asset.v3(assetKey, assetToken);
@@ -64,7 +63,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects an invalid v3 asset (assetKey)', done => {
-      const assetKey = `3-6-${z.util.createRandomUuid()}`;
+      const assetKey = `3-6-${createRandomUuid()}`;
 
       try {
         z.util.ValidationUtil.asset.v3(assetKey);
@@ -76,7 +75,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects an invalid v3 asset (assetToken)', done => {
-      const assetKey = `3-1-${z.util.createRandomUuid()}`;
+      const assetKey = `3-1-${createRandomUuid()}`;
       const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
       try {

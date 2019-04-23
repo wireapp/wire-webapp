@@ -1,0 +1,403 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.modal {
+  position: fixed;
+  z-index: @z-index-modal;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  &.modal-show {
+    display: flex;
+  }
+
+  &::before {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: fade(#000, 64%);
+
+    content: ' ';
+    opacity: 0;
+    transition-delay: 0.35s;
+    transition-duration: 0.55s;
+    transition-property: opacity;
+    transition-timing-function: @ease-out-quart;
+  }
+
+  .modal-header {
+    fill: currentColor;
+  }
+
+  &.modal-fadein {
+    &:before {
+      opacity: 1;
+      transition-delay: 0s;
+      transition-duration: 0.35s;
+      transition-property: opacity;
+      transition-timing-function: @ease-out-quart;
+    }
+
+    .modal-content {
+      .modal-content-anim-open();
+    }
+  }
+
+  .modal-content {
+    .modal-content-anim-close();
+    position: relative;
+    display: block;
+    overflow: hidden;
+    width: 384px;
+    padding: 16px;
+    margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
+
+    border: var(--modal-border-color);
+    background-color: var(--app-bg-secondary);
+    border-radius: 4px;
+    cursor: default;
+
+    a.close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      font-weight: @font-weight-bold;
+    }
+
+    @media (max-width: 600px) {
+      width: 100% !important;
+      min-height: 100% !important;
+      border-radius: 0;
+    }
+
+    header {
+      .text-center;
+
+      position: relative;
+      margin-bottom: @line-height-lg;
+      line-height: @line-height-lg;
+    }
+
+    section {
+      display: flex;
+      padding-bottom: 24px;
+      font-size: @font-size-xs;
+
+      &:not(:first-child) {
+        padding-top: 24px;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid @separator-color;
+      }
+    }
+  }
+
+  .modal-input {
+    width: 100%;
+    height: 40px;
+    padding-left: 4px;
+    border: none;
+    background: var(--foreground-fade-16);
+    border-radius: 4px;
+    outline: none;
+
+    &::placeholder {
+      .label-xs;
+
+      color: var(--foreground-fade-56);
+    }
+  }
+
+  .modal-title {
+    padding-right: 48px;
+    margin-bottom: 16px;
+    font-weight: @font-weight-bold;
+    line-height: @line-height-lg;
+  }
+
+  .modal-text {
+    padding-right: 32px;
+    margin-bottom: 16px;
+    line-height: @line-height-lg;
+    overflow-wrap: break-word;
+  }
+
+  .modal-option {
+    padding-right: 32px;
+    margin-bottom: 16px;
+
+    .modal-checkbox {
+      margin-right: 4px;
+    }
+  }
+
+  .modal-button-close {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+  }
+}
+
+.modal-large {
+  .modal-content {
+    width: 540px;
+  }
+
+  .modal-header {
+    min-height: 16px;
+    margin-bottom: 24px;
+  }
+
+  .modal-center {
+    position: relative;
+    height: 304px;
+    margin-right: -16px;
+    margin-left: -16px;
+  }
+
+  .modal-footer {
+    display: flex;
+    width: 436px;
+    justify-content: space-between;
+    margin: 16px auto 0;
+    text-align: center;
+
+    .button {
+      width: 210px;
+    }
+  }
+}
+
+.modal-account-new-devices {
+}
+
+// mixings
+.modal-content-anim-close {
+  opacity: 0;
+  transform: scale(0.88);
+  transition-delay: 0s, 0s;
+  transition-duration: 0.35s, 0.35s;
+  transition-property: transform, opacity;
+  transition-timing-function: @ease-in-expo, @ease-in-expo;
+}
+
+.modal-content-anim-open {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.15s, 0.15s;
+  transition-duration: 0.55s, 0.55s;
+  transition-property: transform, opacity;
+  transition-timing-function: @ease-out-expo, @ease-out-expo;
+}
+
+.modal {
+  &__overlay {
+    position: fixed;
+    z-index: @z-index-modal;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: fade(#000, 64%);
+    opacity: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: opacity 0.15s @ease-out-quart;
+
+    &--visible {
+      opacity: 1;
+      transition: opacity 0.25s @ease-out-quart;
+    }
+  }
+  &__content {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    width: 384px;
+    max-height: 480px;
+    flex-direction: column;
+    padding: 16px;
+    margin: auto;
+
+    border: var(--modal-border-color);
+    background-color: var(--modal-bg);
+    border-radius: 4px;
+    cursor: default;
+    font-size: 14px;
+    overflow-y: hidden;
+
+    transform: scale(0.8);
+    transition: transform 0.35s @ease-out-quart;
+
+    &__device-list {
+      .label-xs;
+
+      margin-bottom: 16px;
+      line-height: @line-height-sm;
+
+      & div:nth-child(even) {
+        margin-bottom: 16px;
+      }
+    }
+
+    .modal__overlay--visible & {
+      transform: scale(1);
+    }
+    &--large {
+    }
+  }
+
+  &__header {
+    position: relative;
+    display: flex;
+    height: 24px;
+    min-height: 24px;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    color: var(--background);
+    fill: var(--background);
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+
+    & > * {
+      position: relative;
+    }
+
+    &__title {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    &__button {
+      display: flex;
+      width: 16px;
+      height: 16px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
+
+  &__body {
+    padding: 0 16px 16px;
+    margin: 0 -16px -16px;
+    overflow-y: auto;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    --button-color: var(--accent-color);
+  }
+
+  &__button {
+    display: inline-block;
+    width: calc(50% - 8px);
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--button-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 38px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    user-select: none;
+
+    & + & {
+      margin-left: 16px;
+    }
+
+    &--cancel {
+      background: #fff;
+      color: var(--button-color);
+    }
+
+    &--confirm {
+      background: var(--button-color);
+      color: #fff;
+    }
+
+    &--alert {
+      --button-color: @w-red;
+    }
+  }
+
+  &__title {
+    margin: 8px 0;
+    font-weight: @font-weight-bold;
+  }
+
+  &__message {
+    margin: 8px 0;
+  }
+
+  &__text {
+    margin-bottom: 16px;
+    overflow-wrap: break-word;
+  }
+
+  &__input {
+    width: calc(100% + 16px);
+    height: 48px;
+    padding-left: 12px;
+    margin: 0 -8px;
+    border: none;
+    background: var(--app-bg-secondary);
+    border-radius: 4px;
+    color: currentColor;
+    outline: none;
+
+    &::placeholder {
+      .label-xs;
+      color: var(--foreground-fade-56);
+    }
+  }
+  &__info {
+    margin: 8px 0 24px;
+    color: var(--foreground);
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
+  }
+}

@@ -17,7 +17,7 @@
  *
  */
 
-// KARMA_SPECS=search/SearchRepository yarn test:app
+import User from 'src/script/entity/User';
 
 describe('z.search.SearchRepository', () => {
   const test_factory = new TestFactory();
@@ -147,7 +147,7 @@ describe('z.search.SearchRepository', () => {
 });
 
 function generateUser(handle, name) {
-  const user = new z.entity.User();
+  const user = new User();
   user.username(handle);
   user.name(name);
   return user;

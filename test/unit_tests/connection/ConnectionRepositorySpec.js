@@ -17,7 +17,10 @@
  *
  */
 
-// KARMA_SPECS=connection/ConnectionRepository yarn test:app
+import {backendConfig} from '../../api/testResolver';
+import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
+import {createRandomUuid} from 'utils/util';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -41,11 +44,11 @@ describe('z.connection.ConnectionRepository', () => {
     let userEntity = undefined;
 
     beforeEach(() => {
-      const userId = z.util.createRandomUuid();
-      const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
+      const userId = createRandomUuid();
+      const connectionEntity = new z.connection.ConnectionEntity(createRandomUuid());
       connectionEntity.userId = userId;
 
-      userEntity = new z.entity.User(userId);
+      userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.connectionEntities.push(connectionEntity);
@@ -62,7 +65,7 @@ describe('z.connection.ConnectionRepository', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(userEntity, new z.entity.Conversation()).then(() => {
+      return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
         expect(connectionRepository._updateStatus).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });
@@ -75,11 +78,11 @@ describe('z.connection.ConnectionRepository', () => {
 
     beforeEach(() => {
       firstConnectionEntity = new z.connection.ConnectionEntity();
-      firstConnectionEntity.conversationId = z.util.createRandomUuid();
+      firstConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(firstConnectionEntity);
 
       secondConnectionEntity = new z.connection.ConnectionEntity();
-      secondConnectionEntity.conversationId = z.util.createRandomUuid();
+      secondConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(secondConnectionEntity);
     });
 
@@ -96,7 +99,7 @@ describe('z.connection.ConnectionRepository', () => {
   describe('getConnections', () => {
     // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
     it('should return the connected users', () => {
-      server.respondWith('GET', `${testFactory.settings.connection.restUrl}/connections?size=500`, [
+      server.respondWith('GET', `${backendConfig.restUrl}/connections?size=500`, [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload.connections.get),
@@ -104,9 +107,7 @@ describe('z.connection.ConnectionRepository', () => {
 
       server.respondWith(
         'GET',
-        `${testFactory.settings.connection.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${
-          entities.user.jane_roe.id
-        }`,
+        `${backendConfig.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${entities.user.jane_roe.id}`,
         [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
       );
 

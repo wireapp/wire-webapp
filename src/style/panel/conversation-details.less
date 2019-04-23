@@ -1,0 +1,125 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-details {
+  .right-panel-mute {
+    path {
+      fill: var(--background);
+    }
+
+    &--active {
+      path {
+        fill: @w-blue;
+      }
+    }
+  }
+
+  &__header {
+    padding: 8px 16px;
+  }
+
+  &__flex-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__name {
+    display: flex;
+    min-height: 24px;
+    padding: 0;
+    border: none;
+    font-size: 20px;
+    font-weight: @font-weight-bold;
+    word-break: break-word;
+
+    &--input {
+      width: 250px;
+      height: auto;
+      border: 0;
+      background-color: var(--app-bg-secondary);
+      color: var(--background);
+      outline: none;
+      resize: none;
+    }
+
+    &__edit-icon {
+      flex-grow: 1;
+      margin-left: 11px;
+      opacity: 0;
+      transition: opacity @animation-timing-faster @ease-in-quart;
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      path {
+        fill: var(--background-fade-56);
+      }
+    }
+
+    &:hover > &__edit-icon {
+      opacity: 1;
+    }
+  }
+
+  &__participant_count {
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+
+    &__service {
+      margin-left: 8px;
+    }
+
+    &__text {
+      color: var(--foreground);
+    }
+  }
+
+  &__list-head {
+    padding-bottom: 8px;
+    margin: 32px 16px 4px;
+    border-bottom: 1px solid var(--background-fade-8);
+    color: var(--foreground);
+    font-size: 11px;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  &__participant-options {
+    margin: 32px 0 0;
+  }
+
+  &__bottom-actions {
+    margin: 16px 0 5px;
+  }
+
+  &__group-size-info {
+    margin: 8px 0 0;
+    color: var(--foreground);
+    font-size: @font-size-xs;
+    line-height: @line-height-sm;
+  }
+
+  &__read-receipts {
+    margin: 24px 0;
+  }
+}

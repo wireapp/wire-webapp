@@ -1,0 +1,42 @@
+<div id="conversation-title-bar" class="conversation-title-bar" data-bind="with: $root.titleBar">
+  <!-- ko if: conversationEntity() -->
+    <div class="conversation-title-bar-library">
+      <!-- ko if: isActivatedAccount() -->
+        <span class="conversation-title-bar-icon button-icon-large icon-search"
+              data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch')}"
+              data-uie-name="do-collections"></span>
+      <!-- /ko -->
+    </div>
+
+    <div id="show-participants"
+          data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
+          data-placement="bottom"
+          data-uie-name="do-participants"
+          class="conversation-title-bar-name">
+      <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
+        <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
+      <!-- /ko -->
+      <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
+    </div>
+
+    <div class="conversation-title-bar-icons">
+      <!-- ko if: showCallControls() -->
+        <!-- ko if: supportsVideoCall() -->
+          <camera-icon class="conversation-title-bar-icon"
+                data-bind="clickOrDrag: clickOnVideoButton, attr: {title: t('tooltipConversationVideoCall')}"
+                data-uie-name="do-video-call">
+          </camera-icon>
+        <!-- /ko -->
+        <pickup-icon class="conversation-title-bar-icon"
+              data-bind="clickOrDrag: clickOnCallButton, attr: {title: t('tooltipConversationCall')}"
+              data-uie-name="do-call">
+        </pickup-icon>
+      <!-- /ko -->
+      <info-icon class="conversation-title-bar-icon" data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}" data-uie-name="do-open-info"></info-icon>
+    </div>
+
+    <!-- ko if: badgeLabelCopy() -->
+      <div class="conversation-title-bar-indication-badge" data-bind="text: badgeLabelCopy" data-uie-name="status-indication-badge"></div>
+    <!-- /ko -->
+  <!-- /ko -->
+</div>

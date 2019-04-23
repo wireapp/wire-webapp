@@ -20,10 +20,10 @@
 // KARMA_SPECS=event/preprocessor/ReceiptsMiddleware yarn test:app
 
 import UUID from 'uuidjs';
-import ReceiptsMiddleware from 'app/script/event/preprocessor/ReceiptsMiddleware';
+import ReceiptsMiddleware from 'src/script/event/preprocessor/ReceiptsMiddleware';
+import {noop} from 'utils/util';
 
 describe('ReceiptsMiddleware', () => {
-  const noop = () => {};
   const selfId = UUID.genV4();
   let readReceiptMiddleware;
   const eventService = {loadEvents: noop, replaceEvent: noop};
@@ -44,7 +44,7 @@ describe('ReceiptsMiddleware', () => {
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([]));
       spyOn(eventService, 'replaceEvent');
 
-      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+      return readReceiptMiddleware.processEvent(event).then(() => {
         expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).not.toHaveBeenCalled();
       });
@@ -57,7 +57,7 @@ describe('ReceiptsMiddleware', () => {
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originalEvent]));
       spyOn(eventService, 'replaceEvent');
 
-      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+      return readReceiptMiddleware.processEvent(event).then(() => {
         expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).not.toHaveBeenCalled();
       });
@@ -68,7 +68,7 @@ describe('ReceiptsMiddleware', () => {
       const originaleEvent = {from: UUID.genV4()};
       spyOn(eventService, 'loadEvents').and.returnValue(Promise.resolve([originaleEvent]));
       spyOn(eventService, 'replaceEvent');
-      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+      return readReceiptMiddleware.processEvent(event).then(() => {
         expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).not.toHaveBeenCalled();
       });
@@ -81,7 +81,7 @@ describe('ReceiptsMiddleware', () => {
 
       const event = createConfirmationEvent(4);
 
-      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+      return readReceiptMiddleware.processEvent(event).then(() => {
         expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
           from: selfId,
@@ -98,7 +98,7 @@ describe('ReceiptsMiddleware', () => {
 
       const event = createConfirmationEvent(3);
 
-      return readReceiptMiddleware.processEvent(event).then(decoratedEvent => {
+      return readReceiptMiddleware.processEvent(event).then(() => {
         expect(eventService.loadEvents).toHaveBeenCalledWith(event.conversation, [event.data.message_id]);
         expect(eventService.replaceEvent).toHaveBeenCalledWith({
           from: selfId,

@@ -17,9 +17,9 @@
  *
  */
 
-// KARMA_SPECS=util/NumberUtil yarn test:app
+import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
 
-describe('z.util.PeerConnectionUtil', () => {
+describe('PeerConnectionUtil', () => {
   const hostIceCandidates = [
     'a=candidate:0 1 UDP 2122252543 192.168.120.196 32785 typ host',
     'a=candidate:3 1 TCP 2105524479 192.168.120.196 9 typ host tcptype active',
@@ -37,20 +37,20 @@ describe('z.util.PeerConnectionUtil', () => {
 
   describe('isValidIceCandidatesGathering', () => {
     it('returns false if no ice candidate gathered', () => {
-      const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering({}, []);
+      const result = isValidIceCandidatesGathering({}, []);
 
       expect(result).toBe(false);
     });
 
     it('returns true if there are some not-relay candidates with empty iceServers config', () => {
-      const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering({iceServers: []}, hostIceCandidates);
+      const result = isValidIceCandidatesGathering({iceServers: []}, hostIceCandidates);
 
       expect(result).toBe(true);
     });
 
     it('returns true if there are as many relay ice candidates as there are iceServers', () => {
       [1, 2, 3, 4, 5, 6].forEach(numberOfServers => {
-        const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
+        const result = isValidIceCandidatesGathering(
           {iceServers: new Array(numberOfServers)},
           relayIceCandidates.slice(0, numberOfServers)
         );
@@ -61,10 +61,7 @@ describe('z.util.PeerConnectionUtil', () => {
 
     it('returns false if there are some ice servers and no relay candidate', () => {
       [1, 2, 3, 4, 5, 6].forEach(numberOfServers => {
-        const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
-          {iceServers: new Array(numberOfServers)},
-          hostIceCandidates
-        );
+        const result = isValidIceCandidatesGathering({iceServers: new Array(numberOfServers)}, hostIceCandidates);
 
         expect(result).toBe(false);
       });
@@ -72,7 +69,7 @@ describe('z.util.PeerConnectionUtil', () => {
 
     it('returns true if there is one ice server and one or more candidates', () => {
       [1, 2, 3, 4, 5, 6].forEach(numberOfCandidates => {
-        const result = z.util.PeerConnectionUtil.isValidIceCandidatesGathering(
+        const result = isValidIceCandidatesGathering(
           {iceServers: new Array(1)},
           relayIceCandidates.slice(0, numberOfCandidates)
         );
@@ -86,7 +83,7 @@ describe('z.util.PeerConnectionUtil', () => {
     it('detects types of candidates', () => {
       const candidates = hostIceCandidates.concat(relayIceCandidates);
 
-      expect(z.util.PeerConnectionUtil.getIceCandidatesTypes(candidates)).toEqual({
+      expect(getIceCandidatesTypes(candidates)).toEqual({
         host: hostIceCandidates.length,
         relay: relayIceCandidates.length,
       });

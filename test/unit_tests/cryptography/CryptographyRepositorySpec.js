@@ -17,20 +17,16 @@
  *
  */
 
-// KARMA_SPECS=cryptography/CryptographyRepository yarn test:app
-
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
+import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {createRandomUuid, arrayToBase64} from 'utils/util';
 
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(() => {
-    return z.util.protobuf
-      .loadProtos('ext/js/@wireapp/protocol-messaging/proto/messages.proto')
-      .then(() => test_factory.exposeCryptographyActors(false));
-  });
+  beforeAll(() => test_factory.exposeCryptographyActors(false));
 
   describe('encryptGenericMessage', () => {
     let jane_roe = undefined;
@@ -78,8 +74,10 @@ describe('z.cryptography.CryptographyRepository', () => {
         })
       );
 
-      const generic_message = new z.proto.GenericMessage(z.util.createRandomUuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
+      const generic_message = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
+        messageId: createRandomUuid(),
+      });
 
       const recipients = {};
       recipients[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];
@@ -117,22 +115,24 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const plainText = 'Hello, Alice!';
 
-      const genericMessage = new z.proto.GenericMessage(z.util.createRandomUuid());
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plainText));
+      const genericMessage = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
+        messageId: createRandomUuid(),
+      });
 
       const cipherText = await bob.encrypt(
         'session-with-alice',
-        genericMessage.toArrayBuffer(),
+        GenericMessage.encode(genericMessage).finish(),
         aliceBundle.serialise()
       );
-      const encodedCipherText = z.util.arrayToBase64(cipherText);
+      const encodedCipherText = arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {
           text: encodedCipherText,
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);

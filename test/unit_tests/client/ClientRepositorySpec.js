@@ -17,7 +17,8 @@
  *
  */
 
-// KARMA_SPECS=client/ClientRepository yarn test:app
+import {backendConfig} from '../../api/testResolver';
+import User from 'src/script/entity/User';
 
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -56,7 +57,7 @@ describe('z.client.ClientRepository', () => {
   describe('getValidLocalClient', () => {
     let server = undefined;
 
-    const clientUrl = `${testFactory.settings.connection.restUrl}/clients/${clientId}`;
+    const clientUrl = `${backendConfig.restUrl}/clients/${clientId}`;
     const clientPayloadServer = {
       address: '62.96.148.44',
       class: 'desktop',
@@ -230,7 +231,7 @@ describe('z.client.ClientRepository', () => {
       const clientEntity = new z.client.ClientEntity();
       clientEntity.id = clientId;
       TestFactory.client_repository.currentClient(clientEntity);
-      TestFactory.client_repository.selfUser(new z.entity.User(userId));
+      TestFactory.client_repository.selfUser(new User(userId));
       const result = TestFactory.client_repository._isCurrentClient(userId, clientId);
 
       expect(result).toBeTruthy();

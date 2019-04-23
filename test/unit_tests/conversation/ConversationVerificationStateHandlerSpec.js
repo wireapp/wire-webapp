@@ -17,11 +17,10 @@
  *
  */
 
-// KARMA_SPECS=conversation/ConversationVerificationStateHandler yarn test:app
-
-import ClientEntity from 'app/script/client/ClientEntity';
-import Conversation from 'app/script/entity/Conversation';
-import User from 'app/script/entity/User';
+import ClientEntity from 'src/script/client/ClientEntity';
+import Conversation from 'src/script/entity/Conversation';
+import User from 'src/script/entity/User';
+import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();
@@ -45,15 +44,18 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       conversation_repository = _conversation_repository;
       state_handler = conversation_repository.verification_state_handler;
 
-      conversation_ab = new Conversation(z.util.createRandomUuid());
-      conversation_b = new Conversation(z.util.createRandomUuid());
-      conversation_c = new Conversation(z.util.createRandomUuid());
+      conversation_ab = new Conversation(createRandomUuid());
+      conversation_b = new Conversation(createRandomUuid());
+      conversation_c = new Conversation(createRandomUuid());
 
-      selfUserEntity = conversation_repository.selfUser();
+      selfUserEntity = new User(createRandomUuid());
+      selfUserEntity.is_me = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      user_a = new User(z.util.createRandomUuid());
-      user_b = new User(z.util.createRandomUuid());
+      spyOn(conversation_repository, 'selfUser').and.returnValue(selfUserEntity);
+
+      user_a = new User(createRandomUuid());
+      user_b = new User(createRandomUuid());
 
       client_a = new ClientEntity();
       client_a.meta.isVerified(true);
@@ -151,7 +153,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.buildDegraded.calls.count()).toEqual(3);
+      expect(z.conversation.EventBuilder.buildDegraded).toHaveBeenCalledTimes(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
@@ -160,7 +162,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
       expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.buildAllVerified.calls.count()).toEqual(3);
+      expect(z.conversation.EventBuilder.buildAllVerified).toHaveBeenCalledTimes(3);
       expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(verifiedEvent);
     });
   });
@@ -200,7 +202,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       const degradedEvent = {type: 'degraded'};
       spyOn(z.conversation.EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
-      const new_user = new User(z.util.createRandomUuid());
+      const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
@@ -219,7 +221,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'buildDegraded');
 
-      const new_user = new User(z.util.createRandomUuid());
+      const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);

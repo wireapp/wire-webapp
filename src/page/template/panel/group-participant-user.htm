@@ -1,0 +1,22 @@
+<div id="group-participant-user" class="panel__page group-participant" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.GROUP_PARTICIPANT_USER]">
+  <!-- ko if: isVisible() -->
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-group-participant"></arrow-left-icon>
+      <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="panel__content" data-bind="fadingscrollbar">
+      <!-- ko if: selectedParticipant() -->
+        <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id)"></panel-user-details>
+      <!-- /ko -->
+      <!-- ko if: showActionDevices(selectedParticipant()) -->
+        <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+          <devices-icon class="panel__action-item__icon"></devices-icon>
+          <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
+          <disclose-icon></disclose-icon>
+        </div>
+      <!-- /ko -->
+      <enriched-fields params="user: selectedParticipant"></enriched-fields>
+      <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
+    </div>
+  <!-- /ko -->
+</div>

@@ -1,0 +1,23 @@
+<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.subViews[z.viewModel.PanelViewModel.STATE.TIMED_MESSAGES]">
+  <!-- ko if: isVisible() -->
+    <div class="panel__header">
+      <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-timed-messages-options"></arrow-left-icon>
+      <div class="panel__header__title" data-bind="text: t('timedMessagesTitle')"></div>
+      <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="panel__content" data-bind="fadingscrollbar">
+      <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
+        <input type="radio" name="timed-message-settings" data-bind="checked: currentMessageTimer, value: 0, event: {change: timedMessageChange}"/>
+        <span data-bind="text: t('ephemeralUnitsNone')"></span>
+      </label>
+
+      <!-- ko foreach: {data: messageTimes} -->
+        <label class="panel__action-item panel__action-item__option" data-uie-name="item-timed-messages-option">
+          <input type="radio" name="timed-message-settings" data-bind="checked: $parent.currentMessageTimer, value: value, disabled: isCustom, event: {change: $parent.timedMessageChange}"/>
+          <span data-bind="text: text"></span>
+        </label>
+      <!-- /ko -->
+      <div class="panel__info-text timed-messages__disclaimer" data-bind="text: t('timedMessageDisclaimer')"></div>
+   </div>
+  <!-- /ko -->
+</div>
