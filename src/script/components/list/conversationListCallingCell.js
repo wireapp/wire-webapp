@@ -20,7 +20,7 @@
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 
-import {PermissionState} from '../../notification/PermissionState';
+//import {PermissionState} from '../../notification/PermissionState';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
@@ -179,13 +179,11 @@ class ConversationListCallingCell {
 
   onJoinCall(data, event) {
     event.stopPropagation();
-    const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
-    const mediaType = isVideoCall ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
-    this.callingRepository.joinCall(this.conversation, mediaType);
+    this.callingRepository.answerCall(this.conversation().id);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.joinCall(this.conversation, MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation().id, z.media.MediaType.AUDIO);
   }
 
   onLeaveCall() {

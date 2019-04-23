@@ -32,7 +32,6 @@ import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
 
 import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
-import {CallMessageEntity} from './entities/CallMessageEntity';
 import {CALL_TYPE, CALL_STATE, CONVERSATION_TYPE} from './callAPI';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
@@ -41,7 +40,6 @@ import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
-import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
@@ -273,51 +271,22 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
-    if (!window.callv1) {
-      const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const toSecond = timestamp => Math.floor(timestamp / 1000);
-      const contentStr = JSON.stringify(content);
-      const res = this.callingApi.recv_msg(
-        this.wUser,
-        contentStr,
-        contentStr.length,
-        toSecond(currentTimestamp),
-        toSecond(new Date(time).getTime()),
-        conversationId,
-        userId,
-        clientId
-      );
-      if (res !== 0) {
-        this.callLogger.warn(`recv_msg failed with code: ${res}`);
-      }
-      return;
-    }
-    const {content: eventContent, time: eventDate, type: eventType} = event;
-    const isCall = eventType === ClientEvent.CALL.E_CALL;
-
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    this.callLogger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
-
-    if (isCall) {
-      const isSupportedVersion = eventContent.version === CallMessageEntity.CONFIG.VERSION;
-      if (!isSupportedVersion) {
-        throw new z.error.CallError(z.error.CallError.TYPE.UNSUPPORTED_VERSION);
-      }
-
-      const callMessageEntity = CallMessageMapper.mapEvent(event);
-      this._logMessage(false, callMessageEntity, eventDate);
-
-      this._validateMessageType(callMessageEntity)
-        .then(conversationEntity => {
-          const isBackendTimestamp = source !== EventRepository.SOURCE.INJECTED;
-          conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
-        })
-        .then(() => {
-          return this.supportsCalling
-            ? this._onCallEventInSupportedBrowsers(callMessageEntity, source)
-            : this._onCallEventInUnsupportedBrowsers(callMessageEntity, source);
-        });
+    const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const toSecond = timestamp => Math.floor(timestamp / 1000);
+    const contentStr = JSON.stringify(content);
+    const res = this.callingApi.recv_msg(
+      this.wUser,
+      contentStr,
+      contentStr.length,
+      toSecond(currentTimestamp),
+      toSecond(new Date(time).getTime()),
+      conversationId,
+      userId,
+      clientId
+    );
+    if (res !== 0) {
+      this.callLogger.warn(`recv_msg failed with code: ${res}`);
     }
   }
 
@@ -744,7 +713,7 @@ export class CallingRepository {
           if (grantedCall) {
             const mediaType = callEntity.isRemoteVideoCall() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
             return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-              this.joinCall(conversationEntity, mediaType);
+              this.joinCall(conversationEntity.id, mediaType);
             });
           }
         })
@@ -1004,19 +973,12 @@ export class CallingRepository {
   /**
    * Join a call.
    *
-   * @param {Conversation} conversationEntity - conversation to join call in
+   * @param {string} conversationId - id of the conversation to join call in
    * @param {MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
-  joinCall(conversationEntity, mediaType) {
-    this.getCallById(conversationEntity.id)
-      .then(callEntity => ({callEntity, callState: callEntity.state()}))
-      .catch(error => {
-        this._handleNotFoundError(error);
-        return {callState: CALL_STATE.OUTGOING};
-      })
-      .then(({callEntity, callState}) => this._joinCall(conversationEntity, mediaType, callState, callEntity))
-      .catch(error => this._handleJoinCallError(error, conversationEntity.id));
+  joinCall(conversationId, mediaType) {
+    this.callingApi.start(this.wUser, conversationId, CALL_TYPE.FORCED_AUDIO, CONVERSATION_TYPE.ONEONONE, false);
   }
 
   /**
@@ -1027,16 +989,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   leaveCall(conversationId, terminationReason) {
-    if (!window.callv1) {
-      this.callingApi.end(this.wUser, conversationId);
-      return;
-    }
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        const leftConversation = terminationReason === TERMINATION_REASON.MEMBER_LEAVE;
-        return leftConversation ? this._deleteCall(callEntity) : this._leaveCall(callEntity, terminationReason);
-      })
-      .catch(error => this._handleNotFoundError(error));
+    this.callingApi.end(this.wUser, conversationId);
   }
 
   /**
@@ -1097,7 +1050,7 @@ export class CallingRepository {
       const isActiveCall = conversationEntity.id === this._selfClientOnACall();
       return isActiveCall
         ? this.leaveCall(conversationEntity.id, TERMINATION_REASON.SELF_USER)
-        : this.joinCall(conversationEntity, mediaType);
+        : this.joinCall(conversationEntity.id, mediaType);
     }
   }
 
@@ -1342,36 +1295,6 @@ export class CallingRepository {
       : this.mediaStreamHandler
           .initiateMediaStream(callEntity.id, mediaType, callEntity.isGroup)
           .then(() => callEntity);
-  }
-
-  /**
-   * Join a call.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {MediaType} mediaType - Media type of the call
-   * @param {CALL_STATE} callState - State of call
-   * @param {CallEntity} [callEntity] - Retrieved call entity
-   * @returns {undefined} No return value
-   */
-  _joinCall(conversationEntity, mediaType, callState, callEntity) {
-    if (!window.callv1) {
-      this.callingApi.start(
-        this.wUser,
-        conversationEntity.id,
-        CALL_TYPE.FORCED_AUDIO,
-        CONVERSATION_TYPE.ONEONONE,
-        false
-      );
-    } else {
-      this._checkCallingSupport(conversationEntity, mediaType, callState)
-        .then(() => this._checkConcurrentJoinedCall(conversationEntity.id, callState))
-        .then(() => callEntity || this._initiateOutgoingCall(conversationEntity.id, mediaType, callState))
-        .then(callEntityToJoin => this._initiatePreJoinCall(callEntityToJoin))
-        .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
-        .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
-        .catch(error => this._handleJoinError(conversationEntity.id, !callEntity, error));
-    }
   }
 
   /**

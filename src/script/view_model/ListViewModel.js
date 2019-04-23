@@ -151,7 +151,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   joinCall = (conversationEntity, mediaType) => {
-    this.callingRepository.joinCall(conversationEntity, mediaType);
+    this.callingRepository.joinCall(conversationEntity.id, mediaType);
   };
 
   changeNotificationSetting() {
