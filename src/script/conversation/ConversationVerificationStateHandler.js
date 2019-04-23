@@ -18,7 +18,6 @@
  */
 
 import {getLogger} from 'utils/Logger';
-import {EventBuilder} from './EventBuilder';
 import {ConversationVerificationState} from './ConversationVerificationState';
 
 window.z = window.z || {};
@@ -134,7 +133,7 @@ export class ConversationVerificationStateHandler {
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
+      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -167,7 +166,7 @@ export class ConversationVerificationStateHandler {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
+      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event);
 
       return true;

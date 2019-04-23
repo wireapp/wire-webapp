@@ -21,7 +21,10 @@ import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {createRandomUuid} from 'utils/util';
 import {Config} from '../auth/config';
 
-export const EventBuilder = {
+window.z = window.z || {};
+window.z.conversation = z.conversation || {};
+
+z.conversation.EventBuilder = {
   build1to1Creation(conversationEntity, timestamp) {
     const {creator: creatorId, id} = conversationEntity;
     const isoDate = new Date(timestamp || 0).toISOString();

@@ -17,12 +17,12 @@
  *
  */
 
-enum ACCESS_PERSONAL {
+enum PERSONAL {
   GROUP = 'z.conversation.ACCESS_STATE.PERSONAL.GROUP',
   ONE2ONE = 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
 }
 
-enum ACCESS_TEAM {
+enum TEAM {
   GUEST_ROOM = 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
   LEGACY = 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
   ONE2ONE = 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',
@@ -30,8 +30,8 @@ enum ACCESS_TEAM {
 }
 
 export const ACCESS_STATE = {
-  PERSONAL: ACCESS_PERSONAL,
+  PERSONAL,
   SELF: 'z.conversation.ACCESS_STATE.SELF',
-  TEAM: ACCESS_TEAM,
+  TEAM,
   UNKNOWN: 'z.conversation.ACCESS_STATE.UNKNOWN',
 };

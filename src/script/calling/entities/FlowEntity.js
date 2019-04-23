@@ -34,7 +34,6 @@ import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {FlowAudioEntity} from './FlowAudioEntity';
 import {CallEntity} from './CallEntity';
-import {EventBuilder} from '../../conversation/EventBuilder';
 
 import {DATA_CHANNEL_STATE} from '../rtc/DataChannelState';
 import {ICE_CONNECTION_STATE} from '../rtc/ICEConnectionState';
@@ -777,7 +776,7 @@ class FlowEntity {
       : `Received '${type}' (response: ${response}) message via data channel`;
     this.callLogger.debug(logMessage, callMessage);
 
-    const callEvent = EventBuilder.buildCalling(
+    const callEvent = z.conversation.EventBuilder.buildCalling(
       conversationEntity,
       callMessage,
       this.remoteUserId,

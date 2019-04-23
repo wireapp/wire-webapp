@@ -266,7 +266,7 @@ z.conversation.ConversationService = class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
    *
    * @param {string} conversationId - ID of conversation
-   * @param {Array<ACCESS_MODE>} accessModes - Conversation access mode
+   * @param {ACCESS_MODE[]} accessModes - Conversation access mode
    * @param {ACCESS_ROLE} accessRole - Conversation access role
    * @returns {Promise} Resolves with the server response
    */

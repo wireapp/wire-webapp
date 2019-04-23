@@ -20,8 +20,6 @@
 import {getLogger} from 'utils/Logger';
 import {getDifference} from 'utils/ArrayUtil';
 
-import {EventBuilder} from './EventBuilder';
-
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -174,7 +172,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
             const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);
           }

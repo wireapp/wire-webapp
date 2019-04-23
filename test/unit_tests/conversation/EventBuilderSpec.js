@@ -20,11 +20,10 @@
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
 
 import {createRandomUuid} from 'utils/util';
 
-describe('EventBuilder', () => {
+describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
   let conversation_et = undefined;
   let self_user_et = undefined;
@@ -40,7 +39,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildAllVerified', () => {
-    const event = EventBuilder.buildAllVerified(conversation_et, 0);
+    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -53,7 +52,7 @@ describe('EventBuilder', () => {
 
   it('buildDegraded', () => {
     const user_ids = [createRandomUuid()];
-    const event = EventBuilder.buildDegraded(
+    const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
       user_ids,
       z.message.VerificationMessageType.NEW_DEVICE,
@@ -71,7 +70,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildMissed', () => {
-    const event = EventBuilder.buildMissed(conversation_et, 0);
+    const event = z.conversation.EventBuilder.buildMissed(conversation_et, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -84,7 +83,7 @@ describe('EventBuilder', () => {
   it('buildGroupCreation', () => {
     conversation_et.participating_user_ids(['one', 'two', 'three']);
     conversation_et.creator = 'one';
-    const event = EventBuilder.buildGroupCreation(conversation_et);
+    const event = z.conversation.EventBuilder.buildGroupCreation(conversation_et);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
