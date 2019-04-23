@@ -19,33 +19,23 @@
 
 import {LRUCache} from '@wireapp/lru-cache';
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
+const cache: LRUCache<string> = new LRUCache(100);
 
-z.assets.AssetURLCache = (() => {
-  const _lruCache = new LRUCache(100);
+export const getAssetUrl = (identifier: string): string => cache.get(identifier);
 
-  const _getUrl = identifier => _lruCache.get(identifier);
+export const setAssetUrl = (identifier: string, url: string) => {
+  const isExistingUrl = getAssetUrl(identifier);
 
-  const _setUrl = (identifier, url) => {
-    const isExistingUrl = _getUrl(identifier);
+  if (isExistingUrl) {
+    window.URL.revokeObjectURL(url);
+    return isExistingUrl;
+  }
 
-    if (isExistingUrl) {
-      window.URL.revokeObjectURL(url);
-      return isExistingUrl;
-    }
+  const outdatedUrl = cache.set(identifier, url);
 
-    const outdatedUrl = _lruCache.set(identifier, url);
+  if (outdatedUrl != null) {
+    window.URL.revokeObjectURL(outdatedUrl);
+  }
 
-    if (outdatedUrl != null) {
-      window.URL.revokeObjectURL(outdatedUrl);
-    }
-
-    return url;
-  };
-
-  return {
-    getUrl: _getUrl,
-    setUrl: _setUrl,
-  };
-})();
+  return url;
+};
