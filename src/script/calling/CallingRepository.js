@@ -91,6 +91,12 @@ export class CallingRepository {
     ko.computed(() => {
       if (userRepository.self() && clientRepository.currentClient()) {
         getAvsInstance().then(callingApi => {
+          const avsLogger = Logger('avs');
+          callingApi.set_log_handler((level, message) => {
+            // TODO handle levels
+            avsLogger.debug(message);
+          });
+
           callingApi.init();
           const requestConfig = () => {
             this.getConfig().then(config => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
@@ -132,11 +138,6 @@ export class CallingRepository {
             () => 0, //acbrh,
             () => 0 //vstateh,
           );
-          const avsLogger = Logger('avs');
-          callingApi.set_log_handler((level, message) => {
-            // TODO handle levels
-            avsLogger.debug(message);
-          });
 
           callingApi.set_state_handler(wUser, (conversationId, state) => {
             const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
