@@ -35,10 +35,13 @@ export function getAvsInstance() {
     avs_core().then(em_module => {
       const wcall = {
         WCALL_VERSION_3: 3,
+
         WCALL_ERROR_UNKNOWN_PROTOCOL: 1000,
+
         WCALL_QUALITY_NORMAL: 1,
         WCALL_QUALITY_MEDIUM: 2,
         WCALL_QUALITY_POOR: 3,
+
         WCALL_REASON_NORMAL: 0,
         WCALL_REASON_ERROR: 1,
         WCALL_REASON_TIMEOUT: 2,
@@ -50,15 +53,35 @@ export function getAvsInstance() {
         WCALL_REASON_TIMEOUT_ECONN: 8,
         WCALL_REASON_DATACHANNEL: 9,
         WCALL_REASON_REJECTED: 10,
+
         WCALL_LOG_LEVEL_DEBUG: 0,
         WCALL_LOG_LEVEL_INFO: 1,
         WCALL_LOG_LEVEL_WARN: 2,
         WCALL_LOG_LEVEL_ERROR: 3,
+
         WCALL_VIDEO_STATE_STOPPED: 0,
         WCALL_VIDEO_STATE_STARTED: 1,
         WCALL_VIDEO_STATE_BAD_CONN: 2,
         WCALL_VIDEO_STATE_PAUSED: 3,
         WCALL_VIDEO_STATE_SCREENSHARE: 4,
+
+        WCALL_CALL_TYPE_NORMAL: 0,
+        WCALL_CALL_TYPE_VIDEO: 1,
+        WCALL_CALL_TYPE_FORCED_AUDIO: 2,
+
+        WCALL_CONV_TYPE_ONEONONE: 0,
+        WCALL_CONV_TYPE_GROUP: 1,
+        WCALL_CONV_TYPE_CONFERENCE: 2,
+
+        WCALL_STATE_NONE: 0,
+        WCALL_STATE_OUTGOING: 1,
+        WCALL_STATE_INCOMING: 2,
+        WCALL_STATE_ANSWERED: 3,
+        WCALL_STATE_MEDIA_ESTAB: 4,
+        WCALL_STATE_TERM_LOCAL: 6,
+        WCALL_STATE_TERM_REMOTE: 7,
+        WCALL_STATE_UNKNOWN: 8,
+
         init: function() {
           avs_pc.avspc_init(em_module);
 
@@ -90,6 +113,7 @@ export function getAvsInstance() {
               readyh(version, arg);
             }
           }, 'vnn');
+
           const fn_sendh = em_module.addFunction(
             (ctx, convid, userid_self, clientid_self, userid_dest, clientid_dest, data, len, trans, arg) => {
               if (sendh) {
@@ -110,6 +134,7 @@ export function getAvsInstance() {
             },
             'nnssssssnnn'
           );
+
           const fn_incomingh = em_module.addFunction((convid, msg_time, userid, video_call, should_ring, arg) => {
             if (incomingh) {
               incomingh(
@@ -122,6 +147,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vsnsnnn');
+
           const fn_missedh = em_module.addFunction((convid, msg_time, userid, video_call, arg) => {
             if (missedh) {
               missedh(
@@ -133,11 +159,13 @@ export function getAvsInstance() {
               );
             }
           }, 'vsnsnn');
+
           const fn_answerh = em_module.addFunction((convid, arg) => {
             if (answerh) {
               answerh(convid == 0 ? null : em_module.UTF8ToString(convid), arg);
             }
           }, 'vsn');
+
           const fn_estabh = em_module.addFunction((convid, userid, arg) => {
             if (estabh) {
               estabh(
@@ -147,6 +175,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vssn');
+
           const fn_closeh = em_module.addFunction((reason, convid, msg_time, userid, arg) => {
             if (closeh) {
               closeh(
@@ -158,6 +187,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vnsnsn');
+
           const fn_metricsh = em_module.addFunction((convid, metrics_json, arg) => {
             if (metricsh) {
               metricsh(
@@ -167,17 +197,20 @@ export function getAvsInstance() {
               );
             }
           }, 'vssn');
+
           const fn_cfg_reqh = em_module.addFunction((wuser, arg) => {
             if (cfg_reqh) {
               return cfg_reqh(wuser, arg);
             }
             return null;
           }, 'nnn');
+
           const fn_acbrh = em_module.addFunction((userid, enabled, arg) => {
             if (acbrh) {
               acbrh(userid == 0 ? null : em_module.UTF8ToString(userid), enabled, arg);
             }
           }, 'vsnn');
+
           const fn_vstateh = em_module.addFunction((userid, state, arg) => {
             if (vstateh) {
               vstateh(userid == 0 ? null : em_module.UTF8ToString(userid), state, arg);
@@ -245,6 +278,7 @@ export function getAvsInstance() {
               readyh(version, arg);
             }
           }, 'vnn');
+
           const fn_sendh = em_module.addFunction(
             (ctx, convid, userid_self, clientid_self, userid_dest, clientid_dest, data, len, trans, arg) => {
               if (sendh) {
@@ -265,6 +299,7 @@ export function getAvsInstance() {
             },
             'nnssssssnnn'
           );
+
           const fn_sfth = em_module.addFunction((ctx, url, data, len, arg) => {
             if (sfth) {
               return sfth(
@@ -277,6 +312,7 @@ export function getAvsInstance() {
             }
             return null;
           }, 'nnssnn');
+
           const fn_incomingh = em_module.addFunction((convid, msg_time, userid, video_call, should_ring, arg) => {
             if (incomingh) {
               incomingh(
@@ -289,6 +325,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vsnsnnn');
+
           const fn_missedh = em_module.addFunction((convid, msg_time, userid, video_call, arg) => {
             if (missedh) {
               missedh(
@@ -300,11 +337,13 @@ export function getAvsInstance() {
               );
             }
           }, 'vsnsnn');
+
           const fn_answerh = em_module.addFunction((convid, arg) => {
             if (answerh) {
               answerh(convid == 0 ? null : em_module.UTF8ToString(convid), arg);
             }
           }, 'vsn');
+
           const fn_estabh = em_module.addFunction((convid, userid, arg) => {
             if (estabh) {
               estabh(
@@ -314,6 +353,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vssn');
+
           const fn_closeh = em_module.addFunction((reason, convid, msg_time, userid, arg) => {
             if (closeh) {
               closeh(
@@ -325,6 +365,7 @@ export function getAvsInstance() {
               );
             }
           }, 'vnsnsn');
+
           const fn_metricsh = em_module.addFunction((convid, metrics_json, arg) => {
             if (metricsh) {
               metricsh(
@@ -334,17 +375,20 @@ export function getAvsInstance() {
               );
             }
           }, 'vssn');
+
           const fn_cfg_reqh = em_module.addFunction((wuser, arg) => {
             if (cfg_reqh) {
               return cfg_reqh(wuser, arg);
             }
             return null;
           }, 'nnn');
+
           const fn_acbrh = em_module.addFunction((userid, enabled, arg) => {
             if (acbrh) {
               acbrh(userid == 0 ? null : em_module.UTF8ToString(userid), enabled, arg);
             }
           }, 'vsnn');
+
           const fn_vstateh = em_module.addFunction((userid, state, arg) => {
             if (vstateh) {
               vstateh(userid == 0 ? null : em_module.UTF8ToString(userid), state, arg);
@@ -411,12 +455,6 @@ export function getAvsInstance() {
           em_module.ccall('wcall_set_trace', 'null', ['number', 'number'], [wuser, trace]);
         },
 
-        WCALL_CALL_TYPE_NORMAL: 0,
-        WCALL_CALL_TYPE_VIDEO: 1,
-        WCALL_CALL_TYPE_FORCED_AUDIO: 2,
-        WCALL_CONV_TYPE_ONEONONE: 0,
-        WCALL_CONV_TYPE_GROUP: 1,
-        WCALL_CONV_TYPE_CONFERENCE: 2,
         start: function(wuser, convid, call_type, conv_type, audio_cbr) {
           return em_module.ccall(
             'wcall_start',
@@ -573,6 +611,7 @@ export function getAvsInstance() {
             }
             return null;
           }, 'nssn');
+
           const fn_size_h = em_module.addFunction((w, h, userid, arg) => {
             if (size_h) {
               size_h(w, h, userid == 0 ? null : em_module.UTF8ToString(userid), arg);
@@ -651,14 +690,6 @@ export function getAvsInstance() {
           return em_module.ccall('wcall_debug', 'number', ['struct', 'number'], [re_printf, id]);
         },
 
-        WCALL_STATE_NONE: 0,
-        WCALL_STATE_OUTGOING: 1,
-        WCALL_STATE_INCOMING: 2,
-        WCALL_STATE_ANSWERED: 3,
-        WCALL_STATE_MEDIA_ESTAB: 4,
-        WCALL_STATE_TERM_LOCAL: 6,
-        WCALL_STATE_TERM_REMOTE: 7,
-        WCALL_STATE_UNKNOWN: 8,
         set_state_handler: function(wuser, stateh) {
           const fn_stateh = em_module.addFunction((convid, state, arg) => {
             if (stateh) {
