@@ -17,13 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.notification = z.notification || {};
-
-// Enum of notification preferences.
-z.notification.NotificationPreference = {
-  NONE: 'none',
-  OBFUSCATE: 'obfuscate',
-  OBFUSCATE_MESSAGE: 'obfuscate-message',
-  ON: 'on',
+const ConnectSource = {
+  ICLOUD: 'icloud',
 };
+
+export {ConnectSource};

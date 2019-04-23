@@ -25,10 +25,10 @@ import TimeUtil from 'utils/TimeUtil';
 import {AvailabilityType} from '../user/AvailabilityType';
 
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {PermissionState} from './PermissionState';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
-
-window.z = window.z || {};
-window.z.notification = z.notification || {};
+import {PermissionType} from '../permission/PermissionType';
+import {NotificationPreference} from './NotificationPreference';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -36,7 +36,7 @@ window.z.notification = z.notification || {};
  * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
-z.notification.NotificationRepository = class NotificationRepository {
+class NotificationRepository {
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
@@ -61,7 +61,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Construct a new Notification Repository.
    * @param {CallingRepository} callingRepository - Repository for all call interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users
    */
   constructor(callingRepository, conversationRepository, permissionRepository, userRepository) {
@@ -71,20 +71,20 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.userRepository = userRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
-    this.logger = Logger('z.notification.NotificationRepository');
+    this.logger = Logger('NotificationRepository');
 
     this.notifications = [];
 
     this.subscribeToEvents();
-    this.notificationsPreference = ko.observable(z.notification.NotificationPreference.ON);
+    this.notificationsPreference = ko.observable(NotificationPreference.ON);
     this.notificationsPreference.subscribe(notificationsPreference => {
-      const preferenceIsNone = notificationsPreference === z.notification.NotificationPreference.NONE;
+      const preferenceIsNone = notificationsPreference === NotificationPreference.NONE;
       if (!preferenceIsNone) {
         this.checkPermission();
       }
     });
 
-    this.permissionState = this.permissionRepository.permissionState[z.permission.PermissionType.NOTIFICATIONS];
+    this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
     this.selfUser = this.userRepository.self;
   }
 
@@ -111,18 +111,18 @@ z.notification.NotificationRepository = class NotificationRepository {
       }
 
       if (!z.util.Environment.browser.supports.notifications) {
-        return this.updatePermissionState(z.notification.PermissionState.UNSUPPORTED);
+        return this.updatePermissionState(PermissionState.UNSUPPORTED);
       }
 
       if (z.util.Environment.browser.supports.permissions) {
-        return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS).then(() => {
+        return this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS).then(() => {
           const shouldRequestPermission = this.permissionState() === PermissionStatusState.PROMPT;
           return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
         });
       }
 
       const currentPermission = window.Notification.permission;
-      const shouldRequestPermission = currentPermission === z.notification.PermissionState.DEFAULT;
+      const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
       return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
     });
   }
@@ -635,8 +635,8 @@ z.notification.NotificationRepository = class NotificationRepository {
         return Promise.resolve(true);
       }
 
-      case z.notification.PermissionState.IGNORED:
-      case z.notification.PermissionState.UNSUPPORTED:
+      case PermissionState.IGNORED:
+      case PermissionState.UNSUPPORTED:
       case PermissionStatusState.DENIED: {
         return Promise.resolve(false);
       }
@@ -720,10 +720,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {boolean} Obfuscate message in notification
    */
   _shouldObfuscateNotificationMessage(messageEntity) {
-    const preferencesToObfuscateMessage = [
-      z.notification.NotificationPreference.OBFUSCATE,
-      z.notification.NotificationPreference.OBFUSCATE_MESSAGE,
-    ];
+    const preferencesToObfuscateMessage = [NotificationPreference.OBFUSCATE, NotificationPreference.OBFUSCATE_MESSAGE];
 
     return preferencesToObfuscateMessage.includes(this.notificationsPreference()) || messageEntity.is_ephemeral();
   }
@@ -735,7 +732,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {boolean} Obfuscate sender in notification
    */
   _shouldObfuscateNotificationSender(messageEntity) {
-    const isSetToObfuscate = this.notificationsPreference() === z.notification.NotificationPreference.OBFUSCATE;
+    const isSetToObfuscate = this.notificationsPreference() === NotificationPreference.OBFUSCATE;
     return isSetToObfuscate || messageEntity.is_ephemeral();
   }
 
@@ -757,7 +754,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
-    const preferenceIsNone = this.notificationsPreference() === z.notification.NotificationPreference.NONE;
+    const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
     const supportsNotification = z.util.Environment.browser.supports.notifications;
 
     const hideNotification =
@@ -859,4 +856,6 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     return isEventToNotify && isSelfMentionOrReply;
   }
-};
+}
+
+export {NotificationRepository};

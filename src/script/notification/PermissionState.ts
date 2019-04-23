@@ -17,25 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.properties = z.properties || {};
-
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    MACOS: 'contact_import.macos',
-  },
-  EMOJI: {
-    REPLACE_INLINE: 'settings.emoji.replace_inline',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  INTERFACE: {
-    THEME: 'settings.interface.theme',
-  },
-  NOTIFICATIONS: 'settings.notifications',
-  PREVIEWS: {
-    SEND: 'settings.previews.send',
-  },
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
+const PermissionState = {
+  DEFAULT: 'default',
+  DENIED: 'denied',
+  GRANTED: 'granted',
+  IGNORED: 'ignored',
+  UNSUPPORTED: 'unsupported',
 };
+
+export {PermissionState};

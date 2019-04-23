@@ -17,7 +17,10 @@
  *
  */
 
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+
 const THEMES_CLASS_PREFIX = 'theme-';
+
 export const THEMES = {
   DARK: 'dark',
   DEFAULT: 'default',
@@ -25,7 +28,7 @@ export const THEMES = {
 
 export class ThemeViewModel {
   constructor(propertiesRepository) {
-    this.setTheme(propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME));
+    this.setTheme(propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.THEME, this.setTheme);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties =>

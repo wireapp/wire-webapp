@@ -17,9 +17,17 @@
  *
  */
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
+class PhoneBook {
+  self: string[];
+  cards: string[];
 
-z.connect.ConnectSource = {
-  ICLOUD: 'icloud',
-};
+  /**
+   * Construct a new Phone book.
+   */
+  constructor() {
+    this.self = [];
+    this.cards = [];
+  }
+}
+
+export {PhoneBook};

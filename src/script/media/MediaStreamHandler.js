@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
 
 export default class MediaStreamHandler {
   /**
@@ -83,7 +84,7 @@ export default class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    */
   constructor(mediaRepository, permissionRepository) {
     this._toggleScreenSend = this._toggleScreenSend.bind(this);
@@ -388,20 +389,20 @@ export default class MediaStreamHandler {
    *
    * @private
    * @param {z.media.MediaType} mediaType - Requested media type
-   * @returns {Array<z.permission.PermissionType>} Array containing the necessary permission types
+   * @returns {Array<PermissionType>} Array containing the necessary permission types
    */
   _getPermissionTypes(mediaType) {
     switch (mediaType) {
       case z.media.MediaType.AUDIO: {
-        return [z.permission.PermissionType.MICROPHONE];
+        return [PermissionType.MICROPHONE];
       }
 
       case z.media.MediaType.AUDIO_VIDEO: {
-        return [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE];
+        return [PermissionType.CAMERA, PermissionType.MICROPHONE];
       }
 
       case z.media.MediaType.VIDEO: {
-        return [z.permission.PermissionType.CAMERA];
+        return [PermissionType.CAMERA];
       }
     }
   }

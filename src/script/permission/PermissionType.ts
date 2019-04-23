@@ -17,15 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.connect = z.connect || {};
-
-z.connect.PhoneBook = class PhoneBook {
-  /**
-   * Construct a new Phone book.
-   */
-  constructor() {
-    this.self = [];
-    this.cards = [];
-  }
+// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+const PermissionType = {
+  CAMERA: 'camera',
+  GEO_LOCATION: 'geolocation',
+  MICROPHONE: 'microphone',
+  NOTIFICATIONS: 'notifications',
 };
+
+export {PermissionType};
