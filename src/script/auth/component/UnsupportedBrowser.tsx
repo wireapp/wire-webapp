@@ -26,7 +26,7 @@ import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import WirelessContainer from './WirelessContainer';
 
-interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
+interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   headline: FormattedMessage.MessageDescriptor;
   subhead: FormattedMessage.MessageDescriptor;
 }
@@ -43,7 +43,7 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   </ContainerXS>
 );
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+export interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 interface ConnectedProps {
   hasCookieSupport: boolean;
@@ -54,13 +54,15 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
+type CombinedProps = Props & DispatchProps & ConnectedProps & InjectedIntlProps;
+
+export const UnsupportedBrowser = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
   isCheckingSupport,
   isSupportedBrowser,
-}) => {
+}: CombinedProps) => {
   if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
@@ -99,21 +101,17 @@ export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntl
     );
   }
 
-  return <React.Fragment>{children}</React.Fragment>;
+  return <>{children}</>;
 };
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-        hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-        isCheckingSupport: RuntimeSelector.isChecking(state),
-        isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
+    (state: RootState) => ({
+      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+      isCheckingSupport: RuntimeSelector.isChecking(state),
+      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(UnsupportedBrowser)
 );
