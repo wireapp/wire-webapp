@@ -59,7 +59,6 @@ import AssetURLCacheGlobal from '../assets/AssetURLCache.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetRetentionPolicyGlobal from '../assets/AssetRetentionPolicy.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
-import AssetTypeGlobal from '../assets/AssetType.js';
 import AssetMapperGlobal from '../assets/AssetMapper.js';
 import AssetCryptoGlobal from '../assets/AssetCrypto.js';
 import ErrorGlobal from '../backup/Error.js';
@@ -112,7 +111,6 @@ import QuotedMessageMiddlewareGlobal from '../event/preprocessor/QuotedMessageMi
 import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js';
 import WebAppGlobal from '../event/WebApp.js';
 import WebSocketServiceGlobal from '../event/WebSocketService.js';
-import GiphyContentSizesGlobal from '../extension/GiphyContentSizes.js';
 import IntegrationMapperGlobal from '../integration/IntegrationMapper.js';
 import IntegrationRepositoryGlobal from '../integration/IntegrationRepository.js';
 import IntegrationServiceGlobal from '../integration/IntegrationService.js';
