@@ -28,5 +28,5 @@ const AssetTransferState = {
   UPLOADING: 'uploading',
 };
 
-export default AssetTransferState;
+export {AssetTransferState};
 z.assets.AssetTransferState = AssetTransferState;

@@ -17,16 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import ko from 'knockout';
 
 import platform from 'platform';
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
-import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
-import UserRepository from '../user/UserRepository';
+import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {VideoGridRepository} from '../calling/VideoGridRepository';
@@ -36,28 +36,26 @@ import {ConnectRepository} from '../connect/ConnectRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
-import BackendClient from '../service/BackendClient';
+import {BackendClient} from '../service/BackendClient';
 
-import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
-import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
-import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
+import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
-import DebugUtil from 'utils/DebugUtil';
+import {DebugUtil} from 'utils/DebugUtil';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
 
-import ReceiptsMiddleware from '../event/preprocessor/ReceiptsMiddleware';
+import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 import {t} from 'utils/LocalizerUtil';
 
-/* eslint-disable no-unused-vars */
-import globals from './globals';
-/* eslint-enable no-unused-vars */
+import './globals';
 import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from 'utils/LoggerUtil';
 
@@ -93,7 +91,7 @@ class App {
    */
   constructor(backendClient, appContainer) {
     this.backendClient = backendClient;
-    this.logger = Logger('App');
+    this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
@@ -862,4 +860,4 @@ $(() => {
   }
 });
 
-export default App;
+export {App};

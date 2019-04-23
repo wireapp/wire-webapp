@@ -17,7 +17,7 @@
  *
  */
 
-export default {
+export const AppInitStatisticsValue = {
   BACKEND_REQUESTS: 'backend_requests',
   CLIENT_TYPE: 'client_type',
   CLIENTS: 'clients',

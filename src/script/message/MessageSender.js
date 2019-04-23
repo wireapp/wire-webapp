@@ -17,7 +17,7 @@
  *
  */
 
-import PromiseQueue from 'utils/PromiseQueue';
+import {PromiseQueue} from 'utils/PromiseQueue';
 
 export class MessageSender {
   constructor() {

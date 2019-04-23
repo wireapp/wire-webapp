@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
@@ -27,7 +27,7 @@ import {PermissionType} from './PermissionType';
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
  */
-export default class PermissionRepository {
+export class PermissionRepository {
   static get CONFIG() {
     return {
       MEDIA_TYPES: [PermissionType.CAMERA, PermissionType.MICROPHONE],
@@ -37,7 +37,7 @@ export default class PermissionRepository {
    * Construct a new Permission Repository.
    */
   constructor() {
-    this.logger = Logger('PermissionRepository');
+    this.logger = getLogger('PermissionRepository');
 
     this.permissionState = {
       [PermissionType.CAMERA]: ko.observable(undefined),

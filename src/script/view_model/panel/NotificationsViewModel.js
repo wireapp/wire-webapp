@@ -17,9 +17,9 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 
-export default class NotificationsViewModel extends BasePanelViewModel {
+export class NotificationsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 

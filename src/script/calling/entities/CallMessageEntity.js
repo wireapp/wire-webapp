@@ -17,7 +17,7 @@
  *
  */
 
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 
 class CallMessageEntity {
   static get CONFIG() {

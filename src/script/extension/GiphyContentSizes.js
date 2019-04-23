@@ -17,7 +17,7 @@
  *
  */
 // Enum of different Giphy content sizes.
-export default {
+export const GiphyContentSizes = {
   DOWNSIZED: 'downsized',
   DOWNSIZED_LARGE: 'downsized_large',
   DOWNSIZED_STILL: 'downsized_still',

@@ -17,16 +17,16 @@
  *
  */
 
-import AddParticipantsViewModel from './panel/AddParticipantsViewModel';
-import ConversationDetailsViewModel from './panel/ConversationDetailsViewModel';
-import ConversationParticipantsViewModel from './panel/ConversationParticipantsViewModel';
-import GroupParticipantServiceViewModel from './panel/GroupParticipantServiceViewModel';
-import GroupParticipantUserViewModel from './panel/GroupParticipantUserViewModel';
-import GuestsAndServicesViewModel from './panel/GuestsAndServicesViewModel';
-import MessageDetailsViewModel from './panel/MessageDetailsViewModel';
-import NotificationsViewModel from './panel/NotificationsViewModel';
-import ParticipantDevicesViewModel from './panel/ParticipantDevicesViewModel';
-import TimedMessagesViewModel from './panel/TimedMessagesViewModel';
+import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
+import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
+import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
+import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
+import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
+import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
+import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
+import {NotificationsViewModel} from './panel/NotificationsViewModel';
+import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
+import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

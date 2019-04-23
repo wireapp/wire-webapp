@@ -47,14 +47,14 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import {Config} from '../config';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import LabeledError from '../module/action/LabeledError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {LabeledError} from '../module/action/LabeledError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
@@ -63,7 +63,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
-import Page from './Page';
+import {Page} from './Page';
 
 declare global {
   interface Window {
@@ -71,7 +71,7 @@ declare global {
   }
 }
 
-interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_Login>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -106,7 +106,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class Login extends React.Component<CombinedProps, State> {
+class _Login extends React.Component<CombinedProps, State> {
   private readonly inputs: {
     email: React.RefObject<any>;
     password: React.RefObject<any>;
@@ -475,7 +475,7 @@ class Login extends React.Component<CombinedProps, State> {
   }
 }
 
-export default withRouter(
+export const Login = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -501,6 +501,6 @@ export default withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
       }
-    )(Login)
+    )(_Login)
   )
 );

@@ -22,7 +22,7 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {appAlreadyOpenStrings} from '../../strings';
-import ROOT_ACTIONS from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 
@@ -38,7 +38,7 @@ interface DispatchProps {
   removeCookie: (name: string) => Promise<void>;
 }
 
-class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
+class _AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
   onContinue = () => {
     this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED);
   };
@@ -71,7 +71,7 @@ class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchPr
   };
 }
 
-export default injectIntl(
+export const AppAlreadyOpen = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -83,5 +83,5 @@ export default injectIntl(
         removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
       };
     }
-  )(AppAlreadyOpen)
+  )(_AppAlreadyOpen)
 );

@@ -80,4 +80,4 @@ const viewportObserver = {
   trackElement,
 };
 
-export default viewportObserver;
+export {viewportObserver};

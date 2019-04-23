@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 
-export default class MediaStreamHandler {
+export class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
    * @param {MediaStream} mediaStream - MediaStream to detect the type off
@@ -93,7 +93,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = Logger('MediaStreamHandler');
+    this.logger = getLogger('MediaStreamHandler');
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();

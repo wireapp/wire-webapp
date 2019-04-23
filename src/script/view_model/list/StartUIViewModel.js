@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
-import User from '../../entity/User';
+import {User} from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -66,7 +66,7 @@ class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.StartUIViewModel');
+    this.logger = getLogger('z.viewModel.list.StartUIViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
 

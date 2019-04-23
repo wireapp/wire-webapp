@@ -21,8 +21,8 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {conversationJoinStrings} from '../../strings';
-import WirelessContainer from '../component/WirelessContainer';
-import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
+import {WirelessUnsupportedBrowser} from '../component/WirelessUnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
@@ -33,7 +33,7 @@ interface DispatchProps {}
 
 interface State {}
 
-class ConversationJoinInvalid extends React.PureComponent<
+class _ConversationJoinInvalid extends React.PureComponent<
   Props & ConnectedProps & DispatchProps & InjectedIntlProps,
   State
 > {
@@ -64,7 +64,7 @@ class ConversationJoinInvalid extends React.PureComponent<
   }
 }
 
-export default injectIntl(
+export const ConversationJoinInvalid = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {};
@@ -72,5 +72,5 @@ export default injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {};
     }
-  )(ConversationJoinInvalid)
+  )(_ConversationJoinInvalid)
 );

@@ -39,18 +39,18 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps} from 'react-router';
 import {inviteStrings} from '../../strings';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
-import Page from './Page';
+import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_InitialInvite>, RouteComponentProps {}
 
 interface ConnectedProps {
   error: Error;
@@ -70,7 +70,7 @@ interface State {
   error: Error;
 }
 
-class InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class _InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   emailInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredEmail: '',
@@ -203,7 +203,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
   }
 }
 
-export default injectIntl(
+export const InitialInvite = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -221,5 +221,5 @@ export default injectIntl(
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       };
     }
-  )(InitialInvite)
+  )(_InitialInvite)
 );

@@ -41,17 +41,17 @@ import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {teamNameStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import Page from './Page';
+import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<_TeamName>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   error: Error;
@@ -70,7 +70,7 @@ interface State {
   isValidTeamName: boolean;
 }
 
-class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private readonly teamNameInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredTeamName: this.props.teamName || '',
@@ -190,7 +190,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
   }
 }
 
-export default withRouter(
+export const TeamName = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -207,6 +207,6 @@ export default withRouter(
           resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
         };
       }
-    )(TeamName)
+    )(_TeamName)
   )
 );

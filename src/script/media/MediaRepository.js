@@ -19,13 +19,13 @@
 
 import {t} from 'utils/LocalizerUtil';
 
-import MediaDevicesHandler from './MediaDevicesHandler';
-import MediaConstraintsHandler from './MediaConstraintsHandler';
-import MediaElementHandler from './MediaElementHandler';
-import MediaStreamHandler from './MediaStreamHandler';
+import {MediaDevicesHandler} from './MediaDevicesHandler';
+import {MediaConstraintsHandler} from './MediaConstraintsHandler';
+import {MediaElementHandler} from './MediaElementHandler';
+import {MediaStreamHandler} from './MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
-export default class MediaRepository {
+export class MediaRepository {
   // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
   static get AUDIO_CONTEXT_STATE() {
     return {

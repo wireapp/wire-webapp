@@ -18,10 +18,10 @@
  */
 
 import {backendConfig} from '../../api/testResolver';
-import ConsentValue from 'src/script/user/ConsentValue';
-import PropertiesRepository from 'src/script/properties/PropertiesRepository';
-import ReceiptMode from 'src/script/conversation/ReceiptMode';
-import User from 'src/script/entity/User';
+import {ConsentValue} from 'src/script/user/ConsentValue';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
+import {User} from 'src/script/entity/User';
 
 describe('UserRepository', () => {
   let server = null;

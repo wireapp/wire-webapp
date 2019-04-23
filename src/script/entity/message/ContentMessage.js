@@ -21,7 +21,7 @@ import moment from 'moment';
 import ko from 'knockout';
 
 import {copyText} from 'utils/ClipboardUtil';
-import Message from './Message';
+import {Message} from './Message';
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -180,5 +180,5 @@ class ContentMessage extends Message {
   }
 }
 
-export default ContentMessage;
+export {ContentMessage};
 z.entity.ContentMessage = ContentMessage;

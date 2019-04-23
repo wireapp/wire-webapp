@@ -17,24 +17,24 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from './ConsentValue';
-import ConsentType from './ConsentType';
+import {ConsentValue} from './ConsentValue';
+import {ConsentType} from './ConsentType';
 
-import User from '../entity/User';
-import UserMapper from './UserMapper';
+import {User} from '../entity/User';
+import {UserMapper} from './UserMapper';
 
 import {chunk} from 'utils/ArrayUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 
-export default class UserRepository {
+export class UserRepository {
   static get CONFIG() {
     return {
       MINIMUM_NAME_LENGTH: 2,
@@ -57,7 +57,7 @@ export default class UserRepository {
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
-    this.logger = Logger('UserRepository');
+    this.logger = getLogger('UserRepository');
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;

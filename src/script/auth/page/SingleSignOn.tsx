@@ -36,13 +36,13 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {ssoLoginStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import {Config} from '../config';
-import BackendError from '../module/action/BackendError';
+import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';
-import Page from './Page';
-import SingleSignOnForm from './SingleSignOnForm';
+import {Page} from './Page';
+import {SingleSignOnForm} from './SingleSignOnForm';
 
 interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
@@ -50,7 +50,7 @@ interface State {
   isOverlayOpen: boolean;
 }
 
-class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State> {
+class _SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State> {
   private ssoWindow: Window = undefined;
   state: State = {
     isOverlayOpen: false,
@@ -254,4 +254,4 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
   }
 }
 
-export default withRouter(injectIntl(SingleSignOn));
+export const SingleSignOn = withRouter(injectIntl(_SingleSignOn));

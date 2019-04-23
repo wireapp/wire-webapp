@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 export class ArchiveViewModel {
   /**
@@ -34,7 +34,7 @@ export class ArchiveViewModel {
 
     this.listViewModel = listViewModel;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('ArchiveViewModel');
+    this.logger = getLogger('ArchiveViewModel');
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 

@@ -20,11 +20,11 @@
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 import {AvailabilityType} from '../user/AvailabilityType';
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'utils/util';
 
-export default class CryptographyMapper {
+export class CryptographyMapper {
   static get CONFIG() {
     return {
       MAX_MENTIONS_PER_MESSAGE: 500,
@@ -33,7 +33,7 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = Logger('z.cryptography.CryptographyMapper');
+    this.logger = getLogger('z.cryptography.CryptographyMapper');
   }
 
   /**

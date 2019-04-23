@@ -17,9 +17,9 @@
  *
  */
 
-import AssetType from '../../assets/AssetType';
+import {AssetType} from '../../assets/AssetType';
 
-export default class Asset {
+export class Asset {
   constructor(id) {
     this.id = id;
     this.key = '';

@@ -18,7 +18,7 @@
  */
 
 /* eslint-disable sort-keys */
-export default {
+export const AppInitTimingsStep = {
   RECEIVED_ACCESS_TOKEN: 'received_access_token',
   RECEIVED_SELF_USER: 'received_self_user',
   INITIALIZED_CRYPTOGRAPHY: 'initialized_cryptography',

@@ -19,9 +19,9 @@
 import {amplify} from 'amplify';
 import UUID from 'uuidjs';
 
-import PreferenceNotificationRepository from 'src/script/notification/PreferenceNotificationRepository';
-import PropertiesRepository from 'src/script/properties/PropertiesRepository';
-import backendEvent from 'src/script/event/Backend';
+import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {Backend as backendEvent} from 'src/script/event/Backend';
 
 describe('PreferenceNotificationRepository', () => {
   const user = {id: UUID.genV4().hexString};

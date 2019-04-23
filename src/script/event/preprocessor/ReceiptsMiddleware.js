@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import ReceiptMode from '../../conversation/ReceiptMode';
-import StatusType from '../../message/StatusType';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
+import {StatusType} from '../../message/StatusType';
 
-export default class ReceiptsMiddleware {
+export class ReceiptsMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
    * This class is responsible for parsing incoming confirmation messages
@@ -36,7 +36,7 @@ export default class ReceiptsMiddleware {
     this.eventService = eventService;
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('ReadReceiptMiddleware');
+    this.logger = getLogger('ReadReceiptMiddleware');
   }
 
   /**

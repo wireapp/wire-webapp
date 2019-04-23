@@ -17,7 +17,13 @@
  *
  */
 
-export default {
-  MARKETING: 2,
-  TERMS_OF_USE: 1,
+export const CALL_STATE = {
+  CONNECTING: 'connecting',
+  DISCONNECTING: 'disconnecting',
+  ENDED: 'ended',
+  INCOMING: 'incoming',
+  ONGOING: 'ongoing',
+  OUTGOING: 'outgoing',
+  REJECTED: 'rejected',
+  UNKNOWN: 'unknown',
 };

@@ -18,9 +18,9 @@
  */
 
 import {ClientActionCreator} from './creator/';
-import ROOT_ACTIONS from './';
+import {actionRoot as ROOT_ACTIONS} from './';
 import {mockStore} from '../../util/TestUtil';
-import BackendError from './BackendError';
+import {BackendError} from './BackendError';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 
 function printActions(actions) {

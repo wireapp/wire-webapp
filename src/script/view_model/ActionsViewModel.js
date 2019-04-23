@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
@@ -32,7 +32,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     this.conversationRepository = repositories.conversation;
     this.integrationRepository = repositories.integration;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.ListViewModel');
+    this.logger = getLogger('z.viewModel.ListViewModel');
   }
 
   acceptConnectionRequest(userEntity, showConversation) {

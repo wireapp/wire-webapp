@@ -17,7 +17,7 @@
  *
  */
 
-export default {
+export const AssetType = {
   FILE: 'File',
   IMAGE: 'Image',
   LOCATION: 'Location',

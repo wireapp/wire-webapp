@@ -25,9 +25,9 @@ import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
-import BackendError from './BackendError';
+import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
-import LabeledError from './LabeledError';
+import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => void;

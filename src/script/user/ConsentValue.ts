@@ -17,10 +17,7 @@
  *
  */
 
-const PROPERTY_STATE = {
-  FALSE: 'false',
-  PAUSED: 'paused',
-  TRUE: 'true',
+export const ConsentValue = {
+  GIVEN: 1,
+  NOT_GIVEN: 0,
 };
-
-export default PROPERTY_STATE;

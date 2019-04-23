@@ -18,8 +18,8 @@
  */
 
 import UUID from 'uuidjs';
-import Conversation from 'src/script/entity/Conversation';
-import ConversationMapper from 'src/script/conversation/ConversationMapper';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {createRandomUuid} from 'utils/util';
 
 describe('Conversation Mapper', () => {

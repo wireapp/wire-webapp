@@ -21,7 +21,7 @@ import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
@@ -31,10 +31,10 @@ import {CallMessageBuilder} from './CallMessageBuilder';
 import {CallEntity} from './entities/CallEntity';
 import {CallMessageEntity} from './entities/CallMessageEntity';
 
-import CALL_MESSAGE_TYPE from './enum/CallMessageType';
-import PROPERTY_STATE from './enum/PropertyState';
-import CALL_STATE from './enum/CallState';
-import TERMINATION_REASON from './enum/TerminationReason';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {PROPERTY_STATE} from './enum/PropertyState';
+import {CALL_STATE} from './enum/CallState';
+import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';

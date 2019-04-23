@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,18 @@
  *
  */
 
-export default {
-  DELIVERY: 0,
-  DELIVERY_AND_READ: 1,
+import {CALL_STATE} from './CallState';
+
+export const CALL_STATE_GROUP = {
+  CAN_CONNECT: [CALL_STATE.INCOMING, CALL_STATE.ONGOING, CALL_STATE.REJECTED],
+  CAN_JOIN: [CALL_STATE.INCOMING, CALL_STATE.REJECTED],
+  IS_ACTIVE: [
+    CALL_STATE.CONNECTING,
+    CALL_STATE.DISCONNECTING,
+    CALL_STATE.INCOMING,
+    CALL_STATE.ONGOING,
+    CALL_STATE.OUTGOING,
+  ],
+  IS_ENDED: [CALL_STATE.ENDED, CALL_STATE.UNKNOWN],
+  UNANSWERED: [CALL_STATE.INCOMING, CALL_STATE.OUTGOING],
 };

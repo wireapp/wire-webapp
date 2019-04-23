@@ -17,22 +17,19 @@
  *
  */
 
-import {MediaStreamHandler} from './MediaStreamHandler';
-
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flowId, stream, callEntity) {
-    this.source = source;
-    this.flowId = flowId;
-    this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
-  }
-
-  getType() {
-    return MediaStreamHandler.detectMediaStreamType(this.stream);
-  }
+export const TERMINATION_REASON = {
+  COMPLETED: 'completed',
+  CONCURRENT_CALL: 'concurrent',
+  CONNECTION_DROP: 'drop',
+  CONNECTION_FAILED: 'failed_ice',
+  GROUP_CHECK: 'group_check',
+  MEMBER_LEAVE: 'member_leave',
+  MISSED: 'missed',
+  OTHER_USER: 'other',
+  PAGE_NAVIGATION: 'page_navigation',
+  RENEGOTIATION: 'renegotiation',
+  SDP_FAILED: 'failed_sdp',
+  SELF_USER: 'self',
+  TIMEOUT: 'timeout',
+  UNKNOWN: 'unknown',
 };

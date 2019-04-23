@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import AuthViewModel from '../view_model/AuthViewModel';
+import {AuthViewModel} from '../view_model/AuthViewModel';
 import {resolve, graph} from '../config/appResolver';
 import {enableLogging} from '../util/LoggerUtil';
 import {Config} from '../auth/config';

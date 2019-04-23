@@ -18,7 +18,7 @@
  */
 
 import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
-import {getLogger} from '../../LogProvider';
+import {getLogger} from '../../../util/Logger';
 import {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';
 

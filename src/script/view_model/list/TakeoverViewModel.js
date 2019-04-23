@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
 
@@ -33,7 +33,7 @@ class TakeoverViewModel {
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('TakeoverViewModel');
+    this.logger = getLogger('TakeoverViewModel');
 
     this.selfUser = this.userRepository.self;
 

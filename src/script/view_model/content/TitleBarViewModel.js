@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -35,7 +35,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
-    this.logger = Logger('z.viewModel.content.TitleBarViewModel');
+    this.logger = getLogger('z.viewModel.content.TitleBarViewModel');
 
     this.panelViewModel = mainViewModel.panel;
 

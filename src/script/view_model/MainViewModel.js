@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {afterRender} from 'utils/util';
-import WindowTitleViewModel from './WindowTitleViewModel';
+import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 
 export class MainViewModel {
@@ -59,7 +59,7 @@ export class MainViewModel {
 
   constructor(repositories) {
     this.userRepository = repositories.user;
-    this.logger = Logger('MainViewModel');
+    this.logger = getLogger('MainViewModel');
 
     this.selfUser = this.userRepository.self;
 

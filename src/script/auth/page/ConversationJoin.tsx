@@ -39,15 +39,15 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {conversationJoinStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
-import WirelessContainer from '../component/WirelessContainer';
-import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
+import {WirelessUnsupportedBrowser} from '../component/WirelessUnsupportedBrowser';
 import {Config} from '../config';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
@@ -59,7 +59,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_ConversationJoin>, RouteComponentProps {}
 
 interface ConnectedProps {
   error: Error;
@@ -93,7 +93,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class ConversationJoin extends React.Component<CombinedProps, State> {
+class _ConversationJoin extends React.Component<CombinedProps, State> {
   nameInput: React.RefObject<any> = React.createRef();
   state: State = {
     accentColor: AccentColor.random(),
@@ -376,7 +376,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
   }
 }
 
-export default withRouter(
+export const ConversationJoin = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({
@@ -398,6 +398,6 @@ export default withRouter(
           dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
         setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
       })
-    )(ConversationJoin)
+    )(_ConversationJoin)
   )
 );

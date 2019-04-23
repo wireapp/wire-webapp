@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,16 @@
  *
  */
 
-const SDP_SOURCE = {
-  LOCAL: 'local',
-  REMOTE: 'remote',
-};
+import {LogFactory} from '@wireapp/commons';
+import {Logger} from 'logdown';
 
-export default SDP_SOURCE;
+const LOGGER_NAMESPACE = '@wireapp/webapp';
+
+function getLogger(name: string): Logger {
+  return LogFactory.getLogger(name, {
+    namespace: LOGGER_NAMESPACE,
+    separator: '/',
+  });
+}
+
+export {getLogger, LOGGER_NAMESPACE, Logger};
