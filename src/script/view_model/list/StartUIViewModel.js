@@ -26,11 +26,7 @@ import User from '../../entity/User';
 import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.StartUIViewModel = class StartUIViewModel {
+class StartUIViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -607,4 +603,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   dispose() {
     this.renderAvatarComputed.dispose();
   }
-};
+}
+
+export {StartUIViewModel};

@@ -185,10 +185,6 @@ import PreferencesOptionsViewModelGlobal from '../view_model/content/Preferences
 import TitleBarViewModelGlobal from '../view_model/content/TitleBarViewModel.js';
 import PanelViewModelGlobal from '../view_model/PanelViewModel.js';
 import ListViewModelGlobal from '../view_model/ListViewModel.js';
-import PreferencesListViewModelGlobal from '../view_model/list/PreferencesListViewModel.js';
-import StartUIViewModelGlobal from '../view_model/list/StartUIViewModel.js';
-import TakeoverViewModelGlobal from '../view_model/list/TakeoverViewModel.js';
-import TemporaryGuestViewModelGlobal from '../view_model/list/TemporaryGuestViewModel.js';
 import accentColorPickerGlobal from '../components/accentColorPicker.js';
 import availabilityStateGlobal from '../components/availabilityState.js';
 import copyToClipboardGlobal from '../components/copyToClipboard.js';
