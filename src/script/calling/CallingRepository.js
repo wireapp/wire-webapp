@@ -983,12 +983,23 @@ export class CallingRepository {
   joinCall(conversationId, mediaType) {
     // TODO, deduce call type from media type
     // TODO pass on the conversation type
-    this.callingApi.start(this.wUser, conversationId, CALL_TYPE.FORCED_AUDIO, CONVERSATION_TYPE.ONEONONE, false);
+    const callType = this.callTypeFromMediaType(mediaType);
+    this.callingApi.start(this.wUser, conversationId, callType, CONVERSATION_TYPE.ONEONONE, false);
   }
 
   answerCall(conversationId, mediaType) {
-    // TODO, deduce the call type from the media type
-    this.callingApi.answer(this.wUser, conversationId, CALL_TYPE.FORCED_AUDIO, false);
+    const callType = this.callTypeFromMediaType(mediaType);
+    this.callingApi.answer(this.wUser, conversationId, callType, false);
+  }
+
+  callTypeFromMediaType(mediaType) {
+    const types = {
+      [z.media.MediaType.AUDIO]: CALL_TYPE.NORMAL,
+      [z.media.MediaType.AUDIO_VIDEO]: CALL_TYPE.VIDEO,
+      [z.media.MediaType.SCREEN]: CALL_TYPE.VIDEO,
+    };
+
+    return types[mediaType] || CALL_TYPE.NORMAL;
   }
 
   /**
