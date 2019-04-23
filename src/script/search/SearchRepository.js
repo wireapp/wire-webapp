@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {validateHandle} from '../user/UserHandleGenerator';
+import {EMOJI_RANGES} from 'utils/EmojiUtil';
 
 window.z = window.z || {};
 window.z.search = z.search || {};
@@ -104,7 +105,7 @@ class SearchRepository {
 
   _matches(term, property, userEntity) {
     const excludedEmojis = Array.from(term).reduce((emojis, char) => {
-      const isEmoji = z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+      const isEmoji = EMOJI_RANGES.includes(char);
       return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
     }, {});
     const value = typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property];
