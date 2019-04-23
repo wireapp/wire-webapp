@@ -22,6 +22,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {AssetUploadFailedReason} from 'src/script/assets/AssetUploadFailedReason';
 
 async function createEncodedCiphertext(
   preKey,
@@ -592,7 +593,7 @@ describe('Event Repository', () => {
           type: z.event.Client.CONVERSATION.ASSET_ADD,
         });
         const assetCancelEvent = Object.assign({}, assetAddEvent, {
-          data: {reason: z.assets.AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+          data: {reason: AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
           time: '2017-09-06T09:43:36.528Z',
         });
 
@@ -613,7 +614,7 @@ describe('Event Repository', () => {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
@@ -631,7 +632,7 @@ describe('Event Repository', () => {
         type: z.event.Client.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: z.assets.AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
