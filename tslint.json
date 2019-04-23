@@ -1,8 +1,7 @@
 {
   "extends": ["@wireapp/tslint-config"],
   "rules": {
-    "no-floating-promises": false,
-    "no-default-export": false
+    "no-floating-promises": false
   },
   "rulesDirectory": ["node_modules/tslint-eslint-rules/dist/rules"],
   "linterOptions": {
