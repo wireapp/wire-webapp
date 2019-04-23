@@ -17,18 +17,24 @@
  *
  */
 
-export const capToByte = value => {
+export function capToByte(value: number): number {
   const MAX_VALUE = 255;
-  return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
-};
+  return Math.min(Math.abs(value * MAX_VALUE), MAX_VALUE);
+}
 
-export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
 
-export const getRandomNumber = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+export function getRandomNumber(minimum: number, maximum: number): number {
+  return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+}
 
-export const inRange = (value, lowerBound, upperBound) => value >= lowerBound && value <= upperBound;
+export function inRange(value: number, lowerBound: number, upperBound: number): boolean {
+  return value >= lowerBound && value <= upperBound;
+}
 
-export const rootMeanSquare = floatArray => {
+export function rootMeanSquare(floatArray: number[]): number {
   const sum = floatArray.reduce((power, number) => power + number ** 2, 0);
   return Math.sqrt(sum) / floatArray.length;
-};
+}
