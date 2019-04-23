@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.7.4...@wireapp/api-client@4.0.0) (2019-04-23)
+
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7f14a39))
+
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+
+
+
+
 ## [3.7.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@3.7.3...@wireapp/api-client@3.7.4) (2019-04-17)
 
 **Note:** Version bump only for package @wireapp/api-client
