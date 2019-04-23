@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -45,6 +46,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     window.setTimeout(() => $('.titlebar').remove(), TimeUtil.UNITS_IN_MILLIS.SECOND);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
+    this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
     this.selfStreamState = this.callingRepository.selfStreamState;
