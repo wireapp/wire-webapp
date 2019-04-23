@@ -39,6 +39,7 @@ import {validationError} from '../auth/ValidationError';
 /* eslint-enable no-unused-vars */
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
+import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -224,6 +225,8 @@ class AuthViewModel {
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
 
+    this.COUNTRY_CODES = COUNTRY_CODES;
+
     this._init_base();
     $(elementSelector).show();
     $('.auth-page-container').css({display: 'flex'});
@@ -238,7 +241,7 @@ class AuthViewModel {
     this._init_page();
 
     // Select country based on location of user IP
-    this.country_code((z.util.CountryCodes.getCountryCode($('[name=geoip]').attr('country')) || 1).toString());
+    this.country_code((getCountryCode($('[name=geoip]').attr('country')) || 1).toString());
     this.changed_country_code();
 
     this.audio_repository.init();
@@ -630,7 +633,7 @@ class AuthViewModel {
     this.clear_error(z.auth.AuthView.TYPE.PHONE);
 
     const country = event ? event.currentTarget.value || undefined : this.country();
-    this.country_code(`+${z.util.CountryCodes.getCountryCode(country)}`);
+    this.country_code(`+${getCountryCode(country)}`);
     $('#wire-login-phone').focus();
   }
 
@@ -642,7 +645,7 @@ class AuthViewModel {
 
     if (country_code) {
       this.country_code(`+${country_code}`);
-      country_iso = z.util.CountryCodes.getCountryByCode(country_code) || 'X1';
+      country_iso = getCountryByCode(country_code) || 'X1';
     } else {
       this.country_code('');
       country_iso = 'X0';

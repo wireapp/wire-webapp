@@ -21,7 +21,6 @@ import helpersGlobal from '../util/scroll-helpers.js';
 import StorageUtilGlobal from '../util/StorageUtil.js';
 import StringUtilGlobal from '../util/StringUtil.js';
 import URLUtilGlobal from '../util/URLUtil.js';
-import CountryCodesGlobal from '../util/CountryCodes.js';
 import workerGlobal from '../util/worker.js';
 import ValidationUtilGlobal from '../util/ValidationUtil.js';
 import ValidationUtilErrorGlobal from '../util/ValidationUtilError.js';
