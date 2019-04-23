@@ -19,8 +19,8 @@
 
 import Logger from 'utils/Logger';
 
-import ConsentType from '../user/ConsentType';
-import ConsentValue from '../user/ConsentValue';
+import {ConsentType} from '../user/ConsentType';
+import {ConsentValue} from '../user/ConsentValue';
 import ReceiptMode from '../conversation/ReceiptMode';
 import WebappProperties from './WebappProperties';
 import {PROPERTIES_TYPE} from './PropertiesType';

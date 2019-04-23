@@ -26,8 +26,8 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from './ConsentValue';
-import ConsentType from './ConsentType';
+import {ConsentValue} from './ConsentValue';
+import {ConsentType} from './ConsentType';
 
 import User from '../entity/User';
 import UserMapper from './UserMapper';

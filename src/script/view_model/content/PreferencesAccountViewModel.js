@@ -22,7 +22,7 @@ import Logger from 'utils/Logger';
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from '../../user/ConsentValue';
+import {ConsentValue} from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
