@@ -17,11 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.permission = z.permission || {};
-
 // https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
-z.permission.PermissionStatusState = {
+export const PermissionStatusState = {
   DENIED: 'denied',
   GRANTED: 'granted',
   PROMPT: 'prompt',

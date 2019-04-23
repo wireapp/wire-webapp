@@ -143,7 +143,6 @@ import MotionDurationGlobal from '../motion/MotionDuration.js';
 import PermissionStateGlobal from '../notification/PermissionState.js';
 import NotificationPreferenceGlobal from '../notification/NotificationPreference.js';
 import NotificationRepositoryGlobal from '../notification/NotificationRepository.js';
-import PermissionStatusStateGlobal from '../permission/PermissionStatusState.js';
 import PermissionTypeGlobal from '../permission/PermissionType.js';
 import PropertiesRepositoryGlobal from '../properties/PropertiesRepository.js';
 import PropertiesServiceGlobal from '../properties/PropertiesService.js';
