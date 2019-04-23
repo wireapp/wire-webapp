@@ -17,7 +17,7 @@
  *
  */
 
-// Enum of notification preferences.
+/** Enum of notification preferences */
 export enum NotificationPreference {
   NONE = 'none',
   OBFUSCATE = 'obfuscate',
