@@ -19,14 +19,12 @@
 
 // http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
-const ICE_CONNECTION_STATE = {
-  CHECKING: 'checking',
-  CLOSED: 'closed',
-  COMPLETED: 'completed',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-  FAILED: 'failed',
-  NEW: 'new',
-};
-
-export {ICE_CONNECTION_STATE};
+export enum ICE_CONNECTION_STATE {
+  CHECKING = 'checking',
+  CLOSED = 'closed',
+  COMPLETED = 'completed',
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  FAILED = 'failed',
+  NEW = 'new',
+}

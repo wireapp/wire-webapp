@@ -17,7 +17,7 @@
  *
  */
 
-export const SDP_SOURCE = {
-  LOCAL: 'local',
-  REMOTE: 'remote',
-};
+export enum SDP_SOURCE {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+}

@@ -19,10 +19,8 @@
 
 // http://www.w3.org/TR/webrtc/#rtcicegatheringstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceGatheringState#Value
-const ICE_GATHERING_STATE = {
-  COMPLETE: 'complete',
-  GATHERING: 'gathering',
-  NEW: 'new',
-};
-
-export {ICE_GATHERING_STATE};
+export enum ICE_GATHERING_STATE {
+  COMPLETE = 'complete',
+  GATHERING = 'gathering',
+  NEW = 'new',
+}

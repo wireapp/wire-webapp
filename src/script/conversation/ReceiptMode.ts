@@ -17,7 +17,7 @@
  *
  */
 
-export const ReceiptMode = {
-  DELIVERY: 0,
-  DELIVERY_AND_READ: 1,
-};
+export enum ReceiptMode {
+  DELIVERY = 0,
+  DELIVERY_AND_READ = 1,
+}

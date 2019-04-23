@@ -17,8 +17,8 @@
  *
  */
 
-export const PROPERTY_STATE = {
-  FALSE: 'false',
-  PAUSED: 'paused',
-  TRUE: 'true',
-};
+export enum PROPERTY_STATE {
+  FALSE = 'false',
+  PAUSED = 'paused',
+  TRUE = 'true',
+}

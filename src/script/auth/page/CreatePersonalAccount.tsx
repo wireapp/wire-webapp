@@ -38,7 +38,7 @@ interface URLParams {
   invitationCode: string;
 }
 
-interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
+interface Props extends React.HTMLAttributes<_CreatePersonalAccount>, RouteComponentProps<URLParams> {}
 
 interface ConnectedProps {
   account: RegistrationDataState;

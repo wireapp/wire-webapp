@@ -25,7 +25,7 @@ import {WirelessContainer} from '../component/WirelessContainer';
 import {WirelessUnsupportedBrowser} from '../component/WirelessUnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
-interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
+interface Props extends React.HTMLAttributes<_ConversationJoinInvalid> {}
 
 interface ConnectedProps {}
 

@@ -17,13 +17,13 @@
  *
  */
 
-export const CALL_STATE = {
-  CONNECTING: 'connecting',
-  DISCONNECTING: 'disconnecting',
-  ENDED: 'ended',
-  INCOMING: 'incoming',
-  ONGOING: 'ongoing',
-  OUTGOING: 'outgoing',
-  REJECTED: 'rejected',
-  UNKNOWN: 'unknown',
-};
+export enum CALL_STATE {
+  CONNECTING = 'connecting',
+  DISCONNECTING = 'disconnecting',
+  ENDED = 'ended',
+  INCOMING = 'incoming',
+  ONGOING = 'ongoing',
+  OUTGOING = 'outgoing',
+  REJECTED = 'rejected',
+  UNKNOWN = 'unknown',
+}

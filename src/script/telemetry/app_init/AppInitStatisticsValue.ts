@@ -17,9 +17,12 @@
  *
  */
 
-export const AssetType = {
-  FILE: 'File',
-  IMAGE: 'Image',
-  LOCATION: 'Location',
-  TEXT: 'Text',
-};
+export enum AppInitStatisticsValue {
+  BACKEND_REQUESTS = 'backend_requests',
+  CLIENT_TYPE = 'client_type',
+  CLIENTS = 'clients',
+  CONNECTIONS = 'connections',
+  CONVERSATIONS = 'conversations',
+  NOTIFICATIONS = 'notifications',
+  SESSIONS = 'sessions',
+}

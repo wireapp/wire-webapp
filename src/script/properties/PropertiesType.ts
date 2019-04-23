@@ -17,24 +17,36 @@
  *
  */
 
+enum CONTACT_IMPORT {
+  MACOS = 'contact_import.macos',
+}
+
+enum EMOJI {
+  REPLACE_INLINE = 'settings.emoji.replace_inline',
+}
+
+enum INTERFACE {
+  THEME = 'settings.interface.theme',
+}
+
+enum PREVIEWS {
+  SEND = 'settings.previews.send',
+}
+
+enum PROPERTIES {
+  ENABLE_DEBUGGING = 'enable_debugging',
+  NOTIFICATIONS = 'settings.notifications',
+  PRIVACY = 'settings.privacy.improve_wire',
+  SOUND_ALERTS = 'settings.sound.alerts',
+  VERSION = 'version',
+}
+
 const PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    MACOS: 'contact_import.macos',
-  },
-  EMOJI: {
-    REPLACE_INLINE: 'settings.emoji.replace_inline',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  INTERFACE: {
-    THEME: 'settings.interface.theme',
-  },
-  NOTIFICATIONS: 'settings.notifications',
-  PREVIEWS: {
-    SEND: 'settings.previews.send',
-  },
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+  ...PROPERTIES,
+  CONTACT_IMPORT,
+  EMOJI,
+  INTERFACE,
+  PREVIEWS,
 };
 
 export {PROPERTIES_TYPE};

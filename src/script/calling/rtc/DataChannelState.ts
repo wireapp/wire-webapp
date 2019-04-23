@@ -19,11 +19,9 @@
 
 // https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
-const DATA_CHANNEL_STATE = {
-  CLOSED: 'closed',
-  CLOSING: 'closing',
-  CONNECTING: 'connecting',
-  OPEN: 'open',
-};
-
-export {DATA_CHANNEL_STATE};
+export enum DATA_CHANNEL_STATE {
+  CLOSED = 'closed',
+  CLOSING = 'closing',
+  CONNECTING = 'connecting',
+  OPEN = 'open',
+}

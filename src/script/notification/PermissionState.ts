@@ -18,12 +18,10 @@
  */
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
-const PermissionState = {
-  DEFAULT: 'default',
-  DENIED: 'denied',
-  GRANTED: 'granted',
-  IGNORED: 'ignored',
-  UNSUPPORTED: 'unsupported',
-};
-
-export {PermissionState};
+export enum PermissionState {
+  DEFAULT = 'default',
+  DENIED = 'denied',
+  GRANTED = 'granted',
+  IGNORED = 'ignored',
+  UNSUPPORTED = 'unsupported',
+}

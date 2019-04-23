@@ -19,13 +19,11 @@
 
 // http://www.w3.org/TR/webrtc/#rtcsdptype
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
-const SDP_TYPE = {
-  ANSWER: 'answer',
-  LOCAL: 'local',
-  OFFER: 'offer',
-  PROVISIONAL_ANSWER: 'pranswer',
-  REMOTE: 'remote',
-  ROLLBACK: 'rollback',
-};
-
-export {SDP_TYPE};
+export enum SDP_TYPE {
+  ANSWER = 'answer',
+  LOCAL = 'local',
+  OFFER = 'offer',
+  PROVISIONAL_ANSWER = 'pranswer',
+  REMOTE = 'remote',
+  ROLLBACK = 'rollback',
+}

@@ -19,14 +19,12 @@
 
 // http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
-const SIGNALING_STATE = {
-  CLOSED: 'closed',
-  LOCAL_OFFER: 'have-local-offer',
-  LOCAL_PROVISIONAL_ANSWER: 'have-local-pranswer',
-  NEW: 'new',
-  REMOTE_OFFER: 'have-remote-offer',
-  REMOTE_PROVISIONAL_ANSWER: 'have-remote-pranswer',
-  STABLE: 'stable',
-};
-
-export {SIGNALING_STATE};
+export enum SIGNALING_STATE {
+  CLOSED = 'closed',
+  LOCAL_OFFER = 'have-local-offer',
+  LOCAL_PROVISIONAL_ANSWER = 'have-local-pranswer',
+  NEW = 'new',
+  REMOTE_OFFER = 'have-remote-offer',
+  REMOTE_PROVISIONAL_ANSWER = 'have-remote-pranswer',
+  STABLE = 'stable',
+}

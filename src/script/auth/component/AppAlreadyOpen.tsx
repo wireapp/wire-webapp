@@ -26,7 +26,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 
-export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
+export interface Props extends React.HTMLAttributes<_AppAlreadyOpen> {
   fullscreen?: boolean;
 }
 

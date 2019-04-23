@@ -17,8 +17,6 @@
  *
  */
 
-const ConnectSource = {
-  ICLOUD: 'icloud',
-};
-
-export {ConnectSource};
+export enum ConnectSource {
+  ICLOUD = 'icloud',
+}

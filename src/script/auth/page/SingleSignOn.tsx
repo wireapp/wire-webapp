@@ -44,7 +44,7 @@ import {ROUTE} from '../route';
 import {Page} from './Page';
 import {SingleSignOnForm} from './SingleSignOnForm';
 
-interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<_SingleSignOn>, RouteComponentProps<{}> {}
 
 interface State {
   isOverlayOpen: boolean;
