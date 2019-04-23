@@ -17,15 +17,13 @@
  *
  */
 
-import * as logdown from 'logdown';
-
+import {Logger, getLogger} from '../auth/LogProvider';
 import BackendClient from '../service/BackendClient';
-import Logger from '../util/Logger';
 import {PhoneBook} from './PhoneBook';
 
 class ConnectService {
   backendClient: BackendClient;
-  logger: logdown.Logger;
+  logger: Logger;
 
   /**
    * Construct an new ConnectService.
@@ -33,7 +31,7 @@ class ConnectService {
    */
   constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('ConnectService');
+    this.logger = getLogger('ConnectService');
   }
 
   /**
