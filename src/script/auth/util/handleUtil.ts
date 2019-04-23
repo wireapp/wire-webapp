@@ -1,4 +1,3 @@
-/* @flow */
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -17,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+/* @flow */
 
 import * as getSlug from 'speakingurl';
 import {randomArrayElement, randomInt} from './randomUtil';
