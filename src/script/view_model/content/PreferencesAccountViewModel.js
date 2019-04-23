@@ -22,7 +22,7 @@ import Logger from 'utils/Logger';
 import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from '../../user/ConsentValue';
+import {ConsentValue} from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -32,6 +32,7 @@ import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {validateProfileImageResolution} from 'utils/util';
+import {nameFromType} from '../../user/AvailabilityMapper';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -76,7 +77,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+      let label = nameFromType(this.availability());
 
       const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {

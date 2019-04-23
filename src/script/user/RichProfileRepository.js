@@ -17,7 +17,7 @@
  *
  */
 
-export default class RichProfileRepository {
+export class RichProfileRepository {
   static get URL() {
     return {
       RICH_INFO: '/users/:id/rich-info',

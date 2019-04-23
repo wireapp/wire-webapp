@@ -17,7 +17,7 @@
  *
  */
 
-export default {
-  MARKETING: 2,
-  TERMS_OF_USE: 1,
-};
+export enum ConsentType {
+  MARKETING = 2,
+  TERMS_OF_USE = 1,
+}
