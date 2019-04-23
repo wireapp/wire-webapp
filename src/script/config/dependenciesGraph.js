@@ -35,7 +35,7 @@ import {MessageSender} from '../message/MessageSender';
 import PermissionRepository from '../permission/PermissionRepository';
 import PropertiesRepository from '../properties/PropertiesRepository';
 import PropertiesService from '../properties/PropertiesService';
-import RichProfileRepository from '../user/RichProfileRepository';
+import {RichProfileRepository} from '../user/RichProfileRepository';
 import SelfService from '../self/SelfService';
 import StorageService from '../storage/StorageService';
 import UserService from '../user/UserService';
