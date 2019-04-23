@@ -17,8 +17,10 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
+ */
 export enum SIGNALING_STATE {
   CLOSED = 'closed',
   LOCAL_OFFER = 'have-local-offer',

@@ -17,8 +17,10 @@
  *
  */
 
-// https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+/**
+ * @see https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+ */
 export enum DATA_CHANNEL_STATE {
   CLOSED = 'closed',
   CLOSING = 'closing',

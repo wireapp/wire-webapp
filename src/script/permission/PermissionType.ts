@@ -17,7 +17,7 @@
  *
  */
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query */
 export enum PermissionType {
   CAMERA = 'camera',
   GEO_LOCATION = 'geolocation',

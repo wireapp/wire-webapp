@@ -17,7 +17,7 @@
  *
  */
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/permission */
 export enum PermissionState {
   DEFAULT = 'default',
   DENIED = 'denied',

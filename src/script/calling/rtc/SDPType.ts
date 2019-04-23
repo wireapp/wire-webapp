@@ -17,8 +17,10 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcsdptype
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcsdptype
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
+ */
 export enum SDP_TYPE {
   ANSWER = 'answer',
   LOCAL = 'local',

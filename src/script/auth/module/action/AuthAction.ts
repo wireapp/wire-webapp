@@ -144,7 +144,7 @@ export class AuthAction {
   ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;
     // TODO: Fixed once core v6 is inside
-    // eslint-disable-next-line dot-notation
+    // @ts-ignore
     const accessToken = core['apiClient'].accessTokenStore.accessToken;
     const expiresMillis = accessToken.expires_in * 1000;
     const expireTimestamp = Date.now() + expiresMillis;
@@ -181,7 +181,6 @@ export class AuthAction {
       registration.team.icon = 'default';
       registration.team.binding = true;
       // TODO: Fixed once core v6 is inside
-      // eslint-disable-next-line dot-notation
       // @ts-ignore
       registration.team['currency'] = currentCurrency();
       registration.team.name = registration.team.name.trim();

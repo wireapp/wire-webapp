@@ -17,7 +17,7 @@
  *
  */
 
-// https://www.w3.org/TR/webrtc/#dom-rtcstatstype
+/** @see https://www.w3.org/TR/webrtc/#dom-rtcstatstype */
 export enum STATS_TYPE {
   CANDIDATE_PAIR = 'candidate-pair',
   GOOGLE_CANDIDATE_PAIR = 'googCandidatePair',

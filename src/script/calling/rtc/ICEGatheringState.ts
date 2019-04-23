@@ -17,8 +17,10 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcicegatheringstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceGatheringState#Value
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcicegatheringstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceGatheringState#Value
+ */
 export enum ICE_GATHERING_STATE {
   COMPLETE = 'complete',
   GATHERING = 'gathering',

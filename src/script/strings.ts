@@ -23,8 +23,6 @@ import {LabeledError} from './auth/module/action/LabeledError';
 import {ValidationError} from './auth/module/action/ValidationError';
 import {LOGOUT_REASON} from './auth/route';
 
-/* eslint-disable sort-keys */
-
 export const footerStrings = defineMessages({
   copy: {
     defaultMessage: '© Wire Swiss GmbH',

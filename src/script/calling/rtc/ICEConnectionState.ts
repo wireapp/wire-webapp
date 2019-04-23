@@ -17,8 +17,10 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
+ */
 export enum ICE_CONNECTION_STATE {
   CHECKING = 'checking',
   CLOSED = 'closed',
