@@ -94,14 +94,7 @@ export class CallingRepository {
         getAvsInstance().then(callingApi => {
           callingApi.init();
           const requestConfig = () => {
-            this.getConfig().then(({ice_servers}) => {
-              const config = {
-                bundlePolicy: 'max-bundle',
-                iceServers: ice_servers,
-                rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
-              };
-              callingApi.config_update(this.callingAccount, 0, JSON.stringify(config));
-            });
+            this.getConfig().then(config => callingApi.config_update(this.callingAccount, 0, JSON.stringify(config)));
             return 0;
           };
 
@@ -117,7 +110,7 @@ export class CallingRepository {
             const protoCalling = new Calling({content: payload});
             const genericMessage = new GenericMessage({
               [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-              messageId: z.util.createRandomUuid(),
+              messageId: createRandomUuid(),
             });
 
             //const options = {precondition, recipients};
