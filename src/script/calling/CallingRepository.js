@@ -20,7 +20,7 @@
 import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -91,7 +91,7 @@ export class CallingRepository {
     ko.computed(() => {
       if (userRepository.self() && clientRepository.currentClient()) {
         getAvsInstance().then(callingApi => {
-          const avsLogger = Logger('avs');
+          const avsLogger = getLogger('avs');
           callingApi.set_log_handler((level, message) => {
             // TODO handle levels
             avsLogger.debug(message);
