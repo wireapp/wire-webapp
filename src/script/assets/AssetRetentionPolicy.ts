@@ -20,10 +20,10 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-z.assets.AssetRetentionPolicy = {
-  ETERNAL: 'eternal',
-  ETERNAL_INFREQUENT_ACCESS: 'eternal-infrequent_access',
-  EXPIRING: 'expiring',
-  PERSISTENT: 'persistent',
-  VOLATILE: 'volatile',
-};
+export enum AssetRetentionPolicy {
+  ETERNAL = 'eternal',
+  ETERNAL_INFREQUENT_ACCESS = 'eternal-infrequent_access',
+  EXPIRING = 'expiring',
+  PERSISTENT = 'persistent',
+  VOLATILE = 'volatile',
+}

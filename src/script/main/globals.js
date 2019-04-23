@@ -55,7 +55,6 @@ import EventNameGlobal from '../tracking/EventName.js';
 import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
 import SuperPropertyGlobal from '../tracking/SuperProperty.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
-import AssetRetentionPolicyGlobal from '../assets/AssetRetentionPolicy.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetTypeGlobal from '../assets/AssetType.js';
 import AssetMapperGlobal from '../assets/AssetMapper.js';
