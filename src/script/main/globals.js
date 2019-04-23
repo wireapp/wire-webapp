@@ -12,7 +12,6 @@ import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';
 import CryptoGlobal from '../util/Crypto.js';
 import DebugUtilGlobal from '../util/DebugUtil.js';
-import EmojiUtilGlobal from '../util/EmojiUtil.js';
 import utilGlobal from '../util/util.js';
 import SanitizationUtilGlobal from '../util/SanitizationUtil.js';
 import KeyboardUtilGlobal from '../util/KeyboardUtil.js';

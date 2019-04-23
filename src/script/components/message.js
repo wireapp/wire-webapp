@@ -21,6 +21,7 @@ import moment from 'moment';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {t} from 'utils/LocalizerUtil';
+import {includesOnlyEmojis} from 'utils/EmojiUtil';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -79,6 +80,7 @@ class Message {
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
+    this.includesOnlyEmojis = includesOnlyEmojis;
 
     const markedSubscription = ko.computed(() => {
       const marked = isMarked();
@@ -282,7 +284,7 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>

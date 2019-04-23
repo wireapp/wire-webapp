@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {includesOnlyEmojis} from 'utils/EmojiUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -55,6 +56,8 @@ z.components.MessageQuote = class MessageQuote {
     this.quotedMessage = ko.observable();
     this.quotedMessageId = ko.observable();
     this.error = ko.observable(quote().error);
+
+    this.includesOnlyEmojis = includesOnlyEmojis;
 
     this.quotedMessage.subscribe(() => this.showFullText(false));
 
@@ -147,7 +150,7 @@ ko.components.register('message-quote', {
             <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()),
                                                         event: {click: $parent.handleClickOnMessage},
                                                         css: {'message-quote__text--full': $parent.showFullText(),
-                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}"
+                                                              'message-quote__text--large': includesOnlyEmojis(asset.text)}"
               dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
