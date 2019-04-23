@@ -17,9 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
 export enum AssetRetentionPolicy {
   ETERNAL = 'eternal',
   ETERNAL_INFREQUENT_ACCESS = 'eternal-infrequent_access',

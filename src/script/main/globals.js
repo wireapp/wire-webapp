@@ -57,7 +57,6 @@ import SuperPropertyGlobal from '../tracking/SuperProperty.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetTypeGlobal from '../assets/AssetType.js';
-import AssetMapperGlobal from '../assets/AssetMapper.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import AssetCryptoGlobal from '../assets/AssetCrypto.js';
 import ErrorGlobal from '../backup/Error.js';
