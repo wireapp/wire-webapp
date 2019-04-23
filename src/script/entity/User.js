@@ -19,22 +19,24 @@
 
 import ko from 'knockout';
 
+import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
+import {AvailabilityType} from '../user/AvailabilityType';
 
 // Please note: The own user has a "locale"
 class User {
   static get ACCENT_COLOR() {
     return {
-      BLUE: '#2391d3',
-      GREEN: '#00c800',
-      ORANGE: '#ff8900',
-      PINK: '#fe5ebd',
-      PURPLE: '#9c00fe',
-      RED: '#fb0807',
-      YELLOW: '#febf02',
+      [ACCENT_ID.BLUE]: '#2391d3',
+      [ACCENT_ID.GREEN]: '#00c800',
+      [ACCENT_ID.ORANGE]: '#ff8900',
+      [ACCENT_ID.PINK]: '#fe5ebd',
+      [ACCENT_ID.PURPLE]: '#9c00fe',
+      [ACCENT_ID.RED]: '#fb0807',
+      [ACCENT_ID.YELLOW]: '#febf02',
     };
   }
 
@@ -52,18 +54,6 @@ class User {
     };
   }
 
-  static get THEME() {
-    return {
-      BLUE: 'theme-blue',
-      GREEN: 'theme-green',
-      ORANGE: 'theme-orange',
-      PINK: 'theme-pink',
-      PURPLE: 'theme-purple',
-      RED: 'theme-red',
-      YELLOW: 'theme-yellow',
-    };
-  }
-
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
@@ -73,56 +63,9 @@ class User {
 
     this.joaatHash = -1;
 
-    this.accent_id = ko.observable(z.config.ACCENT_ID.BLUE);
-    this.accent_theme = ko.pureComputed(
-      () => {
-        switch (this.accent_id()) {
-          case z.config.ACCENT_ID.BLUE:
-            return User.THEME.BLUE;
-          case z.config.ACCENT_ID.GREEN:
-            return User.THEME.GREEN;
-          case z.config.ACCENT_ID.ORANGE:
-            return User.THEME.ORANGE;
-          case z.config.ACCENT_ID.PINK:
-            return User.THEME.PINK;
-          case z.config.ACCENT_ID.PURPLE:
-            return User.THEME.PURPLE;
-          case z.config.ACCENT_ID.RED:
-            return User.THEME.RED;
-          case z.config.ACCENT_ID.YELLOW:
-            return User.THEME.YELLOW;
-          default:
-            return User.THEME.BLUE;
-        }
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.accent_id = ko.observable(ACCENT_ID.BLUE);
 
-    this.accent_color = ko.pureComputed(
-      () => {
-        switch (this.accent_id()) {
-          case z.config.ACCENT_ID.BLUE:
-            return User.ACCENT_COLOR.BLUE;
-          case z.config.ACCENT_ID.GREEN:
-            return User.ACCENT_COLOR.GREEN;
-          case z.config.ACCENT_ID.ORANGE:
-            return User.ACCENT_COLOR.ORANGE;
-          case z.config.ACCENT_ID.PINK:
-            return User.ACCENT_COLOR.PINK;
-          case z.config.ACCENT_ID.PURPLE:
-            return User.ACCENT_COLOR.PURPLE;
-          case z.config.ACCENT_ID.RED:
-            return User.ACCENT_COLOR.RED;
-          case z.config.ACCENT_ID.YELLOW:
-            return User.ACCENT_COLOR.YELLOW;
-          default:
-            return User.ACCENT_COLOR.BLUE;
-        }
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.accent_color = ko.pureComputed(() => User.ACCENT_COLOR[this.accent_id()] || User.ACCENT_COLOR[ACCENT_ID.BLUE]);
 
     this.email = ko.observable();
     this.phone = ko.observable();
@@ -186,7 +129,7 @@ class User {
       return this.devices().every(client_et => client_et.meta.isVerified());
     });
 
-    this.availability = ko.observable(z.user.AvailabilityType.NONE);
+    this.availability = ko.observable(AvailabilityType.NONE);
 
     this.expirationRemaining = ko.observable(0);
     this.expirationText = ko.observable('');

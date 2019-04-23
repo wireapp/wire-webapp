@@ -117,7 +117,9 @@ z.util.Environment = (() => {
     const requestPermissionNotSupported = window.Notification.requestPermission === undefined;
     return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
   };
-  const _supportsScreenSharing = () => (window.desktopCapturer ? true : _isFirefox());
+  const _supportsScreenSharing = () => {
+    return window.desktopCapturer || _isFirefox();
+  };
 
   // add body information
   const _osCssClass = _isMac() ? 'os-mac' : 'os-pc';

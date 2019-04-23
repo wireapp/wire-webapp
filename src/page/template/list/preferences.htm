@@ -17,7 +17,7 @@
         <options-icon class="left-column-icon"></options-icon>
         <div class="center-column" data-bind="text: t('preferencesOptions')"></div>
       </li>
-      <!-- ko if: z.calling.CallingRepository.supportsCalling -->
+      <!-- ko if: supportsCalling -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAV, css: {'accent-text accent-fill': selectedAV}" data-uie-name="go-audio-video">
           <av-icon class="left-column-icon"></av-icon>
           <div class="center-column" data-bind="text: t('preferencesAV')"></div>

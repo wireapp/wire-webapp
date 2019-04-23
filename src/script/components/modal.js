@@ -21,8 +21,8 @@ import ko from 'knockout';
 
 ko.components.register('modal', {
   template: `
-    <div class="modal__overlay" data-bind="click: onBgClick, css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
-      <div class="modal__content" data-bind="click: () => false, clickBubble: false, css: {'modal__content--large': large}, fadingscrollbar" >
+    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
+      <div class="modal__content" data-bind="click: () => true, clickBubble: false, css: {'modal__content--large': large}, fadingscrollbar" >
         <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
       </div>
     </div>
@@ -31,7 +31,6 @@ ko.components.register('modal', {
     this.large = large;
     this.onBgClick = onBgClick;
     this.displayNone = ko.observable(!ko.unwrap(isShown));
-
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
 
     let timeoutId = 0;

@@ -20,6 +20,10 @@
 import Logger from 'utils/Logger';
 import MessageListViewModel from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
+import {GroupCreationViewModel} from './content/GroupCreationViewModel';
+import {EmojiInputViewModel} from './content/EmojiInputViewModel';
+import {ModalsViewModel} from './ModalsViewModel';
+
 import {t} from 'utils/LocalizerUtil';
 
 window.z = window.z || {};
@@ -66,7 +70,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
     this.collection = new z.viewModel.content.CollectionViewModel(mainViewModel, this, repositories);
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
-    this.emojiInput = new z.viewModel.content.EmojiInputViewModel(mainViewModel, this, repositories);
+    this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
     this.inputBar = new z.viewModel.content.InputBarViewModel(
       mainViewModel,
@@ -74,7 +78,12 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       repositories,
       z.message.MessageHasher
     );
-    this.groupCreation = new z.viewModel.content.GroupCreationViewModel(mainViewModel, this, repositories);
+    this.groupCreation = new GroupCreationViewModel(
+      repositories.conversation,
+      repositories.search,
+      repositories.team,
+      repositories.user
+    );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
@@ -88,7 +97,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
       repositories
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
-    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(mainViewModel, this, repositories);
+    this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
 
     this.historyExport = new z.viewModel.content.HistoryExportViewModel(mainViewModel, this, repositories);
     this.historyImport = new z.viewModel.content.HistoryImportViewModel(mainViewModel, this, repositories);
@@ -235,7 +244,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         });
       })
       .catch(() => {
-        this.mainViewModel.modals.showModal('.modal-template-acknowledge', {
+        this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('conversationNotFoundMessage'),
             title: t('conversationNotFoundTitle'),

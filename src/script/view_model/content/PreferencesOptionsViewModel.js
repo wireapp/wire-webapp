@@ -29,6 +29,7 @@ window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
@@ -37,7 +38,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(repositories) {
     this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel');
 
     this.callingRepository = repositories.calling;
@@ -47,6 +48,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
+    this.supportsCalling = this.callingRepository.supportsCalling;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {
@@ -54,8 +56,9 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
 
     this.optionDarkMode = ko.observable();
-    this.optionDarkMode.subscribe(darkModePreference => {
-      amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE_TOGGLE, darkModePreference);
+    this.optionDarkMode.subscribe(useDarkMode => {
+      const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
 
@@ -75,6 +78,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    this.updateProperties(this.propertiesRepository.properties);
   }
 
   connectMacOSContacts() {
@@ -96,7 +100,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       return z.util.downloadBlob(blob, filename);
     }
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: t('modalCallEmptyLogMessage'),
         title: t('modalCallEmptyLogHeadline'),
@@ -104,11 +108,11 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     });
   }
 
-  updateProperties(properties) {
-    this.optionAudio(properties.settings.sound.alerts);
-    this.optionReplaceInlineEmoji(properties.settings.emoji.replace_inline);
-    this.optionDarkMode(properties.settings.interface.theme === ThemeViewModelThemes.DARK);
-    this.optionSendPreviews(properties.settings.previews.send);
-    this.optionNotifications(properties.settings.notifications);
-  }
+  updateProperties = ({settings}) => {
+    this.optionAudio(settings.sound.alerts);
+    this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
+    this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
+    this.optionSendPreviews(settings.previews.send);
+    this.optionNotifications(settings.notifications);
+  };
 };

@@ -21,6 +21,8 @@ import Logger from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {iterateItem} from 'utils/ArrayUtil';
+import {ArchiveViewModel} from './list/ArchiveViewModel';
+import {ConversationListViewModel} from './list/ConversationListViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -44,7 +46,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
   /**
    * View model for the list column.
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {Object} repositories - Object containing all the repositories
    */
   constructor(mainViewModel, repositories) {
@@ -54,6 +56,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
+    this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
 
@@ -104,9 +107,14 @@ z.viewModel.ListViewModel = class ListViewModel {
     });
 
     // Nested view models
-    this.archive = new z.viewModel.list.ArchiveViewModel(mainViewModel, this, repositories);
-    this.conversations = new z.viewModel.list.ConversationListViewModel(mainViewModel, this, repositories);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(mainViewModel, this, repositories);
+    this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
+    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
+    this.preferences = new z.viewModel.list.PreferencesListViewModel(
+      this.contentViewModel,
+      this,
+      repositories.user,
+      repositories.calling
+    );
     this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
     this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);
@@ -129,6 +137,10 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
+
+  joinCall = (conversationEntity, mediaType) => {
+    this.callingRepository.joinCall(conversationEntity, mediaType);
+  };
 
   changeNotificationSetting() {
     if (this.isProAccount()) {

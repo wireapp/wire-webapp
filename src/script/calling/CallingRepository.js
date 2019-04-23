@@ -23,40 +23,21 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import {CallLogger} from '../telemetry/calling/CallLogger';
+import {CallMessageBuilder} from './CallMessageBuilder';
 
 import CALL_MESSAGE_TYPE from './enum/CallMessageType';
 import PROPERTY_STATE from './enum/PropertyState';
 import CALL_STATE from './enum/CallState';
 import TERMINATION_REASON from './enum/TerminationReason';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-
-z.calling.CallingRepository = class CallingRepository {
+export class CallingRepository {
   static get CONFIG() {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
-      MAX_VIDEO_PARTICIPANTS: 4,
-      PROTOCOL_VERSION: '3.0',
     };
-  }
-
-  /**
-   * Extended check for calling support of browser.
-   * @returns {boolean} True if calling is supported
-   */
-  static get supportsCalling() {
-    return z.util.Environment.browser.supports.calling;
-  }
-
-  /**
-   * Extended check for screen sharing support of browser.
-   * @returns {boolean} True if screen sharing is supported
-   */
-  static get supportsScreenSharing() {
-    return z.util.Environment.browser.supports.screenSharing;
   }
 
   /**
@@ -67,7 +48,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    * @param {EventRepository} eventRepository -  Repository that handles events
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository -  Repository for all user interactions
    */
   constructor(
@@ -76,7 +57,7 @@ z.calling.CallingRepository = class CallingRepository {
     conversationRepository,
     eventRepository,
     mediaRepository,
-    serverTimeRepository,
+    serverTimeHandler,
     userRepository
   ) {
     this.getConfig = this.getConfig.bind(this);
@@ -86,12 +67,11 @@ z.calling.CallingRepository = class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.mediaRepository = mediaRepository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
     this.messageLog = [];
-    const loggerName = 'z.calling.CallingRepository';
-    this.callLogger = new CallLogger(loggerName, null, this.messageLog);
+    this.callLogger = new CallLogger('CallingRepository', null, this.messageLog);
 
     this.selfUserId = ko.pureComputed(() => {
       if (this.userRepository.self()) {
@@ -129,6 +109,22 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
+   * Extended check for calling support of browser.
+   * @returns {boolean} True if calling is supported
+   */
+  get supportsCalling() {
+    return z.util.Environment.browser.supports.calling;
+  }
+
+  /**
+   * Extended check for screen sharing support of browser.
+   * @returns {boolean} True if screen sharing is supported
+   */
+  get supportsScreenSharing() {
+    return z.util.Environment.browser.supports.screenSharing;
+  }
+
+  /**
    * Share call states with MediaRepository.
    * @returns {undefined} No return value
    */
@@ -145,11 +141,10 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.deleteCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.JOIN, this.joinCall.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leaveCall.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.rejectCall.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.getConfig);
   }
@@ -187,7 +182,7 @@ z.calling.CallingRepository = class CallingRepository {
           conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
         })
         .then(() => {
-          return z.calling.CallingRepository.supportsCalling
+          return this.supportsCalling
             ? this._onCallEventInSupportedBrowsers(callMessageEntity, source)
             : this._onCallEventInUnsupportedBrowsers(callMessageEntity, source);
         });
@@ -616,7 +611,9 @@ z.calling.CallingRepository = class CallingRepository {
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
             const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-            this.joinCall(conversationId, mediaType);
+            return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+              this.joinCall(conversationEntity, mediaType);
+            });
           }
         })
         .catch(_error => {
@@ -875,19 +872,19 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Join a call.
    *
-   * @param {string} conversationId - ID of conversation to join call in
+   * @param {Conversation} conversationEntity - conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
-  joinCall(conversationId, mediaType) {
-    this.getCallById(conversationId)
+  joinCall(conversationEntity, mediaType) {
+    this.getCallById(conversationEntity.id)
       .then(callEntity => ({callEntity, callState: callEntity.state()}))
       .catch(error => {
         this._handleNotFoundError(error);
         return {callState: CALL_STATE.OUTGOING};
       })
-      .then(({callEntity, callState}) => this._joinCall(conversationId, mediaType, callState, callEntity))
-      .catch(error => this._handleJoinCallError(error, conversationId));
+      .then(({callEntity, callState}) => this._joinCall(conversationEntity, mediaType, callState, callEntity))
+      .catch(error => this._handleJoinCallError(error, conversationEntity.id));
   }
 
   /**
@@ -965,7 +962,7 @@ z.calling.CallingRepository = class CallingRepository {
       const isActiveCall = conversationEntity.id === this._selfClientOnACall();
       return isActiveCall
         ? this.leaveCall(conversationEntity.id, TERMINATION_REASON.SELF_USER)
-        : this.joinCall(conversationEntity.id, mediaType);
+        : this.joinCall(conversationEntity, mediaType);
     }
   }
 
@@ -973,30 +970,31 @@ z.calling.CallingRepository = class CallingRepository {
    * Check whether conversation supports calling.
    *
    * @private
-   * @param {string} conversationId - ID of conversation to join call in
+   * @param {Conversation} conversationEntity - conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type for this call
    * @param {CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
-  _checkCallingSupport(conversationId, mediaType, callState) {
-    return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+  _checkCallingSupport(conversationEntity, mediaType, callState) {
+    return new Promise((resolve, reject) => {
       const noConversationParticipants = !conversationEntity.participating_user_ids().length;
       if (noConversationParticipants) {
         this._showModal(t('modalCallEmptyConversationHeadline'), t('modalCallEmptyConversationMessage'));
-        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
+        return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
-      if (isOutgoingCall && !z.calling.CallingRepository.supportsCalling) {
+      if (isOutgoingCall && !this.supportsCalling) {
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
-        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
+        return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
       const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
       if (isVideoCall && !conversationEntity.supportsVideoCall(isOutgoingCall)) {
         this._showModal(t('modalCallNoGroupVideoHeadline'), t('modalCallNoGroupVideoMessage'));
-        throw new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED);
+        return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
+      resolve();
     });
   }
 
@@ -1048,7 +1046,7 @@ z.calling.CallingRepository = class CallingRepository {
           }
         }
 
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
@@ -1175,8 +1173,8 @@ z.calling.CallingRepository = class CallingRepository {
   _initiateOutgoingCall(conversationId, mediaType) {
     const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
-    const messagePayload = z.calling.CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
-    const callMessageEntity = z.calling.CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
+    const messagePayload = CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
+    const callMessageEntity = CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
     return this._createOutgoingCall(callMessageEntity);
   }
 
@@ -1213,20 +1211,20 @@ z.calling.CallingRepository = class CallingRepository {
    * Join a call.
    *
    * @private
-   * @param {string} conversationId - ID of conversation to join call in
+   * @param {Conversation} conversationEntity - conversation to join call in
    * @param {z.media.MediaType} mediaType - Media type of the call
    * @param {CALL_STATE} callState - State of call
    * @param {CallEntity} [callEntity] - Retrieved call entity
    * @returns {undefined} No return value
    */
-  _joinCall(conversationId, mediaType, callState, callEntity) {
-    this._checkCallingSupport(conversationId, mediaType, callState)
-      .then(() => this._checkConcurrentJoinedCall(conversationId, callState))
-      .then(() => callEntity || this._initiateOutgoingCall(conversationId, mediaType, callState))
+  _joinCall(conversationEntity, mediaType, callState, callEntity) {
+    this._checkCallingSupport(conversationEntity, mediaType, callState)
+      .then(() => this._checkConcurrentJoinedCall(conversationEntity.id, callState))
+      .then(() => callEntity || this._initiateOutgoingCall(conversationEntity.id, mediaType, callState))
       .then(callEntityToJoin => this._initiatePreJoinCall(callEntityToJoin))
       .then(callEntityToJoin => this._initiateMediaStream(callEntityToJoin, mediaType))
       .then(callEntityToJoin => this._initiateJoinCall(callEntityToJoin, mediaType))
-      .catch(error => this._handleJoinError(conversationId, !callEntity, error));
+      .catch(error => this._handleJoinError(conversationEntity.id, !callEntity, error));
   }
 
   /**
@@ -1274,8 +1272,8 @@ z.calling.CallingRepository = class CallingRepository {
   _removeParticipant(callEntity, userId) {
     return callEntity.getParticipantById(userId).then(() => {
       const {id, sessionId} = callEntity;
-      const additionalPayload = z.calling.CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
-      const callMessageEntity = z.calling.CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
+      const additionalPayload = CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
+      const callMessageEntity = CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
 
       this._onGroupLeave(callMessageEntity, TERMINATION_REASON.MEMBER_LEAVE);
     });
@@ -1290,7 +1288,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _showModal(title, message) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message,
         title,
@@ -1472,7 +1470,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
-    const currentTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
     this.eventRepository.injectEvent(event, source);
   }
@@ -1731,4 +1729,4 @@ ${turnServersConfig}`;
     Raygun.send(new Error('Call failure report'), customData);
     this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
   }
-};
+}

@@ -21,12 +21,15 @@ import Logger from 'utils/Logger';
 
 import Cookies from 'js-cookie';
 import moment from 'moment';
+import {ValidationUtil} from '@wireapp/commons';
 
 import App from '../main/app';
+import {Config} from '../auth/config';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import AssetService from '../assets/AssetService';
 import StorageService from '../storage/StorageService';
 import UserRepository from '../user/UserRepository';
+import {serverTimeHandler} from '../time/serverTimeHandler';
 import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 /* eslint-disable no-unused-vars */
@@ -80,7 +83,7 @@ class AuthViewModel {
       this.asset_service,
       this.selfService,
       this.client_repository,
-      resolveDependency(graph.ServerTimeRepository)
+      serverTimeHandler
     );
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
@@ -170,6 +173,7 @@ class AuthViewModel {
     this.failed_validation_password = ko.observable(false);
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
+    this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
@@ -549,32 +553,34 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   verify_password() {
-    if (!this.pending_server_request() && this._validate_input(z.auth.AuthView.MODE.VERIFY_PASSWORD)) {
-      this.pending_server_request(true);
-      const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
+    if (this.pending_server_request()) {
+      return;
+    }
+    this._clear_errors();
+    this.pending_server_request(true);
+    const payload = this._create_payload(z.auth.AuthView.MODE.VERIFY_PASSWORD);
 
-      this.authRepository
-        .login(payload, this.persist())
-        .then(() => this._authentication_successful())
-        .catch(error => {
-          this.pending_server_request(false);
-          $('#wire-verify-password').focus();
-          if (navigator.onLine) {
-            if (error.label) {
-              if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                this._add_error(t('authErrorPending'));
-              } else {
-                this._add_error(t('authErrorSignIn'), z.auth.AuthView.TYPE.PASSWORD);
-              }
+    this.authRepository
+      .login(payload, this.persist())
+      .then(() => this._authentication_successful())
+      .catch(error => {
+        this.pending_server_request(false);
+        $('#wire-verify-password').focus();
+        if (navigator.onLine) {
+          if (error.label) {
+            if (error.label === z.error.BackendClientError.LABEL.PENDING_ACTIVATION) {
+              this._add_error(t('authErrorPending'));
             } else {
-              this._add_error(t('authErrorMisc'));
+              this._add_error(t('authErrorSignIn'), z.auth.AuthView.TYPE.PASSWORD);
             }
           } else {
-            this._add_error(t('authErrorOffline'));
+            this._add_error(t('authErrorMisc'));
           }
-          this._has_errors();
-        });
-    }
+        } else {
+          this._add_error(t('authErrorOffline'));
+        }
+        this._has_errors();
+      });
   }
 
   /**
@@ -665,7 +671,7 @@ class AuthViewModel {
 
   clear_error_password(view_model, input_event) {
     this.failed_validation_password(false);
-    if (!input_event.currentTarget.value.length || input_event.currentTarget.value.length >= 8) {
+    if (this._validatePassword(input_event.currentTarget.value)) {
       this._remove_error(input_event.currentTarget.classList[1]);
     }
   }
@@ -1409,7 +1415,10 @@ class AuthViewModel {
 
     const password_modes = [z.auth.AuthView.MODE.VERIFY_ACCOUNT, z.auth.AuthView.MODE.VERIFY_PASSWORD];
     if (password_modes.includes(mode)) {
-      this._validate_password(mode);
+      const isValidPassword = this._validatePassword(this.password());
+      if (!isValidPassword) {
+        this._add_error(t('authErrorPasswordWrong', this.minPasswordLength), z.auth.AuthView.TYPE.PASSWORD);
+      }
     }
 
     const phone_modes = [z.auth.AuthView.MODE.ACCOUNT_LOGIN, z.auth.AuthView.MODE.VERIFY_PASSWORD];
@@ -1424,15 +1433,11 @@ class AuthViewModel {
    * Validate password input.
    *
    * @private
-   * @param {z.auth.AuthView.MODE} mode - View state of the authentication page
+   * @param {string} password - Password to validate
    * @returns {undefined} No return value
    */
-  _validate_password(mode) {
-    if (this.password().length < z.config.MINIMUM_PASSWORD_LENGTH) {
-      const isPasswordVerification = mode === z.auth.AuthView.MODE.VERIFY_PASSWORD;
-      const errorMessage = isPasswordVerification ? t('authErrorPasswordWrong') : t('authErrorPasswordShort');
-      this._add_error(errorMessage, z.auth.AuthView.TYPE.PASSWORD);
-    }
+  _validatePassword(password) {
+    return new RegExp(ValidationUtil.getNewPasswordPattern(this.minPasswordLength)).test(password);
   }
 
   /**

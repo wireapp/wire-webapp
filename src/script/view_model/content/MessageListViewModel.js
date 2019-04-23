@@ -26,8 +26,9 @@ import {groupBy} from 'underscore';
 
 import Conversation from '../../entity/Conversation';
 import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
 
-/**
+/*
  * Message list rendering view model.
  *
  * @todo Get rid of the participants dependencies whenever bubble implementation has changed
@@ -54,12 +55,13 @@ class MessageListViewModel {
     this.mainViewModel = mainViewModel;
     this.conversation_repository = repositories.conversation;
     this.integrationRepository = repositories.integration;
-    this.serverTimeRepository = repositories.serverTime;
+    this.serverTimeHandler = repositories.serverTime;
     this.userRepository = repositories.user;
     this.logger = Logger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
+    this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
     this.verticallyCenterMessage = ko.pureComputed(() => {
@@ -352,30 +354,26 @@ class MessageListViewModel {
   focusMessage(messageId) {
     const messageIsLoaded = !!this.conversation().getMessage(messageId);
     const conversationEntity = this.conversation();
+    this.focusedMessage(messageId);
 
-    const loadMessagePromise = messageIsLoaded
-      ? Promise.resolve()
-      : this.conversation_repository
-          .get_message_in_conversation_by_id(conversationEntity, messageId)
-          .then(messageEntity => {
-            conversationEntity.remove_messages();
-            return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
-          });
-
-    loadMessagePromise.then(() => {
-      z.util.afterRender(() => {
-        const messagesContainer = this.getMessagesContainer();
-        const messageElement = messagesContainer.querySelector(`.message[data-uie-uid="${messageId}"]`);
-
-        if (messageElement) {
-          messageElement.classList.remove('message-marked');
-          const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
-          scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
-          messageElement.classList.add('message-marked');
-        }
-      });
-    });
+    if (!messageIsLoaded) {
+      this.conversation_repository
+        .get_message_in_conversation_by_id(conversationEntity, messageId)
+        .then(messageEntity => {
+          conversationEntity.remove_messages();
+          return this.conversation_repository.getMessagesWithOffset(conversationEntity, messageEntity);
+        });
+    }
   }
+
+  onMessageMarked = messageElement => {
+    const messagesContainer = this.getMessagesContainer();
+    messageElement.classList.remove('message-marked');
+    const offsetTop = messageElement.getBoundingClientRect().top - messagesContainer.scrollTop;
+    scrollBy(messagesContainer, offsetTop - messagesContainer.offsetHeight / 2);
+    messageElement.classList.add('message-marked');
+    this.focusedMessage(null);
+  };
 
   /**
    * Triggered when user clicks on an avatar in the message list.
@@ -408,7 +406,7 @@ class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.SESSION_RESET);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -442,27 +440,29 @@ class MessageListViewModel {
       });
   }
 
-  get_timestamp_class(message_et) {
-    const lastReadMessage = this.conversation().get_previous_message(message_et);
-    if (lastReadMessage) {
-      if (message_et.is_call()) {
-        return '';
-      }
+  get_timestamp_class(messageEntity) {
+    const previousMessage = this.conversation().get_previous_message(messageEntity);
+    if (!previousMessage || messageEntity.is_call()) {
+      return '';
+    }
 
-      if (lastReadMessage.timestamp() === this.conversation_last_read_timestamp) {
-        return 'message-timestamp-visible message-timestamp-unread';
-      }
+    const isFirstUnread =
+      previousMessage.timestamp() <= this.conversation_last_read_timestamp &&
+      messageEntity.timestamp() > this.conversation_last_read_timestamp;
 
-      const last = moment(lastReadMessage.timestamp());
-      const current = moment(message_et.timestamp());
+    if (isFirstUnread) {
+      return 'message-timestamp-visible message-timestamp-unread';
+    }
 
-      if (!last.isSame(current, 'day')) {
-        return 'message-timestamp-visible message-timestamp-day';
-      }
+    const last = moment(previousMessage.timestamp());
+    const current = moment(messageEntity.timestamp());
 
-      if (current.diff(last, 'minutes') > 60) {
-        return 'message-timestamp-visible';
-      }
+    if (!last.isSame(current, 'day')) {
+      return 'message-timestamp-visible message-timestamp-day';
+    }
+
+    if (current.diff(last, 'minutes') > 60) {
+      return 'message-timestamp-visible';
     }
   }
 
@@ -580,9 +580,7 @@ class MessageListViewModel {
 
   updateConversationLastRead(conversationEntity, messageEntity) {
     const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(
-      this.serverTimeRepository.toServerTimestamp()
-    );
+    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this._isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
@@ -594,7 +592,7 @@ class MessageListViewModel {
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
           z.util.SanitizationUtil.safeWindowOpen(href);
         },

@@ -25,9 +25,11 @@ import {t} from 'utils/LocalizerUtil';
 import ConsentValue from '../../user/ConsentValue';
 import ReceiptMode from '../../conversation/ReceiptMode';
 import PropertiesRepository from '../../properties/PropertiesRepository';
+import {AvailabilityType} from '../../user/AvailabilityType';
 
 import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -74,7 +76,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availabilityLabel = ko.pureComputed(() => {
       let label = z.user.AvailabilityMapper.nameFromType(this.availability());
 
-      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {
         label = t('preferencesAccountAvaibilityUnset');
       }
@@ -110,11 +112,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
+    this.updateProperties(this.propertiesRepository.properties);
     this._initSubscriptions();
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties);
   }
 
   changeAccentColor(id) {
@@ -201,8 +204,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   _showNotification(type, aggregatedNotifications, closeAction) {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          close: closeAction,
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
+          afterClose: closeAction,
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
@@ -213,8 +216,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          close: closeAction,
+        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
+          afterClose: closeAction,
           data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
@@ -252,7 +255,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnDeleteAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
         action: t('modalAccountDeletionAction'),
@@ -263,7 +266,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnLeaveGuestRoom() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
@@ -374,7 +377,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _showUploadWarning(title, message) {
     const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
   }
@@ -399,7 +402,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return true;
   }
 
-  updateProperties(properties) {
-    this.optionPrivacy(properties.settings.privacy.improve_wire);
-  }
+  updateProperties = ({settings}) => {
+    this.optionPrivacy(settings.privacy.improve_wire);
+  };
 };

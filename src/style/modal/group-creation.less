@@ -17,8 +17,18 @@
  *
  */
 
-.group-creation-modal {
-  .group-creation-modal-action {
+.group-creation {
+  &__modal {
+    .modal__content {
+      height: 480px;
+    }
+
+    .modal__info {
+      margin: 8px 4px 72px;
+    }
+  }
+
+  &__action {
     opacity: 0.32;
     transition: all 0.25s ease-in-out;
 
@@ -28,94 +38,17 @@
     }
   }
 
-  .group-creation-modal-center {
-    overflow: hidden;
-    width: 100%;
-    flex-grow: 1;
-    margin: 0;
-    background-color: var(--app-bg);
-  }
-
-  .group-creation-modal-content {
-    display: flex;
-    width: 424px;
-    height: 504px;
-    flex-direction: column;
-    padding: 0;
-  }
-
-  .group-creation-modal-header {
-    display: flex;
-    min-height: 44px;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0 16px;
-    fill: currentColor;
-
-    .group-creation-header-block {
-      width: 80px;
-    }
-  }
-  .group-creation-modal-title,
-  .group-creation-modal-action {
+  &__error {
     .label-bold-xs;
 
-    line-height: 12px;
-  }
-
-  .group-creation-modal-teamname-input {
-    height: 56px;
-    margin: 60px 0 0;
-    background-color: var(--group-creation-modal-teamname-input-bg);
-    border-radius: 0;
-    color: var(--background);
-    line-height: 56px;
-
-    &::placeholder {
-      padding: 0 8px;
-      color: var(--foreground);
-      font-size: @font-size-xs;
-      transform: translateY(-2px);
-    }
-  }
-
-  .group-creation-modal-participants-input {
-    margin: 8px;
-  }
-
-  .group-size-info {
-    margin: 16px 16px 0;
-    color: var(--foreground);
-    font-size: @font-size-xs;
-    line-height: @line-height-sm;
-  }
-
-  .group-creation-list-wrapper {
-    position: absolute;
-    right: -16px;
-    left: 16px;
-    height: 100%;
-    padding-right: 16px;
-    user-list {
-      margin-left: -16px;
-      overflow-x: hidden;
-      .search-list-item {
-        align-items: center;
-        margin: 0 16px;
-      }
-    }
-  }
-
-  .group-creation-error {
-    .label-bold-xs;
-
-    margin-top: 16px;
+    margin: 8px 4px 0;
     color: #fb0807;
-    text-align: center;
   }
 
-  guest-mode-toggle,
-  info-toggle {
-    margin: 40px 16px 0;
+  &__list {
+    height: 374px;
+    margin: 12px -16px -16px;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }

@@ -26,6 +26,8 @@ import SDP_SOURCE from '../enum/SDPSource';
 import TERMINATION_REASON from '../enum/TerminationReason';
 import TimeUtil from 'utils/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
+import {CallMessageBuilder} from '../CallMessageBuilder';
+import {SDPMapper} from '../SDPMapper';
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
@@ -805,8 +807,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
   saveRemoteSdp(callMessageEntity) {
     let skipNegotiation = false;
 
-    return z.calling.SDPMapper.mapCallMessageToObject(callMessageEntity)
-      .then(rtcSdp => z.calling.SDPMapper.rewriteSdp(rtcSdp, SDP_SOURCE.REMOTE, this))
+    const isIceRestart = this.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
+
+    return SDPMapper.mapCallMessageToObject(callMessageEntity)
+      .then(rtcSdp => SDPMapper.rewriteSdp(rtcSdp, {isGroup: this.isGroup, isIceRestart, isLocalSdp: false}))
       .then(({sdp: remoteSdp}) => {
         const isRemoteOffer = remoteSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
         if (isRemoteOffer) {
@@ -859,7 +863,8 @@ z.calling.entities.FlowEntity = class FlowEntity {
 
     const rawSdp = this.peerConnection.localDescription;
 
-    const mappedSdp = z.calling.SDPMapper.rewriteSdp(rawSdp, SDP_SOURCE.LOCAL, this);
+    const isIceRestart = this.negotiationMode() === SDP_NEGOTIATION_MODE.ICE_RESTART;
+    const mappedSdp = SDPMapper.rewriteSdp(rawSdp, {isGroup: this.isGroup, isIceRestart, isLocalSdp: true});
 
     Promise.resolve(mappedSdp)
       .then(({iceCandidates, sdp: transformedSdp}) => {
@@ -920,10 +925,10 @@ z.calling.entities.FlowEntity = class FlowEntity {
         const inDefaultMode = this.negotiationMode() === SDP_NEGOTIATION_MODE.DEFAULT;
         if (inDefaultMode) {
           callMessageEntity = this.callEntity.isGroup
-            ? z.calling.CallMessageBuilder.buildGroupSetup(response, sessionId, additionalPayload)
-            : z.calling.CallMessageBuilder.buildSetup(response, sessionId, additionalPayload);
+            ? CallMessageBuilder.buildGroupSetup(response, sessionId, additionalPayload)
+            : CallMessageBuilder.buildSetup(response, sessionId, additionalPayload);
         } else {
-          callMessageEntity = z.calling.CallMessageBuilder.buildUpdate(response, sessionId, additionalPayload);
+          callMessageEntity = CallMessageBuilder.buildUpdate(response, sessionId, additionalPayload);
         }
 
         return this.callEntity.sendCallMessage(callMessageEntity).then(() => {
@@ -1063,7 +1068,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
    * @returns {Object} Additional payload
    */
   _createAdditionalPayload(localSdp) {
-    const payload = z.calling.CallMessageBuilder.createPayload(
+    const payload = CallMessageBuilder.createPayload(
       this.conversationId,
       this.selfUserId,
       this.remoteUserId,
@@ -1072,7 +1077,7 @@ z.calling.entities.FlowEntity = class FlowEntity {
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: localSdp.sdp}, payload);
 
     const selfState = this.callEntity.selfState;
-    return z.calling.CallMessageBuilder.createPropSync(selfState, additionalPayload);
+    return CallMessageBuilder.createPropSync(selfState, additionalPayload);
   }
 
   /**

@@ -18,19 +18,25 @@
  */
 
 import Logger from 'utils/Logger';
+import ko from 'knockout';
 
 import platform from 'platform';
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import PreferenceNotificationRepository from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import UserRepository from '../user/UserRepository';
+import {serverTimeHandler} from '../time/serverTimeHandler';
+import {CallingRepository} from '../calling/CallingRepository';
 
 import BackendClient from '../service/BackendClient';
 
 import AppInitStatisticsValue from '../telemetry/app_init/AppInitStatisticsValue';
 import AppInitTimingsStep from '../telemetry/app_init/AppInitTimingsStep';
 import AppInitTelemetry from '../telemetry/app_init/AppInitTelemetry';
+import {MainViewModel} from '../view_model/MainViewModel';
+import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
 import DebugUtil from '../util/DebugUtil';
@@ -76,28 +82,27 @@ class App {
   /**
    * Construct a new app.
    * @param {BackendClient} backendClient - Configured backend client
+   * @param {Element} appContainer - DOM element that will hold the app
    */
-  constructor(backendClient) {
+  constructor(backendClient, appContainer) {
     this.backendClient = backendClient;
     this.logger = Logger('App');
+    this.appContainer = appContainer;
 
-    this.telemetry = new AppInitTelemetry();
     new WindowHandler();
 
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
-    this.view = this._setupViewModels();
-    this.util = this._setup_utils();
+    if (Config.FEATURE.ENABLE_DEBUG) {
+      this.util = {debug: new DebugUtil(this.repository)};
+    }
 
     this._publishGlobals();
 
-    this.instanceId = z.util.createRandomUuid();
-
-    this._onExtraInstanceStarted = this._onExtraInstanceStarted.bind(this);
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler(this._onExtraInstanceStarted);
+    const onExtraInstanceStarted = () => this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+    this.singleInstanceHandler = new z.main.SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
-
     this.initApp();
     this.initServiceWorker();
   }
@@ -117,7 +122,7 @@ class App {
     repositories.auth = resolve(graph.AuthRepository);
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = resolve(graph.PropertiesRepository);
-    repositories.serverTime = resolve(graph.ServerTimeRepository);
+    repositories.serverTime = serverTimeHandler;
     repositories.storage = new z.storage.StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
@@ -131,7 +136,7 @@ class App {
       this.service.asset,
       resolve(graph.SelfService),
       repositories.client,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
@@ -141,7 +146,7 @@ class App {
       this.service.webSocket,
       this.service.conversation,
       repositories.cryptography,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.connect = new z.connect.ConnectRepository(this.service.connect, repositories.properties);
@@ -159,7 +164,7 @@ class App {
       repositories.giphy,
       resolve(graph.LinkPreviewRepository),
       resolve(graph.MessageSender),
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.team,
       repositories.user,
       repositories.properties,
@@ -198,13 +203,13 @@ class App {
       resolve(graph.MessageSender),
       repositories.user
     );
-    repositories.calling = new z.calling.CallingRepository(
+    repositories.calling = new CallingRepository(
       resolve(graph.CallingService),
       repositories.client,
       repositories.conversation,
       repositories.event,
       repositories.media,
-      repositories.serverTime,
+      serverTimeHandler,
       repositories.user
     );
     repositories.integration = new z.integration.IntegrationRepository(
@@ -253,22 +258,6 @@ class App {
   }
 
   /**
-   * Create all app utils.
-   * @returns {Object} All utils
-   */
-  _setup_utils() {
-    return z.config.FEATURE.ENABLE_DEBUG ? {debug: new DebugUtil(this.repository)} : {};
-  }
-
-  /**
-   * Create all app view models.
-   * @returns {Object} All view models
-   */
-  _setupViewModels() {
-    return new z.viewModel.MainViewModel(this.repository);
-  }
-
-  /**
    * Subscribe to amplify events.
    * @returns {undefined} No return value
    */
@@ -292,30 +281,33 @@ class App {
    * @returns {undefined} No return value
    */
   initApp(isReload = this._isReload()) {
+    new ThemeViewModel(this.repository.properties);
+    const loadingView = new LoadingViewModel();
+    const telemetry = new AppInitTelemetry();
     z.util
       .checkIndexedDb()
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
-        this.view.loading.updateProgress(2.5);
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+        loadingView.updateProgress(2.5);
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return this._initiateSelfUser();
       })
       .then(() => {
-        this.view.loading.updateProgress(5, t('initReceivedSelfUser'));
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
+        loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        this.view.loading.updateProgress(7.5, t('initValidatedClient'));
-        this.telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+        loadingView.updateProgress(7.5, t('initValidatedClient'));
+        telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
+        telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
-        this.view.loading.updateProgress(10);
-        this.telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+        loadingView.updateProgress(10);
+        telemetry.time_step(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
         this.repository.event.connectWebSocket();
 
@@ -323,11 +315,11 @@ class App {
         return Promise.all(promises);
       })
       .then(([conversationEntities, connectionEntities]) => {
-        this.view.loading.updateProgress(25, t('initReceivedUserData'));
+        loadingView.updateProgress(25, t('initReceivedUserData'));
 
-        this.telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-        this.telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
+        telemetry.time_step(AppInitTimingsStep.RECEIVED_USER_DATA);
+        telemetry.add_statistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+        telemetry.add_statistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
         this.repository.conversation.map_connections(this.repository.connection.connectionEntities());
         this._subscribeToUnloadEvents();
@@ -337,37 +329,38 @@ class App {
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initializeFromStream())
       .then(notificationsCount => {
-        this.telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-        this.telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+        telemetry.time_step(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+        telemetry.add_statistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
         this.repository.eventTracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.updateProgress(97.5, t('initUpdatedFromNotifications'));
+        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications'));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
       })
       .then(clientEntities => {
-        this.view.loading.updateProgress(99);
+        loadingView.updateProgress(99);
 
-        this.telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
-        this.telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
+        telemetry.add_statistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
+        telemetry.time_step(AppInitTimingsStep.APP_PRE_LOADED);
 
         this.repository.user.self().devices(clientEntities);
         this.logger.info('App pre-loading completed');
         return this._handleUrlParams();
       })
       .then(() => {
-        this.telemetry.time_step(AppInitTimingsStep.APP_LOADED);
+        telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
-        this.telemetry.report();
+        loadingView.removeFromView();
+        telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
-        this.telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
+        telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
         if (this.repository.user.isActivatedAccount()) {
           // start regularly polling the server to check if there is a new version of Wire
           startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
@@ -583,14 +576,15 @@ class App {
 
   /**
    * Check that this is the single instance tab of the app.
-   * @returns {Promise} Resolves when page is the first tab
+   * @returns {void} Resolves when page is the first tab
    */
   _registerSingleInstance() {
-    if (this.singleInstanceHandler.registerInstance(this.instanceId)) {
-      this._registerSingleInstanceCleaning();
-      return Promise.resolve();
+    const instanceId = z.util.createRandomUuid();
+
+    if (this.singleInstanceHandler.registerInstance(instanceId)) {
+      return this._registerSingleInstanceCleaning();
     }
-    return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS));
+    throw new z.error.AuthError(z.error.AuthError.TYPE.MULTIPLE_TABS);
   }
 
   _registerSingleInstanceCleaning() {
@@ -604,29 +598,33 @@ class App {
    * @returns {undefined} No return value
    */
   _showInterface() {
+    const mainView = new MainViewModel(this.repository);
+    ko.applyBindings(mainView, this.appContainer);
+
+    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
+
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
     if (this.repository.user.isTemporaryGuest()) {
-      this.view.list.showTemporaryGuest();
+      mainView.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
-      this.view.list.showTakeover();
+      mainView.list.showTakeover();
     } else if (conversationEntity) {
-      this.view.content.showConversation(conversationEntity);
+      mainView.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
-      '/conversation/:conversationId': conversationId => this.view.content.showConversation(conversationId),
+      '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
       '/user/:userId': userId => {
-        this.view.content.userModal.showUser(userId, () => router.navigate('/'));
+        mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
 
-    this.view.loading.removeFromView();
-    $('#wire-main').attr('data-uie-value', 'is-loaded');
+    this.appContainer.dataset.uieValue = 'is-loaded';
 
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
@@ -831,10 +829,6 @@ class App {
     this.repository.calling.reportCall();
   }
 
-  _onExtraInstanceStarted() {
-    return this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
-  }
-
   _publishGlobals() {
     window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
@@ -850,13 +844,14 @@ class App {
 
 $(() => {
   enableLogging(Config.FEATURE.ENABLE_DEBUG);
-  if ($('#wire-main-app').length !== 0) {
+  const appContainer = document.getElementById('wire-main');
+  if (appContainer) {
     const backendClient = resolve(graph.BackendClient);
     backendClient.setSettings({
       restUrl: Config.BACKEND_REST,
       webSocketUrl: Config.BACKEND_WS,
     });
-    wire.app = new App(backendClient);
+    wire.app = new App(backendClient, appContainer);
   }
 });
 

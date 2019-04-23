@@ -71,7 +71,7 @@ ko.components.register('device-remove', {
       <form class="device-remove-form" data-bind="submit: click_on_submit, attr: {'data-uie-value': model}" data-ui-name="device-remove-form">
         <input  class="device-remove-input"
                 type="password"
-                data-bind="hasfocus: true, textInput: password, attr: {placeholder: t('authPlaceholderPasswordPut')}, css: {'device-remove-input-error': device_remove_error}"
+                data-bind="hasfocus: true, textInput: password, attr: {placeholder: t('authPlaceholderPassword')}, css: {'device-remove-input-error': device_remove_error}"
                 data-uie-name="remove-device-password" />
         <button class="device-remove-button-remove button button-medium button-fluid"
                 data-bind="attr: {'data-uie-value': model}, text: t('preferencesDevicesRemove')"

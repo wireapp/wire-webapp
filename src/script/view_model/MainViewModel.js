@@ -19,13 +19,10 @@
 
 import Logger from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
+import WindowTitleViewModel from './WindowTitleViewModel';
+import {ModalsViewModel} from './ModalsViewModel';
 
-import ThemeViewModel from './ThemeViewModel';
-import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
-
-z.viewModel.MainViewModel = class MainViewModel {
+export class MainViewModel {
   static get CONFIG() {
     return {
       PANEL: {
@@ -60,15 +57,8 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   constructor(repositories) {
-    this.closePanel = this.closePanel.bind(this);
-    this.closePanelImmediatly = this.closePanelImmediatly.bind(this);
-    this.closePanelOnClick = this.closePanelOnClick.bind(this);
-    this.openPanel = this.openPanel.bind(this);
-    this.togglePanel = this.togglePanel.bind(this);
-
-    this.elementId = 'wire-main';
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.MainViewModel');
+    this.logger = Logger('MainViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -78,12 +68,10 @@ z.viewModel.MainViewModel = class MainViewModel {
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new z.viewModel.ContentViewModel(this, repositories);
-    this.theme = new ThemeViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = new z.viewModel.ModalsViewModel();
+    this.modals = new ModalsViewModel();
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.loading = new z.viewModel.LoadingViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
@@ -93,11 +81,9 @@ z.viewModel.MainViewModel = class MainViewModel {
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {
         // deprecated - still used on input control hover
-        return `main-accent-color-${this.selfUser().accent_id()} ${this.selfUser().accent_theme()} show`;
+        return `main-accent-color-${this.selfUser().accent_id()} show`;
       }
     });
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   openPanel() {
@@ -109,12 +95,11 @@ z.viewModel.MainViewModel = class MainViewModel {
   }
 
   closePanelImmediatly() {
-    document.querySelector('.center-column__overlay').removeEventListener('click', this.togglePanel);
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
 
-  togglePanel(forceState) {
+  togglePanel = forceState => {
     const app = document.querySelector('#app');
     const panel = document.querySelector('.right-column');
 
@@ -197,7 +182,7 @@ z.viewModel.MainViewModel = class MainViewModel {
         }
       });
     });
-  }
+  };
 
   _applyStyle(element, style) {
     if (element) {
@@ -211,7 +196,7 @@ z.viewModel.MainViewModel = class MainViewModel {
     }
   }
 
-  closePanelOnClick() {
+  closePanelOnClick = () => {
     this.panel.closePanel();
-  }
-};
+  };
+}

@@ -28,7 +28,7 @@ const router = express.Router();
 
 const RedirectRoutes = (config: ServerConfig) => [
   router.get('/robots.txt', async (req, res) => {
-    const robotsContent = config.SERVER.ROBOTS.ALLOWED_HOSTS.includes(req.host)
+    const robotsContent = config.SERVER.ROBOTS.ALLOWED_HOSTS.includes(req.hostname)
       ? config.SERVER.ROBOTS.ALLOW
       : config.SERVER.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);

@@ -21,25 +21,22 @@ import {t} from 'utils/LocalizerUtil';
 import TimeUtil from 'utils/TimeUtil';
 import TERMINATION_REASON from '../../calling/enum/TerminationReason';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ConversationListCallingCell = class ConversationListCallingCell {
+class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
 
-    const callingRepository = params.callingRepository;
+    this.callingRepository = params.callingRepository;
     const permissionRepository = params.permissionRepository;
 
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
     this.videoGridRepository = params.videoGridRepository;
 
-    this.calls = callingRepository.calls;
+    this.calls = this.callingRepository.calls;
     this.call = this.conversation.call;
     this.conversationParticipants = this.conversation.participating_user_ets;
-    this.joinedCall = callingRepository.joinedCall;
-    this.selfStreamState = callingRepository.selfStreamState;
+    this.joinedCall = this.callingRepository.joinedCall;
+    this.selfStreamState = this.callingRepository.selfStreamState;
     this.selfUser = this.conversation.selfUser();
 
     this.isConnected = this.call().isConnected;
@@ -74,7 +71,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
       const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
-    this.disableScreenButton = ko.pureComputed(() => !z.calling.CallingRepository.supportsScreenSharing);
+    this.disableScreenButton = ko.pureComputed(() => !this.callingRepository.supportsScreenSharing);
 
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.callParticipants().length);
@@ -106,22 +103,24 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.TimeUtil = TimeUtil;
   }
 
-  onEndCall() {
+  onEndCall(data, event) {
+    event.stopPropagation();
     return this.isIncoming() ? this.onRejectCall() : this.onLeaveCall();
   }
 
-  onJoinCall() {
+  onJoinCall(data, event) {
+    event.stopPropagation();
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
     const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, mediaType);
+    this.callingRepository.joinCall(this.conversation, mediaType);
   }
 
   onJoinDeclinedCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation, z.media.MediaType.AUDIO);
   }
 
   onLeaveCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, TERMINATION_REASON.SELF_USER);
+    this.callingRepository.leaveCall(this.conversation.id, TERMINATION_REASON.SELF_USER);
   }
 
   onMaximizeVideoGrid() {
@@ -141,18 +140,21 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.conversation.id);
   }
 
-  onToggleAudio() {
+  onToggleAudio(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
   }
 
-  onToggleScreen() {
+  onToggleScreen(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
   }
 
-  onToggleVideo() {
+  onToggleVideo(data, event) {
+    event.stopPropagation();
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
   }
-};
+}
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
@@ -261,5 +263,5 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
     <!-- /ko -->
  `,
-  viewModel: z.components.ConversationListCallingCell,
+  viewModel: ConversationListCallingCell,
 });

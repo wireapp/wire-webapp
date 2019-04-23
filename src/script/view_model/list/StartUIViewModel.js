@@ -23,6 +23,7 @@ import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import User from '../../entity/User';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -40,7 +41,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
    * View model for the start UI.
    * @class z.viewModel.list.StartUIViewModel
    *
-   * @param {z.viewModel.MainViewModel} mainViewModel - Main view model
+   * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
    */
@@ -532,7 +533,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
             text: {
               action: t('modalUploadContactsAction'),

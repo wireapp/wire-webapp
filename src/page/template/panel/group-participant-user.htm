@@ -8,15 +8,15 @@
       <!-- ko if: selectedParticipant() -->
         <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id)"></panel-user-details>
       <!-- /ko -->
-      <!-- ko if: showActionDevices() -->
+      <!-- ko if: showActionDevices(selectedParticipant()) -->
         <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
           <devices-icon class="panel__action-item__icon"></devices-icon>
           <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
           <disclose-icon></disclose-icon>
         </div>
       <!-- /ko -->
-      <enriched-fields params="userId: selectedParticipant().id"></enriched-fields>
-      <user-actions params="user: selectedParticipant(), conversation: activeConversation(), actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
+      <enriched-fields params="user: selectedParticipant"></enriched-fields>
+      <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"></user-actions>
     </div>
   <!-- /ko -->
 </div>

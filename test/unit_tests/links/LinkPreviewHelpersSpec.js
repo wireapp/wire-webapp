@@ -106,4 +106,11 @@ describe('getFirstLinkWithOffset', () => {
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });
+
+  it('ignores mailto link', () => {
+    const link_preview = getFirstLinkWithOffset('mailto:person@wire.com wire.com');
+
+    expect(link_preview.offset).toEqual(23);
+    expect(link_preview.url).toEqual('wire.com');
+  });
 });
