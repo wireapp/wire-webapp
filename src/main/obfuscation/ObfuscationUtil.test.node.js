@@ -18,7 +18,7 @@
  */
 
 const {Cookie: ToughCookie} = require('tough-cookie');
-const {ObfuscationUtil} = require('@wireapp/api-client/dist/commonjs/obfuscation/');
+const ObfuscationUtil = require('@wireapp/api-client/dist/commonjs/obfuscation/');
 
 describe('"ObfuscationUtil"', () => {
   const accessTokenData = {

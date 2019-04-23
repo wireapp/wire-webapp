@@ -22,7 +22,7 @@ import {Cookie as ToughCookie} from 'tough-cookie';
 
 const obfuscationLengthLimit = 20;
 
-const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): AccessTokenData => {
+export const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): AccessTokenData => {
   if (enabled) {
     return {
       ...accessToken,
@@ -32,7 +32,7 @@ const obfuscateAccessToken = (accessToken: AccessTokenData, enabled = true): Acc
   return accessToken;
 };
 
-const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
+export const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
   if (enabled) {
     const obfuscatedCookie = cookie.clone();
     obfuscatedCookie.value = `${cookie.value.substr(0, obfuscationLengthLimit)}...`;
@@ -40,5 +40,3 @@ const obfuscateCookie = (cookie: ToughCookie, enabled = true): ToughCookie => {
   }
   return cookie;
 };
-
-export const ObfuscationUtil = {obfuscateAccessToken, obfuscateCookie};
