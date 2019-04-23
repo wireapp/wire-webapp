@@ -20,7 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {Self} from '@wireapp/api-client/dist/commonjs/self/';
 
-export default class SelfService {
+export class SelfService {
   constructor(private readonly apiClient: APIClient) {}
 
   public async checkUsername(username: string): Promise<boolean> {
