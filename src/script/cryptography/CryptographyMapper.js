@@ -19,7 +19,7 @@
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 import {AvailabilityType} from '../user/AvailabilityType';
-import {AssetCrypto} from '../assets/AssetCrypto';
+import {decryptAesAsset} from '../assets/AssetCrypto';
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
@@ -332,7 +332,7 @@ export class CryptographyMapper {
         const keyBytes = new Uint8Array(otrKey).buffer;
         const referenceSha256 = new Uint8Array(sha256).buffer;
 
-        return AssetCrypto.decryptAesAsset(cipherText, keyBytes, referenceSha256);
+        return decryptAesAsset(cipherText, keyBytes, referenceSha256);
       })
       .then(externalMessageBuffer => GenericMessage.decode(new Uint8Array(externalMessageBuffer)))
       .catch(error => {

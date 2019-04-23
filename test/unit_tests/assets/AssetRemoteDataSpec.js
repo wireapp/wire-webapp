@@ -17,7 +17,7 @@
  *
  */
 import {createRandomUuid} from 'utils/util';
-import {AssetCrypto} from 'src/script/assets/AssetCrypto';
+import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 
 describe('z.assets.AssetRemoteData', () => {
   describe('load unencrypted v1 asset', () => {
@@ -47,7 +47,7 @@ describe('z.assets.AssetRemoteData', () => {
     const video_type = 'video/mp4';
 
     beforeEach(() => {
-      return AssetCrypto.encryptAesAsset(video_bytes).then(({cipherText, keyBytes, sha256}) => {
+      return encryptAesAsset(video_bytes).then(({cipherText, keyBytes, sha256}) => {
         const conversation_id = createRandomUuid();
         const asset_id = createRandomUuid();
         remote_data = z.assets.AssetRemoteData.v2(

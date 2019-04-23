@@ -21,7 +21,7 @@ import {Asset} from '@wireapp/protocol-messaging';
 import {getLogger} from 'utils/Logger';
 import {loadImage, loadFileBuffer, arrayToMd5Base64} from 'utils/util';
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
-import {AssetCrypto} from '../assets/AssetCrypto';
+import {encryptAesAsset} from './AssetCrypto';
 
 // AssetService for all asset handling and the calls to the backend REST API.
 export class AssetService {
@@ -65,7 +65,7 @@ export class AssetService {
    * @returns {Promise<Asset>} Resolves when asset has been uploaded
    */
   _uploadAsset(bytes, options, xhrAccessorFunction) {
-    return AssetCrypto.encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
+    return encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
       return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => {
         const assetRemoteData = new Asset.RemoteData({
           assetId: key,

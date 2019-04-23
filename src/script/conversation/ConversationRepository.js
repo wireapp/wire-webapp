@@ -20,7 +20,7 @@
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
-import {AssetCrypto} from '../assets/AssetCrypto';
+import {encryptAesAsset} from '../assets/AssetCrypto';
 
 import poster from 'poster-image';
 import {
@@ -2442,7 +2442,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageType = eventInfoEntity.getType();
     this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
 
-    return AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
+    return encryptAesAsset(GenericMessage.encode(genericMessage).finish())
       .then(({cipherText, keyBytes, sha256}) => {
         keyBytes = new Uint8Array(keyBytes);
         sha256 = new Uint8Array(sha256);
