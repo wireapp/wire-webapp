@@ -17,9 +17,7 @@
  *
  */
 
-/**
- * Enum of different Giphy content sizes.
- */
+/** Enum of different Giphy content sizes. */
 export enum GiphyContentSizes {
   DOWNSIZED = 'downsized',
   DOWNSIZED_LARGE = 'downsized_large',
