@@ -18,7 +18,7 @@
  */
 
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {TimeUtil} from '../../util/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 export class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
