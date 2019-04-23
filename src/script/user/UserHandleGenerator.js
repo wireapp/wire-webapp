@@ -40,7 +40,7 @@ const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${random
  */
 export const validateCharacter = character => {
   const isAlphaNumeric = /[a-z0-9_]/.test(character);
-  const isString = _.isString(character) && character.length === 1;
+  const isString = typeof character === 'string' && character.length === 1;
   return isAlphaNumeric && isString;
 };
 
