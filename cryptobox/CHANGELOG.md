@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.1.0...@wireapp/cryptobox@10.0.0) (2019-04-23)
+
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/7f14a39))
+
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+
+
+
+
 # [9.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@9.0.75...@wireapp/cryptobox@9.1.0) (2019-04-17)
 
 

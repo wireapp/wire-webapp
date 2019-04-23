@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.83...@wireapp/priority-queue@1.0.0) (2019-04-23)
+
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/7f14a39))
+
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+
+
+
+
 ## [0.2.83](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@0.2.82...@wireapp/priority-queue@0.2.83) (2019-04-17)
 
 **Note:** Version bump only for package @wireapp/priority-queue

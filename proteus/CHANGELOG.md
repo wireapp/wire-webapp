@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.52...@wireapp/proteus@9.0.0) (2019-04-23)
+
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/7f14a39))
+
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+
+
+
+
 ## [8.0.52](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.51...@wireapp/proteus@8.0.52) (2019-04-15)
 
 **Note:** Version bump only for package @wireapp/proteus

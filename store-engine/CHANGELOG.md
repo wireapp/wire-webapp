@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.47...@wireapp/store-engine@2.0.0) (2019-04-23)
+
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/7f14a39))
+
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+
+
+
+
 ## [1.1.47](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@1.1.46...@wireapp/store-engine@1.1.47) (2019-04-17)
 
 **Note:** Version bump only for package @wireapp/store-engine
