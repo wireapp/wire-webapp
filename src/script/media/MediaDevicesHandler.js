@@ -17,14 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import * as StorageUtil from 'utils/StorageUtil';
-import MediaRepository from './MediaRepository';
+import {MediaRepository} from './MediaRepository';
 import {iterateIndex} from 'utils/ArrayUtil';
 import {koArrayPushAll} from 'utils/util';
 
-export default class MediaDevicesHandler {
+export class MediaDevicesHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
@@ -38,7 +38,7 @@ export default class MediaDevicesHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('MediaDevicesHandler');
+    this.logger = getLogger('MediaDevicesHandler');
 
     this.availableDevices = {
       audioInput: ko.observableArray([]),

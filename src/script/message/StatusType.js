@@ -34,4 +34,4 @@ const StatusType = {
 };
 
 z.message.StatusType = StatusType;
-export default StatusType;
+export {StatusType};

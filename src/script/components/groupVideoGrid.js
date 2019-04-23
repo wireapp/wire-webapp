@@ -17,7 +17,7 @@
  *
  */
 
-import PROPERTY_STATE from '../calling/enum/PropertyState';
+import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {afterRender} from 'utils/util';
 
 window.z = window.z || {};

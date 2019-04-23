@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -39,7 +39,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   constructor(integrationService, conversationRepository, teamRepository) {
-    this.logger = Logger('z.integration.IntegrationRepository');
+    this.logger = getLogger('z.integration.IntegrationRepository');
 
     this.integrationService = integrationService;
 

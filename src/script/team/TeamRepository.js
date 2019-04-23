@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import TeamMapper from './TeamMapper';
+import {TeamMapper} from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import {loadDataUrl} from 'utils/util';
@@ -36,7 +36,7 @@ z.team.TeamRepository = class TeamRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(teamService, userRepository) {
-    this.logger = Logger('z.team.TeamRepository');
+    this.logger = getLogger('z.team.TeamRepository');
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;

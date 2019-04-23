@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 import {t} from 'utils/LocalizerUtil';
-import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {koArrayPushAll} from 'utils/util';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 
@@ -83,7 +83,7 @@ z.event.EventRepository = class EventRepository {
     this.cryptographyRepository = cryptographyRepository;
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
-    this.logger = Logger('z.event.EventRepository');
+    this.logger = getLogger('z.event.EventRepository');
 
     this.currentClient = undefined;
 

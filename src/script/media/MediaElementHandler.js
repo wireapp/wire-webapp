@@ -17,16 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-export default class MediaElementHandler {
+export class MediaElementHandler {
   /**
    * Construct an new MediaElement handler.
    * @param {MediaRepository} mediaRepository - Repository for media interactions
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('MediaElementHandler');
+    this.logger = getLogger('MediaElementHandler');
 
     this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
     this.remoteMediaElements = ko.observableArray([]);

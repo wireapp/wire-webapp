@@ -19,7 +19,7 @@
 
 import DexieBatch from 'dexie-batch';
 
-export default class BackupService {
+export class BackupService {
   static get CONFIG() {
     return {
       BATCH_SIZE: 10000,

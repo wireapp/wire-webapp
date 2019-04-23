@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
@@ -36,7 +36,7 @@ class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.messageSender = messageSender;
-    this.logger = Logger('BroadcastRepository');
+    this.logger = getLogger('BroadcastRepository');
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 

@@ -17,8 +17,8 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 import * as StorageUtil from 'utils/StorageUtil';
 
 import ko from 'knockout';
@@ -26,19 +26,21 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import ConsentValue from './ConsentValue';
-import ConsentType from './ConsentType';
+import {ConsentValue} from './ConsentValue';
+import {ConsentType} from './ConsentType';
 
-import User from '../entity/User';
-import UserMapper from './UserMapper';
+import {User} from '../entity/User';
+import {UserMapper} from './UserMapper';
 import {AssetMapper} from '../assets/AssetMapper';
 
 import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
+import {createSuggestions} from './UserHandleGenerator';
+import {valueFromType, protoFromType} from './AvailabilityMapper';
 
-export default class UserRepository {
+export class UserRepository {
   static get CONFIG() {
     return {
       MINIMUM_NAME_LENGTH: 2,
@@ -61,7 +63,7 @@ export default class UserRepository {
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
   constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
-    this.logger = Logger('UserRepository');
+    this.logger = getLogger('UserRepository');
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -328,9 +330,9 @@ export default class UserRepository {
 
   setAvailability(availability, method) {
     const hasAvailabilityChanged = availability !== this.self().availability();
-    const newAvailabilityValue = z.user.AvailabilityMapper.valueFromType(availability);
+    const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = z.user.AvailabilityMapper.valueFromType(this.self().availability());
+      const oldAvailabilityValue = valueFromType(this.self().availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
@@ -338,7 +340,7 @@ export default class UserRepository {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
+    const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
@@ -398,7 +400,7 @@ export default class UserRepository {
   _trackAvailability(availability, method) {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
-      status: z.user.AvailabilityMapper.valueFromType(availability),
+      status: valueFromType(availability),
     });
   }
 
@@ -741,7 +743,7 @@ export default class UserRepository {
 
     return Promise.resolve()
       .then(() => {
-        suggestions = z.user.UserHandleGenerator.create_suggestions(this.self().name());
+        suggestions = createSuggestions(this.self().name());
         return this.verify_usernames(suggestions);
       })
       .then(valid_suggestions => {

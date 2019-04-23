@@ -18,20 +18,20 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {loadImage, loadFileBuffer, arrayToMd5Base64} from 'utils/util';
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {AssetCrypto} from '../assets/AssetCrypto';
 
 // AssetService for all asset handling and the calls to the backend REST API.
-export default class AssetService {
+export class AssetService {
   /**
    * Construct a new Asset Service.
    * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('AssetService');
+    this.logger = getLogger('AssetService');
   }
 
   /**

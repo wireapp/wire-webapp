@@ -21,11 +21,11 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {conversationJoinStrings} from '../../strings';
-import WirelessContainer from '../component/WirelessContainer';
-import WirelessUnsupportedBrowser from '../component/WirelessUnsupportedBrowser';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
-interface Props extends React.HTMLAttributes<ConversationJoinInvalid> {}
+interface Props extends React.HTMLAttributes<_ConversationJoinInvalid> {}
 
 interface ConnectedProps {}
 
@@ -33,7 +33,7 @@ interface DispatchProps {}
 
 interface State {}
 
-class ConversationJoinInvalid extends React.PureComponent<
+class _ConversationJoinInvalid extends React.PureComponent<
   Props & ConnectedProps & DispatchProps & InjectedIntlProps,
   State
 > {
@@ -44,7 +44,7 @@ class ConversationJoinInvalid extends React.PureComponent<
       intl: {formatMessage: _},
     } = this.props;
     return (
-      <WirelessUnsupportedBrowser>
+      <UnsupportedBrowser>
         <WirelessContainer>
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2
@@ -59,12 +59,12 @@ class ConversationJoinInvalid extends React.PureComponent<
             </Text>
           </ContainerXS>
         </WirelessContainer>
-      </WirelessUnsupportedBrowser>
+      </UnsupportedBrowser>
     );
   }
 }
 
-export default injectIntl(
+export const ConversationJoinInvalid = injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {};
@@ -72,5 +72,5 @@ export default injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {};
     }
-  )(ConversationJoinInvalid)
+  )(_ConversationJoinInvalid)
 );

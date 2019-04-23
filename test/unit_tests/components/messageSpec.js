@@ -20,11 +20,11 @@
 import UUID from 'uuidjs';
 import {instantiateComponent} from '../../api/knockoutHelpers';
 
-import Conversation from 'src/script/entity/Conversation';
-import ContentMessage from 'src/script/entity/message/ContentMessage';
-import LinkPreview from 'src/script/entity/message/LinkPreview';
-import Text from 'src/script/entity/message/Text';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
 import 'src/script/components/message';
 
 describe('message', () => {

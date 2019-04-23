@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-export default class UserService {
+export class UserService {
   static get URL() {
     return {
       PASSWORD_RESET: '/password-reset',
@@ -35,7 +35,7 @@ export default class UserService {
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
-    this.logger = Logger('UserService');
+    this.logger = getLogger('UserService');
     this.storageService = storageService;
 
     this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;

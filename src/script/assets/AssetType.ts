@@ -17,13 +17,9 @@
  *
  */
 
-// https://www.w3.org/TR/webrtc/#dom-rtcstatstype
-const STATS_TYPE = {
-  CANDIDATE_PAIR: 'candidate-pair',
-  GOOGLE_CANDIDATE_PAIR: 'googCandidatePair',
-  INBOUND_RTP: 'inbound-rtp',
-  OUTBOUND_RTP: 'outbound-rtp',
-  SSRC: 'ssrc',
-};
-
-export {STATS_TYPE};
+export enum AssetType {
+  FILE = 'File',
+  IMAGE = 'Image',
+  LOCATION = 'Location',
+  TEXT = 'Text',
+}

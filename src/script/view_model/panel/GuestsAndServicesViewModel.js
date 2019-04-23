@@ -17,14 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {copyText} from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 
-export default class GuestsAndServicesViewModel extends BasePanelViewModel {
+export class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       CONFIRM_DURATION: 1500,
@@ -43,7 +43,7 @@ export default class GuestsAndServicesViewModel extends BasePanelViewModel {
     const conversationRepository = repositories.conversation;
     this.stateHandler = conversationRepository.stateHandler;
 
-    this.logger = Logger('z.viewModel.panel.GuestsAndServicesViewModel');
+    this.logger = getLogger('z.viewModel.panel.GuestsAndServicesViewModel');
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);

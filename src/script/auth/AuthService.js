@@ -17,9 +17,9 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
-import BackendClient from '../service/BackendClient';
+import {BackendClient} from '../service/BackendClient';
 
 export class AuthService {
   static get CONFIG() {

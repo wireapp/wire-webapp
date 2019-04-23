@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from '../tracking/Helpers';
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+import * as trackingHelpers from '../tracking/Helpers';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -48,7 +48,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = Logger('z.viewModel.VideoCallingViewModel');
+    this.logger = getLogger('z.viewModel.VideoCallingViewModel');
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;

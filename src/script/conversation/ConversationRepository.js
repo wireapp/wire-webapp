@@ -17,8 +17,8 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {AssetCrypto} from '../assets/AssetCrypto';
 
@@ -41,20 +41,20 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import PromiseQueue from 'utils/PromiseQueue';
-import EventMapper from './EventMapper';
-import Conversation from '../entity/Conversation';
-import ConversationMapper from './ConversationMapper';
+import {PromiseQueue} from 'utils/PromiseQueue';
+import {EventMapper} from './EventMapper';
+import {Conversation} from '../entity/Conversation';
+import {ConversationMapper} from './ConversationMapper';
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
-import trackingHelpers from '../tracking/Helpers';
+import * as trackingHelpers from '../tracking/Helpers';
 
-import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
-import PROPERTY_STATE from '../calling/enum/PropertyState';
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {PROPERTY_STATE} from '../calling/enum/PropertyState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
 import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
-import AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
+import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
 import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
@@ -132,7 +132,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = Logger('z.conversation.ConversationRepository');
+    this.logger = getLogger('z.conversation.ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();

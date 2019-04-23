@@ -21,10 +21,10 @@ import ko from 'knockout';
 
 import 'src/script/localization/Localizer';
 import {t} from 'utils/LocalizerUtil';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
 
-import WindowTitleViewModel from 'src/script/view_model/WindowTitleViewModel';
+import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {createRandomUuid} from 'utils/util';
 
 describe('WindowTitleViewModel', () => {

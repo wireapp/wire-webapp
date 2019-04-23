@@ -19,7 +19,7 @@
 import ko from 'knockout';
 
 import './assetLoader';
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import {getFileExtension, trimFileExtension, formatBytes} from 'utils/util';
 
 class FileAssetComponent extends AbstractAssetTransferStateTracker {

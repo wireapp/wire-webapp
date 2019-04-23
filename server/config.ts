@@ -166,4 +166,4 @@ const config: ServerConfig = {
   },
 };
 
-export default config;
+export {config};

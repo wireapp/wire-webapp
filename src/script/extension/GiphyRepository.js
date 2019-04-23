@@ -17,9 +17,9 @@
  *
  */
 
-import GiphyContentSizes from './GiphyContentSizes';
+import {GiphyContentSizes} from './GiphyContentSizes';
 
-export default class GiphyRepository {
+export class GiphyRepository {
   static get CONFIG() {
     return {
       MAX_RETRIES: 3,

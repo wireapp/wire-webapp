@@ -17,19 +17,20 @@
  *
  */
 
-import Logger from 'utils/Logger';
 import {AssetMapper} from '../assets/AssetMapper';
-import User from '../entity/User';
+import {getLogger} from 'utils/Logger';
+import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
+import {joaatHash} from 'utils/Crypto';
 
-export default class UserMapper {
+export class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class UserMapper
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    */
   constructor(serverTimeHandler) {
-    this.logger = Logger('UserMapper');
+    this.logger = getLogger('UserMapper');
     this.serverTimeHandler = serverTimeHandler;
   }
 
@@ -94,7 +95,7 @@ export default class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser) {
       userEntity.id = userData.id;
-      userEntity.joaatHash = z.util.Crypto.Hashing.joaatHash(userData.id);
+      userEntity.joaatHash = joaatHash(userData.id);
     }
 
     const {

@@ -23,13 +23,13 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {historyInfoStrings} from '../../strings';
-import EXTERNAL_ROUTE from '../externalRoute';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
-import Page from './Page';
+import {Page} from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -40,7 +40,7 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
   hasHistory,
   hasSelfHandle,
   history,
@@ -88,7 +88,7 @@ const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIn
   );
 };
 
-export default withRouter(
+export const HistoryInfo = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -97,6 +97,6 @@ export default withRouter(
           hasSelfHandle: SelfSelector.hasSelfHandle(state),
         };
       }
-    )(HistoryInfo)
+    )(_HistoryInfo)
   )
 );

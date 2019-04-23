@@ -21,7 +21,7 @@ import {instantiateComponent} from '../../../../api/knockoutHelpers';
 
 import ko from 'knockout';
 
-import AssetTransferState from 'src/script/assets/AssetTransferState';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import 'src/script/components/asset/controls/mediaButton';
 
 describe('media-button', () => {

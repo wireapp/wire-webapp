@@ -17,7 +17,7 @@
  *
  */
 
-import User from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'utils/util';
 
 describe('z.viewModel.content.InputBarViewModel', () => {

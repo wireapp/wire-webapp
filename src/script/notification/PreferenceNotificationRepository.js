@@ -20,8 +20,8 @@
 import {groupBy} from 'underscore';
 import {amplify} from 'amplify';
 
-import PropertiesRepository from '../properties/PropertiesRepository';
-import backendEvent from '../event/Backend';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {Backend as backendEvent} from '../event/Backend';
 import * as StorageUtil from 'utils/StorageUtil';
 
 /**
@@ -106,4 +106,4 @@ class PreferenceNotificationRepository {
   }
 }
 
-export default PreferenceNotificationRepository;
+export {PreferenceNotificationRepository};

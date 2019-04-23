@@ -17,11 +17,7 @@
  *
  */
 
-const SDP_NEGOTIATION_MODE = {
-  DEFAULT: 'default',
-  ICE_RESTART: 'iceRestart',
-  STATE_COLLISION: 'stateCollision',
-  STREAM_CHANGE: 'streamChange',
-};
-
-export default SDP_NEGOTIATION_MODE;
+export enum SDP_SOURCE {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+}

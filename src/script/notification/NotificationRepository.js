@@ -17,14 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t, Declension} from 'utils/LocalizerUtil';
-import SanitizationUtil from 'utils/SanitizationUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {SanitizationUtil} from 'utils/SanitizationUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {AvailabilityType} from '../user/AvailabilityType';
 
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
@@ -71,7 +71,7 @@ class NotificationRepository {
     this.userRepository = userRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
-    this.logger = Logger('NotificationRepository');
+    this.logger = getLogger('NotificationRepository');
 
     this.notifications = [];
 

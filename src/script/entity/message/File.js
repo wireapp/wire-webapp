@@ -17,19 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import Asset from './Asset';
-import TimeUtil from 'utils/TimeUtil';
-import AssetType from '../../assets/AssetType';
+import {getLogger} from 'utils/Logger';
+import {Asset} from './Asset';
+import {TimeUtil} from 'utils/TimeUtil';
+import {AssetType} from '../../assets/AssetType';
 import {downloadBlob} from 'utils/util';
 
-export default class File extends Asset {
+export class File extends Asset {
   constructor(id) {
     super(id);
     this.cancel_download = this.cancel_download.bind(this);
 
     this.type = AssetType.FILE;
-    this.logger = Logger('z.entity.File');
+    this.logger = getLogger('z.entity.File');
 
     // z.assets.AssetTransferState
     this.status = ko.observable();

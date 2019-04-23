@@ -20,9 +20,9 @@
 import moment from 'moment';
 
 import * as StorageUtil from 'utils/StorageUtil';
-import URLUtil from 'utils/URLUtil';
-import URLParameter from '../auth/URLParameter';
-import StorageKey from '../storage/StorageKey';
+import {URLUtil} from 'utils/URLUtil';
+import {URLParameter} from '../auth/URLParameter';
+import {StorageKey} from '../storage/StorageKey';
 
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'utils/LocalizerUtil';
 

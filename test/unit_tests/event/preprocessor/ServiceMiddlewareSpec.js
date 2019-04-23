@@ -17,7 +17,7 @@
  *
  */
 
-import Conversation from 'src/script/entity/Conversation';
+import {Conversation} from 'src/script/entity/Conversation';
 
 describe('z.event.preprocessor.ServiceMiddleware', () => {
   const testFactory = new TestFactory();

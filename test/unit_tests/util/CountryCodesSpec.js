@@ -17,28 +17,30 @@
  *
  */
 
-describe('z.util.CountryCodes', () => {
+import {getCountryCode, getCountryByCode} from 'src/script/util/CountryCodes';
+
+describe('CountryCodes', () => {
   describe('getCountryCode', () => {
     it('returns the county code for an existing ISO name', () => {
-      expect(z.util.CountryCodes.getCountryCode('DE')).toBe(49);
+      expect(getCountryCode('DE')).toBe(49);
     });
 
     it('returns undefined for a non-existent ISO name', () => {
-      expect(z.util.CountryCodes.getCountryCode('XY')).toBeUndefined();
+      expect(getCountryCode('XY')).toBeUndefined();
     });
   });
 
   describe('getCountryByCode', () => {
     it('returns the most populated country for country code ', () => {
-      expect(z.util.CountryCodes.getCountryByCode(49)).toBe('DE');
+      expect(getCountryByCode(49)).toBe('DE');
     });
 
     it('returns the most populated country for country code ', () => {
-      expect(z.util.CountryCodes.getCountryByCode(7)).toBe('RU');
+      expect(getCountryByCode(7)).toBe('RU');
     });
 
     it('returns undefined for a non-existent country code', () => {
-      expect(z.util.CountryCodes.getCountryByCode(9999)).toBeUndefined();
+      expect(getCountryByCode(9999)).toBeUndefined();
     });
   });
 });

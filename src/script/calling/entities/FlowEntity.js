@@ -17,18 +17,18 @@
  *
  */
 
-import MediaStreamHandler from '../../media/MediaStreamHandler';
+import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
 import {FlowTelemetry} from '../../telemetry/calling/FlowTelemetry';
 
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import CALL_STATE from '../enum/CallState';
-import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
-import SDP_SOURCE from '../enum/SDPSource';
-import TERMINATION_REASON from '../enum/TerminationReason';
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
+import {CALL_STATE} from '../enum/CallState';
+import {SDP_NEGOTIATION_MODE} from '../enum/SDPNegotiationMode';
+import {SDP_SOURCE} from '../enum/SDPSource';
+import {TERMINATION_REASON} from '../enum/TerminationReason';
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';

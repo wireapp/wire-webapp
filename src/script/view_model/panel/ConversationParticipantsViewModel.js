@@ -17,9 +17,9 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 
-export default class ConversationParticipantsViewModel extends BasePanelViewModel {
+export class ConversationParticipantsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);

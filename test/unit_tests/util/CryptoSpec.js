@@ -17,8 +17,10 @@
  *
  */
 
-describe('z.util.Crypto', () => {
-  describe('Jenkins’s one-at-a-time hash', () => {
+import {joaatHash} from 'src/script/util/Crypto';
+
+describe('Crypto', () => {
+  describe('Jenkins’ one-at-a-time hash', () => {
     /* eslint-disable sort-keys */
     const sample = {
       '25f79335-6a5b-410e-90ea-653bd18b66da': 348398396,
@@ -37,7 +39,7 @@ describe('z.util.Crypto', () => {
     it('can calculate Jenkins’s one-at-a-time hash for a User ID', () => {
       const userId = '532af01e-1e24-4366-aacf-33b67d4ee376';
 
-      const actual = z.util.Crypto.Hashing.joaatHash(userId);
+      const actual = joaatHash(userId);
       const expected = window.parseInt('200a4836', 16);
 
       expect(actual).toBe(expected);
@@ -45,34 +47,34 @@ describe('z.util.Crypto', () => {
 
     it('returns the expected hash values for some test strings', () => {
       let key = '25f79335-6a5b-410e-90ea-653bd18b66da';
-      let actual = z.util.Crypto.Hashing.joaatHash(key);
+      let actual = joaatHash(key);
 
       expect(actual).toEqual(sample[key]);
 
       key = 'b88a6d46-b2ae-4122-8022-d6ed66a25f09';
-      actual = z.util.Crypto.Hashing.joaatHash(key);
+      actual = joaatHash(key);
 
       expect(actual).toEqual(sample[key]);
 
       key = 'e50759ee-d32b-438f-bdbd-2605f48773e6';
-      actual = z.util.Crypto.Hashing.joaatHash(key);
+      actual = joaatHash(key);
 
       expect(actual).toEqual(sample[key]);
 
       key = 'e1b6e9f0-aafd-4ba9-8030-6dd053531afd';
-      actual = z.util.Crypto.Hashing.joaatHash(key);
+      actual = joaatHash(key);
 
       expect(actual).toEqual(sample[key]);
     });
 
     it('returns zero for an empty string', () => {
-      expect(z.util.Crypto.Hashing.joaatHash('')).toEqual(0);
+      expect(joaatHash('')).toEqual(0);
     });
 
     it('returns the same value for upper and lowercase strings', () => {
       const key = 'E1b6e9f0-aafd-4ba9-8030-6Dd053531afd';
 
-      expect(z.util.Crypto.Hashing.joaatHash(key)).toEqual(sample[key.toLowerCase()]);
+      expect(joaatHash(key)).toEqual(sample[key.toLowerCase()]);
     });
   });
 });

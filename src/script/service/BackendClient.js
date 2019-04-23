@@ -19,10 +19,10 @@
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';
-import PromiseQueue from 'utils/PromiseQueue';
-import TimeUtil from 'utils/TimeUtil';
+import {PromiseQueue} from 'utils/PromiseQueue';
+import {TimeUtil} from 'utils/TimeUtil';
 
-export default class BackendClient {
+export class BackendClient {
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {

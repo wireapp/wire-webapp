@@ -18,11 +18,11 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {afterRender} from 'utils/util';
 
 import {PermissionState} from '../../notification/PermissionState';
-import TERMINATION_REASON from '../../calling/enum/TerminationReason';
+import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 
 class ConversationListCallingCell {
   constructor(params) {

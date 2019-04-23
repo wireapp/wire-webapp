@@ -17,7 +17,7 @@
  *
  */
 
-export default class SelfService {
+export class SelfService {
   static get URL() {
     return {
       SELF: '/self',

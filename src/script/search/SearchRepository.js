@@ -17,7 +17,8 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
+import {validateHandle} from '../user/UserHandleGenerator';
 
 window.z = window.z || {};
 window.z.search = z.search || {};
@@ -57,7 +58,7 @@ class SearchRepository {
   constructor(searchService, userRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
-    this.logger = Logger('z.search.SearchRepository');
+    this.logger = getLogger('z.search.SearchRepository');
   }
 
   /**
@@ -156,7 +157,7 @@ class SearchRepository {
 
     const searchPromises = [directorySearch];
 
-    if (z.user.UserHandleGenerator.validate_handle(name)) {
+    if (validateHandle(name)) {
       searchPromises.push(this.userRepository.get_user_id_by_handle(name));
     }
 
@@ -190,5 +191,5 @@ class SearchRepository {
   }
 }
 
-export default SearchRepository;
 z.search.SearchRepository = SearchRepository;
+export {SearchRepository};

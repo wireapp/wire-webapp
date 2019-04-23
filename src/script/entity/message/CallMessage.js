@@ -18,7 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
-import TERMINATION_REASON from '../../calling/enum/TerminationReason';
+import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

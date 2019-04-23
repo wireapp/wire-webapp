@@ -34,10 +34,10 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {loginStrings, ssoLoginStrings} from '../../strings';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
@@ -48,7 +48,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<SingleSignOnForm>, RouteComponentProps<{code?: string}> {
+interface Props extends React.HTMLAttributes<_SingleSignOnForm>, RouteComponentProps<{code?: string}> {
   handleSSOWindow: (code: string) => {};
 }
 
@@ -78,7 +78,7 @@ interface State {
   validationErrors: Error[];
 }
 
-class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private static readonly SSO_CODE_PREFIX = 'wire-';
   private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
@@ -226,14 +226,14 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   readFromClipboard = () => window.navigator.clipboard.readText();
 
   containsSSOCode = (text: string) =>
-    text && new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
+    text && new RegExp(`${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
   isSSOCode = (text: string) =>
-    text && new RegExp(`^${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
+    text && new RegExp(`^${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
   extractCode = (text: string) => {
     return this.containsSSOCode(text)
-      ? text.match(new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
+      ? text.match(new RegExp(`${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
       : '';
   };
 
@@ -242,7 +242,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
     code
       .trim()
       .toLowerCase()
-      .replace(SingleSignOnForm.SSO_CODE_PREFIX, '');
+      .replace(_SingleSignOnForm.SSO_CODE_PREFIX, '');
 
   render() {
     const {
@@ -285,7 +285,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
             value={code}
             autoComplete="section-login sso-code"
             maxLength={1024}
-            pattern={`${SingleSignOnForm.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
+            pattern={`${_SingleSignOnForm.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
             autoFocus
             type="text"
             required
@@ -325,7 +325,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
   }
 }
 
-export default withRouter(
+export const SingleSignOnForm = withRouter(
   injectIntl(
     connect(
       (state: RootState, ownProps: Props): ConnectedProps => {
@@ -346,6 +346,6 @@ export default withRouter(
           validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
         };
       }
-    )(SingleSignOnForm)
+    )(_SingleSignOnForm)
   )
 );

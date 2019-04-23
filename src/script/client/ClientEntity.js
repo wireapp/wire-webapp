@@ -130,5 +130,5 @@ class ClientEntity {
   }
 }
 
-export default ClientEntity;
+export {ClientEntity};
 z.client.ClientEntity = ClientEntity;

@@ -17,15 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import ko from 'knockout';
-import ReceiptMode from '../conversation/ReceiptMode';
+
+import {getLogger} from 'utils/Logger';
+
+import {ReceiptMode} from '../conversation/ReceiptMode';
 import {t} from 'utils/LocalizerUtil';
 import {koArrayPushAll, koArrayUnshiftAll} from 'utils/util';
 import {Config} from '../auth/config';
 
-export default class Conversation {
+export class Conversation {
   static get TIMESTAMP_TYPE() {
     return {
       ARCHIVED: 'archivedTimestamp',
@@ -45,7 +46,7 @@ export default class Conversation {
   constructor(conversation_id = '') {
     this.id = conversation_id;
 
-    this.logger = Logger(`Conversation (${this.id})`);
+    this.logger = getLogger(`Conversation (${this.id})`);
 
     this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
     this.accessCode = ko.observable();

@@ -20,7 +20,7 @@
 window.z = window.z || {};
 window.z.event = z.event || {};
 
-z.event.Backend = {
+const Backend = {
   CONVERSATION: {
     ACCESS_UPDATE: 'conversation.access-update',
     CODE_DELETE: 'conversation.code-delete',
@@ -59,4 +59,6 @@ z.event.Backend = {
   },
 };
 
-export default z.event.Backend;
+z.event.Backend = Backend;
+
+export {Backend};

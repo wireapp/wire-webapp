@@ -31,7 +31,7 @@ const AUDIO_PLAY_PERMISSION = {
   DISALLOWED_BY_PREFERENCES: 2,
 };
 
-export default class AudioRepository {
+export class AudioRepository {
   constructor(logger) {
     this.logger = logger;
     this.audioElements = {};

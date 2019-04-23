@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 class PropertiesService {
   static get CONFIG() {
@@ -32,7 +32,7 @@ class PropertiesService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('PropertiesService');
+    this.logger = getLogger('PropertiesService');
   }
 
   /**
@@ -103,4 +103,4 @@ class PropertiesService {
   }
 }
 
-export default PropertiesService;
+export {PropertiesService};

@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
-import viewportObserver from '../ui/viewportObserver';
-import User from '../entity/User';
+
+import {getLogger} from 'utils/Logger';
+
+import {viewportObserver} from '../ui/viewportObserver';
+import {User} from '../entity/User';
 import {createRandomUuid} from 'utils/util';
-import Logger from 'utils/Logger';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -49,7 +51,7 @@ class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
-    this.logger = Logger('ParticipantAvatar');
+    this.logger = getLogger('ParticipantAvatar');
 
     const isParticipantObservable = typeof params.participant === 'function';
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
@@ -239,7 +241,7 @@ ko.components.register('participant-avatar', {
   },
 });
 
-export default ParticipantAvatar;
+export {ParticipantAvatar};
 
 window.z = window.z || {};
 window.z.components = z.components || {};

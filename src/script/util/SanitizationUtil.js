@@ -23,8 +23,19 @@ import {isValidEmail} from './util';
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.SanitizationUtil = (() => {
-  const _getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
+const SanitizationUtil = {
+  escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+
+  escapeString: string => _.escape(string),
+
+  getFirstName: (userEntity, declension, bypassSanitization = false) => {
+    if (userEntity.is_me) {
+      return SanitizationUtil.getSelfName(declension, bypassSanitization);
+    }
+    return bypassSanitization ? userEntity.first_name() : z.util.SanitizationUtil.escapeString(userEntity.first_name());
+  },
+
+  getSelfName: (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
     const selfNameDeclensions = {
       [Declension.NOMINATIVE]: t('conversationYouNominative'),
       [Declension.DATIVE]: t('conversationYouDative'),
@@ -32,59 +43,44 @@ z.util.SanitizationUtil = (() => {
     };
 
     const selfName = selfNameDeclensions[declension];
-    return bypassSanitization ? selfName : z.util.SanitizationUtil.escapeString(selfName);
-  };
+    return bypassSanitization ? selfName : SanitizationUtil.escapeString(selfName);
+  },
 
-  return {
-    escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+  safeMailtoOpen: (event, email) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    escapeString: string => _.escape(string),
+    if (!isValidEmail(email)) {
+      return;
+    }
 
-    getFirstName: (userEntity, declension, bypassSanitization = false) => {
-      if (userEntity.is_me) {
-        return _getSelfName(declension, bypassSanitization);
+    const newWindow = window.open(`mailto:${email}`);
+    if (newWindow) {
+      window.setTimeout(() => newWindow.close(), 10);
+    }
+  },
+
+  /**
+   * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
+   * @see https://mathiasbynens.github.io/rel-noopener/
+   * @param {string} url - URL you want to open in a new browser tab
+   * @param {boolean} focus - True, if the new windows should get browser focus
+   * @returns {Object} New window handle
+   */
+  safeWindowOpen: (url, focus = true) => {
+    const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
+
+    if (newWindow) {
+      newWindow.opener = null;
+      if (focus) {
+        newWindow.focus();
       }
-      return bypassSanitization
-        ? userEntity.first_name()
-        : z.util.SanitizationUtil.escapeString(userEntity.first_name());
-    },
+    }
 
-    getSelfName: _getSelfName,
+    return newWindow;
+  },
+};
 
-    safeMailtoOpen: (event, email) => {
-      event.preventDefault();
-      event.stopPropagation();
+z.util.SanitizationUtil = SanitizationUtil;
 
-      if (!isValidEmail(email)) {
-        return;
-      }
-
-      const newWindow = window.open(`mailto:${email}`);
-      if (newWindow) {
-        window.setTimeout(() => newWindow.close(), 10);
-      }
-    },
-
-    /**
-     * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
-     * @see https://mathiasbynens.github.io/rel-noopener/
-     * @param {string} url - URL you want to open in a new browser tab
-     * @param {boolean} focus - True, if the new windows should get browser focus
-     * @returns {Object} New window handle
-     */
-    safeWindowOpen: (url, focus = true) => {
-      const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-      if (newWindow) {
-        newWindow.opener = null;
-        if (focus) {
-          newWindow.focus();
-        }
-      }
-
-      return newWindow;
-    },
-  };
-})();
-
-export default z.util.SanitizationUtil;
+export {SanitizationUtil};

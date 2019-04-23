@@ -19,26 +19,19 @@
 
 import uint32 from 'uint32';
 
-window.z = window.z || {};
-window.z.util = z.util || {};
+export const joaatHash = string => {
+  let hash = uint32.toUint32(0);
+  const key = string.toLowerCase();
 
-z.util.Crypto = {
-  Hashing: {
-    joaatHash: string => {
-      let hash = uint32.toUint32(0);
-      const key = string.toLowerCase();
+  for (let index = 0; index < key.length; index++) {
+    hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(index)));
+    hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
+    hash = uint32.xor(hash, uint32.shiftRight(hash, 6));
+  }
 
-      for (let index = 0; index < key.length; index++) {
-        hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(index)));
-        hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
-        hash = uint32.xor(hash, uint32.shiftRight(hash, 6));
-      }
+  hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 3));
+  hash = uint32.xor(hash, uint32.shiftRight(hash, 11));
+  hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
 
-      hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 3));
-      hash = uint32.xor(hash, uint32.shiftRight(hash, 11));
-      hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
-
-      return hash;
-    },
-  },
+  return hash;
 };

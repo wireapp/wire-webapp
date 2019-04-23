@@ -19,8 +19,8 @@
 
 import {instantiateComponent} from '../../../api/knockoutHelpers';
 
-import User from 'src/script/entity/User';
-import Conversation from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
 
 import 'src/script/components/icons';
 import 'src/script/components/panel/userActions';

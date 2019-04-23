@@ -17,7 +17,9 @@
  *
  */
 
-export default {
-  MARKETING: 2,
-  TERMS_OF_USE: 1,
-};
+export enum SDP_NEGOTIATION_MODE {
+  DEFAULT = 'default',
+  ICE_RESTART = 'iceRestart',
+  STATE_COLLISION = 'stateCollision',
+  STREAM_CHANGE = 'streamChange',
+}
