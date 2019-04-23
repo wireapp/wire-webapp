@@ -18,10 +18,8 @@
  */
 
 // https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
-const PermissionStatusState = {
+export const PermissionStatusState = {
   DENIED: 'denied',
   GRANTED: 'granted',
   PROMPT: 'prompt',
 };
-
-export {PermissionStatusState};

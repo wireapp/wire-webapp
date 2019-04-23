@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
+import * as StorageUtil from 'utils/StorageUtil';
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
@@ -32,6 +33,8 @@ import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
 
 import {chunk} from 'utils/ArrayUtil';
+import {AvailabilityType} from './AvailabilityType';
+import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 
 export class UserRepository {
@@ -70,6 +73,11 @@ export class UserRepository {
 
     this.self = ko.observable();
     this.users = ko.observableArray([]);
+
+    this.selfAvailability = ko
+      .computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE))
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 50}});
+    this.selfAvailability.subscribe(this.showAvailabilityModal);
 
     this.connect_requests = ko
       .pureComputed(() => {
@@ -337,6 +345,46 @@ export class UserRepository {
 
     const recipients = this.teamUsers().concat(this.self());
     amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+  }
+
+  showAvailabilityModal(availability) {
+    function showModal(storageKey, title, message) {
+      const hideModal = StorageUtil.getValue(storageKey);
+      if (!hideModal) {
+        modals.showModal(ModalsViewModel.TYPE.OPTION, {
+          action: dontShowAgain => {
+            if (dontShowAgain) {
+              StorageUtil.setValue(storageKey, 'true');
+            }
+          },
+          preventClose: true,
+          text: {
+            action: t('modalAcknowledgeAction'),
+            message,
+            option: t('modalAvailabilityDontShowAgain'),
+            secondary: '',
+            title,
+          },
+        });
+      }
+    }
+    switch (availability) {
+      case AvailabilityType.AWAY: {
+        showModal('hide_away_modal', t('modalAvailabilityAwayTitle'), t('modalAvailabilityAwayMessage'));
+        break;
+      }
+      case AvailabilityType.BUSY: {
+        showModal('hide_busy_modal', t('modalAvailabilityBusyTitle'), t('modalAvailabilityBusyMessage'));
+        break;
+      }
+      case AvailabilityType.AVAILABLE: {
+        showModal('hide_available_modal', t('modalAvailabilityAvailableTitle'), t('modalAvailabilityAvailableMessage'));
+        break;
+      }
+      case AvailabilityType.NONE: {
+        showModal('hide_none_modal', t('modalAvailabilityNoneTitle'), t('modalAvailabilityNoneMessage'));
+      }
+    }
   }
 
   /**

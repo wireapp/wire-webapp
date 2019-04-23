@@ -66,21 +66,17 @@ class PreferenceNotificationRepository {
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
-  popNotification() {
-    if (!this.notifications().length) {
-      return;
-    }
+  getNotifications() {
     const notificationPriorities = [
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
     ];
-    const groupedNotifications = groupBy(this.notifications(), notification => notification.type);
-    for (const type of notificationPriorities) {
-      if (groupedNotifications[type]) {
-        this.notifications.remove(notification => notification.type === type);
-        return {notification: groupedNotifications[type], type};
-      }
-    }
+    const prio = item => notificationPriorities.indexOf(item.type);
+    const notifications = this.notifications.removeAll();
+    const groupedNotifications = groupBy(notifications, notification => notification.type);
+    return Object.entries(groupedNotifications)
+      .map(([type, notification]) => ({notification, type}))
+      .sort((a, b) => prio(a) - prio(b));
   }
 
   onClientAdd(userId, clientEntity) {

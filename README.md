@@ -71,6 +71,26 @@ The command to run is:
 
 ### Deployment
 
+#### Staging Bumps
+
+**Actions**
+
+1. Checkout commit ID which has been approved by QA team
+1. Create a Git tag with the following format: `YYYY-MM-DD-staging.X`
+1. Push the newly created tag
+
+**Example**
+
+```
+git checkout 90fda951916f0d60a5bffce69a7267830e313391
+git tag 2019-04-23-staging.0
+git push origin --tags
+```
+
+If everything is done right, a deployment job ([Example](https://travis-ci.org/wireapp/wire-webapp/builds/523396493)) should be picked up on Travis CI based on the new tag.
+
+#### Manual Deployments
+
 Based on the Git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
 
 A manual deployment requires the local setup of the Elastic Beanstalk Command Line Interface ([EB CLI](https://docs.aws.amazon.com/en_us/elasticbeanstalk/latest/dg/eb-cli3.html)). Manual deployments are also based on branch defaults which are configured [here](./.elasticbeanstalk/config.yml).

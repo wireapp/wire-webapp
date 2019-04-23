@@ -60,6 +60,7 @@ import {getWebsiteUrl} from '../externalRoute';
 import {enableLogging} from 'utils/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
+import {modals} from '../view_model/ModalsViewModel';
 import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
 
 class App {
@@ -362,6 +363,7 @@ class App {
         loadingView.removeFromView();
         telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        modals.ready();
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {

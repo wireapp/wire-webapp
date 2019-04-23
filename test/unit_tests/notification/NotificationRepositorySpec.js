@@ -24,10 +24,12 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {User} from 'src/script/entity/User';
 import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {createRandomUuid} from 'utils/util';
+import {AvailabilityType} from 'src/script/user/AvailabilityType';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -261,6 +263,91 @@ describe('NotificationRepository', () => {
     });
   });
 
+  describe('reacts according to availability status', () => {
+    let allMessageTypes;
+    function generateTextAsset() {
+      const textEntity = new z.entity.Text(createRandomUuid(), 'hey there');
+      return textEntity;
+    }
+
+    beforeEach(() => {
+      const mentionMessage = new ContentMessage(createRandomUuid());
+      mentionMessage.add_asset(generateTextAsset());
+      spyOn(mentionMessage, 'isUserMentioned').and.returnValue(true);
+
+      const textMessage = new ContentMessage(createRandomUuid());
+      textMessage.add_asset(generateTextAsset());
+
+      const callMessage = new z.entity.CallMessage();
+      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      allMessageTypes = {
+        call: callMessage,
+        content: textMessage,
+        mention: mentionMessage,
+        ping: new z.entity.PingMessage(),
+      };
+    });
+
+    it('filters all notifications if user is "away"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.AWAY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const testPromises = Object.values(allMessageTypes).map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et).then(() => {
+          expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+        });
+      });
+
+      return Promise.all(testPromises);
+    });
+
+    it('filters content and ping messages when user is "busy"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.BUSY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const ignoredMessages = Object.entries(allMessageTypes)
+        .filter(([type]) => ['content', 'ping'].includes(type))
+        .map(([, message]) => message);
+
+      const testPromises = ignoredMessages.map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
+      });
+
+      return Promise.all(testPromises).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
+    });
+
+    it('it allows mentions and calls when user is "busy"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.BUSY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const notifiedMessages = Object.entries(allMessageTypes)
+        .filter(([type]) => ['mention', 'call'].includes(type))
+        .map(([, message]) => message);
+
+      const testPromises = notifiedMessages.map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
+      });
+
+      return Promise.all(testPromises).then(() => {
+        expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(notifiedMessages.length);
+      });
+    });
+  });
+
   describe('shows a well-formed call notification', () => {
     describe('for an incoming call', () => {
       const expected_body = z.string.notificationVoiceChannelActivate;
@@ -306,7 +393,7 @@ describe('NotificationRepository', () => {
     let expected_body = undefined;
 
     beforeEach(() => {
-      message_et = new z.entity.ContentMessage();
+      message_et = new ContentMessage();
       message_et.user(user_et);
     });
 
@@ -639,7 +726,7 @@ describe('NotificationRepository', () => {
       conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.selfUser(selfUserEntity);
 
-      messageEntity = new z.entity.ContentMessage(createRandomUuid());
+      messageEntity = new ContentMessage(createRandomUuid());
       messageEntity.user(selfUserEntity);
     });
 
