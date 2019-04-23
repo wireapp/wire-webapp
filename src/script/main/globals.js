@@ -54,7 +54,6 @@ import LocalizerGlobal from '../localization/Localizer.js';
 import EventNameGlobal from '../tracking/EventName.js';
 import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
 import SuperPropertyGlobal from '../tracking/SuperProperty.js';
-import AssetUploadFailedReasonGlobal from '../assets/AssetUploadFailedReason.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetRetentionPolicyGlobal from '../assets/AssetRetentionPolicy.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';

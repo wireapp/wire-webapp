@@ -19,6 +19,7 @@
 
 import Logger from 'utils/Logger';
 import TimeUtil from 'utils/TimeUtil';
+import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 
 import poster from 'poster-image';
 import {
@@ -1867,11 +1868,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that should receive the file
    * @param {string} messageId - ID of the metadata message
-   * @param {z.assets.AssetUploadFailedReason} [reason=z.assets.AssetUploadFailedReason.FAILED] - Cause for the failed upload (optional)
+   * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] - Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
-  send_asset_upload_failed(conversation_et, messageId, reason = z.assets.AssetUploadFailedReason.FAILED) {
-    const wasCancelled = reason === z.assets.AssetUploadFailedReason.CANCELLED;
+  send_asset_upload_failed(conversation_et, messageId, reason = AssetUploadFailedReason.FAILED) {
+    const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
       [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
@@ -3419,7 +3420,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const fromSelf = event.from === this.selfUser().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === z.assets.AssetTransferState.UPLOAD_FAILED;
-    const isLocalCancel = fromSelf && event.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+    const isLocalCancel = fromSelf && event.data.reason === AssetUploadFailedReason.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
       return conversationEntity.remove_message_by_id(event.id);
@@ -3747,7 +3748,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(messageId) {
-    this.send_asset_upload_failed(this.active_conversation(), messageId, z.assets.AssetUploadFailedReason.CANCELLED);
+    this.send_asset_upload_failed(this.active_conversation(), messageId, AssetUploadFailedReason.CANCELLED);
   }
 
   /**
@@ -3828,7 +3829,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         asset_et.status(reason);
-        asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
+        asset_et.upload_failed_reason(AssetUploadFailedReason.FAILED);
       }
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
