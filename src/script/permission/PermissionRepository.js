@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {PermissionStatusState} from './PermissionStatusState';
 
 /**
  * Permission repository to check browser permissions.
@@ -81,7 +82,7 @@ export default class PermissionRepository {
     const permissionPromises = permissionTypes.map(permissionType => {
       return this.getPermissionState(permissionType)
         .then(permissionState => ({permissionState, permissionType}))
-        .catch(() => ({permissionState: z.permission.PermissionStatusState.PROMPT, permissionType}));
+        .catch(() => ({permissionState: PermissionStatusState.PROMPT, permissionType}));
     });
 
     return Promise.all(permissionPromises);

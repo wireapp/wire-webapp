@@ -18,6 +18,7 @@
  */
 
 import Logger from 'utils/Logger';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
 
 export default class MediaStreamHandler {
   /**
@@ -360,13 +361,13 @@ export default class MediaStreamHandler {
       return this.permissionRepository.getPermissionStates(typesToCheck).then(permissions => {
         for (const permission of permissions) {
           const {permissionState, permissionType} = permission;
-          const isPermissionPrompt = permissionState === z.permission.PermissionStatusState.PROMPT;
+          const isPermissionPrompt = permissionState === PermissionStatusState.PROMPT;
           if (isPermissionPrompt) {
             this.logger.info(`Need to prompt for '${permissionType}' permission`, permissions);
             return Promise.resolve(false);
           }
 
-          const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
+          const isPermissionDenied = permissionState === PermissionStatusState.DENIED;
           if (isPermissionDenied) {
             this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
             return Promise.reject(new z.error.PermissionError(z.error.PermissionError.TYPE.DENIED));

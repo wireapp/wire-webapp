@@ -27,6 +27,7 @@ import User from 'src/script/entity/User';
 import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
 import {createRandomUuid} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
+import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -77,7 +78,7 @@ describe('z.notification.NotificationRepository', () => {
 
       // Mocks
       document.hasFocus = () => false;
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
       z.util.Environment.browser.supports.notifications = true;
 
       window.wire.app = {
@@ -252,7 +253,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the user permission was denied', () => {
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.DENIED);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -291,7 +292,7 @@ describe('z.notification.NotificationRepository', () => {
           availability: () => AvailabilityType.AWAY,
         });
       });
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const testPromises = Object.values(allMessageTypes).map(messageEntity => {
         return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et).then(() => {
@@ -308,7 +309,7 @@ describe('z.notification.NotificationRepository', () => {
           availability: () => AvailabilityType.BUSY,
         });
       });
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const ignoredMessages = Object.entries(allMessageTypes)
         .filter(([type]) => ['content', 'ping'].includes(type))
@@ -329,7 +330,7 @@ describe('z.notification.NotificationRepository', () => {
           availability: () => AvailabilityType.BUSY,
         });
       });
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
         .filter(([type]) => ['mention', 'call'].includes(type))

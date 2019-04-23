@@ -25,6 +25,7 @@ import TimeUtil from 'utils/TimeUtil';
 import {AvailabilityType} from '../user/AvailabilityType';
 
 import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
 
 window.z = window.z || {};
 window.z.notification = z.notification || {};
@@ -115,7 +116,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
       if (z.util.Environment.browser.supports.permissions) {
         return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS).then(() => {
-          const shouldRequestPermission = this.permissionState() === z.permission.PermissionStatusState.PROMPT;
+          const shouldRequestPermission = this.permissionState() === PermissionStatusState.PROMPT;
           return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
         });
       }
@@ -203,7 +204,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   /**
    * Set the permission state.
-   * @param {z.permission.PermissionStatusState} permissionState - State of browser permission
+   * @param {PermissionStatusState} permissionState - State of browser permission
    * @returns {Promise} Resolves with true if notifications are enabled
    */
   updatePermissionState(permissionState) {
@@ -630,13 +631,13 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _checkPermissionState() {
     switch (this.permissionState()) {
-      case z.permission.PermissionStatusState.GRANTED: {
+      case PermissionStatusState.GRANTED: {
         return Promise.resolve(true);
       }
 
       case z.notification.PermissionState.IGNORED:
       case z.notification.PermissionState.UNSUPPORTED:
-      case z.permission.PermissionStatusState.DENIED: {
+      case PermissionStatusState.DENIED: {
         return Promise.resolve(false);
       }
 
@@ -755,7 +756,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
-    const permissionDenied = this.permissionState() === z.permission.PermissionStatusState.DENIED;
+    const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
     const preferenceIsNone = this.notificationsPreference() === z.notification.NotificationPreference.NONE;
     const supportsNotification = z.util.Environment.browser.supports.notifications;
 
