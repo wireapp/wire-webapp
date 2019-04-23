@@ -19,7 +19,7 @@
 
 export function capToByte(value: number): number {
   const MAX_VALUE = 255;
-  return Math.min(Math.abs(value * MAX_VALUE), MAX_VALUE);
+  return Math.min(Math.abs(parseInt((value * MAX_VALUE).toString(), 10)), MAX_VALUE);
 }
 
 export function clamp(value: number, min: number, max: number): number {
