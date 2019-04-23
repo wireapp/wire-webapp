@@ -175,4 +175,4 @@ class DemoTypography extends React.PureComponent {
   }
 }
 
-export default DemoTypography;
+export {DemoTypography};

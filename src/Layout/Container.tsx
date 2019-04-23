@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
-import media, {QueryKeys} from '../mediaQueries';
+import {QueryKeys, media} from '../mediaQueries';
 import {Omit, filterProps} from '../util';
 import {GUTTER, WIDTH} from './sizes';
 

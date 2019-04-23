@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../../Identity';
-import media, {QueryKeys} from '../../mediaQueries';
+import {QueryKeys, media} from '../../mediaQueries';
 import {LinkProps, filterLinkProps, linkStyle} from '../../Text';
 import {filterProps} from '../../util';
 import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './HeaderSubMenu';

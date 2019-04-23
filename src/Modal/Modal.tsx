@@ -23,7 +23,7 @@ import React from 'react';
 import {CloseIcon} from '../Icon';
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
-import media, {QueryKeys} from '../mediaQueries';
+import {QueryKeys, media} from '../mediaQueries';
 import {filterProps, noop} from '../util';
 import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';
 

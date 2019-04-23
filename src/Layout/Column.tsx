@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
-import media, {QueryKeys} from '../mediaQueries';
+import {QueryKeys, media} from '../mediaQueries';
 import {GUTTER} from './sizes';
 
 export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {}

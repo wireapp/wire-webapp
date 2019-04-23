@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import Color from 'color';
 import {COLOR} from '../../Identity';
 import {defaultTransition} from '../../Identity/motions';
-import media, {QueryKeys} from '../../mediaQueries';
+import {QueryKeys, media} from '../../mediaQueries';
 import {TextProps, textStyle} from '../../Text';
 
 interface MenuSubLinkProps<T = HTMLDivElement> extends TextProps<T> {}

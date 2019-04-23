@@ -296,4 +296,4 @@ const DemoInputs = () => {
     </Container>
   );
 };
-export default DemoInputs;
+export {DemoInputs};

@@ -144,4 +144,4 @@ class DemoLayouts extends React.PureComponent {
   }
 }
 
-export default DemoLayouts;
+export {DemoLayouts};

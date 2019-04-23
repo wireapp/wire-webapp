@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../../Identity';
-import media, {QueryKeys} from '../../mediaQueries';
+import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {

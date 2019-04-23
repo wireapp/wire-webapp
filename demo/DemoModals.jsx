@@ -117,4 +117,4 @@ class DemoModals extends React.PureComponent {
   }
 }
 
-export default DemoModals;
+export {DemoModals};
