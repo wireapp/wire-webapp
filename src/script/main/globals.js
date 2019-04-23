@@ -144,7 +144,6 @@ import TeamMemberEntityGlobal from '../team/TeamMemberEntity.js';
 import TeamRepositoryGlobal from '../team/TeamRepository.js';
 import TeamServiceGlobal from '../team/TeamService.js';
 import AvailabilityMapperGlobal from '../user/AvailabilityMapper.js';
-import UserHandleGeneratorGlobal from '../user/UserHandleGenerator.js';
 import ActionsViewModelGlobal from '../view_model/ActionsViewModel.js';
 import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';

@@ -32,6 +32,7 @@ import User from '../../entity/User';
 import UserRepository from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {validateProfileImageResolution} from 'utils/util';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -192,7 +193,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     // Automation: KeyboardEvent triggered during tests is missing key property
     const inputChar = keyboardEvent.key || String.fromCharCode(event.charCode);
-    return z.user.UserHandleGenerator.validate_character(inputChar.toLowerCase());
+    return validateCharacter(inputChar.toLowerCase());
   }
 
   popNotification() {
@@ -354,7 +355,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.enteredUsername(enteredUsername);
 
-    if (z.user.UserHandleGenerator.validate_handle(enteredUsername)) {
+    if (validateHandle(enteredUsername)) {
       this.userRepository
         .verify_username(enteredUsername)
         .then(() => {
