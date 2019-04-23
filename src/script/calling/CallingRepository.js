@@ -164,6 +164,8 @@ export class CallingRepository {
           });
           this.callingAccount = account;
           this.callingApi = callingApi;
+
+          setInterval(callingApi.poll, 500);
         });
       }
     });

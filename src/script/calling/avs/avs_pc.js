@@ -57,6 +57,10 @@ function ccallConnectionHandler(pc, state) {
 
 /* Data-channel hepers */
 
+function ccallDcEstabHandler(pc) {
+  em_module.ccall('dc_estab_handler', null, ['number'], [pc.self]);
+}
+
 function ccallDcStateChangeHandler(pc, state) {
   em_module.ccall('dc_state_handler', null, ['number', 'number'], [pc.self, state]);
 }
@@ -94,12 +98,17 @@ function connectionHandler(pc, event) {
     console.log(`Local stream: ${stream.id}`);
     const audioTracks = stream.getAudioTracks();
     if (audioTracks.length > 0) {
-      console.log(`BlahUsing Audio device: ${audioTracks[0].label}`);
+      console.log(`Using Audio device: ${audioTracks[0].label}`);
     }
     for (const track of audioTracks) {
       track.enabled = true;
     }
   }
+}
+
+function dataChannelHandler(pc, event) {
+  console.log(`dataChannelHandler: ${event.channel}`);
+  ccallDcEstabHandler(pc);
 }
 
 /* DataChannel events */
@@ -114,6 +123,8 @@ function pc_New(self) {
   pc.onicegatheringstatechange = () => gatheringHandler(pc);
 
   pc.onconnectionstatechange = event => connectionHandler(pc, event);
+
+  pc.ondatachannel = event => dataChannelHandler(pc, event);
 
   pc.ontrack = ({streams}) => {
     const stream = streams[0];
