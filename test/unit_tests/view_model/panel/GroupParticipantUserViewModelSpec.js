@@ -18,8 +18,8 @@
  */
 
 import UUID from 'uuidjs';
-import GroupParticipantUserViewModel from 'src/script/view_model/panel/GroupParticipantUserViewModel';
-import User from 'src/script/entity/User';
+import {GroupParticipantUserViewModel} from 'src/script/view_model/panel/GroupParticipantUserViewModel';
+import {User} from 'src/script/entity/User';
 import {noop} from 'utils/util';
 
 describe('GroupParticipantUserViewModel', () => {

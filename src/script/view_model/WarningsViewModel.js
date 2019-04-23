@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
@@ -65,7 +65,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = Logger('z.viewModel.WarningsViewModel');
+    this.logger = getLogger('z.viewModel.WarningsViewModel');
 
     // Array of warning banners
     this.warnings = ko.observableArray();

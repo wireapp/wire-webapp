@@ -17,16 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from '../../tracking/Helpers';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
 import {sortObjectByKeys} from 'utils/util';
 
 // Call traces entity.
 class CallTelemetry {
   constructor() {
-    this.logger = Logger('CallTelemetry');
+    this.logger = getLogger('CallTelemetry');
 
     this.sessions = {};
     this.remote_version = undefined;

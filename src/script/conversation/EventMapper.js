@@ -19,21 +19,21 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import MediumImage from '../entity/message/MediumImage';
-import Logger from 'utils/Logger';
+import {MediumImage} from '../entity/message/MediumImage';
+import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
-import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {base64ToArray} from 'utils/util';
 
 // Event Mapper to convert all server side JSON events into core entities.
-export default class EventMapper {
+export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.logger = Logger('EventMapper');
+    this.logger = getLogger('EventMapper');
   }
 
   /**

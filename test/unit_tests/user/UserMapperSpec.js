@@ -18,8 +18,8 @@
  */
 
 import {ACCENT_ID} from 'src/script/config.js';
-import User from 'src/script/entity/User';
-import UserMapper from 'src/script/user/UserMapper';
+import {User} from 'src/script/entity/User';
+import {UserMapper} from 'src/script/user/UserMapper';
 import {createRandomUuid} from 'utils/util';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 

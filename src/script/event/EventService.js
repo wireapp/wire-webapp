@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -30,7 +30,7 @@ z.event.EventService = class EventService {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = Logger('z.conversation.EventService');
+    this.logger = getLogger('z.conversation.EventService');
     this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
   }
 

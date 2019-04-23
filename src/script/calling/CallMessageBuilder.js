@@ -18,7 +18,7 @@
  */
 
 import {serverTimeHandler} from '../time/serverTimeHandler';
-import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CallMessageEntity} from './entities/CallMessageEntity';
 
 const buildCallMessage = (type, response, sessionId, additionalPayload) => {

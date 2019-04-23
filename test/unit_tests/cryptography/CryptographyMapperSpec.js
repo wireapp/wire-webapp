@@ -34,7 +34,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import CryptographyMapper from 'src/script/cryptography/CryptographyMapper';
+import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 

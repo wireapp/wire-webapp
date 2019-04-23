@@ -17,13 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -42,7 +42,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   constructor(repositories) {
-    this.logger = Logger('z.viewModel.content.PreferencesOptionsViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesOptionsViewModel');
 
     this.callingRepository = repositories.calling;
     this.propertiesRepository = repositories.properties;

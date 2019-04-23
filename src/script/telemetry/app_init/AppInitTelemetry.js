@@ -16,14 +16,14 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import AppInitStatistics from './AppInitStatistics';
-import Logger from 'utils/Logger';
+import {AppInitStatistics} from './AppInitStatistics';
+import {getLogger} from 'utils/Logger';
 
-import AppInitTimings from './AppInitTimings';
+import {AppInitTimings} from './AppInitTimings';
 
-export default class AppInitTelemetry {
+export class AppInitTelemetry {
   constructor() {
-    this.logger = Logger('AppInitTelemetry');
+    this.logger = getLogger('AppInitTelemetry');
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }

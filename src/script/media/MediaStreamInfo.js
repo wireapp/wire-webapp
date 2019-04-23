@@ -17,7 +17,7 @@
  *
  */
 
-import MediaStreamHandler from './MediaStreamHandler';
+import {MediaStreamHandler} from './MediaStreamHandler';
 
 window.z = window.z || {};
 window.z.media = z.media || {};

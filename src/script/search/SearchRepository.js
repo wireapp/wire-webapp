@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 window.z = window.z || {};
@@ -58,7 +58,7 @@ class SearchRepository {
   constructor(searchService, userRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
-    this.logger = Logger('z.search.SearchRepository');
+    this.logger = getLogger('z.search.SearchRepository');
   }
 
   /**
@@ -191,5 +191,5 @@ class SearchRepository {
   }
 }
 
-export default SearchRepository;
 z.search.SearchRepository = SearchRepository;
+export {SearchRepository};

@@ -17,19 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
 import {ConsentValue} from '../../user/ConsentValue';
-import ReceiptMode from '../../conversation/ReceiptMode';
-import PropertiesRepository from '../../properties/PropertiesRepository';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {AvailabilityType} from '../../user/AvailabilityType';
 
-import User from '../../entity/User';
-import UserRepository from '../../user/UserRepository';
+import {User} from '../../entity/User';
+import {UserRepository} from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {validateProfileImageResolution} from 'utils/util';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
@@ -60,7 +60,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.changeAccentColor = this.changeAccentColor.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
-    this.logger = Logger('z.viewModel.content.PreferencesAccountViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesAccountViewModel');
 
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;

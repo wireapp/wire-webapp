@@ -209,4 +209,4 @@ const TimeUtil = {
   },
 };
 
-export default TimeUtil;
+export {TimeUtil};

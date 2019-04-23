@@ -17,9 +17,9 @@
  *
  */
 
-// https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
-export const PermissionStatusState = {
-  DENIED: 'denied',
-  GRANTED: 'granted',
-  PROMPT: 'prompt',
-};
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state */
+export enum PermissionStatusState {
+  DENIED = 'denied',
+  GRANTED = 'granted',
+  PROMPT = 'prompt',
+}

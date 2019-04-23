@@ -17,17 +17,11 @@
  *
  */
 
-const CALL_MESSAGE_TYPE = {
-  CANCEL: 'CANCEL',
-  GROUP_CHECK: 'GROUPCHECK',
-  GROUP_LEAVE: 'GROUPLEAVE',
-  GROUP_SETUP: 'GROUPSETUP',
-  GROUP_START: 'GROUPSTART',
-  HANGUP: 'HANGUP',
-  PROP_SYNC: 'PROPSYNC',
-  REJECT: 'REJECT',
-  SETUP: 'SETUP',
-  UPDATE: 'UPDATE',
-};
-
-export default CALL_MESSAGE_TYPE;
+/** @see https://www.w3.org/TR/webrtc/#dom-rtcstatstype */
+export enum STATS_TYPE {
+  CANDIDATE_PAIR = 'candidate-pair',
+  GOOGLE_CANDIDATE_PAIR = 'googCandidatePair',
+  INBOUND_RTP = 'inbound-rtp',
+  OUTBOUND_RTP = 'outbound-rtp',
+  SSRC = 'ssrc',
+}

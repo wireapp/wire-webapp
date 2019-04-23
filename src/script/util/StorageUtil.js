@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 export function getValue(key) {
   return amplify.store(key);

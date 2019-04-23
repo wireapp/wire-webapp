@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import platform from 'platform';
 
@@ -44,7 +44,7 @@ z.client.ClientRepository = class ClientRepository {
     this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = Logger('z.client.ClientRepository');
+    this.logger = getLogger('z.client.ClientRepository');
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));

@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 class PreferencesListViewModel {
   /**
@@ -30,7 +30,7 @@ class PreferencesListViewModel {
   constructor(contentViewModel, listViewModel, userRepository, callingRepository) {
     this.listViewModel = listViewModel;
     this.userRepository = userRepository;
-    this.logger = Logger('PreferencesListViewModel');
+    this.logger = getLogger('PreferencesListViewModel');
 
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;

@@ -17,16 +17,20 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
-const SIGNALING_STATE = {
-  CLOSED: 'closed',
-  LOCAL_OFFER: 'have-local-offer',
-  LOCAL_PROVISIONAL_ANSWER: 'have-local-pranswer',
-  NEW: 'new',
-  REMOTE_OFFER: 'have-remote-offer',
-  REMOTE_PROVISIONAL_ANSWER: 'have-remote-pranswer',
-  STABLE: 'stable',
-};
+export enum PlatformType {
+  BROWSER_APP = 'web',
+  DESKTOP_LINUX = 'linux',
+  DESKTOP_MACOS = 'mac',
+  DESKTOP_WINDOWS = 'windows',
+}
 
-export {SIGNALING_STATE};
+export enum UserType {
+  GUEST = 'guest',
+  TEMPORARY_GUEST = 'temporary_guest',
+  USER = 'user',
+}
+
+export enum ConversationType {
+  GROUP = 'group',
+  ONE_TO_ONE = 'one_to_one',
+}

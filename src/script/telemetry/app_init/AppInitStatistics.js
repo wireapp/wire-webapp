@@ -18,11 +18,11 @@
  */
 
 import {isNumber, isString} from 'underscore';
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import AppInitStatisticsValue from './AppInitStatisticsValue';
+import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 
-export default class AppInitStatistics {
+export class AppInitStatistics {
   static get CONFIG() {
     return {
       LOG_LENGTH_KEY: 17,
@@ -31,7 +31,7 @@ export default class AppInitStatistics {
   }
 
   constructor() {
-    this.logger = Logger('AppInitStatistics');
+    this.logger = getLogger('AppInitStatistics');
 
     amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }

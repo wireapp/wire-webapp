@@ -17,9 +17,9 @@
  *
  */
 
-import Conversation from 'src/script/entity/Conversation';
+import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationType} from 'src/script/tracking/attribute';
-import trackingHelpers from 'src/script/tracking/Helpers';
+import * as trackingHelpers from 'src/script/tracking/Helpers';
 import {createRandomUuid} from 'utils/util';
 
 describe('trackingHelpers', () => {

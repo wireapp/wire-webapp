@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -39,7 +39,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.clientRepository = repositories.client;
     this.conversationRepository = repositories.conversation;
     this.cryptographyRepository = repositories.cryptography;
-    this.logger = Logger('z.viewModel.content.PreferencesDeviceDetailsViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesDeviceDetailsViewModel');
 
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;

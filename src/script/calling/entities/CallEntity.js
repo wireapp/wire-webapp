@@ -17,13 +17,13 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {getRandomNumber} from 'utils/NumberUtil';
 
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import CALL_STATE from '../enum/CallState';
-import CALL_STATE_GROUP from '../enum/CallStateGroup';
-import TERMINATION_REASON from '../enum/TerminationReason';
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
+import {CALL_STATE} from '../enum/CallState';
+import {CALL_STATE_GROUP} from '../enum/CallStateGroup';
+import {TERMINATION_REASON} from '../enum/TerminationReason';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';

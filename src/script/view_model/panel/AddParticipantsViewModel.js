@@ -17,14 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import {t} from 'utils/LocalizerUtil';
-import trackingHelpers from '../../tracking/Helpers';
+import * as trackingHelpers from '../../tracking/Helpers';
 
-export default class AddParticipantsViewModel extends BasePanelViewModel {
+export class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -42,7 +42,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.teamRepository = team;
     this.userRepository = user;
 
-    this.logger = Logger('z.viewModel.panel.AddParticipantsViewModel');
+    this.logger = getLogger('z.viewModel.panel.AddParticipantsViewModel');
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;

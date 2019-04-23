@@ -17,7 +17,7 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 

@@ -18,9 +18,9 @@
  */
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import PROPERTY_STATE from '../enum/PropertyState';
-import SDP_NEGOTIATION_MODE from '../enum/SDPNegotiationMode';
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
+import {PROPERTY_STATE} from '../enum/PropertyState';
+import {SDP_NEGOTIATION_MODE} from '../enum/SDPNegotiationMode';
 import {FlowEntity} from './FlowEntity';
 
 class ParticipantEntity {

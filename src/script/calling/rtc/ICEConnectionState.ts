@@ -17,12 +17,16 @@
  *
  */
 
-export default {
-  BACKEND_REQUESTS: 'backend_requests',
-  CLIENT_TYPE: 'client_type',
-  CLIENTS: 'clients',
-  CONNECTIONS: 'connections',
-  CONVERSATIONS: 'conversations',
-  NOTIFICATIONS: 'notifications',
-  SESSIONS: 'sessions',
-};
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
+ */
+export enum ICE_CONNECTION_STATE {
+  CHECKING = 'checking',
+  CLOSED = 'closed',
+  COMPLETED = 'completed',
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  FAILED = 'failed',
+  NEW = 'new',
+}

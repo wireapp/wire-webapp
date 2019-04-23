@@ -17,9 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {downloadBlob} from 'utils/util';
 
 window.z = window.z || {};
@@ -45,7 +45,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.HistoryExportViewModel');
+    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
 
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);

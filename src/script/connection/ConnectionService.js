@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -36,7 +36,7 @@ z.connection.ConnectionService = class ConnectionService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.connection.ConnectionService');
+    this.logger = getLogger('z.connection.ConnectionService');
   }
 
   /**

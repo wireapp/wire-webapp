@@ -17,18 +17,18 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import User from '../entity/User';
+import {getLogger} from 'utils/Logger';
+import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
 
-export default class UserMapper {
+export class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class UserMapper
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    */
   constructor(serverTimeHandler) {
-    this.logger = Logger('UserMapper');
+    this.logger = getLogger('UserMapper');
     this.serverTimeHandler = serverTimeHandler;
   }
 

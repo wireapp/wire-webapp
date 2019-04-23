@@ -21,14 +21,14 @@ import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '
 import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
-import EXTERNAL_ROUTE from '../externalRoute';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   onConfirm: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
+const _AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDecline, intl: {formatMessage: _}}) => (
   <Modal>
     <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
       <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
@@ -58,4 +58,4 @@ const AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDec
   </Modal>
 );
 
-export default injectIntl(AcceptNewsModal);
+export const AcceptNewsModal = injectIntl(_AcceptNewsModal);

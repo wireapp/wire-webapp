@@ -17,9 +17,15 @@
  *
  */
 
-const SDP_SOURCE = {
-  LOCAL: 'local',
-  REMOTE: 'remote',
-};
-
-export default SDP_SOURCE;
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcsdptype
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
+ */
+export enum SDP_TYPE {
+  ANSWER = 'answer',
+  LOCAL = 'local',
+  OFFER = 'offer',
+  PROVISIONAL_ANSWER = 'pranswer',
+  REMOTE = 'remote',
+  ROLLBACK = 'rollback',
+}

@@ -18,12 +18,10 @@
  */
 
 import {defineMessages} from 'react-intl';
-import BackendError from './auth/module/action/BackendError';
-import LabeledError from './auth/module/action/LabeledError';
-import ValidationError from './auth/module/action/ValidationError';
+import {BackendError} from './auth/module/action/BackendError';
+import {LabeledError} from './auth/module/action/LabeledError';
+import {ValidationError} from './auth/module/action/ValidationError';
 import {LOGOUT_REASON} from './auth/route';
-
-/* eslint-disable sort-keys */
 
 export const footerStrings = defineMessages({
   copy: {

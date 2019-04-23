@@ -17,9 +17,9 @@
  *
  */
 
-export default {
-  FILE: 'File',
-  IMAGE: 'Image',
-  LOCATION: 'Location',
-  TEXT: 'Text',
-};
+export enum SDP_NEGOTIATION_MODE {
+  DEFAULT = 'default',
+  ICE_RESTART = 'iceRestart',
+  STATE_COLLISION = 'stateCollision',
+  STREAM_CHANGE = 'streamChange',
+}

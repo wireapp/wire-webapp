@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {scrollToBottom} from 'utils/scroll-helpers';
 import {isLastItem} from 'utils/ArrayUtil';
 
@@ -40,7 +40,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
     this.mainViewModel = mainViewModel;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.ConnectRequestsViewModel');
+    this.logger = getLogger('z.viewModel.content.ConnectRequestsViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userRepository.connect_requests;

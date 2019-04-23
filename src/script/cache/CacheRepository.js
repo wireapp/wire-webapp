@@ -26,7 +26,7 @@ import * as StorageUtil from 'utils/StorageUtil';
  *  This happened when doing "@cache_repository.set_entity user_et"
  *
  */
-export default class CacheRepository {
+export class CacheRepository {
   constructor(logger) {
     this.logger = logger;
   }

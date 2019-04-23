@@ -49,4 +49,4 @@ class WebappProperties {
   }
 }
 
-export default WebappProperties;
+export {WebappProperties};

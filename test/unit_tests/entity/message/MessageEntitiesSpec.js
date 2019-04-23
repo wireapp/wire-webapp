@@ -18,7 +18,7 @@
  */
 
 // KARMA_SPECS=entity/message/MessageEntities yarn test:app
-import MediumImage from 'src/script/entity/message/MediumImage';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
 
 describe('Message Entities', () => {
   let message_et = null;

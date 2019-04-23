@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import Dexie from 'dexie';
 
 import {Config} from '../auth/config';
-import StorageSchemata from '../storage/StorageSchemata';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
@@ -38,7 +38,7 @@ class StorageService {
   }
   // Construct an new StorageService.
   constructor() {
-    this.logger = Logger('StorageService');
+    this.logger = getLogger('StorageService');
 
     this.db = undefined;
     this.dbName = undefined;
@@ -307,4 +307,4 @@ class StorageService {
   }
 }
 
-export default StorageService;
+export {StorageService};

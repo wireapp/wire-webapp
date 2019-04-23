@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 window.z = window.z || {};
 window.z.integration = z.integration || {};
@@ -37,7 +37,7 @@ z.integration.IntegrationService = class IntegrationService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.integration.IntegrationService');
+    this.logger = getLogger('z.integration.IntegrationService');
   }
 
   getProvider(providerId) {

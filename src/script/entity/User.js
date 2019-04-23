@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
 import {AvailabilityType} from '../user/AvailabilityType';
 
@@ -250,4 +250,4 @@ class User {
   }
 }
 
-export default User;
+export {User};

@@ -17,15 +17,12 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtcsdptype
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription#RTCSdpType
-const SDP_TYPE = {
-  ANSWER: 'answer',
-  LOCAL: 'local',
-  OFFER: 'offer',
-  PROVISIONAL_ANSWER: 'pranswer',
-  REMOTE: 'remote',
-  ROLLBACK: 'rollback',
-};
-
-export {SDP_TYPE};
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcicegatheringstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceGatheringState#Value
+ */
+export enum ICE_GATHERING_STATE {
+  COMPLETE = 'complete',
+  GATHERING = 'gathering',
+  NEW = 'new',
+}

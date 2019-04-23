@@ -187,4 +187,4 @@ class LinkPreviewRepository {
   }
 }
 
-export default LinkPreviewRepository;
+export {LinkPreviewRepository};

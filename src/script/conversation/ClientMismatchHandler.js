@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 import {getDifference} from 'utils/ArrayUtil';
 
 window.z = window.z || {};
@@ -31,7 +31,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.conversation.ClientMismatchHandler');
+    this.logger = getLogger('z.conversation.ClientMismatchHandler');
   }
 
   /**

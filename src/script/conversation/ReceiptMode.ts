@@ -17,5 +17,7 @@
  *
  */
 
-import {getLogger} from '../auth/LogProvider';
-export default getLogger;
+export enum ReceiptMode {
+  DELIVERY = 0,
+  DELIVERY_AND_READ = 1,
+}

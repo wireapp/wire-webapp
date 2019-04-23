@@ -17,15 +17,15 @@
  *
  */
 
-const CALL_STATE = {
-  CONNECTING: 'connecting',
-  DISCONNECTING: 'disconnecting',
-  ENDED: 'ended',
-  INCOMING: 'incoming',
-  ONGOING: 'ongoing',
-  OUTGOING: 'outgoing',
-  REJECTED: 'rejected',
-  UNKNOWN: 'unknown',
-};
-
-export default CALL_STATE;
+export enum CALL_MESSAGE_TYPE {
+  CANCEL = 'CANCEL',
+  GROUP_CHECK = 'GROUPCHECK',
+  GROUP_LEAVE = 'GROUPLEAVE',
+  GROUP_SETUP = 'GROUPSETUP',
+  GROUP_START = 'GROUPSTART',
+  HANGUP = 'HANGUP',
+  PROP_SYNC = 'PROPSYNC',
+  REJECT = 'REJECT',
+  SETUP = 'SETUP',
+  UPDATE = 'UPDATE',
+}

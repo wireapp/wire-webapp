@@ -319,5 +319,5 @@ class StorageSchemata {
   }
 }
 
-export default StorageSchemata;
+export {StorageSchemata};
 z.storage.StorageSchemata = StorageSchemata;

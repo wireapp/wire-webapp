@@ -17,12 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
-import ReceiptMode from '../conversation/ReceiptMode';
-import WebappProperties from './WebappProperties';
+import {ReceiptMode} from '../conversation/ReceiptMode';
+import {WebappProperties} from './WebappProperties';
 import {PROPERTIES_TYPE} from './PropertiesType';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -46,7 +46,7 @@ class PropertiesRepository {
   constructor(propertiesService, selfService) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
-    this.logger = Logger('PropertiesRepository');
+    this.logger = getLogger('PropertiesRepository');
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
@@ -268,7 +268,7 @@ class PropertiesRepository {
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
         break;
       case PROPERTIES_TYPE.ENABLE_DEBUGGING:
-        amplify.publish(Logger.prototype.LOG_ON_DEBUG, updatedPreference);
+        amplify.publish(getLogger.prototype.LOG_ON_DEBUG, updatedPreference);
         break;
       case PROPERTIES_TYPE.NOTIFICATIONS:
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
@@ -315,4 +315,4 @@ class PropertiesRepository {
   }
 }
 
-export default PropertiesRepository;
+export {PropertiesRepository};

@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import {CallSetupTimings} from './CallSetupTimings';
 import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
@@ -39,7 +39,7 @@ class FlowTelemetry {
     const loggerId = this.id.substr(0, 8);
     const loggerTimestamp = new Date().getMilliseconds();
     const loggerName = `FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
-    this.logger = Logger(loggerName);
+    this.logger = getLogger(loggerName);
     this.is_answer = false;
     this.peer_connection = undefined;
 

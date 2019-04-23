@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'utils/Logger';
 
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
@@ -31,7 +31,7 @@ function downloadText(text, filename = 'default.txt') {
   return downloadFile(url, filename);
 }
 
-export default class DebugUtil {
+export class DebugUtil {
   constructor(repositories) {
     const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
 
@@ -47,7 +47,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = Logger('DebugUtil');
+    this.logger = getLogger('DebugUtil');
   }
 
   blockAllConnections() {

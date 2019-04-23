@@ -17,10 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
 
-export default class PromiseQueue {
+export class PromiseQueue {
   static get CONFIG() {
     return {
       UNBLOCK_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
@@ -41,7 +41,7 @@ export default class PromiseQueue {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
     const loggerName = `PromiseQueue${name ? ` (${name})` : ''}`;
-    this.logger = Logger(loggerName);
+    this.logger = getLogger(loggerName);
 
     this._blocked = false;
     this._concurrent = concurrent;

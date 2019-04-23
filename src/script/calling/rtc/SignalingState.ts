@@ -17,16 +17,16 @@
  *
  */
 
-// http://www.w3.org/TR/webrtc/#rtciceconnectionstate-enum
-// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.iceConnectionState#Value
-const ICE_CONNECTION_STATE = {
-  CHECKING: 'checking',
-  CLOSED: 'closed',
-  COMPLETED: 'completed',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-  FAILED: 'failed',
-  NEW: 'new',
-};
-
-export {ICE_CONNECTION_STATE};
+/**
+ * @see http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
+ */
+export enum SIGNALING_STATE {
+  CLOSED = 'closed',
+  LOCAL_OFFER = 'have-local-offer',
+  LOCAL_PROVISIONAL_ANSWER = 'have-local-pranswer',
+  NEW = 'new',
+  REMOTE_OFFER = 'have-remote-offer',
+  REMOTE_PROVISIONAL_ANSWER = 'have-remote-pranswer',
+  STABLE = 'stable',
+}
