@@ -22,7 +22,7 @@ import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
 
 const TABLE_NAME = 'the-simpsons';
 
-export default {
+export const createSpec = {
   'creates a serialized database record.': (done: DoneFn, engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 

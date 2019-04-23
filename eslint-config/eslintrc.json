@@ -13,11 +13,12 @@
     "ecmaVersion": 6,
     "sourceType": "module"
   },
-  "plugins": ["prettier", "no-unsanitized", "jsdoc", "react"],
+  "plugins": ["import", "jsdoc", "no-unsanitized", "prettier", "react"],
   "rules": {
     "curly": "error",
     "dot-notation": "error",
     "id-length": "error",
+    "import/no-default-export": "error",
     "jsdoc/require-hyphen-before-param-description": "error",
     "no-console": [
       "error",

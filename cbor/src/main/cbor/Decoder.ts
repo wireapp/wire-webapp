@@ -17,8 +17,8 @@
  *
  */
 
-import DecodeError from './DecodeError';
-import Type from './Type';
+import {DecodeError} from './DecodeError';
+import {Type} from './Type';
 
 export interface DecoderConfig {
   max_array_length: number;
@@ -538,4 +538,4 @@ class Decoder {
   }
 }
 
-export default Decoder;
+export {Decoder};

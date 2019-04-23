@@ -17,11 +17,11 @@
  *
  */
 
-import Config from './Config';
-import Item from './Item';
-import Priority from './Priority';
+import {Config} from './Config';
+import {Item} from './Item';
+import {Priority} from './Priority';
 
-export default class PriorityQueue {
+export class PriorityQueue {
   private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {

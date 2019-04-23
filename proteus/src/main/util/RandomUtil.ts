@@ -30,4 +30,4 @@ const random_bytes = (length: number): Uint8Array => {
   }
 };
 
-export default {random_bytes};
+export {random_bytes};

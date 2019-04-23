@@ -17,7 +17,7 @@
  *
  */
 
-import Cryptobox from '../Cryptobox';
+import {Cryptobox} from '../Cryptobox';
 
 // Record that is written into the store
 class SerialisedRecord {

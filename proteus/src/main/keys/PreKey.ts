@@ -19,11 +19,11 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
+import * as ClassUtil from '../util/ClassUtil';
 
-import InputError from '../errors/InputError';
+import {InputError} from '../errors/InputError';
 
-import KeyPair from './KeyPair';
+import {KeyPair} from './KeyPair';
 
 /**
  * @classdesc Pre-generated (and regularly refreshed) pre-keys.
@@ -129,4 +129,4 @@ class PreKey {
   }
 }
 
-export default PreKey;
+export {PreKey};

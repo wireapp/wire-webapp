@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import media, {QueryKeys} from '../mediaQueries';
+import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
 interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {

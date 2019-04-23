@@ -17,6 +17,6 @@
  *
  */
 
-import ConnectionService from './ConnectionService';
+import {ConnectionService} from './ConnectionService';
 
 export {ConnectionService};

@@ -69,4 +69,4 @@ class MacKey {
   }
 }
 
-export default MacKey;
+export {MacKey};

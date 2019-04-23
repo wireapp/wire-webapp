@@ -19,72 +19,70 @@
 
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import ArrayUtil from '../util/ArrayUtil';
-import MemoryUtil from '../util/MemoryUtil';
+import * as ArrayUtil from '../util/ArrayUtil';
+import * as MemoryUtil from '../util/MemoryUtil';
 
-const KeyDerivationUtil = {
-  /**
-   * HMAC-based Key Derivation Function
-   *
-   * @param input Initial Keying Material (IKM)
-   * @param info Key Derivation Data (Info)
-   * @param length Length of the derived key in bytes (L)
-   */
-  hkdf(
-    salt: Uint8Array | string,
-    input: Uint8Array | string | number[] | ArrayBuffer[],
-    info: Uint8Array | string,
-    length: number
-  ): Uint8Array {
-    const convert_type = (value: string | Uint8Array) => {
-      if (typeof value === 'string') {
-        return sodium.from_string(value);
-      }
-      return value;
-    };
+/**
+ * HMAC-based Key Derivation Function
+ *
+ * @param input Initial Keying Material (IKM)
+ * @param info Key Derivation Data (Info)
+ * @param length Length of the derived key in bytes (L)
+ */
+function hkdf(
+  salt: Uint8Array | string,
+  input: Uint8Array | string | number[] | ArrayBuffer[],
+  info: Uint8Array | string,
+  length: number
+): Uint8Array {
+  const convert_type = (value: string | Uint8Array) => {
+    if (typeof value === 'string') {
+      return sodium.from_string(value);
+    }
+    return value;
+  };
 
-    salt = convert_type(salt);
-    input = convert_type(<Uint8Array | string>input);
-    info = convert_type(info);
+  salt = convert_type(salt);
+  input = convert_type(<Uint8Array | string>input);
+  info = convert_type(info);
 
-    const HASH_LEN = 32;
+  const HASH_LEN = 32;
 
-    const salt_to_key = (received_salt: Uint8Array): Uint8Array => {
-      const keybytes = sodium.crypto_auth_hmacsha256_KEYBYTES;
-      if (received_salt.length > keybytes) {
-        return sodium.crypto_hash_sha256(received_salt);
-      }
+  const salt_to_key = (received_salt: Uint8Array): Uint8Array => {
+    const keybytes = sodium.crypto_auth_hmacsha256_KEYBYTES;
+    if (received_salt.length > keybytes) {
+      return sodium.crypto_hash_sha256(received_salt);
+    }
 
-      const key = new Uint8Array(keybytes);
-      key.set(received_salt);
-      return key;
-    };
+    const key = new Uint8Array(keybytes);
+    key.set(received_salt);
+    return key;
+  };
 
-    const extract = (received_salt: Uint8Array, received_input: Uint8Array): Uint8Array => {
-      return sodium.crypto_auth_hmacsha256(received_input, salt_to_key(received_salt));
-    };
+  const extract = (received_salt: Uint8Array, received_input: Uint8Array): Uint8Array => {
+    return sodium.crypto_auth_hmacsha256(received_input, salt_to_key(received_salt));
+  };
 
-    const expand = (tag: Uint8Array, received_info: Uint8Array, received_length: number): Uint8Array => {
-      const num_blocks = Math.ceil(received_length / HASH_LEN);
-      let hmac = new Uint8Array(0);
-      let result = new Uint8Array(0);
+  const expand = (tag: Uint8Array, received_info: Uint8Array, received_length: number): Uint8Array => {
+    const num_blocks = Math.ceil(received_length / HASH_LEN);
+    let hmac = new Uint8Array(0);
+    let result = new Uint8Array(0);
 
-      for (let index = 0; index <= num_blocks - 1; index++) {
-        const buf = ArrayUtil.concatenate_array_buffers([hmac, received_info, new Uint8Array([index + 1])]);
-        hmac = sodium.crypto_auth_hmacsha256(buf, tag);
-        result = ArrayUtil.concatenate_array_buffers([result, hmac]);
-      }
+    for (let index = 0; index <= num_blocks - 1; index++) {
+      const buf = ArrayUtil.concatenate_array_buffers([hmac, received_info, new Uint8Array([index + 1])]);
+      hmac = sodium.crypto_auth_hmacsha256(buf, tag);
+      result = ArrayUtil.concatenate_array_buffers([result, hmac]);
+    }
 
-      return new Uint8Array(result.buffer.slice(0, received_length));
-    };
+    return new Uint8Array(result.buffer.slice(0, received_length));
+  };
 
-    const key = extract(salt, input);
+  const key = extract(salt, input);
 
-    MemoryUtil.zeroize(input);
-    MemoryUtil.zeroize(salt);
+  MemoryUtil.zeroize(input);
+  MemoryUtil.zeroize(salt);
 
-    return expand(key, info, length);
-  },
-};
+  return expand(key, info, length);
+}
 
-export default KeyDerivationUtil;
+export {hkdf};

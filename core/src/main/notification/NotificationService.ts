@@ -20,10 +20,10 @@
 import {APIClient} from '@wireapp/api-client';
 import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import NotificationBackendRepository from './NotificationBackendRepository';
-import NotificationDatabaseRepository from './NotificationDatabaseRepository';
+import {NotificationBackendRepository} from './NotificationBackendRepository';
+import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 
-export default class NotificationService {
+export class NotificationService {
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
 

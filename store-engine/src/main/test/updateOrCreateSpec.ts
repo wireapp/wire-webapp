@@ -25,7 +25,7 @@ interface DomainEntity {
   name: string;
 }
 
-export default {
+export const updateOrCreateSpec = {
   'creates a record if it does not exist in the database.': (done: DoneFn, engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 

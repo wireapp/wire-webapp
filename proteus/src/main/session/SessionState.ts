@@ -19,31 +19,31 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ArrayUtil from '../util/ArrayUtil';
-import ClassUtil from '../util/ClassUtil';
+import * as ArrayUtil from '../util/ArrayUtil';
+import * as ClassUtil from '../util/ClassUtil';
+import * as MemoryUtil from '../util/MemoryUtil';
 
-import DecryptError from '../errors/DecryptError';
-import MemoryUtil from '../util/MemoryUtil';
+import {DecryptError} from '../errors/DecryptError';
 
-import DerivedSecrets from '../derived/DerivedSecrets';
+import {DerivedSecrets} from '../derived/DerivedSecrets';
 
-import IdentityKey from '../keys/IdentityKey';
-import IdentityKeyPair from '../keys/IdentityKeyPair';
-import KeyPair from '../keys/KeyPair';
-import PreKeyBundle from '../keys/PreKeyBundle';
-import PublicKey from '../keys/PublicKey';
+import {IdentityKey} from '../keys/IdentityKey';
+import {IdentityKeyPair} from '../keys/IdentityKeyPair';
+import {KeyPair} from '../keys/KeyPair';
+import {PreKeyBundle} from '../keys/PreKeyBundle';
+import {PublicKey} from '../keys/PublicKey';
 
-import CipherMessage from '../message/CipherMessage';
-import Envelope from '../message/Envelope';
-import Message from '../message/Message';
-import PreKeyMessage from '../message/PreKeyMessage';
-import SessionTag from '../message/SessionTag';
+import {CipherMessage} from '../message/CipherMessage';
+import {Envelope} from '../message/Envelope';
+import {Message} from '../message/Message';
+import {PreKeyMessage} from '../message/PreKeyMessage';
+import {SessionTag} from '../message/SessionTag';
 
-import ChainKey from './ChainKey';
-import RecvChain from './RecvChain';
-import RootKey from './RootKey';
-import SendChain from './SendChain';
-import Session from './Session';
+import {ChainKey} from './ChainKey';
+import {RecvChain} from './RecvChain';
+import {RootKey} from './RootKey';
+import {SendChain} from './SendChain';
+import {Session} from './Session';
 
 class SessionState {
   prev_counter: number;
@@ -279,4 +279,4 @@ class SessionState {
   }
 }
 
-export default SessionState;
+export {SessionState};

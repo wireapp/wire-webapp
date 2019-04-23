@@ -17,7 +17,7 @@
  *
  */
 
-export default class RecordTypeError extends Error {
+export class RecordTypeError extends Error {
   public code: number;
 
   constructor(public message: string) {

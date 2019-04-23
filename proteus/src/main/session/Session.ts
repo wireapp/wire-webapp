@@ -19,27 +19,27 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
+import * as ClassUtil from '../util/ClassUtil';
+import * as MemoryUtil from '../util/MemoryUtil';
 
-import DecodeError from '../errors/DecodeError';
-import DecryptError from '../errors/DecryptError';
-import ProteusError from '../errors/ProteusError';
-import MemoryUtil from '../util/MemoryUtil';
-import SessionState from './SessionState';
+import {DecodeError} from '../errors/DecodeError';
+import {DecryptError} from '../errors/DecryptError';
+import {ProteusError} from '../errors/ProteusError';
+import {SessionState} from './SessionState';
 
-import IdentityKey from '../keys/IdentityKey';
-import IdentityKeyPair from '../keys/IdentityKeyPair';
-import KeyPair from '../keys/KeyPair';
-import PreKey from '../keys/PreKey';
-import PreKeyBundle from '../keys/PreKeyBundle';
-import PublicKey from '../keys/PublicKey';
+import {IdentityKey} from '../keys/IdentityKey';
+import {IdentityKeyPair} from '../keys/IdentityKeyPair';
+import {KeyPair} from '../keys/KeyPair';
+import {PreKey} from '../keys/PreKey';
+import {PreKeyBundle} from '../keys/PreKeyBundle';
+import {PublicKey} from '../keys/PublicKey';
 
-import CipherMessage from '../message/CipherMessage';
-import Envelope from '../message/Envelope';
-import PreKeyMessage from '../message/PreKeyMessage';
-import SessionTag from '../message/SessionTag';
+import {CipherMessage} from '../message/CipherMessage';
+import {Envelope} from '../message/Envelope';
+import {PreKeyMessage} from '../message/PreKeyMessage';
+import {SessionTag} from '../message/SessionTag';
 
-import PreKeyStore from './PreKeyStore';
+import {PreKeyStore} from './PreKeyStore';
 
 export interface IntermediateSessionState {
   [index: string]: {
@@ -417,5 +417,3 @@ export class Session {
     return self;
   }
 }
-
-export default Session;

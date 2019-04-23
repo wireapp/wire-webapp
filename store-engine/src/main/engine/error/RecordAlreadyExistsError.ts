@@ -17,7 +17,7 @@
  *
  */
 
-export default class RecordAlreadyExistsError extends Error {
+export class RecordAlreadyExistsError extends Error {
   public code: number;
 
   constructor(public message: string) {

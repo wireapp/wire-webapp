@@ -20,7 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/commonjs/connection/';
 
-export default class ConnectionService {
+export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}
 
   public acceptConnection(userId: string): Promise<Connection> {
@@ -43,5 +43,3 @@ export default class ConnectionService {
     });
   }
 }
-
-export {ConnectionService};

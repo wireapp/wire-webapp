@@ -17,7 +17,7 @@
  *
  */
 
-export default class RecordNotFoundError extends Error {
+export class RecordNotFoundError extends Error {
   public code: number;
 
   constructor(public message: string) {

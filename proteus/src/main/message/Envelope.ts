@@ -19,9 +19,9 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import MacKey from '../derived/MacKey';
-import ClassUtil from '../util/ClassUtil';
-import Message from './Message';
+import {MacKey} from '../derived/MacKey';
+import * as ClassUtil from '../util/ClassUtil';
+import {Message} from './Message';
 
 class Envelope {
   _message_enc: Uint8Array;
@@ -123,4 +123,4 @@ class Envelope {
   }
 }
 
-export default Envelope;
+export {Envelope};

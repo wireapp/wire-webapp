@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
-import media, {QueryKeys} from '../mediaQueries';
+import {QueryKeys, media} from '../mediaQueries';
 
 export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 

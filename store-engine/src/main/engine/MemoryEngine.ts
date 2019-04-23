@@ -17,14 +17,14 @@
  *
  */
 
-import CRUDEngine from './CRUDEngine';
+import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error/';
 
 export interface MemoryStore {
   [index: string]: {[index: string]: any};
 }
 
-export default class MemoryEngine implements CRUDEngine {
+export class MemoryEngine implements CRUDEngine {
   public storeName = '';
   private readonly stores: MemoryStore = {};
 

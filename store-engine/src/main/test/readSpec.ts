@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine} from '../engine';
-import RecordNotFoundError from '../engine/error/RecordNotFoundError';
+import {RecordNotFoundError} from '../engine/error/RecordNotFoundError';
 
 const TABLE_NAME = 'the-simpsons';
 
@@ -26,7 +26,7 @@ interface DomainEntity {
   some: string;
 }
 
-export default {
+export const readSpec = {
   'returns a database record.': (done: DoneFn, engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 

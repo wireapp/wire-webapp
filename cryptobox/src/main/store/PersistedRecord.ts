@@ -17,7 +17,7 @@
  *
  */
 
-import Cryptobox from '../Cryptobox';
+import {Cryptobox} from '../Cryptobox';
 
 // Record that is read from the store
 class PersistedRecord {

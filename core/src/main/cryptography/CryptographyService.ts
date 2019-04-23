@@ -28,7 +28,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
 import {SessionPayloadBundle} from '../cryptography/';
-import CryptographyDatabaseRepository from './CryptographyDatabaseRepository';
+import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 
 export interface MetaClient extends RegisteredClient {
   meta: {

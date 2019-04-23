@@ -21,7 +21,7 @@ import {CRUDEngine} from '../engine';
 
 const TABLE_NAME = 'the-simpsons';
 
-export default {
+export const readAllPrimaryKeysSpec = {
   'gets the primary keys of all records in a table.': (done: DoneFn, engine: CRUDEngine) => {
     const homer = {
       entity: {

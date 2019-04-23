@@ -41,9 +41,7 @@ export const QUERY: QueryMap = {
   [QueryKeys.TABLET_UP]: `min-width: ${WIDTH.TABLET_MIN}px`,
 };
 
-const media = Object.entries(QUERY).reduce<QueryMap | {}>(
+export const media = Object.entries(QUERY).reduce<QueryMap | {}>(
   (accumulator, [key, value]) => ({...accumulator, [key]: `@media (${value})`}),
   {}
 );
-
-export default media;

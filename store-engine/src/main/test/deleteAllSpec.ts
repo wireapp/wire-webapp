@@ -21,7 +21,7 @@ import {CRUDEngine} from '../engine';
 
 const TABLE_NAME = 'the-simpsons';
 
-export default {
+export const deleteAllSpec = {
   'deletes all records from a database table.': (done: DoneFn, engine: CRUDEngine) => {
     const homer = {
       entity: {

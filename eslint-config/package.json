@@ -6,6 +6,7 @@
   "peerDependencies": {
     "eslint": ">=5",
     "eslint-config-prettier": ">=4",
+    "eslint-plugin-import": ">=2",
     "eslint-plugin-jsdoc": ">=4",
     "eslint-plugin-no-unsanitized": ">=3",
     "eslint-plugin-prettier": ">=3",

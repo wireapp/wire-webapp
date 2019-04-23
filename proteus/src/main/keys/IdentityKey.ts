@@ -19,8 +19,8 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import ClassUtil from '../util/ClassUtil';
-import PublicKey from './PublicKey';
+import * as ClassUtil from '../util/ClassUtil';
+import {PublicKey} from './PublicKey';
 
 /**
  * Construct a long-term identity key pair.
@@ -68,4 +68,4 @@ class IdentityKey {
   }
 }
 
-export default IdentityKey;
+export {IdentityKey};

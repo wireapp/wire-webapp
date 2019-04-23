@@ -143,4 +143,4 @@ class DemoAnimations extends React.PureComponent {
   }
 }
 
-export default DemoAnimations;
+export {DemoAnimations};

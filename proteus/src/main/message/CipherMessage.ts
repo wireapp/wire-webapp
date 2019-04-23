@@ -19,11 +19,11 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import InputError from '../errors/InputError';
-import PublicKey from '../keys/PublicKey';
-import ClassUtil from '../util/ClassUtil';
-import Message from './Message';
-import SessionTag from './SessionTag';
+import {InputError} from '../errors/InputError';
+import {PublicKey} from '../keys/PublicKey';
+import * as ClassUtil from '../util/ClassUtil';
+import {Message} from './Message';
+import {SessionTag} from './SessionTag';
 
 class CipherMessage extends Message {
   cipher_text: Uint8Array;
@@ -115,4 +115,4 @@ class CipherMessage extends Message {
   }
 }
 
-export default CipherMessage;
+export {CipherMessage};

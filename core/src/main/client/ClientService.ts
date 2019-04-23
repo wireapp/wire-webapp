@@ -23,8 +23,8 @@ import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wi
 import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptographyService} from '../cryptography/';
 import {ClientInfo} from './';
-import ClientBackendRepository from './ClientBackendRepository';
-import ClientDatabaseRepository from './ClientDatabaseRepository';
+import {ClientBackendRepository} from './ClientBackendRepository';
+import {ClientDatabaseRepository} from './ClientDatabaseRepository';
 
 const pkg = require('../../package.json');
 
@@ -35,7 +35,7 @@ export interface MetaClient extends RegisteredClient {
   };
 }
 
-export default class ClientService {
+export class ClientService {
   private readonly database: ClientDatabaseRepository;
   private readonly backend: ClientBackendRepository;
 

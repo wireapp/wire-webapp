@@ -17,7 +17,7 @@
  *
  */
 
-import ProteusError from './ProteusError';
+import {ProteusError} from './ProteusError';
 
 class DecryptError extends ProteusError {
   static CODE = {
@@ -101,4 +101,4 @@ namespace DecryptError {
   }
 }
 
-export default DecryptError;
+export {DecryptError};

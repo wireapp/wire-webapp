@@ -26,7 +26,7 @@ interface DomainEntity {
   lastName: string;
 }
 
-export default {
+export const readAllSpec = {
   'returns multiple database records.': (done: DoneFn, engine: CRUDEngine) => {
     const homer = {
       entity: {

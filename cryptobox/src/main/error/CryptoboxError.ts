@@ -17,7 +17,7 @@
  *
  */
 
-export default class CryptoboxError extends Error {
+export class CryptoboxError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, CryptoboxError.prototype);

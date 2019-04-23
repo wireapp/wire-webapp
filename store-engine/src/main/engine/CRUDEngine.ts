@@ -118,4 +118,4 @@ interface CRUDEngine {
   isSupported(): Promise<void>;
 }
 
-export default CRUDEngine;
+export {CRUDEngine};

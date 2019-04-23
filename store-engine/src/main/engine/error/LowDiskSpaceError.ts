@@ -28,4 +28,4 @@ class LowDiskSpaceError extends Error {
   }
 }
 
-export default LowDiskSpaceError;
+export {LowDiskSpaceError};

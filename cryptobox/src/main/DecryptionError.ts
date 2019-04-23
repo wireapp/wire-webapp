@@ -28,4 +28,4 @@ class DecryptionError extends Error {
   }
 }
 
-export default DecryptionError;
+export {DecryptionError};

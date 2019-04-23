@@ -21,8 +21,8 @@ import * as CBOR from '@wireapp/cbor';
 import * as ed2curve from 'ed2curve';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import InputError from '../errors/InputError';
-import ClassUtil from '../util/ClassUtil';
+import {InputError} from '../errors/InputError';
+import * as ClassUtil from '../util/ClassUtil';
 
 class PublicKey {
   pub_edward: Uint8Array;
@@ -85,4 +85,4 @@ class PublicKey {
   }
 }
 
-export default PublicKey;
+export {PublicKey};

@@ -18,7 +18,7 @@
  */
 
 import * as fs from 'bro-fs';
-import CRUDEngine from './CRUDEngine';
+import {CRUDEngine} from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
@@ -30,7 +30,7 @@ export interface FileSystemEngineOptions {
 
 const TEN_MEGABYTES = 1024 * 1024 * 10;
 
-export default class FileSystemEngine implements CRUDEngine {
+export class FileSystemEngine implements CRUDEngine {
   public storeName = '';
 
   private config: FileSystemEngineOptions = {

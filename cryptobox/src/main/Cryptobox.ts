@@ -24,10 +24,10 @@ import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import EventEmitter from 'events';
 import logdown from 'logdown';
-import CryptoboxSession from './CryptoboxSession';
-import DecryptionError from './DecryptionError';
+import {CryptoboxSession} from './CryptoboxSession';
+import {DecryptionError} from './DecryptionError';
 import {CryptoboxError} from './error/';
-import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
+import {InvalidPreKeyFormatError} from './InvalidPreKeyFormatError';
 import {SerializedCryptobox} from './SerializedCryptobox';
 import {CryptoboxCRUDStore} from './store/';
 
@@ -518,4 +518,4 @@ class Cryptobox extends EventEmitter {
   }
 }
 
-export default Cryptobox;
+export {Cryptobox};

@@ -17,10 +17,10 @@
  *
  */
 
-import CipherMessage from './CipherMessage';
-import Envelope from './Envelope';
-import Message from './Message';
-import PreKeyMessage from './PreKeyMessage';
-import SessionTag from './SessionTag';
+import {CipherMessage} from './CipherMessage';
+import {Envelope} from './Envelope';
+import {Message} from './Message';
+import {PreKeyMessage} from './PreKeyMessage';
+import {SessionTag} from './SessionTag';
 
 export {CipherMessage, Envelope, Message, PreKeyMessage, SessionTag};

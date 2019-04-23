@@ -19,17 +19,17 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import PublicKey from '../keys/PublicKey';
-import ClassUtil from '../util/ClassUtil';
+import {PublicKey} from '../keys/PublicKey';
+import * as ClassUtil from '../util/ClassUtil';
 
-import DecryptError from '../errors/DecryptError';
-import ProteusError from '../errors/ProteusError';
+import {DecryptError} from '../errors/DecryptError';
+import {ProteusError} from '../errors/ProteusError';
 
-import CipherMessage from '../message/CipherMessage';
-import Envelope from '../message/Envelope';
+import {CipherMessage} from '../message/CipherMessage';
+import {Envelope} from '../message/Envelope';
 
-import ChainKey from './ChainKey';
-import MessageKeys from './MessageKeys';
+import {ChainKey} from './ChainKey';
+import {MessageKeys} from './MessageKeys';
 
 class RecvChain {
   chain_key: ChainKey;
@@ -173,4 +173,4 @@ class RecvChain {
   }
 }
 
-export default RecvChain;
+export {RecvChain};

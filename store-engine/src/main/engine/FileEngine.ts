@@ -19,7 +19,7 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import CRUDEngine from './CRUDEngine';
+import {CRUDEngine} from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {
   PathValidationError,
@@ -29,7 +29,7 @@ import {
   UnsupportedError,
 } from './error/';
 
-export default class FileEngine implements CRUDEngine {
+export class FileEngine implements CRUDEngine {
   public storeName = '';
   public options: {fileExtension: string} = {
     fileExtension: '.dat',

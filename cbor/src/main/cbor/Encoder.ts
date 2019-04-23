@@ -17,7 +17,7 @@
  *
  */
 
-import Type from './Type';
+import {Type} from './Type';
 
 class Encoder {
   private buffer: ArrayBuffer;
@@ -365,4 +365,4 @@ class Encoder {
   }
 }
 
-export default Encoder;
+export {Encoder};

@@ -126,4 +126,4 @@ class DemoColors extends React.PureComponent {
   }
 }
 
-export default DemoColors;
+export {DemoColors};

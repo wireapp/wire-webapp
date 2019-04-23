@@ -36,4 +36,4 @@ class ProteusError extends Error {
   }
 }
 
-export default ProteusError;
+export {ProteusError};

@@ -113,4 +113,4 @@ class ClientDatabaseRepository {
   }
 }
 
-export default ClientDatabaseRepository;
+export {ClientDatabaseRepository};

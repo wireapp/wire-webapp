@@ -21,7 +21,7 @@ import {CRUDEngine} from '../engine';
 
 const TABLE_NAME = 'the-simpsons';
 
-export default {
+export const appendSpec = {
   'appends text to an existing record.': async (done: DoneFn, engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 

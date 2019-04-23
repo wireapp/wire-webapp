@@ -18,17 +18,17 @@
  */
 
 import Dexie from 'dexie';
-import CRUDEngine from './CRUDEngine';
+import {CRUDEngine} from './CRUDEngine';
 import {LowDiskSpaceError, RecordTypeError, UnsupportedError} from './error/';
-import RecordAlreadyExistsError from './error/RecordAlreadyExistsError';
-import RecordNotFoundError from './error/RecordNotFoundError';
+import {RecordAlreadyExistsError} from './error/RecordAlreadyExistsError';
+import {RecordNotFoundError} from './error/RecordNotFoundError';
 
 // @see https://dexie.org/docs/Typescript#create-a-subclass
 export interface DexieInstance extends Dexie {
   [index: string]: any;
 }
 
-export default class IndexedDBEngine implements CRUDEngine {
+export class IndexedDBEngine implements CRUDEngine {
   private db?: DexieInstance;
   public storeName = '';
 

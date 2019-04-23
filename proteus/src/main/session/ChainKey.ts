@@ -19,10 +19,10 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import DerivedSecrets from '../derived/DerivedSecrets';
-import MacKey from '../derived/MacKey';
-import ClassUtil from '../util/ClassUtil';
-import MessageKeys from './MessageKeys';
+import {DerivedSecrets} from '../derived/DerivedSecrets';
+import {MacKey} from '../derived/MacKey';
+import * as ClassUtil from '../util/ClassUtil';
+import {MessageKeys} from './MessageKeys';
 
 class ChainKey {
   idx: number;
@@ -82,4 +82,4 @@ class ChainKey {
   }
 }
 
-export default ChainKey;
+export {ChainKey};

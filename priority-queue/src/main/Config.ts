@@ -17,7 +17,7 @@
  *
  */
 
-import Item from './Item';
+import {Item} from './Item';
 
 interface Config {
   comparator?: (a: Item, b: Item) => number;
@@ -25,4 +25,4 @@ interface Config {
   retryDelay?: number;
 }
 
-export default Config;
+export {Config};

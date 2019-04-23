@@ -18,18 +18,18 @@
  */
 
 import * as fs from 'bro-fs';
-import appendSpec from '../test/appendSpec';
-import createSpec from '../test/createSpec';
-import deleteAllSpec from '../test/deleteAllSpec';
-import deleteSpec from '../test/deleteSpec';
-import purgeSpec from '../test/purgeSpec';
-import readAllPrimaryKeysSpec from '../test/readAllPrimaryKeysSpec';
-import readAllSpec from '../test/readAllSpec';
-import readSpec from '../test/readSpec';
-import updateOrCreateSpec from '../test/updateOrCreateSpec';
-import updateSpec from '../test/updateSpec';
-import CRUDEngine from './CRUDEngine';
-import FileSystemEngine from './FileSystemEngine';
+import {appendSpec} from '../test/appendSpec';
+import {createSpec} from '../test/createSpec';
+import {deleteAllSpec} from '../test/deleteAllSpec';
+import {deleteSpec} from '../test/deleteSpec';
+import {purgeSpec} from '../test/purgeSpec';
+import {readAllPrimaryKeysSpec} from '../test/readAllPrimaryKeysSpec';
+import {readAllSpec} from '../test/readAllSpec';
+import {readSpec} from '../test/readSpec';
+import {updateOrCreateSpec} from '../test/updateOrCreateSpec';
+import {updateSpec} from '../test/updateSpec';
+import {CRUDEngine} from './CRUDEngine';
+import {FileSystemEngine} from './FileSystemEngine';
 
 const STORE_NAME = 'store-name';
 

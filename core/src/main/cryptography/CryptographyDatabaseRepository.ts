@@ -43,4 +43,4 @@ class CryptographyDatabaseRepository {
   }
 }
 
-export default CryptographyDatabaseRepository;
+export {CryptographyDatabaseRepository};

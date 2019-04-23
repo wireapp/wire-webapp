@@ -17,7 +17,7 @@
  *
  */
 
-import ProteusError from './ProteusError';
+import {ProteusError} from './ProteusError';
 
 class InputError extends ProteusError {
   static CODE = {
@@ -62,4 +62,4 @@ namespace InputError {
   }
 }
 
-export default InputError;
+export {InputError};

@@ -17,7 +17,7 @@
  *
  */
 
-export default class UnsupportedError extends Error {
+export class UnsupportedError extends Error {
   public code: number;
 
   constructor(public message: string) {

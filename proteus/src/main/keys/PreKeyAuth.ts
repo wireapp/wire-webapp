@@ -23,4 +23,4 @@ class PreKeyAuth {
   static VALID = 'Valid';
 }
 
-export default PreKeyAuth;
+export {PreKeyAuth};

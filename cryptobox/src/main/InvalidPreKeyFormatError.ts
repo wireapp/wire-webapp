@@ -27,4 +27,4 @@ class InvalidPreKeyFormatError extends Error {
   }
 }
 
-export default InvalidPreKeyFormatError;
+export {InvalidPreKeyFormatError};

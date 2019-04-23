@@ -21,11 +21,11 @@ import * as CBOR from '@wireapp/cbor';
 import * as ed2curve from 'ed2curve';
 import * as _sodium from 'libsodium-wrappers-sumo';
 
-import ClassUtil from '../util/ClassUtil';
-import PublicKey from './PublicKey';
-import SecretKey from './SecretKey';
+import * as ClassUtil from '../util/ClassUtil';
+import {PublicKey} from './PublicKey';
+import {SecretKey} from './SecretKey';
 
-import InputError from '../errors/InputError';
+import {InputError} from '../errors/InputError';
 
 /** Construct an ephemeral key pair. */
 class KeyPair {
@@ -110,4 +110,4 @@ class KeyPair {
   }
 }
 
-export default KeyPair;
+export {KeyPair};

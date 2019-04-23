@@ -20,7 +20,7 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import ClassUtil from '../util/ClassUtil';
+import * as ClassUtil from '../util/ClassUtil';
 
 class CipherKey {
   key: Uint8Array;
@@ -76,4 +76,4 @@ class CipherKey {
   }
 }
 
-export default CipherKey;
+export {CipherKey};

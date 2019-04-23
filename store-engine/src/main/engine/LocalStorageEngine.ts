@@ -17,11 +17,11 @@
  *
  */
 
-import CRUDEngine from './CRUDEngine';
+import {CRUDEngine} from './CRUDEngine';
 import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
-export default class LocalStorageEngine implements CRUDEngine {
+export class LocalStorageEngine implements CRUDEngine {
   public storeName = '';
 
   public async isSupported(): Promise<void> {

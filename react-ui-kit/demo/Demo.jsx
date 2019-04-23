@@ -37,13 +37,13 @@ import {
   StyledApp,
   Tooltip,
 } from '@wireapp/react-ui-kit';
-import DemoAnimations from './DemoAnimations';
-import DemoColors from './DemoColors';
-import DemoIcons from './DemoIcons';
-import DemoInputs from './DemoInputs';
-import DemoLayouts from './DemoLayouts';
-import DemoModals from './DemoModals';
-import DemoTypography from './DemoTypography';
+import {DemoAnimations} from './DemoAnimations';
+import {DemoColors} from './DemoColors';
+import {DemoIcons} from './DemoIcons';
+import {DemoInputs} from './DemoInputs';
+import {DemoLayouts} from './DemoLayouts';
+import {DemoModals} from './DemoModals';
+import {DemoTypography} from './DemoTypography';
 import Helmet from 'react-helmet';
 import React from 'react';
 
@@ -167,4 +167,4 @@ class Demo extends React.PureComponent {
   }
 }
 
-export default Demo;
+export {Demo};

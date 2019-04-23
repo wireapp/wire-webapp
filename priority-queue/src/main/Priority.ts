@@ -23,4 +23,4 @@ enum Priority {
   HIGH = 9,
 }
 
-export default Priority;
+export {Priority};

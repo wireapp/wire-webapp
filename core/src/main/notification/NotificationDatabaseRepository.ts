@@ -19,7 +19,7 @@
 
 import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine} from '@wireapp/store-engine';
-import CryptographyDatabaseRepository from '../cryptography/CryptographyDatabaseRepository';
+import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
 
 export enum DatabaseStores {
   EVENTS = 'events',
@@ -30,7 +30,7 @@ export enum DatabaseKeys {
   PRIMARY_KEY_LAST_NOTIFICATION = 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
 }
 
-export default class NotificationDatabaseRepository {
+export class NotificationDatabaseRepository {
   public static readonly STORES = DatabaseStores;
   public static readonly KEYS = DatabaseKeys;
 

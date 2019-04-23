@@ -87,4 +87,4 @@ class Type {
   }
 }
 
-export default Type;
+export {Type};

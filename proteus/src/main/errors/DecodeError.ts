@@ -17,7 +17,7 @@
  *
  */
 
-import ProteusError from './ProteusError';
+import {ProteusError} from './ProteusError';
 
 class DecodeError extends ProteusError {
   static CODE = {
@@ -56,4 +56,4 @@ namespace DecodeError {
   }
 }
 
-export default DecodeError;
+export {DecodeError};

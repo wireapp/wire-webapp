@@ -17,6 +17,6 @@
  *
  */
 
-import SelfService from './SelfService';
+import {SelfService} from './SelfService';
 
 export {SelfService};

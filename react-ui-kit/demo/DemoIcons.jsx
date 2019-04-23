@@ -119,4 +119,4 @@ class DemoIcons extends React.PureComponent {
   }
 }
 
-export default DemoIcons;
+export {DemoIcons};

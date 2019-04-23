@@ -31,7 +31,7 @@ interface DomainEntity {
   };
 }
 
-export default {
+export const updateSpec = {
   'fails if the record does not exist.': async (done: DoneFn, engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 

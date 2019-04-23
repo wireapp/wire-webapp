@@ -17,9 +17,9 @@
  *
  */
 
-import Priority from './Priority';
+import {Priority} from './Priority';
 
-export default class Item {
+export class Item {
   /** original business logic */
   fn: Function = () => {};
   label: string | undefined;

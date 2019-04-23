@@ -21,7 +21,7 @@ import {CRUDEngine} from '../engine';
 
 const TABLE_NAME = 'the-simpsons';
 
-export default {
+export const purgeSpec = {
   'database can be reinitialized after purge': async (
     done: DoneFn,
     engine: CRUDEngine,

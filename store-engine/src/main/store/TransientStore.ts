@@ -20,10 +20,10 @@
 import {EventEmitter} from 'events';
 import {CRUDEngine} from '../engine/';
 import {RecordAlreadyExistsError, RecordNotFoundError} from '../engine/error/';
-import ExpiredBundle from './ExpiredBundle';
-import TransientBundle from './TransientBundle';
+import {ExpiredBundle} from './ExpiredBundle';
+import {TransientBundle} from './TransientBundle';
 
-export default class TransientStore extends EventEmitter {
+export class TransientStore extends EventEmitter {
   private readonly bundles: {[index: string]: TransientBundle} = {};
   private tableName = '';
 

@@ -17,34 +17,32 @@
  *
  */
 
-import ProteusError from '../errors/ProteusError';
+import {ProteusError} from '../errors/ProteusError';
+
+function assert_is_not_zeros(array: number[] | Uint8Array): void {
+  let only_zeroes = true;
+  for (const val in array) {
+    if (parseInt(val) > 0) {
+      only_zeroes = false;
+      break;
+    }
+  }
+
+  if (only_zeroes === true) {
+    throw new ProteusError('Array consists only of zeroes.', ProteusError.CODE.CASE_100);
+  }
+}
 
 /** Concatenates array buffers (usually 8-bit unsigned). */
-const ArrayUtil = {
-  assert_is_not_zeros(array: number[] | Uint8Array): void {
-    let only_zeroes = true;
-    for (const val in array) {
-      if (parseInt(val) > 0) {
-        only_zeroes = false;
-        break;
-      }
+function concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
+  return buffers.reduce(
+    (accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
+      const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);
+      buffer.set(accumulator, 0);
+      buffer.set(bytes, accumulator.byteLength);
+      return buffer;
     }
+  );
+}
 
-    if (only_zeroes === true) {
-      throw new ProteusError('Array consists only of zeroes.', ProteusError.CODE.CASE_100);
-    }
-  },
-
-  concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
-    return buffers.reduce(
-      (accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
-        const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);
-        buffer.set(accumulator, 0);
-        buffer.set(bytes, accumulator.byteLength);
-        return buffer;
-      }
-    );
-  },
-};
-
-export default ArrayUtil;
+export {assert_is_not_zeros, concatenate_array_buffers};
