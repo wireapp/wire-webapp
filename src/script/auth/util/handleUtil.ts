@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-/* @flow */
 
 import * as getSlug from 'speakingurl';
 import {randomArrayElement, randomInt} from './randomUtil';
