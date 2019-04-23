@@ -23,6 +23,8 @@ import * as logdown from 'logdown';
 import * as moment from 'moment';
 import * as path from 'path';
 
+type Logger = logdown.Logger;
+
 interface LoggerOptions {
   color?: string;
   forceEnable?: boolean;
@@ -118,4 +120,4 @@ class LogFactory {
   }
 }
 
-export {LogFactory, LoggerOptions};
+export {LogFactory, Logger, LoggerOptions};
