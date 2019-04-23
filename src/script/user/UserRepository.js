@@ -76,9 +76,7 @@ export class UserRepository {
     this.self = ko.observable();
     this.users = ko.observableArray([]);
 
-    this.selfAvailability = ko
-      .computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE))
-      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 50}});
+    this.selfAvailability = ko.computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE));
     this.selfAvailability.subscribe(this.showAvailabilityModal);
 
     this.connect_requests = ko
@@ -353,21 +351,25 @@ export class UserRepository {
     function showModal(storageKey, title, message) {
       const hideModal = StorageUtil.getValue(storageKey);
       if (!hideModal) {
-        modals.showModal(ModalsViewModel.TYPE.OPTION, {
-          action: dontShowAgain => {
-            if (dontShowAgain) {
-              StorageUtil.setValue(storageKey, 'true');
-            }
+        modals.showModal(
+          ModalsViewModel.TYPE.OPTION,
+          {
+            action: dontShowAgain => {
+              if (dontShowAgain) {
+                StorageUtil.setValue(storageKey, 'true');
+              }
+            },
+            preventClose: true,
+            text: {
+              action: t('modalAcknowledgeAction'),
+              message,
+              option: t('modalAvailabilityDontShowAgain'),
+              secondary: '',
+              title,
+            },
           },
-          preventClose: true,
-          text: {
-            action: t('modalAcknowledgeAction'),
-            message,
-            option: t('modalAvailabilityDontShowAgain'),
-            secondary: '',
-            title,
-          },
-        });
+          'availability'
+        );
       }
     }
     switch (availability) {

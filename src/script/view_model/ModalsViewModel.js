@@ -76,8 +76,15 @@ export class ModalsViewModel {
 
   isModalVisible = () => this.state() === States.OPEN;
 
-  showModal = (type, options) => {
-    this.queue.push({options, type});
+  showModal = (type, options, modalId) => {
+    const found = modalId && this.queue.find(({id}) => id === modalId);
+    const newModal = {id: modalId, options, type};
+    if (found) {
+      const foundIndex = this.queue.indexOf(found);
+      this.queue[foundIndex] = newModal;
+    } else {
+      this.queue.push(newModal);
+    }
     this.unqueue();
   };
 
