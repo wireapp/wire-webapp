@@ -19,29 +19,23 @@
 
 import {LRUCache} from '@wireapp/lru-cache';
 
-class AssetURLCache {
-  private readonly cache: LRUCache<string> = new LRUCache(100);
+const cache: LRUCache<string> = new LRUCache(100);
 
-  getUrl(identifier: string): string {
-    return this.cache.get(identifier);
+export const getAssetUrl = (identifier: string): string => cache.get(identifier);
+
+export const setAssetUrl = (identifier: string, url: string) => {
+  const isExistingUrl = getAssetUrl(identifier);
+
+  if (isExistingUrl) {
+    window.URL.revokeObjectURL(url);
+    return isExistingUrl;
   }
 
-  setUrl(identifier: string, url: string): string {
-    const isExistingUrl = this.getUrl(identifier);
+  const outdatedUrl = cache.set(identifier, url);
 
-    if (isExistingUrl) {
-      window.URL.revokeObjectURL(url);
-      return isExistingUrl;
-    }
-
-    const outdatedUrl = this.cache.set(identifier, url);
-
-    if (outdatedUrl != null) {
-      window.URL.revokeObjectURL(outdatedUrl);
-    }
-
-    return url;
+  if (outdatedUrl != null) {
+    window.URL.revokeObjectURL(outdatedUrl);
   }
-}
 
-export {AssetURLCache};
+  return url;
+};

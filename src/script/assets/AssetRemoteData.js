@@ -19,7 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {loadUrlBuffer} from 'utils/util';
-import {AssetURLCache} from './AssetURLCache';
+import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import {AssetCrypto} from './AssetCrypto';
 
 class AssetRemoteData {
@@ -116,13 +116,13 @@ class AssetRemoteData {
    * @returns {Promise<string>} Object URL for asset
    */
   getObjectUrl() {
-    const objectUrl = AssetURLCache.getUrl(this.identifier);
+    const objectUrl = getAssetUrl(this.identifier);
     return objectUrl
       ? Promise.resolve(objectUrl)
       : this.load().then(blob => {
           if (blob) {
             const url = window.URL.createObjectURL(blob);
-            return AssetURLCache.setUrl(this.identifier, url);
+            return setAssetUrl(this.identifier, url);
           }
         });
   }
