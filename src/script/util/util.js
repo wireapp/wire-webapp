@@ -95,8 +95,8 @@ export const loadDataUrl = file => {
 
 /**
  * Loads a HTTP response into an ArrayBuffer.
- * @param {string} url Request URL
- * @param {Function} xhrAccessorFunction Request wrapper
+ * @param {string} url - Request URL
+ * @param {Function} xhrAccessorFunction - Request wrapper
  * @returns {Promise<{buffer: ArrayBuffer, mimeType: string}>} URL buffer
  */
 export const loadUrlBuffer = (url, xhrAccessorFunction) => {
