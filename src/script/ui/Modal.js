@@ -19,10 +19,7 @@
 
 import keyboardJS from 'keyboardjs';
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
-
-z.ui.Modal = class Modal {
+export class Modal {
   static get CLASS() {
     return {
       FADE_IN: 'modal-fadein',
@@ -126,4 +123,4 @@ z.ui.Modal = class Modal {
     }
     keyboardJS.unbind('esc', this._hide);
   }
-};
+}

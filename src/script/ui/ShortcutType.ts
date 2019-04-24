@@ -17,19 +17,16 @@
  *
  */
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
-
-z.ui.ShortcutType = {
-  ADD_PEOPLE: 'add_people',
-  ARCHIVE: 'archive',
-  CALL_MUTE: 'mute_call',
-  CALL_REJECT: 'reject',
-  DEBUG: 'debug',
-  NEXT: 'next',
-  NOTIFICATIONS: 'notifications',
-  PEOPLE: 'people',
-  PING: 'ping',
-  PREV: 'prev',
-  START: 'start',
-};
+export enum ShortcutType {
+  ADD_PEOPLE = 'add_people',
+  ARCHIVE = 'archive',
+  CALL_MUTE = 'mute_call',
+  CALL_REJECT = 'reject',
+  DEBUG = 'debug',
+  NEXT = 'next',
+  NOTIFICATIONS = 'notifications',
+  PEOPLE = 'people',
+  PING = 'ping',
+  PREV = 'prev',
+  START = 'start',
+}

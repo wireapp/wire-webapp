@@ -18,7 +18,9 @@
  */
 
 import {getLogger} from 'utils/Logger';
+
 import {WebAppEvents} from '../../event/WebApp';
+import {Modal} from '../ui/Modal';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -136,7 +138,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this._getRandomGif();
 
     if (!this.modal) {
-      this.modal = new z.ui.Modal('#giphy-modal');
+      this.modal = new Modal('#giphy-modal');
     }
 
     this.modal.show();
