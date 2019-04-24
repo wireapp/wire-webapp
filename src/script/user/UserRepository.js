@@ -19,7 +19,6 @@
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
-import * as StorageUtil from 'utils/StorageUtil';
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
@@ -34,11 +33,10 @@ import {UserMapper} from './UserMapper';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 
 import {chunk} from 'utils/ArrayUtil';
-import {AvailabilityType} from './AvailabilityType';
-import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
+import {showAvailabilityModal} from './AvailabilityModal';
 
 export class UserRepository {
   static get CONFIG() {
@@ -76,9 +74,6 @@ export class UserRepository {
 
     this.self = ko.observable();
     this.users = ko.observableArray([]);
-
-    this.selfAvailability = ko.computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE));
-    this.selfAvailability.subscribe(this.showAvailabilityModal);
 
     this.connect_requests = ko
       .pureComputed(() => {
@@ -334,6 +329,7 @@ export class UserRepository {
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
+      showAvailabilityModal(availability);
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
@@ -346,50 +342,6 @@ export class UserRepository {
 
     const recipients = this.teamUsers().concat(this.self());
     amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
-  }
-
-  showAvailabilityModal(availability) {
-    function showModal(storageKey, title, message) {
-      const hideModal = StorageUtil.getValue(storageKey);
-      if (!hideModal) {
-        modals.showModal(
-          ModalsViewModel.TYPE.OPTION,
-          {
-            action: dontShowAgain => {
-              if (dontShowAgain) {
-                StorageUtil.setValue(storageKey, 'true');
-              }
-            },
-            preventClose: true,
-            text: {
-              action: t('modalAcknowledgeAction'),
-              message,
-              option: t('modalAvailabilityDontShowAgain'),
-              secondary: '',
-              title,
-            },
-          },
-          'availability'
-        );
-      }
-    }
-    switch (availability) {
-      case AvailabilityType.AWAY: {
-        showModal('hide_away_modal', t('modalAvailabilityAwayTitle'), t('modalAvailabilityAwayMessage'));
-        break;
-      }
-      case AvailabilityType.BUSY: {
-        showModal('hide_busy_modal', t('modalAvailabilityBusyTitle'), t('modalAvailabilityBusyMessage'));
-        break;
-      }
-      case AvailabilityType.AVAILABLE: {
-        showModal('hide_available_modal', t('modalAvailabilityAvailableTitle'), t('modalAvailabilityAvailableMessage'));
-        break;
-      }
-      case AvailabilityType.NONE: {
-        showModal('hide_none_modal', t('modalAvailabilityNoneTitle'), t('modalAvailabilityNoneMessage'));
-      }
-    }
   }
 
   /**

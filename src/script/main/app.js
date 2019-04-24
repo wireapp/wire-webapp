@@ -62,6 +62,7 @@ import {enableLogging} from 'utils/LoggerUtil';
 import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
+import {showInitialModal} from '../user/AvailabilityModal';
 
 class App {
   static get CONFIG() {
@@ -364,6 +365,7 @@ class App {
         telemetry.report();
         amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
         modals.ready();
+        showInitialModal(this.repository.user.self().availability());
         return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
