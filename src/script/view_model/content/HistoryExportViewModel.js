@@ -19,7 +19,6 @@
 
 import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
-import {CancelError} from '../../backup/Error';
 import {TimeUtil} from 'utils/TimeUtil';
 import {downloadBlob} from 'utils/util';
 
@@ -134,7 +133,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   onError(error) {
-    if (error instanceof CancelError) {
+    if (error instanceof z.backup.CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
     }

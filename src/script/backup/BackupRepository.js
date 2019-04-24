@@ -25,7 +25,6 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 
 import {BackupService} from './BackupService';
 import {chunk} from 'utils/ArrayUtil';
-import * as BackupError from './Error';
 
 class BackupRepository {
   static get CONFIG() {
@@ -99,8 +98,8 @@ class BackupRepository {
       .catch(error => {
         this.logger.error(`Could not export history: ${error.message}`, error);
 
-        const isCancelError = error instanceof BackupError.CancelError;
-        throw isCancelError ? error : new BackupError.ExportError();
+        const isCancelError = error instanceof z.backup.CancelError;
+        throw isCancelError ? error : new z.backup.ExportError();
       });
   }
 
@@ -157,7 +156,7 @@ class BackupRepository {
     return this.backupService
       .exportTable(table, tableRows => {
         if (this.isCanceled) {
-          throw new BackupError.CancelError();
+          throw new z.backup.CancelError();
         }
         exportedEntitiesCount += tableRows.length;
 
@@ -190,7 +189,7 @@ class BackupRepository {
     this.isCanceled = false;
     const files = archive.files;
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
-      throw new BackupError.InvalidMetaDataError();
+      throw new z.backup.InvalidMetaDataError();
     }
 
     return this.verifyMetadata(files)
@@ -261,7 +260,7 @@ class BackupRepository {
     return importChunks.reduce((promise, importChunk) => {
       return promise.then(() => {
         if (this.isCanceled) {
-          return Promise.reject(new BackupError.CancelError());
+          return Promise.reject(new z.backup.CancelError());
         }
         return importFunction(importChunk);
       });
@@ -306,13 +305,13 @@ class BackupRepository {
       const fromUserId = archiveMetadata.user_id;
       const toUserId = localMetadata.user_id;
       const message = `History from user "${fromUserId}" cannot be restored for user "${toUserId}".`;
-      throw new BackupError.DifferentAccountError(message);
+      throw new z.backup.DifferentAccountError(message);
     }
 
     const isExpectedPlatform = archiveMetadata.platform === localMetadata.platform;
     if (!isExpectedPlatform) {
       const message = `History created from "${archiveMetadata.platform}" device cannot be imported`;
-      throw new BackupError.IncompatiblePlatformError(message);
+      throw new z.backup.IncompatiblePlatformError(message);
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
@@ -325,7 +324,7 @@ class BackupRepository {
 
     if (involvesDatabaseMigration) {
       const message = `History cannot be restored: Database version mismatch`;
-      throw new BackupError.IncompatibleBackupError(message);
+      throw new z.backup.IncompatibleBackupError(message);
     }
   }
 }

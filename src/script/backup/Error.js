@@ -17,61 +17,64 @@
  *
  */
 
-class ExportError extends Error {
-  constructor(message = 'Something went wrong.') {
-    super(message);
-    Object.setPrototypeOf(this, ExportError.prototype);
-  }
-}
+window.z = window.z || {};
+window.z.backup = z.backup || {};
 
-class CancelError extends Error {
-  constructor(message = 'Action was cancelled') {
-    super(message);
-    Object.setPrototypeOf(this, CancelError.prototype);
+(module => {
+  class ExportError extends Error {
+    constructor(message = 'Something went wrong.') {
+      super(message);
+      Object.setPrototypeOf(this, ExportError.prototype);
+    }
   }
-}
 
-class ImportError extends Error {
-  constructor(message = 'Something went wrong.') {
-    super(message);
-    Object.setPrototypeOf(this, ImportError.prototype);
+  class CancelError extends Error {
+    constructor(message = 'Action was cancelled') {
+      super(message);
+      Object.setPrototypeOf(this, CancelError.prototype);
+    }
   }
-}
 
-class InvalidMetaDataError extends ImportError {
-  constructor(message = 'Meta data file is corrupt or missing properties.') {
-    super(message);
-    Object.setPrototypeOf(this, InvalidMetaDataError.prototype);
+  class ImportError extends Error {
+    constructor(message = 'Something went wrong.') {
+      super(message);
+      Object.setPrototypeOf(this, ImportError.prototype);
+    }
   }
-}
 
-class DifferentAccountError extends ImportError {
-  constructor(message = 'You cannot restore history from a different account.') {
-    super(message);
-    Object.setPrototypeOf(this, DifferentAccountError.prototype);
+  class InvalidMetaDataError extends ImportError {
+    constructor(message = 'Meta data file is corrupt or missing properties.') {
+      super(message);
+      Object.setPrototypeOf(this, InvalidMetaDataError.prototype);
+    }
   }
-}
 
-class IncompatibleBackupError extends ImportError {
-  constructor(message = 'Backup created by incompatible database version') {
-    super(message);
-    Object.setPrototypeOf(this, IncompatibleBackupError.prototype);
+  class DifferentAccountError extends ImportError {
+    constructor(message = 'You cannot restore history from a different account.') {
+      super(message);
+      Object.setPrototypeOf(this, DifferentAccountError.prototype);
+    }
   }
-}
 
-class IncompatiblePlatformError extends ImportError {
-  constructor(message = 'Backup created by incompatible platform') {
-    super(message);
-    Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
+  class IncompatibleBackupError extends ImportError {
+    constructor(message = 'Backup created by incompatible database version') {
+      super(message);
+      Object.setPrototypeOf(this, IncompatibleBackupError.prototype);
+    }
   }
-}
 
-export {
-  CancelError,
-  DifferentAccountError,
-  ExportError,
-  ImportError,
-  IncompatibleBackupError,
-  IncompatiblePlatformError,
-  InvalidMetaDataError,
-};
+  class IncompatiblePlatformError extends ImportError {
+    constructor(message = 'Backup created by incompatible platform') {
+      super(message);
+      Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
+    }
+  }
+
+  module.CancelError = CancelError;
+  module.DifferentAccountError = DifferentAccountError;
+  module.ExportError = ExportError;
+  module.ImportError = ImportError;
+  module.IncompatibleBackupError = IncompatibleBackupError;
+  module.IncompatiblePlatformError = IncompatiblePlatformError;
+  module.InvalidMetaDataError = InvalidMetaDataError;
+})(z.backup);

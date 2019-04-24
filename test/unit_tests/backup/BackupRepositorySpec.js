@@ -20,7 +20,6 @@
 import JSZip from 'jszip';
 
 import {BackupRepository} from 'src/script/backup/BackupRepository';
-import * as BackupError from 'src/script/backup/Error';
 
 import {noop} from 'utils/util';
 
@@ -137,7 +136,7 @@ describe('BackupRepository', () => {
           throw new Error('Export should fail with a CancelError');
         })
         .catch(error => {
-          expect(error instanceof BackupError.CancelError).toBe(true);
+          expect(error instanceof z.backup.CancelError).toBe(true);
         });
 
       backupRepository.cancelAction();
@@ -150,15 +149,15 @@ describe('BackupRepository', () => {
     it('fails if metadata doesn´t match', () => {
       const tests = [
         {
-          expectedError: BackupError.DifferentAccountError,
+          expectedError: z.backup.DifferentAccountError,
           metaChanges: {user_id: 'fail'},
         },
         {
-          expectedError: BackupError.IncompatibleBackupError,
+          expectedError: z.backup.IncompatibleBackupError,
           metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
         {
-          expectedError: BackupError.IncompatiblePlatformError,
+          expectedError: z.backup.IncompatiblePlatformError,
           metaChanges: {platform: 'random'},
         },
       ];
