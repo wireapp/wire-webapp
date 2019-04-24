@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,11 @@
  *
  */
 
-import {LRUCache} from '@wireapp/lru-cache';
+// TODO: This dummy can be replaced once the "BackendClient" is TypeScript code
+interface BackendClientInterface {
+  accessToken: string;
+  accessTokenType: string;
+  createUrl: (path: string) => string;
+}
 
-const cache: LRUCache<string> = new LRUCache(100);
-
-export const getAssetUrl = (identifier: string): string => cache.get(identifier);
-
-export const setAssetUrl = (identifier: string, url: string): string => {
-  const isExistingUrl = getAssetUrl(identifier);
-
-  if (isExistingUrl) {
-    window.URL.revokeObjectURL(url);
-    return isExistingUrl;
-  }
-
-  const outdatedUrl = cache.set(identifier, url);
-
-  if (outdatedUrl != null) {
-    window.URL.revokeObjectURL(outdatedUrl);
-  }
-
-  return url;
-};
+export {BackendClientInterface};
