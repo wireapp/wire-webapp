@@ -113,6 +113,7 @@ class AuthViewModel {
     this.persist = ko.observable(true);
     this.phone_number = ko.observable('');
     this.username = ko.observable('');
+    this.COUNTRY_CODES = COUNTRY_CODES;
 
     this.is_public_computer = ko.observable(false);
     this.is_public_computer.subscribe(is_public_computer => this.persist(!is_public_computer));
@@ -224,8 +225,6 @@ class AuthViewModel {
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
-
-    this.COUNTRY_CODES = COUNTRY_CODES;
 
     this._init_base();
     $(elementSelector).show();
