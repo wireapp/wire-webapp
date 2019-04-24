@@ -20,7 +20,7 @@
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
-import {SuperType} from '../message/SuperType';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

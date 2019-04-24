@@ -177,8 +177,6 @@ import conversationListCellGlobal from '../components/list/conversationListCell.
 import groupAvatarGlobal from '../components/list/groupAvatar.js';
 import userDetailsGlobal from '../components/panel/userDetails.js';
 import serviceDetailsGlobal from '../components/panel/serviceDetails.js';
-import CallMessageTypeGlobal from '../message/CallMessageType.js';
-import MessageCategoryGlobal from '../message/MessageCategory.js';
 import MessageCategorizationGlobal from '../message/MessageCategorization.js';
 import MessageHasherGlobal from '../message/MessageHasher.js';
 import MentionEntityGlobal from '../message/MentionEntity.js';

@@ -19,7 +19,7 @@
 
 import {t} from 'utils/LocalizerUtil';
 import {BackendEvent} from '../../event/Backend';
-import {SystemMessageType} from '../message/SystemMessageType';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
