@@ -17,12 +17,14 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import moment from 'moment';
-import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
+
+import {getLogger} from 'utils/Logger';
+import {isToday, isCurrentYear, isSameDay, isSameMonth} from 'utils/moment';
 import {t} from 'utils/LocalizerUtil';
 import {koPushDeferred} from 'utils/util';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -48,9 +50,9 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   setConversation(conversationEntity, category, items) {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
     this.conversationEntity(conversationEntity);
     koPushDeferred(this.items, items);
@@ -105,20 +107,20 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   removedFromView() {
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.lastMessageTimestamp = undefined;
     this.conversationEntity(null);
     this.items.removeAll();
   }
 
   clickOnBackButton() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
   clickOnImage(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
   }
 
   shouldShowHeader(messageEntity) {

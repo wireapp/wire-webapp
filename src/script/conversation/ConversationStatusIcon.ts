@@ -17,20 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
-z.media.MEDIA_STREAM_ERROR_TYPES = {
-  DEVICE: [
-    z.media.MEDIA_STREAM_ERROR.ABORT_ERROR,
-    z.media.MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
-    z.media.MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
-  ],
-  MISC: [
-    z.media.MEDIA_STREAM_ERROR.NOT_SUPPORTED_ERROR,
-    z.media.MEDIA_STREAM_ERROR.OVERCONSTRAINED_ERROR,
-    z.media.MEDIA_STREAM_ERROR.TYPE_ERROR,
-  ],
-  PERMISSION: [z.media.MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR, z.media.MEDIA_STREAM_ERROR.SECURITY_ERROR],
-};
+export enum ConversationStatusIcon {
+  ACTIVE_CALL = 'active-call',
+  MISSED_CALL = 'missed-call',
+  MUTED = 'muted',
+  NONE = 'none',
+  PENDING_CONNECTION = 'pending',
+  TYPING = 'typing',
+  UNREAD_MENTION = 'mention',
+  UNREAD_MESSAGES = 'messages',
+  UNREAD_PING = 'ping',
+  UNREAD_REPLY = 'reply',
+}

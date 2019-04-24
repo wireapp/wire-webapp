@@ -23,6 +23,7 @@ import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 import {t} from 'utils/LocalizerUtil';
 import {alias} from 'utils/util';
@@ -143,8 +144,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation);
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
   /**

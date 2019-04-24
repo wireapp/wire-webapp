@@ -17,13 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaType = {
-  AUDIO: 'audio',
-  AUDIO_VIDEO: 'audio/video',
-  NONE: 'none',
-  SCREEN: 'screen',
-  VIDEO: 'video',
-};
+/** Enum of different ephemeral status types */
+export enum EphemeralStatusType {
+  ACTIVE = 1,
+  INACTIVE = 2,
+  NONE = 0,
+  TIMED_OUT = 3,
+}

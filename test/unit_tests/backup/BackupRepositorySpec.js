@@ -18,7 +18,12 @@
  */
 
 import JSZip from 'jszip';
+
+import {BackupRepository} from 'src/script/backup/BackupRepository';
+
 import {noop} from 'utils/util';
+
+import {ClientEvent} from 'src/script/event/Client';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
@@ -32,7 +37,7 @@ const messages = [
   ];
 /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-describe('z.backup.BackupRepository', () => {
+describe('BackupRepository', () => {
   const test_factory = new TestFactory();
   let backupRepository = undefined;
 
@@ -73,10 +78,7 @@ describe('z.backup.BackupRepository', () => {
     afterEach(() => TestFactory.storage_service.clearStores());
 
     it('generates an archive of the database', () => {
-      const filesToCheck = [
-        z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS,
-        z.backup.BackupRepository.CONFIG.FILENAME.EVENTS,
-      ];
+      const filesToCheck = [BackupRepository.CONFIG.FILENAME.CONVERSATIONS, BackupRepository.CONFIG.FILENAME.EVENTS];
 
       const archivePromise = backupRepository.generateHistory(noop);
 
@@ -86,14 +88,14 @@ describe('z.backup.BackupRepository', () => {
         expect(fileNames).toContain('export.json');
         filesToCheck.map(filename => expect(fileNames).toContain(filename));
 
-        const validateConversationsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
+        const validateConversationsPromise = zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS]
           .async('string')
           .then(conversationsStr => JSON.parse(conversationsStr))
           .then(conversations => {
             expect(conversations).toEqual([conversation]);
           });
 
-        const validateEventsPromise = zip.files[z.backup.BackupRepository.CONFIG.FILENAME.EVENTS]
+        const validateEventsPromise = zip.files[BackupRepository.CONFIG.FILENAME.EVENTS]
           .async('string')
           .then(eventsStr => JSON.parse(eventsStr))
           .then(events => {
@@ -107,7 +109,7 @@ describe('z.backup.BackupRepository', () => {
     it('ignores verification events in the backup', () => {
       const verificationEvent = {
         conversation: conversationId,
-        type: z.event.Client.CONVERSATION.VERIFICATION,
+        type: ClientEvent.CONVERSATION.VERIFICATION,
       };
 
       return TestFactory.storage_service
@@ -169,7 +171,7 @@ describe('z.backup.BackupRepository', () => {
           ...testDescription.metaChanges,
         };
 
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
+        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
         return backupRepository
           .importHistory(archive, noop, noop)
@@ -189,9 +191,9 @@ describe('z.backup.BackupRepository', () => {
 
       const archives = metadataArray.map(metadata => {
         const archive = new JSZip();
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
-        archive.file(z.backup.BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
+        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
+        archive.file(BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
+        archive.file(BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
 
         return archive;
       });

@@ -19,12 +19,13 @@
 /* eslint-disable */
 
 import {resolve, graph} from '../../api/testResolver';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 
 describe('MediaDevicesHandler', () => {
   const screens = [{id: 'screen1', name: 'Screen 1'}, {id: 'screen2', name: 'Screen 2'}];
   const cameras = [
-    {deviceId: 'camera1', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
-    {deviceId: 'camera2', kind: z.media.MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
+    {deviceId: 'camera1', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
+    {deviceId: 'camera2', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
   ];
   let devicesHandler;
 

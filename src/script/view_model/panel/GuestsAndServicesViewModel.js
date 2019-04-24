@@ -18,11 +18,13 @@
  */
 
 import {getLogger} from 'utils/Logger';
-
-import {BasePanelViewModel} from './BasePanelViewModel';
 import {copyText} from 'utils/ClipboardUtil';
 import {t} from 'utils/LocalizerUtil';
+
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {ACCESS_STATE} from '../../conversation/AccessState';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -66,7 +68,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     if (!this.isLinkCopied() && this.activeConversation()) {
       copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
         window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);
       });
     }
@@ -76,7 +78,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     // Handle conversations in legacy state
     const accessStatePromise = this.isGuestRoom()
       ? Promise.resolve()
-      : this.stateHandler.changeAccessState(this.activeConversation(), z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+      : this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM);
 
     accessStatePromise.then(() => {
       if (!this.requestOngoing()) {
@@ -88,7 +90,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   }
 
   revokeAccessCode() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
@@ -108,9 +110,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   toggleAccessState() {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
-      const newAccessState = this.isTeamOnly()
-        ? z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM
-        : z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+      const newAccessState = this.isTeamOnly() ? ACCESS_STATE.TEAM.GUEST_ROOM : ACCESS_STATE.TEAM.TEAM_ONLY;
 
       const _changeAccessState = () => {
         if (!this.requestOngoing()) {
@@ -128,7 +128,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return _changeAccessState();
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => _changeAccessState(),
         preventClose: true,
         text: {

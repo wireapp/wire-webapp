@@ -20,6 +20,7 @@
 import emojiBindings from './emoji.json';
 import * as StorageUtil from 'utils/StorageUtil';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class EmojiInputViewModel {
   static get CONFIG() {
@@ -250,9 +251,9 @@ export class EmojiInputViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.removeEmojiPopup);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.removeEmojiPopup);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
       this.updatedReplaceEmojiPreference(properties.settings.emoji.replace_inline);
     });
   }

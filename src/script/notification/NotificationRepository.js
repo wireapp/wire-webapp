@@ -22,13 +22,14 @@ import {getLogger} from 'utils/Logger';
 import {t, Declension} from 'utils/LocalizerUtil';
 import {SanitizationUtil} from 'utils/SanitizationUtil';
 import {TimeUtil} from 'utils/TimeUtil';
-import {AvailabilityType} from '../user/AvailabilityType';
 
+import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {NotificationPreference} from './NotificationPreference';
+import {WebAppEvents} from '../event/WebApp';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -93,11 +94,11 @@ class NotificationRepository {
   }
 
   subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.NOTIFY, this.notify.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
   }
 
   /**
@@ -599,17 +600,17 @@ class NotificationRepository {
     const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
-      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, showOptions);
+      return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
       };
     }
 
-    return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
+    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId);
   }
 
   /**
@@ -686,12 +687,12 @@ class NotificationRepository {
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case z.message.SuperType.CONTENT: {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
           break;
         }
 
         case z.message.SuperType.PING: {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
           break;
         }
       }
@@ -701,12 +702,12 @@ class NotificationRepository {
   // Request browser permission for notifications.
   _requestPermission() {
     return new Promise(resolve => {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
           this.updatePermissionState(permissionState).then(resolve);
         });
       }
@@ -774,7 +775,7 @@ class NotificationRepository {
    * @returns {undefined} No return value
    */
   _showNotification(notificationContent) {
-    amplify.publish(z.event.WebApp.NOTIFICATION.SHOW, notificationContent);
+    amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
     this._showNotificationInBrowser(notificationContent);
   }
 
@@ -801,7 +802,7 @@ class NotificationRepository {
 
     const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
     notification.onclick = () => {
-      amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
+      amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
       this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();

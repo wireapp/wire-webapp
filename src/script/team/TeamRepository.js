@@ -18,11 +18,14 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
+import {loadDataUrl} from 'utils/util';
 
 import {TeamMapper} from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
-import {t} from 'utils/LocalizerUtil';
-import {loadDataUrl} from 'utils/util';
+
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -75,15 +78,15 @@ z.team.TeamRepository = class TeamRepository {
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
     });
 
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
     this.userRepository.teamUsers = this.teamUsers;
 
-    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
   getTeam() {
@@ -136,28 +139,28 @@ z.team.TeamRepository = class TeamRepository {
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case z.event.Backend.TEAM.CONVERSATION_CREATE:
-      case z.event.Backend.TEAM.CONVERSATION_DELETE: {
+      case BackendEvent.TEAM.CONVERSATION_CREATE:
+      case BackendEvent.TEAM.CONVERSATION_DELETE: {
         this._onUnhandled(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.DELETE: {
+      case BackendEvent.TEAM.DELETE: {
         this._onDelete(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_JOIN: {
+      case BackendEvent.TEAM.MEMBER_JOIN: {
         this._onMemberJoin(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_LEAVE: {
+      case BackendEvent.TEAM.MEMBER_LEAVE: {
         this._onMemberLeave(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_UPDATE: {
+      case BackendEvent.TEAM.MEMBER_UPDATE: {
         this._onMemberUpdate(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.UPDATE: {
+      case BackendEvent.TEAM.UPDATE: {
         this._onUpdate(eventJson);
         break;
       }
@@ -189,7 +192,7 @@ z.team.TeamRepository = class TeamRepository {
           };
 
           this.logger.info('Publishing account info', accountInfo);
-          amplify.publish(z.event.WebApp.TEAM.INFO, accountInfo);
+          amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
         });
     }
   }
@@ -242,7 +245,7 @@ z.team.TeamRepository = class TeamRepository {
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
@@ -276,7 +279,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === userId);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
     }
   }
 

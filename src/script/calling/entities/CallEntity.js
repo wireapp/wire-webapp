@@ -27,9 +27,12 @@ import {TERMINATION_REASON} from '../enum/TerminationReason';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
+
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {AvailabilityType} from '../../user/AvailabilityType';
+import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantEntity} from './ParticipantEntity';
 
 class CallEntity {
@@ -102,7 +105,7 @@ class CallEntity {
     // Media
     this.localMediaStream = mediaStreamHandler.localMediaStream;
     this.localMediaType = mediaStreamHandler.localMediaType;
-    this.remoteMediaType = ko.observable(z.media.MediaType.NONE);
+    this.remoteMediaType = ko.observable(MediaType.NONE);
 
     // Statistics
     this._resetTimer();
@@ -121,8 +124,8 @@ class CallEntity {
     this.isEndedState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
 
     this.isOngoingOnAnotherClient = ko.pureComputed(() => this.selfUserJoined() && !this.selfClientJoined());
-    this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
-    this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.VIDEO);
+    this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === MediaType.SCREEN);
+    this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === MediaType.VIDEO);
 
     this.isLocalVideoCall = ko.pureComputed(() => this.selfState.screenSend() || this.selfState.videoSend());
     this.isRemoteVideoCall = ko.pureComputed(() => this.isRemoteScreenSend() || this.isRemoteVideoSend());
@@ -169,9 +172,9 @@ class CallEntity {
 
     this.networkInterruption.subscribe(isInterrupted => {
       if (isInterrupted) {
-        return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+        return amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
-      amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+      amplify.publish(WebAppEvents.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
@@ -179,7 +182,7 @@ class CallEntity {
         this.isConnected(false);
 
         if (this.isOngoing() || this.isDisconnecting()) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
         }
 
         if (this.terminationReason) {
@@ -295,7 +298,7 @@ class CallEntity {
 
   /**
    * Join the call.
-   * @param {z.media.MediaType} [mediaType] - Media type of the call
+   * @param {MediaType} [mediaType] - Media type of the call
    * @returns {void} No return value
    */
   joinCall(mediaType) {
@@ -320,12 +323,12 @@ class CallEntity {
    * Join group call.
    *
    * @private
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type of the call
    * @returns {void} No return value
    */
-  _joinGroupCall(mediaType = z.media.MediaType.AUDIO) {
+  _joinGroupCall(mediaType = MediaType.AUDIO) {
     const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
 
     const response = !this.isOutgoing();
     const propSync = CallMessageBuilder.createPropSync(this.selfState, additionalPayload, videoSend);
@@ -434,12 +437,12 @@ class CallEntity {
 
   /**
    * Toggle media of this call.
-   * @param {z.media.MediaType} mediaType - MediaType to toggle
+   * @param {MediaType} mediaType - MediaType to toggle
    * @returns {Promise} Resolves when state has been toggled
    */
   toggleMedia(mediaType) {
-    const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
-    const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
+    const toggledVideo = mediaType === MediaType.SCREEN && !this.selfState.videoSend();
+    const toggledScreen = mediaType === MediaType.VIDEO && !this.selfState.screenSend();
     if (toggledVideo || toggledScreen) {
       this.telemetry.setAVToggled();
     }
@@ -645,7 +648,7 @@ class CallEntity {
    */
   _playRingTone(isIncoming) {
     const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, audioId);
+    amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, audioId);
   }
 
   /**
@@ -660,10 +663,10 @@ class CallEntity {
       this._stopRingTone(isIncoming);
 
       if (isIncoming) {
-        return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
+        return this.isGroup ? this.rejectCall(false) : amplify.publish(WebAppEvents.CALL.STATE.DELETE, this.id);
       }
 
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
+      amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
     }, CallEntity.CONFIG.STATE_TIMEOUT);
   }
 
@@ -676,7 +679,7 @@ class CallEntity {
    */
   _stopRingTone(isIncoming) {
     const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, audioId);
+    amplify.publish(WebAppEvents.AUDIO.STOP, audioId);
   }
 
   /**
@@ -689,16 +692,16 @@ class CallEntity {
 
     this.participants().forEach(({activeState}) => {
       if (activeState.screenSend()) {
-        this.remoteMediaType(z.media.MediaType.SCREEN);
+        this.remoteMediaType(MediaType.SCREEN);
         mediaTypeChanged = true;
       } else if (activeState.videoSend()) {
-        this.remoteMediaType(z.media.MediaType.VIDEO);
+        this.remoteMediaType(MediaType.VIDEO);
         mediaTypeChanged = true;
       }
     });
 
     if (!mediaTypeChanged) {
-      this.remoteMediaType(z.media.MediaType.AUDIO);
+      this.remoteMediaType(MediaType.AUDIO);
     }
   }
 
@@ -752,13 +755,13 @@ class CallEntity {
         if (this.selfClientJoined()) {
           switch (terminationReason) {
             case TERMINATION_REASON.OTHER_USER: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
               break;
             }
 
             case TERMINATION_REASON.CONNECTION_DROP:
             case TERMINATION_REASON.MEMBER_LEAVE: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
               break;
             }
 
@@ -951,10 +954,10 @@ class CallEntity {
   /**
    * Initiate the call telemetry.
    * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
+  initiateTelemetry(direction, mediaType = MediaType.AUDIO) {
     this.telemetry.initiateNewCall(direction, mediaType);
     this.timings = new CallSetupTimings(this.id);
   }
@@ -1029,7 +1032,7 @@ class CallEntity {
     this.isConnected(false);
     this.sessionId = undefined;
     this.terminationReason = undefined;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+    amplify.publish(WebAppEvents.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
   }
 
   /**

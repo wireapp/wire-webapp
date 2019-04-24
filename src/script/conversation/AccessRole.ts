@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ACCESS_ROLE = {
-  ACTIVATED: 'activated',
-  NON_ACTIVATED: 'non_activated',
-  PRIVATE: 'private',
-  TEAM: 'team',
-};
+export enum ACCESS_ROLE {
+  ACTIVATED = 'activated',
+  NON_ACTIVATED = 'non_activated',
+  PRIVATE = 'private',
+  TEAM = 'team',
+}

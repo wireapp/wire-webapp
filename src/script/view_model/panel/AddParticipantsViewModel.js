@@ -18,11 +18,12 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -136,7 +137,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -178,7 +179,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
         });
       }
 
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
 }

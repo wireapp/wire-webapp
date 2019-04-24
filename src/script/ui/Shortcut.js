@@ -19,13 +19,15 @@
 
 import keyboardJS from 'keyboardjs';
 
+import {WebAppEvents} from '../event/WebApp';
+
 window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.Shortcut = (() => {
   const SHORTCUT_MAP = {
     [z.ui.ShortcutType.ADD_PEOPLE]: {
-      event: z.event.WebApp.SHORTCUT.ADD_PEOPLE,
+      event: WebAppEvents.SHORTCUT.ADD_PEOPLE,
       shortcut: {
         electron: {
           macos: 'command + shift + k',
@@ -39,7 +41,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.ARCHIVE]: {
-      event: z.event.WebApp.SHORTCUT.ARCHIVE,
+      event: WebAppEvents.SHORTCUT.ARCHIVE,
       shortcut: {
         electron: {
           macos: 'command + d',
@@ -53,7 +55,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.PREV]: {
-      event: z.event.WebApp.SHORTCUT.PREV,
+      event: WebAppEvents.SHORTCUT.PREV,
       shortcut: {
         electron: {
           macos: 'command + alt + down',
@@ -67,7 +69,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.NEXT]: {
-      event: z.event.WebApp.SHORTCUT.NEXT,
+      event: WebAppEvents.SHORTCUT.NEXT,
       shortcut: {
         electron: {
           macos: 'command + alt + up',
@@ -81,7 +83,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.NOTIFICATIONS]: {
-      event: z.event.WebApp.SHORTCUT.SILENCE,
+      event: WebAppEvents.SHORTCUT.SILENCE,
       shortcut: {
         electron: {
           macos: 'command + alt + m',
@@ -95,7 +97,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.PING]: {
-      event: z.event.WebApp.SHORTCUT.PING,
+      event: WebAppEvents.SHORTCUT.PING,
       shortcut: {
         electron: {
           macos: 'command + k',
@@ -109,7 +111,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.PEOPLE]: {
-      event: z.event.WebApp.SHORTCUT.PEOPLE,
+      event: WebAppEvents.SHORTCUT.PEOPLE,
       shortcut: {
         electron: {
           macos: 'command + i',
@@ -123,7 +125,7 @@ z.ui.Shortcut = (() => {
       },
     },
     [z.ui.ShortcutType.START]: {
-      event: z.event.WebApp.SHORTCUT.START,
+      event: WebAppEvents.SHORTCUT.START,
       shortcut: {
         electron: {
           macos: 'command + n',

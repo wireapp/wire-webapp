@@ -21,6 +21,8 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.integration = z.integration || {};
@@ -99,7 +101,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
           services_size: conversationEntity.getNumberOfServices(),
         };
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 
       return event;
@@ -114,7 +116,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    */
   create1to1ConversationWithService(serviceEntity) {
     return this.conversationRepository
-      .createGroupConversation([], undefined, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
+      .createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
@@ -123,7 +125,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .catch(error => {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('modalIntegrationUnavailableMessage'),
             title: t('modalIntegrationUnavailableHeadline'),
@@ -216,7 +218,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
         const attributes = {service_id: serviceId};
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
         return event;
       }
     });

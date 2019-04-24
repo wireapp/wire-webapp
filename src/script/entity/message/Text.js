@@ -23,6 +23,7 @@ import {Asset} from './Asset';
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 import {renderMessage} from 'utils/util';
+import {mediaParser} from '../../media/MediaParser';
 
 export class Text extends Asset {
   constructor(id, text = '') {
@@ -50,7 +51,7 @@ export class Text extends Asset {
   // Process text before rendering it
   render(selfId, themeColor) {
     const message = renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, themeColor) : message;
+    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
   isUserMentioned(userId) {

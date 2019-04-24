@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ACCESS_MODE = {
-  CODE: 'code',
-  INVITE: 'invite',
-  PRIVATE: 'private',
-};
+export enum MediaDeviceType {
+  AUDIO_INPUT = 'audioinput',
+  AUDIO_OUTPUT = 'audiooutput',
+  SCREEN_INPUT = 'screeninput',
+  VIDEO_INPUT = 'videoinput',
+}

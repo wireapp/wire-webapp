@@ -19,6 +19,7 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {Conversation} from 'src/script/entity/Conversation';
+import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {createRandomUuid} from 'utils/util';
 
 describe('ClientMismatchHandler', () => {
@@ -94,7 +95,7 @@ describe('ClientMismatchHandler', () => {
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
 
       const timestamp = new Date(clientMismatch.time).getTime();
-      const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId);
+      const eventInfoEntity = new EventInfoEntity(undefined, conversationId);
       eventInfoEntity.setTimestamp(timestamp);
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
@@ -145,7 +146,7 @@ describe('ClientMismatchHandler', () => {
       TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
       return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db).then(() => {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
         return TestFactory.conversation_repository.clientMismatchHandler
           .onClientMismatch(eventInfoEntity, clientMismatch, payload)
@@ -166,7 +167,7 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updatedPayload => {
@@ -185,7 +186,7 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updated_payload => {

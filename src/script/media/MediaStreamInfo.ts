@@ -17,18 +17,27 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+import {CallEntity} from '../calling/entities/CallEntity';
+import {MediaStreamHandler} from './MediaStreamHandler';
+import {MediaStreamSource} from './MediaStreamSource';
 
-z.conversation.ConversationStatusIcon = {
-  ACTIVE_CALL: 'active-call',
-  MISSED_CALL: 'missed-call',
-  MUTED: 'muted',
-  NONE: 'none',
-  PENDING_CONNECTION: 'pending',
-  TYPING: 'typing',
-  UNREAD_MENTION: 'mention',
-  UNREAD_MESSAGES: 'messages',
-  UNREAD_PING: 'ping',
-  UNREAD_REPLY: 'reply',
-};
+export class MediaStreamInfo {
+  callEntity: CallEntity;
+  conversationId?: string;
+  flowId: string;
+  source: MediaStreamSource;
+  stream: MediaStream;
+
+  constructor(source: MediaStreamSource, flowId: string, stream: MediaStream, callEntity: CallEntity) {
+    this.source = source;
+    this.flowId = flowId;
+    this.stream = stream;
+    this.callEntity = callEntity;
+
+    this.conversationId = callEntity ? callEntity.id : undefined;
+  }
+
+  getType() {
+    return MediaStreamHandler.detectMediaStreamType(this.stream);
+  }
+}

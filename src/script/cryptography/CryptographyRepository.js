@@ -17,15 +17,16 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {CryptographyMapper} from './CryptographyMapper';
+import {getLogger} from 'utils/Logger';
 import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
+
+import {CryptographyMapper} from './CryptographyMapper';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -115,7 +116,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
       this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
         const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
-        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, {id: clientId}, true);
+        amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
       });
     });
   }
@@ -517,7 +518,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {undefined} No return value
    */
   _reportDecryptionFailure(error, {type: eventType}) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: error.code || error.message,
     });
 

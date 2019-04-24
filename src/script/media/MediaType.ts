@@ -17,12 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaDeviceType = {
-  AUDIO_INPUT: 'audioinput',
-  AUDIO_OUTPUT: 'audiooutput',
-  SCREEN_INPUT: 'screeninput',
-  VIDEO_INPUT: 'videoinput',
-};
+export enum MediaType {
+  AUDIO = 'audio',
+  AUDIO_VIDEO = 'audio/video',
+  NONE = 'none',
+  SCREEN = 'screen',
+  VIDEO = 'video',
+}

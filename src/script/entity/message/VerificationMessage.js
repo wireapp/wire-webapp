@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -74,7 +75,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   }
 
   clickOnDevice() {
-    const topic = this.isSelfClient() ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES : z.event.WebApp.SHORTCUT.PEOPLE;
+    const topic = this.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
 };

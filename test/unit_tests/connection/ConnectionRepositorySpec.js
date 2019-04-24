@@ -17,10 +17,12 @@
  *
  */
 
+import {createRandomUuid} from 'utils/util';
+
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'utils/util';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -63,7 +65,7 @@ describe('z.connection.ConnectionRepository', () => {
 
     it('it switches the conversation if requested', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
-      amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, amplifySpy);
+      amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
       return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
         expect(connectionRepository._updateStatus).toHaveBeenCalled();

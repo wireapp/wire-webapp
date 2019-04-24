@@ -17,13 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-// Enum of different conversation types.
-z.conversation.ConversationType = {
-  CONNECT: 3,
-  GROUP: 0,
-  ONE2ONE: 2,
-  SELF: 1,
-};
+export enum ACCESS_MODE {
+  CODE = 'code',
+  INVITE = 'invite',
+  PRIVATE = 'private',
+}

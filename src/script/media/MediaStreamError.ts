@@ -17,11 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-// Enum of a user's participation status in a conversation.
-z.conversation.ConversationStatus = {
-  CURRENT_MEMBER: 0,
-  PAST_MEMBER: 1,
-};
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors */
+export enum MEDIA_STREAM_ERROR {
+  ABORT_ERROR = 'AbortError',
+  NOT_ALLOWED_ERROR = 'NotAllowedError',
+  NOT_FOUND_ERROR = 'NotFoundError',
+  NOT_READABLE_ERROR = 'NotReadableError',
+  NOT_SUPPORTED_ERROR = 'NotSupportedError',
+  OVERCONSTRAINED_ERROR = 'OverConstrainedError',
+  SECURITY_ERROR = 'SecurityError',
+  TYPE_ERROR = 'TypeError',
+}

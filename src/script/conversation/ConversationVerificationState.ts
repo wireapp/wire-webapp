@@ -17,12 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.VIDEO_QUALITY_MODE = {
-  FULL_HD: 'z.media.VIDEO_QUALITY_MODE.FULL_HD',
-  GROUP: 'z.media.VIDEO_QUALITY_MODE.GROUP',
-  HD: 'z.media.VIDEO_QUALITY_MODE.MOBILE.HD',
-  MOBILE: 'z.media.VIDEO_QUALITY_MODE.MOBILE',
-};
+export enum ConversationVerificationState {
+  DEGRADED = 2,
+  UNVERIFIED = 0,
+  VERIFIED = 1,
+}

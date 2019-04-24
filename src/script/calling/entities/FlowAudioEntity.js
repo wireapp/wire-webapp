@@ -19,6 +19,7 @@
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {MediaRepository} from '../../media/MediaRepository';
+import {WebAppEvents} from '../../event/WebApp';
 
 class FlowAudioEntity {
   /**
@@ -67,7 +68,7 @@ class FlowAudioEntity {
     this.audioSource = undefined;
     this.audioRemote = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, this.setGainNode);
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.MUTE_AUDIO, this.setGainNode);
   }
 
   /**

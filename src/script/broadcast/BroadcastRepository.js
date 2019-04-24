@@ -18,6 +18,8 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {WebAppEvents} from '../event/WebApp';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
@@ -52,7 +54,7 @@ class BroadcastRepository {
     Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
     The heavy lifting resides in generalizing the `clientMismatchHandler` so that it doesn't need to directly call the ConversationRepo
     */
-    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
+    amplify.subscribe(WebAppEvents.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
       this.broadcastGenericMessage(genericMessage, recipients);
     });
   }
@@ -66,7 +68,7 @@ class BroadcastRepository {
     return this.messageSender.queueMessage(() => {
       const recipients = this._createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
+        const eventInfoEntity = new EventInfoEntity(genericMessage);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
@@ -93,7 +95,7 @@ class BroadcastRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event to be broadcasted
+   * @param {EventInfoEntity} eventInfoEntity - Event to be broadcasted
    * @param {Object} payload - Payload
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */

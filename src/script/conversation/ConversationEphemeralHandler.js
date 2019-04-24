@@ -19,11 +19,13 @@
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
 import {clamp} from 'utils/NumberUtil';
 import {arrayToBase64, noop} from 'utils/util';
+
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
+import {BackendEvent} from '../event/Backend';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -55,7 +57,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.eventService = eventService;
 
     this.setEventHandlingConfig({
-      [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
+      [BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
 
     this.checkMessageTimer = this.checkMessageTimer.bind(this);

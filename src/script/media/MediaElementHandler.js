@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {MediaType} from './MediaType';
 
 export class MediaElementHandler {
   /**
@@ -34,11 +35,11 @@ export class MediaElementHandler {
 
   /**
    * Add MediaElement for new stream.
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {undefined} No return value
    */
   addMediaElement(mediaStreamInfo) {
-    const isVideoStream = mediaStreamInfo.getType() === z.media.MediaType.VIDEO;
+    const isVideoStream = mediaStreamInfo.getType() === MediaType.VIDEO;
     if (!isVideoStream) {
       const remoteMediaElement = this._createMediaElement(mediaStreamInfo);
       this.remoteMediaElements.push(remoteMediaElement);
@@ -77,7 +78,7 @@ export class MediaElementHandler {
    * Create a new media element.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {Element} HTMLAudioElement that has the stream attached to it
    */
   _createMediaElement(mediaStreamInfo) {

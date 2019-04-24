@@ -22,6 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {createRandomUuid} from 'utils/util';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
@@ -36,9 +37,14 @@ import {PROPERTY_STATE} from './enum/PropertyState';
 import {CALL_STATE} from './enum/CallState';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
-import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
+
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {MediaType} from '../media/MediaType';
+
+import {ClientEvent} from '../event/Client';
+import {WebAppEvents} from '../event/WebApp';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -147,15 +153,15 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.deleteCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leaveCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.rejectCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
-    amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.getConfig);
+    amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.DELETE, this.deleteCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.LEAVE, this.leaveCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.getConfig);
   }
 
   //##############################################################################
@@ -171,7 +177,7 @@ export class CallingRepository {
    */
   onCallEvent(event, source) {
     const {content: eventContent, time: eventDate, type: eventType} = event;
-    const isCall = eventType === z.event.Client.CALL.E_CALL;
+    const isCall = eventType === ClientEvent.CALL.E_CALL;
 
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     this.callLogger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
@@ -275,13 +281,13 @@ export class CallingRepository {
             const warningOptions = {name: userEntity.name()};
             const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
 
-            amplify.publish(z.event.WebApp.WARNING.SHOW, warningType, warningOptions);
+            amplify.publish(WebAppEvents.WARNING.SHOW, warningType, warningOptions);
           });
           break;
         }
 
         case CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -608,7 +614,7 @@ export class CallingRepository {
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId, {recipients: [userId]});
+        const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
         eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING);
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
@@ -619,7 +625,7 @@ export class CallingRepository {
       Promise.all(promises)
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
-            const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            const mediaType = callEntity.isRemoteVideoCall() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
             return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
               this.joinCall(conversationEntity, mediaType);
             });
@@ -746,7 +752,7 @@ export class CallingRepository {
           });
 
           const options = {precondition, recipients};
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
           return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity);
         });
@@ -882,7 +888,7 @@ export class CallingRepository {
    * Join a call.
    *
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
   joinCall(conversationEntity, mediaType) {
@@ -941,7 +947,7 @@ export class CallingRepository {
    * User action to toggle one of the media states of a call.
    *
    * @param {string} conversationId - ID of conversation with call
-   * @param {z.media.MediaType} mediaType - MediaType of requested change
+   * @param {MediaType} mediaType - MediaType of requested change
    * @returns {undefined} No return value
    */
   toggleMedia(conversationId, mediaType) {
@@ -951,7 +957,7 @@ export class CallingRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (!isNotFound) {
-          if (mediaType === z.media.MediaType.VIDEO || mediaType === z.media.MediaType.AUDIO_VIDEO) {
+          if (mediaType === MediaType.VIDEO || mediaType === MediaType.AUDIO_VIDEO) {
             this.mediaRepository.showNoCameraModal();
           }
         }
@@ -961,7 +967,7 @@ export class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {z.media.MediaType} mediaType - Media type of call
+   * @param {MediaType} mediaType - Media type of call
    * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
@@ -979,7 +985,7 @@ export class CallingRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @param {CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
@@ -993,11 +999,11 @@ export class CallingRepository {
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
       if (isOutgoingCall && !this.supportsCalling) {
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
-      const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      const isVideoCall = mediaType === MediaType.AUDIO_VIDEO;
       if (isVideoCall && !conversationEntity.supportsVideoCall(isOutgoingCall)) {
         this._showModal(t('modalCallNoGroupVideoHeadline'), t('modalCallNoGroupVideoMessage'));
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
@@ -1054,16 +1060,16 @@ export class CallingRepository {
           }
         }
 
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
-            amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
+            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
             window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
             if (isIncomingCall) {
-              amplify.publish(z.event.WebApp.CALL.STATE.REJECT, newCallId);
+              amplify.publish(WebAppEvents.CALL.STATE.REJECT, newCallId);
             }
           },
           text: {
@@ -1162,7 +1168,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call to be joined
-   * @param {z.media.MediaType} mediaType - Media type of the call
+   * @param {MediaType} mediaType - Media type of the call
    * @returns {undefined} No return value
    */
   _initiateJoinCall(callEntity, mediaType) {
@@ -1175,11 +1181,11 @@ export class CallingRepository {
    *
    * @private
    * @param {string} conversationId - ID of conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {Promise} Resolves with a call entity
    */
   _initiateOutgoingCall(conversationId, mediaType) {
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
     const messagePayload = CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
     const callMessageEntity = CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
@@ -1204,7 +1210,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call to be joined
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {Promise} Resolves with the call entity
    */
   _initiateMediaStream(callEntity, mediaType) {
@@ -1220,7 +1226,7 @@ export class CallingRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type of the call
+   * @param {MediaType} mediaType - Media type of the call
    * @param {CALL_STATE} callState - State of call
    * @param {CallEntity} [callEntity] - Retrieved call entity
    * @returns {undefined} No return value
@@ -1296,7 +1302,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   _showModal(title, message) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message,
         title,
@@ -1307,20 +1313,20 @@ export class CallingRepository {
   /**
    * Toggle media state of a call.
    *
-   * @param {z.media.MediaType} mediaType - MediaType of requested change
+   * @param {MediaType} mediaType - MediaType of requested change
    * @returns {undefined} No return value
    */
   _toggleMediaState(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         return this.mediaStreamHandler.toggleAudioSend();
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         return this.mediaStreamHandler.toggleScreenSend();
       }
 
-      case z.media.MediaType.VIDEO: {
+      case MediaType.VIDEO: {
         return this.mediaStreamHandler.toggleVideoSend();
       }
 
@@ -1406,7 +1412,7 @@ export class CallingRepository {
           const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
 
           if (eventFromWebSocket && callEntity.isRemoteVideoSend() && !hasCallWithoutVideo) {
-            const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
+            const mediaStreamType = MediaType.AUDIO_VIDEO;
             this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }
 
@@ -1523,13 +1529,13 @@ export class CallingRepository {
   /**
    * Get the MediaType from given call event properties.
    * @param {Object} properties - call event properties
-   * @returns {z.media.MediaType} MediaType of call
+   * @returns {MediaType} MediaType of call
    */
   _getMediaTypeFromProperties(properties) {
     const isVideoSend = properties && properties.videosend === PROPERTY_STATE.TRUE;
     const isScreenSend = properties && properties.screensend === PROPERTY_STATE.TRUE;
     const isTypeVideo = isVideoSend || isScreenSend;
-    return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+    return isTypeVideo ? MediaType.VIDEO : MediaType.AUDIO;
   }
 
   /**

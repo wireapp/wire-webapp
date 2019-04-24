@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class ConversationListViewModel {
   /**
@@ -114,8 +115,8 @@ export class ConversationListViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
   }
 
   clickOnAvailability(viewModel, event) {
@@ -166,7 +167,7 @@ export class ConversationListViewModel {
   }
 
   clickOnPreferencesButton() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   }
 
   clickOnPeopleButton() {

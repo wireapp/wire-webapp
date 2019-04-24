@@ -18,6 +18,11 @@
  */
 
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
+import {MediaStreamSource} from '../../media/MediaStreamSource';
+import {MediaStreamInfo} from '../../media/MediaStreamInfo';
+import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
+
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
 import {FlowTelemetry} from '../../telemetry/calling/FlowTelemetry';
@@ -426,7 +431,7 @@ class FlowEntity {
               ? TERMINATION_REASON.CONNECTION_DROP
               : TERMINATION_REASON.CONNECTION_FAILED;
           }
-          amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
+          amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
         }
       });
   }
@@ -475,7 +480,7 @@ class FlowEntity {
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
       : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
 
-    amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+    amplify.publish(WebAppEvents.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
     this.peerConnection.close();
     this.peerConnection = undefined;
 
@@ -555,18 +560,18 @@ class FlowEntity {
     });
 
     const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStream);
-    const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
+    const isTypeAudio = mediaType === MediaType.AUDIO;
     if (isTypeAudio) {
       mediaStream = this.audio.wrapAudioOutputStream(mediaStream);
     }
 
-    const mediaStreamInfo = new z.media.MediaStreamInfo(
-      z.media.MediaStreamSource.REMOTE,
+    const mediaStreamInfo = new MediaStreamInfo(
+      MediaStreamSource.REMOTE,
       this.remoteUser.id,
       mediaStream,
       this.callEntity
     );
-    amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
+    amplify.publish(WebAppEvents.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
   }
 
   /**
@@ -782,7 +787,7 @@ class FlowEntity {
       this.remoteUserId,
       this.remoteClientId
     );
-    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, callEvent, z.event.EventRepository.SOURCE.WEB_SOCKET);
+    amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, z.event.EventRepository.SOURCE.WEB_SOCKET);
   }
 
   /**
@@ -1023,7 +1028,7 @@ class FlowEntity {
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
+    amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1278,7 +1283,7 @@ class FlowEntity {
    * Replace the MediaStream attached to the PeerConnection.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
    * @param {MediaStream} outdatedMediaStream - Previous MediaStream
    * @returns {Promise} Resolves when negotiation has been restarted
    */
@@ -1301,7 +1306,7 @@ class FlowEntity {
    * Replace the MediaStreamTrack attached to the MediaStream of the PeerConnection.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - Object containing the required MediaStream information
    * @returns {Promise} Resolves when a MediaStreamTrack has been replaced
    */
   replaceMediaTrack(mediaStreamInfo) {
@@ -1323,7 +1328,7 @@ class FlowEntity {
    * Check for support of MediaStreamTrack replacement.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type to check replacement capability for
+   * @param {MediaType} mediaType - Type to check replacement capability for
    * @returns {Promise<boolean>} Resolves when the replacement capability has been checked
    */
   supportsTrackReplacement(mediaType) {
@@ -1378,7 +1383,7 @@ class FlowEntity {
    * Get RTC Sender of matching type.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Requested MediaType
+   * @param {MediaType} mediaType - Requested MediaType
    * @returns {RTCRtpSender} Matching RTC Rtp Sender
    */
   _getRtcSender(mediaType) {
@@ -1404,7 +1409,7 @@ class FlowEntity {
    *
    * @private
    * @param {string} trackId - ID of MediaStreamTrack
-   * @param {z.media.MediaType} mediaType - MediaType of MediaStreamTrack
+   * @param {MediaType} mediaType - MediaType of MediaStreamTrack
    * @returns {undefined} No return value
    */
   _removeMediaStreamTrack(trackId, mediaType) {

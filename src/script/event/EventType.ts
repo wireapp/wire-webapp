@@ -17,22 +17,9 @@
  *
  */
 
-import {MediaStreamHandler} from './MediaStreamHandler';
-
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flowId, stream, callEntity) {
-    this.source = source;
-    this.flowId = flowId;
-    this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
-  }
-
-  getType() {
-    return MediaStreamHandler.detectMediaStreamType(this.stream);
-  }
-};
+export enum EVENT_TYPE {
+  CALL = 'call',
+  CONVERSATION = 'conversation',
+  TEAM = 'team',
+  USER = 'user',
+}

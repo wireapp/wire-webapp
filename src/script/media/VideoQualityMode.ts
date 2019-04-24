@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.EVENT_TYPE = {
-  CALL: 'call',
-  CONVERSATION: 'conversation',
-  TEAM: 'team',
-  USER: 'user',
-};
+export enum VIDEO_QUALITY_MODE {
+  FULL_HD = 'z.media.VIDEO_QUALITY_MODE.FULL_HD',
+  GROUP = 'z.media.VIDEO_QUALITY_MODE.GROUP',
+  HD = 'z.media.VIDEO_QUALITY_MODE.MOBILE.HD',
+  MOBILE = 'z.media.VIDEO_QUALITY_MODE.MOBILE',
+}

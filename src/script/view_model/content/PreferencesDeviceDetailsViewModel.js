@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -68,7 +69,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnDetailsClose() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 

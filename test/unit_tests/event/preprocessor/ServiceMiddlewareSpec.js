@@ -18,6 +18,8 @@
  */
 
 import {Conversation} from 'src/script/entity/Conversation';
+import {ClientEvent} from 'src/script/event/Client';
+import {BackendEvent} from 'src/script/event/Backend';
 
 describe('z.event.preprocessor.ServiceMiddleware', () => {
   const testFactory = new TestFactory();
@@ -39,7 +41,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             user_ids: ['not-a-service', 'a-service'],
           },
-          type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
+          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
         };
 
         const userEntities = [{}, {isService: true}];
@@ -55,7 +57,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             user_ids: ['self-id'],
           },
-          type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
+          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
         };
 
         spyOn(TestFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
@@ -76,7 +78,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             user_ids: ['not-a-service', 'another-not-a-service'],
           },
-          type: z.event.Backend.CONVERSATION.MEMBER_JOIN,
+          type: BackendEvent.CONVERSATION.MEMBER_JOIN,
         };
 
         spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([{}, {}]));
@@ -93,7 +95,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             userIds: ['not-a-service', 'a-service'],
           },
-          type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
+          type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
         };
 
         const userEntities = [{}, {isService: true}];
@@ -109,7 +111,7 @@ describe('z.event.preprocessor.ServiceMiddleware', () => {
           data: {
             userIds: ['not-a-service', 'another-not-a-service'],
           },
-          type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
+          type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
         };
 
         const userEntities = [{}, {}];

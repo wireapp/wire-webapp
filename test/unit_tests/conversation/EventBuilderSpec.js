@@ -20,6 +20,8 @@
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {ClientEvent} from 'src/script/event/Client';
+
 import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.EventBuilder', () => {
@@ -86,7 +88,7 @@ describe('z.conversation.EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.type).toBe(z.event.Client.CONVERSATION.GROUP_CREATION);
+      expect(messageEntity.type).toBe(ClientEvent.CONVERSATION.GROUP_CREATION);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
       expect(conversation_et.participating_user_ids().length).toBe(3);
     });

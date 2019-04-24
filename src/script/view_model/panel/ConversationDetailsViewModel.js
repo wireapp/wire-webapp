@@ -23,6 +23,9 @@ import '../../components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {NotificationSetting} from '../../conversation/NotificationSetting';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {WebAppEvents} from '../../event/WebApp';
 
 import '../../components/panel/panelActions';
 
@@ -102,7 +105,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.isVerified = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED
+        ? this.activeConversation().verification_state() === ConversationVerificationState.VERIFIED
         : false;
     });
 
@@ -178,7 +181,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.notificationStatusText = ko.pureComputed(() => {
       return this.activeConversation()
-        ? z.conversation.NotificationSetting.getText(this.activeConversation().notificationState())
+        ? NotificationSetting.getText(this.activeConversation().notificationState())
         : '';
     });
 
@@ -292,7 +295,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
+    amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
   clickOnDevices() {

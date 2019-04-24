@@ -23,6 +23,8 @@ import {afterRender} from 'utils/util';
 
 import {PermissionState} from '../../notification/PermissionState';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 
 class ConversationListCallingCell {
   constructor(params) {
@@ -114,12 +116,12 @@ class ConversationListCallingCell {
   onJoinCall(data, event) {
     event.stopPropagation();
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
-    const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    const mediaType = isVideoCall ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
     this.callingRepository.joinCall(this.conversation, mediaType);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.joinCall(this.conversation, z.media.MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation, MediaType.AUDIO);
   }
 
   onLeaveCall() {
@@ -140,22 +142,22 @@ class ConversationListCallingCell {
   }
 
   onRejectCall() {
-    amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.conversation.id);
+    amplify.publish(WebAppEvents.CALL.STATE.REJECT, this.conversation.id);
   }
 
   onToggleAudio(data, event) {
     event.stopPropagation();
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
+    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.AUDIO);
   }
 
   onToggleScreen(data, event) {
     event.stopPropagation();
-    amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
+    amplify.publish(WebAppEvents.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
   }
 
   onToggleVideo(data, event) {
     event.stopPropagation();
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
+    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
   }
 }
 

@@ -17,17 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
-z.media.MEDIA_STREAM_ERROR = {
-  ABORT_ERROR: 'AbortError',
-  NOT_ALLOWED_ERROR: 'NotAllowedError',
-  NOT_FOUND_ERROR: 'NotFoundError',
-  NOT_READABLE_ERROR: 'NotReadableError',
-  NOT_SUPPORTED_ERROR: 'NotSupportedError',
-  OVERCONSTRAINED_ERROR: 'OverConstrainedError',
-  SECURITY_ERROR: 'SecurityError',
-  TYPE_ERROR: 'TypeError',
-};
+export enum MediaStreamSource {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+}

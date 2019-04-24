@@ -20,6 +20,7 @@
 import {getLogger} from 'utils/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
+import {WebAppEvents} from '../../event/WebApp';
 
 class TakeoverViewModel {
   /**
@@ -44,7 +45,7 @@ class TakeoverViewModel {
 
   chooseUsername() {
     this.listViewModel.dismissModal();
-    window.requestAnimationFrame(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT));
+    window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
   }
 
   keepUsername() {
@@ -53,14 +54,14 @@ class TakeoverViewModel {
       .then(() => {
         const conversationEntity = this.conversationRepository.getMostRecentConversation();
         if (conversationEntity) {
-          return amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+          return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
         }
       })
-      .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))
+      .catch(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT))
       .then(() => this.listViewModel.dismissModal());
   }
 }

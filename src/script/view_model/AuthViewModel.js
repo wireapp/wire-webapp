@@ -22,6 +22,7 @@ import {getLogger} from 'utils/Logger';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
+import 'phoneformat.js';
 
 import {App} from '../main/app';
 import {Config} from '../auth/config';
@@ -32,11 +33,11 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
-/* eslint-disable no-unused-vars */
-import PhoneFormatGlobal from 'phoneformat.js';
-import {view} from '../auth/AuthView';
-import {validationError} from '../auth/ValidationError';
-/* eslint-enable no-unused-vars */
+
+import '../auth/AuthView';
+import '../auth/ValidationError';
+
+import {BackendEvent} from '../event/Backend';
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
@@ -113,6 +114,7 @@ class AuthViewModel {
     this.persist = ko.observable(true);
     this.phone_number = ko.observable('');
     this.username = ko.observable('');
+    this.COUNTRY_CODES = COUNTRY_CODES;
 
     this.is_public_computer = ko.observable(false);
     this.is_public_computer.subscribe(is_public_computer => this.persist(!is_public_computer));
@@ -224,8 +226,6 @@ class AuthViewModel {
 
     this.tabsCheckIntervalId = undefined;
     this.previousHash = undefined;
-
-    this.COUNTRY_CODES = COUNTRY_CODES;
 
     this._init_base();
     $(elementSelector).show();
@@ -894,7 +894,7 @@ class AuthViewModel {
     this.web_socket_service.connect(notification => {
       const [event] = notification.payload;
       const {type: event_type, user} = event;
-      const is_user_update = event_type === z.event.Backend.USER.UPDATE;
+      const is_user_update = event_type === BackendEvent.USER.UPDATE;
 
       this.logger.info(`»» Event: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
       if (is_user_update && user.email) {
