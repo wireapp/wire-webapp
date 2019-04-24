@@ -17,8 +17,7 @@
  *
  */
 
-import {Logger} from 'logdown';
-import {getLogger} from '../util/Logger';
+import {Logger, getLogger} from '../util/Logger';
 import {loadUrlBuffer} from '../util/util';
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
