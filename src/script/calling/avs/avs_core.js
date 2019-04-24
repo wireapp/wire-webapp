@@ -2866,7 +2866,11 @@ var avs_core = (function() {
               var cursor = event.target.result;
 
               if (!cursor) {
-                return callback(null, {type: 'remote', db: db, entries: entries});
+                return callback(null, {
+                  type: 'remote',
+                  db: db,
+                  entries: entries,
+                });
               }
 
               entries[cursor.primaryKey] = {timestamp: cursor.key};
@@ -2895,7 +2899,11 @@ var avs_core = (function() {
           // Performance consideration: storing a normal JavaScript array to a IndexedDB is much slower than storing a typed array.
           // Therefore always convert the file contents to a typed array first before writing the data to IndexedDB.
           node.contents = MEMFS.getFileDataAsTypedArray(node);
-          return callback(null, {timestamp: stat.mtime, mode: stat.mode, contents: node.contents});
+          return callback(null, {
+            timestamp: stat.mtime,
+            mode: stat.mode,
+            contents: node.contents,
+          });
         } else {
           return callback(new Error('node type not supported'));
         }
@@ -3823,7 +3831,9 @@ var avs_core = (function() {
               var link = FS.readlink(current_path);
               current_path = PATH.resolve(PATH.dirname(current_path), link);
 
-              var lookup = FS.lookupPath(current_path, {recurse_count: opts.recurse_count});
+              var lookup = FS.lookupPath(current_path, {
+                recurse_count: opts.recurse_count,
+              });
               current = lookup.node;
 
               if (count++ > 40) {
@@ -5121,7 +5131,11 @@ var avs_core = (function() {
           this.setErrno(errno);
           this.message = ERRNO_MESSAGES[errno];
           // Node.js compatibility: assigning on this.stack fails on Node 4 (but fixed on Node 8)
-          if (this.stack) Object.defineProperty(this, 'stack', {value: new Error().stack, writable: true});
+          if (this.stack)
+            Object.defineProperty(this, 'stack', {
+              value: new Error().stack,
+              writable: true,
+            });
           if (this.stack) this.stack = demangleAll(this.stack);
         };
         FS.ErrnoError.prototype = new Error();

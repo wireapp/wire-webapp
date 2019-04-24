@@ -348,14 +348,14 @@ function pc_IceGatheringState(hnd) {
   return state;
 }
 
-function pc_SignallingState(hnd) {
-  console.log(`pc_SignallingState: hnd=${hnd}`);
+function pc_SignalingState(hnd) {
+  console.log(`pc_SignalingState: hnd=${hnd}`);
   const pc = connectionsStore.getPeerConnection(hnd);
   if (!pc) {
     return 0;
   }
 
-  const stateStr = pc.signallingState;
+  const stateStr = pc.signalingState;
   let state = PC_SIG_STATE_UNKNOWN;
 
   switch (stateStr) {
@@ -503,7 +503,7 @@ export const avspc = {
       [pc_Close, 'vn'],
       [pc_AddTurnServer, 'vnsss'],
       [pc_IceGatheringState, 'nn'],
-      [pc_SignallingState, 'n'],
+      [pc_SignalingState, 'n'],
       [pc_ConnectionState, 'n'],
       [pc_CreateDataChannel, 'ns'],
       [pc_CreateOffer, 'n'],
