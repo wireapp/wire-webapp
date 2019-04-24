@@ -21,8 +21,8 @@
 */
 /*eslint-disable sort-keys, no-shadow */
 
-const avs_core = require('./avs_core.js').default;
-const avs_pc = require('./avs_pc.js').default;
+import avs_core from './avs_core.js';
+import {avspc} from './avs_pc.js';
 
 let instance;
 
@@ -83,7 +83,7 @@ export function getAvsInstance() {
         WCALL_STATE_UNKNOWN: 8,
 
         init: function() {
-          avs_pc.avspc_init(em_module);
+          avspc.avspc_init(em_module);
 
           return em_module.ccall('wcall_init', 'number', [], []);
         },

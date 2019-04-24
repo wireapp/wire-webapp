@@ -1,6 +1,19 @@
 /*eslint-disable sort-keys, no-console */
 let em_module;
 
+const PC_SIG_STATE_UNKNOWN = 0;
+const PC_SIG_STATE_STABLE = 1;
+const PC_SIG_STATE_LOCAL_OFFER = 2;
+const PC_SIG_STATE_LOCAL_PRANSWER = 3;
+const PC_SIG_STATE_REMOTE_OFFER = 4;
+const PC_SIG_STATE_REMOTE_PRANSWER = 5;
+const PC_SIG_STATE_CLOSED = 6;
+
+const PC_GATHER_STATE_UNKNOWN = 0;
+const PC_GATHER_STATE_NEW = 1;
+const PC_GATHER_STATE_GATHERING = 2;
+const PC_GATHER_STATE_COMPLETE = 3;
+
 const DC_STATE_CONNECTING = 0;
 const DC_STATE_OPEN = 1;
 const DC_STATE_CLOSING = 2;
@@ -8,8 +21,8 @@ const DC_STATE_CLOSED = 3;
 const DC_STATE_ERROR = 4;
 
 const connectionsStore = (() => {
-  const peerConnections = [null]; // we need 1 element in there, cause index 0 is invalid
-  const dataChannels = [null]; // we need 1 element in there, cause index 0 is invalid
+  const peerConnections = [null];
+  const dataChannels = [null];
 
   const storeItem = (store, item) => {
     const index = store.push(item);
@@ -289,12 +302,14 @@ function pc_LocalDescription(hnd, typePtr) {
 
   const pc = connectionsStore.getPeerConnection(hnd);
 
-  const type = em_module.UTF8ToString(typePtr);
   const sdpDesc = pc.localDescription;
 
-  if (type != sdpDesc.type) {
-    console.log('localdesc wrong type');
-    return null;
+  if (typePtr != null) {
+    const type = em_module.UTF8ToString(typePtr);
+    if (type != sdpDesc.type) {
+      console.log('localdesc wrong type');
+      return null;
+    }
   }
 
   const sdp = sdpDesc.sdp.toString();
@@ -313,10 +328,22 @@ function pc_IceGatheringState(hnd) {
     return 0;
   }
 
-  /* Does this need mapping to an int, if it comes as a string,
-   * or we return a string???
-   */
-  const state = pc.iceGatheringState;
+  const stateStr = pc.iceGatheringState;
+  let state = PC_GATHER_STATE_UNKNOWN;
+
+  switch (stateStr) {
+    case 'new':
+      state = PC_GATHER_STATE_NEW;
+      break;
+
+    case 'gathering':
+      state = PC_GATHER_STATE_GATHERING;
+      break;
+
+    case 'complete':
+      state = PC_GATHER_STATE_COMPLETE;
+      break;
+  }
 
   return state;
 }
@@ -328,10 +355,34 @@ function pc_SignallingState(hnd) {
     return 0;
   }
 
-  /* Does this need mapping to an int, if it comes as a string,
-   * or we return a string???
-   */
-  const state = pc.signallingState;
+  const stateStr = pc.signallingState;
+  let state = PC_SIG_STATE_UNKNOWN;
+
+  switch (stateStr) {
+    case 'stable':
+      state = PC_SIG_STATE_STABLE;
+      break;
+
+    case 'have-local-offer':
+      state = PC_SIG_STATE_LOCAL_OFFER;
+      break;
+
+    case 'have-remote-offer':
+      state = PC_SIG_STATE_REMOTE_OFFER;
+      break;
+
+    case 'have-local-pranswer':
+      state = PC_SIG_STATE_LOCAL_PRANSWER;
+      break;
+
+    case 'have-remote-pranswer':
+      state = PC_SIG_STATE_REMOTE_PRANSWER;
+      break;
+
+    case 'closed':
+      state = PC_SIG_STATE_CLOSED;
+      break;
+  }
 
   return state;
 }
@@ -419,13 +470,14 @@ function pc_DataChannelState(hnd) {
 }
 
 function pc_DataChannelSend(hnd, dataPtr, dataLen) {
-  console.log(`pc_DataCHannelSend: hnd=${hnd}`);
+  console.log(`pc_DataChannelSend: hnd=${hnd}`);
 
   const dc = connectionsStore.getDataChannel(hnd);
   if (dc == null) {
     return;
   }
 
+  //const data = new Uint8Array(em_module.HEAPU8.buffer, dataPtr, dataLen);
   const data = em_module.UTF8ToString(dataPtr);
 
   dc.send(data);
@@ -442,7 +494,7 @@ function pc_DataChannelClose(hnd) {
   dc.close();
 }
 
-const avspc = {
+export const avspc = {
   avspc_init: function(module) {
     em_module = module;
     console.log('pcwrap_init');
@@ -468,5 +520,3 @@ const avspc = {
     em_module.ccall('pc_set_callbacks', 'null', callbacks.map(() => 'number'), callbacks);
   },
 };
-
-export default avspc;
