@@ -34,8 +34,7 @@ export const mapProfileAssets = (userId: string, assets: Asset[]) => {
   return assets
     .filter(asset => asset.type === 'image')
     .reduce((mappedAssets, asset) => {
-      const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
-
+      const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, new Uint8Array());
       return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
     }, {});
 };
