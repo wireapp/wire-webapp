@@ -17,6 +17,12 @@
  *
  */
 
+/**
+ * @param {ArrayBuffer} cipherText - Encrypted plaintext
+ * @param {ArrayBuffer} keyBytes - AES key used for encryption
+ * @param {ArrayBuffer} referenceSha256 - SHA-256 checksum of the cipherText
+ * @returns {Promise} Resolves with the decrypted asset
+ */
 export const decryptAesAsset = async (
   cipherText: ArrayBuffer,
   keyBytes: ArrayBuffer,

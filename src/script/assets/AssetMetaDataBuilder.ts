@@ -25,6 +25,11 @@ import {loadFileBuffer} from '../util/util';
 
 export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMetaData;
 
+/**
+ * Constructs corresponding asset meta data depending on the given file type.
+ * @param {File|Blob} file - the file to generate metadata for
+ * @returns {Promise} Resolves with ImageMetaData, VideoMetaData or AudioMetaData
+ */
 const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
   if (!(file instanceof Blob)) {
     throw new Error('Expected file to be type of Blob');
@@ -101,6 +106,14 @@ const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData
   });
 };
 
+/**
+ * Converts an error event into a plain error object.
+ * This needs to be done because error events are not standardized between browser implementations.
+ * @private
+ * @param {Event} event - Error event
+ * @returns {MediaError} Error object
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/originalTarget
+ */
 const convertEventToError = (event: any): MediaError => {
   let error = event;
 
