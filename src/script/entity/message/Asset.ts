@@ -20,7 +20,13 @@
 import {AssetType} from '../../assets/AssetType';
 
 export class Asset {
-  constructor(id) {
+  public file_type: string;
+  public id: string;
+  public key: string;
+  public size: number;
+  public type: string;
+
+  constructor(id: string) {
     this.id = id;
     this.key = '';
     this.type = '';
