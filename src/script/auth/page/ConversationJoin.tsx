@@ -364,7 +364,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
 
   render() {
     return (
-      <UnsupportedBrowser>
+      <UnsupportedBrowser isTemporaryGuest>
         <WirelessContainer
           showCookiePolicyBanner={this.state.showCookiePolicyBanner}
           onCookiePolicyBannerClose={() => this.setState({...this.state, showCookiePolicyBanner: false})}
