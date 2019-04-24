@@ -17,7 +17,7 @@
  *
  */
 
-import {ACCENT_ID} from 'src/script/config.js';
+import {ACCENT_ID} from 'src/script/config';
 import {User} from 'src/script/entity/User';
 import {UserMapper} from 'src/script/user/UserMapper';
 import {createRandomUuid} from 'utils/util';
