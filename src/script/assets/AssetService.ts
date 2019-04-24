@@ -107,8 +107,7 @@ export class AssetService {
           size: compressedBytes.length,
         });
 
-        // TODO: Add index signature
-        protoAsset[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+        (protoAsset as any)[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });
@@ -119,7 +118,7 @@ export class AssetService {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       const url = this.backendClient.createUrl(`/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
-      const conversationIdParam = `&conv_id=${window.encodeURIComponent(conversationId)}`;
+      const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
 
       return `${url}?access_token=${this.backendClient.accessToken}${conversationIdParam}${cachingParam}`;
     });
@@ -139,7 +138,7 @@ export class AssetService {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(assetKey, assetToken);
       const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
-      const assetTokenParam = assetToken ? `&asset_token=${window.encodeURIComponent(assetToken)}` : '';
+      const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
       return `${url}?access_token=${this.backendClient.accessToken}${assetTokenParam}${cachingParam}`;
