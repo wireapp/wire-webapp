@@ -981,7 +981,6 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   joinCall(conversationId, mediaType) {
-    // TODO, deduce call type from media type
     // TODO pass on the conversation type
     const callType = this.callTypeFromMediaType(mediaType);
     this.callingApi.start(this.wUser, conversationId, callType, CONVERSATION_TYPE.ONEONONE, false);
@@ -990,6 +989,11 @@ export class CallingRepository {
   answerCall(conversationId, mediaType) {
     const callType = this.callTypeFromMediaType(mediaType);
     this.callingApi.answer(this.wUser, conversationId, callType, false);
+  }
+
+  rejectCall(conversationId) {
+    // TODO sort out if rejection should be shared accross devices (does avs handle it?)
+    this.callingApi.reject(this.wUser, conversationId);
   }
 
   callTypeFromMediaType(mediaType) {
@@ -1023,18 +1027,6 @@ export class CallingRepository {
   removeParticipant(conversationId, userId) {
     this.getCallById(conversationId)
       .then(callEntity => this._removeParticipant(callEntity, userId))
-      .catch(error => this._handleNotFoundError(error));
-  }
-
-  /**
-   * User action to reject incoming call.
-   * @param {string} conversationId - ID of conversation to ignore call in
-   * @param {boolean} shareRejection - Send rejection to other clients
-   * @returns {undefined} No return value
-   */
-  rejectCall(conversationId, shareRejection = true) {
-    this.getCallById(conversationId)
-      .then(callEntity => this._rejectCall(callEntity, shareRejection))
       .catch(error => this._handleNotFoundError(error));
   }
 
@@ -1230,37 +1222,6 @@ export class CallingRepository {
   }
 
   /**
-   * Handle error when joining a call.
-   *
-   * @private
-   * @param {string} conversationId - ID of call where joining failed
-   * @param {boolean} isOutgoingCall - Was outgoing call
-   * @param {Error} joinError - Error that occured
-   * @returns {undefined} No return value
-   */
-  _handleJoinError(conversationId, isOutgoingCall, joinError) {
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        callEntity.setSelfState(false);
-
-        const logMessage = `Failed to join call in '${callEntity.state()}' conversation '${conversationId}'`;
-        this.callLogger.warn(logMessage, joinError);
-
-        const accessErrors = [
-          z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE,
-          z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
-        ];
-        const isAccessError = accessErrors.includes(joinError.type);
-        if (isAccessError) {
-          this.mediaRepository.showNoCameraModal();
-        }
-
-        return isOutgoingCall ? this._deleteCall(callEntity) : this._rejectCall(callEntity, true);
-      })
-      .catch(error => this._handleNotFoundError(error));
-  }
-
-  /**
    * Actively join a call.
    *
    * @private
@@ -1337,19 +1298,6 @@ export class CallingRepository {
 
     this.mediaStreamHandler.releaseMediaStream();
     callEntity.leaveCall(terminationReason);
-  }
-
-  /**
-   * Reject a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call entity to ignore
-   * @param {boolean} shareRejection - Share rejection with other clients
-   * @returns {undefined} No return value
-   */
-  _rejectCall(callEntity, shareRejection) {
-    this.callLogger.info(`Rejecting call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.rejectCall(shareRejection);
   }
 
   /**

@@ -204,7 +204,7 @@ class ConversationListCallingCell {
   }
 
   onRejectCall() {
-    amplify.publish(WebAppEvents.CALL.STATE.REJECT, this.conversation.id);
+    this.callingRepository.rejectCall(this.conversation().id);
   }
 
   onToggleAudio(data, event) {

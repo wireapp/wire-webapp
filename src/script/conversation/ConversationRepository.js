@@ -3633,7 +3633,7 @@ export class ConversationRepository {
     if (!conversationEntity.showNotificationsEverything()) {
       const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
       if (hasIncomingCall) {
-        amplify.publish(WebAppEvents.CALL.STATE.REJECT, conversationEntity.id, false);
+        this.callingRepository.rejectCall(conversationEntity.id);
       }
     }
 
