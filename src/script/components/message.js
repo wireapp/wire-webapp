@@ -98,6 +98,7 @@ class Message {
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
+    this.StatusType = StatusType;
 
     if (message.has_asset_text()) {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
