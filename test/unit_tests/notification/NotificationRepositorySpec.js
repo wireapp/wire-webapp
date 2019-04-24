@@ -35,6 +35,10 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
 
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
@@ -242,7 +246,7 @@ describe('NotificationRepository', () => {
 
     it('for a successfully completed call', () => {
       message_et = new z.entity.CallMessage();
-      message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+      message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
       message_et.finished_reason = TERMINATION_REASON.COMPLETED;
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
@@ -283,7 +287,7 @@ describe('NotificationRepository', () => {
       textMessage.add_asset(generateTextAsset());
 
       const callMessage = new z.entity.CallMessage();
-      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
       allMessageTypes = {
         call: callMessage,
         content: textMessage,
@@ -358,7 +362,7 @@ describe('NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
         message_et.user(user_et);
       });
 
@@ -377,7 +381,7 @@ describe('NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
         message_et.finished_reason = TERMINATION_REASON.MISSED;
         message_et.user(user_et);
       });
@@ -521,7 +525,7 @@ describe('NotificationRepository', () => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
       message_et.type = BackendEvent.CONVERSATION.CREATE;
-      message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+      message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
       return verify_notification_system(conversation_et, message_et, expected_body);
@@ -559,7 +563,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
+      message_et.memberMessageType = SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
@@ -657,21 +661,21 @@ describe('NotificationRepository', () => {
 
     it('if a connection request is incoming', () => {
       connectionEntity.status = 'pending';
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
@@ -769,7 +773,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({messageId: createRandomUuid(), userId});
+      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
@@ -781,7 +785,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({
+      const quoteEntity = new QuoteEntity({
         messageId: createRandomUuid(),
         userId: createRandomUuid(),
       });

@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -25,7 +26,7 @@ window.z.entity = z.entity || {};
 z.entity.PingMessage = class PingMessage extends z.entity.Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.PING;
+    this.super_type = SuperType.PING;
 
     this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationPingYou') : t('conversationPing')));
 

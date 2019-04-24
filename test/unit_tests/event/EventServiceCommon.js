@@ -16,7 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {createRandomUuid} from 'utils/util';
+import {MessageCategory} from 'src/script/message/MessageCategory';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -276,7 +278,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('should return no entry matches the given category', () => {
         return TestFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.VIDEO)
+          .loadEventsWithCategory(events[0].conversation, MessageCategory.VIDEO)
           .then(result => {
             expect(result.length).toBe(0);
           });
@@ -284,7 +286,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('should get images in the correct order', () => {
         return TestFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE)
+          .loadEventsWithCategory(events[0].conversation, MessageCategory.IMAGE)
           .then(result => {
             expect(result.length).toBe(2);
             expect(result[0].id).toBe(events[1].id);

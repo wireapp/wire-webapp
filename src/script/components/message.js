@@ -25,6 +25,9 @@ import {includesOnlyEmojis} from 'utils/EmojiUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {WebAppEvents} from '../event/WebApp';
 
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+
 import './asset/audioAsset';
 import './asset/fileAsset';
 import './asset/imageAsset';
@@ -129,9 +132,9 @@ class Message {
 
   getSystemMessageIconComponent(message) {
     const iconComponents = {
-      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-      [z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
+      [SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+      [SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
     };
     return iconComponents[message.system_message_type];
   }
@@ -199,7 +202,7 @@ class Message {
       });
     }
 
-    const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
+    const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
       messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
     if (canDelete) {
@@ -284,7 +287,7 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>

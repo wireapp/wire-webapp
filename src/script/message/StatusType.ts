@@ -17,14 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different reactions.
- * @returns {z.message.ReactionType} Enum of reactions
- */
-z.message.ReactionType = {
-  LIKE: '❤️',
-  NONE: '',
-};
+/** Enum for different confirmation types */
+export enum StatusType {
+  DELIVERED = 3,
+  FAILED = 0,
+  SEEN = 4,
+  SENDING = 1,
+  SENT = 2,
+  UNSPECIFIED = -1,
+}

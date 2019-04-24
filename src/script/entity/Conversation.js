@@ -33,6 +33,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
 import {WebAppEvents} from '../event/WebApp';
+import {StatusType} from '../message/StatusType';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -671,7 +672,7 @@ export class Conversation {
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= z.message.StatusType.DELIVERED;
+        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
         return isDelivered && messageEntity.user().is_me;
       });
   }

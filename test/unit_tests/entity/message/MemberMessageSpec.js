@@ -21,6 +21,8 @@ import {User} from 'src/script/entity/User';
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'utils/util';
 
+import {StatusType} from 'src/script/message/StatusType';
+
 describe('Member Message', () => {
   describe('generateNameString', () => {
     let message_et = null;
@@ -91,7 +93,7 @@ describe('Member Message', () => {
 
     it('should not be deletable while message is sending', () => {
       message_et.assets.push(new z.entity.Text());
-      message_et.status(z.message.StatusType.SENDING);
+      message_et.status(StatusType.SENDING);
 
       expect(message_et.is_deletable()).toBe(false);
     });

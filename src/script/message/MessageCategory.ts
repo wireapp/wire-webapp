@@ -17,14 +17,21 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different call message types.
- * @returns {z.message.CALL_MESSAGE_TYPE} Enum of call message types
- */
-z.message.CALL_MESSAGE_TYPE = {
-  ACTIVATED: 'activated',
-  DEACTIVATED: 'deactivated',
-};
+/** Enum for different message categories */
+export enum MessageCategory {
+  AUDIO = 1 << 10,
+  EXCLUDED = 1 << 1,
+  FILE = 1 << 9,
+  GIF = 1 << 8,
+  IMAGE = 1 << 7,
+  KNOCK = 1 << 2,
+  LIKED = 1 << 13,
+  LINK = 1 << 5,
+  LINK_PREVIEW = 1 << 6,
+  LOCATION = 1 << 12,
+  NONE = 0,
+  SYSTEM = 1 << 3,
+  TEXT = 1 << 4,
+  UNDEFINED = 1 << 0,
+  VIDEO = 1 << 11,
+}

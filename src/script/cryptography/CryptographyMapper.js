@@ -23,6 +23,7 @@ import {AvailabilityType} from '../user/AvailabilityType';
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
+import {StatusType} from '../message/StatusType';
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
@@ -276,9 +277,9 @@ export class CryptographyMapper {
         status: (() => {
           switch (confirmation.type) {
             case Confirmation.Type.DELIVERED:
-              return z.message.StatusType.DELIVERED;
+              return StatusType.DELIVERED;
             case Confirmation.Type.READ:
-              return z.message.StatusType.SEEN;
+              return StatusType.SEEN;
             default:
               const message = 'Unhandled confirmation type';
               throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);

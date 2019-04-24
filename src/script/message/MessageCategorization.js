@@ -18,6 +18,7 @@
  */
 
 import {ClientEvent} from '../event/Client';
+import {MessageCategory} from '../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.message = z.message || {};
@@ -30,12 +31,12 @@ z.message.MessageCategorization = (() => {
     if (isAssetAdd) {
       const isTagUndefined = eventData.info.tag === undefined;
       if (isTagUndefined) {
-        return z.message.MessageCategory.FILE;
+        return MessageCategory.FILE;
       }
 
-      let category = z.message.MessageCategory.IMAGE;
+      let category = MessageCategory.IMAGE;
       if (eventData.content_type === 'image/gif') {
-        category = category | z.message.MessageCategory.GIF;
+        category = category | MessageCategory.GIF;
       }
 
       return category;
@@ -45,14 +46,14 @@ z.message.MessageCategorization = (() => {
   const _checkLocation = event => {
     const isLocation = event.type === ClientEvent.CONVERSATION.LOCATION;
     if (isLocation) {
-      return z.message.MessageCategory.LOCATION;
+      return MessageCategory.LOCATION;
     }
   };
 
   const _checkPing = event => {
     const isPing = event.type === ClientEvent.CONVERSATION.KNOCK;
     if (isPing) {
-      return z.message.MessageCategory.KNOCK;
+      return MessageCategory.KNOCK;
     }
   };
 
@@ -61,11 +62,11 @@ z.message.MessageCategorization = (() => {
 
     const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
     if (isMessageAdd) {
-      let category = z.message.MessageCategory.TEXT;
+      let category = MessageCategory.TEXT;
 
       const isLinkPreview = eventData.previews && !!eventData.previews.length;
       if (isLinkPreview) {
-        category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
+        category = category | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
       }
 
       return category;
@@ -76,7 +77,7 @@ z.message.MessageCategorization = (() => {
     categoryFromEvent: event => {
       try {
         const eventReactions = event.reactions;
-        let category = z.message.MessageCategory.NONE;
+        let category = MessageCategory.NONE;
 
         const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
         for (const check of categoryChecks) {
@@ -89,12 +90,12 @@ z.message.MessageCategorization = (() => {
 
         const isReaction = _.isObject(eventReactions) && !!Object.keys(eventReactions).length;
         if (isReaction) {
-          category = category | z.message.MessageCategory.LIKED;
+          category = category | MessageCategory.LIKED;
         }
 
         return category;
       } catch (error) {
-        return z.message.MessageCategory.UNDEFINED;
+        return MessageCategory.UNDEFINED;
       }
     },
   };

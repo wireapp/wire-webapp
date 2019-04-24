@@ -28,6 +28,7 @@ import {t} from 'utils/LocalizerUtil';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 /*
  * Message list rendering view model.
@@ -429,16 +430,14 @@ class MessageListViewModel {
       return;
     }
 
-    this.conversation_repository
-      .get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
-      .then(items => {
-        const message_ets = items.filter(
-          item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF)
-        );
-        const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
+    this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
+      const message_ets = items.filter(
+        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF)
+      );
+      const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-        amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
-      });
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+    });
   }
 
   get_timestamp_class(messageEntity) {
