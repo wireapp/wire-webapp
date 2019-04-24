@@ -31,6 +31,7 @@ import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -101,7 +102,7 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new z.entity.File();
-        file_et.status(z.assets.AssetTransferState.UPLOADING);
+        file_et.status(AssetTransferState.UPLOADING);
         message_et = new z.entity.ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
         conversation_et.add_message(message_et);
@@ -136,7 +137,7 @@ describe('ConversationRepository', () => {
 
         expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
         expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-        expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
+        expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
       });
     });
   });

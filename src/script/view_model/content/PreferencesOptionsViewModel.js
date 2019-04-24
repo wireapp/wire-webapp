@@ -26,14 +26,15 @@ import {WebAppEvents} from '../../event/WebApp';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {downloadBlob} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ConnectSource} from '../../connect/ConnectSource';
+import {AudioPreference} from '../../audio/AudioPreference';
+
+window.z = window.z || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
@@ -83,6 +84,8 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     this.updateProperties(this.propertiesRepository.properties);
+
+    this.AudioPreference = AudioPreference;
   }
 
   connectMacOSContacts() {

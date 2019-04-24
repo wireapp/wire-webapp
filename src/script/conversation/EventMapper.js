@@ -22,7 +22,9 @@ import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {base64ToArray} from 'utils/util';
+
 import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {MediumImage} from '../entity/message/MediumImage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
@@ -643,7 +645,7 @@ export class EventMapper {
       assetEntity.preview_resource(remoteDataPreview);
     }
 
-    assetEntity.status(status || z.assets.AssetTransferState.UPLOAD_PENDING);
+    assetEntity.status(status || AssetTransferState.UPLOAD_PENDING);
 
     return assetEntity;
   }
