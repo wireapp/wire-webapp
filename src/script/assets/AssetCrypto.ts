@@ -17,13 +17,11 @@
  *
  */
 
-/**
- * @param {ArrayBuffer} cipherText - Encrypted plaintext
- * @param {ArrayBuffer} keyBytes - AES key used for encryption
- * @param {ArrayBuffer} referenceSha256 - SHA-256 checksum of the cipherText
- * @returns {Promise} Resolves with the decrypted asset
- */
-export const decryptAesAsset = (cipherText, keyBytes, referenceSha256) => {
+export const decryptAesAsset = (
+  cipherText: ArrayBuffer,
+  keyBytes: ArrayBuffer,
+  referenceSha256: ArrayBuffer
+): PromiseLike<ArrayBuffer> => {
   return window.crypto.subtle
     .digest('SHA-256', cipherText)
     .then(computedSha256 => {
@@ -40,16 +38,14 @@ export const decryptAesAsset = (cipherText, keyBytes, referenceSha256) => {
     });
 };
 
-/**
- * @param {ArrayBuffer} plaintext - Plaintext asset to be encrypted
- * @returns {Promise} Resolves with the encrypted asset
- */
-export const encryptAesAsset = plaintext => {
+export const encryptAesAsset = (
+  plaintext: ArrayBuffer
+): PromiseLike<{cipherText: ArrayBuffer; keyBytes: ArrayBuffer; sha256: ArrayBuffer}> => {
   const iv = _generateRandomBytes(16);
   const rawKeyBytes = _generateRandomBytes(32);
-  let key = null;
-  let ivCipherText = null;
-  let computedSha256 = null;
+  let key: CryptoKey;
+  let ivCipherText: Uint8Array;
+  let computedSha256: ArrayBuffer;
 
   return window.crypto.subtle
     .importKey('raw', rawKeyBytes.buffer, 'AES-CBC', true, ['encrypt'])
@@ -73,13 +69,13 @@ export const encryptAesAsset = plaintext => {
     .then(keyBytes => ({cipherText: ivCipherText.buffer, keyBytes: keyBytes, sha256: computedSha256}));
 };
 
-const _equalHashes = (bufferA, bufferB) => {
+const _equalHashes = (bufferA: ArrayBuffer, bufferB: ArrayBuffer) => {
   const arrayA = new Uint32Array(bufferA);
   const arrayB = new Uint32Array(bufferB);
   return arrayA.length === arrayB.length && arrayA.every((value, index) => value === arrayB[index]);
 };
 
-const _generateRandomBytes = length => {
+const _generateRandomBytes = (length: number) => {
   const getRandomValue = () => {
     const buffer = new Uint32Array(1);
     window.crypto.getRandomValues(buffer);
