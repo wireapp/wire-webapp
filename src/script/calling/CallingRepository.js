@@ -51,7 +51,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventName} from '../tracking/EventName';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {getAvsInstance} from './avs/avs_wcall';
+import {getAvsInstance} from 'avs-web';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -146,6 +146,7 @@ export class CallingRepository {
           );
 
           callingApi.set_state_handler(wUser, (conversationId, state) => {
+            log('state_handler')(conversationId, state);
             const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
               conversationId,
               startedAt: ko.observable(),
