@@ -17,11 +17,12 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import JSZip from 'jszip';
 
+import {getLogger} from 'utils/Logger';
+
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {ClientEvent} from '../event/Client';
 
 import {BackupService} from './BackupService';
 import {chunk} from 'utils/ArrayUtil';
@@ -139,7 +140,7 @@ class BackupRepository {
 
       for (let index = tableRows.length - 1; index >= 0; index -= 1) {
         const event = tableRows[index];
-        const isTypeVerification = event.type === z.event.Client.CONVERSATION.VERIFICATION;
+        const isTypeVerification = event.type === ClientEvent.CONVERSATION.VERIFICATION;
         if (isTypeVerification) {
           tableRows.splice(index, 1);
         }

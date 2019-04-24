@@ -18,14 +18,16 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
 
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {WebappProperties} from './WebappProperties';
 import {PROPERTIES_TYPE} from './PropertiesType';
-import {t} from 'utils/LocalizerUtil';
+
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -61,7 +63,7 @@ class PropertiesRepository {
     return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
             action: () => {
               this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
               this._publishProperties();
@@ -159,7 +161,7 @@ class PropertiesRepository {
   }
 
   _publishProperties() {
-    amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
+    amplify.publish(WebAppEvents.PROPERTIES.UPDATED, this.properties);
     return this.properties;
   }
 
@@ -259,28 +261,28 @@ class PropertiesRepository {
   _publishPropertyUpdate(propertiesType, updatedPreference) {
     switch (propertiesType) {
       case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
         break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;
       case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
         break;
       case PROPERTIES_TYPE.ENABLE_DEBUGGING:
         amplify.publish(getLogger.prototype.LOG_ON_DEBUG, updatedPreference);
         break;
       case PROPERTIES_TYPE.NOTIFICATIONS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
         break;
       case PROPERTIES_TYPE.PREVIEWS.SEND:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
         break;
       case PROPERTIES_TYPE.PRIVACY:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

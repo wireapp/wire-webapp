@@ -27,6 +27,7 @@ import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {NotificationsViewModel} from './panel/NotificationsViewModel';
 import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -97,7 +98,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.conversationEntity.subscribe(this._forceClosePanel.bind(this), null, 'beforeChange');
     this.subViews = this.buildSubViews();
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this._switchContent.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent.bind(this));
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 

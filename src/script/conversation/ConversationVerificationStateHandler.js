@@ -18,7 +18,9 @@
  */
 
 import {getLogger} from 'utils/Logger';
+
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -30,10 +32,10 @@ export class ConversationVerificationStateHandler {
     this.serverTimeHandler = serverTimeHandler;
     this.logger = getLogger('ConversationVerificationStateHandler');
 
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
   }
 
   /**

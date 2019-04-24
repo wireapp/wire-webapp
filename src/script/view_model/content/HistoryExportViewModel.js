@@ -22,6 +22,8 @@ import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 import {downloadBlob} from 'utils/util';
 
+import {WebAppEvents} from '../../event/WebApp';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -87,7 +89,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
+    amplify.subscribe(WebAppEvents.BACKUP.EXPORT.START, this.exportHistory.bind(this));
   }
 
   exportHistory() {
@@ -120,7 +122,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onCancel() {
@@ -139,7 +141,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(archiveBlob) {
@@ -153,6 +155,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   dismissExport() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 };

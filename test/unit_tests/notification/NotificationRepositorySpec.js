@@ -32,6 +32,8 @@ import {PermissionStatusState} from 'src/script/permission/PermissionStatusState
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {BackendEvent} from 'src/script/event/Backend';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -52,7 +54,7 @@ describe('NotificationRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
@@ -518,7 +520,7 @@ describe('NotificationRepository', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.type = z.event.Backend.CONVERSATION.CREATE;
+      message_et.type = BackendEvent.CONVERSATION.CREATE;
       message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
@@ -563,7 +565,7 @@ describe('NotificationRepository', () => {
 
     describe('if people are added', () => {
       beforeEach(() => {
-        message_et.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
 
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
@@ -598,7 +600,7 @@ describe('NotificationRepository', () => {
 
     describe('if people are removed', () => {
       beforeEach(() => {
-        message_et.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 

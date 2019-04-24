@@ -24,6 +24,7 @@ import {TimeUtil} from 'utils/TimeUtil';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -98,8 +99,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
   addedToView() {
     window.setTimeout(() => {
-      amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () => this.showDetails());
-      amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => {
+      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => this.showDetails());
+      amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
         if (this.isActivatedAccount()) {
           this.showAddParticipant();
         }
@@ -108,12 +109,12 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   removedFromView() {
-    amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PEOPLE);
-    amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.ADD_PEOPLE);
+    amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
+    amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   }
 
   clickOnCallButton() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, MediaType.AUDIO);
+    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO);
   }
 
   clickOnDetails() {
@@ -121,11 +122,11 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   clickOnVideoButton() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, MediaType.AUDIO_VIDEO);
+    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO_VIDEO);
   }
 
   clickOnCollectionButton() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
   showAddParticipant() {
@@ -138,7 +139,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     return this.conversationEntity().isGroup()
       ? this.showDetails(true)
       : amplify.publish(
-          z.event.WebApp.CONVERSATION.CREATE_GROUP,
+          WebAppEvents.CONVERSATION.CREATE_GROUP,
           'conversation_details',
           this.conversationEntity().firstUserEntity()
         );

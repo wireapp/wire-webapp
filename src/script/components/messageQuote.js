@@ -20,6 +20,8 @@
 import moment from 'moment';
 import {includesOnlyEmojis} from 'utils/EmojiUtil';
 
+import {WebAppEvents} from '../event/WebApp';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -99,12 +101,12 @@ z.components.MessageQuote = class MessageQuote {
       }
     };
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
 
     this.removedFromView = () => {
-      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
-      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
     };
   }
 

@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {WebAppEvents} from '../../event/WebApp';
 
 class TemporaryGuestViewModel {
   /**
@@ -45,11 +46,11 @@ class TemporaryGuestViewModel {
   }
 
   clickOnPreferencesButton() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   }
 
   clickToCreateAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => window.location.replace(`/auth/${location.search}`),
       preventClose: true,
       text: {

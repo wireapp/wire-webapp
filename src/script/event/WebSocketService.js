@@ -17,11 +17,12 @@
  *
  */
 
-import {AuthRepository} from '../auth/AuthRepository';
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
-
 import * as StorageUtil from 'utils/StorageUtil';
+
+import {AuthRepository} from '../auth/AuthRepository';
+import {WebAppEvents} from './WebApp';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -73,7 +74,7 @@ z.event.WebSocketService = class WebSocketService {
 
     this.pendingReconnectTrigger = undefined;
 
-    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, this.pendingReconnect.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED, this.pendingReconnect.bind(this));
   }
 
   /**
@@ -155,7 +156,7 @@ z.event.WebSocketService = class WebSocketService {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
-        z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
+        WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW,
         AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
       );
     }
@@ -182,9 +183,9 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
-    amplify.publish(z.event.WebApp.CONNECTION.ONLINE);
+    amplify.publish(WebAppEvents.CONNECTION.ONLINE);
   }
 
   /**
@@ -206,7 +207,7 @@ z.event.WebSocketService = class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }

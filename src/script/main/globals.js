@@ -8,6 +8,9 @@ import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 
+// Needed for the wrapper
+import '../event/WebApp';
+
 import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';
 import CryptoGlobal from '../util/Crypto.js';
@@ -81,18 +84,13 @@ import CryptographyServiceGlobal from '../cryptography/CryptographyService.js';
 import GenericMessageTypeGlobal from '../cryptography/GenericMessageType.js';
 import ProtoMessageTypeGlobal from '../cryptography/ProtoMessageType.js';
 import ephemeralTimingsGlobal from '../ephemeral/ephemeralTimings.js';
-import BackendGlobal from '../event/Backend.js';
-import ClientGlobal from '../event/Client.js';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
 import EventServiceNoCompoundGlobal from '../event/EventServiceNoCompound.js';
-import EventTypeGlobal from '../event/EventType.js';
-import EventTypeHandlingGlobal from '../event/EventTypeHandling.js';
 import NotificationHandlingStateGlobal from '../event/NotificationHandlingState.js';
 import NotificationServiceGlobal from '../event/NotificationService.js';
 import QuotedMessageMiddlewareGlobal from '../event/preprocessor/QuotedMessageMiddleware.js';
 import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js';
-import WebAppGlobal from '../event/WebApp.js';
 import WebSocketServiceGlobal from '../event/WebSocketService.js';
 import IntegrationMapperGlobal from '../integration/IntegrationMapper.js';
 import IntegrationRepositoryGlobal from '../integration/IntegrationRepository.js';

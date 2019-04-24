@@ -21,7 +21,8 @@ import UUID from 'uuidjs';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {Backend as backendEvent} from 'src/script/event/Backend';
+import {BackendEvent} from 'src/script/event/Backend';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('PreferenceNotificationRepository', () => {
   const user = {id: UUID.genV4().hexString};
@@ -43,9 +44,9 @@ describe('PreferenceNotificationRepository', () => {
   it('adds new notification when read receipt settings are changed', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
-    amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, {
+    amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, {
       key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
-      type: backendEvent.USER.PROPERTIES_SET,
+      type: BackendEvent.USER.PROPERTIES_SET,
       value: true,
     });
 
@@ -60,7 +61,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user.id, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, user.id, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(1);
     expect(preferenceNotificationRepository.notifications()[0]).toEqual({
@@ -73,7 +74,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, UUID.genV4().hexString, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, UUID.genV4().hexString, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);
   });

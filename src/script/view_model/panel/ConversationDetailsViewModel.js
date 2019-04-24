@@ -25,6 +25,7 @@ import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 import {NotificationSetting} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {WebAppEvents} from '../../event/WebApp';
 
 import '../../components/panel/panelActions';
 
@@ -294,7 +295,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
+    amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
   clickOnDevices() {
