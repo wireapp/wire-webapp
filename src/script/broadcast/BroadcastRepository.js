@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {WebAppEvents} from '../event/WebApp';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
@@ -53,7 +54,7 @@ class BroadcastRepository {
     Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
     The heavy lifting resides in generalizing the `clientMismatchHandler` so that it doesn't need to directly call the ConversationRepo
     */
-    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
+    amplify.subscribe(WebAppEvents.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
       this.broadcastGenericMessage(genericMessage, recipients);
     });
   }

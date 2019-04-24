@@ -18,6 +18,8 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {ClientEvent} from '../Client';
+import {BackendEvent} from '../Backend';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -38,10 +40,10 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
 
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+      case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this._process1To1ConversationCreationEvent(event);
 
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+      case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._processMemberJoinEvent(event);
 
       default:

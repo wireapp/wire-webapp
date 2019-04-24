@@ -18,15 +18,16 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {alias} from 'utils/util';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
-import {generatePermissionHelpers} from '../../user/UserPermission';
 import {t} from 'utils/LocalizerUtil';
 import {User} from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
-import {alias} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
+import {WebAppEvents} from '../../event/WebApp';
 
 class StartUIViewModel {
   static get STATE() {
@@ -226,7 +227,7 @@ class StartUIViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
   }
 
   clickOnClose() {
@@ -242,27 +243,27 @@ class StartUIViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'start_ui');
+    amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui');
   }
 
   clickOnCreateGuestRoom() {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   }
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -380,7 +381,7 @@ class StartUIViewModel {
   _closeList() {
     $('user-input input').blur();
 
-    amplify.publish(z.event.WebApp.SEARCH.HIDE);
+    amplify.publish(WebAppEvents.SEARCH.HIDE);
     this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     this.resetView();
@@ -532,7 +533,7 @@ class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
             text: {
               action: t('modalUploadContactsAction'),

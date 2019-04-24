@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {CALL_STATE} from '../calling/enum/CallState';
 import {MediaType} from '../media/MediaType';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -56,27 +57,27 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
   }
 
   _subscribeIncomingCall() {
-    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.onRejectCall);
+    amplify.subscribe(WebAppEvents.SHORTCUT.CALL_REJECT, this.onRejectCall);
   }
 
   _subscribeOutgoingOrOngoingCall() {
-    amplify.subscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.onMuteCall);
+    amplify.subscribe(WebAppEvents.SHORTCUT.CALL_MUTE, this.onMuteCall);
   }
 
   _unsubscribeShortcuts() {
-    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.onMuteCall);
-    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.onRejectCall);
+    amplify.unsubscribe(WebAppEvents.SHORTCUT.CALL_MUTE, this.onMuteCall);
+    amplify.unsubscribe(WebAppEvents.SHORTCUT.CALL_REJECT, this.onRejectCall);
   }
 
   onMuteCall() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
+      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
     }
   }
 
   onRejectCall() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, this.joinedCall().id);
+      amplify.publish(WebAppEvents.CALL.STATE.REJECT, this.joinedCall().id);
     }
   }
 };

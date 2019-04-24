@@ -27,6 +27,7 @@ import {User} from 'src/script/entity/User';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {BackendEvent} from 'src/script/event/Backend';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -970,7 +971,7 @@ describe('Conversation', () => {
       conversationEntity.messages_unordered.removeAll();
 
       const memberLeaveMessage = new z.entity.MemberMessage();
-      memberLeaveMessage.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+      memberLeaveMessage.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
       memberLeaveMessage.timestamp(timestamp + 100);
       conversationEntity.messages_unordered.push(memberLeaveMessage);
 
@@ -987,13 +988,13 @@ describe('Conversation', () => {
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       const memberJoinMessage = new z.entity.MemberMessage();
-      memberJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      memberJoinMessage.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
       memberJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(memberJoinMessage);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       const selfJoinMessage = new z.entity.MemberMessage();
-      selfJoinMessage.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+      selfJoinMessage.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
       selfJoinMessage.userIds.push(selfUserEntity.id);
       selfJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(selfJoinMessage);

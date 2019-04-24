@@ -18,8 +18,11 @@
  */
 
 import {Quote} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'utils/Logger';
 import {base64ToArray} from 'utils/util';
+
+import {ClientEvent} from '../Client';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -49,13 +52,13 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
    */
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
         if (event.data.replacing_message_id) {
           return this._handleEditEvent(event);
         }
         return this._handleAddEvent(event);
 
-      case z.event.Client.CONVERSATION.MESSAGE_DELETE:
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         return this._handleDeleteEvent(event);
 
       default:

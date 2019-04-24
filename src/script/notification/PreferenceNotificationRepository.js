@@ -20,9 +20,11 @@
 import {groupBy} from 'underscore';
 import {amplify} from 'amplify';
 
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {Backend as backendEvent} from '../event/Backend';
 import * as StorageUtil from 'utils/StorageUtil';
+
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 /**
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
@@ -61,9 +63,9 @@ class PreferenceNotificationRepository {
       };
     };
 
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, executeIfSelfUser(this.onClientAdd.bind(this)));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, executeIfSelfUser(this.onClientRemove.bind(this)));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, executeIfSelfUser(this.onClientAdd.bind(this)));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, executeIfSelfUser(this.onClientRemove.bind(this)));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
   getNotifications() {
@@ -94,7 +96,7 @@ class PreferenceNotificationRepository {
   }
 
   onUserEvent(event) {
-    if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
+    if (event.type === BackendEvent.USER.PROPERTIES_DELETE || event.type === BackendEvent.USER.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
         this.notifications.push({

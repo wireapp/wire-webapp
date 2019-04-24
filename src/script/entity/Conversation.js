@@ -32,6 +32,8 @@ import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
+import {WebAppEvents} from '../event/WebApp';
+
 export class Conversation {
   static get TIMESTAMP_TYPE() {
     return {
@@ -309,7 +311,7 @@ export class Conversation {
     });
 
     this.shouldPersistStateChanges = false;
-    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.publishPersistState = _.debounce(() => amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this), 100);
 
     this._initSubscriptions();
   }
@@ -410,7 +412,7 @@ export class Conversation {
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
   }

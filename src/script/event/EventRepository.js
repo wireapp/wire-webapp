@@ -20,9 +20,16 @@
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
 import {t} from 'utils/LocalizerUtil';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {koArrayPushAll} from 'utils/util';
+
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
+
+import {EVENT_TYPE} from './EventType';
+import {ClientEvent} from './Client';
+import {EventTypeHandling} from './EventTypeHandling';
+import {BackendEvent} from './Backend';
+import {WebAppEvents} from './WebApp';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -89,14 +96,14 @@ z.event.EventRepository = class EventRepository {
 
     this.notificationHandlingState = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
       const isHandlingWebSocket = handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         this._handleBufferedNotifications();
         const previouslyHandlingRecovery = this.previousHandlingState === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
         if (previouslyHandlingRecovery) {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
       }
       this.previousHandlingState = handling_state;
@@ -155,7 +162,7 @@ z.event.EventRepository = class EventRepository {
 
     this.eventProcessMiddlewares = [];
 
-    amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
   }
 
   /**
@@ -359,7 +366,7 @@ z.event.EventRepository = class EventRepository {
    */
   recoverFromStream() {
     this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
     return this._updateFromStream(this._getLastKnownNotificationId())
       .then(numberOfNotifications => {
@@ -371,7 +378,7 @@ z.event.EventRepository = class EventRepository {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
           this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         }
       });
   }
@@ -406,12 +413,12 @@ z.event.EventRepository = class EventRepository {
       return eventDate;
     }
 
-    const isTypeUserClientAdd = eventType === z.event.Backend.USER.CLIENT_ADD;
+    const isTypeUserClientAdd = eventType === BackendEvent.USER.CLIENT_ADD;
     if (isTypeUserClientAdd) {
       return client.time;
     }
 
-    const isTypeUserConnection = eventType === z.event.Backend.USER.CONNECTION;
+    const isTypeUserConnection = eventType === BackendEvent.USER.CONNECTION;
     if (isTypeUserConnection) {
       return connection.lastUpdate;
     }
@@ -438,7 +445,7 @@ z.event.EventRepository = class EventRepository {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
       const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
       if (!lastNotificationIdEqualsMissedId) {
-        amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
         this.notificationService.saveMissedIdToDb(this.lastNotificationId());
       }
     });
@@ -512,7 +519,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
+      amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
     }
   }
 
@@ -566,17 +573,17 @@ z.event.EventRepository = class EventRepository {
 
     const [category] = type.split('.');
     switch (category) {
-      case z.event.EVENT_TYPE.CALL:
-        amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.CALL:
+        amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.CONVERSATION:
-        amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.CONVERSATION:
+        amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.TEAM:
-        amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.TEAM:
+        amplify.publish(WebAppEvents.TEAM.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.USER:
-        amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.USER:
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, event, source);
         break;
       default:
         amplify.publish(type, event, source);
@@ -612,7 +619,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   processEvent(event, source) {
-    const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
     const mapEvent = isEncryptedEvent
       ? this.cryptographyRepository.handleEncryptedEvent(event)
       : Promise.resolve(event);
@@ -626,7 +633,7 @@ z.event.EventRepository = class EventRepository {
         }, Promise.resolve(mappedEvent));
       })
       .then(mappedEvent => {
-        const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
       .then(savedEvent => this._handleEventDistribution(savedEvent, source));
@@ -648,7 +655,7 @@ z.event.EventRepository = class EventRepository {
       this._updateLastEventDate(eventDate);
     }
 
-    const isCallEvent = event.type === z.event.Client.CALL.E_CALL;
+    const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
     if (isCallEvent) {
       this._validateCallEventLifetime(event);
     }
@@ -723,10 +730,10 @@ z.event.EventRepository = class EventRepository {
 
   _handleDuplicatedEvent(originalEvent, newEvent) {
     switch (newEvent.type) {
-      case z.event.Client.CONVERSATION.ASSET_ADD:
+      case ClientEvent.CONVERSATION.ASSET_ADD:
         return this._handleAssetUpdate(originalEvent, newEvent);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
         return this._handleLinkPreviewUpdate(originalEvent, newEvent);
 
       default:
@@ -859,7 +866,7 @@ z.event.EventRepository = class EventRepository {
     return Promise.resolve().then(() => {
       const {time: eventDate, type: eventType} = event;
 
-      const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(eventType);
+      const isIgnoredEvent = EventTypeHandling.IGNORE.includes(eventType);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
         const errorMessage = 'Event ignored: Type ignored';

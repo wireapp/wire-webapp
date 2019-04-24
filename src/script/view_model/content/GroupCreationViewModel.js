@@ -24,6 +24,7 @@ import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {ACCESS_STATE} from '../../conversation/AccessState';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class GroupCreationViewModel {
   static get STATE() {
@@ -114,7 +115,7 @@ export class GroupCreationViewModel {
       .computed(() => this.selectedContacts() && this.stateIsPreferences() && this.contacts())
       .extend({notify: 'always', rateLimit: 500});
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
+    amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
   showCreateGroup = (method, userEntity) => {
@@ -125,7 +126,7 @@ export class GroupCreationViewModel {
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
       method: this.method,
     });
   };
@@ -158,7 +159,7 @@ export class GroupCreationViewModel {
         .then(conversationEntity => {
           this.isShown(false);
 
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+          amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
 
           this._trackGroupCreation(conversationEntity);
         })
@@ -184,7 +185,7 @@ export class GroupCreationViewModel {
         return this.nameError(t('groupCreationPreferencesErrorNameShort'));
       }
 
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
         method: this.method,
       });
 
@@ -220,7 +221,7 @@ export class GroupCreationViewModel {
     }
 
     const eventName = z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
   _trackAddParticipants(conversationEntity) {
@@ -241,6 +242,6 @@ export class GroupCreationViewModel {
       });
     }
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 }

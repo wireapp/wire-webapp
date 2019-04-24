@@ -17,11 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-// Enum of different webapp events.
-z.event.WebApp = {
+/** Enum of different webapp events. */
+export const WebAppEvents = {
   ANALYTICS: {
     EVENT: 'wire.webapp.analytics.event',
     SUPER_PROPERTY: 'wire.webapp.analytics.super_property',
@@ -143,8 +140,8 @@ z.event.WebApp = {
     LOADED: 'wire.webapp.lifecycle.loaded',
     REFRESH: 'wire.webapp.lifecycle.refresh',
     RESTART: 'wire.webapp.lifecycle.restart',
-    SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
     SIGNED_OUT: 'wire.webapp.lifecycle.signed_out',
+    SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
     UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
@@ -223,9 +220,9 @@ z.event.WebApp = {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',
   },
   USER: {
+    CLIENTS_UPDATED: 'wire.webapp.user.clients_updated',
     CLIENT_ADDED: 'wire.webapp.user.client_added',
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
-    CLIENTS_UPDATED: 'wire.webapp.user.clients_updated',
     EVENT_FROM_BACKEND: 'wire.webapp.user.event_from_backend',
     PERSIST: 'wire.webapp.user.persist',
     SET_AVAILABILITY: 'wire.webapp.user.set_availability',
@@ -239,4 +236,8 @@ z.event.WebApp = {
   },
 };
 
-export const WebAppEvents = z.event.WebApp;
+// Needed for the wrapper
+
+window.z = window.z || {};
+window.z.event = z.event || {};
+window.z.event.WebApp = WebAppEvents;

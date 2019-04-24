@@ -18,10 +18,11 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
@@ -142,7 +143,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickOnShowSelfDevices() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
   }
 
   clickToShowSelfFingerprint() {

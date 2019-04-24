@@ -17,12 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.EVENT_TYPE = {
-  CALL: 'call',
-  CONVERSATION: 'conversation',
-  TEAM: 'team',
-  USER: 'user',
-};
+/** Enum of different ephemeral status types */
+export enum EphemeralStatusType {
+  ACTIVE = 1,
+  INACTIVE = 2,
+  NONE = 0,
+  TIMED_OUT = 3,
+}

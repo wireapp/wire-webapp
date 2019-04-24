@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {WebAppEvents} from '../../event/WebApp';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
@@ -63,7 +64,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
 
     this.optionReplaceInlineEmoji = ko.observable();
     this.optionReplaceInlineEmoji.subscribe(emojiPreference => {
@@ -80,12 +81,12 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     this.updateProperties(this.propertiesRepository.properties);
   }
 
   connectMacOSContacts() {
-    amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
+    amplify.publish(WebAppEvents.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
   }
 
   saveCallLogs() {
@@ -103,7 +104,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       return downloadBlob(blob, filename);
     }
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: t('modalCallEmptyLogMessage'),
         title: t('modalCallEmptyLogHeadline'),

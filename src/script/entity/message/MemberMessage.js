@@ -18,7 +18,10 @@
  */
 
 import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+
 import {User} from '../User';
+import {ClientEvent} from '../../event/Client';
+import {BackendEvent} from '../../event/Backend';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -48,7 +51,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.visibleUsers = ko.observable([]);
     this.hiddenUserCount = ko.pureComputed(() => this.joinedUserEntities().length - this.visibleUsers().length);
     this.highlightedUsers = ko.pureComputed(() => {
-      return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
+      return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN ? this.joinedUserEntities() : [];
     });
 
     this.hasUsers = ko.pureComputed(() => this.userEntities().length);
@@ -83,7 +86,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this.senderName = ko.pureComputed(() => {
-      const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+      const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
       return isTeamMemberLeave
         ? this.name()
         : z.util.SanitizationUtil.getFirstName(this.user(), Declension.NOMINATIVE, true);
@@ -163,7 +166,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       }
 
       switch (this.type) {
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
+        case BackendEvent.CONVERSATION.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
             return this.user().is_me
@@ -181,7 +184,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : t('conversationMemberJoined', {name, users}, replaceShowMore);
         }
 
-        case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
+        case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
           const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return t('temporaryGuestLeaveMessage');
@@ -198,7 +201,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : t('conversationMemberRemoved', {name, users: allUsers});
         }
 
-        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
+        case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
           return t('conversationTeamLeft', name);
         }
 
@@ -274,15 +277,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   isMemberJoin() {
-    return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+    return this.type === BackendEvent.CONVERSATION.MEMBER_JOIN;
   }
 
   isMemberLeave() {
-    return this.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+    return this.type === BackendEvent.CONVERSATION.MEMBER_LEAVE;
   }
 
   isTeamMemberLeave() {
-    return this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+    return this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
   }
 
   isMemberRemoval() {

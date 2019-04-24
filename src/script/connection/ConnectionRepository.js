@@ -20,13 +20,16 @@
 import {getLogger} from 'utils/Logger';
 import {koArrayPushAll} from 'utils/util';
 
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+
 window.z = window.z || {};
 window.z.connection = z.connection || {};
 
 z.connection.ConnectionRepository = class ConnectionRepository {
   static get CONFIG() {
     return {
-      SUPPORTED_EVENTS: [z.event.Backend.USER.CONNECTION],
+      SUPPORTED_EVENTS: [BackendEvent.USER.CONNECTION],
     };
   }
   /**
@@ -44,7 +47,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
 
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
   /**
@@ -62,7 +65,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
       this.logger.info(`»» User Event: '${eventType}' (Source: ${source})`, logObject);
 
-      const isUserConnection = eventType === z.event.Backend.USER.CONNECTION;
+      const isUserConnection = eventType === BackendEvent.USER.CONNECTION;
       if (isUserConnection) {
         this.onUserConnection(eventJson, source);
       }
@@ -100,7 +103,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         this.userRepository.updateUserById(connectionEntity.userId);
       }
       this._sendNotification(connectionEntity, source, previousStatus);
-      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
     });
   }
 
@@ -125,7 +128,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
     return this._updateStatus(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -141,7 +144,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
     return this._updateStatus(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -344,7 +347,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
           messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
         }
 
-        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
+        amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
       });
     }
   }

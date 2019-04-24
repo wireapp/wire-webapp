@@ -21,7 +21,10 @@ import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+
 import {createRandomUuid, arrayToBase64} from 'utils/util';
+
+import {ClientEvent} from 'src/script/event/Client';
 
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
@@ -158,7 +161,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT);
       });
     });
 
@@ -176,7 +179,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
 
@@ -194,7 +197,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
   });

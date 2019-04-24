@@ -21,8 +21,13 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
+
 import {createRandomUuid, arrayToBase64} from 'utils/util';
+
 import {AssetUploadFailedReason} from 'src/script/assets/AssetUploadFailedReason';
+import {ClientEvent} from 'src/script/event/Client';
+import {BackendEvent} from 'src/script/event/Backend';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 async function createEncodedCiphertext(
   preKey,
@@ -116,8 +121,8 @@ describe('Event Repository', () => {
 
     it('should fetch last notifications ID from backend if not found in storage', () => {
       const missed_events_spy = jasmine.createSpy();
-      amplify.unsubscribeAll(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-      amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, missed_events_spy);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+      amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, missed_events_spy);
 
       TestFactory.event_repository.connectWebSocket();
       return TestFactory.event_repository.initializeFromStream().then(() => {
@@ -199,21 +204,21 @@ describe('Event Repository', () => {
     });
 
     it('should not save but distribute "user.*" events', () => {
-      return TestFactory.event_repository._handleEvent({type: z.event.Backend.USER.UPDATE}).then(() => {
+      return TestFactory.event_repository._handleEvent({type: BackendEvent.USER.UPDATE}).then(() => {
         expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
       });
     });
 
     it('should not save but distribute "call.*" events', () => {
-      return TestFactory.event_repository._handleEvent({type: z.event.Client.CALL.E_CALL}).then(() => {
+      return TestFactory.event_repository._handleEvent({type: ClientEvent.CALL.E_CALL}).then(() => {
         expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
       });
     });
 
     it('should not save but distribute "conversation.create" events', () => {
-      return TestFactory.event_repository._handleEvent({type: z.event.Backend.CONVERSATION.CREATE}).then(() => {
+      return TestFactory.event_repository._handleEvent({type: BackendEvent.CONVERSATION.CREATE}).then(() => {
         expect(TestFactory.event_service.saveEvent).not.toHaveBeenCalled();
         expect(TestFactory.event_repository._distributeEvent).toHaveBeenCalled();
       });
@@ -358,7 +363,7 @@ describe('Event Repository', () => {
         from: createRandomUuid(),
         id: createRandomUuid(),
         time: new Date().toISOString(),
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       spyOn(TestFactory.event_service, 'saveEvent').and.callFake(saved_event => Promise.resolve(saved_event));
@@ -388,7 +393,7 @@ describe('Event Repository', () => {
     });
 
     it('ignores a non-"text message" with an ID previously used by the same user', () => {
-      event.type = z.event.Client.CALL.E_CALL;
+      event.type = ClientEvent.CALL.E_CALL;
       previously_stored_event = JSON.parse(JSON.stringify(event));
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
@@ -404,7 +409,7 @@ describe('Event Repository', () => {
 
     it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.type = z.event.Client.CALL.E_CALL;
+      previously_stored_event.type = ClientEvent.CALL.E_CALL;
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
 
       return TestFactory.event_repository
@@ -566,13 +571,13 @@ describe('Event Repository', () => {
 
     it('saves a conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
 
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
 
       return TestFactory.event_repository.processEvent(assetAddEvent).then(updatedEvent => {
-        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_service.saveEvent).toHaveBeenCalled();
       });
     });
@@ -590,7 +595,7 @@ describe('Event Repository', () => {
       const testPromises = froms.map(from => {
         const assetAddEvent = Object.assign({}, event, {
           from,
-          type: z.event.Client.CONVERSATION.ASSET_ADD,
+          type: ClientEvent.CONVERSATION.ASSET_ADD,
         });
         const assetCancelEvent = Object.assign({}, assetAddEvent, {
           data: {reason: AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
@@ -601,7 +606,7 @@ describe('Event Repository', () => {
         deleteEventSpy.and.returnValue(Promise.resolve());
 
         return TestFactory.event_repository.processEvent(assetCancelEvent).then(savedEvent => {
-          expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+          expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
           expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
         });
       });
@@ -611,7 +616,7 @@ describe('Event Repository', () => {
 
     it('deletes other user failed upload for conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
         data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
@@ -622,14 +627,14 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_service, 'deleteEvent').and.returnValue(Promise.resolve());
 
       return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
-        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_service.deleteEvent).toHaveBeenCalled();
       });
     });
 
     it('updates self failed upload for conversation.asset-add event', () => {
       const assetAddEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
         data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
@@ -643,14 +648,14 @@ describe('Event Repository', () => {
       );
 
       return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {
-        expect(savedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(TestFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
       });
     });
 
     it('handles conversation.asset-add state update event', () => {
       const initialAssetEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
 
       const updateStatusEvent = Object.assign({}, initialAssetEvent, {
@@ -662,7 +667,7 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
 
       return TestFactory.event_repository.processEvent(updateStatusEvent).then(updatedEvent => {
-        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
         expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
@@ -670,7 +675,7 @@ describe('Event Repository', () => {
 
     it('updates video when preview is received', () => {
       const initialAssetEvent = Object.assign({}, event, {
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
 
       const AssetPreviewEvent = Object.assign({}, initialAssetEvent, {
@@ -682,7 +687,7 @@ describe('Event Repository', () => {
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
 
       return TestFactory.event_repository.processEvent(AssetPreviewEvent).then(updatedEvent => {
-        expect(updatedEvent.type).toEqual(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(updatedEvent.data.preview_key).toEqual(AssetPreviewEvent.data.preview_key);
         expect(TestFactory.event_service.replaceEvent).toHaveBeenCalled();
       });
@@ -692,7 +697,7 @@ describe('Event Repository', () => {
   describe('_handleEventValidation', () => {
     it('ignores "conversation.typing" events', () => {
       TestFactory.event_repository
-        ._handleEventValidation({type: z.event.Backend.CONVERSATION.TYPING})
+        ._handleEventValidation({type: BackendEvent.CONVERSATION.TYPING})
         .then(fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.error.EventError));

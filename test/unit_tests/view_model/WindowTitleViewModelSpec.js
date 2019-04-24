@@ -21,13 +21,14 @@ import ko from 'knockout';
 
 import 'src/script/localization/Localizer';
 import {t} from 'utils/LocalizerUtil';
+import {createRandomUuid} from 'utils/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
-import {createRandomUuid} from 'utils/util';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('WindowTitleViewModel', () => {
   const suffix = t('wire');
@@ -252,7 +253,7 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.type(ConversationType.GROUP);
       conversationEntity.selfUser(new User(createRandomUuid()));
 
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badgeCount => {
+      amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);
         done();
       });
