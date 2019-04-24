@@ -26,10 +26,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {BackupService} from './BackupService';
 import {chunk} from 'utils/ArrayUtil';
 
-window.z = window.z || {};
-window.z.backup = z.backup || {};
-
-z.backup.BackupRepository = class BackupRepository {
+class BackupRepository {
   static get CONFIG() {
     return {
       FILENAME: {
@@ -43,7 +40,6 @@ z.backup.BackupRepository = class BackupRepository {
 
   /**
    * Construct a new Backup repository.
-   * @class z.backup.BackupRepository
    * @param {BackupService} backupService - Backup service implementation
    * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
@@ -51,7 +47,7 @@ z.backup.BackupRepository = class BackupRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
-    this.logger = getLogger('z.backup.BackupRepository');
+    this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
     this.clientRepository = clientRepository;
@@ -331,4 +327,6 @@ z.backup.BackupRepository = class BackupRepository {
       throw new z.backup.IncompatibleBackupError(message);
     }
   }
-};
+}
+
+export {BackupRepository};

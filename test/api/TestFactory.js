@@ -27,6 +27,7 @@ import {resolve, graph, backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {ConnectService} from 'src/script/connect/ConnectService';
 import {ConnectRepository} from 'src/script/connect/ConnectRepository';
@@ -78,7 +79,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
     .then(() => {
       TestFactory.backup_service = resolve(graph.BackupService);
 
-      TestFactory.backup_repository = new z.backup.BackupRepository(
+      TestFactory.backup_repository = new BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
         TestFactory.connection_repository,

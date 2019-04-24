@@ -56,7 +56,6 @@ import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
 import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import ErrorGlobal from '../backup/Error.js';
-import BackupRepositoryGlobal from '../backup/BackupRepository.js';
 import ConnectionEntityGlobal from '../connection/ConnectionEntity.js';
 import ConnectionMapperGlobal from '../connection/ConnectionMapper.js';
 import ConnectionRepositoryGlobal from '../connection/ConnectionRepository.js';
