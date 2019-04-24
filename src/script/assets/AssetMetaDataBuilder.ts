@@ -18,8 +18,6 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import {capToByte, rootMeanSquare} from 'utils/NumberUtil';
-import {TimeUtil} from 'utils/TimeUtil';
 import {chunk} from '../util/ArrayUtil';
 import {capToByte, rootMeanSquare} from '../util/NumberUtil';
 import {TimeUtil} from '../util/TimeUtil';
