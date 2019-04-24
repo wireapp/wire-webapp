@@ -44,7 +44,7 @@ class _ConversationJoinInvalid extends React.PureComponent<
       intl: {formatMessage: _},
     } = this.props;
     return (
-      <UnsupportedBrowser>
+      <UnsupportedBrowser isTemporaryGuest>
         <WirelessContainer>
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2
