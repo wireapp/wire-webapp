@@ -17,20 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
-z.media.MEDIA_STREAM_ERROR_TYPES = {
-  DEVICE: [
-    z.media.MEDIA_STREAM_ERROR.ABORT_ERROR,
-    z.media.MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
-    z.media.MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
-  ],
-  MISC: [
-    z.media.MEDIA_STREAM_ERROR.NOT_SUPPORTED_ERROR,
-    z.media.MEDIA_STREAM_ERROR.OVERCONSTRAINED_ERROR,
-    z.media.MEDIA_STREAM_ERROR.TYPE_ERROR,
-  ],
-  PERMISSION: [z.media.MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR, z.media.MEDIA_STREAM_ERROR.SECURITY_ERROR],
-};
+export enum VIDEO_QUALITY_MODE {
+  FULL_HD = 'z.media.VIDEO_QUALITY_MODE.FULL_HD',
+  GROUP = 'z.media.VIDEO_QUALITY_MODE.GROUP',
+  HD = 'z.media.VIDEO_QUALITY_MODE.MOBILE.HD',
+  MOBILE = 'z.media.VIDEO_QUALITY_MODE.MOBILE',
+}

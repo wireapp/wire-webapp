@@ -41,6 +41,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {MediaType} from '../media/MediaType';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -621,7 +622,7 @@ export class CallingRepository {
       Promise.all(promises)
         .then(([callEntity, grantedCall]) => {
           if (grantedCall) {
-            const mediaType = callEntity.isRemoteVideoCall() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            const mediaType = callEntity.isRemoteVideoCall() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
             return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
               this.joinCall(conversationEntity, mediaType);
             });
@@ -884,7 +885,7 @@ export class CallingRepository {
    * Join a call.
    *
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
   joinCall(conversationEntity, mediaType) {
@@ -943,7 +944,7 @@ export class CallingRepository {
    * User action to toggle one of the media states of a call.
    *
    * @param {string} conversationId - ID of conversation with call
-   * @param {z.media.MediaType} mediaType - MediaType of requested change
+   * @param {MediaType} mediaType - MediaType of requested change
    * @returns {undefined} No return value
    */
   toggleMedia(conversationId, mediaType) {
@@ -953,7 +954,7 @@ export class CallingRepository {
       .catch(error => {
         const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
         if (!isNotFound) {
-          if (mediaType === z.media.MediaType.VIDEO || mediaType === z.media.MediaType.AUDIO_VIDEO) {
+          if (mediaType === MediaType.VIDEO || mediaType === MediaType.AUDIO_VIDEO) {
             this.mediaRepository.showNoCameraModal();
           }
         }
@@ -963,7 +964,7 @@ export class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {z.media.MediaType} mediaType - Media type of call
+   * @param {MediaType} mediaType - Media type of call
    * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
@@ -981,7 +982,7 @@ export class CallingRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @param {CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
@@ -999,7 +1000,7 @@ export class CallingRepository {
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
-      const isVideoCall = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      const isVideoCall = mediaType === MediaType.AUDIO_VIDEO;
       if (isVideoCall && !conversationEntity.supportsVideoCall(isOutgoingCall)) {
         this._showModal(t('modalCallNoGroupVideoHeadline'), t('modalCallNoGroupVideoMessage'));
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
@@ -1164,7 +1165,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call to be joined
-   * @param {z.media.MediaType} mediaType - Media type of the call
+   * @param {MediaType} mediaType - Media type of the call
    * @returns {undefined} No return value
    */
   _initiateJoinCall(callEntity, mediaType) {
@@ -1177,11 +1178,11 @@ export class CallingRepository {
    *
    * @private
    * @param {string} conversationId - ID of conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {Promise} Resolves with a call entity
    */
   _initiateOutgoingCall(conversationId, mediaType) {
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
     const payload = {conversationId};
     const messagePayload = CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
     const callMessageEntity = CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
@@ -1206,7 +1207,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallEntity} callEntity - Call to be joined
-   * @param {z.media.MediaType} mediaType - Media type for this call
+   * @param {MediaType} mediaType - Media type for this call
    * @returns {Promise} Resolves with the call entity
    */
   _initiateMediaStream(callEntity, mediaType) {
@@ -1222,7 +1223,7 @@ export class CallingRepository {
    *
    * @private
    * @param {Conversation} conversationEntity - conversation to join call in
-   * @param {z.media.MediaType} mediaType - Media type of the call
+   * @param {MediaType} mediaType - Media type of the call
    * @param {CALL_STATE} callState - State of call
    * @param {CallEntity} [callEntity] - Retrieved call entity
    * @returns {undefined} No return value
@@ -1309,20 +1310,20 @@ export class CallingRepository {
   /**
    * Toggle media state of a call.
    *
-   * @param {z.media.MediaType} mediaType - MediaType of requested change
+   * @param {MediaType} mediaType - MediaType of requested change
    * @returns {undefined} No return value
    */
   _toggleMediaState(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         return this.mediaStreamHandler.toggleAudioSend();
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         return this.mediaStreamHandler.toggleScreenSend();
       }
 
-      case z.media.MediaType.VIDEO: {
+      case MediaType.VIDEO: {
         return this.mediaStreamHandler.toggleVideoSend();
       }
 
@@ -1408,7 +1409,7 @@ export class CallingRepository {
           const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
 
           if (eventFromWebSocket && callEntity.isRemoteVideoSend() && !hasCallWithoutVideo) {
-            const mediaStreamType = z.media.MediaType.AUDIO_VIDEO;
+            const mediaStreamType = MediaType.AUDIO_VIDEO;
             this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
           }
 
@@ -1525,13 +1526,13 @@ export class CallingRepository {
   /**
    * Get the MediaType from given call event properties.
    * @param {Object} properties - call event properties
-   * @returns {z.media.MediaType} MediaType of call
+   * @returns {MediaType} MediaType of call
    */
   _getMediaTypeFromProperties(properties) {
     const isVideoSend = properties && properties.videosend === PROPERTY_STATE.TRUE;
     const isScreenSend = properties && properties.screensend === PROPERTY_STATE.TRUE;
     const isTypeVideo = isVideoSend || isScreenSend;
-    return isTypeVideo ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+    return isTypeVideo ? MediaType.VIDEO : MediaType.AUDIO;
   }
 
   /**

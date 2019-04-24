@@ -20,6 +20,7 @@
 import {getLogger} from 'utils/Logger';
 
 import {CALL_STATE} from '../calling/enum/CallState';
+import {MediaType} from '../media/MediaType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -69,7 +70,7 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
 
   onMuteCall() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.AUDIO);
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
     }
   }
 

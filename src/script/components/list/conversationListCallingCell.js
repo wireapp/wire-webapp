@@ -23,6 +23,7 @@ import {afterRender} from 'utils/util';
 
 import {PermissionState} from '../../notification/PermissionState';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import {MediaType} from '../../media/MediaType';
 
 class ConversationListCallingCell {
   constructor(params) {
@@ -114,12 +115,12 @@ class ConversationListCallingCell {
   onJoinCall(data, event) {
     event.stopPropagation();
     const isVideoCall = this.call().isRemoteVideoSend() && this.selfStreamState.videoSend();
-    const mediaType = isVideoCall ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+    const mediaType = isVideoCall ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
     this.callingRepository.joinCall(this.conversation, mediaType);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.joinCall(this.conversation, z.media.MediaType.AUDIO);
+    this.callingRepository.joinCall(this.conversation, MediaType.AUDIO);
   }
 
   onLeaveCall() {
@@ -145,7 +146,7 @@ class ConversationListCallingCell {
 
   onToggleAudio(data, event) {
     event.stopPropagation();
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.AUDIO);
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.AUDIO);
   }
 
   onToggleScreen(data, event) {
@@ -155,7 +156,7 @@ class ConversationListCallingCell {
 
   onToggleVideo(data, event) {
     event.stopPropagation();
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, z.media.MediaType.VIDEO);
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
   }
 }
 

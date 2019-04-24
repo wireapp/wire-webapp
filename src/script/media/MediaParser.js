@@ -17,19 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import {MediaEmbeds} from './MediaEmbeds';
 
 class MediaParser {
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
 
-    this.embeds = [
-      z.media.MediaEmbeds.soundcloud,
-      z.media.MediaEmbeds.spotify,
-      z.media.MediaEmbeds.vimeo,
-      z.media.MediaEmbeds.youtube,
-    ];
+    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
   }
 
   /**
@@ -49,4 +43,4 @@ class MediaParser {
   }
 }
 
-z.media.MediaParser = new MediaParser();
+export const mediaParser = new MediaParser();

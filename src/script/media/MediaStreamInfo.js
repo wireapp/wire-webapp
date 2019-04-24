@@ -19,10 +19,7 @@
 
 import {MediaStreamHandler} from './MediaStreamHandler';
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaStreamInfo = class MediaStreamInfo {
+export class MediaStreamInfo {
   constructor(source, flowId, stream, callEntity) {
     this.source = source;
     this.flowId = flowId;
@@ -35,4 +32,4 @@ z.media.MediaStreamInfo = class MediaStreamInfo {
   getType() {
     return MediaStreamHandler.detectMediaStreamType(this.stream);
   }
-};
+}

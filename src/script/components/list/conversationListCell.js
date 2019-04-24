@@ -18,7 +18,9 @@
  */
 
 import {noop} from 'utils/util';
+
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
+import {MediaType} from '../../media/MediaType';
 
 class ConversationListCell {
   constructor({conversation, onJoinCall, is_selected = noop, click = noop}) {
@@ -36,7 +38,7 @@ class ConversationListCell {
     this.showJoinButton = this.conversation.hasJoinableCall;
     this.ConversationStatusIcon = ConversationStatusIcon;
 
-    this.onJoinCall = () => onJoinCall(conversation, z.media.MediaType.AUDIO);
+    this.onJoinCall = () => onJoinCall(conversation, MediaType.AUDIO);
   }
 
   destroy() {

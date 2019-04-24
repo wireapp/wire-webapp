@@ -19,9 +19,11 @@
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
+import {sortObjectByKeys} from 'utils/util';
+
 import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
-import {sortObjectByKeys} from 'utils/util';
+import {MediaType} from '../../media/MediaType';
 
 // Call traces entity.
 class CallTelemetry {
@@ -34,7 +36,7 @@ class CallTelemetry {
     this.maxNumberOfParticipants = 0;
     this.direction = undefined;
 
-    this.mediaType = z.media.MediaType.AUDIO;
+    this.mediaType = MediaType.AUDIO;
   }
 
   //##############################################################################
@@ -83,10 +85,10 @@ class CallTelemetry {
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
    * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateNewCall(direction, mediaType = z.media.MediaType.AUDIO) {
+  initiateNewCall(direction, mediaType = MediaType.AUDIO) {
     this.mediaType = mediaType;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
@@ -121,7 +123,7 @@ class CallTelemetry {
     if (callEntity) {
       const {conversationEntity, isGroup} = callEntity;
 
-      const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+      const videoTypes = [MediaType.VIDEO, MediaType.AUDIO_VIDEO];
 
       attributes = Object.assign(
         {
