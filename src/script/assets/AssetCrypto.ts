@@ -17,11 +17,11 @@
  *
  */
 
-export const decryptAesAsset = (
+export const decryptAesAsset = async (
   cipherText: ArrayBuffer,
   keyBytes: ArrayBuffer,
   referenceSha256: ArrayBuffer
-): PromiseLike<ArrayBuffer> => {
+): Promise<ArrayBuffer> => {
   return window.crypto.subtle
     .digest('SHA-256', cipherText)
     .then(computedSha256 => {
@@ -38,9 +38,9 @@ export const decryptAesAsset = (
     });
 };
 
-export const encryptAesAsset = (
+export const encryptAesAsset = async (
   plaintext: ArrayBuffer
-): PromiseLike<{cipherText: ArrayBuffer; keyBytes: ArrayBuffer; sha256: ArrayBuffer}> => {
+): Promise<{cipherText: ArrayBuffer; keyBytes: ArrayBuffer; sha256: ArrayBuffer}> => {
   const iv = _generateRandomBytes(16);
   const rawKeyBytes = _generateRandomBytes(32);
   let key: CryptoKey;

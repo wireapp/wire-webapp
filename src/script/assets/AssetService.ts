@@ -18,31 +18,47 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import {getLogger} from 'utils/Logger';
-import {loadImage, loadFileBuffer, arrayToMd5Base64} from 'utils/util';
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
+import {BackendClientInterface} from '../service/BackendClientInterface';
+import {arrayToMd5Base64, loadFileBuffer, loadImage} from '../util/util';
 import {encryptAesAsset} from './AssetCrypto';
 
-// AssetService for all asset handling and the calls to the backend REST API.
+export interface UploadAssetResponse {
+  key: string;
+  token: string;
+}
+
+export interface CompressedImage {
+  compressedBytes: any;
+  compressedImage: any;
+}
+
+export interface AssetUploadOptions {
+  expectsReadConfirmation: boolean;
+  public: boolean;
+  retention: AssetRetentionPolicy;
+}
+
 export class AssetService {
-  /**
-   * Construct a new Asset Service.
-   * @param {BackendClient} backendClient - Client for the API calls
-   */
-  constructor(backendClient) {
+  private readonly backendClient: BackendClientInterface;
+
+  constructor(backendClient: BackendClientInterface) {
     this.backendClient = backendClient;
-    this.logger = getLogger('AssetService');
   }
 
-  /**
-   * Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
-   * @param {File|Blob} image - Profile image
-   * @returns {Promise} Resolves when profile image has been uploaded
-   */
-  uploadProfileImage(image) {
+  uploadProfileImage(
+    image: Blob | File
+  ): Promise<{
+    mediumImageKey: string;
+    previewImageKey: string;
+  }> {
     return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
       .then(([{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}]) => {
-        const assetUploadOptions = {public: true, retention: AssetRetentionPolicy.ETERNAL};
+        const assetUploadOptions = {
+          expectsReadConfirmation: false,
+          public: true,
+          retention: AssetRetentionPolicy.ETERNAL,
+        };
         return Promise.all([
           this.postAsset(previewImageBytes, assetUploadOptions),
           this.postAsset(mediumImageBytes, assetUploadOptions),
@@ -53,18 +69,7 @@ export class AssetService {
       });
   }
 
-  /**
-   * Upload arbitrary binary data using the new asset api v3.
-   * The data is AES encrypted before uploading.
-   *
-   * @param {ArrayBuffer} bytes - Asset binary data
-   * @param {Object} options - Asset upload options
-   * @param {boolean} options.public - Flag whether asset is public
-   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
-   * @returns {Promise<Asset>} Resolves when asset has been uploaded
-   */
-  _uploadAsset(bytes, options, xhrAccessorFunction) {
+  async _uploadAsset(bytes: ArrayBuffer, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
     return encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
       return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => {
         const assetRemoteData = new Asset.RemoteData({
@@ -76,7 +81,7 @@ export class AssetService {
 
         const protoAsset = new Asset({
           [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation || false,
+          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
         });
 
         return protoAsset;
@@ -84,35 +89,11 @@ export class AssetService {
     });
   }
 
-  /**
-   * Upload file using the new asset api v3. Promise will resolve with an Asset instance.
-   * In case of an successful upload the uploaded property is set.
-   *
-   * @param {Blob|File} file - File asset to be uploaded
-   * @param {Object} options - Asset upload options
-   * @param {boolean} options.public - Flag whether asset is public
-   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
-   * @param {Function} xhrAccessorFunction - Function will get a reference to the underlying XMLHTTPRequest
-   * @returns {Promise} Resolves when asset has been uploaded
-   */
-  uploadAsset(file, options, xhrAccessorFunction) {
+  uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
     return loadFileBuffer(file).then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction));
   }
 
-  /**
-   * Upload image using the new asset api v3. Promise will resolve with an Asset instance.
-   * In case of an successful upload the uploaded property is set.
-   *
-   * @param {Blob|File} image - Image asset to be uploaded
-   * @param {Object} options - Asset upload options
-   * @param {boolean} options.public - Flag whether asset is public
-   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {boolean} options.expectsReadConfirmation - Whether the sender expects a read confirmation
-   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
-   * @returns {Promise} Resolves when asset has been uploaded
-   */
-  uploadImageAsset(image, options, xhrAccessorFunction) {
+  uploadImageAsset(image: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
     return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
       return this._uploadAsset(compressedBytes, options, xhrAccessorFunction).then(protoAsset => {
         const assetImageMetadata = new Asset.ImageMetaData({
@@ -126,22 +107,14 @@ export class AssetService {
           size: compressedBytes.length,
         });
 
+        // TODO: Add index signature
         protoAsset[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });
   }
 
-  /**
-   * Generates the URL an asset can be downloaded from.
-   *
-   * @deprecated
-   * @param {string} assetId - ID of asset
-   * @param {string} conversationId - Conversation ID
-   * @param {boolean} forceCaching - Cache asset in ServiceWorker
-   * @returns {Promise} Resolves with URL of v1 asset
-   */
-  generateAssetUrl(assetId, conversationId, forceCaching) {
+  generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       const url = this.backendClient.createUrl(`/assets/${assetId}`);
@@ -152,16 +125,7 @@ export class AssetService {
     });
   }
 
-  /**
-   * Generates the URL for asset api v2.
-   *
-   * @deprecated
-   * @param {string} assetId - ID of asset
-   * @param {string} conversationId - Conversation ID
-   * @param {boolean} forceCaching - Cache asset in ServiceWorker
-   * @returns {Promise} Resolves with URL of v2 asset
-   */
-  generateAssetUrlV2(assetId, conversationId, forceCaching) {
+  generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
@@ -171,15 +135,7 @@ export class AssetService {
     });
   }
 
-  /**
-   * Generates the URL for asset api v3.
-   *
-   * @param {string} assetKey - ID of asset
-   * @param {string} assetToken - Asset token
-   * @param {boolean} forceCaching - Cache asset in ServiceWorker
-   * @returns {Promise} Resolves with URL of v3 asset
-   */
-  generateAssetUrlV3(assetKey, assetToken, forceCaching) {
+  generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: string) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(assetKey, assetToken);
       const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
@@ -190,46 +146,38 @@ export class AssetService {
     });
   }
 
-  getAssetRetention(userEntity, conversationEntity) {
+  getAssetRetention(userEntity: any, conversationEntity: any): AssetRetentionPolicy {
     const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
     const isTeamUserInConversation = conversationEntity
       .participating_user_ets()
-      .some(conversationParticipant => conversationParticipant.inTeam());
+      .some((conversationParticipant: any) => conversationParticipant.inTeam());
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  /**
-   * Post assets.
-   *
-   * @param {Uint8Array} assetData - Asset data
-   * @param {Object} options - Asset metadata
-   * @param {boolean} options.public - Flag whether asset is public
-   * @param {AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
-   * @returns {Promise} Resolves when asset has been uploaded
-   */
-  postAsset(assetData, options, xhrAccessorFunction) {
+  postAsset(
+    assetData: Uint8Array,
+    options: AssetUploadOptions,
+    xhrAccessorFunction?: Function
+  ): Promise<UploadAssetResponse> {
     const BOUNDARY = 'frontier';
 
-    options = Object.assign(
-      {
-        public: false,
-        retention: AssetRetentionPolicy.PERSISTENT,
-      },
-      options
-    );
+    options = {
+      public: false,
+      retention: AssetRetentionPolicy.PERSISTENT,
+      ...options,
+    };
 
-    options = JSON.stringify(options);
+    const optionsString = JSON.stringify(options);
 
     const body = [
       `--${BOUNDARY}`,
       'Content-Type: application/json; charset=utf-8',
-      `Content-length: ${options.length}`,
+      `Content-length: ${optionsString.length}`,
       '',
-      options,
+      optionsString,
       `--${BOUNDARY}`,
       'Content-Type: application/octet-stream',
       `Content-length: ${assetData.length}`,
@@ -256,38 +204,21 @@ export class AssetService {
     });
   }
 
-  /**
-   * Compress image.
-   * @param {File|Blob} image - Image to be compressed in ServiceWorker
-   * @returns {Promise} Resolves with the compressed imaged
-   */
-  _compressImage(image) {
+  _compressImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/image-worker.js', image, () => image.type === 'image/gif');
   }
 
-  /**
-   * Compress profile image.
-   * @param {File|Blob} image - Profile image to be compressed in ServiceWorker
-   * @returns {Promise} Resolves with the compressed profile imaged
-   */
-  _compressProfileImage(image) {
+  _compressProfileImage(image: File | Blob): Promise<CompressedImage> {
     return this._compressImageWithWorker('worker/profile-image-worker.js', image);
   }
 
-  /**
-   * Compress image using given worker.
-   * @param {string} worker - Path to worker file
-   * @param {File|Blob} image - Image to be compressed in ServiceWorker
-   * @param {Function} filter - Optional filter to be applied
-   * @returns {Promise} Resolves with the compressed image
-   */
-  _compressImageWithWorker(worker, image, filter) {
+  _compressImageWithWorker(pathToWorkerFile: string, image: File | Blob, filter?: Function): Promise<CompressedImage> {
     return loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
         }
-        return new z.util.Worker(worker).post(buffer);
+        return new z.util.Worker(pathToWorkerFile).post(buffer);
       })
       .then(compressedBytes => {
         return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({
