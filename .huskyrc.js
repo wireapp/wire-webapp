@@ -1,5 +1,5 @@
 module.exports = {
   "hooks": {
-    "pre-commit": "lint-staged --debug"
+    "pre-commit": "lint-staged"
   }
 };
