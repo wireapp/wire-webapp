@@ -129,7 +129,7 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} eventJson - JSON data for team event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onTeamEvent(eventJson, source) {

@@ -21,17 +21,15 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64} from 'utils/util';
 import {ClientEvent} from 'src/script/event/Client';
+import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
 
-describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
+describe('QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
   let quotedMessageMiddleware;
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
-        TestFactory.event_service,
-        z.message.MessageHasher
-      );
+      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service, z.message.MessageHasher);
     });
   });
 

@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {AudioType} from './AudioType';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
-import {NotificationHandlingState} from '../event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 
 import {WebAppEvents} from '../event/WebApp';
 
@@ -232,7 +232,7 @@ export class AudioRepository {
   }
 
   setMutedState(handlingNotifications) {
-    const updatedMutedState = handlingNotifications !== NotificationHandlingState.WEB_SOCKET;
+    const updatedMutedState = handlingNotifications !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.muted !== updatedMutedState;
     if (isStateChange) {

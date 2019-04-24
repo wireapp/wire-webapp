@@ -22,6 +22,7 @@ import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
 
 describe('UserRepository', () => {
   let server = null;
@@ -74,7 +75,7 @@ describe('UserRepository', () => {
           },
         };
 
-        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const source = EventRepository.SOURCE.WEB_SOCKET;
         const errorReporting = () =>
           TestFactory.user_repository.propertyRepository.properties.settings.privacy.improve_wire;
 
@@ -100,7 +101,7 @@ describe('UserRepository', () => {
           type: 'user.properties-delete',
         };
 
-        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const source = EventRepository.SOURCE.WEB_SOCKET;
         const marketingConsent = TestFactory.user_repository.propertyRepository.marketingConsent;
 
         expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
@@ -126,7 +127,7 @@ describe('UserRepository', () => {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-delete',
         };
-        const source = z.event.EventRepository.SOURCE.WEB_SOCKET;
+        const source = EventRepository.SOURCE.WEB_SOCKET;
         const receiptMode = TestFactory.user_repository.propertyRepository.receiptMode;
 
         expect(receiptMode()).toBe(ReceiptMode.DELIVERY);

@@ -45,6 +45,7 @@ import {MediaType} from '../media/MediaType';
 
 import {ClientEvent} from '../event/Client';
 import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -172,7 +173,7 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    *
    * @param {Object} event - Event payload
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
@@ -193,7 +194,7 @@ export class CallingRepository {
 
       this._validateMessageType(callMessageEntity)
         .then(conversationEntity => {
-          const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+          const isBackendTimestamp = source !== EventRepository.SOURCE.INJECTED;
           conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
         })
         .then(() => {
@@ -209,7 +210,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onCallEventInSupportedBrowsers(callMessageEntity, source) {
@@ -267,7 +268,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onCallEventInUnsupportedBrowsers(callMessageEntity, source) {
@@ -335,7 +336,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onGroupCheck(callMessageEntity, source) {
@@ -399,7 +400,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onGroupStart(callMessageEntity, source) {
@@ -493,7 +494,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onSetup(callMessageEntity, source) {
@@ -595,7 +596,7 @@ export class CallingRepository {
    * Verify validity of incoming call.
    *
    * @param {CallMessageEntity} callMessageEntity - Call message to validate
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {z.error.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
@@ -609,7 +610,7 @@ export class CallingRepository {
     const validMessage = response === isTypeGroupCheck;
 
     if (!isSelfUser && validMessage) {
-      const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+      const eventFromStream = source === EventRepository.SOURCE.STREAM;
       const silentCall = isTypeGroupCheck || eventFromStream;
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
@@ -1369,7 +1370,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
    */
@@ -1407,7 +1408,7 @@ export class CallingRepository {
           this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
           this.injectActivateEvent(callMessageEntity, source);
 
-          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          const eventFromWebSocket = source === EventRepository.SOURCE.WEB_SOCKET;
           const hasOtherCalls = this.calls().some(call => call.id !== callEntity.id);
           const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
 
@@ -1468,7 +1469,7 @@ export class CallingRepository {
   /**
    * Inject a call activate event.
    * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   injectActivateEvent(callMessageEntity, source) {
@@ -1479,7 +1480,7 @@ export class CallingRepository {
   /**
    * Inject a call deactivate event.
    * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
