@@ -17,55 +17,89 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {loadUrlBuffer} from 'utils/util';
-import {getAssetUrl, setAssetUrl} from './AssetURLCache';
+import {Logger} from 'logdown';
+import {getLogger} from '../util/Logger';
+import {loadUrlBuffer} from '../util/util';
 import {decryptAesAsset} from './AssetCrypto';
+import {getAssetUrl, setAssetUrl} from './AssetURLCache';
+
+export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
+
+export interface AssetUrlDataVersion3 {
+  assetKey: string;
+  assetToken: string;
+  forceCaching: boolean;
+  version: 3;
+}
+
+export interface AssetUrlDataVersion2 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 2;
+}
+
+export interface AssetUrlDataVersion1 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 1;
+}
 
 class AssetRemoteData {
-  /**
-   * Use either AssetRemoteData.v2 or AssetRemoteData.v3 to initialize.
-   * @param {Uint8Array} otrKey - Encryption key
-   * @param {Uint8Array} sha256 - Checksum
-   * @param {string} identifier - The asset's idenfifier
-   * @param {Object} urlData - Data needed to generate the url to fetch the asset
-   */
-  constructor(otrKey, sha256, identifier, urlData) {
+  public cancelDownload: Function;
+
+  private readonly downloadProgress: ko.Observable<number>;
+  private readonly identifier: string;
+  private loadPromise: Promise<void | Blob> | undefined;
+  private readonly logger: Logger;
+  private readonly otrKey: Uint8Array;
+  private readonly sha256: Uint8Array;
+  private readonly urlData: AssetUrlData;
+
+  constructor(otrKey: Uint8Array, sha256: Uint8Array, identifier: string, urlData: AssetUrlData) {
+    this.cancelDownload = () => {};
+    this.downloadProgress = ko.observable();
+    this.identifier = identifier;
+    this.loadPromise = undefined;
+    this.logger = getLogger('AssetRemoteData');
     this.otrKey = otrKey;
     this.sha256 = sha256;
-    this.downloadProgress = ko.observable();
-    this.cancelDownload = undefined;
     this.urlData = urlData;
-    this.identifier = identifier;
-
-    this.loadPromise = undefined;
-
-    this.logger = getLogger('AssetRemoteData');
   }
 
-  generateUrl() {
-    const {version, assetId, conversationId, forceCaching, assetKey, assetToken} = this.urlData;
-    switch (version) {
+  generateUrl(): Promise<string> {
+    switch (this.urlData.version) {
       case 3:
-        return wire.app.service.asset.generateAssetUrlV3(assetKey, assetToken, forceCaching);
+        return window.wire.app.service.asset.generateAssetUrlV3(
+          this.urlData.assetKey,
+          this.urlData.assetToken,
+          this.urlData.forceCaching
+        );
       case 2:
-        return wire.app.service.asset.generateAssetUrlV2(assetId, conversationId, forceCaching);
+        return window.wire.app.service.asset.generateAssetUrlV2(
+          this.urlData.assetId,
+          this.urlData.conversationId,
+          this.urlData.forceCaching
+        );
       case 1:
-        return wire.app.service.asset.generateAssetUrl(assetId, conversationId, forceCaching);
+        return window.wire.app.service.asset.generateAssetUrl(
+          this.urlData.assetId,
+          this.urlData.conversationId,
+          this.urlData.forceCaching
+        );
+      default:
+        throw Error('Cannot map URL data.');
     }
   }
 
-  /**
-   * Static initializer for v3 assets.
-   *
-   * @param {string} assetKey - ID to retrieve asset with
-   * @param {Uint8Array} [otrKey] - Encryption key
-   * @param {Uint8Array} [sha256] - Checksum
-   * @param {string} [assetToken] - Token data
-   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {AssetRemoteData} V3 asset remote data
-   */
-  static v3(assetKey, otrKey, sha256, assetToken, forceCaching = false) {
+  static v3(
+    assetKey: string,
+    otrKey: Uint8Array,
+    sha256: Uint8Array,
+    assetToken: string,
+    forceCaching: boolean = false
+  ): AssetRemoteData {
     return new AssetRemoteData(otrKey, sha256, assetKey, {
       assetKey,
       assetToken,
@@ -74,17 +108,13 @@ class AssetRemoteData {
     });
   }
 
-  /**
-   * Static initializer for v2 assets.
-   *
-   * @param {string} conversationId - ID of conversation
-   * @param {string} assetId - ID to retrieve asset with
-   * @param {Uint8Array} otrKey - Encryption key
-   * @param {Uint8Array} sha256 - Checksum
-   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {AssetRemoteData} V2 asset remote data
-   */
-  static v2(conversationId, assetId, otrKey, sha256, forceCaching = false) {
+  static v2(
+    conversationId: string,
+    assetId: string,
+    otrKey: Uint8Array,
+    sha256: Uint8Array,
+    forceCaching: boolean = false
+  ): AssetRemoteData {
     return new AssetRemoteData(otrKey, sha256, `${conversationId}${assetId}`, {
       assetId,
       conversationId,
@@ -93,16 +123,7 @@ class AssetRemoteData {
     });
   }
 
-  /**
-   * Static initializer for v1 assets.
-   *
-   * @deprecated
-   * @param {string} conversationId - ID of conversation
-   * @param {string} assetId - ID to retrieve asset with
-   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
-   * @returns {AssetRemoteData} V1 asset remote data
-   */
-  static v1(conversationId, assetId, forceCaching = false) {
+  static v1(conversationId: string, assetId: string, forceCaching: boolean = false): AssetRemoteData {
     return new AssetRemoteData(undefined, undefined, `${conversationId}${assetId}`, {
       assetId,
       conversationId,
@@ -111,28 +132,18 @@ class AssetRemoteData {
     });
   }
 
-  /**
-   * Get object url for asset remote data. URLs are cached in memory.
-   * @returns {Promise<string>} Object URL for asset
-   */
-  getObjectUrl() {
+  getObjectUrl(): Promise<string> {
     const objectUrl = getAssetUrl(this.identifier);
     return objectUrl
       ? Promise.resolve(objectUrl)
       : this.load().then(blob => {
-          if (blob) {
-            const url = window.URL.createObjectURL(blob);
-            return setAssetUrl(this.identifier, url);
-          }
+          const url = window.URL.createObjectURL(blob);
+          return setAssetUrl(this.identifier, url);
         });
   }
 
-  /**
-   * Loads and decrypts stored asset
-   * @returns {Promise<Blob>} Resolves with the decrypted asset data
-   */
-  load() {
-    let type;
+  load(): Promise<void | Blob> {
+    let type: string;
 
     if (this.loadPromise) {
       return this.loadPromise;
@@ -161,10 +172,13 @@ class AssetRemoteData {
     return this.loadPromise;
   }
 
-  _loadBuffer() {
+  _loadBuffer(): Promise<{
+    buffer: ArrayBuffer;
+    mimeType: string;
+  }> {
     return this.generateUrl()
       .then(generatedUrl => {
-        return loadUrlBuffer(generatedUrl, xhr => {
+        return loadUrlBuffer(generatedUrl, (xhr: XMLHttpRequest) => {
           xhr.onprogress = event => this.downloadProgress(Math.round((event.loaded / event.total) * 100));
           this.cancelDownload = () => xhr.abort.call(xhr);
         });
@@ -183,7 +197,3 @@ class AssetRemoteData {
 }
 
 export {AssetRemoteData};
-
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-z.assets.AssetRemoteData = AssetRemoteData;

@@ -23,7 +23,7 @@ const cache: LRUCache<string> = new LRUCache(100);
 
 export const getAssetUrl = (identifier: string): string => cache.get(identifier);
 
-export const setAssetUrl = (identifier: string, url: string) => {
+export const setAssetUrl = (identifier: string, url: string): string => {
   const isExistingUrl = getAssetUrl(identifier);
 
   if (isExistingUrl) {

@@ -34,15 +34,15 @@ export const mapProfileAssets = (userId: string, assets: Asset[]) => {
   return assets
     .filter(asset => asset.type === 'image')
     .reduce((mappedAssets, asset) => {
-      const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, new Uint8Array());
+      const assetRemoteData = AssetRemoteData.v3(asset.key, new Uint8Array(), new Uint8Array(), '');
       return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
     }, {});
 };
 
 export const mapProfileAssetsV1 = (userId: string, pictures: Asset[]): MappedAsset => {
   const [previewPicture, mediumPicture] = pictures;
-  const previewAsset = previewPicture ? z.assets.AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
-  const mediumAsset = mediumPicture ? z.assets.AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
+  const previewAsset = previewPicture ? AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
+  const mediumAsset = mediumPicture ? AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
 
   return {medium: mediumAsset, preview: previewAsset};
 };

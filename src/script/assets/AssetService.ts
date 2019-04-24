@@ -124,7 +124,7 @@ export class AssetService {
     });
   }
 
-  generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean) {
+  generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(assetId, conversationId);
       const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
@@ -134,7 +134,7 @@ export class AssetService {
     });
   }
 
-  generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: string) {
+  generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(assetKey, assetToken);
       const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
