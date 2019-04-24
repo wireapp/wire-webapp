@@ -123,20 +123,26 @@ export class CallingRepository {
             this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
             return 0;
           };
+          const log = name => {
+            return function() {
+              // eslint-disable-next-line no-console
+              console.log('avs_cb', name, arguments);
+            };
+          };
           const wUser = callingApi.create(
             userRepository.self().id,
             clientRepository.currentClient().id,
-            () => 0, //readyh,
+            log('readyh'), //readyh,
             sendMessage, //sendh,
-            () => 0, //incomingh,
-            () => 0, //missedh,
-            () => 0, //answerh,
-            () => 0, //estabh,
-            () => 0, //closeh,
-            () => 0, //metricsh,
+            log('incomingh'), //incomingh,
+            log('missedh'), //missedh,
+            log('answerh'), //answerh,
+            log('estabh'), //estabh,
+            log('closeh'), //closeh,
+            log('metricsh'), //metricsh,
             requestConfig, //cfg_reqh,
-            () => 0, //acbrh,
-            () => 0 //vstateh,
+            log('acbrh'), //acbrh,
+            log('vstateh') //vstateh,
           );
 
           callingApi.set_state_handler(wUser, (conversationId, state) => {
