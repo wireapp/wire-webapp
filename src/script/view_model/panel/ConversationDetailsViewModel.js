@@ -27,8 +27,8 @@ import {TimeUtil} from 'utils/TimeUtil';
 import {NotificationSetting} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {WebAppEvents} from '../../event/WebApp';
-import {Shortcut} from '../ui/Shortcut';
-import {ShortcutType} from '../ui/ShortcutType';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
 
 import '../../components/panel/panelActions';
 

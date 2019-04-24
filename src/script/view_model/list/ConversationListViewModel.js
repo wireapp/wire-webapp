@@ -21,9 +21,9 @@ import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
-import {AvailabilityContextMenu} from '../ui/AvailabilityContextMenu';
-import {Shortcut} from '../ui/Shortcut';
-import {ShortcutType} from '../ui/ShortcutType';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
 
 export class ConversationListViewModel {
   /**

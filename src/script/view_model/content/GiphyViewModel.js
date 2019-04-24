@@ -20,7 +20,7 @@
 import {getLogger} from 'utils/Logger';
 
 import {WebAppEvents} from '../../event/WebApp';
-import {Modal} from '../ui/Modal';
+import {Modal} from '../../ui/Modal';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
