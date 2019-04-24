@@ -17,22 +17,15 @@
  *
  */
 
-import {MediaStreamHandler} from './MediaStreamHandler';
+import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaStreamInfo = class MediaStreamInfo {
-  constructor(source, flowId, stream, callEntity) {
-    this.source = source;
-    this.flowId = flowId;
-    this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
-  }
-
-  getType() {
-    return MediaStreamHandler.detectMediaStreamType(this.stream);
-  }
+/** @see https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors */
+export const MEDIA_STREAM_ERROR_TYPES = {
+  DEVICE: [MEDIA_STREAM_ERROR.ABORT_ERROR, MEDIA_STREAM_ERROR.NOT_FOUND_ERROR, MEDIA_STREAM_ERROR.NOT_READABLE_ERROR],
+  MISC: [
+    MEDIA_STREAM_ERROR.NOT_SUPPORTED_ERROR,
+    MEDIA_STREAM_ERROR.OVERCONSTRAINED_ERROR,
+    MEDIA_STREAM_ERROR.TYPE_ERROR,
+  ],
+  PERMISSION: [MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR, MEDIA_STREAM_ERROR.SECURITY_ERROR],
 };

@@ -21,7 +21,9 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {MediaType} from '../../media/MediaType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -111,7 +113,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   clickOnCallButton() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
+    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, MediaType.AUDIO);
   }
 
   clickOnDetails() {
@@ -119,7 +121,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   clickOnVideoButton() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO);
+    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, MediaType.AUDIO_VIDEO);
   }
 
   clickOnCollectionButton() {

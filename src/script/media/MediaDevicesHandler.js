@@ -20,9 +20,12 @@
 import {getLogger} from 'utils/Logger';
 
 import * as StorageUtil from 'utils/StorageUtil';
-import {MediaRepository} from './MediaRepository';
 import {iterateIndex} from 'utils/ArrayUtil';
 import {koArrayPushAll} from 'utils/util';
+
+import {MediaRepository} from './MediaRepository';
+import {MediaType} from './MediaType';
+import {MediaDeviceType} from './MediaDeviceType';
 
 export class MediaDevicesHandler {
   static get CONFIG() {
@@ -92,13 +95,13 @@ export class MediaDevicesHandler {
   _setCurrentDevices() {
     const defaultDeviceId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE_ID;
 
-    const audioInputId = StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
+    const audioInputId = StorageUtil.getValue(MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
     this.currentDeviceId.audioInput(audioInputId);
 
-    const audioOutputId = StorageUtil.getValue(z.media.MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
+    const audioOutputId = StorageUtil.getValue(MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
     this.currentDeviceId.audioOutput(audioOutputId);
 
-    const videoInputId = StorageUtil.getValue(z.media.MediaDeviceType.VIDEO_INPUT);
+    const videoInputId = StorageUtil.getValue(MediaDeviceType.VIDEO_INPUT);
     this.currentDeviceId.videoInput(videoInputId);
 
     const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.deviceSupport.videoInput();
@@ -131,69 +134,69 @@ export class MediaDevicesHandler {
   _subscribeToObservables() {
     this.availableDevices.audioInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.AUDIO_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(MediaDeviceType.AUDIO_INPUT, mediaDevices);
       }
     });
 
     this.availableDevices.audioOutput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(MediaDeviceType.AUDIO_OUTPUT, mediaDevices);
       }
     });
 
     this.availableDevices.screenInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.SCREEN_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(MediaDeviceType.SCREEN_INPUT, mediaDevices);
       }
     });
 
     this.availableDevices.videoInput.subscribe(mediaDevices => {
       if (mediaDevices.length) {
-        this._updateCurrentIndexFromDevices(z.media.MediaDeviceType.VIDEO_INPUT, mediaDevices);
+        this._updateCurrentIndexFromDevices(MediaDeviceType.VIDEO_INPUT, mediaDevices);
       }
     });
 
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
-      StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+      StorageUtil.setValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
 
       const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this._replaceInputDevice(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+        this._replaceInputDevice(MediaType.AUDIO, MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
       }
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
-      StorageUtil.setValue(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
+      StorageUtil.setValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
 
       if (mediaDeviceId) {
         this.mediaRepository.elementHandler.switchMediaElementOutput(mediaDeviceId);
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
+        this._updateCurrentIndexFromId(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
       }
     });
 
     this.currentDeviceId.screenInput.subscribe(mediaDeviceId => {
       if (mediaDeviceId) {
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
+        this._updateCurrentIndexFromId(MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
 
-      const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.SCREEN;
+      const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === MediaType.SCREEN;
       const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this._replaceInputDevice(z.media.MediaType.SCREEN, z.media.MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
+        this._replaceInputDevice(MediaType.SCREEN, MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
     });
 
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       if (mediaDeviceId) {
-        this._updateCurrentIndexFromId(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+        this._updateCurrentIndexFromId(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
 
-      StorageUtil.setValue(z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+      StorageUtil.setValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
-      const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === z.media.MediaType.VIDEO;
+      const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
-        this._replaceInputDevice(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+        this._replaceInputDevice(MediaType.VIDEO, MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
     });
   }
@@ -219,17 +222,17 @@ export class MediaDevicesHandler {
 
           mediaDevices.forEach(mediaDevice => {
             switch (mediaDevice.kind) {
-              case z.media.MediaDeviceType.AUDIO_INPUT: {
+              case MediaDeviceType.AUDIO_INPUT: {
                 audioInputDevices.push(mediaDevice);
                 break;
               }
 
-              case z.media.MediaDeviceType.AUDIO_OUTPUT: {
+              case MediaDeviceType.AUDIO_OUTPUT: {
                 audioOutputDevices.push(mediaDevice);
                 break;
               }
 
-              case z.media.MediaDeviceType.VIDEO_INPUT: {
+              case MediaDeviceType.VIDEO_INPUT: {
                 videoInputDevices.push(mediaDevice);
                 break;
               }
@@ -288,8 +291,8 @@ export class MediaDevicesHandler {
    * Replace input device of given type
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Media type to change device for
-   * @param {z.media.MediaDeviceType} mediaDeviceType - Media device type to change
+   * @param {MediaType} mediaType - Media type to change device for
+   * @param {MediaDeviceType} mediaDeviceType - Media device type to change
    * @param {string} mediaDeviceId - New media device Id
    * @returns {undefined} No return value
    */
@@ -378,9 +381,9 @@ export class MediaDevicesHandler {
         }
       };
 
-      _checkDevice(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
+      _checkDevice(MediaType.AUDIO, MediaDeviceType.AUDIO_INPUT);
       if (videoSend) {
-        _checkDevice(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
+        _checkDevice(MediaType.VIDEO, MediaDeviceType.VIDEO_INPUT);
       }
     });
   }
@@ -417,7 +420,7 @@ export class MediaDevicesHandler {
   /**
    * Add uppercase to MediaDevice types.
    * @private
-   * @param {z.media.MediaDeviceType} deviceType - Device type string to update
+   * @param {MediaDeviceType} deviceType - Device type string to update
    * @returns {string} Updated device type
    */
   _typeConversion(deviceType) {
@@ -444,7 +447,7 @@ export class MediaDevicesHandler {
   /**
    * Update the index for current device after the list of devices changed.
    * @private
-   * @param {z.media.MediaDeviceType} deviceType - MediaDeviceType to be updates
+   * @param {MediaDeviceType} deviceType - MediaDeviceType to be updates
    * @param {Array} availableDevices - Array of MediaDevices
    * @returns {undefined} No return value
    */
@@ -459,7 +462,7 @@ export class MediaDevicesHandler {
   /**
    * Update the index for current device after the current device changed.
    * @private
-   * @param {z.media.MediaDeviceType} deviceType - MediaDeviceType to be updates
+   * @param {MediaDeviceType} deviceType - MediaDeviceType to be updates
    * @param {string} selectedInputDeviceId - ID of selected input device
    * @returns {undefined} No return value
    */

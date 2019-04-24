@@ -19,8 +19,11 @@
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
+
 import * as trackingHelpers from '../tracking/Helpers';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {MediaType} from '../media/MediaType';
+import {MediaDeviceType} from '../media/MediaDeviceType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -193,6 +196,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
 
     this.TimeUtil = TimeUtil;
+    this.MediaDeviceType = MediaDeviceType;
   }
 
   chooseSharedScreen(conversationId) {
@@ -202,7 +206,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
         z.util.Environment.browser.firefox ||
         navigator.mediaDevices.getDisplayMedia;
       if (skipScreenSelection) {
-        amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, z.media.MediaType.SCREEN);
+        amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
         return;
       }
 
@@ -233,7 +237,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
                 this.multitasking.isMinimized(false);
               }
             } else {
-              amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, z.media.MediaType.SCREEN);
+              amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
             }
           })
           .catch(error => {
@@ -256,7 +260,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clickedOnMuteAudio() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.AUDIO);
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
     }
   }
 
@@ -272,7 +276,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
     this.isChoosingScreen(false);
     this.currentDeviceId.screenInput(screenSource.id);
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.SCREEN);
+    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.SCREEN);
 
     if (this.multitasking.resetMinimize()) {
       this.multitasking.isMinimized(true);
@@ -283,7 +287,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clickedOnStopVideo() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, z.media.MediaType.VIDEO);
+      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.VIDEO);
     }
   }
 

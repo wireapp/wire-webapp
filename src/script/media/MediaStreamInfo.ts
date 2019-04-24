@@ -17,17 +17,27 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import {CallEntity} from '../calling/entities/CallEntity';
+import {MediaStreamHandler} from './MediaStreamHandler';
+import {MediaStreamSource} from './MediaStreamSource';
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
-z.media.MEDIA_STREAM_ERROR = {
-  ABORT_ERROR: 'AbortError',
-  NOT_ALLOWED_ERROR: 'NotAllowedError',
-  NOT_FOUND_ERROR: 'NotFoundError',
-  NOT_READABLE_ERROR: 'NotReadableError',
-  NOT_SUPPORTED_ERROR: 'NotSupportedError',
-  OVERCONSTRAINED_ERROR: 'OverConstrainedError',
-  SECURITY_ERROR: 'SecurityError',
-  TYPE_ERROR: 'TypeError',
-};
+export class MediaStreamInfo {
+  callEntity: CallEntity;
+  conversationId?: string;
+  flowId: string;
+  source: MediaStreamSource;
+  stream: MediaStream;
+
+  constructor(source: MediaStreamSource, flowId: string, stream: MediaStream, callEntity: CallEntity) {
+    this.source = source;
+    this.flowId = flowId;
+    this.stream = stream;
+    this.callEntity = callEntity;
+
+    this.conversationId = callEntity ? callEntity.id : undefined;
+  }
+
+  getType() {
+    return MediaStreamHandler.detectMediaStreamType(this.stream);
+  }
+}

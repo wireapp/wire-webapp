@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaStreamSource = {
-  LOCAL: 'local',
-  REMOTE: 'remote',
-};
+export enum MediaStreamSource {
+  LOCAL = 'local',
+  REMOTE = 'remote',
+}

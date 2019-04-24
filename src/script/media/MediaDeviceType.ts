@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
-
-z.media.MediaType = {
-  AUDIO: 'audio',
-  AUDIO_VIDEO: 'audio/video',
-  NONE: 'none',
-  SCREEN: 'screen',
-  VIDEO: 'video',
-};
+export enum MediaDeviceType {
+  AUDIO_INPUT = 'audioinput',
+  AUDIO_OUTPUT = 'audiooutput',
+  SCREEN_INPUT = 'screeninput',
+  VIDEO_INPUT = 'videoinput',
+}
