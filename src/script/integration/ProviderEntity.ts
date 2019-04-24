@@ -17,11 +17,22 @@
  *
  */
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
+export interface ProviderData {
+  description?: string;
+  email?: string;
+  id?: string;
+  name?: string;
+  url?: string;
+}
 
-z.integration.ProviderEntity = class ProviderEntity {
-  constructor(providerData = {}) {
+export class ProviderEntity {
+  description: string;
+  email: string;
+  id: string;
+  name: string;
+  url: string;
+
+  constructor(providerData: ProviderData = {}) {
     const {description, id, name, url, email} = providerData;
 
     this.id = id || '';
@@ -31,4 +42,4 @@ z.integration.ProviderEntity = class ProviderEntity {
     this.name = name || '';
     this.url = url || '';
   }
-};
+}

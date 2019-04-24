@@ -41,6 +41,8 @@ import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {ConnectService} from '../connect/ConnectService';
 import {ConnectRepository} from '../connect/ConnectRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
+import {IntegrationRepository} from '../integration/IntegrationRepository';
+import {IntegrationService} from '../integration/IntegrationService';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 import {BackendClient} from '../service/BackendClient';
@@ -222,7 +224,7 @@ class App {
       serverTimeHandler,
       repositories.user
     );
-    repositories.integration = new z.integration.IntegrationRepository(
+    repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
       repositories.team
@@ -258,7 +260,7 @@ class App {
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
-      integration: new z.integration.IntegrationService(this.backendClient),
+      integration: new IntegrationService(this.backendClient),
       notification: new z.event.NotificationService(this.backendClient, storageService),
       search: new z.search.SearchService(this.backendClient),
       storage: storageService,

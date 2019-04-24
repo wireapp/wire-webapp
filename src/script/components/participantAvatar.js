@@ -24,6 +24,7 @@ import {getLogger} from 'utils/Logger';
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {createRandomUuid} from 'utils/util';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -57,7 +58,7 @@ class ParticipantAvatar {
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
     this.isService = ko.pureComputed(() => {
-      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isService;
+      return this.participant() instanceof ServiceEntity || this.participant().isService;
     });
 
     this.isUser = ko.pureComputed(() => {

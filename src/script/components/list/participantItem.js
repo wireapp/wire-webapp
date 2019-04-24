@@ -18,6 +18,7 @@
  */
 
 import {User} from '../../entity/User';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -25,7 +26,7 @@ window.z.components = z.components || {};
 z.components.ParticipantItem = class ParticipantItem {
   constructor(params) {
     this.participant = ko.unwrap(params.participant);
-    this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isService;
+    this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfUser = window.wire.app.repository.user.self;
     this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();

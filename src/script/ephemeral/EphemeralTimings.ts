@@ -17,23 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
+import {TimeUtil} from '../util/TimeUtil';
 
-z.integration.ServiceEntity = class ServiceEntity {
-  constructor(serviceData = {}) {
-    const {description, id, name, provider: providerId, summary, tags} = serviceData;
-
-    this.id = id || '';
-
-    this.description = description || '';
-    this.name = name || '';
-    this.providerId = providerId || '';
-    this.providerName = ko.observable(' ');
-    this.summary = summary || '';
-    this.tags = tags || [];
-
-    this.mediumPictureResource = ko.observable();
-    this.previewPictureResource = ko.observable();
-  }
+export const EphemeralTimings = {
+  VALUES: [
+    TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+    TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+    TimeUtil.UNITS_IN_MILLIS.HOUR,
+    TimeUtil.UNITS_IN_MILLIS.DAY,
+    TimeUtil.UNITS_IN_MILLIS.WEEK,
+    TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
+  ],
 };

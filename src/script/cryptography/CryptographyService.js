@@ -32,7 +32,7 @@ z.cryptography.CryptographyService = class CryptographyService {
 
   /**
    * Construct a new Cryptography Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;

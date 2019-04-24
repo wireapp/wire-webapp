@@ -28,6 +28,7 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '../../event/WebApp';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 class StartUIViewModel {
   static get STATE() {
@@ -190,7 +191,7 @@ class StartUIViewModel {
 
     // Selected user bubble
     this.userProfile = ko.observable(null);
-    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof z.integration.ServiceEntity);
+    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof ServiceEntity);
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
       return this.userProfileIsService() ? 'start-ui-service-bubble' : '';

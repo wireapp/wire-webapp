@@ -52,7 +52,7 @@ z.event.WebSocketService = class WebSocketService {
 
   /**
    * Construct a new WebSocket Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.sendPing = this.sendPing.bind(this);

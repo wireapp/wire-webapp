@@ -28,7 +28,7 @@ class PropertiesService {
 
   /**
    * Construct a new Properties Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
