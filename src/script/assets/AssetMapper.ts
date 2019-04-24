@@ -21,8 +21,8 @@ import {Asset} from '../entity/message/Asset';
 import {AssetRemoteData} from './AssetRemoteData';
 
 export interface MappedAsset {
-  medium: AssetRemoteData;
-  preview: AssetRemoteData;
+  medium?: AssetRemoteData;
+  preview?: AssetRemoteData;
 }
 
 export const mapProfileAssets = (userId: string, assets: Asset[]) => {
@@ -53,7 +53,7 @@ export const updateUserEntityAssets = (
     previewPictureResource: ko.Observable<AssetRemoteData>;
     mediumPictureResource: ko.Observable<AssetRemoteData>;
   },
-  mappedAssets: MappedAsset
+  mappedAssets: MappedAsset = {}
 ) => {
   const {preview, medium} = mappedAssets;
   if (preview) {

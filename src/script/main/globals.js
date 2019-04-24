@@ -213,7 +213,6 @@ import ReactionTypeGlobal from '../message/ReactionType.js';
 import SuperTypeGlobal from '../message/SuperType.js';
 import SystemMessageTypeGlobal from '../message/SystemMessageType.js';
 import VerificationMessageTypeGlobal from '../message/VerificationMessageType.js';
-import AssetGlobal from '../entity/message/Asset.js';
 import TextGlobal from '../entity/message/Text.js';
 import LinkPreviewGlobal from '../entity/message/LinkPreview.js';
 import FileGlobal from '../entity/message/File.js';
