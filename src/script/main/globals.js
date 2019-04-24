@@ -83,7 +83,6 @@ import CryptographyRepositoryGlobal from '../cryptography/CryptographyRepository
 import CryptographyServiceGlobal from '../cryptography/CryptographyService.js';
 import GenericMessageTypeGlobal from '../cryptography/GenericMessageType.js';
 import ProtoMessageTypeGlobal from '../cryptography/ProtoMessageType.js';
-import ephemeralTimingsGlobal from '../ephemeral/EphemeralTimings/index';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
 import EventServiceNoCompoundGlobal from '../event/EventServiceNoCompound.js';
