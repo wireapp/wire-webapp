@@ -25,6 +25,7 @@
     "no-return-await": true,
     "no-sparse-arrays": true,
     "no-this-assignment": true,
+    "no-unused-variable": true,
     "no-unused-expression": true,
     "object-literal-sort-keys": true,
     "ordered-imports": [true, {"named-imports-order": "lowercase-last"}],
