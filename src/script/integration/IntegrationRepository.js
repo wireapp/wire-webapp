@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ACCESS_STATE} from '../conversation/AccessState';
 
 window.z = window.z || {};
 window.z.integration = z.integration || {};
@@ -114,7 +115,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    */
   create1to1ConversationWithService(serviceEntity) {
     return this.conversationRepository
-      .createGroupConversation([], undefined, z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
+      .createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);

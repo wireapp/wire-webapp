@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
 
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
@@ -25,7 +26,6 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {CryptographyMapper} from './CryptographyMapper';
-import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};

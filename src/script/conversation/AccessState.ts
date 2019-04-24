@@ -17,12 +17,21 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+enum PERSONAL {
+  GROUP = 'z.conversation.ACCESS_STATE.PERSONAL.GROUP',
+  ONE2ONE = 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
+}
 
-z.conversation.ACCESS_ROLE = {
-  ACTIVATED: 'activated',
-  NON_ACTIVATED: 'non_activated',
-  PRIVATE: 'private',
-  TEAM: 'team',
+enum TEAM {
+  GUEST_ROOM = 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
+  LEGACY = 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
+  ONE2ONE = 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',
+  TEAM_ONLY = 'z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY',
+}
+
+export const ACCESS_STATE = {
+  PERSONAL,
+  SELF: 'z.conversation.ACCESS_STATE.SELF',
+  TEAM,
+  UNKNOWN: 'z.conversation.ACCESS_STATE.UNKNOWN',
 };

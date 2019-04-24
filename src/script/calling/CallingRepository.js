@@ -40,6 +40,8 @@ import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
 
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+
 export class CallingRepository {
   static get CONFIG() {
     return {
@@ -608,7 +610,7 @@ export class CallingRepository {
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(undefined, conversationId, {recipients: [userId]});
+        const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
         eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING);
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
@@ -746,7 +748,7 @@ export class CallingRepository {
           });
 
           const options = {precondition, recipients};
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, conversationEntity.id, options);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
           return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity);
         });

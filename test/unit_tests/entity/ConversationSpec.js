@@ -18,12 +18,15 @@
  */
 
 import 'src/script/localization/Localizer';
+import {createRandomUuid} from 'utils/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {createRandomUuid} from 'utils/util';
+import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {ConversationType} from 'src/script/conversation/ConversationType';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -44,28 +47,28 @@ describe('Conversation', () => {
     beforeEach(() => (conversation_et = new Conversation()));
 
     it('should return the expected value for personal conversations', () => {
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      conversation_et.type(ConversationType.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeTruthy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(z.conversation.ConversationType.SELF);
+      conversation_et.type(ConversationType.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeTruthy();
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -76,28 +79,28 @@ describe('Conversation', () => {
     it('should return the expected value for team conversations', () => {
       conversation_et.team_id = createRandomUuid();
 
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      conversation_et.type(ConversationType.CONNECT);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeTruthy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.type(z.conversation.ConversationType.SELF);
+      conversation_et.type(ConversationType.SELF);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeFalsy();
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeTruthy();
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -105,7 +108,7 @@ describe('Conversation', () => {
       expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeFalsy();
       expect(conversation_et.is1to1()).toBeTruthy();
@@ -113,7 +116,7 @@ describe('Conversation', () => {
       expect(conversation_et.isSelf()).toBeFalsy();
 
       conversation_et.participating_user_ids.push(createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.isGroup()).toBeTruthy();
       expect(conversation_et.is1to1()).toBeFalsy();
@@ -448,21 +451,21 @@ describe('Conversation', () => {
     it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
 
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      conversation_et.type(ConversationType.CONNECT);
 
       expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
     });
 
     it('displays a fallback if no user name has been set', () => {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.display_name()).toBe('…');
 
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      conversation_et.type(ConversationType.CONNECT);
 
       expect(conversation_et.display_name()).toBe('…');
     });
@@ -473,7 +476,7 @@ describe('Conversation', () => {
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
       const expected_display_name = `${conversation_et
         .participating_user_ets()[0]
         .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
@@ -482,14 +485,14 @@ describe('Conversation', () => {
     });
 
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
       const user = new User(createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
       conversation_et.participating_user_ids.push(other_user.id);
       conversation_et.participating_user_ids.push(user.id);
 
@@ -497,7 +500,7 @@ describe('Conversation', () => {
     });
 
     it('displays the conversation name for a self conversation', () => {
-      conversation_et.type(z.conversation.ConversationType.SELF);
+      conversation_et.type(ConversationType.SELF);
 
       expect(conversation_et.display_name()).toBe('…');
 
@@ -609,11 +612,11 @@ describe('Conversation', () => {
       const userEntity = new User(createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
@@ -622,21 +625,21 @@ describe('Conversation', () => {
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.hasGuest()).toBe(true);
 
       // Is false for conversations containing a guest if the self user is a personal account
       selfUserEntity.inTeam(false);
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.hasGuest()).toBe(false);
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.hasGuest()).toBe(false);
     });
@@ -649,11 +652,11 @@ describe('Conversation', () => {
       conversation_et = new Conversation(createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.hasService()).toBe(false);
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.hasService()).toBe(false);
 
@@ -661,11 +664,11 @@ describe('Conversation', () => {
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
       expect(conversation_et.hasService()).toBe(true);
 
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      conversation_et.type(ConversationType.GROUP);
 
       expect(conversation_et.hasService()).toBe(true);
     });
@@ -910,7 +913,7 @@ describe('Conversation', () => {
     });
 
     it('returns false if conversation is in no notification state', () => {
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -931,7 +934,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -952,7 +955,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in everything notifications state', () => {
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -1013,7 +1016,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversation_et.mutedState(NotificationSetting.STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -1044,7 +1047,7 @@ describe('Conversation', () => {
 
   describe('notificationState', () => {
     it('returns expected values', () => {
-      const NOTIFICATION_STATES = z.conversation.NotificationSetting.STATE;
+      const NOTIFICATION_STATES = NotificationSetting.STATE;
       const conversationEntity = new Conversation(createRandomUuid());
       const selfUserEntity = new User(createRandomUuid());
 

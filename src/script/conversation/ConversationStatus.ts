@@ -17,20 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ACCESS_STATE = {
-  PERSONAL: {
-    GROUP: 'z.conversation.ACCESS_STATE.PERSONAL.GROUP',
-    ONE2ONE: 'z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE',
-  },
-  SELF: 'z.conversation.ACCESS_STATE.SELF',
-  TEAM: {
-    GUEST_ROOM: 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
-    LEGACY: 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
-    ONE2ONE: 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',
-    TEAM_ONLY: 'z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY',
-  },
-  UNKNOWN: 'z.conversation.ACCESS_STATE.UNKNOWN',
-};
+/** Enum of a user's participation status in a conversation */
+export enum ConversationStatus {
+  CURRENT_MEMBER = 0,
+  PAST_MEMBER = 1,
+}

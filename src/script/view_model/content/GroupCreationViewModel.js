@@ -18,11 +18,12 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
-import {t} from 'utils/LocalizerUtil';
 import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {ACCESS_STATE} from '../../conversation/AccessState';
 
 export class GroupCreationViewModel {
   static get STATE() {
@@ -53,8 +54,8 @@ export class GroupCreationViewModel {
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
 
-    this.accessState = ko.observable(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.accessState = ko.observable(ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestRoom.subscribe(isGuestRoom => {
       if (!isGuestRoom) {
         this.selectedContacts.remove(userEntity => !userEntity.isTeamMember());
@@ -138,9 +139,7 @@ export class GroupCreationViewModel {
   }
 
   clickOnToggleGuestMode = () => {
-    const accessState = this.isGuestRoom()
-      ? z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY
-      : z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
+    const accessState = this.isGuestRoom() ? ACCESS_STATE.TEAM.TEAM_ONLY : ACCESS_STATE.TEAM.GUEST_ROOM;
 
     this.accessState(accessState);
   };
@@ -201,7 +200,7 @@ export class GroupCreationViewModel {
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
-    this.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
   _trackGroupCreation(conversationEntity) {

@@ -17,11 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-// Enum of a user's participation status in a conversation.
-z.conversation.ConversationStatus = {
-  CURRENT_MEMBER: 0,
-  PAST_MEMBER: 1,
-};
+export enum ACCESS_ROLE {
+  ACTIVATED = 'activated',
+  NON_ACTIVATED = 'non_activated',
+  PRIVATE = 'private',
+  TEAM = 'team',
+}

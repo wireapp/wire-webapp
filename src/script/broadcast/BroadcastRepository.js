@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
@@ -66,7 +67,7 @@ class BroadcastRepository {
     return this.messageSender.queueMessage(() => {
       const recipients = this._createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
+        const eventInfoEntity = new EventInfoEntity(genericMessage);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
@@ -93,7 +94,7 @@ class BroadcastRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event to be broadcasted
+   * @param {EventInfoEntity} eventInfoEntity - Event to be broadcasted
    * @param {Object} payload - Payload
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
