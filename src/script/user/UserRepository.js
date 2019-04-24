@@ -31,6 +31,7 @@ import {ConsentType} from './ConsentType';
 
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
 
 import {chunk} from 'utils/ArrayUtil';
 import {AvailabilityType} from './AvailabilityType';
@@ -76,9 +77,7 @@ export class UserRepository {
     this.self = ko.observable();
     this.users = ko.observableArray([]);
 
-    this.selfAvailability = ko
-      .computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE))
-      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 50}});
+    this.selfAvailability = ko.computed(() => (this.self() ? this.self().availability() : AvailabilityType.NONE));
     this.selfAvailability.subscribe(this.showAvailabilityModal);
 
     this.connect_requests = ko
@@ -353,21 +352,25 @@ export class UserRepository {
     function showModal(storageKey, title, message) {
       const hideModal = StorageUtil.getValue(storageKey);
       if (!hideModal) {
-        modals.showModal(ModalsViewModel.TYPE.OPTION, {
-          action: dontShowAgain => {
-            if (dontShowAgain) {
-              StorageUtil.setValue(storageKey, 'true');
-            }
+        modals.showModal(
+          ModalsViewModel.TYPE.OPTION,
+          {
+            action: dontShowAgain => {
+              if (dontShowAgain) {
+                StorageUtil.setValue(storageKey, 'true');
+              }
+            },
+            preventClose: true,
+            text: {
+              action: t('modalAcknowledgeAction'),
+              message,
+              option: t('modalAvailabilityDontShowAgain'),
+              secondary: '',
+              title,
+            },
           },
-          preventClose: true,
-          text: {
-            action: t('modalAcknowledgeAction'),
-            message,
-            option: t('modalAvailabilityDontShowAgain'),
-            secondary: '',
-            title,
-          },
-        });
+          'availability'
+        );
       }
     }
     switch (availability) {
@@ -519,7 +522,7 @@ export class UserRepository {
     if (hasPicture) {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
-        const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+        const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
         medium.load().then(imageBlob => this.change_picture(imageBlob));
       } else {
         // if an asset is already there, remove the pointer to the old picture

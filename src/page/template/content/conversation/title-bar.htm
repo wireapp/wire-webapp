@@ -13,7 +13,7 @@
           data-placement="bottom"
           data-uie-name="do-participants"
           class="conversation-title-bar-name">
-      <!-- ko if: conversationEntity().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
+      <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
         <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
       <!-- /ko -->
       <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>

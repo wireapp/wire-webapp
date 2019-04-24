@@ -17,10 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
-};
+export enum AssetRetentionPolicy {
+  ETERNAL = 'eternal',
+  ETERNAL_INFREQUENT_ACCESS = 'eternal-infrequent_access',
+  EXPIRING = 'expiring',
+  PERSISTENT = 'persistent',
+  VOLATILE = 'volatile',
+}

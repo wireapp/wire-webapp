@@ -37,6 +37,7 @@ import {
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
+import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -566,7 +567,7 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(generic_message).finish())
+      return encryptAesAsset(GenericMessage.encode(generic_message).finish())
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
@@ -594,7 +595,7 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return z.assets.AssetCrypto.encryptAesAsset(GenericMessage.encode(genericMessage).finish())
+      return encryptAesAsset(GenericMessage.encode(genericMessage).finish())
         .then(({cipherText, keyBytes, sha256}) => {
           keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);

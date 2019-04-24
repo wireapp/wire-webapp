@@ -17,11 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ACCESS_MODE = {
-  CODE: 'code',
-  INVITE: 'invite',
-  PRIVATE: 'private',
-};
+export enum ConversationStatusIcon {
+  ACTIVE_CALL = 'active-call',
+  MISSED_CALL = 'missed-call',
+  MUTED = 'muted',
+  NONE = 'none',
+  PENDING_CONNECTION = 'pending',
+  TYPING = 'typing',
+  UNREAD_MENTION = 'mention',
+  UNREAD_MESSAGES = 'messages',
+  UNREAD_PING = 'ping',
+  UNREAD_REPLY = 'reply',
+}
