@@ -76,6 +76,7 @@ import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -3876,8 +3877,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset_et = message_et.get_first_asset();
 
     const resource = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
     asset_et.status(z.assets.AssetTransferState.UPLOADED);
