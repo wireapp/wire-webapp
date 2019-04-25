@@ -70,6 +70,7 @@ import {WebAppEvents} from '../event/WebApp';
 
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {ClientRepository} from '../client/ClientRepository';
 
 class App {
   static get CONFIG() {
@@ -139,7 +140,8 @@ class App {
       this.service.cryptography,
       repositories.storage
     );
-    repositories.client = new z.client.ClientRepository(this.backendClient, repositories.cryptography);
+    const storageService = resolve(graph.StorageService);
+    repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
       resolve(graph.UserService),

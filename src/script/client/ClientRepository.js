@@ -31,12 +31,8 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientService} from './ClientService';
-import {resolve, graph} from '../config/appResolver';
 
-window.z = window.z || {};
-window.z.client = z.client || {};
-
-z.client.ClientRepository = class ClientRepository {
+export class ClientRepository {
   static get CONFIG() {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
@@ -47,12 +43,11 @@ z.client.ClientRepository = class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(backendClient, cryptographyRepository) {
-    const storageService = resolve(graph.StorageService);
+  constructor(backendClient, storageService, cryptographyRepository) {
     this.clientService = new ClientService(backendClient, storageService);
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = getLogger('z.client.ClientRepository');
+    this.logger = getLogger('ClientRepository');
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
@@ -96,7 +91,7 @@ z.client.ClientRepository = class ClientRepository {
   getAllClientsFromDb() {
     return this.clientService.loadAllClientsFromDb().then(clients => {
       const recipients = {};
-      const skippedUserIds = [this.selfUser().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
+      const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
         const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
@@ -132,7 +127,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   getCurrentClientFromDb() {
     return this.clientService
-      .loadClientFromDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      .loadClientFromDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
         throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
@@ -220,7 +215,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   _saveCurrentClientInDb(clientPayload) {
     clientPayload.meta = {is_verified: true};
-    return this.clientService.saveClientInDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
+    return this.clientService.saveClientInDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
   }
 
   /**
@@ -720,4 +715,4 @@ z.client.ClientRepository = class ClientRepository {
       amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
     }
   }
-};
+}

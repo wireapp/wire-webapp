@@ -20,8 +20,9 @@
 import {backendConfig} from '../../api/testResolver';
 import {User} from 'src/script/entity/User';
 import {Environment} from 'src/script/util/Environment';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 
-describe('z.client.ClientRepository', () => {
+describe('ClientRepository', () => {
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
   let userId = undefined;
@@ -105,7 +106,7 @@ describe('z.client.ClientRepository', () => {
 
     it('rejects with an error if no client found locally', done => {
       spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+        Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       );
 
       TestFactory.client_repository
