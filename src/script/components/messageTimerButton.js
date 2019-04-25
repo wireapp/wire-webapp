@@ -19,6 +19,7 @@
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {Context} from '../ui/ContextMenu';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -62,7 +63,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
       })
     );
 
-    z.ui.Context.from(event, entries, 'message-timer-menu');
+    Context.from(event, entries, 'message-timer-menu');
   }
 };
 
