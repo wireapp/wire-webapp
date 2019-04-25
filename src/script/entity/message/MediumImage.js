@@ -32,7 +32,7 @@ class MediumImage extends File {
     this.width = '0px';
     this.height = '0px';
 
-    // AssetRemoteData
+    // z.assets.AssetRemoteData
     this.resource = ko.observable();
     this.logger = getLogger('MediumImage');
   }
