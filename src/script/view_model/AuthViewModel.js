@@ -47,6 +47,8 @@ import {WebSocketService} from '../event/WebSocketService';
 
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 
+import {Modal} from '../ui/Modal';
+
 class AuthViewModel {
   static get CONFIG() {
     return {
@@ -834,7 +836,7 @@ class AuthViewModel {
   clicked_on_manage_devices() {
     if (!this.device_modal) {
       const hideCallback = $(document).off('keydown.deviceModal');
-      this.device_modal = new z.ui.Modal('#modal-limit', hideCallback);
+      this.device_modal = new Modal('#modal-limit', hideCallback);
       this.device_modal.setAutoclose(false);
     }
 

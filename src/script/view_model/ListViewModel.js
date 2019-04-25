@@ -30,6 +30,10 @@ import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 import {WebAppEvents} from '../event/WebApp';
 
+import {Context} from '../ui/ContextMenu';
+import {Shortcut} from '../ui/Shortcut';
+import {ShortcutType} from '../ui/ShortcutType';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -325,7 +329,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
+      const notificationsShortcut = Shortcut.getShortcutTooltip(ShortcutType.NOTIFICATIONS);
 
       if (this.isProAccount()) {
         entries.push({
@@ -355,7 +359,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: t('conversationsPopoverUnarchive'),
       });
     } else {
-      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
@@ -397,7 +401,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    z.ui.Context.from(event, entries, 'conversation-list-options-menu');
+    Context.from(event, entries, 'conversation-list-options-menu');
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {

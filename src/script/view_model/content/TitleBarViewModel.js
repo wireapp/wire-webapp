@@ -25,6 +25,8 @@ import {TimeUtil} from 'utils/TimeUtil';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -93,7 +95,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       return this.conversationEntity() && this.conversationEntity().supportsVideoCall(true);
     });
 
-    const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PEOPLE);
+    const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
   }
 

@@ -202,11 +202,6 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-import AvailabilityContextMenuGlobal from '../ui/AvailabilityContextMenu.js';
-import ContextMenuGlobal from '../ui/ContextMenu.js';
-import ModalGlobal from '../ui/Modal.js';
-import ShortcutTypeGlobal from '../ui/ShortcutType.js';
-import ShortcutGlobal from '../ui/Shortcut.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';

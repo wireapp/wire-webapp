@@ -23,6 +23,10 @@ import {t} from 'utils/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
+
 export class ConversationListViewModel {
   /**
    * View model for conversation list.
@@ -104,7 +108,7 @@ export class ConversationListViewModel {
       return t('tooltipConversationsArchived', this.archivedConversations().length);
     });
 
-    const startShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.START);
+    const startShortcut = Shortcut.getShortcutTooltip(ShortcutType.START);
     this.startTooltip = t('tooltipConversationsStart', startShortcut);
 
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
@@ -122,7 +126,7 @@ export class ConversationListViewModel {
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
+    AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   }
 
   clickOnConnectRequests() {
