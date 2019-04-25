@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {MediaType} from '../../media/MediaType';
+import {Environment} from 'utils/Environment';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -79,7 +80,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.permissionDenied = ko.observable(false);
 
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return this.deviceSupport.audioOutput() && z.util.Environment.browser.supports.audioOutputSelection;
+      return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
     });
   }
 

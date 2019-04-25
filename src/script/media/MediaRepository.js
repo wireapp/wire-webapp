@@ -18,6 +18,7 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+import {Environment} from 'utils/Environment';
 
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
@@ -40,7 +41,7 @@ export class MediaRepository {
    * @returns {boolean} True if MediaDevices are supported
    */
   static supportsMediaDevices() {
-    return z.util.Environment.browser.supports.mediaDevices;
+    return Environment.browser.supports.mediaDevices;
   }
 
   /**

@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 
 import {CallSetupTimings} from './CallSetupTimings';
 import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
@@ -68,8 +69,8 @@ class FlowTelemetry {
   create_report(passed_error) {
     const report = {
       meta: {
-        browser_name: z.util.Environment.browser.name,
-        browser_version: z.util.Environment.browser.version,
+        browser_name: Environment.browser.name,
+        browser_version: Environment.browser.version,
         flow_id: this.id,
         id: this.call_et.id,
         is_answer: this.is_answer,

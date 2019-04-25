@@ -20,6 +20,7 @@
 import {TimeUtil} from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
+import {Environment} from 'utils/Environment';
 
 export class AuthRepository {
   static get CONFIG() {
@@ -114,7 +115,7 @@ export class AuthRepository {
         .catch(error => {
           const {message, type} = error;
           const isRequestForbidden = type === z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
-          if (isRequestForbidden || z.util.Environment.frontend.isLocalhost()) {
+          if (isRequestForbidden || Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             Raygun.send(error);
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);

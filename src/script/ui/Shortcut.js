@@ -18,6 +18,7 @@
  */
 
 import keyboardJS from 'keyboardjs';
+import {Environment} from 'utils/Environment';
 
 window.z = window.z || {};
 window.z.ui = z.ui || {};
@@ -179,22 +180,22 @@ z.ui.Shortcut = (() => {
   };
 
   const _getShortcut = shortcutName => {
-    const platform = z.util.Environment.desktop ? 'electron' : 'webapp';
+    const platform = Environment.desktop ? 'electron' : 'webapp';
     const platformShortcuts = SHORTCUT_MAP[shortcutName].shortcut[platform];
-    return z.util.Environment.os.mac ? platformShortcuts.macos : platformShortcuts.pc;
+    return Environment.os.mac ? platformShortcuts.macos : platformShortcuts.pc;
   };
 
   const _getShortcutTooltip = shortcutName => {
     const shortcut = _getShortcut(shortcutName);
     if (shortcut) {
-      return z.util.Environment.os.mac ? _getBeautifiedShortcutMac(shortcut) : _getBeautifiedShortcutWin(shortcut);
+      return Environment.os.mac ? _getBeautifiedShortcutMac(shortcut) : _getBeautifiedShortcutWin(shortcut);
     }
   };
 
   const _init = () => {
     for (const shortcut in SHORTCUT_MAP) {
       const shortcutData = SHORTCUT_MAP[shortcut];
-      const isMenuShortcut = z.util.Environment.desktop && shortcutData.shortcut.electron.menu;
+      const isMenuShortcut = Environment.desktop && shortcutData.shortcut.electron.menu;
 
       if (!isMenuShortcut) {
         _registerEvent(_getShortcut(shortcut), shortcutData.event);
@@ -205,6 +206,7 @@ z.ui.Shortcut = (() => {
   _init();
 
   return {
+    __test__assignEnvironment: data => Object.assign(Environment, data),
     getBeautifiedShortcutMac: _getBeautifiedShortcutMac,
     getBeautifiedShortcutWin: _getBeautifiedShortcutWin,
     getShortcut: _getShortcut,

@@ -42,6 +42,7 @@ import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
+import {Environment} from 'utils/Environment';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -125,7 +126,7 @@ export class CallingRepository {
    * @returns {boolean} True if calling is supported
    */
   get supportsCalling() {
-    return z.util.Environment.browser.supports.calling;
+    return Environment.browser.supports.calling;
   }
 
   /**
@@ -133,7 +134,7 @@ export class CallingRepository {
    * @returns {boolean} True if screen sharing is supported
    */
   get supportsScreenSharing() {
-    return z.util.Environment.browser.supports.screenSharing;
+    return Environment.browser.supports.screenSharing;
   }
 
   /**
@@ -1610,7 +1611,7 @@ export class CallingRepository {
    * @returns {Promise} Resolves with the updated calling config
    */
   _getConfigFromBackend() {
-    const limit = z.util.Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+    const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
 
     return this.callingService.getConfig(limit).then(callingConfig => {
       if (callingConfig) {

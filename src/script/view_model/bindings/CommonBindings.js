@@ -31,6 +31,7 @@ import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {t} from 'utils/LocalizerUtil';
 import {stripUrlWrapper} from 'utils/util';
+import {Environment} from 'utils/Environment';
 
 /**
  * Use it on the drop area.
@@ -500,7 +501,7 @@ ko.bindingHandlers.simplebar = {
 
 ko.bindingHandlers.electron_remove = {
   init(element) {
-    if (z.util.Environment.electron) {
+    if (Environment.electron) {
       $(element).remove();
     }
   },
@@ -686,7 +687,7 @@ ko.bindingHandlers.tooltip = {
  */
 ko.bindingHandlers.clickOrDrag = {
   init(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    const isMacDesktop = Environment.electron && Environment.os.mac;
     const context = bindingContext.$data;
     const callback = valueAccessor().bind(context, context);
     if (!isMacDesktop) {

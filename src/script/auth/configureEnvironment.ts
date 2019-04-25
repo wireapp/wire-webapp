@@ -29,7 +29,7 @@ import '../message/MessageCategory';
 import '../service/BackendEnvironment';
 import '../storage/StorageSchemata';
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
-import '../util/Environment';
+//import '../util/Environment';
 import '../util/URLUtil';
 
 declare global {

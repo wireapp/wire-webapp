@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
@@ -359,7 +360,7 @@ export class MediaStreamHandler {
    * @returns {Promise} Resolves true when permissions is granted
    */
   _hasPermissionToAccess(mediaType) {
-    if (!z.util.Environment.browser.supports.mediaPermissions) {
+    if (!Environment.browser.supports.mediaPermissions) {
       return Promise.resolve(false);
     }
 
@@ -446,7 +447,7 @@ export class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _hidePermissionRequestHint(mediaType) {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
       amplify.publish(z.event.WebApp.WARNING.DISMISS, warningType);
     }
@@ -567,7 +568,7 @@ export class MediaStreamHandler {
   _requestMediaStream(mediaType, mediaStreamConstraints, hasPermission) {
     this.logger.info(`Requesting MediaStream access for '${mediaType}'`, mediaStreamConstraints);
 
-    const willPromptForPermission = !hasPermission && !z.util.Environment.desktop;
+    const willPromptForPermission = !hasPermission && !Environment.desktop;
     if (willPromptForPermission) {
       this._schedulePermissionHint(mediaType);
     }
@@ -689,7 +690,7 @@ export class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _showPermissionRequestHint(mediaType) {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
       amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
     }

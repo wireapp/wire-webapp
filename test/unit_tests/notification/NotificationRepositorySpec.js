@@ -32,6 +32,7 @@ import {PermissionStatusState} from 'src/script/permission/PermissionStatusState
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
+import {Environment} from 'src/script/util/Environment';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -83,8 +84,8 @@ describe('NotificationRepository', () => {
       // Mocks
       document.hasFocus = () => false;
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
-      z.util.Environment.browser.supports.notifications = true;
-
+      Environment.browser.supports.notifications = true;
+      TestFactory.notification_repository.__test__assignEnvironment(Environment);
       window.wire.app = {
         service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
@@ -196,7 +197,8 @@ describe('NotificationRepository', () => {
     });
 
     it('if the browser does not support them', () => {
-      z.util.Environment.browser.supports.notifications = false;
+      Environment.browser.supports.notifications = false;
+      TestFactory.notification_repository.__test__assignEnvironment(Environment);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();

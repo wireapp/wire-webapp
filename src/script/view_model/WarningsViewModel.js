@@ -22,6 +22,7 @@ import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
+import {Environment} from 'utils/Environment';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -70,6 +71,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
+    this.Environment = Environment;
 
     this.warnings.subscribe(warnings => {
       let topMargin;

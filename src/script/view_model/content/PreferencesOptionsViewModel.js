@@ -24,6 +24,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {Environment} from 'utils/Environment';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,6 +53,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.supportsCalling = this.callingRepository.supportsCalling;
+    this.Environment = Environment;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {
