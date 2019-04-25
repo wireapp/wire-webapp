@@ -21,6 +21,8 @@ import {TimeUtil} from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {WebAppEvents} from '../event/WebApp';
+import {SIGN_OUT_REASON} from './SignOutReason';
+import {QUEUE_STATE} from '../service/QueueState';
 
 export class AuthRepository {
   static get CONFIG() {
@@ -100,10 +102,10 @@ export class AuthRepository {
    * @returns {undefined} No return value
    */
   renewAccessToken(renewalTrigger) {
-    const isRefreshingToken = this.queueState() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
+    const isRefreshingToken = this.queueState() === QUEUE_STATE.ACCESS_TOKEN_REFRESH;
 
     if (!isRefreshingToken) {
-      this.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+      this.queueState(QUEUE_STATE.ACCESS_TOKEN_REFRESH);
       this.authService.backendClient.scheduleQueueUnblock();
       this.logger.info(`Access token renewal started. Source: ${renewalTrigger}`);
 
@@ -118,10 +120,10 @@ export class AuthRepository {
           if (isRequestForbidden || z.util.Environment.frontend.isLocalhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             Raygun.send(error);
-            return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);
+            return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.SESSION_EXPIRED, false);
           }
 
-          this.queueState(z.service.QUEUE_STATE.READY);
+          this.queueState(QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
           amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         });

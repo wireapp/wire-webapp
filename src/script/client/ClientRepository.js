@@ -28,6 +28,7 @@ import {murmurhash3} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -458,7 +459,7 @@ z.client.ClientRepository = class ClientRepository {
   removeLocalClient() {
     this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
       const shouldClearData = this.currentClient().isTemporary();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
   }
 
@@ -466,13 +467,13 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
-          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true)
         );
       }
 
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
         action: clearData => {
-          return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+          return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
         },
         preventClose: true,
         text: {

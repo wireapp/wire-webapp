@@ -17,16 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
-
-z.auth.SIGN_OUT_REASON = {
-  ACCOUNT_DELETED: 'deleted',
-  APP_INIT: 'app_init',
-  CLIENT_REMOVED: 'client_removed',
-  INDEXED_DB: 'indexedDb',
-  MULTIPLE_TABS: 'multiple_tabs',
-  NOT_SIGNED_IN: 'not_signed_in',
-  SESSION_EXPIRED: 'expired',
-  USER_REQUESTED: 'user_requested',
-};
+export enum QUEUE_STATE {
+  ACCESS_TOKEN_REFRESH = 'z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH',
+  CONNECTIVITY_PROBLEM = 'z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM',
+  READY = 'z.service.QUEUE_STATE.READY',
+}
