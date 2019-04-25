@@ -17,11 +17,33 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {Logger, getLogger} from 'utils/Logger';
+import {CallSetupSteps} from './CallSetupSteps';
 import {CallSetupStepsOrder} from './CallSetupStepsOrder';
 
 class CallSetupTimings {
-  constructor(call_id) {
+  call_id: string;
+  flow_received: number;
+  flowId?: string;
+  ice_connection_checking: number;
+  ice_connection_completed: number;
+  ice_connection_connected: number;
+  ice_gathering_completed: number;
+  ice_gathering_started: number;
+  is_answer: boolean;
+  local_sdp_created: number;
+  local_sdp_send: number;
+  local_sdp_set: number;
+  logger: Logger;
+  peer_connection_created: number;
+  remote_sdp_received: number;
+  remote_sdp_set: number;
+  started: number;
+  state_put: number;
+  stream_received: number;
+  stream_requested: number;
+
+  constructor(call_id: string) {
     this.get = this.get.bind(this);
     this.log = this.log.bind(this);
     this.call_id = call_id;
@@ -50,7 +72,7 @@ class CallSetupTimings {
   }
 
   get() {
-    const timings = {};
+    const timings: Record<string, number> = {};
 
     this._steps_order().forEach(step => {
       timings[step] = this[step];
@@ -59,9 +81,9 @@ class CallSetupTimings {
     return timings;
   }
 
-  time_step(step) {
+  time_step(step: CallSetupSteps) {
     if (this[step] === 0) {
-      this[step] = window.parseInt(window.performance.now() - this.started);
+      this[step] = parseInt((window.performance.now() - this.started).toString());
     }
   }
 
@@ -70,8 +92,8 @@ class CallSetupTimings {
 
     this._steps_order().forEach(step => {
       if (this.hasOwnProperty(step)) {
-        const placeholder_key = Array.from(Math.max(26 - step.length, 1)).join(' ');
-        const placeholder_value = Array.from(Math.max(6 - this[step].toString().length, 1)).join(' ');
+        const placeholder_key = new Array(Math.max(26 - step.length, 1)).join(' ');
+        const placeholder_value = new Array(Math.max(6 - this[step].toString().length, 1)).join(' ');
 
         this.logger.info(`Step${placeholder_key}'${step}':${placeholder_value}${this[step]}ms`);
       }

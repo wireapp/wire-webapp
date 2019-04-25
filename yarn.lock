@@ -1024,6 +1024,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/crypto-js@3.1.43":
+  version "3.1.43"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.43.tgz#b859347d6289ba13e347c335a4c9efa63337a748"
+  integrity sha512-EHe/YKctU3IYNBsDmSOPX/7jLHPRlx8WaiDKSY9JCTnJ8XJeM4c0ZJvx+9Gxmr2s2ihI92R+3U/gNL1sq5oRuQ==
+
 "@types/ed2curve@0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@types/ed2curve/-/ed2curve-0.2.2.tgz#8f8bc7e2c9a5895a941c63a4f7acd7a6a62a5b15"
@@ -1217,6 +1222,11 @@
   integrity sha512-7+H3+O8VX4Mx2HNdDLP1MSNoWp+FXfq3HDGc08kY5vxyuml7OAudO4CAQFsKsDvbU5spApJMZ6buEi/c3hKjtQ==
   dependencies:
     redux "^4.0.0"
+
+"@types/sdp-transform@2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.0.tgz#5078629ab539a38fb699549fe25427339dc52f29"
+  integrity sha512-RWVFLpqNsUbz085OanSNKAtk64G/e9Ol+t5a3QpCxkloidHYFk41vKtWIPmLcZS0Sm87L93S+MC8SL5S1LBPRA==
 
 "@types/serve-static@*":
   version "1.13.2"
