@@ -27,6 +27,11 @@ export const decryptAesAsset = (cipherText, keyBytes, referenceSha256) => {
   return window.crypto.subtle
     .digest('SHA-256', cipherText)
     .then(computedSha256 => {
+      console.log('cipherText', btoa(String.fromCharCode.apply(null, new Uint8Array(cipherText))));
+      console.log('keyBytes', btoa(String.fromCharCode.apply(null, new Uint8Array(keyBytes))));
+      console.log('referenceSha256', btoa(String.fromCharCode.apply(null, new Uint8Array(referenceSha256))));
+      console.log('computedSha256', btoa(String.fromCharCode.apply(null, new Uint8Array(computedSha256))));
+
       if (_equalHashes(referenceSha256, computedSha256)) {
         return window.crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
       }
