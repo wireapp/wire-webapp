@@ -19,6 +19,8 @@
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+
+import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
 
 window.z = window.z || {};
@@ -53,7 +55,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
         label: t('ephemeralUnitsNone'),
       },
     ].concat(
-      z.ephemeral.timings.VALUES.map(milliseconds => {
+      EphemeralTimings.VALUES.map(milliseconds => {
         const {text} = TimeUtil.formatDuration(milliseconds);
 
         return {

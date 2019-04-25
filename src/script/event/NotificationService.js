@@ -35,7 +35,7 @@ export class NotificationService {
   /**
    * Construct a new Notification Service.
    *
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageService} storageService - Service for all storage related tasks
    */
   constructor(backendClient, storageService) {

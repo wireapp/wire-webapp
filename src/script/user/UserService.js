@@ -31,7 +31,7 @@ export class UserService {
   /**
    * Construct a new User Service.
    * @class UserService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageService} storageService - Service for all storage interactions
    */
   constructor(backendClient, storageService) {
