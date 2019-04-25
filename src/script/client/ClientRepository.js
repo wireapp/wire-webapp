@@ -30,6 +30,8 @@ import {Environment} from 'utils/Environment';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {ClientService} from './ClientService';
+import {resolve, graph} from '../config/appResolver';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -45,8 +47,9 @@ z.client.ClientRepository = class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(clientService, cryptographyRepository) {
-    this.clientService = clientService;
+  constructor(backendClient, cryptographyRepository) {
+    const storageService = resolve(graph.StorageService);
+    this.clientService = new ClientService(backendClient, storageService);
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('z.client.ClientRepository');

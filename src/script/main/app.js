@@ -139,7 +139,7 @@ class App {
       this.service.cryptography,
       repositories.storage
     );
-    repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
+    repositories.client = new z.client.ClientRepository(this.backendClient, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
       resolve(graph.UserService),
@@ -252,7 +252,6 @@ class App {
 
     return {
       asset: resolve(graph.AssetService),
-      client: new z.client.ClientService(this.backendClient, storageService),
       connect: new ConnectService(this.backendClient),
       connection: new z.connection.ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),

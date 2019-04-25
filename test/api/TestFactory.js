@@ -141,13 +141,8 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(
-        resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-
       TestFactory.client_repository = new z.client.ClientRepository(
-        TestFactory.client_service,
+        resolve(graph.BackendClient),
         TestFactory.cryptography_repository
       );
       TestFactory.client_repository.init(user);

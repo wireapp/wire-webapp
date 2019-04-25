@@ -48,6 +48,7 @@ import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCode
 import {Environment} from 'utils/Environment';
 
 import {Modal} from '../ui/Modal';
+import {ClientService} from '../client/ClientService';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -80,7 +81,7 @@ class AuthViewModel {
       this.cryptography_service,
       this.storage_repository
     );
-    this.client_service = new z.client.ClientService(backendClient, this.storageService);
+    this.client_service = new ClientService(backendClient, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
     this.selfService = resolveDependency(graph.SelfService);
