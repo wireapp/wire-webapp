@@ -21,11 +21,9 @@ import {t} from 'utils/LocalizerUtil';
 
 import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';
+import {Context} from '../ui/ContextMenu';
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
-
-z.ui.AvailabilityContextMenu = {
+export const AvailabilityContextMenu = {
   show: (event, method, elementName) => {
     const entries = [
       {
@@ -46,6 +44,6 @@ z.ui.AvailabilityContextMenu = {
       },
     ];
 
-    z.ui.Context.from(event, entries, elementName);
+    Context.from(event, entries, elementName);
   },
 };

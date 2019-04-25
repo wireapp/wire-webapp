@@ -17,13 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.audio = z.audio || {};
-
-z.audio.AudioPreference = {
-  ALL: 'all',
-  NONE: 'none',
-  SOME: 'some',
-};
-
-export const AudioPreference = z.audio.AudioPreference;
+export enum AssetTransferState {
+  DOWNLOADING = 'downloading',
+  UPLOAD_FAILED = 'upload-failed',
+  UPLOAD_PENDING = 'upload-pending',
+  UPLOADED = 'uploaded',
+  UPLOADING = 'uploading',
+}

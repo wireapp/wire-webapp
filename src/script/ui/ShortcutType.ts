@@ -17,19 +17,16 @@
  *
  */
 
-window.z = window.z || {};
-window.z.audio = z.audio || {};
-
-z.audio.AudioType = {
-  CALL_DROP: 'call_drop',
-  INCOMING_CALL: 'ringing_from_them',
-  INCOMING_PING: 'ping_from_them',
-  NETWORK_INTERRUPTION: 'nw_interruption',
-  NEW_MESSAGE: 'new_message',
-  OUTGOING_CALL: 'ringing_from_me',
-  OUTGOING_PING: 'ping_from_me',
-  READY_TO_TALK: 'ready_to_talk',
-  TALK_LATER: 'talk_later',
-};
-
-export const AudioType = z.audio.AudioType;
+export enum ShortcutType {
+  ADD_PEOPLE = 'add_people',
+  ARCHIVE = 'archive',
+  CALL_MUTE = 'mute_call',
+  CALL_REJECT = 'reject',
+  DEBUG = 'debug',
+  NEXT = 'next',
+  NOTIFICATIONS = 'notifications',
+  PEOPLE = 'people',
+  PING = 'ping',
+  PREV = 'prev',
+  START = 'start',
+}
