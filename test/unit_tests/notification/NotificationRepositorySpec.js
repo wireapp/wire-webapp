@@ -20,21 +20,23 @@
 import 'src/script/localization/Localizer';
 import {t} from 'utils/LocalizerUtil';
 import {createRandomUuid} from 'utils/util';
+import {Environment} from 'utils/Environment';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {User} from 'src/script/entity/User';
-import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {Environment} from 'src/script/util/Environment';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
@@ -59,7 +61,7 @@ describe('NotificationRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;

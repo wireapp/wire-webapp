@@ -23,6 +23,7 @@ import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
 import {WebAppEvents} from '../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 
 export class WindowTitleViewModel {
   static get TITLE_DEBOUNCE() {
@@ -137,7 +138,7 @@ export class WindowTitleViewModel {
   }
 
   setUpdateState(handlingNotifications) {
-    const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const updateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
     if (isStateChange) {

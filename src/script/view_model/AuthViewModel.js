@@ -17,15 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 import 'phoneformat.js';
 
+import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
+import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
+import {Environment} from 'utils/Environment';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -42,10 +44,12 @@ import '../auth/ValidationError';
 import {AuthView} from '../auth/AuthView';
 
 import {BackendEvent} from '../event/Backend';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {NotificationService} from '../event/NotificationService';
+import {WebSocketService} from '../event/WebSocketService';
+
 import {resolve as resolveDependency, graph} from '../config/appResolver';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
-import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
-import {Environment} from 'utils/Environment';
 
 import {Modal} from '../ui/Modal';
 import {ClientRepository} from '../client/ClientRepository';
@@ -94,10 +98,10 @@ class AuthViewModel {
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
-    const eventService = new z.event.EventService(this.storageService);
-    this.notification_service = new z.event.NotificationService(backendClient, this.storageService);
-    this.web_socket_service = new z.event.WebSocketService(backendClient);
-    this.event_repository = new z.event.EventRepository(
+    const eventService = new EventService(this.storageService);
+    this.notification_service = new NotificationService(backendClient, this.storageService);
+    this.web_socket_service = new WebSocketService(backendClient);
+    this.event_repository = new EventRepository(
       eventService,
       this.notification_service,
       this.web_socket_service,

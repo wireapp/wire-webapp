@@ -80,7 +80,6 @@ import ephemeralTimingsGlobal from '../ephemeral/ephemeralTimings.js';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
 import EventServiceNoCompoundGlobal from '../event/EventServiceNoCompound.js';
-import NotificationHandlingStateGlobal from '../event/NotificationHandlingState.js';
 import NotificationServiceGlobal from '../event/NotificationService.js';
 import QuotedMessageMiddlewareGlobal from '../event/preprocessor/QuotedMessageMiddleware.js';
 import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js';

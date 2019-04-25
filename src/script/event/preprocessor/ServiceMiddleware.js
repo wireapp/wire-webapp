@@ -21,11 +21,7 @@ import {getLogger} from 'utils/Logger';
 import {ClientEvent} from '../Client';
 import {BackendEvent} from '../Backend';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-window.z.event.preprocessor = z.event.preprocessor || {};
-
-z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
+export class ServiceMiddleware {
   /**
    * Construct a new ServiceMiddleware.
    *
@@ -35,7 +31,7 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = getLogger('z.event.preprocessor.ServiceMiddleware');
+    this.logger = getLogger('ServiceMiddleware');
   }
 
   processEvent(event) {
@@ -86,4 +82,4 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
     const updatedData = Object.assign({}, event.data, {has_service: true});
     return Object.assign({}, event, {data: updatedData});
   }
-};
+}

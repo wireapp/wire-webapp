@@ -32,9 +32,11 @@ import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {MediaType} from '../../media/MediaType';
-import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantEntity} from './ParticipantEntity';
 import {AudioType} from '../../audio/AudioType';
+
+import {WebAppEvents} from '../../event/WebApp';
+import {EventRepository} from '../../event/EventRepository';
 
 class CallEntity {
   static get CONFIG() {
@@ -278,9 +280,7 @@ class CallEntity {
       this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
     }
 
-    const eventSource = onGroupCheck
-      ? z.event.EventRepository.SOURCE.INJECTED
-      : z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const eventSource = onGroupCheck ? EventRepository.SOURCE.INJECTED : EventRepository.SOURCE.WEB_SOCKET;
 
     callMessageEntity.userId = this.creatingUser.id;
     this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
