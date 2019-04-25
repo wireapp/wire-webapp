@@ -22,9 +22,6 @@ import moment from 'moment';
 import {t} from 'utils/LocalizerUtil';
 
 z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
-  deleted_timestamp: number | null;
-  display_deleted_timestamp: () => string;
-
   constructor() {
     super();
 
