@@ -25,8 +25,10 @@ import Dexie from 'dexie';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
+
 import {BackendEvent} from '../event/Backend';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {EventRepository} from '../event/EventRepository';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -135,7 +137,7 @@ export class DebugUtil {
       })
       .then(message => {
         return this.eventRepository.notificationService
-          .getNotifications(undefined, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
+          .getNotifications(undefined, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
           .then(({notifications}) => ({
             message,
             notifications,
@@ -304,7 +306,7 @@ export class DebugUtil {
     const clientId = this.clientRepository.currentClient().id;
 
     return this.eventRepository.notificationService
-      .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
+      .getNotifications(clientId, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
       .then(({notifications}) => {
         this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
 
@@ -320,7 +322,7 @@ export class DebugUtil {
       })
       .then(events => {
         this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
-        events.forEach(event => this.eventRepository.processEvent(event, z.event.EventRepository.SOURCE.STREAM));
+        events.forEach(event => this.eventRepository.processEvent(event, EventRepository.SOURCE.STREAM));
       });
   }
 }

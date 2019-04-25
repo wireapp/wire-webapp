@@ -35,6 +35,7 @@ import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
@@ -121,7 +122,7 @@ export class UserRepository {
    * Listener for incoming user events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   on_user_event(event_json, source) {
@@ -143,7 +144,7 @@ export class UserRepository {
     }
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
-    if (source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
+    if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
         case BackendEvent.USER.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(event_json.key);

@@ -30,7 +30,10 @@ import {BackendEvent} from 'src/script/event/Backend';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {EventRepository} from 'src/script/event/EventRepository';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
@@ -67,7 +70,7 @@ describe('ConversationRepository', () => {
     sinon.spy(jQuery, 'ajax');
 
     return test_factory.exposeConversationActors().then(conversation_repository => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       ({storageService: storage_service} = conversation_repository.conversation_service);
 
       spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
@@ -1107,10 +1110,7 @@ describe('ConversationRepository', () => {
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
-        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
-          event,
-          z.event.EventRepository.SOURCE.INJECTED
-        );
+        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
       });
     });
   });

@@ -45,6 +45,14 @@ import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
+import {EventRepository} from '../event/EventRepository';
+import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
+import {EventService} from '../event/EventService';
+import {NotificationService} from '../event/NotificationService';
+import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
+import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
+import {WebSocketService} from '../event/WebSocketService';
+
 import {BackendClient} from '../service/BackendClient';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -154,7 +162,7 @@ class App {
       repositories.properties
     );
     repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
-    repositories.event = new z.event.EventRepository(
+    repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
       this.service.webSocket,
@@ -185,11 +193,8 @@ class App {
       resolve(graph.AssetUploader)
     );
 
-    const serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
-      this.service.event,
-      z.message.MessageHasher
-    );
+    const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
+    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event, z.message.MessageHasher);
 
     const readReceiptMiddleware = new ReceiptsMiddleware(
       this.service.event,
@@ -251,8 +256,8 @@ class App {
   _setupServices() {
     const storageService = resolve(graph.StorageService);
     const eventService = Environment.browser.edge
-      ? new z.event.EventServiceNoCompound(storageService)
-      : new z.event.EventService(storageService);
+      ? new EventServiceNoCompound(storageService)
+      : new EventService(storageService);
 
     return {
       asset: resolve(graph.AssetService),
@@ -262,11 +267,11 @@ class App {
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,
       integration: new z.integration.IntegrationService(this.backendClient),
-      notification: new z.event.NotificationService(this.backendClient, storageService),
+      notification: new NotificationService(this.backendClient, storageService),
       search: new z.search.SearchService(this.backendClient),
       storage: storageService,
       team: new z.team.TeamService(this.backendClient),
-      webSocket: new z.event.WebSocketService(this.backendClient),
+      webSocket: new WebSocketService(this.backendClient),
     };
   }
 
@@ -408,7 +413,7 @@ class App {
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
       amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
       amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-      this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
+      this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
     });
   }
 
@@ -418,7 +423,7 @@ class App {
    */
   onInternetConnectionLost() {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
+    this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
   }
 
@@ -651,7 +656,7 @@ class App {
   _subscribeToUnloadEvents() {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
       this.repository.calling.leaveCallOnUnload();
 
       if (this.repository.user.isActivatedAccount()) {
@@ -694,7 +699,7 @@ class App {
 
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];

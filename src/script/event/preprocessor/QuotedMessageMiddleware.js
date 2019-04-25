@@ -25,23 +25,19 @@ import {base64ToArray} from 'utils/util';
 import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-window.z.event.preprocessor = z.event.preprocessor || {};
-
-z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
+export class QuotedMessageMiddleware {
   /**
    * Construct a new QuotedMessageMiddleware.
    * This class is reponsible for parsing incoming text messages that contains quoted messages.
    * It will handle validating the quote and adding metadata to the event.
    *
-   * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {EventService} eventService - Repository that handles events
    * @param {z.message.MessageHasher} messageHasher - Handles hashing messages
    */
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = getLogger('z.event.preprocessor.QuotedMessageMiddleware');
+    this.logger = getLogger('QuotedMessageMiddleware');
   }
 
   /**
@@ -164,4 +160,4 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         }));
     });
   }
-};
+}

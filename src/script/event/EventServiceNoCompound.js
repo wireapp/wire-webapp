@@ -17,12 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
+import {EventService} from './EventService';
 
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
-z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.EventService {
+export class EventServiceNoCompound extends EventService {
   constructor(storage_service) {
     super(storage_service);
   }
@@ -65,4 +64,4 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
       })
       .limit(limit);
   }
-};
+}

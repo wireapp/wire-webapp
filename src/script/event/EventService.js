@@ -24,11 +24,8 @@ import {MessageCategory} from '../message/MessageCategory';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
 /** Handles all databases interactions related to events */
-z.event.EventService = class EventService {
+export class EventService {
   /**
    * Construct a new Event Service.
    * @param {StorageService} storageService - Service for all storage interactions
@@ -367,4 +364,4 @@ z.event.EventService = class EventService {
       .filter(record => !isoDate || isoDate >= record.time)
       .delete();
   }
-};
+}

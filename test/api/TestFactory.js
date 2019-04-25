@@ -35,6 +35,12 @@ import {NotificationRepository} from 'src/script/notification/NotificationReposi
 import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 
+import {EventRepository} from 'src/script/event/EventRepository';
+import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
+import {EventService} from 'src/script/event/EventService';
+import {NotificationService} from 'src/script/event/NotificationService';
+import {WebSocketService} from 'src/script/event/WebSocketService';
+
 window.testConfig = {
   connection: backendConfig,
 };
@@ -170,20 +176,17 @@ window.TestFactory.prototype.exposeClientActors = function() {
 
 /**
  *
- * @returns {Promise<z.event.EventRepository>} The event repository.
+ * @returns {Promise<EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function() {
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.web_socket_service = new z.event.WebSocketService(
-        resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-      TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
-      TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
-      TestFactory.notification_service = new z.event.NotificationService(
+      TestFactory.web_socket_service = new WebSocketService(resolve(graph.BackendClient), TestFactory.storage_service);
+      TestFactory.event_service = new EventService(TestFactory.storage_service);
+      TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
+      TestFactory.notification_service = new NotificationService(
         resolve(graph.BackendClient),
         TestFactory.storage_service
       );
@@ -193,7 +196,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.storage_service
       );
 
-      TestFactory.event_repository = new z.event.EventRepository(
+      TestFactory.event_repository = new EventRepository(
         TestFactory.event_service,
         TestFactory.notification_service,
         TestFactory.web_socket_service,

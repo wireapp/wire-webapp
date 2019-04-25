@@ -20,17 +20,15 @@
 import {Conversation} from 'src/script/entity/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
+import {ServiceMiddleware} from 'src/script/event/preprocessor/ServiceMiddleware';
 
-describe('z.event.preprocessor.ServiceMiddleware', () => {
+describe('ServiceMiddleware', () => {
   const testFactory = new TestFactory();
   let serviceMiddleware;
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(() => {
-      serviceMiddleware = new z.event.preprocessor.ServiceMiddleware(
-        TestFactory.conversation_repository,
-        TestFactory.user_repository
-      );
+      serviceMiddleware = new ServiceMiddleware(TestFactory.conversation_repository, TestFactory.user_repository);
     });
   });
 
