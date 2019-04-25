@@ -75,7 +75,7 @@
           </div>
         </div>
         <div class="preferences-detail preferences-detail-emoji" data-bind="html: t('preferencesOptionsEmojiReplaceDetail', {}, {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'})"></div>
-        <!-- ko if: z.util.Environment.desktop -->
+        <!-- ko if: Environment.desktop -->
           <div class="preferences-option preferences-options-multiple">
             <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
               <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">

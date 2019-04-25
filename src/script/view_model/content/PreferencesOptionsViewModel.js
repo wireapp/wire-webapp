@@ -25,6 +25,7 @@ import {WebAppEvents} from '../../event/WebApp';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {Environment} from 'utils/Environment';
 
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {downloadBlob} from 'utils/util';
@@ -54,6 +55,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
     this.supportsCalling = this.callingRepository.supportsCalling;
+    this.Environment = Environment;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {

@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 import {t} from 'utils/LocalizerUtil';
 
 import {ConsentType} from '../user/ConsentType';
@@ -236,7 +237,7 @@ class PropertiesRepository {
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         return this.selfService
-          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${z.util.Environment.version(false)}`)
+          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`)
           .then(() => {
             if (value === ConsentValue.NOT_GIVEN) {
               return this.propertiesService.deletePropertiesByKey(key);

@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 
 class PreferencesListViewModel {
   /**
@@ -35,6 +36,7 @@ class PreferencesListViewModel {
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.Environment = Environment;
 
     this.supportsCalling = callingRepository.supportsCalling;
 

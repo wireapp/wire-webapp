@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
+import {Environment} from 'utils/Environment';
 
 import * as trackingHelpers from '../tracking/Helpers';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -203,9 +204,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   chooseSharedScreen(conversationId) {
     if (!this.disableToggleScreen()) {
       const skipScreenSelection =
-        this.selfStreamState.screenSend() ||
-        z.util.Environment.browser.firefox ||
-        navigator.mediaDevices.getDisplayMedia;
+        this.selfStreamState.screenSend() || Environment.browser.firefox || navigator.mediaDevices.getDisplayMedia;
       if (skipScreenSelection) {
         amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
         return;

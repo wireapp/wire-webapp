@@ -18,6 +18,7 @@
  */
 import {AppInitStatistics} from './AppInitStatistics';
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 
 import {AppInitTimings} from './AppInitTimings';
 import {WebAppEvents} from '../../event/WebApp';
@@ -53,7 +54,7 @@ export class AppInitTelemetry {
     const statistics = this.get_statistics();
 
     statistics.loading_time = this.timings.get_app_load();
-    statistics.app_version = z.util.Environment.version(false);
+    statistics.app_version = Environment.version(false);
     this.logger.info(`App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`);
     this.log_statistics();
     this.log_timings();

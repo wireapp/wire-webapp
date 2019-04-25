@@ -27,6 +27,7 @@ import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
+import {Environment} from 'utils/Environment';
 import {WebAppEvents} from '../../event/WebApp';
 
 class StartUIViewModel {
@@ -175,7 +176,7 @@ class StartUIViewModel {
     this.inviteBubble = null;
 
     this.inviteHint = ko.pureComputed(() => {
-      const metaKey = z.util.Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
+      const metaKey = Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
 
       return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
     });

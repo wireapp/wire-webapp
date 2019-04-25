@@ -17,8 +17,10 @@
  *
  */
 
+import {Environment} from './Environment';
+
 export function copyText(text) {
-  if (z.util.Environment.browser.supports.clipboard) {
+  if (Environment.browser.supports.clipboard) {
     return navigator.clipboard.writeText(text);
   }
 

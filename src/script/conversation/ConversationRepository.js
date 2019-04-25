@@ -78,6 +78,7 @@ import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, creat
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
+import {QUEUE_STATE} from '../service/QueueState';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -218,7 +219,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     this.conversation_service.backendClient.queueState.subscribe(queueState => {
-      const queueReady = queueState === z.service.QUEUE_STATE.READY;
+      const queueReady = queueState === QUEUE_STATE.READY;
       this.messageSender.pauseQueue(!queueReady || this.block_event_handling());
     });
 
