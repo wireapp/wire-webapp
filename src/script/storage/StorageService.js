@@ -23,10 +23,11 @@ import Dexie from 'dexie';
 
 import {Config} from '../auth/config';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageKey} from '../storage/StorageKey';
 
 import * as StorageUtil from 'utils/StorageUtil';
 
-class StorageService {
+export class StorageService {
   static get CONFIG() {
     return {
       DEXIE_CRUD_EVENTS: {
@@ -59,7 +60,7 @@ class StorageService {
    */
   init(userId = this.userId) {
     return Promise.resolve().then(() => {
-      const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
+      const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;
@@ -306,5 +307,3 @@ class StorageService {
       });
   }
 }
-
-export {StorageService};

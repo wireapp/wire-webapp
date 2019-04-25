@@ -19,6 +19,7 @@
 
 import {t} from 'utils/LocalizerUtil';
 import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -28,7 +29,7 @@ z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
     super();
 
     this.type = BackendEvent.CONVERSATION.RENAME;
-    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
+    this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
 
     this.caption = ko.pureComputed(() => (this.user().is_me ? t('conversationRenameYou') : t('conversationRename')));
   }

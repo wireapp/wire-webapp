@@ -19,25 +19,32 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-window.z = window.z || {};
-window.z.message = z.message || {};
+export interface QuoteEntityOptions {
+  error?: Error;
+  hash?: ArrayBuffer;
+  messageId: string;
+  userId: string;
+}
 
-z.message.QuoteEntity = class QuoteEntity {
-  static get ERROR() {
-    return {
-      INVALID_HASH: 'INVALID_HASH',
-      MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
-    };
+export class QuoteEntity {
+  error?: Error;
+  hash?: ArrayBuffer;
+  messageId: string;
+  userId: string;
+
+  static ERROR = {
+    INVALID_HASH: 'INVALID_HASH',
+    MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
+  };
+
+  constructor(options: QuoteEntityOptions) {
+    this.messageId = options.messageId;
+    this.hash = options.hash;
+    this.userId = options.userId;
+    this.error = options.error;
   }
 
-  constructor({error, hash, messageId, userId}) {
-    this.messageId = messageId;
-    this.hash = hash;
-    this.userId = userId;
-    this.error = error;
-  }
-
-  isQuoteFromUser(userId) {
+  isQuoteFromUser(userId: string) {
     return this.userId === userId;
   }
 
@@ -54,4 +61,4 @@ z.message.QuoteEntity = class QuoteEntity {
       quotedMessageSha256: new Uint8Array(this.hash),
     });
   }
-};
+}

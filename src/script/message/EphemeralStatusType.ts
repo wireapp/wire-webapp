@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum of different ephemeral status types */
 export enum EphemeralStatusType {
   ACTIVE = 1,
   INACTIVE = 2,

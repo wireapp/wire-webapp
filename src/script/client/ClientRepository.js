@@ -29,12 +29,11 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Environment} from 'utils/Environment';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {ClientService} from './ClientService';
 
-window.z = window.z || {};
-window.z.client = z.client || {};
-
-z.client.ClientRepository = class ClientRepository {
+export class ClientRepository {
   static get CONFIG() {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
@@ -45,11 +44,11 @@ z.client.ClientRepository = class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(clientService, cryptographyRepository) {
-    this.clientService = clientService;
+  constructor(backendClient, storageService, cryptographyRepository) {
+    this.clientService = new ClientService(backendClient, storageService);
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = getLogger('z.client.ClientRepository');
+    this.logger = getLogger('ClientRepository');
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
@@ -93,7 +92,7 @@ z.client.ClientRepository = class ClientRepository {
   getAllClientsFromDb() {
     return this.clientService.loadAllClientsFromDb().then(clients => {
       const recipients = {};
-      const skippedUserIds = [this.selfUser().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
+      const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
         const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
@@ -129,7 +128,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   getCurrentClientFromDb() {
     return this.clientService
-      .loadClientFromDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      .loadClientFromDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
         throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
@@ -217,7 +216,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   _saveCurrentClientInDb(clientPayload) {
     clientPayload.meta = {is_verified: true};
-    return this.clientService.saveClientInDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
+    return this.clientService.saveClientInDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
   }
 
   /**
@@ -259,7 +258,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
     const loginHash = murmurhash3(login || this.selfUser().id, 42);
-    return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
+    return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
   /**
@@ -398,7 +397,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
   _transferCookieLabel(clientType, cookieLabel) {
-    const indexedDbKey = z.storage.StorageKey.AUTH.COOKIE_LABEL;
+    const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
 
@@ -425,7 +424,7 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
+    const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
@@ -717,4 +716,4 @@ z.client.ClientRepository = class ClientRepository {
       amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
     }
   }
-};
+}

@@ -23,7 +23,7 @@ import {resolve, graph} from './../../api/testResolver';
 import {AudioPreference} from 'src/script/audio/AudioPreference';
 import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
 import {AudioType} from 'src/script/audio/AudioType';
-import {NotificationHandlingState} from 'src/script/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 describe('AudioRepository', () => {
   const audioRepository = resolve(graph.AudioRepository);
@@ -66,7 +66,7 @@ describe('AudioRepository', () => {
         spyOn(this, 'play');
       });
       audioRepository.init();
-      audioRepository.setMutedState(NotificationHandlingState.WEB_SOCKET);
+      audioRepository.setMutedState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     });
 
     it('only plays muted allowed sounds when in muted state', () => {

@@ -22,6 +22,8 @@ import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import {User} from '../User';
 import {ClientEvent} from '../../event/Client';
 import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -38,8 +40,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   constructor() {
     super();
 
-    this.super_type = z.message.SuperType.MEMBER;
-    this.memberMessageType = z.message.SystemMessageType.NORMAL;
+    this.super_type = SuperType.MEMBER;
+    this.memberMessageType = SystemMessageType.NORMAL;
 
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
@@ -111,8 +113,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       const name = this.senderName();
 
       switch (this.memberMessageType) {
-        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_REQUEST: {
+        case SystemMessageType.CONNECTION_ACCEPTED:
+        case SystemMessageType.CONNECTION_REQUEST: {
           if (this.otherUser()) {
             if (this.otherUser().isBlocked()) {
               return t('conversationConnectionBlocked');
@@ -126,7 +128,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return t('conversationConnectionAccepted');
         }
 
-        case z.message.SystemMessageType.CONVERSATION_CREATE: {
+        case SystemMessageType.CONVERSATION_CREATE: {
           if (this.name().length) {
             const exceedsMaxTeam = this.joinedUserEntities().length > MemberMessage.CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
             if (this.allTeamMembers && exceedsMaxTeam) {
@@ -157,7 +159,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             : t('conversationCreated', {name, users});
         }
 
-        case z.message.SystemMessageType.CONVERSATION_RESUME: {
+        case SystemMessageType.CONVERSATION_RESUME: {
           return t('conversationResume', this._generateNameString(false, Declension.DATIVE));
         }
 
@@ -226,10 +228,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this.showLargeAvatar = () => {
-      const largeAvatarTypes = [
-        z.message.SystemMessageType.CONNECTION_ACCEPTED,
-        z.message.SystemMessageType.CONNECTION_REQUEST,
-      ];
+      const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
       return largeAvatarTypes.includes(this.memberMessageType);
     };
   }
@@ -239,33 +238,30 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   isConnection() {
-    const connectionMessageTypes = [
-      z.message.SystemMessageType.CONNECTION_ACCEPTED,
-      z.message.SystemMessageType.CONNECTION_REQUEST,
-    ];
+    const connectionMessageTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
 
     return connectionMessageTypes.includes(this.memberMessageType);
   }
 
   isConnectionRequest() {
-    return this.memberMessageType === z.message.SystemMessageType.CONNECTION_REQUEST;
+    return this.memberMessageType === SystemMessageType.CONNECTION_REQUEST;
   }
 
   isCreation() {
     return [
-      z.message.SystemMessageType.CONNECTION_ACCEPTED,
-      z.message.SystemMessageType.CONNECTION_REQUEST,
-      z.message.SystemMessageType.CONVERSATION_CREATE,
-      z.message.SystemMessageType.CONVERSATION_RESUME,
+      SystemMessageType.CONNECTION_ACCEPTED,
+      SystemMessageType.CONNECTION_REQUEST,
+      SystemMessageType.CONVERSATION_CREATE,
+      SystemMessageType.CONVERSATION_RESUME,
     ].includes(this.memberMessageType);
   }
 
   isConversationCreate() {
-    return this.memberMessageType === z.message.SystemMessageType.CONVERSATION_CREATE;
+    return this.memberMessageType === SystemMessageType.CONVERSATION_CREATE;
   }
 
   isConversationResume() {
-    return this.memberMessageType === z.message.SystemMessageType.CONVERSATION_RESUME;
+    return this.memberMessageType === SystemMessageType.CONVERSATION_RESUME;
   }
 
   isGroupCreation() {

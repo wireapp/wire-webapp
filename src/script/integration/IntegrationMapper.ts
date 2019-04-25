@@ -18,26 +18,11 @@
  */
 
 import {mapProfileAssets, updateUserEntityAssets} from '../assets/AssetMapper';
+import {ProviderData, ProviderEntity} from './ProviderEntity';
+import {ServiceData, ServiceEntity} from './ServiceEntity';
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
-
-z.integration.IntegrationMapper = (() => {
-  const _mapProviderFromObject = providerData => {
-    return _updateProviderFromObject(providerData);
-  };
-
-  const _mapServicesFromArray = (servicesData = []) => {
-    return servicesData
-      .filter(serviceData => serviceData.enabled)
-      .map(serviceData => _updateServiceFromObject(serviceData));
-  };
-
-  const _mapServiceFromObject = serviceData => {
-    return _updateServiceFromObject(serviceData);
-  };
-
-  const _updateProviderFromObject = (providerData, providerEntity = new z.integration.ProviderEntity()) => {
+export const IntegrationMapper = {
+  mapProviderFromObject: (providerData: ProviderData, providerEntity = new ProviderEntity()) => {
     if (providerData) {
       const {description, email, id, name, url} = providerData;
 
@@ -63,9 +48,9 @@ z.integration.IntegrationMapper = (() => {
     }
 
     return providerEntity;
-  };
+  },
 
-  const _updateServiceFromObject = (serviceData, serviceEntity = new z.integration.ServiceEntity()) => {
+  mapServiceFromObject: (serviceData: ServiceData, serviceEntity = new ServiceEntity()) => {
     if (serviceData) {
       const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
@@ -100,11 +85,11 @@ z.integration.IntegrationMapper = (() => {
     }
 
     return serviceEntity;
-  };
+  },
 
-  return {
-    mapProviderFromObject: _mapProviderFromObject,
-    mapServiceFromObject: _mapServiceFromObject,
-    mapServicesFromArray: _mapServicesFromArray,
-  };
-})();
+  mapServicesFromArray: (servicesData: any[] = []) => {
+    return servicesData
+      .filter(serviceData => serviceData.enabled)
+      .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData));
+  },
+};

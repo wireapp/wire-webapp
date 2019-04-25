@@ -24,6 +24,7 @@ import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {noop} from 'utils/util';
 
 import {ClientEvent} from 'src/script/event/Client';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
@@ -66,7 +67,7 @@ describe('BackupRepository', () => {
   });
 
   describe('generateHistory', () => {
-    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
     beforeEach(() => {
       return Promise.all([
@@ -113,12 +114,12 @@ describe('BackupRepository', () => {
       };
 
       return TestFactory.storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent)
+        .save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent)
         .then(() => {
           const archivePromise = backupRepository.generateHistory(noop);
 
           return archivePromise.then(zip => {
-            return zip.files[`${z.storage.StorageSchemata.OBJECT_STORE.EVENTS}.json`]
+            return zip.files[`${StorageSchemata.OBJECT_STORE.EVENTS}.json`]
               .async('string')
               .then(eventsStr => JSON.parse(eventsStr))
               .then(events => {
@@ -201,7 +202,7 @@ describe('BackupRepository', () => {
       const importPromises = archives.map(archive => {
         return backupRepository.importHistory(archive, noop, noop).then(() => {
           const conversationsTest = TestFactory.storage_service
-            .getAll(z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS)
+            .getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
             .then(conversationsData => {
               expect(conversationsData.length).toEqual(1);
               const [conversationData] = conversationsData;
@@ -210,12 +211,10 @@ describe('BackupRepository', () => {
               expect(conversationData.id).toEqual(conversation.id);
             });
 
-          const eventsTest = TestFactory.storage_service
-            .getAll(z.storage.StorageSchemata.OBJECT_STORE.EVENTS)
-            .then(events => {
-              expect(events.length).toEqual(messages.length);
-              expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
-            });
+          const eventsTest = TestFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS).then(events => {
+            expect(events.length).toEqual(messages.length);
+            expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
+          });
 
           return Promise.all([conversationsTest, eventsTest]);
         });

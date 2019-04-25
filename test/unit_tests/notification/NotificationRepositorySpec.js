@@ -20,21 +20,27 @@
 import 'src/script/localization/Localizer';
 import {t} from 'utils/LocalizerUtil';
 import {createRandomUuid} from 'utils/util';
+import {Environment} from 'utils/Environment';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {User} from 'src/script/entity/User';
-import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {Environment} from 'src/script/util/Environment';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -55,7 +61,7 @@ describe('NotificationRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
@@ -244,7 +250,7 @@ describe('NotificationRepository', () => {
 
     it('for a successfully completed call', () => {
       message_et = new z.entity.CallMessage();
-      message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+      message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
       message_et.finished_reason = TERMINATION_REASON.COMPLETED;
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
@@ -285,7 +291,7 @@ describe('NotificationRepository', () => {
       textMessage.add_asset(generateTextAsset());
 
       const callMessage = new z.entity.CallMessage();
-      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
       allMessageTypes = {
         call: callMessage,
         content: textMessage,
@@ -360,7 +366,7 @@ describe('NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
         message_et.user(user_et);
       });
 
@@ -379,7 +385,7 @@ describe('NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
         message_et.finished_reason = TERMINATION_REASON.MISSED;
         message_et.user(user_et);
       });
@@ -523,7 +529,7 @@ describe('NotificationRepository', () => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
       message_et.type = BackendEvent.CONVERSATION.CREATE;
-      message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+      message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
       return verify_notification_system(conversation_et, message_et, expected_body);
@@ -561,7 +567,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
+      message_et.memberMessageType = SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
@@ -659,21 +665,21 @@ describe('NotificationRepository', () => {
 
     it('if a connection request is incoming', () => {
       connectionEntity.status = 'pending';
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
@@ -771,7 +777,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({messageId: createRandomUuid(), userId});
+      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
@@ -783,7 +789,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({
+      const quoteEntity = new QuoteEntity({
         messageId: createRandomUuid(),
         userId: createRandomUuid(),
       });

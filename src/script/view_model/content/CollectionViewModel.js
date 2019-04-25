@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -104,7 +105,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
       this.conversationEntity(conversationEntity);
 
       this.conversation_repository
-        .get_events_for_category(conversationEntity, z.message.MessageCategory.LINK_PREVIEW)
+        .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
         .then(messageEntities => this._populateItems(messageEntities));
     }
   }
@@ -113,19 +114,19 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     messageEntities.forEach(messageEntity => {
       if (!messageEntity.is_expired()) {
         // TODO: create binary map helper
-        const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
-        const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+        const isImage = messageEntity.category & MessageCategory.IMAGE;
+        const isGif = messageEntity.category & MessageCategory.GIF;
         if (isImage && !isGif) {
           return this.images.push(messageEntity);
         }
 
-        const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+        const isFile = messageEntity.category & MessageCategory.FILE;
         if (isFile) {
           const isAudio = messageEntity.get_first_asset().is_audio();
           return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
         }
 
-        const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+        const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
         if (isLinkPreview) {
           this.links.push(messageEntity);
         }

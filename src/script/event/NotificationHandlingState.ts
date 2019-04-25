@@ -17,20 +17,8 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
-
-window.z = window.z || {};
-window.z.ephemeral = z.ephemeral || {};
-
-z.ephemeral.timings = class {
-  static get VALUES() {
-    return [
-      TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-      TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
-      TimeUtil.UNITS_IN_MILLIS.HOUR,
-      TimeUtil.UNITS_IN_MILLIS.DAY,
-      TimeUtil.UNITS_IN_MILLIS.WEEK,
-      TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
-    ];
-  }
-};
+export enum NOTIFICATION_HANDLING_STATE {
+  RECOVERY = 'z.event.NOTIFICATION_HANDLING_STATE.RECOVERY',
+  STREAM = 'z.event.NOTIFICATION_HANDLING_STATE.STREAM',
+  WEB_SOCKET = 'z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET',
+}

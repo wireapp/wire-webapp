@@ -32,6 +32,14 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {ConnectService} from 'src/script/connect/ConnectService';
 import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+
+import {EventRepository} from 'src/script/event/EventRepository';
+import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
+import {EventService} from 'src/script/event/EventService';
+import {NotificationService} from 'src/script/event/NotificationService';
+import {WebSocketService} from 'src/script/event/WebSocketService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -56,7 +64,7 @@ window.TestFactory.prototype.exposeAuthActors = function() {
 
 /**
  *
- * @returns {Promise<z.storage.StorageRepository>} The storage repository.
+ * @returns {Promise<StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
   return Promise.resolve()
@@ -67,7 +75,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
       }
     })
     .then(() => {
-      TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
+      TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
       return TestFactory.storage_repository;
     });
 };
@@ -121,7 +129,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
 
 /**
  *
- * @returns {Promise<z.client.ClientRepository>} The client repository.
+ * @returns {Promise<ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function() {
   return Promise.resolve()
@@ -141,13 +149,9 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(
+      TestFactory.client_repository = new ClientRepository(
         resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-
-      TestFactory.client_repository = new z.client.ClientRepository(
-        TestFactory.client_service,
+        TestFactory.storage_service,
         TestFactory.cryptography_repository
       );
       TestFactory.client_repository.init(user);
@@ -172,20 +176,17 @@ window.TestFactory.prototype.exposeClientActors = function() {
 
 /**
  *
- * @returns {Promise<z.event.EventRepository>} The event repository.
+ * @returns {Promise<EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function() {
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.web_socket_service = new z.event.WebSocketService(
-        resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-      TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
-      TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
-      TestFactory.notification_service = new z.event.NotificationService(
+      TestFactory.web_socket_service = new WebSocketService(resolve(graph.BackendClient), TestFactory.storage_service);
+      TestFactory.event_service = new EventService(TestFactory.storage_service);
+      TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
+      TestFactory.notification_service = new NotificationService(
         resolve(graph.BackendClient),
         TestFactory.storage_service
       );
@@ -195,7 +196,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.storage_service
       );
 
-      TestFactory.event_repository = new z.event.EventRepository(
+      TestFactory.event_repository = new EventRepository(
         TestFactory.event_service,
         TestFactory.notification_service,
         TestFactory.web_socket_service,

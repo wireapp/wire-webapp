@@ -32,7 +32,7 @@ z.connection.ConnectionService = class ConnectionService {
   /**
    * Construct a new Connection Service.
    * @class z.connection.ConnectionService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;

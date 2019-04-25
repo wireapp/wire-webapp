@@ -38,6 +38,10 @@ import {
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
+import {PromiseQueue} from 'utils/PromiseQueue';
+import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import {getNextItem} from 'utils/ArrayUtil';
+import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -46,11 +50,11 @@ import {ClientEvent} from '../event/Client';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {EventRepository} from '../event/EventRepository';
 
-import {PromiseQueue} from 'utils/PromiseQueue';
 import {Conversation} from '../entity/Conversation';
 
-import {t, Declension, joinNames} from 'utils/LocalizerUtil';
 import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
@@ -73,12 +77,17 @@ import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
 
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 
-import {getNextItem} from 'utils/ArrayUtil';
-import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {QUEUE_STATE} from '../service/QueueState';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+import {SuperType} from '../message/SuperType';
+import {MessageCategory} from '../message/MessageCategory';
+import {ReactionType} from '../message/ReactionType';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -668,10 +677,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get messages for given category. Category param acts as lower bound.
    *
    * @param {Conversation} conversationEntity - Conversation entity
-   * @param {MessageCategory} [category=z.message.MessageCategory.NONE] - Message category
+   * @param {MessageCategory} [category=MessageCategory.NONE] - Message category
    * @returns {Promise} Array of message entities
    */
-  get_events_for_category(conversationEntity, category = z.message.MessageCategory.NONE) {
+  get_events_for_category(conversationEntity, category = MessageCategory.NONE) {
     return this.eventService
       .loadEventsWithCategory(conversationEntity.id, category)
       .then(events => this.event_mapper.mapJsonEvents(events, conversationEntity))
@@ -1193,11 +1202,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Set the notification handling state.
    *
    * @note Temporarily do not unarchive conversations when handling the notification stream
-   * @param {z.event.NOTIFICATION_HANDLING_STATE} handling_state - State of the notifications stream handling
+   * @param {NOTIFICATION_HANDLING_STATE} handling_state - State of the notifications stream handling
    * @returns {undefined} No return value
    */
   set_notification_handling_state(handling_state) {
-    const updated_handling_state = handling_state !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const updated_handling_state = handling_state !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.block_event_handling() !== updated_handling_state) {
       this.block_event_handling(updated_handling_state);
@@ -1247,7 +1256,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
-          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
@@ -1257,7 +1266,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const [sender] = userIds;
       const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
-      return this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.INJECTED);
+      return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
     });
   }
 
@@ -1277,7 +1286,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
           this.logger.debug(logMessage, response);
-          return this.eventRepository.injectEvent(response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
 
         return event;
@@ -1392,7 +1401,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
-      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1412,7 +1421,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         ? response.event
         : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
-      this.eventRepository.injectEvent(event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
     });
   }
@@ -1427,7 +1436,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   renameConversation(conversation_et, name) {
     return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
       if (response) {
-        this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
       }
     });
@@ -1447,7 +1456,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
       .then(response => {
         if (response) {
-          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1458,7 +1467,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .updateConversationReceiptMode(conversationEntity.id, receiptMode)
       .then(response => {
         if (response) {
-          this.eventRepository.injectEvent(response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1491,7 +1500,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to send message in
    * @param {string} url - URL of giphy image
    * @param {string} tag - tag tag used for gif search
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves when the gif was posted
    */
   sendGif(conversationEntity, url, tag, quoteEntity) {
@@ -2025,7 +2034,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
-   * @param {z.message.QuoteEntity} quoteEntity - Link to a quoted message
+   * @param {QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
@@ -2156,7 +2165,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   toggle_like(conversation_et, message_et) {
     if (!conversation_et.removed_from_conversation()) {
-      const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
+      const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
       window.setTimeout(() => this.sendReaction(conversation_et, message_et, reaction), 100);
@@ -2167,7 +2176,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send reaction to a content message in specified conversation.
    * @param {Conversation} conversationEntity - Conversation to send reaction in
    * @param {Message} messageEntity - Message to react to
-   * @param {z.message.ReactionType} reaction - Reaction
+   * @param {ReactionType} reaction - Reaction
    * @returns {Promise} Resolves after sending the reaction
    */
   sendReaction(conversationEntity, messageEntity, reaction) {
@@ -2221,7 +2230,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2253,7 +2262,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quoted message
+   * @param {QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2421,9 +2430,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
     return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
       .then(messageEntity => {
-        messageEntity.status(z.message.StatusType.SENT);
+        messageEntity.status(StatusType.SENT);
 
-        const changes = {status: z.message.StatusType.SENT};
+        const changes = {status: StatusType.SENT};
         if (isoDate) {
           changes.time = isoDate;
 
@@ -2878,10 +2887,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} [eventSource=z.event.EventRepository.SOURCE.STREAM] - Source of event
+   * @param {EventRepository.SOURCE} [eventSource=EventRepository.SOURCE.STREAM] - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
+  onConversationEvent(eventJson, eventSource = EventRepository.SOURCE.STREAM) {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
     const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
@@ -2889,7 +2898,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._pushToReceivingQueue(eventJson, eventSource);
   }
 
-  _handleConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
+  _handleConversationEvent(eventJson, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2921,7 +2930,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
 
-          const isBackendTimestamp = eventSource !== z.event.EventRepository.SOURCE.INJECTED;
+          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
           conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
@@ -2945,12 +2954,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the participant list has been checked
    */
   _checkConversationParticipants(conversationEntity, eventJson, eventSource) {
     // We ignore injected events
-    const isInjectedEvent = eventSource === z.event.EventRepository.SOURCE.INJECTED;
+    const isInjectedEvent = eventSource === EventRepository.SOURCE.INJECTED;
     if (isInjectedEvent || !conversationEntity) {
       return conversationEntity;
     }
@@ -2993,7 +3002,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise<any>} Resolves when the event has been treated
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
@@ -3063,7 +3072,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversationEntity - Conversation targeted by the event
    * @param {Object} eventJson - JSON data of the event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when all the handlers have done their job
    */
   _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
@@ -3079,7 +3088,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {EventRepository.SOURCE} eventSource - Source of event
    * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
    * @returns {Promise} Resolves when the conversation was updated
    */
@@ -3087,8 +3096,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
-      const eventFromWebSocket = eventSource === z.event.EventRepository.SOURCE.WEB_SOCKET;
-      const eventFromStream = eventSource === z.event.EventRepository.SOURCE.STREAM;
+      const eventFromWebSocket = eventSource === EventRepository.SOURCE.WEB_SOCKET;
+      const eventFromStream = eventSource === EventRepository.SOURCE.STREAM;
 
       if (messageEntity) {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
@@ -3123,7 +3132,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Push to receiving queue.
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _pushToReceivingQueue(eventJson, source) {
@@ -3131,7 +3140,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .push(() => this._handleConversationEvent(eventJson, source))
       .then(() => {
         if (this.init_promise) {
-          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+          const eventFromStream = source === EventRepository.SOURCE.STREAM;
           if (eventFromStream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
@@ -3183,7 +3192,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const userEntity = messageEntity.otherUser();
         const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
         if (isOutgoingRequest) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
         conversationEntity.add_message(messageEntity);
@@ -3216,7 +3225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Object} eventJson - JSON data of 'conversation.create' event
-   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
+   * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
   _onCreate(eventJson, eventSource) {
@@ -3261,7 +3270,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
+          messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
         }
 
         return this._updateMessageUserEntities(messageEntity);
@@ -3711,7 +3720,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
       return this.user_repository.get_user_by_id(from).then(userEntity => {
-        const reactionMessageEntity = new z.entity.Message(messageEntity.id, z.message.SuperType.REACTION);
+        const reactionMessageEntity = new z.entity.Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
         return {conversationEntity, messageEntity: reactionMessageEntity};
@@ -3879,12 +3888,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset_et = message_et.get_first_asset();
 
     const resource = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
     asset_et.status(AssetTransferState.UPLOADED);
-    message_et.status(z.message.StatusType.SENT);
+    message_et.status(StatusType.SENT);
 
     return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
   }

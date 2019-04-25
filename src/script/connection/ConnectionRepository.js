@@ -22,6 +22,8 @@ import {koArrayPushAll} from 'utils/util';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
+import {SystemMessageType} from '../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -54,7 +56,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Listener for incoming user events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   onUserEvent(eventJson, source) {
@@ -76,7 +78,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Convert a JSON event into an entity and get the matching conversation.
    *
    * @param {Object} eventJson - JSON data of 'user.connection' event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {boolean} [showConversation] - Should the new conversation be opened?
    * @returns {undefined} No return value
    */
@@ -161,7 +163,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .postConnections(userEntity.id, userEntity.name())
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
@@ -301,7 +303,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .putConnections(userEntity.id, connectionStatus)
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
@@ -321,7 +323,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Send the user connection notification.
    *
    * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
@@ -330,7 +332,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
-    const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const isWebSocketEvent = source === EventRepository.SOURCE.WEB_SOCKET;
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
@@ -341,10 +343,10 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         if (connectionEntity.isConnected()) {
           const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
           messageEntity.memberMessageType = statusWasSent
-            ? z.message.SystemMessageType.CONNECTION_ACCEPTED
-            : z.message.SystemMessageType.CONNECTION_CONNECTED;
+            ? SystemMessageType.CONNECTION_ACCEPTED
+            : SystemMessageType.CONNECTION_CONNECTED;
         } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
         amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);

@@ -19,10 +19,9 @@
 
 import {getLogger} from 'utils/Logger';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
+import {StorageSchemata} from '../storage/StorageSchemata';
 
-z.event.NotificationService = class NotificationService {
+export class NotificationService {
   static get CONFIG() {
     return {
       PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_DATE',
@@ -36,15 +35,15 @@ z.event.NotificationService = class NotificationService {
   /**
    * Construct a new Notification Service.
    *
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageService} storageService - Service for all storage related tasks
    */
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = getLogger('z.event.NotificationService');
+    this.logger = getLogger('NotificationService');
 
-    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**
@@ -166,4 +165,4 @@ z.event.NotificationService = class NotificationService {
       value: notificationId,
     });
   }
-};
+}

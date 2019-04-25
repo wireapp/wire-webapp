@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class UserService {
   static get URL() {
@@ -30,7 +31,7 @@ export class UserService {
   /**
    * Construct a new User Service.
    * @class UserService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageService} storageService - Service for all storage interactions
    */
   constructor(backendClient, storageService) {
@@ -38,7 +39,7 @@ export class UserService {
     this.logger = getLogger('UserService');
     this.storageService = storageService;
 
-    this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;
+    this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 
   //##############################################################################

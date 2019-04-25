@@ -17,14 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
+import {TimeUtil} from '../util/TimeUtil';
 
-/**
- * Enum for different call message types.
- * @returns {z.message.CALL_MESSAGE_TYPE} Enum of call message types
- */
-z.message.CALL_MESSAGE_TYPE = {
-  ACTIVATED: 'activated',
-  DEACTIVATED: 'deactivated',
+export const EphemeralTimings = {
+  VALUES: [
+    TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+    TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
+    TimeUtil.UNITS_IN_MILLIS.HOUR,
+    TimeUtil.UNITS_IN_MILLIS.DAY,
+    TimeUtil.UNITS_IN_MILLIS.WEEK,
+    TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
+  ],
 };

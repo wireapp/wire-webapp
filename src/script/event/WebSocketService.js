@@ -22,12 +22,10 @@ import {TimeUtil} from 'utils/TimeUtil';
 import * as StorageUtil from 'utils/StorageUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
+import {StorageKey} from '../storage/StorageKey';
 import {WebAppEvents} from './WebApp';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.WebSocketService = class WebSocketService {
+export class WebSocketService {
   static get CHANGE_TRIGGER() {
     return {
       CLEANUP: 'WebSocketService.CHANGE_TRIGGER.CLEANUP',
@@ -52,13 +50,13 @@ z.event.WebSocketService = class WebSocketService {
 
   /**
    * Construct a new WebSocket Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = getLogger('z.event.WebSocketService');
+    this.logger = getLogger('WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';
@@ -152,7 +150,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
@@ -231,4 +229,4 @@ z.event.WebSocketService = class WebSocketService {
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
     this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
   }
-};
+}

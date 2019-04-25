@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.NOTIFICATION_HANDLING_STATE = {
-  RECOVERY: 'z.event.NOTIFICATION_HANDLING_STATE.RECOVERY',
-  STREAM: 'z.event.NOTIFICATION_HANDLING_STATE.STREAM',
-  WEB_SOCKET: 'z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET',
-};
-
-export const NotificationHandlingState = z.event.NOTIFICATION_HANDLING_STATE;
+export enum VerificationMessageType {
+  NEW_DEVICE = 'new-device',
+  NEW_MEMBER = 'new-member',
+  UNVERIFIED = 'unverified',
+  VERIFIED = 'verified',
+}

@@ -21,6 +21,8 @@ import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -136,7 +138,7 @@ export class ConversationListViewModel {
   }
 
   setShowCallsState(handlingNotifications) {
-    const shouldShowCalls = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;
     if (isStateChange) {

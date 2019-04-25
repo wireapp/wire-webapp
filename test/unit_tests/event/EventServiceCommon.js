@@ -16,8 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {createRandomUuid} from 'utils/util';
+
+import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -25,7 +29,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
 
     const test_factory = new TestFactory();
-    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
     beforeEach(() => test_factory.exposeEventActors());
 
@@ -277,7 +281,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('should return no entry matches the given category', () => {
         return TestFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.VIDEO)
+          .loadEventsWithCategory(events[0].conversation, MessageCategory.VIDEO)
           .then(result => {
             expect(result.length).toBe(0);
           });
@@ -285,7 +289,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       it('should get images in the correct order', () => {
         return TestFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, z.message.MessageCategory.IMAGE)
+          .loadEventsWithCategory(events[0].conversation, MessageCategory.IMAGE)
           .then(result => {
             expect(result.length).toBe(2);
             expect(result[0].id).toBe(events[1].id);

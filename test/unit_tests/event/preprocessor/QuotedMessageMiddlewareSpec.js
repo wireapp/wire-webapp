@@ -21,17 +21,16 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64} from 'utils/util';
 import {ClientEvent} from 'src/script/event/Client';
+import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
-describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
+describe('QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
   let quotedMessageMiddleware;
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
-        TestFactory.event_service,
-        z.message.MessageHasher
-      );
+      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service, z.message.MessageHasher);
     });
   });
 
@@ -54,7 +53,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
 
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
       };
 
       const quote = new Quote({
@@ -79,7 +78,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
     it('adds an error if hashes do not match', () => {
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+        type: QuoteEntity.ERROR.INVALID_HASH,
       };
 
       const quotedMessage = {
@@ -241,7 +240,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       return quotedMessageMiddleware.processEvent(event).then(() => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
-            data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
+            data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
           })
         );
       });

@@ -17,4 +17,4 @@
  *
  */
 
-window.testEventServiceClass('event_service_no_compound', 'z.event.EventServiceNoCompound');
+window.testEventServiceClass('event_service_no_compound', 'EventServiceNoCompound');

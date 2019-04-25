@@ -21,6 +21,7 @@ import moment from 'moment';
 import {includesOnlyEmojis} from 'utils/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
+import {QuoteEntity} from '../message/QuoteEntity';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -81,7 +82,7 @@ z.components.MessageQuote = class MessageQuote {
         })
         .catch(error => {
           if (error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-            return this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+            return this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;
         });
@@ -89,7 +90,7 @@ z.components.MessageQuote = class MessageQuote {
 
     const handleQuoteDeleted = messageId => {
       if (this.quotedMessageId() === messageId) {
-        this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+        this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         this.quotedMessage(undefined);
       }
     };

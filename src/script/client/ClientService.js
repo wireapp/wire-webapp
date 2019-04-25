@@ -18,11 +18,9 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
-window.z = window.z || {};
-window.z.client = z.client || {};
-
-z.client.ClientService = class ClientService {
+export class ClientService {
   static get URL_CLIENTS() {
     return '/clients';
   }
@@ -39,9 +37,9 @@ z.client.ClientService = class ClientService {
   constructor(backendClient, storageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
-    this.logger = getLogger('z.client.ClientService');
+    this.logger = getLogger('ClientService');
 
-    this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
+    this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
   }
 
   //##############################################################################
@@ -203,4 +201,4 @@ z.client.ClientService = class ClientService {
   updateClientInDb(primaryKey, changes) {
     return this.storageService.update(this.CLIENT_STORE_NAME, primaryKey, changes);
   }
-};
+}

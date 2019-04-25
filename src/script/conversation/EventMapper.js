@@ -30,6 +30,12 @@ import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessa
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
+import {QuoteEntity} from '../message/QuoteEntity';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -109,7 +115,7 @@ export class EventMapper {
 
       if (eventData.quote) {
         const {message_id: messageId, user_id: userId, error} = eventData.quote;
-        originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+        originalEntity.quote(new QuoteEntity({error, messageId, userId}));
       }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
@@ -126,8 +132,8 @@ export class EventMapper {
       const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
       if (preview_otr_key) {
         const remoteDataPreview = preview_key
-          ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-          : z.assets.AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+          ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+          : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         asset.preview_resource(remoteDataPreview);
       }
     }
@@ -140,7 +146,7 @@ export class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.is_content() || originalEntity.is_ping()) {
-      originalEntity.status(event.status || z.message.StatusType.SENT);
+      originalEntity.status(event.status || StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -271,7 +277,7 @@ export class EventMapper {
     messageEntity.version = version || 1;
 
     if (messageEntity.is_content() || messageEntity.is_ping()) {
-      messageEntity.status(event.status || z.message.StatusType.SENT);
+      messageEntity.status(event.status || StatusType.SENT);
     }
 
     if (messageEntity.isReactable()) {
@@ -306,7 +312,7 @@ export class EventMapper {
     const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+    messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
 
     if (hasService) {
@@ -354,7 +360,7 @@ export class EventMapper {
    */
   _mapEventGroupCreation({data: eventData}) {
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+    messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
@@ -407,7 +413,7 @@ export class EventMapper {
 
       if (creatorIsJoiningMember) {
         userIds.splice(creatorIndex, 1);
-        messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+        messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
       if (hasService) {
@@ -450,7 +456,7 @@ export class EventMapper {
 
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+      messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
     return messageEntity;
@@ -567,7 +573,7 @@ export class EventMapper {
   _mapEventVoiceChannelActivate() {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
     messageEntity.visible(false);
 
     return messageEntity;
@@ -583,7 +589,7 @@ export class EventMapper {
   _mapEventVoiceChannelDeactivate({data: eventData}) {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
     messageEntity.finished_reason = eventData.reason;
     messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
 
@@ -631,16 +637,16 @@ export class EventMapper {
     // Remote data - full
     const {key, otr_key, sha256, token} = eventData;
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
       const remoteDataPreview = preview_key
-        ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        : z.assets.AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+        ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
     }
 
@@ -677,8 +683,8 @@ export class EventMapper {
     }
 
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
     assetEntity.resource(remoteData);
     return assetEntity;
@@ -712,7 +718,7 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
+          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 

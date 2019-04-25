@@ -27,6 +27,7 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 window.z = window.z || {};
@@ -123,7 +124,7 @@ z.team.TeamRepository = class TeamRepository {
 
   getWhitelistedServices(teamId, size, prefix) {
     return this.teamService.getWhitelistedServices(teamId, size, prefix).then(({services: servicesData}) => {
-      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+      return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
@@ -131,7 +132,7 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} eventJson - JSON data for team event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onTeamEvent(eventJson, source) {

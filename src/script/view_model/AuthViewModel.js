@@ -17,15 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 import 'phoneformat.js';
 
+import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
+import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
+import {Environment} from 'utils/Environment';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -34,20 +36,25 @@ import {App} from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import {AssetService} from '../assets/AssetService';
 import {StorageService} from '../storage/StorageService';
+import {StorageRepository} from '../storage/StorageRepository';
 import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 import '../auth/AuthView';
 import '../auth/ValidationError';
 import {AuthView} from '../auth/AuthView';
 
 import {BackendEvent} from '../event/Backend';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {NotificationService} from '../event/NotificationService';
+import {WebSocketService} from '../event/WebSocketService';
+
 import {resolve as resolveDependency, graph} from '../config/appResolver';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
-import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
-import {Environment} from 'utils/Environment';
 
 import {Modal} from '../ui/Modal';
+import {ClientRepository} from '../client/ClientRepository';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -73,15 +80,14 @@ class AuthViewModel {
     this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new StorageService();
-    this.storage_repository = new z.storage.StorageRepository(this.storageService);
+    this.storage_repository = new StorageRepository(this.storageService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
       this.storage_repository
     );
-    this.client_service = new z.client.ClientService(backendClient, this.storageService);
-    this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
+    this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
 
     this.selfService = resolveDependency(graph.SelfService);
     this.user_repository = new UserRepository(
@@ -94,10 +100,10 @@ class AuthViewModel {
 
     this.singleInstanceHandler = new z.main.SingleInstanceHandler();
 
-    const eventService = new z.event.EventService(this.storageService);
-    this.notification_service = new z.event.NotificationService(backendClient, this.storageService);
-    this.web_socket_service = new z.event.WebSocketService(backendClient);
-    this.event_repository = new z.event.EventRepository(
+    const eventService = new EventService(this.storageService);
+    this.notification_service = new NotificationService(backendClient, this.storageService);
+    this.web_socket_service = new WebSocketService(backendClient);
+    this.event_repository = new EventRepository(
       eventService,
       this.notification_service,
       this.web_socket_service,
@@ -1571,7 +1577,7 @@ class AuthViewModel {
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _hasLocalHistory() {
-    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
     return this.storageService.getAll(eventStoreName).then(events => events.length > 0);
   }
 

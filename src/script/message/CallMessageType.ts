@@ -17,23 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
-
-z.integration.ServiceEntity = class ServiceEntity {
-  constructor(serviceData = {}) {
-    const {description, id, name, provider: providerId, summary, tags} = serviceData;
-
-    this.id = id || '';
-
-    this.description = description || '';
-    this.name = name || '';
-    this.providerId = providerId || '';
-    this.providerName = ko.observable(' ');
-    this.summary = summary || '';
-    this.tags = tags || [];
-
-    this.mediumPictureResource = ko.observable();
-    this.previewPictureResource = ko.observable();
-  }
-};
+/** Enum for different call message types */
+export enum CALL_MESSAGE_TYPE {
+  ACTIVATED = 'activated',
+  DEACTIVATED = 'deactivated',
+}

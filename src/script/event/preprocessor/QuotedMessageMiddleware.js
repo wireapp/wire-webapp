@@ -23,24 +23,21 @@ import {getLogger} from 'utils/Logger';
 import {base64ToArray} from 'utils/util';
 
 import {ClientEvent} from '../Client';
+import {QuoteEntity} from '../../message/QuoteEntity';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-window.z.event.preprocessor = z.event.preprocessor || {};
-
-z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
+export class QuotedMessageMiddleware {
   /**
    * Construct a new QuotedMessageMiddleware.
    * This class is reponsible for parsing incoming text messages that contains quoted messages.
    * It will handle validating the quote and adding metadata to the event.
    *
-   * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {EventService} eventService - Repository that handles events
    * @param {z.message.MessageHasher} messageHasher - Handles hashing messages
    */
   constructor(eventService, messageHasher) {
     this.eventService = eventService;
     this.messageHasher = messageHasher;
-    this.logger = getLogger('z.event.preprocessor.QuotedMessageMiddleware');
+    this.logger = getLogger('QuotedMessageMiddleware');
   }
 
   /**
@@ -71,7 +68,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
     return this._findRepliesToMessage(event.conversation, originalMessageId).then(({replies}) => {
       this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
       replies.forEach(reply => {
-        reply.data.quote = {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
+        reply.data.quote = {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}};
         this.eventService.replaceEvent(reply);
       });
       return event;
@@ -115,7 +112,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
         const quoteData = {
           error: {
-            type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
           },
         };
 
@@ -132,7 +129,7 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
           this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
           quoteData = {
             error: {
-              type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+              type: QuoteEntity.ERROR.INVALID_HASH,
             },
           };
         } else {
@@ -163,4 +160,4 @@ z.event.preprocessor.QuotedMessageMiddleware = class QuotedMessageMiddleware {
         }));
     });
   }
-};
+}

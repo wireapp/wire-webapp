@@ -17,52 +17,49 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {BackendClient} from '../service/BackendClient';
+import {Logger, getLogger} from '../util/Logger';
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
-
-z.integration.IntegrationService = class IntegrationService {
-  static get URL() {
-    return {
-      PROVIDERS: '/providers',
-      SERVICES: '/services',
-    };
-  }
+export class IntegrationService {
+  static URL = {
+    PROVIDERS: '/providers',
+    SERVICES: '/services',
+  };
+  backendClient: BackendClient;
+  logger: Logger;
 
   /**
    * Construct a new Integration Service.
-   * @class z.integration.IntegrationService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param backendClient - Client for the API calls
    */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('z.integration.IntegrationService');
+    this.logger = getLogger('IntegrationService');
   }
 
-  getProvider(providerId) {
+  getProvider(providerId: string) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}`,
     });
   }
 
-  getProviderServices(providerId) {
+  getProviderServices(providerId: string) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}`,
     });
   }
 
-  getService(providerId, serviceId) {
+  getService(providerId: string, serviceId: string) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}/${serviceId}`,
     });
   }
 
-  getServices(tags, start) {
-    const params = {tags};
+  getServices(tags: string[], start: string) {
+    const params: Record<string, string[] | string> = {tags};
     if (start) {
       params.start = start;
     }
@@ -73,4 +70,4 @@ z.integration.IntegrationService = class IntegrationService {
       url: IntegrationService.URL.SERVICES,
     });
   }
-};
+}
