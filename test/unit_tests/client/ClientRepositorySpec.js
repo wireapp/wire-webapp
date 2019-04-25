@@ -19,6 +19,7 @@
 
 import {backendConfig} from '../../api/testResolver';
 import {User} from 'src/script/entity/User';
+import {Environment} from 'src/script/util/Environment';
 
 describe('z.client.ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -168,7 +169,8 @@ describe('z.client.ClientRepository', () => {
 
   describe('isCurrentClientPermanent', () => {
     beforeEach(() => {
-      z.util.Environment.electron = false;
+      Environment.electron = false;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       TestFactory.client_repository.currentClient(undefined);
     });
 
@@ -176,7 +178,8 @@ describe('z.client.ClientRepository', () => {
       const clientPayload = {type: z.client.ClientType.PERMANENT};
       const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
@@ -186,14 +189,16 @@ describe('z.client.ClientRepository', () => {
       const clientPayload = {type: z.client.ClientType.TEMPORARY};
       const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
 
     it('throws an error on Electron if no current client', () => {
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const functionCall = () => TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);

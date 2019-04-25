@@ -59,6 +59,7 @@ import '../components/mentionSuggestions.js';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {Environment} from 'utils/Environment';
 
 import {getWebsiteUrl} from '../externalRoute';
 
@@ -245,7 +246,7 @@ class App {
    */
   _setupServices() {
     const storageService = resolve(graph.StorageService);
-    const eventService = z.util.Environment.browser.edge
+    const eventService = Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
@@ -374,7 +375,7 @@ class App {
         telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
         if (this.repository.user.isActivatedAccount()) {
           // start regularly polling the server to check if there is a new version of Wire
-          startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
+          startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
         }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
@@ -390,7 +391,7 @@ class App {
   initServiceWorker() {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
-        .register(`/sw.js?${z.util.Environment.version(false)}`)
+        .register(`/sw.js?${Environment.version(false)}`)
         .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
@@ -419,9 +420,9 @@ class App {
   }
 
   _appInitFailure(error, isReload) {
-    let logMessage = `Could not initialize app version '${z.util.Environment.version(false)}'`;
-    if (z.util.Environment.desktop) {
-      logMessage += ` - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
+    let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
+    if (Environment.desktop) {
+      logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
@@ -571,7 +572,7 @@ class App {
    * @returns {Promise} Resolves with the access token
    */
   _loadAccessToken() {
-    const isLocalhost = z.util.Environment.frontend.isLocalhost();
+    const isLocalhost = Environment.frontend.isLocalhost();
     const referrer = document.referrer.toLowerCase();
     const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
     const getCachedToken = isLocalhost || isLoginRedirect;
@@ -760,7 +761,7 @@ class App {
    */
   refresh() {
     this.logger.info(`Refresh to update started`);
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }

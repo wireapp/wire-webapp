@@ -19,6 +19,7 @@
 
 import {Conversation} from '../entity/Conversation';
 import {ConversationType, UserType, PlatformType} from './attribute';
+import {Environment} from 'utils/Environment';
 
 /**
  * Get corresponding tracking attribute for conversation type.
@@ -75,14 +76,14 @@ function getParticipantTypes(userEntities, countSelf) {
  * @returns {PlatformType} Mapped platform type
  */
 function getPlatform() {
-  if (!z.util.Environment.desktop) {
+  if (!Environment.desktop) {
     return PlatformType.BROWSER_APP;
   }
 
-  if (z.util.Environment.os.win) {
+  if (Environment.os.win) {
     return PlatformType.DESKTOP_WINDOWS;
   }
-  return z.util.Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
+  return Environment.os.mac ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
 }
 
 export {getConversationType, getGuestAttributes, getParticipantTypes, getPlatform};

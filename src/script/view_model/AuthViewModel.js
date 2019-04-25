@@ -45,6 +45,7 @@ import {BackendEvent} from '../event/Backend';
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
+import {Environment} from 'utils/Environment';
 
 import {Modal} from '../ui/Modal';
 
@@ -360,7 +361,7 @@ class AuthViewModel {
    * @returns {Promise} Resolves when page is the first tab
    */
   _checkSingleInstance() {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       if (!this.tabsCheckIntervalId) {
         this._setTabsCheckInterval();
       }
