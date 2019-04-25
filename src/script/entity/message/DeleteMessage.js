@@ -20,6 +20,7 @@
 import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -28,7 +29,7 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
   constructor() {
     super();
 
-    this.super_type = z.message.SuperType.DELETE;
+    this.super_type = SuperType.DELETE;
     this.deleted_timestamp = null;
 
     this.display_deleted_timestamp = () => {

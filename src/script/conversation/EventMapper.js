@@ -31,6 +31,11 @@ import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
+import {QuoteEntity} from '../message/QuoteEntity';
+
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
   /**
@@ -109,7 +114,7 @@ export class EventMapper {
 
       if (eventData.quote) {
         const {message_id: messageId, user_id: userId, error} = eventData.quote;
-        originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+        originalEntity.quote(new QuoteEntity({error, messageId, userId}));
       }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
@@ -140,7 +145,7 @@ export class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.is_content() || originalEntity.is_ping()) {
-      originalEntity.status(event.status || z.message.StatusType.SENT);
+      originalEntity.status(event.status || StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -271,7 +276,7 @@ export class EventMapper {
     messageEntity.version = version || 1;
 
     if (messageEntity.is_content() || messageEntity.is_ping()) {
-      messageEntity.status(event.status || z.message.StatusType.SENT);
+      messageEntity.status(event.status || StatusType.SENT);
     }
 
     if (messageEntity.isReactable()) {
@@ -306,7 +311,7 @@ export class EventMapper {
     const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+    messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
 
     if (hasService) {
@@ -354,7 +359,7 @@ export class EventMapper {
    */
   _mapEventGroupCreation({data: eventData}) {
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+    messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
@@ -407,7 +412,7 @@ export class EventMapper {
 
       if (creatorIsJoiningMember) {
         userIds.splice(creatorIndex, 1);
-        messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+        messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
       if (hasService) {
@@ -450,7 +455,7 @@ export class EventMapper {
 
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+      messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
     return messageEntity;
@@ -567,7 +572,7 @@ export class EventMapper {
   _mapEventVoiceChannelActivate() {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
     messageEntity.visible(false);
 
     return messageEntity;
@@ -583,7 +588,7 @@ export class EventMapper {
   _mapEventVoiceChannelDeactivate({data: eventData}) {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
     messageEntity.finished_reason = eventData.reason;
     messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
 

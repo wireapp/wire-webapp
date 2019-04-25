@@ -22,6 +22,7 @@ import moment from 'moment';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
+import {SuperType} from '../../message/SuperType';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
@@ -109,7 +110,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       if (!this.message()) {
         return false;
       }
-      const isPing = this.message().super_type === z.message.SuperType.PING;
+      const isPing = this.message().super_type === SuperType.PING;
       const isEphemeral = this.message().is_ephemeral();
       return !isPing && !isEphemeral;
     });

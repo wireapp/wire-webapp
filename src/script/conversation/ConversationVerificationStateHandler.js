@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {WebAppEvents} from '../event/WebApp';
+import {VerificationMessageType} from '../message/VerificationMessageType';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -47,7 +48,7 @@ export class ConversationVerificationStateHandler {
     this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this._checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.UNVERIFIED);
+        this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.UNVERIFIED);
       }
     });
   }
@@ -68,7 +69,7 @@ export class ConversationVerificationStateHandler {
    */
   onClientsAdded(userIds) {
     this._getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
-      this._checkChangeToDegraded(conversationEntity, matchingUserIds, z.message.VerificationMessageType.NEW_DEVICE);
+      this._checkChangeToDegraded(conversationEntity, matchingUserIds, VerificationMessageType.NEW_DEVICE);
     });
   }
 
@@ -101,7 +102,7 @@ export class ConversationVerificationStateHandler {
     this._getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this._checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
-        this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_DEVICE);
+        this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_DEVICE);
       }
     });
   }
@@ -113,7 +114,7 @@ export class ConversationVerificationStateHandler {
    * @returns {undefined} No return value
    */
   onMemberJoined(conversationEntity, userIds) {
-    this._checkChangeToDegraded(conversationEntity, userIds, z.message.VerificationMessageType.NEW_MEMBER);
+    this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
   }
 
   /**
@@ -147,7 +148,7 @@ export class ConversationVerificationStateHandler {
    * @private
    * @param {Conversation} conversationEntity - Changed conversation entity
    * @param {Array<string>} userIds - IDs of affected users
-   * @param {z.message.VerificationMessageType} type - Type of degradation
+   * @param {VerificationMessageType} type - Type of degradation
    * @returns {boolean} True if state changed
    */
   _checkChangeToDegraded(conversationEntity, userIds, type) {

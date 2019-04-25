@@ -17,24 +17,20 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
 /**
  * Enum for different system message types.
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "z.message.SuperType".
- * @type {z.message.SystemMessageType} Enum of system message types
+ * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "SuperType".
  */
-z.message.SystemMessageType = {
-  CONNECTION_ACCEPTED: 'created-one-to-one',
-  CONNECTION_CONNECTED: 'connected',
-  CONNECTION_REQUEST: 'connecting',
-  CONVERSATION_CREATE: 'created-group',
-  CONVERSATION_MESSAGE_TIMER_UPDATE: 'message-timer-update',
-  CONVERSATION_RECEIPT_MODE_UPDATE: 'receipt-mode-update',
-  CONVERSATION_RENAME: 'rename',
-  CONVERSATION_RESUME: 'resume',
-  MEMBER_JOIN: 'join',
-  MEMBER_LEAVE: 'leave',
-  NORMAL: 'normal',
-};
+export enum SystemMessageType {
+  CONNECTION_ACCEPTED = 'created-one-to-one',
+  CONNECTION_CONNECTED = 'connected',
+  CONNECTION_REQUEST = 'connecting',
+  CONVERSATION_CREATE = 'created-group',
+  CONVERSATION_MESSAGE_TIMER_UPDATE = 'message-timer-update',
+  CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
+  CONVERSATION_RENAME = 'rename',
+  CONVERSATION_RESUME = 'resume',
+  MEMBER_JOIN = 'join',
+  MEMBER_LEAVE = 'leave',
+  NORMAL = 'normal',
+}
