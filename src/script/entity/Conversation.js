@@ -33,6 +33,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
 import {WebAppEvents} from '../event/WebApp';
+import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 
 export class Conversation {
@@ -479,11 +480,11 @@ export class Conversation {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
-          : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+          : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.selfUser().devices().length);
     }
 
-    return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**

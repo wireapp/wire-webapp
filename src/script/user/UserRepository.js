@@ -60,7 +60,7 @@ export class UserRepository {
    * @param {UserService} user_service - Backend REST API user service implementation
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
-   * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
+   * @param {ClientRepository} client_repository - Repository for all client interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
