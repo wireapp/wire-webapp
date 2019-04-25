@@ -22,7 +22,6 @@ import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
 import {base64ToArray} from 'utils/util';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {MediumImage} from '../entity/message/MediumImage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
@@ -125,8 +124,8 @@ export class EventMapper {
       const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
       if (preview_otr_key) {
         const remoteDataPreview = preview_key
-          ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-          : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+          ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+          : z.assets.AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         asset.preview_resource(remoteDataPreview);
       }
     }
@@ -630,16 +629,16 @@ export class EventMapper {
     // Remote data - full
     const {key, otr_key, sha256, token} = eventData;
     const remoteData = key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token)
-      : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
+      : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
       const remoteDataPreview = preview_key
-        ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+        ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        : z.assets.AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
     }
 
@@ -676,8 +675,8 @@ export class EventMapper {
     }
 
     const remoteData = key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
     assetEntity.resource(remoteData);
     return assetEntity;
@@ -711,7 +710,7 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
+          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 
