@@ -17,13 +17,19 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.NOTIFICATION_HANDLING_STATE = {
-  RECOVERY: 'z.event.NOTIFICATION_HANDLING_STATE.RECOVERY',
-  STREAM: 'z.event.NOTIFICATION_HANDLING_STATE.STREAM',
-  WEB_SOCKET: 'z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET',
-};
-
-export const NotificationHandlingState = z.event.NOTIFICATION_HANDLING_STATE;
+/** Enum for different message super types */
+export enum SuperType {
+  CALL = 'call',
+  CONTENT = 'normal',
+  DELETE = 'delete',
+  DEVICE = 'device',
+  LOCATION = 'location',
+  MEMBER = 'member',
+  MISSED = 'missed',
+  PING = 'ping',
+  REACTION = 'reaction',
+  SPECIAL = 'special',
+  SYSTEM = 'system',
+  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
+  VERIFICATION = 'verification',
+}

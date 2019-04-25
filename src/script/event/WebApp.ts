@@ -239,5 +239,5 @@ export const WebAppEvents = {
 // Needed for the wrapper
 
 window.z = window.z || {};
-window.z.event = z.event || {};
+window.z.event = window.z.event || {};
 window.z.event.WebApp = WebAppEvents;

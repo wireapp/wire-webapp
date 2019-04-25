@@ -21,6 +21,7 @@ import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 
 import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -30,7 +31,7 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
     super();
 
     this.type = BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE;
-    this.system_message_type = z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
+    this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
     this.message_timer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
 

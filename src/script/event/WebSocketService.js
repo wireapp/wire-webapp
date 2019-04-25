@@ -24,10 +24,7 @@ import * as StorageUtil from 'utils/StorageUtil';
 import {AuthRepository} from '../auth/AuthRepository';
 import {WebAppEvents} from './WebApp';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.WebSocketService = class WebSocketService {
+export class WebSocketService {
   static get CHANGE_TRIGGER() {
     return {
       CLEANUP: 'WebSocketService.CHANGE_TRIGGER.CLEANUP',
@@ -58,7 +55,7 @@ z.event.WebSocketService = class WebSocketService {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = getLogger('z.event.WebSocketService');
+    this.logger = getLogger('WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';
@@ -231,4 +228,4 @@ z.event.WebSocketService = class WebSocketService {
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
     this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
   }
-};
+}

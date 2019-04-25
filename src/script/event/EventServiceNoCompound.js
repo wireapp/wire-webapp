@@ -17,12 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
+import {EventService} from './EventService';
 
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
-z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.EventService {
+export class EventServiceNoCompound extends EventService {
   constructor(storage_service) {
     super(storage_service);
   }
@@ -31,7 +30,7 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
    * Get events with given category.
    *
    * @param {string} conversationId - ID of conversation to add users to
-   * @param {z.message.MessageCategory} category - Will be used as lower bound
+   * @param {MessageCategory} category - Will be used as lower bound
    * @returns {Promise} Resolves with matching events
    */
   loadEventsWithCategory(conversationId, category) {
@@ -65,4 +64,4 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
       })
       .limit(limit);
   }
-};
+}

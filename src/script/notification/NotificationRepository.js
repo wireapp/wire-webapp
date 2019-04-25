@@ -32,6 +32,9 @@ import {NotificationPreference} from './NotificationPreference';
 import {WebAppEvents} from '../event/WebApp';
 import {AudioType} from '../audio/AudioType';
 
+import {SystemMessageType} from '../message/SystemMessageType';
+import {SuperType} from '../message/SuperType';
+
 /**
  * Notification repository to trigger browser and audio notifications.
  *
@@ -49,14 +52,7 @@ class NotificationRepository {
   }
 
   static get EVENTS_TO_NOTIFY() {
-    return [
-      z.message.SuperType.CALL,
-      z.message.SuperType.CONTENT,
-      z.message.SuperType.MEMBER,
-      z.message.SuperType.PING,
-      z.message.SuperType.REACTION,
-      z.message.SuperType.SYSTEM,
-    ];
+    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
   }
 
   /**
@@ -163,7 +159,7 @@ class NotificationRepository {
 
     const isUserBusy = this.selfUser().availability() === AvailabilityType.BUSY;
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
-    const isCallMessage = messageEntity.super_type === z.message.SuperType.CALL;
+    const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage) {
       return Promise.resolve();
@@ -341,7 +337,7 @@ class NotificationRepository {
     const isGroup = conversationEntity && conversationEntity.isGroup();
 
     switch (messageEntity.memberMessageType) {
-      case z.message.SystemMessageType.NORMAL:
+      case SystemMessageType.NORMAL:
         if (isGroup) {
           if (messageEntity.isMemberJoin()) {
             return this._createBodyMemberJoin(messageEntity);
@@ -351,13 +347,13 @@ class NotificationRepository {
           }
         }
         break;
-      case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+      case SystemMessageType.CONNECTION_ACCEPTED:
         return t('notificationConnectionAccepted');
-      case z.message.SystemMessageType.CONNECTION_CONNECTED:
+      case SystemMessageType.CONNECTION_CONNECTED:
         return t('notificationConnectionConnected');
-      case z.message.SystemMessageType.CONNECTION_REQUEST:
+      case SystemMessageType.CONNECTION_REQUEST:
         return t('notificationConnectionRequest');
-      case z.message.SystemMessageType.CONVERSATION_CREATE:
+      case SystemMessageType.CONVERSATION_CREATE:
         return t('notificationConversationCreate', messageEntity.user().first_name(), {}, true);
     }
   }
@@ -431,11 +427,11 @@ class NotificationRepository {
     };
 
     switch (messageEntity.system_message_type) {
-      case z.message.SystemMessageType.CONVERSATION_RENAME: {
+      case SystemMessageType.CONVERSATION_RENAME: {
         return createBodyRename();
       }
 
-      case z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
+      case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
         return createBodyMessageTimerUpdate(messageEntity);
       }
     }
@@ -486,17 +482,17 @@ class NotificationRepository {
    */
   _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
     switch (messageEntity.super_type) {
-      case z.message.SuperType.CALL:
+      case SuperType.CALL:
         return this._createBodyCall(messageEntity);
-      case z.message.SuperType.CONTENT:
+      case SuperType.CONTENT:
         return this._createBodyContent(messageEntity);
-      case z.message.SuperType.MEMBER:
+      case SuperType.MEMBER:
         return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
-      case z.message.SuperType.PING:
+      case SuperType.PING:
         return this._createBodyPing();
-      case z.message.SuperType.REACTION:
+      case SuperType.REACTION:
         return this._createBodyReaction(messageEntity);
-      case z.message.SuperType.SYSTEM:
+      case SuperType.SYSTEM:
         return this._createBodySystem(messageEntity);
     }
   }
@@ -691,12 +687,12 @@ class NotificationRepository {
 
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
-        case z.message.SuperType.CONTENT: {
+        case SuperType.CONTENT: {
           amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
           break;
         }
 
-        case z.message.SuperType.PING: {
+        case SuperType.PING: {
           amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.INCOMING_PING);
           break;
         }

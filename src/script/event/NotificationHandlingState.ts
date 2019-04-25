@@ -17,27 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different message categories.
- * @returns {z.message.MessageCategory} Enum of message categories
- */
-z.message.MessageCategory = {
-  AUDIO: 1 << 10,
-  EXCLUDED: 1 << 1,
-  FILE: 1 << 9,
-  GIF: 1 << 8,
-  IMAGE: 1 << 7,
-  KNOCK: 1 << 2,
-  LIKED: 1 << 13,
-  LINK: 1 << 5,
-  LINK_PREVIEW: 1 << 6,
-  LOCATION: 1 << 12,
-  NONE: 0,
-  SYSTEM: 1 << 3,
-  TEXT: 1 << 4,
-  UNDEFINED: 1 << 0,
-  VIDEO: 1 << 11,
-};
+export enum NOTIFICATION_HANDLING_STATE {
+  RECOVERY = 'z.event.NOTIFICATION_HANDLING_STATE.RECOVERY',
+  STREAM = 'z.event.NOTIFICATION_HANDLING_STATE.STREAM',
+  WEB_SOCKET = 'z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET',
+}

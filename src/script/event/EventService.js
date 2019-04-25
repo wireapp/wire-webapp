@@ -18,13 +18,13 @@
  */
 
 import {getLogger} from 'utils/Logger';
+
+import {StatusType} from '../message/StatusType';
+import {MessageCategory} from '../message/MessageCategory';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
 /** Handles all databases interactions related to events */
-z.event.EventService = class EventService {
+export class EventService {
   /**
    * Construct a new Event Service.
    * @param {StorageService} storageService - Service for all storage interactions
@@ -92,10 +92,10 @@ z.event.EventService = class EventService {
    *
    * @param {string} conversationId - ID of conversation to add users to
    * @param {MessageCategory} categoryMin - Minimum message category
-   * @param {MessageCategory} [categoryMax=z.message.MessageCategory.LIKED] - Maximum message category
+   * @param {MessageCategory} [categoryMax=MessageCategory.LIKED] - Maximum message category
    * @returns {Promise} Resolves with matching events
    */
-  loadEventsWithCategory(conversationId, categoryMin, categoryMax = z.message.MessageCategory.LIKED) {
+  loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
     return this.storageService.db[this.EVENT_STORE_NAME]
       .where('[conversation+category]')
       .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
@@ -226,7 +226,7 @@ z.event.EventService = class EventService {
       record.data.sha256 = assetData.sha256;
       record.data.status = AssetTransferState.UPLOADED;
       record.data.token = assetData.token;
-      record.status = z.message.StatusType.SENT;
+      record.status = StatusType.SENT;
 
       return this.replaceEvent(record).then(() => this.logger.info('Updated asset message_et (uploaded)', primaryKey));
     });
@@ -363,4 +363,4 @@ z.event.EventService = class EventService {
       .filter(record => !isoDate || isoDate >= record.time)
       .delete();
   }
-};
+}

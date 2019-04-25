@@ -17,13 +17,15 @@
  *
  */
 
+import {SuperType} from '../../message/SuperType';
+
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.MISSED;
+    this.super_type = SuperType.MISSED;
     this.affect_order(false);
   }
 };

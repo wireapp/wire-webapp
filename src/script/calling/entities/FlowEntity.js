@@ -21,7 +21,9 @@ import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaStreamSource} from '../../media/MediaStreamSource';
 import {MediaStreamInfo} from '../../media/MediaStreamInfo';
 import {MediaType} from '../../media/MediaType';
+
 import {WebAppEvents} from '../../event/WebApp';
+import {EventRepository} from '../../event/EventRepository';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
@@ -787,7 +789,7 @@ class FlowEntity {
       this.remoteUserId,
       this.remoteClientId
     );
-    amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, z.event.EventRepository.SOURCE.WEB_SOCKET);
+    amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, EventRepository.SOURCE.WEB_SOCKET);
   }
 
   /**

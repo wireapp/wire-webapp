@@ -17,14 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different reactions.
- * @returns {z.message.ReactionType} Enum of reactions
- */
-z.message.ReactionType = {
-  LIKE: '❤️',
-  NONE: '',
-};
+/** Enum for different reactions */
+export enum ReactionType {
+  LIKE = '❤️',
+  NONE = '',
+}
