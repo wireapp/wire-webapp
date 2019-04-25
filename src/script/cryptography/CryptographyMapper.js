@@ -19,15 +19,17 @@
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
-import {AvailabilityType} from '../user/AvailabilityType';
-import {decryptAesAsset} from '../assets/AssetCrypto';
-import {ClientEvent} from '../event/Client';
-import {BackendEvent} from '../event/Backend';
-import {StatusType} from '../message/StatusType';
-
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'utils/util';
+
+import {AvailabilityType} from '../user/AvailabilityType';
+import {decryptAesAsset} from '../assets/AssetCrypto';
+import {AssetTransferState} from '../assets/AssetTransferState';
+
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
+import {StatusType} from '../message/StatusType';
 
 export class CryptographyMapper {
   static get CONFIG() {
@@ -200,13 +202,13 @@ export class CryptographyMapper {
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
-        status: z.assets.AssetTransferState.UPLOADED,
+        status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
       });
     } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
-        status: z.assets.AssetTransferState.UPLOAD_FAILED,
+        status: AssetTransferState.UPLOAD_FAILED,
       });
     }
 

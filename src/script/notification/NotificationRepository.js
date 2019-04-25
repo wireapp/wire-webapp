@@ -30,6 +30,8 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {NotificationPreference} from './NotificationPreference';
 import {WebAppEvents} from '../event/WebApp';
+import {AudioType} from '../audio/AudioType';
+
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
 
@@ -682,12 +684,12 @@ class NotificationRepository {
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case SuperType.CONTENT: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
           break;
         }
 
         case SuperType.PING: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.INCOMING_PING);
           break;
         }
       }

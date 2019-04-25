@@ -76,6 +76,8 @@ import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioType} from '../audio/AudioType';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
@@ -2393,7 +2395,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
         const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
         if (shouldPlayPingAudio) {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
         }
 
         return mappedEvent;
@@ -3440,7 +3442,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onAssetAdd(conversationEntity, event) {
     const fromSelf = event.from === this.selfUser().id;
 
-    const isRemoteFailure = !fromSelf && event.data.status === z.assets.AssetTransferState.UPLOAD_FAILED;
+    const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
     const isLocalCancel = fromSelf && event.data.reason === AssetUploadFailedReason.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
@@ -3449,7 +3451,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
       const firstAsset = messageEntity.get_first_asset();
-      if (firstAsset.is_image() || firstAsset.status() === z.assets.AssetTransferState.UPLOADED) {
+      if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
         return {conversationEntity, messageEntity};
       }
     });
@@ -3833,10 +3835,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update asset in UI and DB as failed
    * @param {Message} message_et - Message to update
-   * @param {string} [reason=z.assets.AssetTransferState.UPLOAD_FAILED] - Failure reason
+   * @param {string} [reason=AssetTransferState.UPLOAD_FAILED] - Failure reason
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_failed(message_et, reason = z.assets.AssetTransferState.UPLOAD_FAILED) {
+  update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
       if (!message_et.is_content()) {
         throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
@@ -3886,7 +3888,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
-    asset_et.status(z.assets.AssetTransferState.UPLOADED);
+    asset_et.status(AssetTransferState.UPLOADED);
     message_et.status(StatusType.SENT);
 
     return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);

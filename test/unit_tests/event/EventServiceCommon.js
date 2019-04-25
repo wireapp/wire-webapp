@@ -18,7 +18,9 @@
  */
 
 import {createRandomUuid} from 'utils/util';
+
 import {MessageCategory} from 'src/script/message/MessageCategory';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -390,11 +392,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
           id: 'event-id',
           data: {content: ''},
         };
-        const reason = z.assets.AssetTransferState.UPLOAD_FAILED;
+        const reason = AssetTransferState.UPLOAD_FAILED;
         spyOn(TestFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
         spyOn(TestFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
           expect(updates.data.reason).toEqual(reason);
-          expect(updates.data.status).toEqual(z.assets.AssetTransferState.UPLOAD_FAILED);
+          expect(updates.data.status).toEqual(AssetTransferState.UPLOAD_FAILED);
           expect(updates.data.content).toEqual(initialEvent.data.content);
           return Promise.resolve(undefined);
         });

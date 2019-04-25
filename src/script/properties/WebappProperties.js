@@ -19,6 +19,7 @@
 
 import {NotificationPreference} from '../notification/NotificationPreference';
 import {PROPERTIES_TYPE} from './PropertiesType';
+import {AudioPreference} from '../audio/AudioPreference';
 
 class WebappProperties {
   constructor() {
@@ -39,7 +40,7 @@ class WebappProperties {
         report_errors: undefined,
       },
       sound: {
-        alerts: z.audio.AudioPreference.ALL,
+        alerts: AudioPreference.ALL,
       },
     };
     this.contact_import = {
