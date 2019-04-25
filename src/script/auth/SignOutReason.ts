@@ -17,18 +17,13 @@
  *
  */
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
-
-z.auth.ValidationError = class ValidationError extends Error {
-  constructor(types, errorMessage) {
-    super();
-
-    if (_.isString(types)) {
-      types = [types];
-    }
-
-    this.types = types;
-    this.message = errorMessage;
-  }
-};
+export enum SIGN_OUT_REASON {
+  ACCOUNT_DELETED = 'deleted',
+  APP_INIT = 'app_init',
+  CLIENT_REMOVED = 'client_removed',
+  INDEXED_DB = 'indexedDb',
+  MULTIPLE_TABS = 'multiple_tabs',
+  NOT_SIGNED_IN = 'not_signed_in',
+  SESSION_EXPIRED = 'expired',
+  USER_REQUESTED = 'user_requested',
+}
