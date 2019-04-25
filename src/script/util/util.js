@@ -27,20 +27,21 @@ import {SanitizationUtil} from 'utils/SanitizationUtil';
 import PhoneFormatGlobal from 'phoneformat.js';
 import MarkdownIt from 'markdown-it';
 import {StringUtilGlobal} from './StringUtil';
+import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.util = z.util || {};
 
 export const checkIndexedDb = () => {
-  if (!z.util.Environment.browser.supports.indexedDb) {
-    const errorType = z.util.Environment.browser.edge
+  if (!Environment.browser.supports.indexedDb) {
+    const errorType = Environment.browser.edge
       ? z.error.AuthError.TYPE.PRIVATE_MODE
       : z.error.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
     return Promise.reject(new z.error.AuthError(errorType));
   }
 
-  if (z.util.Environment.browser.firefox) {
+  if (Environment.browser.firefox) {
     let dbOpenRequest;
 
     try {

@@ -19,6 +19,7 @@
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {MediaRepository} from '../../media/MediaRepository';
+import {Environment} from 'utils/Environment';
 import {WebAppEvents} from '../../event/WebApp';
 
 class FlowAudioEntity {
@@ -136,7 +137,7 @@ class FlowAudioEntity {
    * @returns {MediaStream} Wrapped MediaStream
    */
   wrapAudioOutputStream(mediaStream) {
-    if (z.util.Environment.browser.firefox) {
+    if (Environment.browser.firefox) {
       const audioContext = this._getAudioContext();
 
       if (audioContext) {

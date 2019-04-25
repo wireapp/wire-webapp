@@ -26,6 +26,7 @@ import {t} from 'utils/LocalizerUtil';
 import {murmurhash3} from 'utils/util';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {Environment} from 'utils/Environment';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
@@ -63,6 +64,10 @@ z.client.ClientRepository = class ClientRepository {
   init(selfUser) {
     this.selfUser(selfUser);
     this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
+  }
+
+  __test__assignEnvironment(data) {
+    Object.assign(Environment, data);
   }
 
   //##############################################################################
@@ -344,17 +349,17 @@ z.client.ClientRepository = class ClientRepository {
 
     let deviceModel = platform.name;
 
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       let modelString;
-      if (z.util.Environment.os.mac) {
+      if (Environment.os.mac) {
         modelString = t('wireMacos');
-      } else if (z.util.Environment.os.win) {
+      } else if (Environment.os.win) {
         modelString = t('wireWindows');
       } else {
         modelString = t('wireLinux');
       }
       deviceModel = modelString;
-      if (!z.util.Environment.frontend.isProduction()) {
+      if (!Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
     } else if (clientType === z.client.ClientType.TEMPORARY) {
@@ -422,7 +427,7 @@ z.client.ClientRepository = class ClientRepository {
     }
     const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
-    return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
+    return Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
 
   //##############################################################################
@@ -542,7 +547,7 @@ z.client.ClientRepository = class ClientRepository {
     if (!this.currentClient()) {
       throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
     }
-    return z.util.Environment.electron || this.currentClient().isPermanent();
+    return Environment.electron || this.currentClient().isPermanent();
   }
 
   /**

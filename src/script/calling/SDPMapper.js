@@ -18,6 +18,7 @@
  */
 
 import {SDP_TYPE} from './rtc/SDPType';
+import {Environment} from 'utils/Environment';
 
 export const SDPMapper = {
   CONFIG: {
@@ -70,7 +71,7 @@ export const SDPMapper = {
     const iceCandidates = [];
     let sessionDescription;
 
-    const isFirefox = z.util.Environment.browser.firefox;
+    const isFirefox = Environment.browser.firefox;
 
     const isLocalSdpInGroup = isLocalSdp && isGroup;
     const isOffer = rtcSdp.type === SDP_TYPE.OFFER;
@@ -90,11 +91,11 @@ export const SDPMapper = {
         if (isLocalSdp) {
           sdpLines.push(sdpLine);
 
-          const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
-          const webappVersion = z.util.Environment.version(false);
+          const browserString = `${Environment.browser.name} ${Environment.browser.version}`;
+          const webappVersion = Environment.version(false);
 
-          outline = z.util.Environment.desktop
-            ? `a=tool:electron ${z.util.Environment.version(true)} ${webappVersion} (${browserString})`
+          outline = Environment.desktop
+            ? `a=tool:electron ${Environment.version(true)} ${webappVersion} (${browserString})`
             : `a=tool:webapp ${webappVersion} (${browserString})`;
         }
       } else if (sdpLine.startsWith('a=candidate')) {

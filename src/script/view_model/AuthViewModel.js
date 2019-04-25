@@ -27,6 +27,7 @@ import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
+import {Environment} from 'utils/Environment';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -364,7 +365,7 @@ class AuthViewModel {
    * @returns {Promise} Resolves when page is the first tab
    */
   _checkSingleInstance() {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       if (!this.tabsCheckIntervalId) {
         this._setTabsCheckInterval();
       }

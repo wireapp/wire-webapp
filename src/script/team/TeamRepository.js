@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 import {t} from 'utils/LocalizerUtil';
 import {loadDataUrl} from 'utils/util';
 
@@ -172,7 +173,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   sendAccountInfo() {
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       const imageResource = this.isTeam() ? undefined : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
