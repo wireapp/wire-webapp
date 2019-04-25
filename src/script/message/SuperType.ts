@@ -17,21 +17,19 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-z.message.SuperType = {
-  CALL: 'call',
-  CONTENT: 'normal',
-  DELETE: 'delete',
-  DEVICE: 'device',
-  LOCATION: 'location',
-  MEMBER: 'member',
-  MISSED: 'missed',
-  PING: 'ping',
-  REACTION: 'reaction',
-  SPECIAL: 'special',
-  SYSTEM: 'system',
-  UNABLE_TO_DECRYPT: 'unable-to-decrypt',
-  VERIFICATION: 'verification',
-};
+/** Enum for different message super types */
+export enum SuperType {
+  CALL = 'call',
+  CONTENT = 'normal',
+  DELETE = 'delete',
+  DEVICE = 'device',
+  LOCATION = 'location',
+  MEMBER = 'member',
+  MISSED = 'missed',
+  PING = 'ping',
+  REACTION = 'reaction',
+  SPECIAL = 'special',
+  SYSTEM = 'system',
+  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
+  VERIFICATION = 'verification',
+}

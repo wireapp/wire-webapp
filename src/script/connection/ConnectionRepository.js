@@ -22,6 +22,7 @@ import {koArrayPushAll} from 'utils/util';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {SystemMessageType} from '../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -341,10 +342,10 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         if (connectionEntity.isConnected()) {
           const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
           messageEntity.memberMessageType = statusWasSent
-            ? z.message.SystemMessageType.CONNECTION_ACCEPTED
-            : z.message.SystemMessageType.CONNECTION_CONNECTED;
+            ? SystemMessageType.CONNECTION_ACCEPTED
+            : SystemMessageType.CONNECTION_CONNECTED;
         } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
         amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);

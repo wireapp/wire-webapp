@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-z.message.VerificationMessageType = {
-  NEW_DEVICE: 'new-device',
-  NEW_MEMBER: 'new-member',
-  UNVERIFIED: 'unverified',
-  VERIFIED: 'verified',
-};
+export enum VerificationMessageType {
+  NEW_DEVICE = 'new-device',
+  NEW_MEMBER = 'new-member',
+  UNVERIFIED = 'unverified',
+  VERIFIED = 'verified',
+}

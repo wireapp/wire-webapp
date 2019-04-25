@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {MessageCategory} from '../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -481,9 +482,8 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the matching events
    */
   search_in_conversation(conversation_id, query) {
-    const category_min = z.message.MessageCategory.TEXT;
-    const category_max =
-      z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
+    const category_min = MessageCategory.TEXT;
+    const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
     return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
       return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));

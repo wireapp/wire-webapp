@@ -31,7 +31,7 @@ z.event.EventServiceNoCompound = class EventServiceNoCompound extends z.event.Ev
    * Get events with given category.
    *
    * @param {string} conversationId - ID of conversation to add users to
-   * @param {z.message.MessageCategory} category - Will be used as lower bound
+   * @param {MessageCategory} category - Will be used as lower bound
    * @returns {Promise} Resolves with matching events
    */
   loadEventsWithCategory(conversationId, category) {

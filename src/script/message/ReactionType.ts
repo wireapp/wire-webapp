@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-z.message.CALL_MESSAGE_TYPE = {
-  ACTIVATED: 'activated',
-  DEACTIVATED: 'deactivated',
-};
+export enum ReactionType {
+  LIKE = '❤️',
+  NONE = '',
+}

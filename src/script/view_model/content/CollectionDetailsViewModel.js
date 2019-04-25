@@ -25,6 +25,7 @@ import {t} from 'utils/LocalizerUtil';
 import {koPushDeferred} from 'utils/util';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -47,6 +48,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.items = ko.observableArray();
 
     this.lastMessageTimestamp = undefined;
+    this.MessageCategory = MessageCategory;
   }
 
   setConversation(conversationEntity, category, items) {
@@ -63,8 +65,8 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
-          const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
-          const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+          const isImage = messageEntity.category & MessageCategory.IMAGE;
+          const isGif = messageEntity.category & MessageCategory.GIF;
           if (isImage && !isGif) {
             this.items.push(messageEntity);
           }
@@ -72,7 +74,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
         }
 
         case 'files': {
-          const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+          const isFile = messageEntity.category & MessageCategory.FILE;
           if (isFile) {
             this.items.push(messageEntity);
           }
@@ -80,7 +82,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
         }
 
         case 'links':
-          const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+          const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
           if (isLinkPreview) {
             this.items.push(messageEntity);
           }

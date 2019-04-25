@@ -17,21 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different confirmation types.
- * @type {z.message.StatusType} Enum of status types
- */
-const StatusType = {
-  DELIVERED: 3,
-  FAILED: 0,
-  SEEN: 4,
-  SENDING: 1,
-  SENT: 2,
-  UNSPECIFIED: -1,
-};
-
-z.message.StatusType = StatusType;
-export {StatusType};
+/** Enum for different call message types */
+export enum CALL_MESSAGE_TYPE {
+  ACTIVATED = 'activated',
+  DEACTIVATED = 'deactivated',
+}
