@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
@@ -51,12 +52,12 @@ export class PermissionRepository {
     return Promise.resolve().then(() => {
       const setPermissionState = permissionState => this.permissionState[permissionType](permissionState);
 
-      if (!z.util.Environment.browser.supports.permissions) {
+      if (!Environment.browser.supports.permissions) {
         throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED);
       }
 
       const isMediaPermission = PermissionRepository.CONFIG.MEDIA_TYPES.includes(permissionType);
-      if (isMediaPermission && !z.util.Environment.browser.supports.mediaPermissions) {
+      if (isMediaPermission && !Environment.browser.supports.mediaPermissions) {
         throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED_TYPE);
       }
 

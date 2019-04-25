@@ -17,18 +17,7 @@
  *
  */
 
-export function isToday(momentDate) {
-  return momentDate.isSame(new Date(), 'd');
-}
-
-export function isCurrentYear(momentDate) {
-  return momentDate.isSame(new Date(), 'y');
-}
-
-export function isSameDay(momentDate, otherDate) {
-  return momentDate.isSame(otherDate, 'd');
-}
-
-export function isSameMonth(momentDate, otherDate) {
-  return momentDate.isSame(otherDate, 'M');
-}
+export const isToday = momentDate => momentDate.isSame(new Date(), 'd');
+export const isCurrentYear = momentDate => momentDate.isSame(new Date(), 'y');
+export const isSameDay = (momentDate, otherDate) => momentDate.isSame(otherDate, 'd');
+export const isSameMonth = (momentDate, otherDate) => momentDate.isSame(otherDate, 'M');

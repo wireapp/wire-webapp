@@ -17,16 +17,19 @@
  *
  */
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
+import {isString} from 'underscore';
 
-const URLParameter = {
-  ENVIRONMENT: 'env',
-  LOCALE: 'hl',
-  MODE: 'mode',
-  REASON: 'reason',
-  TRACKING: 'tracking',
-};
+export class ValidationError extends Error {
+  types: string | string[];
 
-export {URLParameter};
-z.auth.URLParameter = URLParameter;
+  constructor(types: string | string[], errorMessage: string) {
+    super();
+
+    if (isString(types)) {
+      types = [types];
+    }
+
+    this.types = types;
+    this.message = errorMessage;
+  }
+}

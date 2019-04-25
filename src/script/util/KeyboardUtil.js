@@ -17,15 +17,17 @@
  *
  */
 
+import {Environment} from './Environment';
+
 window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.KeyboardUtil = (() => {
-  const KEY_DEFAULT = {
-    ARROW_DOWN: 'ArrowDown',
-    ARROW_LEFT: 'ArrowLeft',
-    ARROW_RIGHT: 'ArrowRight',
-    ARROW_UP: 'ArrowUp',
+  const KEYBOARD_KEY = {
+    ARROW_DOWN: Environment.browser.edge ? 'Down' : 'ArrowDown',
+    ARROW_LEFT: Environment.browser.edge ? 'Left' : 'ArrowLeft',
+    ARROW_RIGHT: Environment.browser.edge ? 'Right' : 'ArrowRight',
+    ARROW_UP: Environment.browser.edge ? 'Up' : 'ArrowUp',
     BACKSPACE: 'Backspace',
     DELETE: 'Delete',
     ENTER: 'Enter',
@@ -34,16 +36,6 @@ z.util.KeyboardUtil = (() => {
     SPACE: ' ',
     TAB: 'Tab',
   };
-
-  const KEY_EDGE = {
-    ARROW_DOWN: 'Down',
-    ARROW_LEFT: 'Left',
-    ARROW_RIGHT: 'Right',
-    ARROW_UP: 'Up',
-  };
-
-  const KEYBOARD_KEY = z.util.Environment.browser.edge ? Object.assign(KEY_DEFAULT, KEY_EDGE) : KEY_DEFAULT;
-
   const _insertAtCaret = (areaId, text) => {
     // http://stackoverflow.com/a/1064139
     const textArea = document.getElementById(areaId);

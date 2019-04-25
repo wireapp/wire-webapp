@@ -19,6 +19,7 @@
 
 import {getLogger} from 'utils/Logger';
 import {MediaType} from './MediaType';
+import {Environment} from 'utils/Environment';
 
 export class MediaElementHandler {
   /**
@@ -89,7 +90,7 @@ export class MediaElementHandler {
       mediaElement.dataset.flowId = mediaStreamInfo.flowId;
       mediaElement.muted = false;
       mediaElement.setAttribute('autoplay', true);
-      if (z.util.Environment.browser.supports.audioOutputSelection) {
+      if (Environment.browser.supports.audioOutputSelection) {
         this._setMediaElementOutput(mediaElement, this.currentDeviceId.audioOutput());
       }
       return mediaElement;

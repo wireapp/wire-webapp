@@ -83,7 +83,7 @@ export class BackendClient {
     this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});
 
     this.requestQueue = new PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
-    this.queueState = ko.observable(z.service.QUEUE_STATE.READY);
+    this.queueState = ko.observable(QUEUE_STATE.READY);
     this.queueTimeout = undefined;
 
     this.accessToken = '';

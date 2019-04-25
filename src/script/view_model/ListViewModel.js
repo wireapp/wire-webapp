@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {t} from 'utils/LocalizerUtil';
 import {iterateItem} from 'utils/ArrayUtil';
+import {Environment} from 'utils/Environment';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -102,7 +103,7 @@ z.viewModel.ListViewModel = class ListViewModel {
           z.viewModel.ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
-        if (!z.util.Environment.desktop) {
+        if (!Environment.desktop) {
           preferenceItems.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 

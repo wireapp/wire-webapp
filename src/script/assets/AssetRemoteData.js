@@ -59,7 +59,7 @@ class AssetRemoteData {
    * Static initializer for v3 assets.
    *
    * @param {string} assetKey - ID to retrieve asset with
-   * @param {Uint8Array} [otrKey] - Encryption key
+   * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} [sha256] - Checksum
    * @param {string} [assetToken] - Token data
    * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker

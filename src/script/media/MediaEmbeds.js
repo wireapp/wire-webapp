@@ -18,6 +18,7 @@
  */
 
 import 'url-search-params-polyfill';
+import {Environment} from 'utils/Environment';
 
 /**
  * Create and iframe.
@@ -46,7 +47,7 @@ const _createIframeContainer = options => {
     options.class = 'iframe-container';
   }
 
-  if (z.util.Environment.desktop) {
+  if (Environment.desktop) {
     options.allowfullscreen = '';
   }
 

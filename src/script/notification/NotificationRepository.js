@@ -22,7 +22,7 @@ import {getLogger} from 'utils/Logger';
 import {t, Declension} from 'utils/LocalizerUtil';
 import {SanitizationUtil} from 'utils/SanitizationUtil';
 import {TimeUtil} from 'utils/TimeUtil';
-
+import {Environment} from 'utils/Environment';
 import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';
@@ -86,6 +86,10 @@ class NotificationRepository {
     this.selfUser = this.userRepository.self;
   }
 
+  __test__assignEnvironment(data) {
+    Object.assign(Environment, data);
+  }
+
   setContentViewModelStates(state, multitasking) {
     this.contentViewModelState = {multitasking, state};
   }
@@ -108,11 +112,11 @@ class NotificationRepository {
         return isPermitted;
       }
 
-      if (!z.util.Environment.browser.supports.notifications) {
+      if (!Environment.browser.supports.notifications) {
         return this.updatePermissionState(PermissionState.UNSUPPORTED);
       }
 
-      if (z.util.Environment.browser.supports.permissions) {
+      if (Environment.browser.supports.permissions) {
         return this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS).then(() => {
           const shouldRequestPermission = this.permissionState() === PermissionStatusState.PROMPT;
           return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
@@ -534,7 +538,7 @@ class NotificationRepository {
         });
     }
 
-    const isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    const isMacOsWrapper = Environment.electron && Environment.os.mac;
     return Promise.resolve(isMacOsWrapper ? '' : NotificationRepository.CONFIG.ICON_URL);
   }
 
@@ -677,7 +681,7 @@ class NotificationRepository {
    * @returns {undefined} No return value
    */
   _notifySound(messageEntity) {
-    const muteSound = !document.hasFocus() && z.util.Environment.browser.firefox && z.util.Environment.os.mac;
+    const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
     const isFromSelf = messageEntity.user().is_me;
     const shouldPlaySound = !muteSound && !isFromSelf;
 
@@ -753,7 +757,7 @@ class NotificationRepository {
     const messageFromSelf = messageEntity.user().is_me;
     const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
     const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
-    const supportsNotification = z.util.Environment.browser.supports.notifications;
+    const supportsNotification = Environment.browser.supports.notifications;
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
