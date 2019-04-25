@@ -33,6 +33,7 @@ import {ConnectService} from 'src/script/connect/ConnectService';
 import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {StorageRepository} from 'src/script/storage/StorageRepository';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -122,7 +123,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
 
 /**
  *
- * @returns {Promise<z.client.ClientRepository>} The client repository.
+ * @returns {Promise<ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function() {
   return Promise.resolve()
@@ -142,13 +143,9 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(
+      TestFactory.client_repository = new ClientRepository(
         resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-
-      TestFactory.client_repository = new z.client.ClientRepository(
-        TestFactory.client_service,
+        TestFactory.storage_service,
         TestFactory.cryptography_repository
       );
       TestFactory.client_repository.init(user);

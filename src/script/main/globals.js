@@ -58,8 +58,6 @@ import ConnectionServiceGlobal from '../connection/ConnectionService.js';
 import ConnectionStatusGlobal from '../connection/ConnectionStatus.js';
 import ClientEntityGlobal from '../client/ClientEntity.js';
 import ClientMapperGlobal from '../client/ClientMapper.js';
-import ClientRepositoryGlobal from '../client/ClientRepository.js';
-import ClientServiceGlobal from '../client/ClientService.js';
 import ClientTypeGlobal from '../client/ClientType.js';
 import AbstractConversationEventHandlerGlobal from '../conversation/AbstractConversationEventHandler.js';
 import ClientMismatchHandlerGlobal from '../conversation/ClientMismatchHandler.js';

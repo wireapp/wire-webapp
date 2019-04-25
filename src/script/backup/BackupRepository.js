@@ -42,7 +42,7 @@ class BackupRepository {
   /**
    * Construct a new Backup repository.
    * @param {BackupService} backupService - Backup service implementation
-   * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
+   * @param {ClientRepository} clientRepository - Repository for all client interactions
    * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {UserRepository} userRepository - Repository for all user interactions
