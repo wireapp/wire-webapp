@@ -23,7 +23,7 @@ export class Asset {
   public file_type: string;
   public id: string;
   public key: string;
-  public size: number;
+  public size: string;
   public type: string;
 
   constructor(id: string) {

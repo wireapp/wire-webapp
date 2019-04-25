@@ -20,12 +20,9 @@
 import {Asset} from '../entity/message/Asset';
 import {AssetRemoteData} from './AssetRemoteData';
 
-export interface MappedAsset {
-  medium?: AssetRemoteData;
-  preview?: AssetRemoteData;
-}
+export type MappedAsset = {[index: string]: AssetRemoteData};
 
-export const mapProfileAssets = (userId: string, assets: Asset[]) => {
+export const mapProfileAssets = (userId: string, assets: Asset[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
     complete: 'medium',
     preview: 'preview',
