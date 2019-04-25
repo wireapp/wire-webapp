@@ -49,13 +49,7 @@ export const mapProfileAssetsV1 = (userId: string, pictures: Asset[]): MappedAss
 };
 
 // TODO: Fake user entity signature until "User" has been converted to TypeScript
-export const updateUserEntityAssets = (
-  userEntity: {
-    previewPictureResource: ko.Observable<AssetRemoteData>;
-    mediumPictureResource: ko.Observable<AssetRemoteData>;
-  },
-  mappedAssets: MappedAsset = {}
-) => {
+export const updateUserEntityAssets = (userEntity: any, mappedAssets: MappedAsset = {}) => {
   const {preview, medium} = mappedAssets;
   if (preview) {
     userEntity.previewPictureResource(preview);
