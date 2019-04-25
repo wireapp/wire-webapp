@@ -18,19 +18,17 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import {chunk} from '../util/ArrayUtil';
-import {capToByte, rootMeanSquare} from '../util/NumberUtil';
-import {TimeUtil} from '../util/TimeUtil';
-import {loadFileBuffer} from '../util/util';
-
-export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMetaData;
+import {TimeUtil} from 'utils/TimeUtil';
+import {capToByte, rootMeanSquare} from 'utils/NumberUtil';
+import {chunk} from 'utils/ArrayUtil';
+import {loadFileBuffer} from 'utils/util';
 
 /**
- * Constructs corresponding asset meta data depending on the given file type.
+ * Constructs corresponding asset metadata depending on the given file type
  * @param {File|Blob} file - the file to generate metadata for
  * @returns {Promise} Resolves with ImageMetaData, VideoMetaData or AudioMetaData
  */
-const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
+const buildMetadata = file => {
   if (!(file instanceof Blob)) {
     throw new Error('Expected file to be type of Blob');
   }
@@ -38,19 +36,16 @@ const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
   if (isVideo(file)) {
     return buildMetadataVideo(file);
   }
-
   if (isAudio(file)) {
     return buildMetadataAudio(file);
   }
-
   if (isImage(file)) {
     return buildMetadataImage(file);
   }
-
   return Promise.resolve();
 };
 
-const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData> => {
+const buildMetadataAudio = audioFile => {
   return loadFileBuffer(audioFile)
     .then(buffer => {
       const audioContext = new AudioContext();
@@ -64,7 +59,7 @@ const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData
     });
 };
 
-const buildMetadataImage = (imageFile: File | Blob): Promise<Asset.ImageMetaData> => {
+const buildMetadataImage = imageFile => {
   return new Promise((resolve, reject) => {
     const url = window.URL.createObjectURL(imageFile);
     const image = new Image();
@@ -80,7 +75,7 @@ const buildMetadataImage = (imageFile: File | Blob): Promise<Asset.ImageMetaData
   });
 };
 
-const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData> => {
+const buildMetadataVideo = videoFile => {
   return new Promise((resolve, reject) => {
     const url = window.URL.createObjectURL(videoFile);
     const video = document.createElement('video');
@@ -107,14 +102,14 @@ const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData
 };
 
 /**
- * Converts an error event into a plain error object.
+ * Convert an error event into a plain error object.
  * This needs to be done because error events are not standardized between browser implementations.
  * @private
  * @param {Event} event - Error event
  * @returns {MediaError} Error object
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/originalTarget
  */
-const convertEventToError = (event: any): MediaError => {
+const convertEventToError = event => {
   let error = event;
 
   // Chrome v60
@@ -130,23 +125,23 @@ const convertEventToError = (event: any): MediaError => {
   return error;
 };
 
-const isAudio = (file: File | Blob): boolean => {
+const isAudio = file => {
   return file && file.type.startsWith('audio');
 };
 
-const isImage = (file: File | Blob): boolean => {
+const isImage = file => {
   return file && file.type.startsWith('image');
 };
 
-const isVideo = (file: File | Blob): boolean => {
+const isVideo = file => {
   return file && file.type.startsWith('video');
 };
 
-const normaliseLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
+const normaliseLoudness = audioBuffer => {
   const MAX_SAMPLES = 200;
   const AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
   const channel = audioBuffer.getChannelData(0);
-  const bucketSize = channel.length / MAX_SAMPLES;
+  const bucketSize = parseInt(channel.length / MAX_SAMPLES);
   const buckets = chunk(channel, bucketSize);
 
   const audioPreview = buckets.map(bucket => {
@@ -156,4 +151,5 @@ const normaliseLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
   return new Uint8Array(audioPreview);
 };
 
+// Builder for creating all kinds of asset metadata
 export {buildMetadata, isAudio, isImage, isVideo};
