@@ -28,7 +28,7 @@ describe('Shortcut', () => {
     describe('webapp', () => {
       beforeEach(() => {
         Environment.electron = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
+        Shortcut.__test__assignEnvironment(Environment);
       });
 
       it('can get shortcut for mac', () => {
@@ -56,7 +56,7 @@ describe('Shortcut', () => {
 
       it('can get shortcut for electron mac', () => {
         Environment.os.mac = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
+        Shortcut.__test__assignEnvironment(Environment);
         const mac_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.electron.macos);
