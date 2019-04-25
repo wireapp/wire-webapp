@@ -19,16 +19,10 @@
 
 import {ValidationUtil} from '@wireapp/commons';
 import * as UUID from 'uuid/v4';
-import {AssetService} from '../assets/AssetService';
 
 declare global {
   interface Window {
     wire: {
-      app: {
-        service: {
-          asset: AssetService;
-        };
-      };
       env: {
         APP_BASE: string;
         APP_NAME: string;
