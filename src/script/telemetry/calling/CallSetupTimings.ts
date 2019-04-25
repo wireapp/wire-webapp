@@ -83,7 +83,7 @@ class CallSetupTimings {
 
   time_step(step: CallSetupSteps) {
     if (this[step] === 0) {
-      this[step] = parseInt((window.performance.now() - this.started).toString());
+      this[step] = Math.floor(window.performance.now() - this.started);
     }
   }
 
