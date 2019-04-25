@@ -23,7 +23,6 @@ window.z.message = z.message || {};
 /**
  * Enum for different system message types.
  * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "z.message.SuperType".
- * @type {z.message.SystemMessageType} Enum of system message types
  */
 z.message.SystemMessageType = {
   CONNECTION_ACCEPTED: 'created-one-to-one',

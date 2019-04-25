@@ -20,10 +20,6 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-/**
- * Enum for different message super types.
- * @type {z.message.SuperType} Enum of super types
- */
 z.message.SuperType = {
   CALL: 'call',
   CONTENT: 'normal',

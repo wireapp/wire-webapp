@@ -20,10 +20,6 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-/**
- * Enum for different call message types.
- * @returns {z.message.CALL_MESSAGE_TYPE} Enum of call message types
- */
 z.message.CALL_MESSAGE_TYPE = {
   ACTIVATED: 'activated',
   DEACTIVATED: 'deactivated',

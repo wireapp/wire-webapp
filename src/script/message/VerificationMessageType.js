@@ -20,10 +20,6 @@
 window.z = window.z || {};
 window.z.message = z.message || {};
 
-/**
- * Enum for different verification message types.
- * @type {z.message.VerificationMessageType} Enum of verification message types
- */
 z.message.VerificationMessageType = {
   NEW_DEVICE: 'new-device',
   NEW_MEMBER: 'new-member',
