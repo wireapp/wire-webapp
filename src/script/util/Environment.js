@@ -174,3 +174,7 @@ export const Environment = {
     return showElectronVersion ? electronVersion : _getFormattedAppVersion();
   },
 };
+
+window.z = window.z || {};
+z.util = z.util || {};
+window.z.util.Environment = Environment;
