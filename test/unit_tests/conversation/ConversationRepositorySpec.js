@@ -32,6 +32,7 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -361,8 +362,8 @@ describe('ConversationRepository', () => {
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
       return storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
+        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
+        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);

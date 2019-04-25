@@ -19,6 +19,8 @@
 
 import {getLogger} from 'utils/Logger';
 
+import {StorageSchemata} from '../storage/StorageSchemata';
+
 window.z = window.z || {};
 window.z.event = z.event || {};
 
@@ -44,7 +46,7 @@ z.event.NotificationService = class NotificationService {
     this.storageService = storageService;
     this.logger = getLogger('z.event.NotificationService');
 
-    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**

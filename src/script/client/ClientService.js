@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -41,7 +42,7 @@ z.client.ClientService = class ClientService {
     this.storageService = storageService;
     this.logger = getLogger('z.client.ClientService');
 
-    this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
+    this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
   }
 
   //##############################################################################

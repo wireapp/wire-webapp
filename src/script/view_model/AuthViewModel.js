@@ -29,8 +29,10 @@ import {Config} from '../auth/config';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
 import {AssetService} from '../assets/AssetService';
 import {StorageService} from '../storage/StorageService';
+import {StorageRepository} from '../storage/StorageRepository';
 import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
+import {StorageSchemata} from '../storage/StorageSchemata';
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 
@@ -72,7 +74,7 @@ class AuthViewModel {
     this.asset_service = new AssetService(backendClient);
     // @todo Don't operate with the service directly. Get a repository!
     this.storageService = new StorageService();
-    this.storage_repository = new z.storage.StorageRepository(this.storageService);
+    this.storage_repository = new StorageRepository(this.storageService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
@@ -1569,7 +1571,7 @@ class AuthViewModel {
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _hasLocalHistory() {
-    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
     return this.storageService.getAll(eventStoreName).then(events => events.length > 0);
   }
 

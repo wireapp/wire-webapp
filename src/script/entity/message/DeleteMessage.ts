@@ -21,10 +21,10 @@ import moment from 'moment';
 
 import {t} from 'utils/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
 z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
+  deleted_timestamp: number | null;
+  display_deleted_timestamp: () => string;
+
   constructor() {
     super();
 

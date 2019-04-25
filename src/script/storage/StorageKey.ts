@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.storage = z.storage || {};
-
-const StorageKey = {
+export const StorageKey = {
   AUTH: {
     ACCESS_TOKEN: {
       EXPIRATION: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION',
@@ -43,6 +40,3 @@ const StorageKey = {
     SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
   },
 };
-
-export {StorageKey};
-z.storage.StorageKey = StorageKey;

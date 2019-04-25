@@ -32,6 +32,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {ConnectService} from 'src/script/connect/ConnectService';
 import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -56,7 +57,7 @@ window.TestFactory.prototype.exposeAuthActors = function() {
 
 /**
  *
- * @returns {Promise<z.storage.StorageRepository>} The storage repository.
+ * @returns {Promise<StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
   return Promise.resolve()
@@ -67,7 +68,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
       }
     })
     .then(() => {
-      TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
+      TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
       return TestFactory.storage_repository;
     });
 };

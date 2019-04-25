@@ -19,8 +19,10 @@
 
 import emojiBindings from './emoji.json';
 import * as StorageUtil from 'utils/StorageUtil';
+
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
+import {StorageKey} from '../../storage/StorageKey';
 
 export class EmojiInputViewModel {
   static get CONFIG() {
@@ -116,7 +118,7 @@ export class EmojiInputViewModel {
 
     this.emojiDiv = $(`<div class='${EMOJI_DIV_CLASS}' />`);
     this.emojiStartPosition = -1;
-    this.emojiUsageCount = StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emojiUsageCount = StorageUtil.getValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.shouldReplaceEmoji = propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
@@ -435,7 +437,7 @@ export class EmojiInputViewModel {
 
   _increaseUsageCount(emojiName) {
     this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
-    StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
+    StorageUtil.setValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
   }
 
   _escapeRegexp(string) {

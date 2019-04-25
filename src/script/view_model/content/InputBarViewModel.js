@@ -29,7 +29,9 @@ import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {AvailabilityType} from '../../user/AvailabilityType';
 
+import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
+
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 
@@ -331,7 +333,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _generateStorageKey(conversationEntity) {
-    return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+    return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   }
 
   _loadDraftState(conversationEntity) {

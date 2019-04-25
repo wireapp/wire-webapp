@@ -19,12 +19,13 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {IndexedDBEngine} from '@wireapp/store-engine';
+import {StorageSchemata} from '../storage/StorageSchemata';
 import {Config} from './config';
 
 const configureClient = () => {
   return new APIClient({
     schemaCallback: db => {
-      const databaseSchemata = window.z.storage.StorageSchemata.SCHEMATA;
+      const databaseSchemata = StorageSchemata.SCHEMATA;
       databaseSchemata.forEach(
         ({
           schema,

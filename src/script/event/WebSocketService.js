@@ -22,6 +22,7 @@ import {TimeUtil} from 'utils/TimeUtil';
 import * as StorageUtil from 'utils/StorageUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
+import {StorageKey} from '../storage/StorageKey';
 import {WebAppEvents} from './WebApp';
 
 window.z = window.z || {};
@@ -152,7 +153,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(

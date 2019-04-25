@@ -21,6 +21,7 @@ import {TimeUtil} from 'utils/TimeUtil';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {WebAppEvents} from '../event/WebApp';
+import {StorageKey} from '../storage/StorageKey';
 
 export class AuthRepository {
   static get CONFIG() {
@@ -68,8 +69,8 @@ export class AuthRepository {
   login(login, persist) {
     return this.authService.postLogin(login, persist).then(accessTokenResponse => {
       this.saveAccessToken(accessTokenResponse);
-      StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
-      StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      StorageUtil.setValue(StorageKey.AUTH.PERSIST, persist);
+      StorageUtil.setValue(StorageKey.AUTH.SHOW_LOGIN, true);
       return accessTokenResponse;
     });
   }
@@ -133,10 +134,10 @@ export class AuthRepository {
    * @returns {undefined} No return value
    */
   deleteAccessToken() {
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+    StorageUtil.resetValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+    StorageUtil.resetValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
+    StorageUtil.resetValue(StorageKey.AUTH.ACCESS_TOKEN.TTL);
+    StorageUtil.resetValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
 
   /**
@@ -145,13 +146,13 @@ export class AuthRepository {
    */
   getCachedAccessToken() {
     return new Promise((resolve, reject) => {
-      const accessToken = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const accessTokenType = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const accessToken = StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const accessTokenType = StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
         this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
-        this._scheduleTokenRefresh(StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+        this._scheduleTokenRefresh(StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
       }
 
@@ -181,10 +182,10 @@ export class AuthRepository {
     const expiresInMillis = expiresIn * TimeUtil.UNITS_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
+    StorageUtil.setValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
+    StorageUtil.setValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
+    StorageUtil.setValue(StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
+    StorageUtil.setValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
 
     this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 

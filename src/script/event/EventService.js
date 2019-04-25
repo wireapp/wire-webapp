@@ -18,7 +18,9 @@
  */
 
 import {getLogger} from 'utils/Logger';
+
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -32,7 +34,7 @@ z.event.EventService = class EventService {
   constructor(storageService) {
     this.storageService = storageService;
     this.logger = getLogger('z.conversation.EventService');
-    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   /**

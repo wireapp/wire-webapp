@@ -26,6 +26,7 @@ import Dexie from 'dexie';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {BackendEvent} from '../event/Backend';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -73,7 +74,7 @@ export class DebugUtil {
 
         cryptobox.cachedSessions.set(sessionId, cryptoboxSession);
 
-        const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
+        const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
         return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
