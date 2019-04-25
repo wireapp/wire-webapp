@@ -22,6 +22,9 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 
+import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {SuperType} from 'src/script/message/SuperType';
+
 import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.EventBuilder', () => {
@@ -44,8 +47,8 @@ describe('z.conversation.EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
-      expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.VERIFIED);
+      expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
+      expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.VERIFIED);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
     });
@@ -56,14 +59,14 @@ describe('z.conversation.EventBuilder', () => {
     const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
       user_ids,
-      z.message.VerificationMessageType.NEW_DEVICE,
+      VerificationMessageType.NEW_DEVICE,
       0
     );
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(z.message.SuperType.VERIFICATION);
-      expect(messageEntity.verificationMessageType()).toBe(z.message.VerificationMessageType.NEW_DEVICE);
+      expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
+      expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
       expect(messageEntity.userIds()).toEqual(user_ids);
@@ -75,7 +78,7 @@ describe('z.conversation.EventBuilder', () => {
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
-      expect(messageEntity.super_type).toBe(z.message.SuperType.MISSED);
+      expect(messageEntity.super_type).toBe(SuperType.MISSED);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
     });

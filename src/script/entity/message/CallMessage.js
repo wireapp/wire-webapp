@@ -18,7 +18,10 @@
  */
 
 import {t} from 'utils/LocalizerUtil';
+
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -26,7 +29,7 @@ window.z.entity = z.entity || {};
 z.entity.CallMessage = class CallMessage extends z.entity.Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.CALL;
+    this.super_type = SuperType.CALL;
     this.call_message_type = '';
     this.finished_reason = '';
 
@@ -40,7 +43,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
    * @returns {boolean} Is message of type activate
    */
   is_activation() {
-    return this.call_message_type === z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    return this.call_message_type === CALL_MESSAGE_TYPE.ACTIVATED;
   }
 
   /**
@@ -48,7 +51,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
    * @returns {boolean} Is message of type deactivate
    */
   is_deactivation() {
-    return this.call_message_type === z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    return this.call_message_type === CALL_MESSAGE_TYPE.DEACTIVATED;
   }
 
   was_completed() {

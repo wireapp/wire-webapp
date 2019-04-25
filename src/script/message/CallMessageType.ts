@@ -17,16 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different verification message types.
- * @type {z.message.VerificationMessageType} Enum of verification message types
- */
-z.message.VerificationMessageType = {
-  NEW_DEVICE: 'new-device',
-  NEW_MEMBER: 'new-member',
-  UNVERIFIED: 'unverified',
-  VERIFIED: 'verified',
-};
+/** Enum for different call message types */
+export enum CALL_MESSAGE_TYPE {
+  ACTIVATED = 'activated',
+  DEACTIVATED = 'deactivated',
+}

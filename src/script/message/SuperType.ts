@@ -17,21 +17,19 @@
  *
  */
 
-window.z = window.z || {};
-window.z.message = z.message || {};
-
-/**
- * Enum for different confirmation types.
- * @type {z.message.StatusType} Enum of status types
- */
-const StatusType = {
-  DELIVERED: 3,
-  FAILED: 0,
-  SEEN: 4,
-  SENDING: 1,
-  SENT: 2,
-  UNSPECIFIED: -1,
-};
-
-z.message.StatusType = StatusType;
-export {StatusType};
+/** Enum for different message super types */
+export enum SuperType {
+  CALL = 'call',
+  CONTENT = 'normal',
+  DELETE = 'delete',
+  DEVICE = 'device',
+  LOCATION = 'location',
+  MEMBER = 'member',
+  MISSED = 'missed',
+  PING = 'ping',
+  REACTION = 'reaction',
+  SPECIAL = 'special',
+  SYSTEM = 'system',
+  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
+  VERIFICATION = 'verification',
+}

@@ -80,6 +80,12 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {QUEUE_STATE} from '../service/QueueState';
 
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+import {SuperType} from '../message/SuperType';
+import {MessageCategory} from '../message/MessageCategory';
+import {ReactionType} from '../message/ReactionType';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -668,10 +674,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get messages for given category. Category param acts as lower bound.
    *
    * @param {Conversation} conversationEntity - Conversation entity
-   * @param {MessageCategory} [category=z.message.MessageCategory.NONE] - Message category
+   * @param {MessageCategory} [category=MessageCategory.NONE] - Message category
    * @returns {Promise} Array of message entities
    */
-  get_events_for_category(conversationEntity, category = z.message.MessageCategory.NONE) {
+  get_events_for_category(conversationEntity, category = MessageCategory.NONE) {
     return this.eventService
       .loadEventsWithCategory(conversationEntity.id, category)
       .then(events => this.event_mapper.mapJsonEvents(events, conversationEntity))
@@ -1491,7 +1497,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to send message in
    * @param {string} url - URL of giphy image
    * @param {string} tag - tag tag used for gif search
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves when the gif was posted
    */
   sendGif(conversationEntity, url, tag, quoteEntity) {
@@ -2025,7 +2031,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
-   * @param {z.message.QuoteEntity} quoteEntity - Link to a quoted message
+   * @param {QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity) {
@@ -2156,7 +2162,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   toggle_like(conversation_et, message_et) {
     if (!conversation_et.removed_from_conversation()) {
-      const reaction = message_et.is_liked() ? z.message.ReactionType.NONE : z.message.ReactionType.LIKE;
+      const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
       window.setTimeout(() => this.sendReaction(conversation_et, message_et, reaction), 100);
@@ -2167,7 +2173,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send reaction to a content message in specified conversation.
    * @param {Conversation} conversationEntity - Conversation to send reaction in
    * @param {Message} messageEntity - Message to react to
-   * @param {z.message.ReactionType} reaction - Reaction
+   * @param {ReactionType} reaction - Reaction
    * @returns {Promise} Resolves after sending the reaction
    */
   sendReaction(conversationEntity, messageEntity, reaction) {
@@ -2221,7 +2227,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quote as part of the message
+   * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendText(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2253,7 +2259,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
    * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
-   * @param {z.message.QuoteEntity} [quoteEntity] - Quoted message
+   * @param {QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
   sendTextWithLinkPreview(conversationEntity, textMessage, mentionEntities, quoteEntity) {
@@ -2421,9 +2427,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _updateMessageAsSent(conversationEntity, eventJson, isoDate) {
     return this.get_message_in_conversation_by_id(conversationEntity, eventJson.id)
       .then(messageEntity => {
-        messageEntity.status(z.message.StatusType.SENT);
+        messageEntity.status(StatusType.SENT);
 
-        const changes = {status: z.message.StatusType.SENT};
+        const changes = {status: StatusType.SENT};
         if (isoDate) {
           changes.time = isoDate;
 
@@ -3183,7 +3189,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const userEntity = messageEntity.otherUser();
         const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
         if (isOutgoingRequest) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
         conversationEntity.add_message(messageEntity);
@@ -3261,7 +3267,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
+          messageEntity.memberMessageType = SystemMessageType.CONVERSATION_RESUME;
         }
 
         return this._updateMessageUserEntities(messageEntity);
@@ -3711,7 +3717,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
       return this.user_repository.get_user_by_id(from).then(userEntity => {
-        const reactionMessageEntity = new z.entity.Message(messageEntity.id, z.message.SuperType.REACTION);
+        const reactionMessageEntity = new z.entity.Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
         return {conversationEntity, messageEntity: reactionMessageEntity};
@@ -3884,7 +3890,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     asset_et.original_resource(resource);
     asset_et.status(AssetTransferState.UPLOADED);
-    message_et.status(z.message.StatusType.SENT);
+    message_et.status(StatusType.SENT);
 
     return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
   }

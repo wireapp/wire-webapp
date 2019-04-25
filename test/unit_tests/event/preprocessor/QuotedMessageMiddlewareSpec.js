@@ -21,6 +21,7 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64} from 'utils/util';
 import {ClientEvent} from 'src/script/event/Client';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
@@ -54,7 +55,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
 
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
       };
 
       const quote = new Quote({
@@ -79,7 +80,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
     it('adds an error if hashes do not match', () => {
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+        type: QuoteEntity.ERROR.INVALID_HASH,
       };
 
       const quotedMessage = {
@@ -241,7 +242,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       return quotedMessageMiddleware.processEvent(event).then(() => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
-            data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
+            data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
           })
         );
       });
