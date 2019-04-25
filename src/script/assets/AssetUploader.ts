@@ -18,49 +18,43 @@
  */
 
 import ko from 'knockout';
+import {Asset} from '../entity/message/Asset';
+import {AssetService} from './AssetService';
 
-const uploadQueue = ko.observableArray();
+export interface UploadStatus {
+  messageId: string;
+  progress: ko.Observable<number>;
+  xhr: XMLHttpRequest;
+}
+
+const uploadQueue: ko.ObservableArray<UploadStatus> = ko.observableArray();
 
 export class AssetUploader {
-  constructor(assetService) {
+  private readonly assetService: AssetService;
+
+  constructor(assetService: AssetService) {
     this.assetService = assetService;
   }
 
-  /**
-   * Starts uploading an asset.
-   *
-   * Will also keep track of this upload
-   * @param {string} messageId - id of the message the asset belongs to
-   * @param {Blob} file - file to upload
-   * @param {Object} options - upload options
-   * @param {boolean} asImage - force the asset to be considered an image
-   * @returns {Promise<Asset>} Promise that resolves when the upload is done
-   */
-  uploadAsset(messageId, file, options, asImage) {
+  uploadAsset(messageId: string, file: Blob, options: object, asImage: boolean): Promise<Asset> {
     const uploadFunction = asImage ? this.assetService.uploadImageAsset : this.assetService.uploadAsset;
 
     return uploadFunction
-      .call(this.assetService, file, options, xhr => {
-        const progressObservable = ko.observable(0);
+      .call(this.assetService, file, options, (xhr: XMLHttpRequest) => {
+        const progressObservable: ko.Observable<number> = ko.observable(0);
         uploadQueue.push({messageId, progress: progressObservable, xhr});
         xhr.upload.onprogress = event => {
           const progress = (event.loaded / event.total) * 100;
           progressObservable(progress);
         };
       })
-      .then(asset => {
+      .then((asset: Asset) => {
         this._removeFromQueue(messageId);
         return asset;
       });
   }
 
-  /**
-   * Cancels an upload in progress
-   *
-   * @param {string} messageId - id the the message the asset belongs to
-   * @returns {void} nothing
-   */
-  cancelUpload(messageId) {
+  cancelUpload(messageId: string): void {
     const uploadStatus = this._findUploadStatus(messageId);
     if (uploadStatus) {
       uploadStatus.xhr.abort();
@@ -68,33 +62,22 @@ export class AssetUploader {
     }
   }
 
-  /**
-   * Returns the number of current uploads that are tracked
-   *
-   * @returns {number} the number of uploads
-   */
-  getNumberOfOngoingUploads() {
+  getNumberOfOngoingUploads(): number {
     return uploadQueue().length;
   }
 
-  /**
-   * Get the current upload progress of an asset depending on the message id the asset belongs to.
-   *
-   * @param {string} messageId - the id of the message to which the asset belongs to
-   * @returns {Observable} an observable that contains the upload progress
-   */
-  getUploadProgress(messageId) {
+  getUploadProgress(messageId: string): ko.PureComputed<number> {
     return ko.pureComputed(() => {
       const uploadStatus = this._findUploadStatus(messageId);
       return uploadStatus ? uploadStatus.progress() : -1;
     });
   }
 
-  _findUploadStatus(messageId) {
+  _findUploadStatus(messageId: string): UploadStatus {
     return uploadQueue().find(upload => upload.messageId === messageId);
   }
 
-  _removeFromQueue(messageId) {
+  _removeFromQueue(messageId: string): void {
     uploadQueue(uploadQueue().filter(upload => upload.messageId !== messageId));
   }
 }
