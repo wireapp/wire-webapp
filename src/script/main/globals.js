@@ -44,7 +44,6 @@ import PermissionErrorGlobal from '../error/PermissionError.js';
 import StorageErrorGlobal from '../error/StorageError.js';
 import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
-import AudioTypeGlobal from '../audio/AudioType.js';
 import SignOutReasonGlobal from '../auth/SignOutReason.js';
 import authUrlParamGlobal from '../auth/URLParameter.js';
 import QueueStateGlobal from '../service/QueueState.js';
@@ -56,7 +55,6 @@ import EventNameGlobal from '../tracking/EventName.js';
 import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
 import SuperPropertyGlobal from '../tracking/SuperProperty.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
-import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import ErrorGlobal from '../backup/Error.js';
 import ConnectionEntityGlobal from '../connection/ConnectionEntity.js';
@@ -213,7 +211,6 @@ import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
-import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;

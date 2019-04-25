@@ -31,6 +31,7 @@ import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NotificationService} from 'src/script/event/NotificationService';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 async function createEncodedCiphertext(
   preKey,
@@ -599,7 +600,7 @@ describe('Event Repository', () => {
           type: ClientEvent.CONVERSATION.ASSET_ADD,
         });
         const assetCancelEvent = Object.assign({}, assetAddEvent, {
-          data: {reason: AssetUploadFailedReason.CANCELLED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+          data: {reason: AssetUploadFailedReason.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
           time: '2017-09-06T09:43:36.528Z',
         });
 
@@ -620,7 +621,7 @@ describe('Event Repository', () => {
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
@@ -638,7 +639,7 @@ describe('Event Repository', () => {
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       });
       const assetUploadFailedEvent = Object.assign({}, assetAddEvent, {
-        data: {reason: AssetUploadFailedReason.FAILED, status: z.assets.AssetTransferState.UPLOAD_FAILED},
+        data: {reason: AssetUploadFailedReason.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
@@ -660,7 +661,7 @@ describe('Event Repository', () => {
       });
 
       const updateStatusEvent = Object.assign({}, initialAssetEvent, {
-        data: {status: z.assets.AssetTransferState.UPLOADED},
+        data: {status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
       });
 
@@ -680,7 +681,7 @@ describe('Event Repository', () => {
       });
 
       const AssetPreviewEvent = Object.assign({}, initialAssetEvent, {
-        data: {status: z.assets.AssetTransferState.UPLOADED},
+        data: {status: AssetTransferState.UPLOADED},
         time: '2017-09-06T09:43:36.528Z',
       });
 

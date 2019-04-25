@@ -24,6 +24,7 @@ import {koArrayPushAll} from 'utils/util';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
@@ -748,13 +749,13 @@ export class EventRepository {
 
     switch (status) {
       case ASSET_PREVIEW:
-      case z.assets.AssetTransferState.UPLOADED: {
+      case AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
         return this.eventService.replaceEvent(updatedEvent);
       }
 
-      case z.assets.AssetTransferState.UPLOAD_FAILED: {
+      case AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromOther = newEvent.from !== this.userRepository.self().id;
         const selfCancel = !fromOther && newEvent.data.reason === AssetUploadFailedReason.CANCELLED;
