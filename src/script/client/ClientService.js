@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {
   static get URL_CLIENTS() {
@@ -38,7 +39,7 @@ export class ClientService {
     this.storageService = storageService;
     this.logger = getLogger('ClientService');
 
-    this.CLIENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CLIENTS;
+    this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
   }
 
   //##############################################################################

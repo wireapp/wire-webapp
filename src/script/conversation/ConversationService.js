@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 
 window.z = window.z || {};
@@ -43,8 +44,8 @@ z.conversation.ConversationService = class ConversationService {
     this.storageService = storageService;
     this.logger = getLogger('z.conversation.ConversationService');
 
-    this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.CONVERSATION_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   //##############################################################################

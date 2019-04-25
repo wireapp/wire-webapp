@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum for different reactions */
 export enum ReactionType {
   LIKE = '❤️',
   NONE = '',

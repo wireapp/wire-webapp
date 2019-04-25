@@ -45,7 +45,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   /**
    * Construct a new Cryptography repository.
    * @param {z.cryptography.CryptographyService} cryptographyService - Backend REST API cryptography service implementation
-   * @param {z.storage.StorageRepository} storageRepository - Repository for all storage interactions
+   * @param {StorageRepository} storageRepository - Repository for all storage interactions
    */
   constructor(cryptographyService, storageRepository) {
     this.cryptographyService = cryptographyService;

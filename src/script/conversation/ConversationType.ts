@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum of different conversation types */
 export enum ConversationType {
   CONNECT = 3,
   GROUP = 0,

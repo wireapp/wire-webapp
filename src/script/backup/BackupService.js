@@ -18,15 +18,13 @@
  */
 
 import DexieBatch from 'dexie-batch';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class BackupService {
   static get CONFIG() {
     return {
       BATCH_SIZE: 10000,
-      SUPPORTED_TABLES: [
-        z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS,
-        z.storage.StorageSchemata.OBJECT_STORE.EVENTS,
-      ],
+      SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
     };
   }
 
@@ -34,7 +32,7 @@ export class BackupService {
     this.logger = logger;
     this.storageService = storageService;
 
-    this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.EVENTS_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   exportTable(table, onProgress) {
