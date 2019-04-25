@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
 window.z = window.z || {};
 window.z.event = z.event || {};
@@ -223,7 +224,7 @@ z.event.EventService = class EventService {
       record.data.key = assetData.key;
       record.data.otr_key = assetData.otr_key;
       record.data.sha256 = assetData.sha256;
-      record.data.status = z.assets.AssetTransferState.UPLOADED;
+      record.data.status = AssetTransferState.UPLOADED;
       record.data.token = assetData.token;
       record.status = z.message.StatusType.SENT;
 
@@ -244,7 +245,7 @@ z.event.EventService = class EventService {
         return this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       }
       record.data.reason = reason;
-      record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
+      record.data.status = AssetTransferState.UPLOAD_FAILED;
 
       return this.replaceEvent(record).then(() => {
         this.logger.info('Updated asset message_et (failed)', primaryKey);

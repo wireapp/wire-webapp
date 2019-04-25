@@ -18,10 +18,13 @@
  */
 
 import {getLogger} from 'utils/Logger';
-import {Asset} from './Asset';
 import {TimeUtil} from 'utils/TimeUtil';
-import {AssetType} from '../../assets/AssetType';
 import {downloadBlob} from 'utils/util';
+
+import {Asset} from './Asset';
+
+import {AssetType} from '../../assets/AssetType';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 
 export class File extends Asset {
   constructor(id) {
@@ -31,7 +34,7 @@ export class File extends Asset {
     this.type = AssetType.FILE;
     this.logger = getLogger('z.entity.File');
 
-    // z.assets.AssetTransferState
+    // AssetTransferState
     this.status = ko.observable();
 
     this.file_name = '';
@@ -72,16 +75,16 @@ export class File extends Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   load() {
-    this.status(z.assets.AssetTransferState.DOWNLOADING);
+    this.status(AssetTransferState.DOWNLOADING);
 
     return this.original_resource()
       .load()
       .then(blob => {
-        this.status(z.assets.AssetTransferState.UPLOADED);
+        this.status(AssetTransferState.UPLOADED);
         return blob;
       })
       .catch(error => {
-        this.status(z.assets.AssetTransferState.UPLOADED);
+        this.status(AssetTransferState.UPLOADED);
         throw error;
       });
   }
@@ -92,7 +95,7 @@ export class File extends Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   download() {
-    if (this.status() !== z.assets.AssetTransferState.UPLOADED) {
+    if (this.status() !== AssetTransferState.UPLOADED) {
       return Promise.resolve(undefined);
     }
 
@@ -108,7 +111,7 @@ export class File extends Asset {
   }
 
   cancel_download() {
-    this.status(z.assets.AssetTransferState.UPLOADED);
+    this.status(AssetTransferState.UPLOADED);
     return this.original_resource().cancelDownload();
   }
 
