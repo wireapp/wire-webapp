@@ -407,13 +407,16 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       }
       link.attrSet('href', cleanString(href));
       if (nextToken && nextToken.type === 'text') {
-        nextToken.content = cleanString(text);
+        nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
     }
     if (isWireDeepLink) {
       link.attrPush(['data-uie-name', 'wire-deep-link']);
+    }
+    if (link.markup === 'linkify') {
+      nextToken.content = encodeURI(nextToken.content);
     }
     return self.renderToken(tokens, idx, options);
   };
