@@ -79,6 +79,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {QUEUE_STATE} from '../service/QueueState';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -3879,8 +3880,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset_et = message_et.get_first_asset();
 
     const resource = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
     asset_et.status(AssetTransferState.UPLOADED);
