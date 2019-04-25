@@ -32,23 +32,23 @@ export class Asset {
     this.type = '';
   }
 
-  is_image() {
+  is_image(): boolean {
     return this.type === AssetType.IMAGE;
   }
 
-  is_text() {
+  is_text(): boolean {
     return this.type === AssetType.TEXT;
   }
 
-  is_file() {
+  is_file(): boolean {
     return this.type === AssetType.FILE && !this.is_video() && !this.is_audio();
   }
 
-  is_location() {
+  is_location(): boolean {
     return this.type === AssetType.LOCATION;
   }
 
-  is_video() {
+  is_video(): boolean {
     const is_video_asset = this.type === AssetType.FILE && this.file_type && this.file_type.startsWith('video');
     if (is_video_asset) {
       const can_play = document.createElement('video').canPlayType(this.file_type);
@@ -59,7 +59,7 @@ export class Asset {
     return false;
   }
 
-  is_audio() {
+  is_audio(): boolean {
     const is_audio_asset = this.type === AssetType.FILE && this.file_type && this.file_type.startsWith('audio');
     if (is_audio_asset) {
       const can_play = document.createElement('audio').canPlayType(this.file_type);
