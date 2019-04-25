@@ -17,6 +17,8 @@
  *
  */
 
+import {URLParameter} from 'src/script/auth/URLParameter';
+
 describe('z.util.URLUtil', () => {
   describe('appendParameter', () => {
     it('append param with & when url contains param', () => {
@@ -30,25 +32,25 @@ describe('z.util.URLUtil', () => {
 
   describe('forwardParameter', () => {
     it('forwards existing URL parameter set to true', () => {
-      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=true');
+      const url = z.util.URLUtil.forwardParameter('foo.com', URLParameter.TRACKING, '?tracking=true');
 
       expect(url).toBe('foo.com?tracking=true');
     });
 
     it('forwards existing URL parameter set to false', () => {
-      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=false');
+      const url = z.util.URLUtil.forwardParameter('foo.com', URLParameter.TRACKING, '?tracking=false');
 
       expect(url).toBe('foo.com?tracking=false');
     });
 
     it('forwards existing URL parameter with string value', () => {
-      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?tracking=bar');
+      const url = z.util.URLUtil.forwardParameter('foo.com', URLParameter.TRACKING, '?tracking=bar');
 
       expect(url).toBe('foo.com?tracking=bar');
     });
 
     it('ignored non-existing URL parameters', () => {
-      const url = z.util.URLUtil.forwardParameter('foo.com', z.auth.URLParameter.TRACKING, '?bot=bar');
+      const url = z.util.URLUtil.forwardParameter('foo.com', URLParameter.TRACKING, '?bot=bar');
 
       expect(url).toBe('foo.com');
     });

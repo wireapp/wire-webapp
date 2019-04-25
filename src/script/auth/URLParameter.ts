@@ -17,13 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.service = z.service || {};
-
-z.service.QUEUE_STATE = {
-  ACCESS_TOKEN_REFRESH: 'z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH',
-  CONNECTIVITY_PROBLEM: 'z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM',
-  READY: 'z.service.QUEUE_STATE.READY',
-};
-
-export const QUEUE_STATE = z.service.QUEUE_STATE;
+export enum URLParameter {
+  ENVIRONMENT = 'env',
+  LOCALE = 'hl',
+  MODE = 'mode',
+  REASON = 'reason',
+  TRACKING = 'tracking',
+}

@@ -17,11 +17,12 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+import {chunk} from 'utils/ArrayUtil';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {t} from 'utils/LocalizerUtil';
@@ -34,8 +35,8 @@ import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
-import {chunk} from 'utils/ArrayUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
@@ -192,7 +193,7 @@ export class UserRepository {
     const is_self_user = id === this.self().id;
     if (is_self_user) {
       window.setTimeout(() => {
-        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
