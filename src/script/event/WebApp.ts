@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum of different webapp events. */
 export const WebAppEvents = {
   ANALYTICS: {
     EVENT: 'wire.webapp.analytics.event',

@@ -18,7 +18,6 @@
  */
 
 /**
- * Enum for different system message types.
  * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "SuperType".
  */
 export enum SystemMessageType {

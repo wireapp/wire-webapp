@@ -62,7 +62,6 @@ const _createIframeContainer = options => {
   );
 };
 
-// Enum of different regex for the supported services.
 const _regex = {
   // example: http://regexr.com/3ase5
   soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,

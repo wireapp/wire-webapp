@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class UserService {
   static get URL() {
@@ -38,7 +39,7 @@ export class UserService {
     this.logger = getLogger('UserService');
     this.storageService = storageService;
 
-    this.USER_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.USERS;
+    this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 
   //##############################################################################

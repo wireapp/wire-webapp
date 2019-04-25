@@ -41,6 +41,8 @@ import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {ConnectService} from '../connect/ConnectService';
 import {ConnectRepository} from '../connect/ConnectRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
+import {StorageRepository} from '../storage/StorageRepository';
+import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 import {EventRepository} from '../event/EventRepository';
@@ -142,7 +144,7 @@ class App {
     repositories.giphy = resolve(graph.GiphyRepository);
     repositories.properties = resolve(graph.PropertiesRepository);
     repositories.serverTime = serverTimeHandler;
-    repositories.storage = new z.storage.StorageRepository(this.service.storage);
+    repositories.storage = new StorageRepository(this.service.storage);
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
       this.service.cryptography,
@@ -700,11 +702,11 @@ class App {
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
-      const keysToKeep = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
+      const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
 
       const keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       if (keepPermanentDatabase) {
-        keysToKeep.push(z.storage.StorageKey.AUTH.PERSIST);
+        keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
       // @todo remove on next iteration
@@ -715,7 +717,7 @@ class App {
         Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
           const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
           const deleteLabelKey = isCookieLabelKey && clearData;
-          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, z.storage.StorageKey.AUTH.COOKIE_LABEL);
+          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
 
           if (!deleteLabelKey && isCookieLabel) {
             keysToKeep.push(keyInAmplifyStore);

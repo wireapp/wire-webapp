@@ -22,9 +22,6 @@ import moment from 'moment';
 import {t} from 'utils/LocalizerUtil';
 import {SuperType} from '../../message/SuperType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
 z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
   constructor() {
     super();

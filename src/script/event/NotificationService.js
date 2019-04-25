@@ -19,6 +19,8 @@
 
 import {getLogger} from 'utils/Logger';
 
+import {StorageSchemata} from '../storage/StorageSchemata';
+
 export class NotificationService {
   static get CONFIG() {
     return {
@@ -41,7 +43,7 @@ export class NotificationService {
     this.storageService = storageService;
     this.logger = getLogger('NotificationService');
 
-    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**

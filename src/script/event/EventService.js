@@ -22,6 +22,7 @@ import {getLogger} from 'utils/Logger';
 import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 /** Handles all databases interactions related to events */
 export class EventService {
@@ -32,7 +33,7 @@ export class EventService {
   constructor(storageService) {
     this.storageService = storageService;
     this.logger = getLogger('z.conversation.EventService');
-    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   /**

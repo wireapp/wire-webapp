@@ -29,6 +29,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Environment} from 'utils/Environment';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientService} from './ClientService';
 
@@ -257,7 +258,7 @@ export class ClientRepository {
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
     const loginHash = murmurhash3(login || this.selfUser().id, 42);
-    return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
+    return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
   /**
@@ -396,7 +397,7 @@ export class ClientRepository {
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
   _transferCookieLabel(clientType, cookieLabel) {
-    const indexedDbKey = z.storage.StorageKey.AUTH.COOKIE_LABEL;
+    const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
 
@@ -423,7 +424,7 @@ export class ClientRepository {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
+    const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
