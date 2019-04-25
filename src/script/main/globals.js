@@ -51,7 +51,6 @@ import LocalizerGlobal from '../localization/Localizer.js';
 import EventNameGlobal from '../tracking/EventName.js';
 import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
 import SuperPropertyGlobal from '../tracking/SuperProperty.js';
-import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import ErrorGlobal from '../backup/Error.js';
 import ConnectionEntityGlobal from '../connection/ConnectionEntity.js';
 import ConnectionMapperGlobal from '../connection/ConnectionMapper.js';
