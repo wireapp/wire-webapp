@@ -26,27 +26,15 @@ const configureClient = () => {
   return new APIClient({
     schemaCallback: db => {
       const databaseSchemata = StorageSchemata.SCHEMATA;
-      databaseSchemata.forEach(
-        ({
-          schema,
-          upgrade,
-          version,
-        }: {
-          schema: {
-            [key: string]: string;
-          };
-          upgrade: Function;
-          version: number;
-        }) => {
-          if (upgrade) {
-            return db
-              .version(version)
-              .stores(schema)
-              .upgrade(transaction => upgrade(transaction, db));
-          }
-          return db.version(version).stores(schema);
+      databaseSchemata.forEach(({schema, upgrade, version}) => {
+        if (upgrade) {
+          return db
+            .version(version)
+            .stores(schema)
+            .upgrade(transaction => upgrade(transaction, db));
         }
-      );
+        return db.version(version).stores(schema);
+      });
     },
     store: new IndexedDBEngine(),
     urls: {

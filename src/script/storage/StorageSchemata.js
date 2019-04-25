@@ -84,7 +84,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
+        upgrade: (transaction, db) => {
           transaction[StorageSchemata.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
             client.meta = {is_verified: true, primary_key: 'local_identity'};
           });
