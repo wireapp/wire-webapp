@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 import {t} from 'utils/LocalizerUtil';
 import {loadDataUrl} from 'utils/util';
 
@@ -27,6 +28,7 @@ import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -172,7 +174,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   sendAccountInfo() {
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       const imageResource = this.isTeam() ? undefined : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
@@ -246,7 +248,7 @@ z.team.TeamRepository = class TeamRepository {
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
       window.setTimeout(() => {
-        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }

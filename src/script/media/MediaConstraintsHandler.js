@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'utils/Logger';
+import {Environment} from 'utils/Environment';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 export class MediaConstraintsHandler {
@@ -147,7 +148,7 @@ export class MediaConstraintsHandler {
       return Promise.resolve(streamConstraints);
     }
 
-    if (z.util.Environment.browser.firefox) {
+    if (Environment.browser.firefox) {
       this.logger.info('Enabling screen sharing from Firefox');
 
       const streamConstraints = {

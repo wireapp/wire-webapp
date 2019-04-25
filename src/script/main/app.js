@@ -61,6 +61,7 @@ import '../components/mentionSuggestions.js';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {Environment} from 'utils/Environment';
 
 import {getWebsiteUrl} from '../externalRoute';
 
@@ -68,6 +69,9 @@ import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {WebAppEvents} from '../event/WebApp';
+
+import {URLParameter} from '../auth/URLParameter';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 class App {
   static get CONFIG() {
@@ -77,15 +81,11 @@ class App {
       },
       NOTIFICATION_CHECK: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
-        IMMEDIATE: [
-          z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
-          z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
-          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
-        ],
+        IMMEDIATE: [SIGN_OUT_REASON.ACCOUNT_DELETED, SIGN_OUT_REASON.CLIENT_REMOVED, SIGN_OUT_REASON.SESSION_EXPIRED],
         TEMPORARY_GUEST: [
-          z.auth.SIGN_OUT_REASON.MULTIPLE_TABS,
-          z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
-          z.auth.SIGN_OUT_REASON.USER_REQUESTED,
+          SIGN_OUT_REASON.MULTIPLE_TABS,
+          SIGN_OUT_REASON.SESSION_EXPIRED,
+          SIGN_OUT_REASON.USER_REQUESTED,
         ],
       },
     };
@@ -111,7 +111,7 @@ class App {
 
     this._publishGlobals();
 
-    const onExtraInstanceStarted = () => this._redirectToLogin(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
+    const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     this.singleInstanceHandler = new z.main.SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
@@ -248,7 +248,7 @@ class App {
    */
   _setupServices() {
     const storageService = resolve(graph.StorageService);
-    const eventService = z.util.Environment.browser.edge
+    const eventService = Environment.browser.edge
       ? new z.event.EventServiceNoCompound(storageService)
       : new z.event.EventService(storageService);
 
@@ -377,7 +377,7 @@ class App {
         telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
         if (this.repository.user.isActivatedAccount()) {
           // start regularly polling the server to check if there is a new version of Wire
-          startNewVersionPolling(z.util.Environment.version(false, true), this.update.bind(this));
+          startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
         }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
@@ -393,7 +393,7 @@ class App {
   initServiceWorker() {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
-        .register(`/sw.js?${z.util.Environment.version(false)}`)
+        .register(`/sw.js?${Environment.version(false)}`)
         .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
@@ -422,9 +422,9 @@ class App {
   }
 
   _appInitFailure(error, isReload) {
-    let logMessage = `Could not initialize app version '${z.util.Environment.version(false)}'`;
-    if (z.util.Environment.desktop) {
-      logMessage += ` - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
+    let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
+    if (Environment.desktop) {
+      logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
@@ -432,9 +432,7 @@ class App {
     const isAuthError = error instanceof z.error.AuthError;
     if (isAuthError) {
       const isTypeMultipleTabs = type === z.error.AuthError.TYPE.MULTIPLE_TABS;
-      const signOutReason = isTypeMultipleTabs
-        ? z.auth.SIGN_OUT_REASON.MULTIPLE_TABS
-        : z.auth.SIGN_OUT_REASON.INDEXED_DB;
+      const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
       return this._redirectToLogin(signOutReason);
     }
 
@@ -450,7 +448,7 @@ class App {
       if (isSessionExpired.includes(type)) {
         this.logger.error(`Session expired on page reload: ${message}`, error);
         Raygun.send(new Error('Session expired on page reload', error));
-        return this._redirectToLogin(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
+        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
@@ -471,7 +469,7 @@ class App {
         case z.error.AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case z.error.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
 
         default: {
@@ -484,7 +482,7 @@ class App {
             Raygun.send(error);
           }
 
-          return this.logout(z.auth.SIGN_OUT_REASON.APP_INIT);
+          return this.logout(SIGN_OUT_REASON.APP_INIT);
         }
       }
     }
@@ -576,7 +574,7 @@ class App {
    * @returns {Promise} Resolves with the access token
    */
   _loadAccessToken() {
-    const isLocalhost = z.util.Environment.frontend.isLocalhost();
+    const isLocalhost = Environment.frontend.isLocalhost();
     const referrer = document.referrer.toLowerCase();
     const isLoginRedirect = referrer.includes('/auth') || referrer.includes('/login');
     const getCachedToken = isLocalhost || isLoginRedirect;
@@ -683,7 +681,7 @@ class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Cause for logout
+   * @param {SIGN_OUT_REASON} signOutReason - Cause for logout
    * @param {boolean} clearData - Keep data in database
    * @returns {undefined} No return value
    */
@@ -720,7 +718,7 @@ class App {
           }
         });
 
-        const keepConversationInput = signOutReason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
+        const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
         resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
@@ -765,7 +763,7 @@ class App {
    */
   refresh() {
     this.logger.info(`Refresh to update started`);
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
       return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }
@@ -784,7 +782,7 @@ class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {z.auth.SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
+   * @param {SIGN_OUT_REASON} signOutReason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
   _redirectToLogin(signOutReason) {
@@ -801,10 +799,10 @@ class App {
       let url = `/auth/${location.search}`;
       const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
       if (isImmediateSignOutReason) {
-        url = z.util.URLUtil.appendParameter(url, `${z.auth.URLParameter.REASON}=${signOutReason}`);
+        url = z.util.URLUtil.appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
       }
 
-      const redirectToLogin = signOutReason !== z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN;
+      const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;
       if (redirectToLogin) {
         url = `${url}#login`;
       }

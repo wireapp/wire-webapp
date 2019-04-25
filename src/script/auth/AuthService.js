@@ -20,6 +20,7 @@
 import {TimeUtil} from 'utils/TimeUtil';
 
 import {BackendClient} from '../service/BackendClient';
+import {QUEUE_STATE} from '../service/QueueState';
 
 export class AuthService {
   static get CONFIG() {
@@ -121,7 +122,7 @@ export class AuthService {
             .executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
             .then(() => {
               this.logger.info('Continuing to request access token after verifying connectivity');
-              this.backendClient.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+              this.backendClient.queueState(QUEUE_STATE.ACCESS_TOKEN_REFRESH);
               this.backendClient.scheduleQueueUnblock();
               return _retry();
             });

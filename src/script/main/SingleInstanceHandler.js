@@ -17,9 +17,8 @@
  *
  */
 
-//@ts-check
-
-import {TimeUtil} from '../util/TimeUtil';
+import {TimeUtil} from 'utils/TimeUtil';
+import {Environment} from 'utils/Environment';
 import Cookies from 'js-cookie';
 
 window.z = window.z || {};
@@ -103,7 +102,7 @@ z.main.SingleInstanceHandler = (() => {
     }
 
     _isSingleRunningInstance() {
-      if (z.util.Environment.electron) {
+      if (Environment.electron) {
         return true;
       }
       const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);

@@ -27,6 +27,8 @@ import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {Environment} from 'utils/Environment';
+
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
@@ -73,6 +75,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
+    this.Environment = Environment;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
@@ -112,7 +115,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.isMacOsWrapper = Environment.electron && Environment.os.mac;
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 

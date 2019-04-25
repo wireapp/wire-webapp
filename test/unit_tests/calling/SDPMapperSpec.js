@@ -19,15 +19,10 @@
 
 import {SDPMapper} from 'src/script/calling/SDPMapper';
 import {SDP_TYPE} from 'src/script/calling/rtc/SDPType';
+import {Environment} from 'src/script/util/Environment';
 
 describe('SDPMapper', () => {
-  const envInitialState = Object.assign({}, z.util.Environment);
   const defaultConfig = {isGroup: false, isIceRestart: false, isLocalSdp: true};
-
-  afterEach(() => {
-    z.util.Environment = Object.assign({}, envInitialState);
-  });
-
   const sdpStr = `v=0
 o=alice 2890844526 2890844526 IN IP4 host.atlanta.example.com
 s=
@@ -72,13 +67,15 @@ m=application 0 UDP/DTLS/SCTP webrtc-datachannel`.replace(/\n/g, '\r\n');
         type: SDP_TYPE.OFFER,
       };
 
-      z.util.Environment.browser.firefox = true;
+      const originalFirefox = Environment.browser.firefox;
+      Environment.browser.firefox = true;
 
       const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(localSdp.sdp).not.toContain('UDP/DTLS/');
       expect(localSdp.sdp).toContain('DTLS/SCTP');
       checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
+      Environment.browser.firefox = originalFirefox;
     });
 
     it('Use the most recent syntax to define the sctp port', () => {
@@ -91,13 +88,15 @@ a=sctpmap:5000 webrtc-datachannel 1024
         type: SDP_TYPE.OFFER,
       };
 
-      z.util.Environment.browser.firefox = true;
+      const originalFirefox = Environment.browser.firefox;
+      Environment.browser.firefox = true;
 
       const {sdp: localSdp} = SDPMapper.rewriteSdp(rtcSdp, {isGroup: false, isIceRestart: false, isLocalSdp: false});
 
       expect(localSdp.sdp).not.toContain('a=sctpmap:5000 webrtc-datachannel 1024');
       expect(localSdp.sdp).toContain('a=sctp-port:5000');
       checkUntouchedLines(rtcSdp.sdp, localSdp.sdp);
+      Environment.browser.firefox = originalFirefox;
     });
 
     it('adds the browser name and app version for local SDP', () => {
@@ -106,11 +105,13 @@ a=sctpmap:5000 webrtc-datachannel 1024
         type: SDP_TYPE.OFFER,
       };
 
-      spyOn(z.util.Environment, 'version').and.callFake(isDesktop => (isDesktop ? '5.5.5' : '4.4.4'));
+      spyOn(Environment, 'version').and.callFake(isDesktop => (isDesktop ? '5.5.5' : '4.4.4'));
 
       // webapp
-      z.util.Environment.desktop = false;
-      z.util.Environment.browser = {
+      const originalDesktop = Environment.desktop;
+      const originalBrowser = Environment.browser;
+      Environment.desktop = false;
+      Environment.browser = {
         name: 'firefox',
         version: '12',
       };
@@ -121,8 +122,8 @@ a=sctpmap:5000 webrtc-datachannel 1024
       expect(browserSdp.sdp).toContain('t=0 0');
       checkUntouchedLines(rtcSdp.sdp, browserSdp.sdp);
 
-      z.util.Environment.desktop = true;
-      z.util.Environment.browser = {
+      Environment.desktop = true;
+      Environment.browser = {
         name: 'chrome',
         version: '12',
       };
@@ -131,6 +132,8 @@ a=sctpmap:5000 webrtc-datachannel 1024
       expect(electronSdp.sdp).toContain('a=tool:electron 5.5.5 4.4.4 (chrome 12)');
       expect(electronSdp.sdp).toContain('t=0 0');
       checkUntouchedLines(rtcSdp.sdp, electronSdp.sdp);
+      Environment.desktop = originalDesktop;
+      Environment.browser = originalBrowser;
     });
 
     it('keeps all the ice candidates', () => {
@@ -164,19 +167,21 @@ a=candidate:750991856 1 udp 25108223 237.30.30.30 58779 typ relay raddr 47.61.61
         type: SDP_TYPE.OFFER,
       };
 
-      z.util.Environment.browser.firefox = true;
+      const originalFirefox = Environment.browser.firefox;
+      Environment.browser.firefox = true;
       const {sdp: firefoxSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(firefoxSdp.sdp).toContain('m=application 9');
       expect(firefoxSdp.sdp).toContain('m=video 9');
       checkUntouchedLines(rtcSdp.sdp, firefoxSdp.sdp);
 
-      z.util.Environment.browser.firefox = false;
+      Environment.browser.firefox = false;
       const {sdp: noFirefoxSdp} = SDPMapper.rewriteSdp(rtcSdp, defaultConfig);
 
       expect(noFirefoxSdp.sdp).toContain('m=application 0');
       expect(noFirefoxSdp.sdp).toContain('m=video 0');
       checkUntouchedLines(rtcSdp.sdp, noFirefoxSdp.sdp);
+      Environment.browser.firefox = originalFirefox;
     });
 
     it('adds audio bitrate and PTime for group and restarted ICE', () => {
