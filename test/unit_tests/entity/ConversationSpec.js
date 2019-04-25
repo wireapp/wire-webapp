@@ -28,6 +28,8 @@ import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {BackendEvent} from 'src/script/event/Backend';
+import {StatusType} from 'src/script/message/StatusType';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -292,35 +294,35 @@ describe('Conversation', () => {
 
       const sentMessageEntity = new ContentMessage(createRandomUuid());
       sentMessageEntity.user(selfUserEntity);
-      sentMessageEntity.status(z.message.StatusType.SENT);
+      sentMessageEntity.status(StatusType.SENT);
       conversation_et.add_message(sentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
       const deliveredMessageEntity = new ContentMessage(createRandomUuid());
       deliveredMessageEntity.user(selfUserEntity);
-      deliveredMessageEntity.status(z.message.StatusType.DELIVERED);
+      deliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.add_message(deliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextSentMessageEntity = new ContentMessage(createRandomUuid());
       nextSentMessageEntity.user(selfUserEntity);
-      nextSentMessageEntity.status(z.message.StatusType.SENT);
+      nextSentMessageEntity.status(StatusType.SENT);
       conversation_et.add_message(nextSentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextDeliveredMessageEntity = new ContentMessage(createRandomUuid());
       nextDeliveredMessageEntity.user(selfUserEntity);
-      nextDeliveredMessageEntity.status(z.message.StatusType.DELIVERED);
+      nextDeliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.add_message(nextDeliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
       const remoteMessageEntity = new ContentMessage(createRandomUuid());
       remoteMessageEntity.user(remoteUserEntity);
-      remoteMessageEntity.status(z.message.StatusType.DELIVERED);
+      remoteMessageEntity.status(StatusType.DELIVERED);
       conversation_et.add_message(remoteMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
@@ -978,7 +980,7 @@ describe('Conversation', () => {
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
       const callMessage = new z.entity.CallMessage();
-      callMessage.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
       callMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(callMessage);
 

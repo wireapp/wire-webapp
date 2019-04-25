@@ -17,17 +17,22 @@
  *
  */
 
+import ko from 'knockout';
+
+import {t} from '../../util/LocalizerUtil';
 import {SystemMessage} from './SystemMessage';
-import {t} from 'utils/LocalizerUtil';
 
 import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled) {
+  public caption: ko.PureComputed<string>;
+
+  constructor(isReceiptEnabled: boolean) {
     super();
 
     this.type = BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE;
-    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
+    this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
     this.caption = ko.pureComputed(() => {
       if (isReceiptEnabled) {

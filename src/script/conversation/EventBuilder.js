@@ -24,6 +24,9 @@ import {Config} from '../auth/config';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 
+import {VerificationMessageType} from '../message/VerificationMessageType';
+import {StatusType} from '../message/StatusType';
+
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
@@ -47,7 +50,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: conversationEntity.id,
       data: {
-        type: z.message.VerificationMessageType.VERIFIED,
+        type: VerificationMessageType.VERIFIED,
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
@@ -60,7 +63,7 @@ z.conversation.EventBuilder = {
       conversation: conversationEntity.id,
       data: data,
       from: conversationEntity.selfUser().id,
-      status: z.message.StatusType.SENDING,
+      status: StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
@@ -166,7 +169,7 @@ z.conversation.EventBuilder = {
       conversation: conversationEntity.id,
       data: {},
       from: conversationEntity.selfUser().id,
-      status: z.message.StatusType.SENDING,
+      status: StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };

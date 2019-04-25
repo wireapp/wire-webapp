@@ -40,6 +40,7 @@ import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
+import {ReactionType} from 'src/script/message/ReactionType';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -513,7 +514,7 @@ describe('CryptographyMapper', () => {
       const messageId = createRandomUuid();
 
       const reaction = new Reaction({
-        emoji: z.message.ReactionType.LIKE,
+        emoji: ReactionType.LIKE,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -529,7 +530,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(z.message.ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
       });
     });
 
@@ -649,7 +650,7 @@ describe('CryptographyMapper', () => {
       const messageId = createRandomUuid();
 
       const reaction = new Reaction({
-        emoji: z.message.ReactionType.LIKE,
+        emoji: ReactionType.LIKE,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -665,7 +666,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(z.message.ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
       });
     });
 
