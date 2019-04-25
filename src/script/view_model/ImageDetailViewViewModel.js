@@ -18,8 +18,11 @@
  */
 
 import moment from 'moment';
+
 import {iterateItem} from 'utils/ArrayUtil';
+
 import {WebAppEvents} from '../event/WebApp';
+import {Modal} from '../ui/Modal';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -91,7 +94,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
     if (!this.imageModal) {
-      this.imageModal = new z.ui.Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
     }
 
     this.imageModal.show();

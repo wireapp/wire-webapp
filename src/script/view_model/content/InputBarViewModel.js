@@ -32,6 +32,9 @@ import {AvailabilityType} from '../../user/AvailabilityType';
 import {WebAppEvents} from '../../event/WebApp';
 import {QuoteEntity} from '../../message/QuoteEntity';
 
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
@@ -238,7 +241,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
     });
 
-    const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
+    const pingShortcut = Shortcut.getShortcutTooltip(ShortcutType.PING);
     this.pingTooltip = t('tooltipConversationPing', pingShortcut);
 
     this.isEditing.subscribe(isEditing => {

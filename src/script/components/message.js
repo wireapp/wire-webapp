@@ -24,6 +24,7 @@ import {includesOnlyEmojis} from 'utils/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {WebAppEvents} from '../event/WebApp';
+import {Context} from '../ui/ContextMenu';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
@@ -213,7 +214,7 @@ class Message {
       });
     }
 
-    z.ui.Context.from(event, entries, 'message-options-menu');
+    Context.from(event, entries, 'message-options-menu');
   }
 
   bindShowMore(elements, scope) {

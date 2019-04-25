@@ -36,6 +36,7 @@ import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator'
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -240,7 +241,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+    AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   clickOnBackupExport() {
