@@ -19,22 +19,26 @@
 
 import {getLogger} from 'utils/Logger';
 
+import {t} from 'utils/LocalizerUtil';
+import {validateProfileImageResolution} from 'utils/util';
+
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
-import {ConsentValue} from '../../user/ConsentValue';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {AvailabilityType} from '../../user/AvailabilityType';
 import {Environment} from 'utils/Environment';
 
-import {User} from '../../entity/User';
-import {UserRepository} from '../../user/UserRepository';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
-import {validateProfileImageResolution} from 'utils/util';
+import {User} from '../../entity/User';
+
+import {AvailabilityType} from '../../user/AvailabilityType';
+import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
+import {WebAppEvents} from '../../event/WebApp';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -123,7 +127,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
   }
 
   changeAccentColor(id) {
@@ -212,7 +216,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
-            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+            amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
           },
         });
         break;
@@ -240,19 +244,19 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+    AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   clickOnBackupExport() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.START);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
+    amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (file) {
-      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
-      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
+      amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
     }
   }
 
@@ -286,7 +290,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 

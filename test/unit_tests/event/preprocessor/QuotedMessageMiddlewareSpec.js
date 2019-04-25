@@ -18,7 +18,9 @@
  */
 
 import {Quote} from '@wireapp/protocol-messaging';
+
 import {arrayToBase64} from 'utils/util';
+import {ClientEvent} from 'src/script/event/Client';
 
 describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
@@ -40,7 +42,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: undefined,
         },
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(decoratedEvent => {
@@ -66,7 +68,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: arrayToBase64(Quote.encode(quote).finish()),
         },
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -85,7 +87,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'pas salut',
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
@@ -102,7 +104,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -118,7 +120,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         from: 'user-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
       spyOn(z.message.MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
@@ -135,7 +137,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -181,7 +183,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         id: 'new-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       jasmine.clock().install();
@@ -233,7 +235,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         id: 'new-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+        type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(() => {

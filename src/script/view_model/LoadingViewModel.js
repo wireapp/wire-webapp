@@ -19,12 +19,13 @@
 
 import {t} from 'utils/LocalizerUtil';
 import ko from 'knockout';
+import {WebAppEvents} from '../event/WebApp';
 
 export class LoadingViewModel {
   constructor() {
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
-    amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
+    amplify.subscribe(WebAppEvents.APP.UPDATE_PROGRESS, this.updateProgress.bind(this));
 
     const elementId = 'loading-screen';
     this.element = document.getElementById(elementId);
@@ -34,7 +35,7 @@ export class LoadingViewModel {
   removeFromView() {
     ko.cleanNode(this.element);
     this.element.remove();
-    amplify.unsubscribeAll(z.event.WebApp.APP.UPDATE_PROGRESS);
+    amplify.unsubscribeAll(WebAppEvents.APP.UPDATE_PROGRESS);
   }
 
   updateProgress(progress = 0, message, replaceContent) {

@@ -29,6 +29,11 @@ import {PreferencesListViewModel} from './list/PreferencesListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
+import {WebAppEvents} from '../event/WebApp';
+
+import {Context} from '../ui/ContextMenu';
+import {Shortcut} from '../ui/Shortcut';
+import {ShortcutType} from '../ui/ShortcutType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -131,17 +136,17 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.openConversations.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webappLoaded(true));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.openStartUI.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.goToNext.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
+    amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
   joinCall = (conversationEntity, mediaType) => {
@@ -183,7 +188,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
 
     if (nextItem) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextItem);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem);
     }
   }
 
@@ -278,7 +283,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         this.start.updateList();
         break;
       case ListViewModel.STATE.PREFERENCES:
-        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respectLastState) {
@@ -314,7 +319,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
   //##############################################################################
@@ -325,7 +330,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
+      const notificationsShortcut = Shortcut.getShortcutTooltip(ShortcutType.NOTIFICATIONS);
 
       if (this.isProAccount()) {
         entries.push({
@@ -355,7 +360,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: t('conversationsPopoverUnarchive'),
       });
     } else {
-      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
@@ -397,7 +402,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    z.ui.Context.from(event, entries, 'conversation-list-options-menu');
+    Context.from(event, entries, 'conversation-list-options-menu');
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
@@ -435,7 +440,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   }
 
   clickToUnarchive(conversationEntity) {

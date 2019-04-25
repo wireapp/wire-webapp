@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
@@ -48,6 +49,6 @@ export class AbstractAssetTransferStateTracker {
 
   cancelUpload(message) {
     this.assetUploader.cancelUpload(message.id);
-    amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message.id);
+    amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   }
 }

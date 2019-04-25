@@ -23,10 +23,11 @@ import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
+import {t} from 'utils/LocalizerUtil';
 
 import {Conversation} from '../../entity/Conversation';
-import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {WebAppEvents} from '../../event/WebApp';
 
 /*
  * Message list rendering view model.
@@ -71,7 +72,7 @@ class MessageListViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
+    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this._handleInputResize.bind(this));
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
@@ -406,7 +407,7 @@ class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -436,7 +437,7 @@ class MessageListViewModel {
         );
         const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+        amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
       });
   }
 
@@ -592,7 +593,7 @@ class MessageListViewModel {
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
           z.util.SanitizationUtil.safeWindowOpen(href);
         },

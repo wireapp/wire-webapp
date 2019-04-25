@@ -17,16 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.assets = z.assets || {};
-
-const AssetTransferState = {
-  DOWNLOADING: 'downloading',
-  UPLOAD_FAILED: 'upload-failed',
-  UPLOAD_PENDING: 'upload-pending',
-  UPLOADED: 'uploaded',
-  UPLOADING: 'uploading',
-};
-
-export {AssetTransferState};
-z.assets.AssetTransferState = AssetTransferState;
+/** Enum of different ephemeral status types */
+export enum EphemeralStatusType {
+  ACTIVE = 1,
+  INACTIVE = 2,
+  NONE = 0,
+  TIMED_OUT = 3,
+}

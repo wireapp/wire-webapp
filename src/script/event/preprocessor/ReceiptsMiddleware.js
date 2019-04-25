@@ -21,6 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {StatusType} from '../../message/StatusType';
+import {ClientEvent} from '../Client';
 
 export class ReceiptsMiddleware {
   /**
@@ -47,10 +48,10 @@ export class ReceiptsMiddleware {
    */
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.ASSET_ADD:
-      case z.event.Client.CONVERSATION.KNOCK:
-      case z.event.Client.CONVERSATION.LOCATION:
-      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+      case ClientEvent.CONVERSATION.ASSET_ADD:
+      case ClientEvent.CONVERSATION.KNOCK:
+      case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
           if (conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
@@ -59,7 +60,7 @@ export class ReceiptsMiddleware {
           return event;
         });
       }
-      case z.event.Client.CONVERSATION.CONFIRMATION: {
+      case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService
           .loadEvents(event.conversation, messageIds)

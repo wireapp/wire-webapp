@@ -18,7 +18,11 @@
  */
 
 import moment from 'moment';
+
 import {iterateItem} from 'utils/ArrayUtil';
+
+import {WebAppEvents} from '../event/WebApp';
+import {Modal} from '../ui/Modal';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -57,7 +61,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show.bind(this));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -75,9 +79,9 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(undefined);
     this.source = undefined;
 
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   }
 
   show(messageEntity, messageEntities, source) {
@@ -85,12 +89,12 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.messageEntity(messageEntity);
     this.source = source;
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
 
     if (!this.imageModal) {
-      this.imageModal = new z.ui.Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
     }
 
     this.imageModal.show();
@@ -175,7 +179,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnReply() {
-    amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
+    amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
     this.imageModal.hide();
   }
 

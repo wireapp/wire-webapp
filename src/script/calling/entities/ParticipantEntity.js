@@ -22,6 +22,8 @@ import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 import {PROPERTY_STATE} from '../enum/PropertyState';
 import {SDP_NEGOTIATION_MODE} from '../enum/SDPNegotiationMode';
 import {FlowEntity} from './FlowEntity';
+import {WebAppEvents} from '../../event/WebApp';
+import {AudioType} from '../../audio/AudioType';
 
 class ParticipantEntity {
   static get CONFIG() {
@@ -79,7 +81,7 @@ class ParticipantEntity {
 
     this.isConnected.subscribe(isConnected => {
       if (isConnected && !this.wasConnected) {
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK);
+        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.READY_TO_TALK);
         this.wasConnected = true;
       }
     });

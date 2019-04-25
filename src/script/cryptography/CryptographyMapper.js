@@ -18,12 +18,17 @@
  */
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
-import {AvailabilityType} from '../user/AvailabilityType';
-import {decryptAesAsset} from '../assets/AssetCrypto';
 
 import {getLogger} from 'utils/Logger';
 import {TimeUtil} from 'utils/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'utils/util';
+
+import {AvailabilityType} from '../user/AvailabilityType';
+import {decryptAesAsset} from '../assets/AssetCrypto';
+import {AssetTransferState} from '../assets/AssetTransferState';
+
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
 
 export class CryptographyMapper {
   static get CONFIG() {
@@ -41,7 +46,7 @@ export class CryptographyMapper {
    * Maps a generic message into an event in JSON.
    *
    * @param {GenericMessage} genericMessage - Received ProtoBuffer message
-   * @param {JSON} event - Event of z.event.Backend.CONVERSATION.OTR-ASSET-ADD or z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {JSON} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   mapGenericMessage(genericMessage, event) {
@@ -196,17 +201,17 @@ export class CryptographyMapper {
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
-        status: z.assets.AssetTransferState.UPLOADED,
+        status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
       });
     } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
-        status: z.assets.AssetTransferState.UPLOAD_FAILED,
+        status: AssetTransferState.UPLOAD_FAILED,
       });
     }
 
-    return {data, type: z.event.Client.CONVERSATION.ASSET_ADD};
+    return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
   }
 
   _mapAssetMetaData(original) {
@@ -243,7 +248,7 @@ export class CryptographyMapper {
           }
         })(),
       },
-      type: z.event.Client.USER.AVAILABILITY,
+      type: ClientEvent.USER.AVAILABILITY,
     };
   }
 
@@ -251,7 +256,7 @@ export class CryptographyMapper {
     return {
       content: JSON.parse(calling.content),
       sender: eventData.sender,
-      type: z.event.Client.CALL.E_CALL,
+      type: ClientEvent.CALL.E_CALL,
     };
   }
 
@@ -261,7 +266,7 @@ export class CryptographyMapper {
         cleared_timestamp: cleared.clearedTimestamp.toString(),
         conversationId: cleared.conversationId,
       },
-      type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
     };
   }
 
@@ -282,7 +287,7 @@ export class CryptographyMapper {
           }
         })(),
       },
-      type: z.event.Client.CONVERSATION.CONFIRMATION,
+      type: ClientEvent.CONVERSATION.CONFIRMATION,
     };
   }
 
@@ -291,7 +296,7 @@ export class CryptographyMapper {
       data: {
         message_id: deleted.messageId,
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+      type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
     };
   }
 
@@ -347,7 +352,7 @@ export class CryptographyMapper {
         conversation_id: hidden.conversationId,
         message_id: hidden.messageId,
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+      type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
     };
   }
 
@@ -378,14 +383,14 @@ export class CryptographyMapper {
         otr_key: new Uint8Array(image.otrKey ? image.otrKey : []),
         sha256: new Uint8Array(image.sha256 ? image.sha256 : []),
       },
-      type: z.event.Client.CONVERSATION.ASSET_ADD,
+      type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   }
 
   _mapKnock() {
     return {
       data: {},
-      type: z.event.Client.CONVERSATION.KNOCK,
+      type: ClientEvent.CONVERSATION.KNOCK,
     };
   }
 
@@ -395,7 +400,7 @@ export class CryptographyMapper {
         conversationId: lastRead.conversationId,
         last_read_timestamp: lastRead.lastReadTimestamp.toString(),
       },
-      type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
     };
   }
 
@@ -409,7 +414,7 @@ export class CryptographyMapper {
           zoom: location.zoom,
         },
       },
-      type: z.event.Client.CONVERSATION.LOCATION,
+      type: ClientEvent.CONVERSATION.LOCATION,
     };
   }
 
@@ -419,7 +424,7 @@ export class CryptographyMapper {
         message_id: reaction.messageId,
         reaction: reaction.emoji,
       },
-      type: z.event.Client.CONVERSATION.REACTION,
+      type: ClientEvent.CONVERSATION.REACTION,
     };
   }
 
@@ -442,7 +447,7 @@ export class CryptographyMapper {
         ),
         quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   }
 }

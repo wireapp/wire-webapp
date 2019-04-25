@@ -19,13 +19,17 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {MediumImage} from '../entity/message/MediumImage';
 import {getLogger} from 'utils/Logger';
 import {t} from 'utils/LocalizerUtil';
+import {base64ToArray} from 'utils/util';
 
+import {AssetTransferState} from '../assets/AssetTransferState';
+
+import {MediumImage} from '../entity/message/MediumImage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {base64ToArray} from 'utils/util';
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -158,93 +162,93 @@ export class EventMapper {
     let messageEntity;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
+      case BackendEvent.CONVERSATION.MEMBER_JOIN: {
         messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
+      case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE: {
+      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE: {
         messageEntity = this._mapEventReceiptModeUpdate(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE: {
+      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE: {
         messageEntity = this._mapEventMessageTimerUpdate(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.RENAME: {
+      case BackendEvent.CONVERSATION.RENAME: {
         messageEntity = this._mapEventRename(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.ASSET_ADD: {
+      case ClientEvent.CONVERSATION.ASSET_ADD: {
         messageEntity = addReadReceiptData(this._mapEventAssetAdd(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE: {
+      case ClientEvent.CONVERSATION.DELETE_EVERYWHERE: {
         messageEntity = this._mapEventDeleteEverywhere(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.GROUP_CREATION: {
+      case ClientEvent.CONVERSATION.GROUP_CREATION: {
         messageEntity = this._mapEventGroupCreation(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT: {
+      case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT: {
         messageEntity = this._mapEventUnableToDecrypt(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.KNOCK: {
+      case ClientEvent.CONVERSATION.KNOCK: {
         messageEntity = addReadReceiptData(this._mapEventPing(), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.LOCATION: {
+      case ClientEvent.CONVERSATION.LOCATION: {
         messageEntity = addReadReceiptData(this._mapEventLocation(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+      case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         messageEntity = addReadReceiptData(this._mapEventMessageAdd(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES: {
+      case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
         break;
       }
 
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION: {
+      case ClientEvent.CONVERSATION.ONE2ONE_CREATION: {
         messageEntity = this._mapEvent1to1Creation(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
+      case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
         messageEntity = this._mapEventTeamMemberLeave(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.VERIFICATION: {
+      case ClientEvent.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE: {
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE: {
         messageEntity = this._mapEventVoiceChannelActivate();
         break;
       }
 
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
       }
@@ -640,7 +644,7 @@ export class EventMapper {
       assetEntity.preview_resource(remoteDataPreview);
     }
 
-    assetEntity.status(status || z.assets.AssetTransferState.UPLOAD_PENDING);
+    assetEntity.status(status || AssetTransferState.UPLOAD_PENDING);
 
     return assetEntity;
   }

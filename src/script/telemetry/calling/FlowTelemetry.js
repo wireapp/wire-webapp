@@ -22,6 +22,7 @@ import {Environment} from 'utils/Environment';
 
 import {CallSetupTimings} from './CallSetupTimings';
 import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
+import {WebAppEvents} from '../../event/WebApp';
 
 class FlowTelemetry {
   /**
@@ -118,7 +119,7 @@ class FlowTelemetry {
    * @returns {undefined} No return value
    */
   disconnected() {
-    amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
+    amplify.publish(WebAppEvents.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
   }
 
   /**

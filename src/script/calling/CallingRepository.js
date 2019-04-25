@@ -22,6 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
+import {createRandomUuid} from 'utils/util';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
@@ -36,13 +37,15 @@ import {PROPERTY_STATE} from './enum/PropertyState';
 import {CALL_STATE} from './enum/CallState';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
-import {createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
 import {Environment} from 'utils/Environment';
+
+import {ClientEvent} from '../event/Client';
+import {WebAppEvents} from '../event/WebApp';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -151,15 +154,15 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.deleteCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.LEAVE, this.leaveCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, this.rejectCall.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
-    amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.getConfig);
+    amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.DELETE, this.deleteCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.LEAVE, this.leaveCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.getConfig);
   }
 
   //##############################################################################
@@ -175,7 +178,7 @@ export class CallingRepository {
    */
   onCallEvent(event, source) {
     const {content: eventContent, time: eventDate, type: eventType} = event;
-    const isCall = eventType === z.event.Client.CALL.E_CALL;
+    const isCall = eventType === ClientEvent.CALL.E_CALL;
 
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     this.callLogger.info(`»» Call Event: '${eventType}' (Source: ${source})`, logObject);
@@ -279,13 +282,13 @@ export class CallingRepository {
             const warningOptions = {name: userEntity.name()};
             const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
 
-            amplify.publish(z.event.WebApp.WARNING.SHOW, warningType, warningOptions);
+            amplify.publish(WebAppEvents.WARNING.SHOW, warningType, warningOptions);
           });
           break;
         }
 
         case CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -997,7 +1000,7 @@ export class CallingRepository {
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
       if (isOutgoingCall && !this.supportsCalling) {
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
@@ -1058,16 +1061,16 @@ export class CallingRepository {
           }
         }
 
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
-            amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
+            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
             window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
             if (isIncomingCall) {
-              amplify.publish(z.event.WebApp.CALL.STATE.REJECT, newCallId);
+              amplify.publish(WebAppEvents.CALL.STATE.REJECT, newCallId);
             }
           },
           text: {
@@ -1300,7 +1303,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   _showModal(title, message) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message,
         title,

@@ -17,8 +17,6 @@
  *
  */
 
-// KARMA_SPECS=calling/entities/CallMessageEntity yarn test:app
-
 import {CallMessageEntity} from 'src/script/calling/entities/CallMessageEntity';
 
 describe('CallMessageEntity', () => {

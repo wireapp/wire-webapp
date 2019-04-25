@@ -17,15 +17,10 @@
  *
  */
 
-/**
- * Enum of different ephemeral status types.
- * @type {EphemeralStatusType} Enum of ephemeral status types
- */
-const EphemeralStatusType = {
-  ACTIVE: 1,
-  INACTIVE: 2,
-  NONE: 0,
-  TIMED_OUT: 3,
-};
-
-export {EphemeralStatusType};
+export enum AssetTransferState {
+  DOWNLOADING = 'downloading',
+  UPLOAD_FAILED = 'upload-failed',
+  UPLOAD_PENDING = 'upload-pending',
+  UPLOADED = 'uploaded',
+  UPLOADING = 'uploading',
+}

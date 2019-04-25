@@ -20,6 +20,7 @@
 import {t} from 'utils/LocalizerUtil';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -327,7 +328,7 @@ z.conversation.ConversationCellState = (() => {
           string = true;
         } else if (messageEntity.has_asset()) {
           const assetEntity = messageEntity.get_first_asset();
-          const isUploaded = assetEntity.status() === z.assets.AssetTransferState.UPLOADED;
+          const isUploaded = assetEntity.status() === AssetTransferState.UPLOADED;
 
           if (isUploaded) {
             if (assetEntity.is_audio()) {

@@ -17,11 +17,6 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
-import {encryptAesAsset} from '../assets/AssetCrypto';
-
 import poster from 'poster-image';
 import {
   Asset,
@@ -40,6 +35,17 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
+
+import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'utils/TimeUtil';
+
+import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
+import {encryptAesAsset} from '../assets/AssetCrypto';
+
+import {ClientEvent} from '../event/Client';
+import {EventTypeHandling} from '../event/EventTypeHandling';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 import {PromiseQueue} from 'utils/PromiseQueue';
 import {Conversation} from '../entity/Conversation';
@@ -70,6 +76,8 @@ import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {getNextItem} from 'utils/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioType} from '../audio/AudioType';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -288,17 +296,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
-    amplify.subscribe(
-      z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-      this.set_notification_handling_state.bind(this)
-    );
-    amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
+    amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.unblocked_user.bind(this));
 
     this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
     this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
@@ -309,7 +314,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const replacedMessageEntity = this._replaceMessageInConversation(conversationEntity, oldEvent.id, updatedEvent);
     if (replacedMessageEntity) {
       this._updateMessageUserEntities(replacedMessageEntity).then(messageEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
       });
     }
   }
@@ -1057,7 +1062,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this.updateParticipatingUserEntities(conversationEntity).then(updated_conversation_et => {
           if (show_conversation) {
-            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
+            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updated_conversation_et);
           }
 
           this.conversations.notifySubscribers();
@@ -1141,7 +1146,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, this.self_conversation().id);
     this.sendGenericMessageToConversation(eventInfoEntity)
       .then(() => {
-        amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
+        amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
         this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
       })
       .catch(error => {
@@ -1334,7 +1339,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (is_active_conversation) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, next_conversation_et);
     }
   }
 
@@ -1702,7 +1707,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _showModal(messageText, titleText) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: messageText,
         title: titleText,
@@ -1909,7 +1914,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
-    const typeToConfirm = z.event.EventTypeHandling.CONFIRM.includes(messageEntity.type);
+    const typeToConfirm = EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
     if (messageEntity.user().is_me || !typeToConfirm) {
       return;
@@ -1980,7 +1985,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        amplify.publish(z.event.WebApp.CALL.STATE.DELETE, callMessageEntity.conversationId);
+        amplify.publish(WebAppEvents.CALL.STATE.DELETE, callMessageEntity.conversationId);
       });
   }
 
@@ -2384,7 +2389,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
         const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
         if (shouldPlayPingAudio) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
         }
 
         return mappedEvent;
@@ -2430,7 +2435,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         this.checkMessageTimer(messageEntity);
-        if (z.event.EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
+        if (EventTypeHandling.STORE.includes(messageEntity.type) || messageEntity.has_asset_image()) {
           return this.eventService.updateEvent(messageEntity.primary_key, changes);
         }
       })
@@ -2669,7 +2674,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
             }
 
-            amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+            amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
               action: () => {
                 sendAnyway = true;
                 conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
@@ -2805,7 +2810,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, messageId, conversationId);
+        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationId);
         return this._delete_message_by_id(conversationEntity, messageId);
       })
       .catch(error => {
@@ -2843,7 +2848,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.sendGenericMessageToConversation(eventInfoEntity);
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, messageEntity.id, conversationEntity.id);
+        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageEntity.id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, messageEntity.id);
       })
       .catch(error => {
@@ -2895,8 +2900,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {
       const typesInSelfConversation = [
-        z.event.Backend.CONVERSATION.MEMBER_UPDATE,
-        z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+        BackendEvent.CONVERSATION.MEMBER_UPDATE,
+        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
       ];
 
       const isExpectedType = typesInSelfConversation.includes(type);
@@ -2905,7 +2910,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
     }
 
-    const isConversationCreate = type === z.event.Backend.CONVERSATION.CREATE;
+    const isConversationCreate = type === BackendEvent.CONVERSATION.CREATE;
     const onEventPromise = isConversationCreate ? Promise.resolve() : this.get_conversation_by_id(conversationId);
     let previouslyArchived;
 
@@ -2957,9 +2962,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (isFromUnknownUser) {
         const membersUpdateMessages = [
-          z.event.Backend.CONVERSATION.MEMBER_LEAVE,
-          z.event.Backend.CONVERSATION.MEMBER_JOIN,
-          z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
+          BackendEvent.CONVERSATION.MEMBER_LEAVE,
+          BackendEvent.CONVERSATION.MEMBER_JOIN,
+          ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
         ];
         const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
         if (isMembersUpdateEvent) {
@@ -2992,44 +2997,44 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
     switch (eventJson.type) {
-      case z.event.Backend.CONVERSATION.CREATE:
+      case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
 
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+      case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._onMemberJoin(conversationEntity, eventJson);
 
-      case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+      case BackendEvent.CONVERSATION.MEMBER_LEAVE:
+      case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE:
         return this._onMemberLeave(conversationEntity, eventJson);
 
-      case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
+      case BackendEvent.CONVERSATION.MEMBER_UPDATE:
         return this._onMemberUpdate(conversationEntity, eventJson);
 
-      case z.event.Backend.CONVERSATION.RENAME:
+      case BackendEvent.CONVERSATION.RENAME:
         return this._onRename(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.ASSET_ADD:
+      case ClientEvent.CONVERSATION.ASSET_ADD:
         return this._onAssetAdd(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.GROUP_CREATION:
+      case ClientEvent.CONVERSATION.GROUP_CREATION:
         return this._onGroupCreation(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_DELETE:
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         return this._onMessageDeleted(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
+      case ClientEvent.CONVERSATION.MESSAGE_HIDDEN:
         return this._onMessageHidden(eventJson);
 
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+      case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this._on1to1Creation(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.REACTION:
+      case ClientEvent.CONVERSATION.REACTION:
         return this._onReaction(conversationEntity, eventJson);
 
-      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE:
+      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE:
         return this._onReceiptModeChanged(conversationEntity, eventJson);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
         const isMessageEdit = !!eventJson.edited_time;
         if (isMessageEdit) {
           // in case of an edition, the DB listner will take care of updating the local entity
@@ -3037,16 +3042,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
         return this._addEventToConversation(conversationEntity, eventJson);
 
-      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE:
-      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
-      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-      case z.event.Client.CONVERSATION.KNOCK:
-      case z.event.Client.CONVERSATION.LOCATION:
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
-      case z.event.Client.CONVERSATION.VERIFICATION:
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE:
+      case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
+      case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case ClientEvent.CONVERSATION.KNOCK:
+      case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.MISSED_MESSAGES:
+      case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
+      case ClientEvent.CONVERSATION.VERIFICATION:
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
         return this._addEventToConversation(conversationEntity, eventJson);
     }
   }
@@ -3092,7 +3097,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         if (!eventFromStream) {
-          amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
+          amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
         }
 
         if (conversationEntity.is_cleared()) {
@@ -3135,7 +3140,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               };
               const progress = (this.init_handled / this.init_total) * 20 + 75;
 
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
+              amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
             }
           }
 
@@ -3331,7 +3336,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (conversationEntity.call()) {
         const reason = TERMINATION_REASON.MEMBER_LEAVE;
-        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversationEntity.id, reason);
+        amplify.publish(WebAppEvents.CALL.STATE.LEAVE, conversationEntity.id, reason);
       }
 
       if (this.selfUser().isTemporaryGuest()) {
@@ -3353,7 +3358,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
 
               if (conversationEntity.call()) {
-                amplify.publish(z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
+                amplify.publish(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 
@@ -3411,12 +3416,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (!conversationEntity.showNotificationsEverything()) {
       const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
       if (hasIncomingCall) {
-        amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationEntity.id, false);
+        amplify.publish(WebAppEvents.CALL.STATE.REJECT, conversationEntity.id, false);
       }
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEt);
     }
   }
 
@@ -3431,7 +3436,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onAssetAdd(conversationEntity, event) {
     const fromSelf = event.from === this.selfUser().id;
 
-    const isRemoteFailure = !fromSelf && event.data.status === z.assets.AssetTransferState.UPLOAD_FAILED;
+    const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
     const isLocalCancel = fromSelf && event.data.reason === AssetUploadFailedReason.CANCELLED;
 
     if (isRemoteFailure || isLocalCancel) {
@@ -3440,7 +3445,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this._addEventToConversation(conversationEntity, event).then(({messageEntity}) => {
       const firstAsset = messageEntity.get_first_asset();
-      if (firstAsset.is_image() || firstAsset.status() === z.assets.AssetTransferState.UPLOADED) {
+      if (firstAsset.is_image() || firstAsset.status() === AssetTransferState.UPLOADED) {
         return {conversationEntity, messageEntity};
       }
     });
@@ -3474,7 +3479,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
+        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3511,7 +3516,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.get_conversation_by_id(eventData.conversation_id);
       })
       .then(conversationEntity => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
+        amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
         return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
@@ -3596,7 +3601,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   handleMessageExpiration(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
@@ -3824,10 +3829,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update asset in UI and DB as failed
    * @param {Message} message_et - Message to update
-   * @param {string} [reason=z.assets.AssetTransferState.UPLOAD_FAILED] - Failure reason
+   * @param {string} [reason=AssetTransferState.UPLOAD_FAILED] - Failure reason
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_failed(message_et, reason = z.assets.AssetTransferState.UPLOAD_FAILED) {
+  update_message_as_upload_failed(message_et, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
       if (!message_et.is_content()) {
         throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
@@ -3877,7 +3882,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       : z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
-    asset_et.status(z.assets.AssetTransferState.UPLOADED);
+    asset_et.status(AssetTransferState.UPLOADED);
     message_et.status(z.message.StatusType.SENT);
 
     return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
@@ -3965,7 +3970,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
       }
 
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
     }
   }
 };

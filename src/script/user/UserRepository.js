@@ -31,6 +31,9 @@ import {ConsentType} from './ConsentType';
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 import {chunk} from 'utils/ArrayUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'utils/util';
@@ -101,16 +104,16 @@ export class UserRepository {
       return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
 
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.UPDATE, this.updateUserById.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
+    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
 
   /**
@@ -127,13 +130,13 @@ export class UserRepository {
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case z.event.Backend.USER.DELETE:
+      case BackendEvent.USER.DELETE:
         this.user_delete(event_json);
         break;
-      case z.event.Backend.USER.UPDATE:
+      case BackendEvent.USER.UPDATE:
         this.user_update(event_json);
         break;
-      case z.event.Client.USER.AVAILABILITY:
+      case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(event_json);
         break;
     }
@@ -141,10 +144,10 @@ export class UserRepository {
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
-        case z.event.Backend.USER.PROPERTIES_DELETE:
+        case BackendEvent.USER.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(event_json.key);
           break;
-        case z.event.Backend.USER.PROPERTIES_SET:
+        case BackendEvent.USER.PROPERTIES_SET:
           this.propertyRepository.setProperty(event_json.key, event_json.value);
           break;
       }
@@ -189,7 +192,7 @@ export class UserRepository {
     const is_self_user = id === this.self().id;
     if (is_self_user) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
@@ -221,7 +224,7 @@ export class UserRepository {
       this.user_mapper.updateUserFromObject(user_et, user);
 
       if (is_self_user) {
-        amplify.publish(z.event.WebApp.TEAM.UPDATE_INFO);
+        amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       }
 
       return user_et;
@@ -285,7 +288,7 @@ export class UserRepository {
       if (wasClientAdded) {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
           if (publishClient) {
-            amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
+            amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
         });
       }
@@ -304,7 +307,7 @@ export class UserRepository {
       .then(() => this.get_user_by_id(user_id))
       .then(user_et => {
         user_et.remove_client(client_id);
-        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id);
+        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
       });
   }
 
@@ -317,7 +320,7 @@ export class UserRepository {
   update_clients_from_user(user_id, client_ets) {
     this.get_user_by_id(user_id).then(user_et => {
       user_et.devices(client_ets);
-      amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
   }
 
@@ -341,7 +344,7 @@ export class UserRepository {
     });
 
     const recipients = this.teamUsers().concat(this.self());
-    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
   /**
@@ -352,7 +355,7 @@ export class UserRepository {
    * @returns {undefined} No return value
    */
   _trackAvailability(availability, method) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
       status: valueFromType(availability),
     });

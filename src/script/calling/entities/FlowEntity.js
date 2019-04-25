@@ -21,6 +21,7 @@ import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaStreamSource} from '../../media/MediaStreamSource';
 import {MediaStreamInfo} from '../../media/MediaStreamInfo';
 import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
@@ -430,7 +431,7 @@ class FlowEntity {
               ? TERMINATION_REASON.CONNECTION_DROP
               : TERMINATION_REASON.CONNECTION_FAILED;
           }
-          amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
+          amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, terminationReason);
         }
       });
   }
@@ -479,7 +480,7 @@ class FlowEntity {
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
       : this.peerConnection.getRemoteStreams().reduce((tracks, stream) => tracks.concat(stream.getTracks()), []);
 
-    amplify.publish(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
+    amplify.publish(WebAppEvents.CALL.MEDIA.CONNECTION_CLOSED, connectionMediaStreamTracks);
     this.peerConnection.close();
     this.peerConnection = undefined;
 
@@ -570,7 +571,7 @@ class FlowEntity {
       mediaStream,
       this.callEntity
     );
-    amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
+    amplify.publish(WebAppEvents.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
   }
 
   /**
@@ -786,7 +787,7 @@ class FlowEntity {
       this.remoteUserId,
       this.remoteClientId
     );
-    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, callEvent, z.event.EventRepository.SOURCE.WEB_SOCKET);
+    amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, z.event.EventRepository.SOURCE.WEB_SOCKET);
   }
 
   /**
@@ -1027,7 +1028,7 @@ class FlowEntity {
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
     this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
+    amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
   }
 
   /**

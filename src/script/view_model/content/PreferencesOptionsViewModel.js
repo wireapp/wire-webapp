@@ -21,19 +21,21 @@ import {getLogger} from 'utils/Logger';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {WebAppEvents} from '../../event/WebApp';
 
 import {t} from 'utils/LocalizerUtil';
 import {TimeUtil} from 'utils/TimeUtil';
 import {Environment} from 'utils/Environment';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
-
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {downloadBlob} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ConnectSource} from '../../connect/ConnectSource';
+import {AudioPreference} from '../../audio/AudioPreference';
+
+window.z = window.z || {};
+window.z.viewModel = z.viewModel || {};
+window.z.viewModel.content = z.viewModel.content || {};
 
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
@@ -65,7 +67,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     });
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, this.optionDarkMode);
 
     this.optionReplaceInlineEmoji = ko.observable();
     this.optionReplaceInlineEmoji.subscribe(emojiPreference => {
@@ -82,12 +84,14 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
     this.updateProperties(this.propertiesRepository.properties);
+
+    this.AudioPreference = AudioPreference;
   }
 
   connectMacOSContacts() {
-    amplify.publish(z.event.WebApp.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
+    amplify.publish(WebAppEvents.CONNECT.IMPORT_CONTACTS, ConnectSource.ICLOUD);
   }
 
   saveCallLogs() {
@@ -105,7 +109,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       return downloadBlob(blob, filename);
     }
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: t('modalCallEmptyLogMessage'),
         title: t('modalCallEmptyLogHeadline'),

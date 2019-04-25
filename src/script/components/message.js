@@ -19,9 +19,12 @@
 
 import moment from 'moment';
 
-import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {t} from 'utils/LocalizerUtil';
 import {includesOnlyEmojis} from 'utils/EmojiUtil';
+
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
+import {WebAppEvents} from '../event/WebApp';
+import {Context} from '../ui/ContextMenu';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -135,9 +138,7 @@ class Message {
   }
 
   showDevice(messageEntity) {
-    const topic = messageEntity.isSelfClient()
-      ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
-      : z.event.WebApp.SHORTCUT.PEOPLE;
+    const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
 
@@ -162,14 +163,14 @@ class Message {
 
     if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
         label: t('conversationContextMenuEdit'),
       });
     }
 
     if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
       entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
         label: t('conversationContextMenuReply'),
       });
     }
@@ -209,7 +210,7 @@ class Message {
       });
     }
 
-    z.ui.Context.from(event, entries, 'message-options-menu');
+    Context.from(event, entries, 'message-options-menu');
   }
 
   bindShowMore(elements, scope) {

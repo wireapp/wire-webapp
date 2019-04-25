@@ -27,11 +27,14 @@ import {TERMINATION_REASON} from '../enum/TerminationReason';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
+
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantEntity} from './ParticipantEntity';
+import {AudioType} from '../../audio/AudioType';
 
 class CallEntity {
   static get CONFIG() {
@@ -170,9 +173,9 @@ class CallEntity {
 
     this.networkInterruption.subscribe(isInterrupted => {
       if (isInterrupted) {
-        return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+        return amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, AudioType.NETWORK_INTERRUPTION);
       }
-      amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+      amplify.publish(WebAppEvents.AUDIO.STOP, AudioType.NETWORK_INTERRUPTION);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
@@ -180,7 +183,7 @@ class CallEntity {
         this.isConnected(false);
 
         if (this.isOngoing() || this.isDisconnecting()) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.TALK_LATER);
         }
 
         if (this.terminationReason) {
@@ -645,8 +648,8 @@ class CallEntity {
    * @returns {undefined} No return value
    */
   _playRingTone(isIncoming) {
-    const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, audioId);
+    const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
+    amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, audioId);
   }
 
   /**
@@ -661,10 +664,10 @@ class CallEntity {
       this._stopRingTone(isIncoming);
 
       if (isIncoming) {
-        return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
+        return this.isGroup ? this.rejectCall(false) : amplify.publish(WebAppEvents.CALL.STATE.DELETE, this.id);
       }
 
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
+      amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
     }, CallEntity.CONFIG.STATE_TIMEOUT);
   }
 
@@ -676,8 +679,8 @@ class CallEntity {
    * @returns {undefined} No return value
    */
   _stopRingTone(isIncoming) {
-    const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, audioId);
+    const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
+    amplify.publish(WebAppEvents.AUDIO.STOP, audioId);
   }
 
   /**
@@ -753,13 +756,13 @@ class CallEntity {
         if (this.selfClientJoined()) {
           switch (terminationReason) {
             case TERMINATION_REASON.OTHER_USER: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.TALK_LATER);
               break;
             }
 
             case TERMINATION_REASON.CONNECTION_DROP:
             case TERMINATION_REASON.MEMBER_LEAVE: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.CALL_DROP);
               break;
             }
 
@@ -1030,7 +1033,7 @@ class CallEntity {
     this.isConnected(false);
     this.sessionId = undefined;
     this.terminationReason = undefined;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+    amplify.publish(WebAppEvents.AUDIO.STOP, AudioType.NETWORK_INTERRUPTION);
   }
 
   /**

@@ -26,6 +26,7 @@ import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaStreamSource} from './MediaStreamSource';
 import {MediaStreamInfo} from './MediaStreamInfo';
 import {MediaType} from './MediaType';
+import {WebAppEvents} from '../event/WebApp';
 
 export class MediaStreamHandler {
   /**
@@ -145,8 +146,8 @@ export class MediaStreamHandler {
 
     this.requestHintTimeout = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
   }
 
   //##############################################################################
@@ -172,7 +173,7 @@ export class MediaStreamHandler {
       .catch(error => {
         this._initiateMediaStreamFailure(error, conversationId);
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
           video: videoSend,
         });
@@ -436,7 +437,7 @@ export class MediaStreamHandler {
    */
   _hidePermissionFailedHint(mediaType) {
     const warningType = this._selectPermissionDeniedWarningType(mediaType);
-    amplify.publish(z.event.WebApp.WARNING.DISMISS, warningType);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
   }
 
   /**
@@ -449,7 +450,7 @@ export class MediaStreamHandler {
   _hidePermissionRequestHint(mediaType) {
     if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.DISMISS, warningType);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
     }
   }
 
@@ -657,13 +658,13 @@ export class MediaStreamHandler {
    */
   _showDeviceNotFoundHint(mediaType, conversationId) {
     if (mediaType === MediaType.AUDIO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
     } else if (mediaType === MediaType.VIDEO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
     }
 
     if (conversationId) {
-      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationId);
+      amplify.publish(WebAppEvents.CALL.STATE.REJECT, conversationId);
     }
   }
 
@@ -678,7 +679,7 @@ export class MediaStreamHandler {
     const videoTypes = [MediaType.AUDIO_VIDEO, MediaType.VIDEO];
     if (!videoTypes.includes(mediaType)) {
       const warningType = this._selectPermissionDeniedWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
+      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
     }
   }
 
@@ -692,7 +693,7 @@ export class MediaStreamHandler {
   _showPermissionRequestHint(mediaType) {
     if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
+      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
     }
   }
 
@@ -984,7 +985,7 @@ export class MediaStreamHandler {
   _toggleStreamEnabled(mediaType, sendState) {
     const isTypeAudio = mediaType === MediaType.AUDIO;
     if (isTypeAudio) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !sendState);
+      amplify.publish(WebAppEvents.CALL.MEDIA.MUTE_AUDIO, !sendState);
     }
 
     if (this.localMediaStream()) {

@@ -25,6 +25,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {MediaType} from '../media/MediaType';
 import {MediaDeviceType} from '../media/MediaDeviceType';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -191,8 +192,8 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.hasUnreadMessages = ko.observable(false);
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
+    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
 
@@ -205,7 +206,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
       const skipScreenSelection =
         this.selfStreamState.screenSend() || Environment.browser.firefox || navigator.mediaDevices.getDisplayMedia;
       if (skipScreenSelection) {
-        amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
+        amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
         return;
       }
 
@@ -226,7 +227,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
               Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
             }
 
-            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
+            amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
 
             const hasMultipleScreens = screenSources.length > 1;
             if (hasMultipleScreens) {
@@ -236,7 +237,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
                 this.multitasking.isMinimized(false);
               }
             } else {
-              amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
+              amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
             }
           })
           .catch(error => {
@@ -253,13 +254,13 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   clickedOnLeaveCall() {
     if (this.joinedCall()) {
       const reason = TERMINATION_REASON.SELF_USER;
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.joinedCall().id, reason);
+      amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.joinedCall().id, reason);
     }
   }
 
   clickedOnMuteAudio() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
+      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
     }
   }
 
@@ -275,7 +276,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
     this.isChoosingScreen(false);
     this.currentDeviceId.screenInput(screenSource.id);
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.SCREEN);
+    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.SCREEN);
 
     if (this.multitasking.resetMinimize()) {
       this.multitasking.isMinimized(true);
@@ -286,7 +287,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clickedOnStopVideo() {
     if (this.joinedCall()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.VIDEO);
+      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.VIDEO);
     }
   }
 

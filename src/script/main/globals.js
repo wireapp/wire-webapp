@@ -8,6 +8,9 @@ import raygun from '../../../node_modules/raygun4js/dist/raygun.vanilla.js';
 import namespace from '../../ext/js/webapp-module-namespace/Namespace.js';
 import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 
+// Needed for the wrapper
+import '../event/WebApp';
+
 import configGlobal from '../config.js';
 import envGlobal from '../util/Environment.js';
 import CryptoGlobal from '../util/Crypto.js';
@@ -41,7 +44,6 @@ import PermissionErrorGlobal from '../error/PermissionError.js';
 import StorageErrorGlobal from '../error/StorageError.js';
 import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
-import AudioTypeGlobal from '../audio/AudioType.js';
 import SignOutReasonGlobal from '../auth/SignOutReason.js';
 import authUrlParamGlobal from '../auth/URLParameter.js';
 import QueueStateGlobal from '../service/QueueState.js';
@@ -53,7 +55,6 @@ import EventNameGlobal from '../tracking/EventName.js';
 import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
 import SuperPropertyGlobal from '../tracking/SuperProperty.js';
 import AssetRemoteDataGlobal from '../assets/AssetRemoteData.js';
-import AssetTransferStateGlobal from '../assets/AssetTransferState.js';
 import AssetMetaDataBuilderGlobal from '../assets/AssetMetaDataBuilder.js';
 import ErrorGlobal from '../backup/Error.js';
 import ConnectionEntityGlobal from '../connection/ConnectionEntity.js';
@@ -81,18 +82,13 @@ import CryptographyServiceGlobal from '../cryptography/CryptographyService.js';
 import GenericMessageTypeGlobal from '../cryptography/GenericMessageType.js';
 import ProtoMessageTypeGlobal from '../cryptography/ProtoMessageType.js';
 import ephemeralTimingsGlobal from '../ephemeral/ephemeralTimings.js';
-import BackendGlobal from '../event/Backend.js';
-import ClientGlobal from '../event/Client.js';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
 import EventServiceNoCompoundGlobal from '../event/EventServiceNoCompound.js';
-import EventTypeGlobal from '../event/EventType.js';
-import EventTypeHandlingGlobal from '../event/EventTypeHandling.js';
 import NotificationHandlingStateGlobal from '../event/NotificationHandlingState.js';
 import NotificationServiceGlobal from '../event/NotificationService.js';
 import QuotedMessageMiddlewareGlobal from '../event/preprocessor/QuotedMessageMiddleware.js';
 import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js';
-import WebAppGlobal from '../event/WebApp.js';
 import WebSocketServiceGlobal from '../event/WebSocketService.js';
 import IntegrationMapperGlobal from '../integration/IntegrationMapper.js';
 import IntegrationRepositoryGlobal from '../integration/IntegrationRepository.js';
@@ -207,16 +203,10 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-import AvailabilityContextMenuGlobal from '../ui/AvailabilityContextMenu.js';
-import ContextMenuGlobal from '../ui/ContextMenu.js';
-import ModalGlobal from '../ui/Modal.js';
-import ShortcutTypeGlobal from '../ui/ShortcutType.js';
-import ShortcutGlobal from '../ui/Shortcut.js';
 import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';
-import audioPreferenceGlobal from '../audio/AudioPreference.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;

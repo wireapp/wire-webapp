@@ -17,6 +17,8 @@
  *
  */
 
+import {ClientEvent} from '../event/Client';
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -24,7 +26,7 @@ z.message.MessageCategorization = (() => {
   const _checkAsset = event => {
     const {data: eventData, type: eventType} = event;
 
-    const isAssetAdd = eventType === z.event.Client.CONVERSATION.ASSET_ADD;
+    const isAssetAdd = eventType === ClientEvent.CONVERSATION.ASSET_ADD;
     if (isAssetAdd) {
       const isTagUndefined = eventData.info.tag === undefined;
       if (isTagUndefined) {
@@ -41,14 +43,14 @@ z.message.MessageCategorization = (() => {
   };
 
   const _checkLocation = event => {
-    const isLocation = event.type === z.event.Client.CONVERSATION.LOCATION;
+    const isLocation = event.type === ClientEvent.CONVERSATION.LOCATION;
     if (isLocation) {
       return z.message.MessageCategory.LOCATION;
     }
   };
 
   const _checkPing = event => {
-    const isPing = event.type === z.event.Client.CONVERSATION.KNOCK;
+    const isPing = event.type === ClientEvent.CONVERSATION.KNOCK;
     if (isPing) {
       return z.message.MessageCategory.KNOCK;
     }
@@ -57,7 +59,7 @@ z.message.MessageCategorization = (() => {
   const _checkText = event => {
     const {data: eventData, type: eventType} = event;
 
-    const isMessageAdd = eventType === z.event.Client.CONVERSATION.MESSAGE_ADD;
+    const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
     if (isMessageAdd) {
       let category = z.message.MessageCategory.TEXT;
 

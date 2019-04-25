@@ -17,9 +17,11 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
-import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'utils/util';
+import 'src/script/localization/Localizer';
+
+import {User} from 'src/script/entity/User';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
@@ -98,7 +100,7 @@ describe('Member Message', () => {
 
     it('should be deletable when message is a file and uploading or downloading', () => {
       const file_et = new z.entity.File();
-      file_et.status(z.assets.AssetTransferState.UPLOADING);
+      file_et.status(AssetTransferState.UPLOADING);
       message_et.assets.push(file_et);
 
       expect(message_et.is_deletable()).toBe(true);

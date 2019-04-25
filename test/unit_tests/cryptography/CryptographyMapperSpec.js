@@ -38,6 +38,8 @@ import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {createRandomUuid, arrayToBase64} from 'utils/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
+import {ClientEvent} from 'src/script/event/Client';
+import {BackendEvent} from 'src/script/event/Backend';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -77,7 +79,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -108,7 +110,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -147,7 +149,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -169,7 +171,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -190,7 +192,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -225,7 +227,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -245,7 +247,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.USER.AVAILABILITY);
+        expect(event_json.type).toBe(ClientEvent.USER.AVAILABILITY);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -269,7 +271,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
+        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -293,7 +295,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_HIDDEN);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_HIDDEN);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -312,7 +314,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_DELETE);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_DELETE);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -349,7 +351,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -394,7 +396,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -438,7 +440,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -477,7 +479,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.KNOCK);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -497,7 +499,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
+        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -521,7 +523,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -539,7 +541,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_ADD);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -582,7 +584,7 @@ describe('CryptographyMapper', () => {
         })
         .then(event_json => {
           expect(event_json.data.content).toBe(plaintext);
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_ADD);
+          expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
           expect(event_json.id).toBe(generic_message.messageId);
         });
     });
@@ -609,7 +611,7 @@ describe('CryptographyMapper', () => {
         })
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.KNOCK);
+          expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -631,7 +633,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.LOCATION);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.LOCATION);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -657,7 +659,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
+        expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
@@ -683,7 +685,7 @@ describe('CryptographyMapper', () => {
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
         expect(_.isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(z.event.Client.CALL.E_CALL);
+        expect(event_json.type).toBe(ClientEvent.CALL.E_CALL);
         expect(event_json.conversation).toBe(event.conversation);
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);

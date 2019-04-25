@@ -24,10 +24,14 @@ import {createRandomUuid} from 'utils/util';
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {ClientEvent} from 'src/script/event/Client';
+import {BackendEvent} from 'src/script/event/Backend';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {WebAppEvents} from 'src/script/event/WebApp';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -62,7 +66,7 @@ describe('ConversationRepository', () => {
     sinon.spy(jQuery, 'ajax');
 
     return test_factory.exposeConversationActors().then(conversation_repository => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       ({storageService: storage_service} = conversation_repository.conversation_service);
 
       spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
@@ -98,7 +102,7 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new z.entity.File();
-        file_et.status(z.assets.AssetTransferState.UPLOADING);
+        file_et.status(AssetTransferState.UPLOADING);
         message_et = new z.entity.ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
         conversation_et.add_message(message_et);
@@ -123,7 +127,7 @@ describe('ConversationRepository', () => {
         from: createRandomUuid(),
         id: message_et.id,
         time: Date.now(),
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
       return TestFactory.conversation_repository._on_asset_upload_complete(conversation_et, event).then(() => {
@@ -133,7 +137,7 @@ describe('ConversationRepository', () => {
 
         expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
         expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-        expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
+        expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
       });
     });
   });
@@ -639,7 +643,7 @@ describe('ConversationRepository', () => {
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
         conversationId = createRandomUuid();
-        createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
+        createEvent = {conversation: conversationId, data: {}, type: BackendEvent.CONVERSATION.CREATE};
       });
 
       it('should process create event for a new conversation created locally', () => {
@@ -730,7 +734,7 @@ describe('ConversationRepository', () => {
           from: createRandomUuid(),
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -757,7 +761,7 @@ describe('ConversationRepository', () => {
           from: TestFactory.user_repository.self().id,
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -781,7 +785,7 @@ describe('ConversationRepository', () => {
           from: other_user_id,
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -806,7 +810,7 @@ describe('ConversationRepository', () => {
           from: other_user_id,
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -843,7 +847,7 @@ describe('ConversationRepository', () => {
           from: createRandomUuid(),
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
@@ -871,7 +875,7 @@ describe('ConversationRepository', () => {
           from: TestFactory.user_repository.self().id,
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
@@ -893,7 +897,7 @@ describe('ConversationRepository', () => {
           from: TestFactory.user_repository.self().id,
           id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();

@@ -17,12 +17,8 @@
  *
  */
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.EVENT_TYPE = {
-  CALL: 'call',
-  CONVERSATION: 'conversation',
-  TEAM: 'team',
-  USER: 'user',
-};
+export enum AudioPreference {
+  ALL = 'all',
+  NONE = 'none',
+  SOME = 'some',
+}

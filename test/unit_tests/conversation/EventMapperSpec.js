@@ -19,10 +19,12 @@
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
+import {createRandomUuid, arrayToBase64} from 'utils/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {AssetType} from 'src/script/assets/AssetType';
-import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {ClientEvent} from 'src/script/event/Client';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -57,7 +59,7 @@ describe('Event Mapper', () => {
         from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
@@ -90,7 +92,7 @@ describe('Event Mapper', () => {
         from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
@@ -123,7 +125,7 @@ describe('Event Mapper', () => {
         from: createRandomUuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {

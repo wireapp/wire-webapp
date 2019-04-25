@@ -17,15 +17,18 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import platform from 'platform';
+
+import {getLogger} from 'utils/Logger';
 
 import * as StorageUtil from 'utils/StorageUtil';
 import {t} from 'utils/LocalizerUtil';
 import {murmurhash3} from 'utils/util';
+
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Environment} from 'utils/Environment';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -53,8 +56,8 @@ z.client.ClientRepository = class ClientRepository {
 
     this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
   init(selfUser) {
@@ -200,7 +203,7 @@ z.client.ClientRepository = class ClientRepository {
   verifyClient(userId, clientEntity, isVerified) {
     return this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}).then(() => {
       clientEntity.meta.isVerified(isVerified);
-      amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+      amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
     });
   }
 
@@ -443,7 +446,7 @@ z.client.ClientRepository = class ClientRepository {
       .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
       .then(() => {
         this.selfUser().remove_client(clientId);
-        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
+        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
         return this.clients();
       })
       .catch(error => {
@@ -460,7 +463,7 @@ z.client.ClientRepository = class ClientRepository {
   removeLocalClient() {
     this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
       const shouldClearData = this.currentClient().isTemporary();
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
   }
 
@@ -468,13 +471,13 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
         );
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
         action: clearData => {
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+          return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
         },
         preventClose: true,
         text: {
@@ -632,7 +635,7 @@ z.client.ClientRepository = class ClientRepository {
       .then(newRecords => this.clientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser))
       .then(clientEntities => {
         if (publish) {
-          amplify.publish(z.event.WebApp.CLIENT.UPDATE, userId, clientEntities);
+          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
         }
         return clientEntities;
       })
@@ -676,12 +679,12 @@ z.client.ClientRepository = class ClientRepository {
   onUserEvent(eventJson) {
     const type = eventJson.type;
 
-    const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
+    const isClientAdd = type === BackendEvent.USER.CLIENT_ADD;
     if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    const isClientRemove = type === z.event.Backend.USER.CLIENT_REMOVE;
+    const isClientRemove = type === BackendEvent.USER.CLIENT_REMOVE;
     if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
@@ -694,7 +697,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   onClientAdd(eventJson) {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
+    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
   }
 
   /**
@@ -710,7 +713,7 @@ z.client.ClientRepository = class ClientRepository {
         return this.removeLocalClient();
       }
 
-      amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.selfUser().id, clientId);
+      amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
     }
   }
 };

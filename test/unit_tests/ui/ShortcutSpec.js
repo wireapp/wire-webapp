@@ -18,9 +18,11 @@
  */
 
 import {Environment} from 'src/script/util/Environment';
+import {Shortcut} from 'src/script/ui/Shortcut';
+import {ShortcutType} from 'src/script/ui/ShortcutType';
 
 describe('Shortcut', () => {
-  const map = z.ui.Shortcut.shortcutMap;
+  const map = Shortcut.shortcutMap;
 
   describe('getShortcut', () => {
     describe('webapp', () => {
@@ -31,41 +33,41 @@ describe('Shortcut', () => {
 
       it('can get shortcut for mac', () => {
         Environment.os.mac = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const mac_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const mac_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
-        expect(mac_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.macos);
+        expect(mac_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.webapp.macos);
       });
 
       it('can get shortcut for pc', () => {
         Environment.os.mac = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const pc_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const pc_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
-        expect(pc_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.pc);
+        expect(pc_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.webapp.pc);
       });
     });
 
     describe('electron', () => {
       beforeEach(() => {
         Environment.electron = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
+        Shortcut.__test__assignEnvironment(Environment);
       });
 
       it('can get shortcut for electron mac', () => {
         Environment.os.mac = true;
         z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const mac_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+        const mac_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
-        expect(mac_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.macos);
+        expect(mac_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.electron.macos);
       });
 
       it('can get shortcut for electron pc', () => {
         Environment.os.mac = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const pc_shortcut = z.ui.Shortcut.getShortcut(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const pc_shortcut = Shortcut.getShortcut(ShortcutType.ADD_PEOPLE);
 
-        expect(pc_shortcut).toBe(map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.pc);
+        expect(pc_shortcut).toBe(map[ShortcutType.ADD_PEOPLE].shortcut.electron.pc);
       });
     });
   });
@@ -74,21 +76,21 @@ describe('Shortcut', () => {
     describe('webapp', () => {
       beforeEach(() => {
         Environment.electron = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
+        Shortcut.__test__assignEnvironment(Environment);
       });
 
       it('can create a beautified tooltip for webapp mac', () => {
         Environment.os.mac = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const mac_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const mac_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
         Environment.os.mac = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const pc_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const pc_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe('Ctrl + Shift + K');
       });
@@ -97,21 +99,21 @@ describe('Shortcut', () => {
     describe('electron', () => {
       beforeEach(() => {
         Environment.electron = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
+        Shortcut.__test__assignEnvironment(Environment);
       });
 
       it('can create a beautified tooltip for webapp mac', () => {
         Environment.os.mac = true;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const mac_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const mac_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(mac_shortcut).toBe('⌘⇧K');
       });
 
       it('can create a beautified tooltip for webapp pc', () => {
         Environment.os.mac = false;
-        z.ui.Shortcut.__test__assignEnvironment(Environment);
-        const pc_shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+        Shortcut.__test__assignEnvironment(Environment);
+        const pc_shortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
 
         expect(pc_shortcut).toBe('Ctrl + Shift + K');
       });
@@ -120,7 +122,7 @@ describe('Shortcut', () => {
 
   describe('getBeautifiedShortcutMac', () => {
     it('can create a beautified shortcut', () => {
-      const mac_shortcut = z.ui.Shortcut.getBeautifiedShortcutMac('command + q');
+      const mac_shortcut = Shortcut.getBeautifiedShortcutMac('command + q');
 
       expect(mac_shortcut).toBe('⌘Q');
     });
@@ -128,7 +130,7 @@ describe('Shortcut', () => {
 
   describe('get_beautified_shortcut_pc', () => {
     it('can create a beautified shortcut', () => {
-      const pc_shortcut = z.ui.Shortcut.getBeautifiedShortcutWin('alt + F4');
+      const pc_shortcut = Shortcut.getBeautifiedShortcutWin('alt + F4');
 
       expect(pc_shortcut).toBe('Alt + F4');
     });

@@ -17,6 +17,8 @@
  *
  */
 
+import {WebAppEvents} from '../event/WebApp';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
@@ -35,7 +37,7 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
     this.unreadCount = ko.observable(0);
 
     this.unreadCountSubscription = this.unreadCount.subscribe(this._updateFavicon.bind(this));
-    this.dispatcher.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
+    this.dispatcher.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
   }
 
   _updateUnreadCount(unreadCount) {
@@ -52,7 +54,7 @@ z.viewModel.FaviconViewModel = class FaviconViewModel {
   }
 
   dispose() {
-    this.dispatcher.unsubscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
+    this.dispatcher.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, this, this._updateUnreadCount);
     this.unreadCountSubscription.dispose();
   }
 };

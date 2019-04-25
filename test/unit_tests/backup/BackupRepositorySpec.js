@@ -23,6 +23,8 @@ import {BackupRepository} from 'src/script/backup/BackupRepository';
 
 import {noop} from 'utils/util';
 
+import {ClientEvent} from 'src/script/event/Client';
+
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
 /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
@@ -107,7 +109,7 @@ describe('BackupRepository', () => {
     it('ignores verification events in the backup', () => {
       const verificationEvent = {
         conversation: conversationId,
-        type: z.event.Client.CONVERSATION.VERIFICATION,
+        type: ClientEvent.CONVERSATION.VERIFICATION,
       };
 
       return TestFactory.storage_service

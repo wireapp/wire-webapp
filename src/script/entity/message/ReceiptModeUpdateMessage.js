@@ -20,11 +20,13 @@
 import {SystemMessage} from './SystemMessage';
 import {t} from 'utils/LocalizerUtil';
 
+import {BackendEvent} from '../../event/Backend';
+
 export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled) {
     super();
 
-    this.type = z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE;
+    this.type = BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE;
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
     this.caption = ko.pureComputed(() => {

@@ -25,6 +25,7 @@ import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaElementHandler} from './MediaElementHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 export class MediaRepository {
   // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
@@ -111,6 +112,6 @@ export class MediaRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 }

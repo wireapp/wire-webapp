@@ -24,6 +24,7 @@ import {t} from 'utils/LocalizerUtil';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -67,7 +68,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     if (!this.isLinkCopied() && this.activeConversation()) {
       copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
         window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);
       });
     }
@@ -89,7 +90,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   }
 
   revokeAccessCode() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
@@ -127,7 +128,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return _changeAccessState();
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => _changeAccessState(),
         preventClose: true,
         text: {

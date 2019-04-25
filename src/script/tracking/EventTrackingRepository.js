@@ -22,6 +22,7 @@ import {TimeUtil} from 'utils/TimeUtil';
 import {Environment} from 'utils/Environment';
 
 import * as trackingHelpers from './Helpers';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
@@ -81,7 +82,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     const privacyPromise = this.privacyPreference ? this._enableServices(false) : Promise.resolve();
     return privacyPromise.then(() => {
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
     });
   }
 
@@ -164,19 +165,19 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _subscribeToAnalyticsEvents() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
       if (this.isUserAnalyticsActivated) {
         this._setSuperProperty(...args);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this, (...args) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (...args) => {
       if (this.isUserAnalyticsActivated) {
         this._trackEvent(...args);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
   }
 
   _setSuperProperties() {
@@ -212,8 +213,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _unsubscribeFromAnalyticsEvents() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 
   //##############################################################################

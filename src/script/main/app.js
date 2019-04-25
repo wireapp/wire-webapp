@@ -17,10 +17,16 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
 import ko from 'knockout';
-
 import platform from 'platform';
+
+import {getLogger} from 'utils/Logger';
+import {t} from 'utils/LocalizerUtil';
+import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
+import {DebugUtil} from 'utils/DebugUtil';
+import {TimeUtil} from 'utils/TimeUtil';
+import {enableLogging} from 'utils/LoggerUtil';
+
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -46,25 +52,21 @@ import {MainViewModel} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
-import {DebugUtil} from 'utils/DebugUtil';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
-import {TimeUtil} from 'utils/TimeUtil';
 
 import '../components/mentionSuggestions.js';
+import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {t} from 'utils/LocalizerUtil';
 import {Environment} from 'utils/Environment';
 
-import './globals';
 import {getWebsiteUrl} from '../externalRoute';
-import {enableLogging} from 'utils/LoggerUtil';
 
 import {resolve, graph} from '../config/appResolver';
 import {modals} from '../view_model/ModalsViewModel';
-import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
 import {showInitialModal} from '../user/AvailabilityModal';
+import {WebAppEvents} from '../event/WebApp';
 
 class App {
   static get CONFIG() {
@@ -271,8 +273,8 @@ class App {
    * @returns {undefined} No return value
    */
   _subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.REFRESH, this.refresh.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
   }
 
   //##############################################################################
@@ -365,7 +367,7 @@ class App {
         this._showInterface();
         loadingView.removeFromView();
         telemetry.report();
-        amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
         modals.ready();
         showInitialModal(this.repository.user.self().availability());
         return this.repository.conversation.updateConversationsOnAppInit();
@@ -402,8 +404,8 @@ class App {
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
     });
   }
@@ -415,7 +417,7 @@ class App {
   onInternetConnectionLost() {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   _appInitFailure(error, isReload) {
@@ -624,7 +626,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
-      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
@@ -686,7 +688,7 @@ class App {
    */
   logout(signOutReason, clearData = false) {
     const _redirectToLogin = () => {
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clearData);
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
     };
 
@@ -764,7 +766,7 @@ class App {
     this.logger.info(`Refresh to update started`);
     if (Environment.desktop) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      return amplify.publish(z.event.WebApp.LIFECYCLE.RESTART);
+      return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
     }
 
     window.location.reload(true);
@@ -776,7 +778,7 @@ class App {
    * @returns {undefined} No return value
    */
   update() {
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**

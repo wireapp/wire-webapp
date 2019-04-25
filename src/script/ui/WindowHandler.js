@@ -21,7 +21,7 @@ import {getLogger} from 'utils/Logger';
 
 export class WindowHandler {
   constructor() {
-    this.logger = getLogger('z.ui.WindowHandler');
+    this.logger = getLogger('WindowHandler');
 
     this._listenToUnhandledPromiseRejection();
   }

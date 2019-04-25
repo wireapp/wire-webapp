@@ -24,6 +24,7 @@ import {sortObjectByKeys} from 'utils/util';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
 import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 
 // Call traces entity.
 class CallTelemetry {
@@ -147,7 +148,7 @@ class CallTelemetry {
       );
     }
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
   /**

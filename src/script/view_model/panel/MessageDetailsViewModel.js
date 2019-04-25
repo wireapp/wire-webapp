@@ -21,12 +21,13 @@ import moment from 'moment';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {t} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
       // listen for any changes to local message entities.
       // if the id of the message being viewed has changed, we store the new ID.
       if (oldId === this.messageId()) {
