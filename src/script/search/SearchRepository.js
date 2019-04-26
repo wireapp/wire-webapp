@@ -17,9 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {EMOJI_RANGES} from 'Util/EmojiUtil';
+
 import {validateHandle} from '../user/UserHandleGenerator';
-import {EMOJI_RANGES} from 'utils/EmojiUtil';
 
 window.z = window.z || {};
 window.z.search = z.search || {};

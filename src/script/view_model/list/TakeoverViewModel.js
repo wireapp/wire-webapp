@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';

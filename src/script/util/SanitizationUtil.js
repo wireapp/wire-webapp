@@ -17,7 +17,8 @@
  *
  */
 
-import {t, Declension} from 'utils/LocalizerUtil';
+import {t, Declension} from 'Util/LocalizerUtil';
+
 import {isValidEmail} from './util';
 
 window.z = window.z || {};

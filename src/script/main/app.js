@@ -20,12 +20,13 @@
 import ko from 'knockout';
 import platform from 'platform';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {checkIndexedDb, isSameLocation, createRandomUuid} from 'utils/util';
-import {DebugUtil} from 'utils/DebugUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {enableLogging} from 'utils/LoggerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {checkIndexedDb, isSameLocation, createRandomUuid} from 'Util/util';
+import {DebugUtil} from 'Util/DebugUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {enableLogging} from 'Util/LoggerUtil';
+import {Environment} from 'Util/Environment';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -67,11 +68,10 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import '../components/mentionSuggestions.js';
+import 'Components/mentionSuggestions.js';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {Environment} from 'utils/Environment';
 
 import {getWebsiteUrl} from '../externalRoute';
 

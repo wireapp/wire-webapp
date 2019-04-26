@@ -18,7 +18,8 @@
  */
 
 import UUID from 'uuidjs';
-import {createRandomUuid} from 'utils/util';
+
+import {createRandomUuid} from 'Util/util';
 
 describe('z.util.ValidationUtil', () => {
   describe('"asset.legacy"', () => {

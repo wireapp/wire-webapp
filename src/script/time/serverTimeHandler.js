@@ -20,7 +20,7 @@
 /* eslint-disable sort-keys */
 import ko from 'knockout';
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 export const serverTimeHandler = {
   logger: getLogger('serverTimeHandler'),

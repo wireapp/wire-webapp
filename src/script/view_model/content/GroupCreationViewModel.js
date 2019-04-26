@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
-import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {WebAppEvents} from '../../event/WebApp';

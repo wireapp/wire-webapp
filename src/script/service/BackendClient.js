@@ -17,8 +17,8 @@
  *
  */
 
-import {PromiseQueue} from 'utils/PromiseQueue';
-import {TimeUtil} from 'utils/TimeUtil';
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';

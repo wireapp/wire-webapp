@@ -17,12 +17,12 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {User} from 'src/script/entity/User';
-
-import {createRandomUuid} from 'utils/util';
 
 describe('ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();

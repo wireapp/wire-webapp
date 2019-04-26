@@ -26,12 +26,13 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {stripUrlWrapper} from 'Util/util';
+import {Environment} from 'Util/Environment';
+
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
-import {t} from 'utils/LocalizerUtil';
-import {stripUrlWrapper} from 'utils/util';
-import {Environment} from 'utils/Environment';
 
 /**
  * Use it on the drop area.

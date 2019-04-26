@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import {AssetTransferState} from '../../assets/AssetTransferState';

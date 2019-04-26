@@ -17,7 +17,7 @@
  *
  */
 
-import {clamp} from 'utils/NumberUtil';
+import {clamp} from 'Util/NumberUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

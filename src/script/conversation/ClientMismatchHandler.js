@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {getDifference} from 'utils/ArrayUtil';
+import {getLogger} from 'Util/Logger';
+import {getDifference} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};

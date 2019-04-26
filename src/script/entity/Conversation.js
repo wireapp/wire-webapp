@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {koArrayPushAll, koArrayUnshiftAll} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
 
 import {Config} from '../auth/config';
 

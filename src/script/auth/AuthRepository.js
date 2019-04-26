@@ -17,10 +17,10 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {Environment} from 'utils/Environment';
+import * as StorageUtil from 'Util/StorageUtil';
+import {Environment} from 'Util/Environment';
 
 import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';

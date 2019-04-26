@@ -19,9 +19,9 @@
 
 import JSZip from 'jszip';
 
-import {BackupRepository} from 'src/script/backup/BackupRepository';
+import {noop} from 'Util/util';
 
-import {noop} from 'utils/util';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';

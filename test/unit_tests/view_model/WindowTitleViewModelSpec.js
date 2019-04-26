@@ -19,9 +19,10 @@
 
 import ko from 'knockout';
 
+import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+
 import 'src/script/localization/Localizer';
-import {t} from 'utils/LocalizerUtil';
-import {createRandomUuid} from 'utils/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';

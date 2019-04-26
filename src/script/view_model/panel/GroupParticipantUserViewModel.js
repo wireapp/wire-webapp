@@ -17,13 +17,13 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+
+import {Actions} from 'Components/panel/userActions';
+import 'Components/panel/enrichedFields';
+import 'Components/panel/userDetails';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {Actions} from '../../components/panel/userActions';
-
-import '../../components/panel/enrichedFields';
-import '../../components/panel/userDetails';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {

@@ -18,10 +18,11 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
-import {chunk} from '../util/ArrayUtil';
-import {capToByte, rootMeanSquare} from '../util/NumberUtil';
-import {TimeUtil} from '../util/TimeUtil';
-import {loadFileBuffer} from '../util/util';
+
+import {chunk} from 'Util/ArrayUtil';
+import {capToByte, rootMeanSquare} from 'Util/NumberUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {loadFileBuffer} from 'Util/util';
 
 export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMetaData;
 

@@ -17,16 +17,16 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {alias} from 'Util/util';
+
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
-
-import {t} from 'utils/LocalizerUtil';
-import {alias} from 'utils/util';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

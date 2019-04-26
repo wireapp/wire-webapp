@@ -17,8 +17,9 @@
  *
  */
 
+import {Logger, getLogger} from 'Util/Logger';
+
 import {BackendClient} from '../service/BackendClient';
-import {Logger, getLogger} from '../util/Logger';
 import {PhoneBook} from './PhoneBook';
 
 class ConnectService {

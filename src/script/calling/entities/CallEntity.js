@@ -17,8 +17,8 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
-import {getRandomNumber} from 'utils/NumberUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {getRandomNumber} from 'Util/NumberUtil';
 
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 import {CALL_STATE} from '../enum/CallState';

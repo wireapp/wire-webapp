@@ -16,10 +16,11 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {AppInitStatistics} from './AppInitStatistics';
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
 
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+
+import {AppInitStatistics} from './AppInitStatistics';
 import {AppInitTimings} from './AppInitTimings';
 import {WebAppEvents} from '../../event/WebApp';
 

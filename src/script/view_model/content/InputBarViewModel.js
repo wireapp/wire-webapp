@@ -19,11 +19,11 @@
 
 import moment from 'moment';
 
-import {getLogger} from 'utils/Logger';
-import * as StorageUtil from 'utils/StorageUtil';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {formatBytes, afterRender, renderMessage} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import * as StorageUtil from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {formatBytes, afterRender, renderMessage} from 'Util/util';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';

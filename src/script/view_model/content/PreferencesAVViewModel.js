@@ -17,9 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+
 import {MediaType} from '../../media/MediaType';
-import {Environment} from 'utils/Environment';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

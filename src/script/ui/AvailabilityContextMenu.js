@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';

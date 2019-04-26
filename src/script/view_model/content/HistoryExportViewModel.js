@@ -17,10 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {downloadBlob} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
 

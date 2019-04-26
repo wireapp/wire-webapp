@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';

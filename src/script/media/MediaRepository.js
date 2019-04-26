@@ -17,8 +17,8 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
-import {Environment} from 'utils/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
 
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';

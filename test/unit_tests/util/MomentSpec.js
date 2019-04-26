@@ -18,7 +18,8 @@
  */
 
 import moment from 'moment';
-import {isSameDay, isSameMonth, isCurrentYear, isToday} from 'utils/moment';
+
+import {isSameDay, isSameMonth, isCurrentYear, isToday} from 'Util/moment';
 
 describe('z.util.moment', () => {
   describe('isToday', () => {

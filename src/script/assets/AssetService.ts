@@ -18,9 +18,11 @@
  */
 
 import {Asset} from '@wireapp/protocol-messaging';
+
+import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
+
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {BackendClientInterface} from '../service/BackendClientInterface';
-import {arrayToMd5Base64, loadFileBuffer, loadImage} from '../util/util';
 import {encryptAesAsset} from './AssetCrypto';
 
 export interface UploadAssetResponse {

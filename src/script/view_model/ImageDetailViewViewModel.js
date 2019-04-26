@@ -19,7 +19,7 @@
 
 import moment from 'moment';
 
-import {iterateItem} from 'utils/ArrayUtil';
+import {iterateItem} from 'Util/ArrayUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {Modal} from '../ui/Modal';

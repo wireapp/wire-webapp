@@ -19,8 +19,8 @@
 
 import moment from 'moment';
 
-import {t} from 'utils/LocalizerUtil';
-import {includesOnlyEmojis} from 'utils/EmojiUtil';
+import {t} from 'Util/LocalizerUtil';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {WebAppEvents} from '../event/WebApp';

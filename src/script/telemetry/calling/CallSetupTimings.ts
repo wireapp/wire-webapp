@@ -17,7 +17,8 @@
  *
  */
 
-import {Logger, getLogger} from 'utils/Logger';
+import {Logger, getLogger} from 'Util/Logger';
+
 import {CallSetupSteps} from './CallSetupSteps';
 import {CallSetupStepsOrder} from './CallSetupStepsOrder';
 

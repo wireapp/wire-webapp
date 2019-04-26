@@ -19,9 +19,9 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {base64ToArray} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {base64ToArray} from 'Util/util';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 

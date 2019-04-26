@@ -20,7 +20,7 @@
 import {groupBy} from 'underscore';
 import {amplify} from 'amplify';
 
-import * as StorageUtil from 'utils/StorageUtil';
+import * as StorageUtil from 'Util/StorageUtil';
 
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {BackendEvent} from '../event/Backend';

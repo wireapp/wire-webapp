@@ -19,8 +19,8 @@
 
 import JSZip from 'jszip';
 
-import {getLogger} from 'utils/Logger';
-import {chunk} from 'utils/ArrayUtil';
+import {getLogger} from 'Util/Logger';
+import {chunk} from 'Util/ArrayUtil';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {ClientEvent} from '../event/Client';

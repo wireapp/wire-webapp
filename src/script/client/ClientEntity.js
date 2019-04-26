@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {zeroPadding} from 'utils/util';
+
+import {zeroPadding} from 'Util/util';
 
 window.z = window.z || {};
 window.z.client = z.client || {};

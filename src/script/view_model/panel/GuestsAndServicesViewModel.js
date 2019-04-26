@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {copyText} from 'utils/ClipboardUtil';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';

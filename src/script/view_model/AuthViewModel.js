@@ -22,12 +22,12 @@ import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
 import 'phoneformat.js';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'utils/util';
-import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'utils/CountryCodes';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util';
+import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
+import {Environment} from 'Util/Environment';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';

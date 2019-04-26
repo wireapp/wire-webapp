@@ -19,9 +19,9 @@
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {base64ToArray, arrayToBase64, createRandomUuid} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {AvailabilityType} from '../user/AvailabilityType';
 import {decryptAesAsset} from '../assets/AssetCrypto';

@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {t} from 'utils/LocalizerUtil';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 

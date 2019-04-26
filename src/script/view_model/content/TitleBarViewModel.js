@@ -17,10 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {MediaType} from '../../media/MediaType';

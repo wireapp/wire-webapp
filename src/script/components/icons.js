@@ -17,12 +17,12 @@
  *
  */
 
-const fileList = require.context('resource/image/icon', true, /.+\.svg$/);
+const fileList = require.context('Resource/image/icon', true, /.+\.svg$/);
 
 fileList.keys().forEach(iconFileName => {
   const iconPath = iconFileName.replace(/^\.\//, '');
   const iconName = iconFileName.substring(iconFileName.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
   ko.components.register(iconName, {
-    template: require(`resource/image/icon/${iconPath}`),
+    template: require(`Resource/image/icon/${iconPath}`),
   });
 });

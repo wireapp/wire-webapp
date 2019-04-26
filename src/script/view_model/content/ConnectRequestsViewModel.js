@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {scrollToBottom} from 'utils/scroll-helpers';
-import {isLastItem} from 'utils/ArrayUtil';
+import {getLogger} from 'Util/Logger';
+import {scrollToBottom} from 'Util/scroll-helpers';
+import {isLastItem} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

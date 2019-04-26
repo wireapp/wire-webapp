@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
+
+import {getLogger} from 'Util/Logger';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';

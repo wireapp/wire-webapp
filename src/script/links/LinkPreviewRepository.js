@@ -17,7 +17,7 @@
  *
  */
 
-import {base64ToBlob} from 'utils/util';
+import {base64ToBlob} from 'Util/util';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';

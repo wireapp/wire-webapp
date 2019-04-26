@@ -186,7 +186,7 @@
   "scripts": {
     "build:server": "cd server && yarn build",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
-    "bundle:prod": "webpack --config webpack.config.prod.js",
+    "bundle:prod": "webpack --config webpack.config.js",
     "bundle:test": "webpack --config webpack.config.test.js",
     "build:prod": "yarn build:server && grunt build_prod",
     "configure": "copy-config",

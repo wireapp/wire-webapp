@@ -18,9 +18,11 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+
+import {createRandomUuid} from 'Util/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {createRandomUuid} from 'utils/util';
 
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();

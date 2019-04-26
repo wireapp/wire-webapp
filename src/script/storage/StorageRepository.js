@@ -17,7 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class StorageRepository {

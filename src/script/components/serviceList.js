@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {noop} from 'utils/util';
+import {noop} from 'Util/util';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

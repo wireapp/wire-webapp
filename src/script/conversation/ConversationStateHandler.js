@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {BackendEvent} from '../event/Backend';

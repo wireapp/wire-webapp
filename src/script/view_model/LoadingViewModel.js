@@ -17,8 +17,10 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
 import ko from 'knockout';
+
+import {t} from 'Util/LocalizerUtil';
+
 import {WebAppEvents} from '../event/WebApp';
 
 export class LoadingViewModel {

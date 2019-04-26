@@ -20,9 +20,10 @@
 import moment from 'moment';
 import ko from 'knockout';
 
-import {copyText} from 'utils/ClipboardUtil';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
 import {Message} from './Message';
-import {t} from 'utils/LocalizerUtil';
 import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
