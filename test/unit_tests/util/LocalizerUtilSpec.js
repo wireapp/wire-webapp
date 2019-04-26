@@ -17,7 +17,7 @@
  *
  */
 
-import {t, setStrings} from 'utils/LocalizerUtil';
+import {t, setStrings} from 'Util/LocalizerUtil';
 
 describe('LocalizerUtil', () => {
   describe('t', () => {

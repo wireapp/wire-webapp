@@ -18,7 +18,7 @@
  */
 
 import moment from 'moment';
-import {includesOnlyEmojis} from 'utils/EmojiUtil';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';

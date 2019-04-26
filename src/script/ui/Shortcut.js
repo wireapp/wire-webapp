@@ -18,7 +18,7 @@
  */
 
 import keyboardJS from 'keyboardjs';
-import {Environment} from 'utils/Environment';
+import {Environment} from 'Util/Environment';
 import {ShortcutType} from './ShortcutType';
 
 import {WebAppEvents} from '../event/WebApp';

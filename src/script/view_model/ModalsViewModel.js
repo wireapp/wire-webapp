@@ -17,10 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 import moment from 'moment';
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../event/WebApp';
 

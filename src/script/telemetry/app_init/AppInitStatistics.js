@@ -18,7 +18,7 @@
  */
 
 import {isNumber, isString} from 'underscore';
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {WebAppEvents} from '../../event/WebApp';

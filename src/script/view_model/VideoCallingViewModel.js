@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
 
 import * as trackingHelpers from '../tracking/Helpers';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';

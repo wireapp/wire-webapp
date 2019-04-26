@@ -24,7 +24,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
-import {enableLogging} from '../util/LoggerUtil';
+import {enableLogging} from 'Util/LoggerUtil';
 import {Config} from './config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';

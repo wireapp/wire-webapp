@@ -18,7 +18,7 @@
  */
 
 import 'src/script/localization/Localizer';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';

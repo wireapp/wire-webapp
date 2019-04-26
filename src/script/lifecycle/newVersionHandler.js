@@ -17,8 +17,8 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
-import {getLogger} from 'utils/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {getLogger} from 'Util/Logger';
 
 const logger = getLogger('LifecycleRepository');
 const VERSION_URL = '/version/';

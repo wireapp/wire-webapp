@@ -17,7 +17,7 @@
  *
  */
 
-import {noop} from 'utils/util';
+import {noop} from 'Util/util';
 
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import {MediaType} from '../../media/MediaType';

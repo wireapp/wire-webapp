@@ -17,8 +17,8 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
-import {Environment} from 'utils/Environment';
+import {TimeUtil} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
 import Cookies from 'js-cookie';
 
 window.z = window.z || {};

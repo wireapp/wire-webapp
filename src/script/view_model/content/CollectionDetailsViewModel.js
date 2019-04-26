@@ -19,10 +19,10 @@
 
 import moment from 'moment';
 
-import {getLogger} from 'utils/Logger';
-import {isToday, isCurrentYear, isSameDay, isSameMonth} from 'utils/moment';
-import {t} from 'utils/LocalizerUtil';
-import {koPushDeferred} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {isToday, isCurrentYear, isSameDay, isSameMonth} from 'Util/moment';
+import {t} from 'Util/LocalizerUtil';
+import {koPushDeferred} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';

@@ -18,7 +18,7 @@
  */
 
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();

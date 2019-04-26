@@ -17,7 +17,7 @@
  *
  */
 
-import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
+import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {Text} from 'src/script/entity/message/Text';
 import UUID from 'uuidjs';
 

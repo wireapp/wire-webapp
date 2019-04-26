@@ -17,7 +17,7 @@
  *
  */
 
-import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 
 import {User} from '../User';
 import {ClientEvent} from '../../event/Client';

@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from '../util/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 export const EphemeralTimings = {
   VALUES: [

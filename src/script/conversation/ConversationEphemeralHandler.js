@@ -19,10 +19,10 @@
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
-import {arrayToBase64, noop} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
+import {arrayToBase64, noop} from 'Util/util';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';

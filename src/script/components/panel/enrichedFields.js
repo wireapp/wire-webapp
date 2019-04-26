@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {resolve, graph} from '../../config/appResolver';
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 ko.components.register('enriched-fields', {
   template: `

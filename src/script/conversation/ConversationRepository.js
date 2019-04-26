@@ -36,12 +36,12 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {PromiseQueue} from 'utils/PromiseQueue';
-import {t, Declension, joinNames} from 'utils/LocalizerUtil';
-import {getNextItem} from 'utils/ArrayUtil';
-import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import {getNextItem} from 'Util/ArrayUtil';
+import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -73,7 +73,7 @@ import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
-import {areMentionsDifferent, isTextDifferent} from 'utils/messageComparator';
+import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 

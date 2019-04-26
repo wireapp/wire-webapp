@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import * as StorageUtil from 'utils/StorageUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import * as StorageUtil from 'Util/StorageUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';

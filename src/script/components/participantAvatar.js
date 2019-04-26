@@ -19,11 +19,11 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatar {

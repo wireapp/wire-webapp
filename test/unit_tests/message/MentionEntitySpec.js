@@ -18,7 +18,7 @@
  */
 
 import {Mention} from '@wireapp/protocol-messaging';
-import {base64ToArray} from 'utils/util';
+import {base64ToArray} from 'Util/util';
 
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';

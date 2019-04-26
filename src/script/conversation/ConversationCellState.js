@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {AssetTransferState} from '../assets/AssetTransferState';

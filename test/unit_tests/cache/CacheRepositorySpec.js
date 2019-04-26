@@ -18,7 +18,7 @@
  */
 
 import {resolve, graph} from './../../api/testResolver';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 import {StorageKey} from 'src/script/storage/StorageKey';
 
 describe('CacheRepository', () => {

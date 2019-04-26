@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 import {MediaType} from './MediaType';
-import {Environment} from 'utils/Environment';
+import {Environment} from 'Util/Environment';
 
 export class MediaElementHandler {
   /**

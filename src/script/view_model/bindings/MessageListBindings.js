@@ -22,8 +22,8 @@ import moment from 'moment';
 
 import 'jquery-mousewheel';
 import {viewportObserver} from '../../ui/viewportObserver';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.

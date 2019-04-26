@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import JSZip from 'jszip';
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};

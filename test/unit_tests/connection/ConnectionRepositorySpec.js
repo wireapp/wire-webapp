@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';

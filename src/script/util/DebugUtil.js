@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';

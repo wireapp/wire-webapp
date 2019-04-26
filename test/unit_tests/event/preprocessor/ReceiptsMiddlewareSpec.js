@@ -20,7 +20,7 @@
 import UUID from 'uuidjs';
 
 import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
-import {noop} from 'utils/util';
+import {noop} from 'Util/util';
 import {ClientEvent} from 'src/script/event/Client';
 
 describe('ReceiptsMiddleware', () => {

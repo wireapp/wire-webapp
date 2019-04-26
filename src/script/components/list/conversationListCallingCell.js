@@ -17,9 +17,9 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {afterRender} from 'utils/util';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {afterRender} from 'Util/util';
 
 import {PermissionState} from '../../notification/PermissionState';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';

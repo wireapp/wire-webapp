@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import {t} from 'utils/LocalizerUtil';
-import {iterateItem} from 'utils/ArrayUtil';
-import {Environment} from 'utils/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {iterateItem} from 'Util/ArrayUtil';
+import {Environment} from 'Util/Environment';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';

@@ -18,7 +18,7 @@
  */
 
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {TimeUtil} from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 
 export class TimedMessagesViewModel extends BasePanelViewModel {

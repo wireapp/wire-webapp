@@ -19,7 +19,7 @@
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 

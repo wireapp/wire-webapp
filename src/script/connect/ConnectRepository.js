@@ -19,8 +19,8 @@
 
 import CryptoJS from 'crypto-js';
 
-import {getLogger} from 'utils/Logger';
-import {phoneNumberToE164, encodeSha256Base64} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {phoneNumberToE164, encodeSha256Base64} from 'Util/util';
 import {PhoneBook} from './PhoneBook';
 
 class ConnectRepository {

@@ -114,7 +114,7 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
   };
 
   loadLanguage = (language: string) => {
-    return require(`resource/translation/${mapLanguage(language)}.json`);
+    return require(`Resource/translation/${mapLanguage(language)}.json`);
   };
 
   render = () => {

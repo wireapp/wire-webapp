@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';

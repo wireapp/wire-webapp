@@ -35,7 +35,7 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {createRandomUuid, arrayToBase64} from 'Util/util';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';

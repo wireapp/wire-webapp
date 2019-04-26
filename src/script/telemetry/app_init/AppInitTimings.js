@@ -18,8 +18,8 @@
  */
 
 import {isNumber, isString} from 'underscore';
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 

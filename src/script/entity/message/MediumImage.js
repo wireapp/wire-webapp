@@ -17,10 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 import {File} from './File';
 import {AssetType} from '../../assets/AssetType';
-import {downloadBlob} from 'utils/util';
+import {downloadBlob} from 'Util/util';
 
 class MediumImage extends File {
   constructor(id) {

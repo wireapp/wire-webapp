@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {downloadBlob} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
 

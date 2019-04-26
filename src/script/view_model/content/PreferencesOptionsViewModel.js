@@ -17,18 +17,18 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {Environment} from 'utils/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
 
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
-import {downloadBlob} from 'utils/util';
+import {downloadBlob} from 'Util/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {AudioPreference} from '../../audio/AudioPreference';

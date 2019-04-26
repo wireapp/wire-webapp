@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {iterateIndex} from 'utils/ArrayUtil';
-import {koArrayPushAll} from 'utils/util';
+import * as StorageUtil from 'Util/StorageUtil';
+import {iterateIndex} from 'Util/ArrayUtil';
+import {koArrayPushAll} from 'Util/util';
 
 import {MediaRepository} from './MediaRepository';
 import {MediaType} from './MediaType';

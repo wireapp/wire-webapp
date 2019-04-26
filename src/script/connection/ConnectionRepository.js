@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {koArrayPushAll} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {koArrayPushAll} from 'Util/util';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';

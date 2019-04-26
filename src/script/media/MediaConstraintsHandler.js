@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 export class MediaConstraintsHandler {

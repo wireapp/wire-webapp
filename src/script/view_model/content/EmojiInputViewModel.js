@@ -18,7 +18,7 @@
  */
 
 import emojiBindings from './emoji.json';
-import * as StorageUtil from 'utils/StorageUtil';
+import * as StorageUtil from 'Util/StorageUtil';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';

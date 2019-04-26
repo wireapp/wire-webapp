@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';

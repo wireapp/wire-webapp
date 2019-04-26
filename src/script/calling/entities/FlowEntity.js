@@ -35,8 +35,8 @@ import {SDP_NEGOTIATION_MODE} from '../enum/SDPNegotiationMode';
 import {SDP_SOURCE} from '../enum/SDPSource';
 import {TERMINATION_REASON} from '../enum/TerminationReason';
 
-import {TimeUtil} from 'utils/TimeUtil';
-import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'utils/PeerConnectionUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {FlowAudioEntity} from './FlowAudioEntity';

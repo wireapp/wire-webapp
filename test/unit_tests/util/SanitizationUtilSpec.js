@@ -18,7 +18,7 @@
  */
 
 import 'src/script/localization/Localizer';
-import {LocalizerUtil, Declension} from 'utils/LocalizerUtil';
+import {LocalizerUtil, Declension} from 'Util/LocalizerUtil';
 import {SanitizationUtil} from 'src/script/util/SanitizationUtil';
 import {User} from 'src/script/entity/User';
 

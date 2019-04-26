@@ -17,17 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {alias} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {alias} from 'Util/util';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {User} from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {Environment} from 'utils/Environment';
+import {Environment} from 'Util/Environment';
 import {WebAppEvents} from '../../event/WebApp';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 

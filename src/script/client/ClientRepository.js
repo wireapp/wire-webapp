@@ -19,14 +19,14 @@
 
 import platform from 'platform';
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {t} from 'utils/LocalizerUtil';
-import {murmurhash3} from 'utils/util';
+import * as StorageUtil from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
+import {murmurhash3} from 'Util/util';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {Environment} from 'utils/Environment';
+import {Environment} from 'Util/Environment';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';

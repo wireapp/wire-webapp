@@ -25,7 +25,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;

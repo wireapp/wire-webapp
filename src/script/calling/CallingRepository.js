@@ -20,9 +20,9 @@
 import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {createRandomUuid} from 'utils/util';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {createRandomUuid} from 'Util/util';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
@@ -42,7 +42,7 @@ import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
-import {Environment} from 'utils/Environment';
+import {Environment} from 'Util/Environment';
 
 import {ClientEvent} from '../event/Client';
 import {WebAppEvents} from '../event/WebApp';

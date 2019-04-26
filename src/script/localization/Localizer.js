@@ -19,12 +19,12 @@
 
 import moment from 'moment';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {URLUtil} from 'utils/URLUtil';
+import * as StorageUtil from 'Util/StorageUtil';
+import {URLUtil} from 'Util/URLUtil';
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
 
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'utils/LocalizerUtil';
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 
 import 'moment/locale/cs.js';
 import 'moment/locale/da.js';
@@ -48,28 +48,28 @@ import 'moment/locale/sl.js';
 import 'moment/locale/tr.js';
 import 'moment/locale/uk.js';
 
-import cs from 'resource/translation/cs-CZ.json';
-import da from 'resource/translation/da-DK.json';
-import de from 'resource/translation/de-DE.json';
-import el from 'resource/translation/el-GR.json';
-import en from 'resource/translation/en-US.json';
-import es from 'resource/translation/es-ES.json';
-import et from 'resource/translation/et-EE.json';
-import fi from 'resource/translation/fi-FI.json';
-import fr from 'resource/translation/fr-FR.json';
-import hr from 'resource/translation/hr-HR.json';
-import hu from 'resource/translation/hu-HU.json';
-import it from 'resource/translation/it-IT.json';
-import lt from 'resource/translation/lt-LT.json';
-import nl from 'resource/translation/nl-NL.json';
-import pl from 'resource/translation/pl-PL.json';
-import pt from 'resource/translation/pt-BR.json';
-import ro from 'resource/translation/ro-RO.json';
-import ru from 'resource/translation/ru-RU.json';
-import sk from 'resource/translation/sk-SK.json';
-import sl from 'resource/translation/sl-SI.json';
-import tr from 'resource/translation/tr-TR.json';
-import uk from 'resource/translation/uk-UA.json';
+import cs from 'Resource/translation/cs-CZ.json';
+import da from 'Resource/translation/da-DK.json';
+import de from 'Resource/translation/de-DE.json';
+import el from 'Resource/translation/el-GR.json';
+import en from 'Resource/translation/en-US.json';
+import es from 'Resource/translation/es-ES.json';
+import et from 'Resource/translation/et-EE.json';
+import fi from 'Resource/translation/fi-FI.json';
+import fr from 'Resource/translation/fr-FR.json';
+import hr from 'Resource/translation/hr-HR.json';
+import hu from 'Resource/translation/hu-HU.json';
+import it from 'Resource/translation/it-IT.json';
+import lt from 'Resource/translation/lt-LT.json';
+import nl from 'Resource/translation/nl-NL.json';
+import pl from 'Resource/translation/pl-PL.json';
+import pt from 'Resource/translation/pt-BR.json';
+import ro from 'Resource/translation/ro-RO.json';
+import ru from 'Resource/translation/ru-RU.json';
+import sk from 'Resource/translation/sk-SK.json';
+import sl from 'Resource/translation/sl-SI.json';
+import tr from 'Resource/translation/tr-TR.json';
+import uk from 'Resource/translation/uk-UA.json';
 
 window.z = window.z || {};
 

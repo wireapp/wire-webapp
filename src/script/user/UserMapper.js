@@ -18,10 +18,10 @@
  */
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
-import {joaatHash} from 'utils/Crypto';
+import {joaatHash} from 'Util/Crypto';
 
 export class UserMapper {
   /**

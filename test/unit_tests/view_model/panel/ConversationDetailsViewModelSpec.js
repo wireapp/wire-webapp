@@ -20,7 +20,7 @@
 import {ConversationDetailsViewModel} from 'src/script/view_model/panel/ConversationDetailsViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {noop} from 'utils/util';
+import {noop} from 'Util/util';
 
 describe('ConversationDetailsViewModel', () => {
   const testFactory = new window.TestFactory();

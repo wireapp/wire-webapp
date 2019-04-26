@@ -17,7 +17,7 @@
  *
  */
 
-import {StringUtil} from 'utils/StringUtil';
+import {StringUtil} from 'Util/StringUtil';
 
 let bitsCounter = 0;
 

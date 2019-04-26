@@ -40,7 +40,7 @@ import {
   printDevicesId,
   zeroPadding,
   isSameLocation,
-} from 'utils/util';
+} from 'Util/util';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 

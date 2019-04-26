@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {base64ToArray} from '../util/util';
+import {base64ToArray} from 'Util/util';
 
 export class StorageSchemata {
   static get OBJECT_STORE() {

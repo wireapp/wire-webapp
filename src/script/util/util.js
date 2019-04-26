@@ -21,7 +21,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
-import {SanitizationUtil} from 'utils/SanitizationUtil';
+import {SanitizationUtil} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';

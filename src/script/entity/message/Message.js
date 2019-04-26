@@ -26,7 +26,7 @@ import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
-import {TimeUtil} from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

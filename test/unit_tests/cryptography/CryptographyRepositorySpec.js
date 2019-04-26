@@ -22,7 +22,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
-import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {createRandomUuid, arrayToBase64} from 'Util/util';
 
 import {ClientEvent} from 'src/script/event/Client';
 

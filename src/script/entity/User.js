@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
 
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';

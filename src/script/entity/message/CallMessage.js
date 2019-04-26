@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';

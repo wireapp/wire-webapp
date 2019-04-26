@@ -17,8 +17,8 @@
  *
  */
 
-import {getValue, setValue} from 'utils/StorageUtil';
-import {t} from 'utils/LocalizerUtil';
+import {getValue, setValue} from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
 import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 

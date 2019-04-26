@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {sortObjectByKeys} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {sortObjectByKeys} from 'Util/util';
 
 import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';

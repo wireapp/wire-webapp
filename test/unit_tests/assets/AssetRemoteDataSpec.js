@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 

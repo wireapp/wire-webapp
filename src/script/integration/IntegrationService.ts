@@ -17,8 +17,8 @@
  *
  */
 
+import {Logger, getLogger} from 'Util/Logger';
 import {BackendClient} from '../service/BackendClient';
-import {Logger, getLogger} from '../util/Logger';
 
 export class IntegrationService {
   static URL = {

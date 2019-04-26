@@ -18,8 +18,8 @@
  */
 
 import getSlug from 'speakingurl';
-import {inRange} from 'utils/NumberUtil';
-import {randomElement} from 'utils/ArrayUtil';
+import {inRange} from 'Util/NumberUtil';
+import {randomElement} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};

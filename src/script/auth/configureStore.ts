@@ -20,7 +20,7 @@
 import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import thunk from 'redux-thunk';
-import {LOGGER_NAMESPACE} from '../util/Logger';
+import {LOGGER_NAMESPACE} from 'Util/Logger';
 import {runtimeAction} from './module/action/RuntimeAction';
 import {RootState, ThunkDispatch, reducers} from './module/reducer';
 

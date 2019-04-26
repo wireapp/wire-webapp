@@ -17,8 +17,8 @@
  *
  */
 
-import {clamp} from 'utils/NumberUtil';
-import {noop} from 'utils/util';
+import {clamp} from 'Util/NumberUtil';
+import {noop} from 'Util/util';
 
 class MentionSuggestions {
   constructor(params) {

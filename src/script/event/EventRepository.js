@@ -17,10 +17,10 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {t} from 'utils/LocalizerUtil';
-import {koArrayPushAll} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {koArrayPushAll} from 'Util/util';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';

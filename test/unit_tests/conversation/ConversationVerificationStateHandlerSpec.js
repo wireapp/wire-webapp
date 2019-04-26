@@ -22,7 +22,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {User} from 'src/script/entity/User';
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 describe('ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();

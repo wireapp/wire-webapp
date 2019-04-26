@@ -17,8 +17,8 @@
  *
  */
 
-import {interpolate} from 'utils/ArrayUtil';
-import {clamp} from 'utils/NumberUtil';
+import {interpolate} from 'Util/ArrayUtil';
+import {clamp} from 'Util/NumberUtil';
 
 class AudioSeekBarComponent {
   /**

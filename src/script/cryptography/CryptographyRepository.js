@@ -22,8 +22,8 @@ import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {base64ToArray, arrayToBase64, zeroPadding} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {WebAppEvents} from '../event/WebApp';

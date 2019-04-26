@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import Dexie from 'dexie';
 
@@ -25,7 +25,7 @@ import {Config} from '../auth/config';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageKey} from '../storage/StorageKey';
 
-import * as StorageUtil from 'utils/StorageUtil';
+import * as StorageUtil from 'Util/StorageUtil';
 
 export class StorageService {
   static get CONFIG() {
