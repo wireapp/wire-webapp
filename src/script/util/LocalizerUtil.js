@@ -18,16 +18,15 @@
  */
 
 import {SanitizationUtil} from './SanitizationUtil';
-
-window.z = window.z || {};
-window.z.util = z.util || {};
+import {StringUtil} from './StringUtil';
+import {isString, isNumber} from 'underscore';
 
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
 let strings = {};
 
-const isStringOrNumber = toTest => _.isString(toTest) || _.isNumber(toTest);
+const isStringOrNumber = toTest => isString(toTest) || isNumber(toTest);
 
 const replaceSubstituteEscaped = (string, regex, substitute) => {
   const replacement = isStringOrNumber(substitute)
@@ -56,10 +55,10 @@ export const LocalizerUtil = {
         const firstName = userEntity.first_name();
         return boldNames ? `[bold]${firstName}[/bold]` : firstName;
       })
-      .sort((userNameA, userNameB) => z.util.StringUtil.sortByPriority(userNameA, userNameB));
+      .sort((userNameA, userNameB) => StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
-      firstNames.push(z.util.SanitizationUtil.getSelfName(declension));
+      firstNames.push(SanitizationUtil.getSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;
