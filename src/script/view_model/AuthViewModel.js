@@ -31,6 +31,7 @@ import {Environment} from 'utils/Environment';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
+import {ValidationError} from '../auth/ValidationError';
 
 import {App} from '../main/app';
 import {URL_PATH, getAccountPagesUrl, getWebsiteUrl} from '../externalRoute';
@@ -1286,7 +1287,7 @@ class AuthViewModel {
    * @returns {undefined} No return value
    */
   _add_error(errorMessage, types) {
-    const error = new z.auth.ValidationError(types || [], errorMessage);
+    const error = new ValidationError(types || [], errorMessage);
     this.validation_errors.push(error);
 
     error.types.map(type => {
@@ -1331,7 +1332,7 @@ class AuthViewModel {
    *
    * @private
    * @param {AuthView.TYPE} type - Input type to get error for
-   * @returns {z.auth.ValidationError} Validation Error
+   * @returns {ValidationError} Validation Error
    */
   _get_error_by_type(type) {
     return ko.utils.arrayFirst(this.validation_errors(), ({types: error_types}) => error_types.includes(type));

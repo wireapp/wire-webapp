@@ -17,7 +17,7 @@
  *
  */
 
-describe('z.auth.AuthRepository', () => {
+describe('AuthRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => test_factory.exposeAuthActors());
