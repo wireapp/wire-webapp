@@ -130,8 +130,8 @@ export class CallLogger {
     // Obfuscate IP addresses
     message = message.replace(CallLogger.REGEXES.IPV4, ip => {
       const ipArray = ip.split('.');
-      ipArray[ip.length - 1] = CallLogger.OBFUSCATED.IPV4;
-      ipArray[ip.length - 2] = CallLogger.OBFUSCATED.IPV4;
+      ipArray[ipArray.length - 1] = CallLogger.OBFUSCATED.IPV4;
+      ipArray[ipArray.length - 2] = CallLogger.OBFUSCATED.IPV4;
       return ipArray.join('.');
     });
     message = message.replace(CallLogger.REGEXES.IPV6, ip => {
