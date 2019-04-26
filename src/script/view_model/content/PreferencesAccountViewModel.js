@@ -18,16 +18,15 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t} from 'Util/LocalizerUtil';
 import {validateProfileImageResolution} from 'Util/util';
+import {Environment} from 'Util/Environment';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {Environment} from 'Util/Environment';
 
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';

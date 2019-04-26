@@ -21,10 +21,10 @@ import moment from 'moment';
 
 import * as StorageUtil from 'Util/StorageUtil';
 import {URLUtil} from 'Util/URLUtil';
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
+
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
-
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 
 import 'moment/locale/cs.js';
 import 'moment/locale/da.js';

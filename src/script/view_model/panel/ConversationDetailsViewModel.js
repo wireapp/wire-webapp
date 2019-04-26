@@ -18,11 +18,11 @@
  */
 
 import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
 
 import {NotificationSetting} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';

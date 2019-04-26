@@ -17,11 +17,12 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import moment from 'moment';
-
-import {t} from 'Util/LocalizerUtil';
 import {amplify} from 'amplify';
+
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+
 import {WebAppEvents} from '../event/WebApp';
 
 const noop = () => {};

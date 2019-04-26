@@ -20,6 +20,7 @@
 import moment from 'moment';
 
 import {t} from 'Util/LocalizerUtil';
+
 import {SuperType} from '../../message/SuperType';
 
 z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {

@@ -18,7 +18,6 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';

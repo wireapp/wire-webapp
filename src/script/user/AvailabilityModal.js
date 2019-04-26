@@ -19,6 +19,7 @@
 
 import {getValue, setValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
+
 import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 

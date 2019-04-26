@@ -21,6 +21,7 @@ const jQuery = require('jquery');
 import {amplify} from 'amplify';
 import * as bazinga64 from 'bazinga64';
 import * as platform from 'platform';
+
 // Adding "window.z.util.Environment" which is required by "wire-desktop"
 import 'Util/Environment';
 import 'Util/URLUtil';

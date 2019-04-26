@@ -18,8 +18,8 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t} from 'Util/LocalizerUtil';
+
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {WebAppEvents} from '../event/WebApp';

@@ -19,10 +19,10 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
-import {Environment} from 'Util/Environment';
 import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};

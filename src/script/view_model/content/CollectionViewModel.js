@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
 

@@ -18,9 +18,10 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {AvailabilityType} from './AvailabilityType';
 
 import {t} from 'Util/LocalizerUtil';
+
+import {AvailabilityType} from './AvailabilityType';
 
 const AVAILABILITY_VALUES = {
   AVAILABLE: 'available',

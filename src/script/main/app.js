@@ -26,6 +26,7 @@ import {checkIndexedDb, isSameLocation, createRandomUuid} from 'Util/util';
 import {DebugUtil} from 'Util/DebugUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
+import {Environment} from 'Util/Environment';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -71,7 +72,6 @@ import 'Components/mentionSuggestions.js';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-import {Environment} from 'Util/Environment';
 
 import {getWebsiteUrl} from '../externalRoute';
 

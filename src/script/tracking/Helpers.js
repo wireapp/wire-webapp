@@ -17,9 +17,10 @@
  *
  */
 
+import {Environment} from 'Util/Environment';
+
 import {Conversation} from '../entity/Conversation';
 import {ConversationType, UserType, PlatformType} from './attribute';
-import {Environment} from 'Util/Environment';
 
 /**
  * Get corresponding tracking attribute for conversation type.

@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';

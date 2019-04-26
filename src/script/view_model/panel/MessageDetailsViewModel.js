@@ -19,8 +19,9 @@
 
 import moment from 'moment';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
 import {t} from 'Util/LocalizerUtil';
+
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
 

@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {WebAppEvents} from '../event/WebApp';
 

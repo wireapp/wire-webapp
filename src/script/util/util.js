@@ -21,11 +21,12 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
+import MarkdownIt from 'markdown-it';
+
 import {SanitizationUtil} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import MarkdownIt from 'markdown-it';
 import {StringUtilGlobal} from './StringUtil';
 import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */

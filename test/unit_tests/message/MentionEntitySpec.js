@@ -18,6 +18,7 @@
  */
 
 import {Mention} from '@wireapp/protocol-messaging';
+
 import {base64ToArray} from 'Util/util';
 
 describe('MentionEntity', () => {

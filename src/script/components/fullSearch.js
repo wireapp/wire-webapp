@@ -17,8 +17,9 @@
  *
  */
 
-import {isScrolledBottom} from 'Util/scroll-helpers';
 import moment from 'moment';
+
+import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
 
 window.z = window.z || {};

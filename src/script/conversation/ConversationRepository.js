@@ -42,6 +42,7 @@ import {PromiseQueue} from 'Util/PromiseQueue';
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
+import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -72,8 +73,6 @@ import {NotificationSetting} from './NotificationSetting';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 

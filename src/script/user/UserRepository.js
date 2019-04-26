@@ -23,9 +23,10 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
+import {t} from 'Util/LocalizerUtil';
+import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
 
 import {UNSPLASH_URL} from '../externalRoute';
-import {t} from 'Util/LocalizerUtil';
 import {ConsentValue} from './ConsentValue';
 import {ConsentType} from './ConsentType';
 
@@ -38,7 +39,6 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
-import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';

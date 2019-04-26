@@ -17,10 +17,11 @@
  *
  */
 
-import 'src/script/localization/Localizer';
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
+
+import 'src/script/localization/Localizer';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';

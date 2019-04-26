@@ -18,7 +18,6 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import * as StorageUtil from 'Util/StorageUtil';
 import {iterateIndex} from 'Util/ArrayUtil';
 import {koArrayPushAll} from 'Util/util';

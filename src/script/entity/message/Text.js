@@ -19,10 +19,11 @@
 
 import ko from 'knockout';
 
+import {renderMessage} from 'Util/util';
+
 import {Asset} from './Asset';
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
-import {renderMessage} from 'Util/util';
 import {mediaParser} from '../../media/MediaParser';
 
 export class Text extends Asset {

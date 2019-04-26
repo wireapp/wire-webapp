@@ -21,8 +21,9 @@ import moment from 'moment';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
-import {Message} from './Message';
 import {t} from 'Util/LocalizerUtil';
+
+import {Message} from './Message';
 import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};

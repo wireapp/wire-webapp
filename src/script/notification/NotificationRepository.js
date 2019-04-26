@@ -18,11 +18,11 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t, Declension} from 'Util/LocalizerUtil';
 import {SanitizationUtil} from 'Util/SanitizationUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+
 import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';

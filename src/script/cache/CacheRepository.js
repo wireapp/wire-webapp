@@ -18,6 +18,7 @@
  */
 
 import * as StorageUtil from 'Util/StorageUtil';
+
 import {StorageKey} from '../storage/StorageKey';
 
 /**

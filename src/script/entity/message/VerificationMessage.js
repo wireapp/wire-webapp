@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+
 import {WebAppEvents} from '../../event/WebApp';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 import {SuperType} from '../../message/SuperType';

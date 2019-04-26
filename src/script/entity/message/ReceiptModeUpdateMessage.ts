@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
+
 import {SystemMessage} from './SystemMessage';
 
 import {BackendEvent} from '../../event/Backend';

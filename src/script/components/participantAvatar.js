@@ -20,10 +20,10 @@
 import ko from 'knockout';
 
 import {getLogger} from 'Util/Logger';
+import {createRandomUuid} from 'Util/util';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
-import {createRandomUuid} from 'Util/util';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatar {
