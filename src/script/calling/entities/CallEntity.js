@@ -38,7 +38,7 @@ import {AudioType} from '../../audio/AudioType';
 import {WebAppEvents} from '../../event/WebApp';
 import {EventRepository} from '../../event/EventRepository';
 
-class CallEntity {
+export class CallEntity {
   static get CONFIG() {
     return {
       GROUP_CHECK: {
@@ -1084,5 +1084,3 @@ class CallEntity {
     this.getFlows().forEach(flowEntity => flowEntity.logTimings());
   }
 }
-
-export {CallEntity};

@@ -17,7 +17,21 @@
  *
  */
 
-export const isToday = momentDate => momentDate.isSame(new Date(), 'd');
-export const isCurrentYear = momentDate => momentDate.isSame(new Date(), 'y');
-export const isSameDay = (momentDate, otherDate) => momentDate.isSame(otherDate, 'd');
-export const isSameMonth = (momentDate, otherDate) => momentDate.isSame(otherDate, 'M');
+import uint32 from 'uint32';
+
+export const joaatHash = (stringToHash: string): number => {
+  let hash = uint32.toUint32(0);
+  const key = stringToHash.toLowerCase();
+
+  for (let index = 0; index < key.length; index++) {
+    hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(index)));
+    hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
+    hash = uint32.xor(hash, uint32.shiftRight(hash, 6));
+  }
+
+  hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 3));
+  hash = uint32.xor(hash, uint32.shiftRight(hash, 11));
+  hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
+
+  return hash;
+};

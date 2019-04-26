@@ -19,7 +19,7 @@
 
 import {CallSetupSteps} from './CallSetupSteps';
 
-const CallSetupStepsOrder = {
+export const CallSetupStepsOrder = {
   ANSWER: [
     CallSetupSteps.STREAM_RECEIVED,
     CallSetupSteps.PEER_CONNECTION_CREATED,
@@ -39,5 +39,3 @@ const CallSetupStepsOrder = {
     CallSetupSteps.ICE_CONNECTION_CONNECTED,
   ],
 };
-
-export {CallSetupStepsOrder};
