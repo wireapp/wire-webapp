@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.5.5...@wireapp/copy-config@0.5.6) (2019-04-26)
+
+
+### Bug Fixes
+
+* **copy-config:** Throw error if neither repositoryUrl nor externalDir is passed as option ([#1787](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1787)) ([2f00008](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/2f00008))
+
+
+
+
+
 ## [0.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.5.4...@wireapp/copy-config@0.5.5) (2019-04-15)
 
 **Note:** Version bump only for package @wireapp/copy-config
