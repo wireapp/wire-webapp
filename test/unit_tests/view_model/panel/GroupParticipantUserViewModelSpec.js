@@ -18,9 +18,11 @@
  */
 
 import UUID from 'uuidjs';
+
+import {noop} from 'Util/util';
+
 import {GroupParticipantUserViewModel} from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import {User} from 'src/script/entity/User';
-import {noop} from 'Util/util';
 
 describe('GroupParticipantUserViewModel', () => {
   const testFactory = new window.TestFactory();

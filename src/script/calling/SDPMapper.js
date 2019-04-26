@@ -17,8 +17,9 @@
  *
  */
 
-import {SDP_TYPE} from './rtc/SDPType';
 import {Environment} from 'Util/Environment';
+
+import {SDP_TYPE} from './rtc/SDPType';
 
 export const SDPMapper = {
   CONFIG: {

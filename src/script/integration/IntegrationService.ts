@@ -18,6 +18,7 @@
  */
 
 import {Logger, getLogger} from 'Util/Logger';
+
 import {BackendClient} from '../service/BackendClient';
 
 export class IntegrationService {

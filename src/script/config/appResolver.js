@@ -18,6 +18,7 @@
  */
 
 import {resolver} from 'Util/dependenciesResolver';
+
 import * as graph from './dependenciesGraph';
 
 resolver.init(graph.dependencies);

@@ -17,12 +17,12 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-
-import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
+
+import {getLogger} from 'Util/Logger';
+import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from '../../entity/Conversation';

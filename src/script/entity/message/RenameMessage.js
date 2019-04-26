@@ -18,6 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
+
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 

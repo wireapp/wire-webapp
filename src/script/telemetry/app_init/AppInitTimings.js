@@ -18,6 +18,7 @@
  */
 
 import {isNumber, isString} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 

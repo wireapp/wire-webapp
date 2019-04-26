@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from 'src/script/entity/Conversation';
+
 import {
   renderMessage,
   createRandomUuid,
@@ -41,6 +41,8 @@ import {
   zeroPadding,
   isSameLocation,
 } from 'Util/util';
+
+import {Conversation} from 'src/script/entity/Conversation';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 

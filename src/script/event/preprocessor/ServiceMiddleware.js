@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+
 import {ClientEvent} from '../Client';
 import {BackendEvent} from '../Backend';
 

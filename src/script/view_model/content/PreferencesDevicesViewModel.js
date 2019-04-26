@@ -18,9 +18,9 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
+
 import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};

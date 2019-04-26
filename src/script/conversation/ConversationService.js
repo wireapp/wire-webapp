@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 

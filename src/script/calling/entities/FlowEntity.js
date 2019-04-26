@@ -17,6 +17,9 @@
  *
  */
 
+import {TimeUtil} from 'Util/TimeUtil';
+import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
+
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaStreamSource} from '../../media/MediaStreamSource';
 import {MediaStreamInfo} from '../../media/MediaStreamInfo';
@@ -35,8 +38,6 @@ import {SDP_NEGOTIATION_MODE} from '../enum/SDPNegotiationMode';
 import {SDP_SOURCE} from '../enum/SDPSource';
 import {TERMINATION_REASON} from '../enum/TerminationReason';
 
-import {TimeUtil} from 'Util/TimeUtil';
-import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {FlowAudioEntity} from './FlowAudioEntity';

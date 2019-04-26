@@ -18,6 +18,7 @@
  */
 
 import UUID from 'uuidjs';
+
 import {createRandomUuid} from 'Util/util';
 
 describe('z.util.ValidationUtil', () => {

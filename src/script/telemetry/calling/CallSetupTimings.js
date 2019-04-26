@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+
 import {CallSetupStepsOrder} from './CallSetupStepsOrder';
 
 class CallSetupTimings {

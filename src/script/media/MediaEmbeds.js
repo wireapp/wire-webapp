@@ -18,6 +18,7 @@
  */
 
 import 'url-search-params-polyfill';
+
 import {Environment} from 'Util/Environment';
 
 /**

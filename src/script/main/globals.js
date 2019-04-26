@@ -12,6 +12,7 @@ import bubble from '../../ext/js/webapp-module-bubble/webapp-module-bubble.js';
 import '../event/WebApp';
 
 import configGlobal from '../config.js';
+
 import envGlobal from 'Util/Environment.js';
 import CryptoGlobal from 'Util/Crypto.js';
 import DebugUtilGlobal from 'Util/DebugUtil.js';
@@ -27,6 +28,7 @@ import workerGlobal from 'Util/worker.js';
 import ValidationUtilGlobal from 'Util/ValidationUtil.js';
 import ValidationUtilErrorGlobal from 'Util/ValidationUtilError.js';
 import PopupUtilGlobal from 'Util/PopupUtil.js';
+
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
 import AuthErrorGlobal from '../error/AuthError.js';

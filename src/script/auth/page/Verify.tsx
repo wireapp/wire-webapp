@@ -23,7 +23,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
+
 import {getLogger} from 'Util/Logger';
+
 import {verifyStrings} from '../../strings';
 import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

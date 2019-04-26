@@ -17,6 +17,7 @@
  *
  */
 import {createRandomUuid} from 'Util/util';
+
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 

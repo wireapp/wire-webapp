@@ -18,6 +18,7 @@
  */
 
 import {t, Declension} from 'Util/LocalizerUtil';
+
 import {isValidEmail} from './util';
 
 window.z = window.z || {};

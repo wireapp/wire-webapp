@@ -18,9 +18,11 @@
  */
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
-import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
+
 import {t} from 'Util/LocalizerUtil';
 import {printDevicesId} from 'Util/util';
+
+import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};

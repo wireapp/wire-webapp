@@ -19,11 +19,11 @@
 
 import {getLogger} from 'Util/Logger';
 
-import {BasePanelViewModel} from './BasePanelViewModel';
 import {Actions} from 'Components/panel/userActions';
-
 import 'Components/panel/enrichedFields';
 import 'Components/panel/userDetails';
+
+import {BasePanelViewModel} from './BasePanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {

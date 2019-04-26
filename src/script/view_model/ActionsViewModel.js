@@ -18,8 +18,8 @@
  */
 
 import {getLogger} from 'Util/Logger';
-
 import {t} from 'Util/LocalizerUtil';
+
 import {ModalsViewModel} from './ModalsViewModel';
 import {NotificationSetting} from '../conversation/NotificationSetting';
 import {WebAppEvents} from '../event/WebApp';

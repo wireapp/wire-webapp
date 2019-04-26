@@ -17,9 +17,10 @@
  *
  */
 
+import Cookies from 'js-cookie';
+
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
-import Cookies from 'js-cookie';
 
 window.z = window.z || {};
 window.z.main = z.main || {};

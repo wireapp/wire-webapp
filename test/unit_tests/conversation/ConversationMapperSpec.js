@@ -18,12 +18,14 @@
  */
 
 import UUID from 'uuidjs';
+
+import {createRandomUuid} from 'Util/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {createRandomUuid} from 'Util/util';
 
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
