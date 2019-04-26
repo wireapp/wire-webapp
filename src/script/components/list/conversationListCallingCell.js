@@ -21,10 +21,9 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
-import {CALL_STATE} from '../../calling/callAPI';
+import {STATE as CALL_STATE} from 'avs-web';
 import {AudioType} from '../../audio/AudioType';
 
 import 'Components/list/participantItem';
@@ -187,7 +186,7 @@ class ConversationListCallingCell {
   }
 
   onLeaveCall() {
-    this.callingRepository.leaveCall(this.conversation().id, TERMINATION_REASON.SELF_USER);
+    this.callingRepository.leaveCall(this.conversation().id);
   }
 
   onMaximizeVideoGrid() {

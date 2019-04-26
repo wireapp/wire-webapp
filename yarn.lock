@@ -1602,10 +1602,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-3.3.8.tgz#9b8f0592d2fa7eb3511777d349920ef56cd09596"
   integrity sha512-u/v08RB7yZ2+7pCBrqEr057Wh9sLjlJh3t5EXM8OzORkfQ9k68FL8JOM6+J9NvEPZtsWCr9XEQqBLxgFFmrd9g==
 
+<<<<<<< HEAD
 "@wireapp/prettier-config@0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.3.0.tgz#e8129b31021c81d90d564d9c4ff0f7f7b514e943"
   integrity sha512-BFokvX4NZlkhWq5/OoJUCS8Iels+MeRgzpd5V9QR3hj5swwCFGxJOAL7soPXkSNWo91gI1qwiTp8szB1O9aCfQ==
+=======
+"@wireapp/prettier-config@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.2.0.tgz#822f5d1db902550c09c8ef5efda2a36ca263a481"
+  integrity sha512-wgFtwop3vWW1MaXwkcbDiwM9NP1JHRWwr09RLTAMQhCs9J1z8ciBnfpty/LxY2LXTRWZt1gEL2a+am/a0xpVPA==
+>>>>>>> f34591cc6... upgrade avs version
 
 "@wireapp/priority-queue@1.2.9":
   version "1.2.9"
@@ -2201,6 +2208,13 @@ autoprefixer@^7.1.1:
     postcss "^6.0.17"
     postcss-value-parser "^3.2.3"
 
+<<<<<<< HEAD
+=======
+avs-web@./avs-web-5.0.0.tgz:
+  version "5.0.0"
+  resolved "./avs-web-5.0.0.tgz#ab2b5d6ed154592bbbe747acade7133a7ffd0b7f"
+
+>>>>>>> f34591cc6... upgrade avs version
 aws-sdk@2.0.x:
   version "2.0.31"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.0.31.tgz#e72cf1fdc69015bd9fd2bdf3d3b88c16507d268e"
