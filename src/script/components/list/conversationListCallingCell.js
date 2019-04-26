@@ -23,7 +23,7 @@ import {afterRender} from 'Util/util';
 //import {PermissionState} from '../../notification/PermissionState';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
-import {STATE as CALL_STATE} from 'avs-web';
+import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
 import {AudioType} from '../../audio/AudioType';
 
 import 'Components/list/participantItem';
@@ -50,10 +50,11 @@ class ConversationListCallingCell {
     this.isIdle = ko.pureComputed(isState(CALL_STATE.NONE));
     this.isOutgoing = ko.pureComputed(isState(CALL_STATE.OUTGOING));
     this.isConnecting = ko.pureComputed(isState(CALL_STATE.ANSWERED));
-    this.isDeclined = ko.pureComputed(isState(CALL_STATE.REJECTED));
     this.isDisconnecting = ko.pureComputed(isState(CALL_STATE.DISCONNECTING));
     this.isIncoming = ko.pureComputed(isState(CALL_STATE.INCOMING));
     this.isOngoing = ko.pureComputed(isState(CALL_STATE.MEDIA_ESTAB));
+
+    this.isDeclined = ko.pureComputed(() => call.reason() === CALL_REASON.STILL_ONGOING);
 
     this.isMuted = ko.observable(false);
 
@@ -73,7 +74,8 @@ class ConversationListCallingCell {
     const ringingSubscription = ko.computed(() => {
       const isOutgoing = this.isOutgoing();
       const isIncoming = this.isIncoming();
-      if (isOutgoing || isIncoming) {
+      const isDeclined = this.isDeclined();
+      if (!isDeclined && (isOutgoing || isIncoming)) {
         const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
         this.audioRepository.loop(audioId);
       } else {
@@ -105,21 +107,6 @@ class ConversationListCallingCell {
     this.selfUser = this.conversation.selfUser();
     this.selfInTeam = this.selfUser.inTeam();
 
-
-    this.state = ko.observable(CALL_STATE.UNKNOWN);
-    this.isIdle = ko.pureComputed(isState(CALL_STATE.UNKNOWN));
-    this.isConnecting = ko.pureComputed(isState(CALL_STATE.CONNECTING));
-    this.isDeclined = ko.pureComputed(isState(CALL_STATE.REJECTED));
-    this.isDisconnecting = ko.pureComputed(isState(CALL_STATE.DISCONNECTING));
-    this.isIncoming = ko.pureComputed(isState(CALL_STATE.INCOMING));
-    this.isOngoing = ko.pureComputed(isState(CALL_STATE.ONGOING));
-    this.isOutgoing = ko.pureComputed(isState(CALL_STATE.OUTGOING));
-
-    this.isConnecting = this.call().isConnecting;
-    this.isDeclined = this.call().isDeclined;
-    this.isIncoming = this.call().isIncoming;
-    this.isOngoing = this.call().isOngoing;
-    this.isOutgoing = this.call().isOutgoing;
 
     this.showParticipants = ko.observable(false);
 
@@ -184,7 +171,7 @@ class ConversationListCallingCell {
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.joinCall(this.conversation().id, z.media.MediaType.AUDIO);
+    this.callingRepository.startCall(this.conversation().id, MediaType.AUDIO);
   }
 
   onLeaveCall() {
@@ -227,8 +214,8 @@ class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-   <!-- ko if: conversation() -->
-    <div class="conversation-list-calling-cell conversation-list-cell" style="color: black">
+   <!-- ko if: conversation() && !isDeclined() -->
+    <div class="conversation-list-calling-cell conversation-list-cell">
       <!-- ko ifnot: temporaryUserStyle -->
         <div class="conversation-list-cell-left">
           <!-- ko if: conversation().isGroup() -->
@@ -267,50 +254,48 @@ ko.components.register('conversation-list-calling-cell', {
             <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
-        <!-- ko if: false && canJoin() -->
-          <div class="call-ui__button call-ui__button--join call-ui__button--green" data-bind="click: onJoinDeclinedCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
-        <!-- /ko -->
       </div>
 
     </div>
 
-
-    <div class="conversation-list-calling-cell-controls">
-      <div class="conversation-list-calling-cell-controls-left">
-        <div class="call-ui__button" data-bind="click: toggleMute, css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
-          <micoff-icon class="small-icon"></micoff-icon>
+    <!-- ko if: !isDeclined() -->
+      <div class="conversation-list-calling-cell-controls">
+        <div class="conversation-list-calling-cell-controls-left">
+          <div class="call-ui__button" data-bind="click: toggleMute, css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+            <micoff-icon class="small-icon"></micoff-icon>
+          </div>
+          <!-- ko if: false && showVideoButton() -->
+            <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}, disable: disableVideoButton(), attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+              <camera-icon class="small-icon"></camera-icon>
+            </button>
+          <!-- /ko -->
+          <!-- ko if: isOngoing() -->
+            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton, position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+              <screenshare-icon class="small-icon"></screenshare-icon>
+            </div>
+          <!-- /ko -->
         </div>
-        <!-- ko if: false && showVideoButton() -->
-          <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}, disable: disableVideoButton(), attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
-            <camera-icon class="small-icon"></camera-icon>
-          </button>
-        <!-- /ko -->
-        <!-- ko if: isOngoing() -->
-          <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton, position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
-            <screenshare-icon class="small-icon"></screenshare-icon>
-          </div>
-        <!-- /ko -->
-      </div>
 
-      <div class="conversation-list-calling-cell-controls-right">
-        <!-- ko if: false && showParticipantsButton() -->
-          <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
-            <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: isIncoming() || isOutgoing() -->
-          <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: endCall" data-uie-name="do-call-controls-call-decline">
-            <hangup-icon class="small-icon"></hangup-icon>
-          </div>
-        <!-- /ko -->
-        <!-- ko if: isIncoming() -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
-            <pickup-icon class="small-icon"></pickup-icon>
-          </div>
-        <!-- /ko -->
+        <div class="conversation-list-calling-cell-controls-right">
+          <!-- ko if: false && showParticipantsButton() -->
+            <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
+              <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: isIncoming() || isOutgoing() -->
+            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: endCall" data-uie-name="do-call-controls-call-decline">
+              <hangup-icon class="small-icon"></hangup-icon>
+            </div>
+          <!-- /ko -->
+          <!-- ko if: isIncoming() && !isDeclined() -->
+            <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
+              <pickup-icon class="small-icon"></pickup-icon>
+            </div>
+          <!-- /ko -->
+        </div>
       </div>
-    </div>
     <!-- /ko -->
+  <!-- /ko -->
   `,
   viewModel: ConversationListCallingCell,
 });

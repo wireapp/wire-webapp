@@ -213,6 +213,7 @@ export class CallingRepository {
       };
 
       call.state(state);
+      call.reason(undefined);
 
       switch (state) {
         case CALL_STATE.TERM_REMOTE:
