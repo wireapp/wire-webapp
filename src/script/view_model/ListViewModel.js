@@ -119,8 +119,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     });
 
     // Nested view models
-    this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
-    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
+    this.archive = new ArchiveViewModel(this, repositories.conversation, this.startCall);
+    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.startCall);
     this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
@@ -150,8 +150,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
-  joinCall = (conversationEntity, mediaType) => {
-    this.callingRepository.joinCall(conversationEntity.id, mediaType);
+  startCall = (conversationEntity, mediaType) => {
+    this.callingRepository.startCall(conversationEntity.id, mediaType);
   };
 
   changeNotificationSetting() {

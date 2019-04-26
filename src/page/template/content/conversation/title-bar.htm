@@ -31,7 +31,7 @@
           </camera-icon>
         <!-- /ko -->
         <pickup-icon class="conversation-title-bar-icon"
-              data-bind="clickOrDrag: clickOnCallButton, attr: {title: t('tooltipConversationCall')}"
+              data-bind="clickOrDrag: () => startCall(conversationEntity().id), attr: {title: t('tooltipConversationCall')}"
               data-uie-name="do-call">
         </pickup-icon>
       <!-- /ko -->

@@ -28,15 +28,8 @@ import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
-import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
-import {CallTelemetry} from '../telemetry/calling/CallTelemetry';
-
-import {CallMessageBuilder} from './CallMessageBuilder';
-import {CallEntity} from './entities/CallEntity';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {PROPERTY_STATE} from './enum/PropertyState';
-import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
@@ -88,95 +81,18 @@ export class CallingRepository {
 
     ko.computed(() => {
       if (userRepository.self() && clientRepository.currentClient()) {
-        getAvsInstance().then(callingApi => {
-          const avsLogger = getLogger('avs');
-          callingApi.set_log_handler((level, message) => {
-            // TODO handle levels
-            avsLogger.debug(message);
+        getAvsInstance()
+          .then(callingInstance => {
+            return this.configureCallingApi(
+              callingInstance,
+              userRepository.self().id,
+              clientRepository.currentClient().id
+            );
+          })
+          .then(({callingApi, wUser}) => {
+            this.callingApi = callingApi;
+            this.wUser = wUser;
           });
-
-          callingApi.init();
-          const requestConfig = () => {
-            this.getConfig().then(config => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
-            return 0;
-          };
-
-          const sendMessage = (
-            context,
-            conversationId,
-            userId,
-            clientId,
-            destinationUserId,
-            destinationClientId,
-            payload
-          ) => {
-            const protoCalling = new Calling({content: payload});
-            const genericMessage = new GenericMessage({
-              [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-              messageId: createRandomUuid(),
-            });
-
-            //const options = {precondition, recipients};
-            const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId /*, options*/);
-            this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
-            return 0;
-          };
-          const log = name => {
-            return function() {
-              // eslint-disable-next-line no-console
-              console.log('avs_cb', name, arguments);
-            };
-          };
-          const wUser = callingApi.create(
-            userRepository.self().id,
-            clientRepository.currentClient().id,
-            log('readyh'), //readyh,
-            sendMessage, //sendh,
-            log('incomingh'), //incomingh,
-            log('missedh'), //missedh,
-            log('answerh'), //answerh,
-            log('estabh'), //estabh,
-            log('closeh'), //closeh,
-            log('metricsh'), //metricsh,
-            requestConfig, //cfg_reqh,
-            log('acbrh'), //acbrh,
-            log('vstateh') //vstateh,
-          );
-
-          callingApi.set_state_handler(wUser, (conversationId, state) => {
-            log('state_handler')(conversationId, state);
-            const call = this.activeCalls().find(callInstance => callInstance.conversationId === conversationId) || {
-              conversationId,
-              startedAt: ko.observable(),
-              state: ko.observable(state),
-            };
-            const storedCallIndex = this.activeCalls().indexOf(call);
-
-            call.state(state);
-
-            switch (state) {
-              case CALL_STATE.TERM_REMOTE:
-              case CALL_STATE.TERM_LOCAL:
-              case CALL_STATE.NONE:
-                if (storedCallIndex > -1) {
-                  this.activeCalls.splice(storedCallIndex, 1);
-                }
-                return;
-
-              case CALL_STATE.MEDIA_ESTAB:
-                call.startedAt(Date.now());
-                break;
-            }
-
-            if (storedCallIndex === -1) {
-              this.activeCalls.push(call);
-            }
-          });
-          this.wUser = wUser;
-          this.callingApi = callingApi;
-
-          setInterval(callingApi.poll, 500);
-        });
       }
     });
 
@@ -200,9 +116,6 @@ export class CallingRepository {
     this.callingConfig = undefined;
     this.callingConfigTimeout = undefined;
 
-    // Telemetry
-    this.telemetry = new CallTelemetry();
-
     // Media Handler
     this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
     this.mediaStreamHandler = this.mediaRepository.streamHandler;
@@ -221,9 +134,120 @@ export class CallingRepository {
 
     this.flowStatus = undefined;
 
-    this.shareCallStates();
     this.subscribeToEvents();
     this._enableDebugging();
+  }
+
+  configureCallingApi(callingApi, selfUserId, selfClientId) {
+    const avsLogger = getLogger('avs');
+    callingApi.set_log_handler((level, message) => {
+      // TODO handle levels
+      avsLogger.debug(message);
+    });
+
+    callingApi.init();
+    const requestConfig = () => {
+      this.getConfig().then(config => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
+      return 0;
+    };
+
+    const sendMessage = (
+      context,
+      conversationId,
+      userId,
+      clientId,
+      destinationUserId,
+      destinationClientId,
+      payload
+    ) => {
+      const protoCalling = new Calling({content: payload});
+      const genericMessage = new GenericMessage({
+        [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+        messageId: createRandomUuid(),
+      });
+
+      //const options = {precondition, recipients};
+      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId /*, options*/);
+      this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+      return 0;
+    };
+
+    const callClosed = (reason, conversationId) => {
+      const storedCall = this.findCall(conversationId);
+      if (!storedCall) {
+        return;
+      }
+      storedCall.reason(reason);
+    };
+
+    const log = name => {
+      return function() {
+        // eslint-disable-next-line no-console
+        console.log('avs_cb', name, arguments);
+      };
+    };
+    const wUser = callingApi.create(
+      selfUserId,
+      selfClientId,
+      log('readyh'), //readyh,
+      sendMessage, //sendh,
+      log('incomingh'), //incomingh,
+      log('missedh'), //missedh,
+      log('answerh'), //answerh,
+      log('estabh'), //estabh,
+      callClosed, //closeh,
+      log('metricsh'), //metricsh,
+      requestConfig, //cfg_reqh,
+      log('acbrh'), //acbrh,
+      log('vstateh') //vstateh,
+    );
+
+    callingApi.set_state_handler(wUser, (conversationId, state) => {
+      log('state_handler')(conversationId, state);
+      const storedCall = this.findCall(conversationId);
+      const call = storedCall || {
+        conversationId,
+        reason: ko.observable(),
+        startedAt: ko.observable(),
+        state: ko.observable(state),
+      };
+
+      call.state(state);
+
+      switch (state) {
+        case CALL_STATE.TERM_REMOTE:
+        case CALL_STATE.TERM_LOCAL:
+        case CALL_STATE.NONE:
+          this.removeCall(storedCall);
+          return;
+
+        case CALL_STATE.MEDIA_ESTAB:
+          call.startedAt(Date.now());
+          break;
+      }
+
+      if (!storedCall) {
+        this.storeCall(call);
+      }
+    });
+    setInterval(callingApi.poll, 500);
+
+    return {callingApi, wUser};
+  }
+
+  findCall(conversationId) {
+    return this.activeCalls().find(callInstance => callInstance.conversationId === conversationId);
+  }
+
+  storeCall(call) {
+    this.activeCalls.push(call);
+  }
+
+  removeCall(call) {
+    const index = this.activeCalls().indexOf(call);
+    if (index !== -1) {
+      this.activeCalls.splice(index, 1);
+    }
   }
 
   /**
@@ -243,22 +267,11 @@ export class CallingRepository {
   }
 
   /**
-   * Share call states with MediaRepository.
-   * @returns {undefined} No return value
-   */
-  shareCallStates() {
-    this.calls.subscribe(callEntities => this.mediaStreamHandler.updateCurrentCalls(callEntities));
-    this.joinedCall.subscribe(joinedCallEntity => this.mediaStreamHandler.setJoinedCall(joinedCallEntity));
-  }
-
-  /**
    * Subscribe to amplify topics.
    * @returns {undefined} No return value
    */
   subscribeToEvents() {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.MEDIA.TOGGLE, this.toggleMedia.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.DELETE, this.deleteCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.LEAVE, this.leaveCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
@@ -279,6 +292,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
+    // TODO handle saving activate/deactivate events
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = timestamp => Math.floor(timestamp / 1000);
@@ -295,377 +309,6 @@ export class CallingRepository {
     );
     if (res !== 0) {
       this.callLogger.warn(`recv_msg failed with code: ${res}`);
-    }
-  }
-
-  /**
-   * Call event handling for browsers supporting calling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
-   */
-  _onCallEventInSupportedBrowsers(callMessageEntity, source) {
-    const messageType = callMessageEntity.type;
-
-    switch (messageType) {
-      case CALL_MESSAGE_TYPE.CANCEL: {
-        return this._onCancel(callMessageEntity, source);
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_CHECK: {
-        return this._onGroupCheck(callMessageEntity, source);
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        return this._onGroupLeave(callMessageEntity);
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_SETUP: {
-        return this._onGroupSetup(callMessageEntity);
-      }
-
-      case CALL_MESSAGE_TYPE.GROUP_START: {
-        return this._onGroupStart(callMessageEntity, source);
-      }
-
-      case CALL_MESSAGE_TYPE.HANGUP: {
-        return this._onHangup(callMessageEntity);
-      }
-
-      case CALL_MESSAGE_TYPE.PROP_SYNC: {
-        return this._onPropSync(callMessageEntity);
-      }
-
-      case CALL_MESSAGE_TYPE.REJECT: {
-        return this._onReject(callMessageEntity);
-      }
-
-      case CALL_MESSAGE_TYPE.SETUP: {
-        return this._onSetup(callMessageEntity, source);
-      }
-
-      case CALL_MESSAGE_TYPE.UPDATE: {
-        return this._onUpdate(callMessageEntity);
-      }
-
-      default: {
-        this.callLogger.warn(`Call event of unknown type '${messageType}' was ignored`, callMessageEntity);
-      }
-    }
-  }
-
-  /**
-   * Call event handling for browsers not supporting calling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
-   */
-  _onCallEventInUnsupportedBrowsers(callMessageEntity, source) {
-    const {response, type, userId} = callMessageEntity;
-
-    if (!response) {
-      switch (type) {
-        case CALL_MESSAGE_TYPE.SETUP: {
-          this.injectActivateEvent(callMessageEntity, source);
-          this.userRepository.get_user_by_id(userId).then(userEntity => {
-            const warningOptions = {name: userEntity.name()};
-            const warningType = WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
-
-            amplify.publish(WebAppEvents.WARNING.SHOW, warningType, warningOptions);
-          });
-          break;
-        }
-
-        case CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
-          break;
-        }
-
-        default: {
-          break;
-        }
-      }
-    }
-  }
-
-  /**
-   * Call cancel message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.CANCEL
-   * @returns {undefined} No return value
-   */
-  _onCancel(callMessageEntity) {
-    const {clientId, conversationId, response, userId} = callMessageEntity;
-
-    if (!response) {
-      const terminationReason = TERMINATION_REASON.OTHER_USER;
-      this.getCallById(conversationId)
-        .then(callEntity => callEntity.verifySessionId(callMessageEntity))
-        .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => {
-          const fromSelf = userId === this.selfUserId();
-          return callEntity.deactivateCall(callMessageEntity, fromSelf, terminationReason).then(wasDeleted => {
-            if (!wasDeleted && fromSelf) {
-              callEntity.state(CALL_STATE.REJECTED);
-            }
-          });
-        })
-        .catch(error => {
-          const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
-          if (!isNotFound) {
-            throw error;
-          }
-        });
-    }
-  }
-
-  /**
-   * Call group check message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
-   */
-  _onGroupCheck(callMessageEntity, source) {
-    this.getCallById(callMessageEntity.conversationId)
-      .then(callEntity => callEntity.scheduleGroupCheck())
-      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
-  }
-
-  /**
-   * Call group leave message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_LEAVE
-   * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.OTHER_USER] - Reason for participant to leave
-   * @returns {undefined} No return value
-   */
-  _onGroupLeave(callMessageEntity, terminationReason = TERMINATION_REASON.OTHER_USER) {
-    const {conversationId, clientId, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        if (callEntity.isOutgoing()) {
-          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Remote user leaving outgoing call');
-        }
-
-        const isSelfUser = userId === this.selfUserId();
-        if (isSelfUser) {
-          callEntity.selfUserJoined(false);
-          return callEntity;
-        }
-
-        return callEntity.deleteParticipant(userId, clientId, terminationReason);
-      })
-      .then(callEntity => callEntity.participantLeft(callMessageEntity, terminationReason))
-      .catch(this._throwMessageError);
-  }
-
-  /**
-   * Call group setup message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - call message entity of type CALL_MESSAGE_TYPE.GROUP_SETUP
-   * @returns {undefined} No return value
-   */
-  _onGroupSetup(callMessageEntity) {
-    const {conversationId, response, userId} = callMessageEntity;
-
-    // @todo Grant message for ongoing call
-    this.getCallById(conversationId)
-      .then(callEntity => this._validateMessageDestination(callEntity, callMessageEntity))
-      .then(callEntity => {
-        callEntity.setRemoteVersion(callMessageEntity);
-        const shouldNegotiate = response !== true;
-        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity);
-      })
-      .catch(this._throwMessageError);
-  }
-
-  /**
-   * Call group start message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
-   */
-  _onGroupStart(callMessageEntity, source) {
-    const {conversationId, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        // @todo Grant message for ongoing call
-
-        const isSelfUser = userId === this.selfUserId();
-        if (isSelfUser) {
-          return this._remoteSelfJoin(callEntity, callMessageEntity);
-        }
-
-        if (callEntity.isOutgoing()) {
-          callEntity.state(CALL_STATE.CONNECTING);
-        }
-
-        // Add the correct participant, start negotiating
-        const shouldNegotiate = callEntity.selfClientJoined();
-        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity);
-      })
-      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
-  }
-
-  /**
-   * Call hangup message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.HANGUP
-   * @param {TERMINATION_REASON} terminationReason - Reason for the participant to hangup
-   * @returns {undefined} No return value
-   */
-  _onHangup(callMessageEntity, terminationReason = TERMINATION_REASON.OTHER_USER) {
-    const {conversationId, clientId, response, userId} = callMessageEntity;
-
-    if (!response) {
-      this.getCallById(conversationId)
-        .then(callEntity => callEntity.verifySessionId(callMessageEntity))
-        .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
-        .then(callEntity => callEntity.deleteParticipant(userId, clientId, terminationReason))
-        .then(callEntity => callEntity.participantLeft(callMessageEntity, terminationReason))
-        .catch(this._throwMessageError);
-    }
-  }
-
-  /**
-   * Call prop-sync message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
-   */
-  _onPropSync(callMessageEntity) {
-    const {conversationId, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => callEntity.verifySessionId(callMessageEntity))
-      .then(callEntity => this._confirmCallMessage(callEntity, callMessageEntity))
-      .then(callEntity => callEntity.addOrUpdateParticipant(userId, false, callMessageEntity))
-      .catch(this._throwMessageError);
-  }
-
-  /**
-   * Call reject message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.REJECT
-   * @returns {undefined} No return value
-   */
-  _onReject(callMessageEntity) {
-    const {conversationId, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        const isSelfUser = userId !== this.selfUserId();
-        if (!isSelfUser) {
-          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
-        }
-
-        if (!callEntity.selfClientJoined()) {
-          this.callLogger.info(`Rejecting call in conversation '${conversationId}'`, callEntity);
-          callEntity.rejectCall(false);
-        }
-      })
-      .catch(this._throwMessageError);
-  }
-
-  /**
-   * Call setup message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
-   */
-  _onSetup(callMessageEntity, source) {
-    const {conversationId, response, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => {
-        callEntity.setRemoteVersion(callMessageEntity);
-
-        const isSelfUser = userId === this.selfUserId();
-        if (isSelfUser) {
-          return this._remoteSelfJoin(callEntity, callMessageEntity);
-        }
-
-        const shouldNegotiate = response !== true;
-        return callEntity.addOrUpdateParticipant(userId, shouldNegotiate, callMessageEntity).then(() => {
-          if (response) {
-            callEntity.state(CALL_STATE.CONNECTING);
-          }
-        });
-      })
-      .catch(error => this._validateIncomingCall(callMessageEntity, source, error));
-  }
-
-  /**
-   * Call setup message handling.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
-   */
-  _onUpdate(callMessageEntity) {
-    const {conversationId, userId} = callMessageEntity;
-
-    this.getCallById(conversationId)
-      .then(callEntity => this._validateMessageDestination(callEntity, callMessageEntity))
-      .then(callEntity => callEntity.verifySessionId(callMessageEntity))
-      .then(callEntity => callEntity.addOrUpdateParticipant(userId, false, callMessageEntity))
-      .catch(this._throwMessageError);
-  }
-
-  /**
-   * Handle remote self join message.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call entity
-   * @returns {Promise} Resolves when self join was handled
-   */
-  _remoteSelfJoin(callEntity) {
-    const conversationEntity = callEntity.conversationEntity;
-
-    if (callEntity.selfClientJoined()) {
-      const logMessage = {
-        data: {
-          default: [conversationEntity.display_name()],
-          obfuscated: [this.callLogger.obfuscate(conversationEntity.id)],
-        },
-        message: `Attempt to join ongoing call in conversation '{0}' from other device`,
-      };
-
-      this.callLogger.warn(logMessage, callEntity);
-    } else {
-      const logMessage = {
-        data: {
-          default: [conversationEntity.display_name()],
-          obfuscated: [this.callLogger.obfuscate(conversationEntity.id)],
-        },
-        message: `Call in conversation '{0}' accepted on other device`,
-      };
-      this.callLogger.info(logMessage, callEntity);
-
-      if (callEntity.isGroup) {
-        callEntity.selfUserJoined(true);
-        callEntity.wasConnected = true;
-        return callEntity.rejectCall(false);
-      }
-
-      return this.deleteCall(conversationEntity.id);
     }
   }
 
@@ -721,7 +364,7 @@ export class CallingRepository {
           if (grantedCall) {
             const mediaType = callEntity.isRemoteVideoCall() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
             return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-              this.joinCall(conversationEntity.id, mediaType);
+              this.startCall(conversationEntity.id, mediaType);
             });
           }
         })
@@ -968,14 +611,19 @@ export class CallingRepository {
   //##############################################################################
 
   /**
-   * Delete a call.
-   * @param {string} conversationId - ID of conversation to delete call from
+   * User action to toggle the call state.
+   *
+   * @param {MediaType} mediaType - Media type of call
+   * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be to
+gled
    * @returns {undefined} No return value
    */
-  deleteCall(conversationId) {
-    this.getCallById(conversationId)
-      .then(callEntity => this._deleteCall(callEntity))
-      .catch(error => this._handleNotFoundError(error));
+  toggleState(mediaType, conversationEntity = this.conversationRepository.active_conversation()) {
+    if (conversationEntity) {
+      // TODO deduce active call from avs api
+      const isActiveCall = false;
+      return isActiveCall ? this.leaveCall(conversationEntity.id) : this.startCall(conversationEntity.id, mediaType);
+    }
   }
 
   /**
@@ -985,7 +633,7 @@ export class CallingRepository {
    * @param {MediaType} mediaType - Media type for this call
    * @returns {undefined} No return value
    */
-  joinCall(conversationId, mediaType) {
+  startCall(conversationId, mediaType) {
     // TODO pass on the conversation type
     const callType = this.callTypeFromMediaType(mediaType);
     this.callingApi.start(this.wUser, conversationId, callType, CONV_TYPE.ONEONONE, false);
@@ -999,6 +647,10 @@ export class CallingRepository {
   rejectCall(conversationId) {
     // TODO sort out if rejection should be shared accross devices (does avs handle it?)
     this.callingApi.reject(this.wUser, conversationId);
+  }
+
+  removeParticipant(conversationId, userId) {
+    throw new Error('TODO: implement removeParticipant');
   }
 
   muteCall(conversationId, isMuted) {
@@ -1023,56 +675,6 @@ export class CallingRepository {
    */
   leaveCall(conversationId) {
     this.callingApi.end(this.wUser, conversationId);
-  }
-
-  /**
-   * Remove a participant from a call if he was removed from the group.
-   *
-   * @param {string} conversationId - ID of conversation
-   * @param {string} userId - ID of user to be removed
-   * @returns {undefined} No return value
-   */
-  removeParticipant(conversationId, userId) {
-    this.getCallById(conversationId)
-      .then(callEntity => this._removeParticipant(callEntity, userId))
-      .catch(error => this._handleNotFoundError(error));
-  }
-
-  /**
-   * User action to toggle one of the media states of a call.
-   *
-   * @param {string} conversationId - ID of conversation with call
-   * @param {MediaType} mediaType - MediaType of requested change
-   * @returns {undefined} No return value
-   */
-  toggleMedia(conversationId, mediaType) {
-    return this.getCallById(conversationId)
-      .then(callEntity => this._toggleMediaState(mediaType).then(() => callEntity))
-      .then(callEntity => callEntity.toggleMedia(mediaType))
-      .catch(error => {
-        const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
-        if (!isNotFound) {
-          if (mediaType === MediaType.VIDEO || mediaType === MediaType.AUDIO_VIDEO) {
-            this.mediaRepository.showNoCameraModal();
-          }
-        }
-      });
-  }
-
-  /**
-   * User action to toggle the call state.
-   *
-   * @param {MediaType} mediaType - Media type of call
-   * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be toggled
-   * @returns {undefined} No return value
-   */
-  toggleState(mediaType, conversationEntity = this.conversationRepository.active_conversation()) {
-    if (conversationEntity) {
-      const isActiveCall = conversationEntity.id === this._selfClientOnACall();
-      return isActiveCall
-        ? this.leaveCall(conversationEntity.id, TERMINATION_REASON.SELF_USER)
-        : this.joinCall(conversationEntity.id, mediaType);
-    }
   }
 
   /**
@@ -1116,9 +718,9 @@ export class CallingRepository {
    * @returns {Promise} Resolves when the new call was joined
    */
   _checkConcurrentJoinedCall(newCallId, callState) {
+    // FIXME use info from avs lib
+    const ongoingCallId = false;
     return new Promise(resolve => {
-      const ongoingCallId = this._selfParticipantOnACall();
-
       if (!ongoingCallId) {
         resolve();
       } else {
@@ -1164,9 +766,9 @@ export class CallingRepository {
           },
           primaryAction: {
             action: () => {
-              const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
-              amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-              window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
+            const terminationReason = 0;
+            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
+            window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
             },
             text: actionString,
           },
@@ -1178,97 +780,6 @@ export class CallingRepository {
         this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
     });
-  }
-
-  /**
-   * Delete a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call to delete
-   * @returns {undefined} No return value
-   */
-  _deleteCall(callEntity) {
-    const conversationId = callEntity.id;
-    this.callLogger.info(`Deleting call in conversation '${conversationId}'`, callEntity);
-
-    callEntity.deleteCall();
-    this.calls.remove(call => call.id === conversationId);
-    this.mediaStreamHandler.resetMediaStream();
-  }
-
-  /**
-   * Handle join call errors.
-   *
-   * @private
-   * @param {Error} error - Error to handle
-   * @param {string} conversationId - Id of conversation
-   * @returns {undefined} No return value
-   */
-  _handleJoinCallError(error, conversationId) {
-    const isNotSupported = error.type === z.error.CallError.TYPE.NOT_SUPPORTED;
-    if (!isNotSupported) {
-      this.deleteCall(conversationId);
-      const isMediaError = error instanceof z.error.MediaError;
-      if (!isMediaError) {
-        throw error;
-      }
-    }
-  }
-
-  /**
-   * Handle not found error.
-   *
-   * @private
-   * @param {Error} error - Error to handle
-   * @returns {undefined} No return value
-   */
-  _handleNotFoundError(error) {
-    const isNotFound = error.type === z.error.CallError.TYPE.NOT_FOUND;
-    if (!isNotFound) {
-      throw error;
-    }
-  }
-
-  /**
-   * Actively join a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call to be joined
-   * @param {MediaType} mediaType - Media type of the call
-   * @returns {undefined} No return value
-   */
-  _initiateJoinCall(callEntity, mediaType) {
-    callEntity.timings.time_step(CallSetupSteps.STREAM_RECEIVED);
-    callEntity.joinCall(mediaType);
-  }
-
-  /**
-   * Initiate an outgoing call.
-   *
-   * @private
-   * @param {string} conversationId - ID of conversation to join call in
-   * @param {MediaType} mediaType - Media type for this call
-   * @returns {Promise} Resolves with a call entity
-   */
-  _initiateOutgoingCall(conversationId, mediaType) {
-    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
-    const payload = {conversationId};
-    const messagePayload = CallMessageBuilder.createPropSync(this.selfStreamState, payload, videoSend);
-    const callMessageEntity = CallMessageBuilder.buildPropSync(false, undefined, messagePayload);
-    return this._createOutgoingCall(callMessageEntity);
-  }
-
-  /**
-   * Prepare to join a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call to be joined
-   * @returns {undefined} No return value
-   */
-  _initiatePreJoinCall(callEntity) {
-    this.callLogger.info(`Joining call in conversation '${callEntity.id}'`, callEntity);
-    callEntity.setSelfState(true);
-    return callEntity;
   }
 
   /**
@@ -1288,45 +799,6 @@ export class CallingRepository {
   }
 
   /**
-   * Leave a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call to leave
-   * @param {TERMINATION_REASON} terminationReason - Reason for call termination
-   * @returns {undefined} No return value
-   */
-  _leaveCall(callEntity, terminationReason) {
-    const conversationId = callEntity.id;
-    const logMessage = `Leaving call in conversation '${conversationId}' triggered by '${terminationReason}'`;
-    this.callLogger.info(logMessage, callEntity);
-
-    if (!callEntity.isOngoing()) {
-      terminationReason = undefined;
-    }
-
-    this.mediaStreamHandler.releaseMediaStream();
-    callEntity.leaveCall(terminationReason);
-  }
-
-  /**
-   * Remove a participant from a call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call entity
-   * @param {string} userId - ID of user to be removed
-   * @returns {Promise} Resolves when the participant was found
-   */
-  _removeParticipant(callEntity, userId) {
-    return callEntity.getParticipantById(userId).then(() => {
-      const {id, sessionId} = callEntity;
-      const additionalPayload = CallMessageBuilder.createPayload(id, this.selfUserId(), userId);
-      const callMessageEntity = CallMessageBuilder.buildGroupLeave(false, sessionId, additionalPayload);
-
-      this._onGroupLeave(callMessageEntity, TERMINATION_REASON.MEMBER_LEAVE);
-    });
-  }
-
-  /**
    * Show acknowledgement warning modal.
    *
    * @private
@@ -1340,158 +812,6 @@ export class CallingRepository {
         message,
         title,
       },
-    });
-  }
-
-  /**
-   * Toggle media state of a call.
-   *
-   * @param {MediaType} mediaType - MediaType of requested change
-   * @returns {undefined} No return value
-   */
-  _toggleMediaState(mediaType) {
-    switch (mediaType) {
-      case MediaType.AUDIO: {
-        return this.mediaStreamHandler.toggleAudioSend();
-      }
-
-      case MediaType.SCREEN: {
-        return this.mediaStreamHandler.toggleScreenSend();
-      }
-
-      case MediaType.VIDEO: {
-        return this.mediaStreamHandler.toggleVideoSend();
-      }
-
-      default: {
-        throw new z.error.MediaError(z.error.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
-      }
-    }
-  }
-
-  //##############################################################################
-  // call entity creation
-  //##############################################################################
-
-  /**
-   * Constructs a call entity.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {User} creatingUserEntity - User that created call
-   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @returns {Promise} Resolves with the new call entity
-   */
-  _createCall(callMessageEntity, creatingUserEntity, direction) {
-    const {conversationId, sessionId, properties} = callMessageEntity;
-    const mediaType = this._getMediaTypeFromProperties(properties);
-
-    return this.getCallById(conversationId).catch(() => {
-      return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-        const callEntity = new CallEntity(conversationEntity, creatingUserEntity, sessionId, this);
-
-        callEntity.initiateTelemetry(direction, mediaType);
-        this.calls.push(callEntity);
-        return callEntity;
-      });
-    });
-  }
-
-  /**
-   * Constructs an incoming call entity.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @param {boolean} [silent=false] - Start call in rejected mode
-   * @returns {Promise} Resolves with the new call entity
-   */
-  _createIncomingCall(callMessageEntity, source, silent = false) {
-    const {conversationId, properties, userId} = callMessageEntity;
-
-    return this.userRepository
-      .get_user_by_id(userId)
-      .then(remoteUserEntity => {
-        return this._createCall(callMessageEntity, remoteUserEntity, CALL_STATE.INCOMING);
-      })
-      .then(callEntity => {
-        const mediaType = this._getMediaTypeFromProperties(properties);
-        const conversation = callEntity.conversationEntity;
-        const conversationName = conversation.display_name();
-
-        const logMessage = {
-          data: {
-            default: [mediaType, conversationName],
-            obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
-          },
-          message: `Incoming '{0}' call in conversation '{1}'`,
-        };
-        this.callLogger.info(logMessage, callEntity);
-
-        callEntity.setRemoteVersion(callMessageEntity);
-
-        if (conversation.showNotificationsNothing()) {
-          silent = true;
-        }
-
-        const callState = silent ? CALL_STATE.REJECTED : CALL_STATE.INCOMING;
-        callEntity.state(callState);
-
-        return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
-          this.telemetry.track_event(EventName.CALLING.RECEIVED_CALL, callEntity);
-          this.injectActivateEvent(callMessageEntity, source);
-
-          const eventFromWebSocket = source === EventRepository.SOURCE.WEB_SOCKET;
-          const hasOtherCalls = this.calls().some(call => call.id !== callEntity.id);
-          const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
-
-          if (eventFromWebSocket && callEntity.isRemoteVideoSend() && !hasCallWithoutVideo) {
-            const mediaStreamType = MediaType.AUDIO_VIDEO;
-            this.mediaStreamHandler.initiateMediaStream(callEntity.id, mediaStreamType, callEntity.isGroup);
-          }
-
-          return callEntity;
-        });
-      })
-      .catch(error => {
-        this.deleteCall(conversationId);
-
-        const isMediaError = error instanceof z.error.MediaError;
-        if (!isMediaError) {
-          throw error;
-        }
-      });
-  }
-
-  /**
-   * Constructs an outgoing call entity.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.PROP_SYNC
-   * @returns {Promise} Resolves with the new call entity
-   */
-  _createOutgoingCall(callMessageEntity) {
-    const properties = callMessageEntity.properties;
-
-    const direction = CALL_STATE.OUTGOING;
-    return this._createCall(callMessageEntity, this.userRepository.self(), direction).then(callEntity => {
-      const mediaType = this._getMediaTypeFromProperties(properties);
-      const conversationName = callEntity.conversationEntity.display_name();
-      const conversationId = callEntity.conversationEntity.id;
-
-      const logMessage = {
-        data: {
-          default: [mediaType, conversationName],
-          obfuscated: [mediaType, this.callLogger.obfuscate(conversationId)],
-        },
-        message: `Outgoing '{0}' call in conversation '{1}'`,
-      };
-      this.callLogger.info(logMessage, callEntity);
-
-      callEntity.state(CALL_STATE.OUTGOING);
-
-      this.telemetry.track_event(EventName.CALLING.INITIATED_CALL, callEntity);
-      return callEntity;
     });
   }
 
@@ -1553,53 +873,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   leaveCallOnUnload() {
-    const conversationId = this._selfClientOnACall();
-
-    if (conversationId) {
-      this.leaveCall(conversationId, TERMINATION_REASON.PAGE_NAVIGATION);
-    }
-  }
-
-  /**
-   * Get the MediaType from given call event properties.
-   * @param {Object} properties - call event properties
-   * @returns {MediaType} MediaType of call
-   */
-  _getMediaTypeFromProperties(properties) {
-    const isVideoSend = properties && properties.videosend === PROPERTY_STATE.TRUE;
-    const isScreenSend = properties && properties.screensend === PROPERTY_STATE.TRUE;
-    const isTypeVideo = isVideoSend || isScreenSend;
-    return isTypeVideo ? MediaType.VIDEO : MediaType.AUDIO;
-  }
-
-  /**
-   * Check if self client is participating in a call.
-   * @private
-   * @returns {string|boolean} Conversation ID of call or false
-   */
-  _selfClientOnACall() {
-    for (const callEntity of this.calls()) {
-      if (callEntity.selfClientJoined()) {
-        return callEntity.id;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check if self participant is participating in a call.
-   * @private
-   * @returns {string|boolean} Conversation ID of call or false
-   */
-  _selfParticipantOnACall() {
-    for (const callEntity of this.calls()) {
-      if (callEntity.selfUserJoined()) {
-        return callEntity.id;
-      }
-    }
-
-    return false;
+    // TODO
   }
 
   //##############################################################################

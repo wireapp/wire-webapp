@@ -116,8 +116,8 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   }
 
-  clickOnCallButton() {
-    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO);
+  startCall(conversationId) {
+    this.callingRepository.startCall(conversationId, MediaType.AUDIO);
   }
 
   clickOnDetails() {
