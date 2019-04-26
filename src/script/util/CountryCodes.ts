@@ -17,7 +17,14 @@
  *
  */
 
-export const COUNTRY_CODES = [
+export interface CountryCode {
+  code: number;
+  iso: string;
+  name: string;
+  population: number;
+}
+
+export const COUNTRY_CODES: CountryCode[] = [
   {
     code: 93,
     iso: 'AF',
@@ -1465,8 +1472,8 @@ export const COUNTRY_CODES = [
  * @param {number} countryCode - Country code
  * @returns {string} Returns the ISO standard country name of the most populated country with the matching country code
  */
-export const getCountryByCode = countryCode => {
-  const parsedCode = window.parseInt(countryCode, 10);
+export const getCountryByCode = (countryCode: string): string | void => {
+  const parsedCode = parseInt(countryCode, 10);
   const country = COUNTRY_CODES.filter(({code}) => code === parsedCode)
     .sort((countryA, countryB) => countryA.population - countryB.population)
     .pop();
@@ -1480,7 +1487,7 @@ export const getCountryByCode = countryCode => {
  * @param {string} isoName - ISO standard country name
  * @returns {number} Matching country code
  */
-export const getCountryCode = isoName => {
+export const getCountryCode = (isoName: string): number | void => {
   const country = COUNTRY_CODES.find(({iso}) => iso === isoName);
   if (country) {
     return country.code;
