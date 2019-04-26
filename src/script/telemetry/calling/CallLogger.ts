@@ -21,7 +21,7 @@ import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
 import {isObject, isString} from 'underscore';
 
-import {Logger, getLogger} from 'utils/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 export class CallLogger {
   static CONFIG = {
