@@ -43,6 +43,10 @@ export class CopyConfig {
     this.options = {...defaultOptions, ...filesOrOptions};
     this.readEnvVars();
 
+    if (!this.options.repositoryUrl && !this.options.externalDir) {
+      throw new Error('Option "repositoryUrl" or "externalDir" required');
+    }
+
     if (this.options.externalDir) {
       this.noClone = true;
       this.noCleanup = true;
