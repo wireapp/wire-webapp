@@ -19,7 +19,7 @@
 
 import uint32 from 'uint32';
 
-export const joaatHash = (stringToHash: string) => {
+export const joaatHash = (stringToHash: string): number => {
   let hash = uint32.toUint32(0);
   const key = stringToHash.toLowerCase();
 
