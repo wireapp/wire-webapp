@@ -17,7 +17,7 @@
  *
  */
 
-import {joaatHash} from 'src/script/util/Crypto';
+import {joaatHash} from 'Util/Crypto';
 
 describe('Crypto', () => {
   describe('Jenkins’ one-at-a-time hash', () => {
@@ -46,25 +46,11 @@ describe('Crypto', () => {
     });
 
     it('returns the expected hash values for some test strings', () => {
-      let key = '25f79335-6a5b-410e-90ea-653bd18b66da';
-      let actual = joaatHash(key);
+      Object.entries(sample).forEach(([input, expected]) => {
+        const actual = joaatHash(input);
 
-      expect(actual).toEqual(sample[key]);
-
-      key = 'b88a6d46-b2ae-4122-8022-d6ed66a25f09';
-      actual = joaatHash(key);
-
-      expect(actual).toEqual(sample[key]);
-
-      key = 'e50759ee-d32b-438f-bdbd-2605f48773e6';
-      actual = joaatHash(key);
-
-      expect(actual).toEqual(sample[key]);
-
-      key = 'e1b6e9f0-aafd-4ba9-8030-6dd053531afd';
-      actual = joaatHash(key);
-
-      expect(actual).toEqual(sample[key]);
+        expect(actual).toEqual(expected);
+      });
     });
 
     it('returns zero for an empty string', () => {
