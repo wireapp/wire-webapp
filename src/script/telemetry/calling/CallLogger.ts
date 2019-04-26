@@ -20,6 +20,7 @@
 import CryptoJS from 'crypto-js';
 import sdpTransform from 'sdp-transform';
 import {isObject, isString} from 'underscore';
+
 import {Logger, getLogger} from 'utils/Logger';
 
 export class CallLogger {
@@ -48,10 +49,10 @@ export class CallLogger {
     UUID: /([0-9a-f]{8})-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gm,
   };
 
-  name: string;
-  messageLog: string[];
-  obfuscationMode: string;
-  logger: Logger;
+  readonly name: string;
+  readonly messageLog: string[];
+  readonly obfuscationMode: string;
+  readonly logger: Logger;
 
   constructor(name: string, id: string, messageLog: string[]) {
     name = id ? this.createName(name, id) : name;
@@ -122,31 +123,42 @@ export class CallLogger {
     this.messageLog.push(logMessage);
   }
 
-  private createName(name: string, id: string) {
-    return `${name} - ${this.obfuscate(id)} (${new Date().getMilliseconds()})`;
+  safeGuard(message: string): string {
+    // Ensure UUIDs are properly obfuscated
+    message = message.replace(CallLogger.REGEXES.UUID, match => this.obfuscate(match));
+
+    // Obfuscate IP addresses
+    message = message.replace(CallLogger.REGEXES.IPV4, ip => {
+      const ipArray = ip.split('.');
+      ipArray[ip.length - 1] = CallLogger.OBFUSCATED.IPV4;
+      ipArray[ip.length - 2] = CallLogger.OBFUSCATED.IPV4;
+      return ipArray.join('.');
+    });
+    message = message.replace(CallLogger.REGEXES.IPV6, ip => {
+      const ipArray = ip.split(':').slice(0, 3);
+      return [...ipArray, CallLogger.OBFUSCATED.IPV6].join(':');
+    });
+
+    return message;
   }
 
-  private isHardObfuscationMode() {
-    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
-  }
-
-  debug() {
+  debug(): void {
     this._log('debug', arguments);
   }
 
-  error() {
+  error(): void {
     this._log('error', arguments);
   }
 
-  info() {
+  info(): void {
     this._log('info', arguments);
   }
 
-  warn() {
+  warn(): void {
     this._log('warn', arguments);
   }
 
-  log() {
+  log(): void {
     this._log('log', arguments);
   }
 
@@ -164,22 +176,11 @@ export class CallLogger {
     this.logger[logFunctionName](loggerMessage, ...extraArgs);
   }
 
-  safeGuard(message: string): string {
-    // Ensure UUID are properly obfuscated
-    message = message.replace(CallLogger.REGEXES.UUID, match => this.obfuscate(match));
+  private createName(name: string, id: string): string {
+    return `${name} - ${this.obfuscate(id)} (${new Date().getMilliseconds()})`;
+  }
 
-    // Obfuscate IP addresses
-    message = message.replace(CallLogger.REGEXES.IPV4, ip => {
-      const ipArray = ip.split('.');
-      ipArray[ip.length - 1] = CallLogger.OBFUSCATED.IPV4;
-      ipArray[ip.length - 2] = CallLogger.OBFUSCATED.IPV4;
-      return ipArray.join('.');
-    });
-    message = message.replace(CallLogger.REGEXES.IPV6, ip => {
-      const ipArray = ip.split(':').slice(0, 3);
-      return [...ipArray, CallLogger.OBFUSCATED.IPV6].join(':');
-    });
-
-    return message;
+  private isHardObfuscationMode(): boolean {
+    return this.obfuscationMode === CallLogger.OBFUSCATION_MODE.HARD;
   }
 }
