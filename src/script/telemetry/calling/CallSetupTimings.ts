@@ -92,8 +92,8 @@ class CallSetupTimings {
 
     this._steps_order().forEach(step => {
       if (this.hasOwnProperty(step)) {
-        const placeholder_key = new Array(Math.max(26 - step.length, 1)).join(' ');
-        const placeholder_value = new Array(Math.max(6 - this[step].toString().length, 1)).join(' ');
+        const placeholder_key = ' '.repeat(Math.max(26 - step.length, 1));
+        const placeholder_value = ' '.repeat(Math.max(6 - this[step].toString().length, 1));
 
         this.logger.info(`Step${placeholder_key}'${step}':${placeholder_value}${this[step]}ms`);
       }
