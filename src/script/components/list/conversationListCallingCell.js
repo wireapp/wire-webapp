@@ -55,6 +55,8 @@ class ConversationListCallingCell {
     this.isIncoming = ko.pureComputed(isState(CALL_STATE.INCOMING));
     this.isOngoing = ko.pureComputed(isState(CALL_STATE.MEDIA_ESTAB));
 
+    this.isMuted = ko.observable(false);
+
     this.callDuration = ko.observable();
     let callDurationUpdateInterval;
     const startedAtSubscription = call.startedAt.subscribe(startedAt => {
@@ -206,9 +208,10 @@ class ConversationListCallingCell {
     this.callingRepository.rejectCall(this.conversation().id);
   }
 
-  onToggleAudio(data, event) {
+  toggleMute(data, event) {
     event.stopPropagation();
-    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.AUDIO);
+    this.isMuted(!this.isMuted());
+    this.callingRepository.muteCall(this.conversation.id, this.isMuted());
   }
 
   onToggleScreen(data, event) {
@@ -274,7 +277,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <div class="conversation-list-calling-cell-controls">
       <div class="conversation-list-calling-cell-controls-left">
-        <div class="call-ui__button" data-bind="click: onToggleAudio, css: {'call-ui__button--active': !selfStreamState.audioSend()}, attr: {'data-uie-value': selfStreamState.audioSend() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+        <div class="call-ui__button" data-bind="click: toggleMute, css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
           <micoff-icon class="small-icon"></micoff-icon>
         </div>
         <!-- ko if: false && showVideoButton() -->

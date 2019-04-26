@@ -1001,6 +1001,10 @@ export class CallingRepository {
     this.callingApi.reject(this.wUser, conversationId);
   }
 
+  muteCall(conversationId, isMuted) {
+    this.callingApi.set_mute(this.wUser, isMuted);
+  }
+
   callTypeFromMediaType(mediaType) {
     const types = {
       [MediaType.AUDIO]: CALL_TYPE.NORMAL,
