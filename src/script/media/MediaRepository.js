@@ -54,8 +54,8 @@ export class MediaRepository {
   constructor(permissionRepository, logger) {
     this.logger = logger;
 
-    this.constraintsHandler = new MediaConstraintsHandler(this);
     this.devicesHandler = new MediaDevicesHandler(this);
+    this.constraintsHandler = new MediaConstraintsHandler(this.devicesHandler);
     this.elementHandler = new MediaElementHandler(this);
     this.streamHandler = new MediaStreamHandler(this, permissionRepository);
 

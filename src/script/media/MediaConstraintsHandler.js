@@ -76,10 +76,10 @@ export class MediaConstraintsHandler {
 
   /**
    * Construct a new MediaConstraints handler.
-   * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
+   * @param {MediaRepository} devicesHandler - Media repository with with references to all other handlers
    */
-  constructor(mediaRepository) {
-    this.mediaRepository = mediaRepository;
+  constructor(devicesHandler) {
+    this.devicesHandler = devicesHandler;
     this.logger = getLogger('MediaConstraintsHandler');
   }
 
@@ -94,18 +94,16 @@ export class MediaConstraintsHandler {
    * @param {boolean} [requestAudio=false] - Request audio in the constraints
    * @param {boolean} [requestVideo=false] - Request video in the constraints
    * @param {boolean} [isGroup=false] - Get constraints for group
-   * @returns {Promise} Resolves with MediaStreamConstraints
+   * @returns {MediaStreamConstraints} - The generated constraints
    */
   getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
-    return Promise.resolve().then(() => {
-      const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
-      const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
+    const currentDeviceId = this.devicesHandler.currentDeviceId;
+    const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
-      return {
-        audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
-        video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
-      };
-    });
+    return {
+      audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
+      video: requestVideo ? this._getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
+    };
   }
 
   /**
@@ -132,7 +130,7 @@ export class MediaConstraintsHandler {
         video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DESKTOP_CAPTURER,
       };
 
-      const chromeMediaSourceId = this.mediaRepository.devicesHandler.currentDeviceId.screenInput();
+      const chromeMediaSourceId = this.devicesHandler.currentDeviceId.screenInput();
       streamConstraints.video.mandatory = Object.assign(streamConstraints.video.mandatory, {chromeMediaSourceId});
 
       return Promise.resolve(streamConstraints);

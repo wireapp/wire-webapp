@@ -13,7 +13,7 @@
     "@wireapp/store-engine": "3.9.4",
     "@wireapp/store-engine-dexie": "0.5.4",
     "amplify": "git+https://git@github.com/wireapp/amplify",
-    "avs-web": "./avs-web-5.0.0.tgz",
+    "avs-web": "./avs-web-5.1.0.tgz",
     "core-js": "2.6.9",
     "crypto-js": "3.1.9-1",
     "dexie-batch": "0.4.2",

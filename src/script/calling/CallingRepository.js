@@ -117,11 +117,7 @@ export class CallingRepository {
     this.callingConfigTimeout = undefined;
 
     // Media Handler
-    this.mediaDevicesHandler = this.mediaRepository.devicesHandler;
-    this.mediaStreamHandler = this.mediaRepository.streamHandler;
-    this.mediaElementHandler = this.mediaRepository.elementHandler;
-
-    this.selfStreamState = this.mediaStreamHandler.selfStreamState;
+    this.mediaConstraintsHandler = this.mediaRepository.constraintsHandler;
 
     this.calls = ko.observableArray([]);
     this.joinedCall = ko.pureComputed(() => {
@@ -153,7 +149,12 @@ export class CallingRepository {
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     callingApi.init(avsEnv);
-    callingApi.setUserMediaHandler(log('userMediaHandler'));
+
+    callingApi.setUserMediaHandler((audio, video, screen) => {
+      const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
+      return navigator.mediaDevices.getUserMedia(constraints);
+    });
+
     const requestConfig = () => {
       this.getConfig().then(config => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
       return 0;
@@ -783,22 +784,6 @@ gled
         this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
       }
     });
-  }
-
-  /**
-   * Initiate media stream for call.
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call to be joined
-   * @param {MediaType} mediaType - Media type for this call
-   * @returns {Promise} Resolves with the call entity
-   */
-  _initiateMediaStream(callEntity, mediaType) {
-    return this.mediaStreamHandler.localMediaStream()
-      ? Promise.resolve(callEntity)
-      : this.mediaStreamHandler
-          .initiateMediaStream(callEntity.id, mediaType, callEntity.isGroup)
-          .then(() => callEntity);
   }
 
   /**
