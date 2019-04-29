@@ -19,6 +19,7 @@
 
 import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
+import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
 class MentionSuggestions {
   constructor(params) {
@@ -71,10 +72,10 @@ class MentionSuggestions {
 
   onInput(keyboardEvent) {
     const actions = {
-      [z.util.KeyboardUtil.KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
-      [z.util.KeyboardUtil.KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
-      [z.util.KeyboardUtil.KEY.ENTER]: this.validateSelection.bind(this, keyboardEvent),
-      [z.util.KeyboardUtil.KEY.TAB]: this.validateSelection.bind(this, keyboardEvent),
+      [KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
+      [KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
+      [KEY.ENTER]: this.validateSelection.bind(this, keyboardEvent),
+      [KEY.TAB]: this.validateSelection.bind(this, keyboardEvent),
     };
 
     const action = actions[keyboardEvent.key];
@@ -105,7 +106,7 @@ class MentionSuggestions {
   }
 
   validateSelection(keyboardEvent) {
-    const isShiftEnter = z.util.KeyboardUtil.isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
+    const isShiftEnter = isEnterKey(keyboardEvent) && keyboardEvent.shiftKey;
     if (isShiftEnter) {
       return false;
     }

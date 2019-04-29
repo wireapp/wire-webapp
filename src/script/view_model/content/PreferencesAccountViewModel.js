@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {KEY, isKey} from 'Util/KeyboardUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
@@ -193,7 +194,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   checkUsernameInput(username, keyboardEvent) {
-    if (z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+    if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
 

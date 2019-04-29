@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
@@ -58,7 +59,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey(keyboardEvent)) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
       }
     });

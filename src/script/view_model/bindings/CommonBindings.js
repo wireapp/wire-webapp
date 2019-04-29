@@ -30,6 +30,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {isEnterKey} from 'Util/KeyboardUtil';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -228,7 +229,7 @@ ko.bindingHandlers.enter = {
     const wrapper = function(_data, jquery_event) {
       const keyboard_event = jquery_event.originalEvent || jquery_event;
 
-      if (z.util.KeyboardUtil.isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+      if (isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, keyboard_event);
