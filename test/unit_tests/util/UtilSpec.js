@@ -141,29 +141,27 @@ describe('renderMessage', () => {
   });
 
   it('renders an email address', () => {
-    const expected =
-      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
+    const expected = 'send it over to <a href="mailto:hello@wire.com" data-email-link="true">hello@wire.com</a>';
 
     expect(renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" data-email-link="true">hello+world@wire.com</a>';
 
     expect(renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" data-email-link="true">janedoe@school.university.edu</a>';
 
     expect(renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
-    const expected =
-      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+    const expected = 'send it over to <a href="mailto:bla@foo.co.uk" data-email-link="true">bla@foo.co.uk</a>';
 
     expect(renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
@@ -215,11 +213,11 @@ describe('renderMessage', () => {
 
   it('renders special escaped email links from markdown notation', () => {
     expect(renderMessage('[email](mailto:test@email.com)')).toBe(
-      '<a href="mailto:test@email.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'test@email.com\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
+      '<a href="mailto:test@email.com" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
 
     expect(renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
-      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
+      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
   });
 

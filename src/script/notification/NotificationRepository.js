@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t, Declension} from 'Util/LocalizerUtil';
-import {SanitizationUtil} from 'Util/SanitizationUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
@@ -294,7 +294,7 @@ class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = SanitizationUtil.getFirstName(otherUserEntity, declension);
+      const nameOfJoinedUser = getFirstName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {

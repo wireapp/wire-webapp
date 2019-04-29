@@ -22,6 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import {validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {KEY, isKey} from 'Util/KeyboardUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
@@ -289,13 +290,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
+      safeWindowOpen(this.manageTeamUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOnResetPassword() {
-    z.util.SanitizationUtil.safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
+    safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   removedFromView() {

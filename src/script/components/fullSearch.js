@@ -21,6 +21,7 @@ import moment from 'moment';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
+import {escapeString} from 'Util/SanitizationUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -91,8 +92,8 @@ z.components.FullSearch = class FullSearch {
   }
 
   htmlFormatResult(messageEntity) {
-    const text = z.util.SanitizationUtil.escapeString(messageEntity.get_first_asset().text);
-    const input = z.util.SanitizationUtil.escapeString(this.input());
+    const text = escapeString(messageEntity.get_first_asset().text);
+    const input = escapeString(this.input());
 
     messageEntity.matchesCount = 0;
 

@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {alias} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {User} from '../../entity/User';
@@ -257,14 +258,14 @@ class StartUIViewModel {
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
+      safeWindowOpen(this.manageTeamUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
+      safeWindowOpen(this.manageServicesUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }

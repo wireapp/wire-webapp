@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
@@ -127,7 +128,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
             const url = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
-            z.util.SanitizationUtil.safeWindowOpen(url);
+            safeWindowOpen(url);
           },
           text: {
             action: t('modalCallNoMicrophoneAction'),

@@ -17,7 +17,7 @@
  *
  */
 
-import {SanitizationUtil} from './SanitizationUtil';
+import {escapeString, getSelfName} from './SanitizationUtil';
 import {StringUtil} from './StringUtil';
 import {isString, isNumber} from 'underscore';
 
@@ -30,9 +30,8 @@ const isStringOrNumber = toTest => isString(toTest) || isNumber(toTest);
 
 const replaceSubstituteEscaped = (string, regex, substitute) => {
   const replacement = isStringOrNumber(substitute)
-    ? SanitizationUtil.escapeString(substitute)
-    : (found, content) =>
-        substitute.hasOwnProperty(content) ? SanitizationUtil.escapeString(substitute[content]) : found;
+    ? escapeString(substitute)
+    : (found, content) => (substitute.hasOwnProperty(content) ? escapeString(substitute[content]) : found);
   return string.replace(regex, replacement);
 };
 
@@ -58,7 +57,7 @@ export const LocalizerUtil = {
       .sort((userNameA, userNameB) => StringUtil.sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
-      firstNames.push(SanitizationUtil.getSelfName(declension));
+      firstNames.push(getSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;
