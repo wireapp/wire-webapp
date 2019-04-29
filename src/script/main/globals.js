@@ -25,7 +25,6 @@ import URLUtilGlobal from 'Util/URLUtil.js';
 import workerGlobal from 'Util/worker.js';
 import ValidationUtilGlobal from 'Util/ValidationUtil.js';
 import ValidationUtilErrorGlobal from 'Util/ValidationUtilError.js';
-import PopupUtilGlobal from 'Util/PopupUtil.js';
 
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
