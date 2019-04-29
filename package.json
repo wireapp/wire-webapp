@@ -34,7 +34,7 @@
     "react-dom": "16.8.6",
     "react-intl": "2.8.0",
     "react-intl-po": "2.2.2",
-    "react-redux": "6.0.1",
+    "react-redux": "7.0.3",
     "react-router": "4.3.1",
     "react-router-dom": "4.3.1",
     "redux": "4.0.1",
