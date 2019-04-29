@@ -2212,7 +2212,7 @@ autoprefixer@^7.1.1:
 =======
 avs-web@./avs-web-5.0.0.tgz:
   version "5.0.0"
-  resolved "./avs-web-5.0.0.tgz#0c2f4dd36f1fb1323733bbb5595de31aac295093"
+  resolved "./avs-web-5.0.0.tgz#7cdd9e771dbf043de33e52b2077a7da3bc830d22"
 
 >>>>>>> f34591cc6... upgrade avs version
 aws-sdk@2.0.x:
