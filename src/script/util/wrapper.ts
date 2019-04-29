@@ -17,9 +17,9 @@
  *
  */
 
-import {Environment} from './Environment';
 import {WebAppEvents} from '../event/WebApp';
 import {ROLE} from '../user/UserPermission';
+import {Environment} from './Environment';
 
 export function exposeWrapperGlobals() {
   if (Environment.desktop && Environment.electron) {

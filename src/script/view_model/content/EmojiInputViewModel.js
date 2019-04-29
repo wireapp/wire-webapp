@@ -18,7 +18,7 @@
  */
 
 import * as StorageUtil from 'Util/StorageUtil';
-import {getCursorPixelPosition} from 'Util/PopupUtil.js';
+import {getCursorPixelPosition} from 'Util/PopupUtil';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
