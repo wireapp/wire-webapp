@@ -24,6 +24,7 @@ import * as StorageUtil from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'Util/util';
+import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -563,15 +564,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ARROW_UP: {
-          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
+        case KEY.ARROW_UP: {
+          if (!isFunctionKey(keyboardEvent) && !this.input().length) {
             this.editMessage(this.conversationEntity().get_last_editable_message());
             this.updateMentions(data, keyboardEvent);
           }
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ESC: {
+        case KEY.ESC: {
           if (this.mentionSuggestions().length) {
             this.endMentionFlow();
           } else if (this.pastedFile()) {
@@ -584,9 +585,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ENTER: {
+        case KEY.ENTER: {
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
-            z.util.KeyboardUtil.insertAtCaret(keyboardEvent.target, '\n');
+            insertAtCaret(keyboardEvent.target, '\n');
             ko.utils.triggerEvent(keyboardEvent.target, 'change');
             keyboardEvent.preventDefault();
           }
@@ -710,7 +711,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this.editedMention()) {
       this.emojiInput.onInputKeyUp(data, keyboardEvent);
     }
-    if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
+    if (keyboardEvent.key !== KEY.ESC) {
       this.handleMentionFlow();
     }
   }

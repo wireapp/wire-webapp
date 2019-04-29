@@ -28,6 +28,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
+import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -742,7 +743,7 @@ class AuthViewModel {
   }
 
   keydown_auth(keyboard_event) {
-    if (z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
+    if (isEnterKey(keyboard_event)) {
       switch (this.visible_mode()) {
         case AuthView.MODE.ACCOUNT_LOGIN:
           this.login_phone();
@@ -773,11 +774,11 @@ class AuthViewModel {
   }
 
   keydown_phone_code(view_model, keyboard_event) {
-    if (z.util.KeyboardUtil.isPasteAction(keyboard_event)) {
+    if (isPasteAction(keyboard_event)) {
       return true;
     }
 
-    if (z.util.KeyboardUtil.isFunctionKey(keyboard_event)) {
+    if (isFunctionKey(keyboard_event)) {
       return false;
     }
 
@@ -786,20 +787,20 @@ class AuthViewModel {
 
     let focus_digit;
     switch (keyboard_event.key) {
-      case z.util.KeyboardUtil.KEY.ARROW_LEFT:
-      case z.util.KeyboardUtil.KEY.ARROW_UP:
+      case KEY.ARROW_LEFT:
+      case KEY.ARROW_UP:
         focus_digit = target_digit - 1;
         $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
         break;
 
-      case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-      case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
+      case KEY.ARROW_DOWN:
+      case KEY.ARROW_RIGHT:
         focus_digit = target_digit + 1;
         $(`#wire-verify-code-digit-${Math.min(6, focus_digit)}`).focus();
         break;
 
-      case z.util.KeyboardUtil.KEY.BACKSPACE:
-      case z.util.KeyboardUtil.KEY.DELETE:
+      case KEY.BACKSPACE:
+      case KEY.DELETE:
         if (keyboard_event.currentTarget.value === '') {
           focus_digit = target_digit - 1;
           $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
@@ -847,7 +848,7 @@ class AuthViewModel {
     if (this.device_modal.isHidden()) {
       this.client_repository.getClientsForSelf();
       $(document).on('keydown.deviceModal', keyboard_event => {
-        if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+        if (isEscapeKey(keyboard_event)) {
           this.device_modal.hide();
         }
       });
