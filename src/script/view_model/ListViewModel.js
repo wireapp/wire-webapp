@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -264,7 +265,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.lastUpdate(Date.now());
 
     $(document).on('keydown.listView', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey(keyboardEvent)) {
         const newState = this.isActivatedAccount()
           ? ListViewModel.STATE.CONVERSATIONS
           : ListViewModel.STATE.TEMPORARY_GUEST;

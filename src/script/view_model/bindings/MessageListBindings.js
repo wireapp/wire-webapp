@@ -24,6 +24,7 @@ import 'jquery-mousewheel';
 
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
+import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 
 import {viewportObserver} from '../../ui/viewportObserver';
 
@@ -45,13 +46,10 @@ ko.bindingHandlers.focus_on_keydown = {
             // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-            const is_arrow_key = z.util.KeyboardUtil.isArrowKey(keyboard_event);
+            const is_arrow_key = isArrowKey(keyboard_event);
 
             if (!active_element_is_input && !is_arrow_key) {
-              const is_meta_key_pressed = z.util.KeyboardUtil.isMetaKey(keyboard_event);
-              const is_paste_action = z.util.KeyboardUtil.isPasteAction(keyboard_event);
-
-              if (!is_meta_key_pressed || is_paste_action) {
+              if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
             }

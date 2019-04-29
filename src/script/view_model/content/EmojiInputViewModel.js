@@ -19,6 +19,7 @@
 
 import * as StorageUtil from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
+import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil.js';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -166,14 +167,14 @@ export class EmojiInputViewModel {
 
     // Handling just entered inline emoji
     switch (keyboardEvent.key) {
-      case z.util.KeyboardUtil.KEY.SPACE: {
+      case KEY.SPACE: {
         if (this._tryReplaceInlineEmoji(input)) {
           return false;
         }
         break;
       }
 
-      case z.util.KeyboardUtil.KEY.TAB: {
+      case KEY.TAB: {
         if (this._tryReplaceInlineEmoji(input)) {
           keyboardEvent.preventDefault();
           return true;
@@ -188,23 +189,23 @@ export class EmojiInputViewModel {
     // Handling emoji popup
     if (this.isVisible) {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ESC: {
+        case KEY.ESC: {
           this.removeEmojiPopup();
           keyboardEvent.preventDefault();
           return true;
         }
 
-        case z.util.KeyboardUtil.KEY.ARROW_UP:
-        case z.util.KeyboardUtil.KEY.ARROW_DOWN: {
-          this._rotateEmojiPopup(z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.ARROW_UP));
+        case KEY.ARROW_UP:
+        case KEY.ARROW_DOWN: {
+          this._rotateEmojiPopup(isKey(keyboardEvent, KEY.ARROW_UP));
           this.suppressKeyUp = true;
           keyboardEvent.preventDefault();
           return true;
         }
 
-        case z.util.KeyboardUtil.KEY.ENTER:
-        case z.util.KeyboardUtil.KEY.TAB: {
-          if (keyboardEvent.shiftKey && z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
+        case KEY.ENTER:
+        case KEY.TAB: {
+          if (keyboardEvent.shiftKey && isEnterKey(keyboardEvent)) {
             break;
           }
 
@@ -219,7 +220,7 @@ export class EmojiInputViewModel {
     }
 
     // Handling inline emoji in the whole text
-    if (z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
+    if (isEnterKey(keyboardEvent)) {
       this._replaceAllInlineEmoji(input);
     }
 
