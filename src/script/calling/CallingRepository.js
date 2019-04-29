@@ -26,6 +26,8 @@ import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 
@@ -311,8 +313,22 @@ export class CallingRepository {
       userId,
       clientId
     );
+
     if (res !== 0) {
       this.callLogger.warn(`recv_msg failed with code: ${res}`);
+      return;
+    }
+
+    // save event if needed
+    switch (content.type) {
+      case 'SETUP':
+        this.injectActivateEvent(conversationId, userId, time, source);
+        break;
+
+      case 'CANCEL':
+        const reason = TERMINATION_REASON.MISSED; // TODO check other reasons
+        this.injectDeactivateEvent(conversationId, userId, reason, time, source);
+        break;
     }
   }
 
@@ -809,25 +825,30 @@ gled
 
   /**
    * Inject a call activate event.
-   * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
+   *
+   * @param {string} conversationId - The conversation id the event occured on
+   * @param {string} userId - The user sending the event
+   * @param {string} time - Time of the event
+   * @param {EventRepository.SOURCE} source - Source of the event
+   * @returns {void} - nothing
    */
-  injectActivateEvent(callMessageEntity, source) {
-    const event = z.conversation.EventBuilder.buildVoiceChannelActivate(callMessageEntity);
+  injectActivateEvent(conversationId, userId, time, source) {
+    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time);
     this.eventRepository.injectEvent(event, source);
   }
 
   /**
    * Inject a call deactivate event.
-   * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @param {TERMINATION_REASON} [reason] - Reason for call to end
-   * @returns {undefined} No return value
+   *
+   * @param {string} conversationId - The conversation id the event occured on
+   * @param {string} userId - The user sending the event
+   * @param {TERMINATION_REASON} reason - reason why the call was deactivated
+   * @param {string} time - Time of the event
+   * @param {EventRepository.SOURCE} source - Source of the event
+   * @returns {void} - nothing
    */
-  injectDeactivateEvent(callMessageEntity, source, reason) {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
+  injectDeactivateEvent(conversationId, userId, reason, time, source) {
+    const event = EventBuilder.buildVoiceChannelDeactivate(conversationId, userId, reason, time);
     this.eventRepository.injectEvent(event, source);
   }
 
