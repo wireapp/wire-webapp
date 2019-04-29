@@ -27,6 +27,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
+import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -304,6 +305,7 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
+    exposeWrapperGlobals();
 
     checkIndexedDb()
       .then(() => this._registerSingleInstance())

@@ -23,6 +23,7 @@ import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 import {StorageKey} from '../../storage/StorageKey';
+import {getCursorPixelPosition} from 'Util/PopupUtil.js';
 
 export class EmojiInputViewModel {
   static get CONFIG() {
@@ -381,7 +382,7 @@ export class EmojiInputViewModel {
       .show();
     this.emojiDiv.find('.emoji:nth(0)').addClass('selected');
 
-    const position = z.util.popup.getCursorPixelPosition(input);
+    const position = getCursorPixelPosition(input);
     const top = position.top - this.emojiDiv.height() - EmojiInputViewModel.CONFIG.LIST.OFFSET_TOP;
     const left = position.left - EmojiInputViewModel.CONFIG.LIST.OFFSET_LEFT;
 

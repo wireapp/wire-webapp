@@ -17,43 +17,42 @@
  *
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
+export const getCursorPixelPosition = input => {
+  const css = getComputedStyle(input);
+  const boundingRectangleInput = input.getBoundingClientRect();
+  const mask = document.createElement('div');
+  const span = document.createElement('span');
+  const text = document.createTextNode(input.value);
 
-z.util.popup = {
-  getCursorPixelPosition: input => {
-    const css = getComputedStyle(input);
-    const boundingRectangleInput = input.getBoundingClientRect();
-    const mask = document.createElement('div');
-    const span = document.createElement('span');
-    const text = document.createTextNode(input.value);
+  mask.appendChild(text);
 
-    mask.appendChild(text);
-    mask.style.font = css.font;
-    mask.style.position = 'fixed';
-    mask.style.left = `${input.clientLeft + boundingRectangleInput.left}px`;
-    mask.style.top = `${input.clientTop + boundingRectangleInput.top}px`;
-    mask.style.color = 'red';
-    mask.style.overflow = 'scroll';
-    mask.style.visibility = 'hidden';
-    mask.style.whiteSpace = 'pre-wrap';
-    mask.style.padding = css.padding;
-    mask.style.width = css.width;
-    mask.style.height = css.height;
-    span.innerText = 'I';
+  Object.assign(mask.style, {
+    color: 'red',
+    font: css.font,
+    height: css.height,
+    left: `${input.clientLeft + boundingRectangleInput.left}px`,
+    overflow: 'scroll',
+    padding: css.padding,
+    position: 'fixed',
+    top: `${input.clientTop + boundingRectangleInput.top}px`,
+    visibility: 'hidden',
+    whiteSpace: 'pre-wrap',
+    width: css.width,
+  });
 
-    const position = input.selectionStart;
-    if (position === input.value.length) {
-      mask.appendChild(span);
-    } else {
-      mask.insertBefore(span, mask.childNodes[0].splitText(position));
-    }
-    document.body.appendChild(mask);
-    span.scrollIntoView();
+  span.innerText = 'I';
 
-    const boundingRectangleSpan = span.getBoundingClientRect();
+  const position = input.selectionStart;
+  if (position === input.value.length) {
+    mask.appendChild(span);
+  } else {
+    mask.insertBefore(span, mask.childNodes[0].splitText(position));
+  }
+  document.body.appendChild(mask);
+  span.scrollIntoView();
 
-    mask.remove();
-    return boundingRectangleSpan;
-  },
+  const boundingRectangleSpan = span.getBoundingClientRect();
+
+  mask.remove();
+  return boundingRectangleSpan;
 };
