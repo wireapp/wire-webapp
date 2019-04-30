@@ -22,6 +22,7 @@ import {t, Declension} from 'Util/LocalizerUtil';
 import {SanitizationUtil} from 'Util/SanitizationUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
 
 import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -251,7 +252,7 @@ class NotificationRepository {
             notificationText = assetEntity.text;
           }
 
-          return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
+          return truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     }
@@ -573,7 +574,7 @@ class NotificationRepository {
         : conversationName;
     }
 
-    return z.util.StringUtil.truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -583,7 +584,7 @@ class NotificationRepository {
    */
   _createTitleObfuscated() {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return z.util.StringUtil.truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**

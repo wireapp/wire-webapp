@@ -17,6 +17,8 @@
  *
  */
 
+import {getRandomChar} from 'Util/StringUtil';
+
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 
 class CallMessageEntity {
@@ -110,7 +112,7 @@ class CallMessageEntity {
    */
   _createSessionId() {
     return _.range(CallMessageEntity.CONFIG.SESSION_ID_LENGTH)
-      .map(() => z.util.StringUtil.getRandomChar())
+      .map(() => getRandomChar())
       .join('');
   }
 }

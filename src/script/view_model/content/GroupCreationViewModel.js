@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import * as trackingHelpers from '../../tracking/Helpers';
@@ -78,7 +79,7 @@ export class GroupCreationViewModel {
 
         return this.teamRepository
           .teamMembers()
-          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+          .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
       }
       return [];
     });

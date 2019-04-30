@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import {getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
+import {getFirstChar} from 'Util/StringUtil';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
@@ -107,7 +108,7 @@ class ParticipantAvatar {
       }
 
       return this.element.hasClass('avatar-xs')
-        ? z.util.StringUtil.getFirstChar(this.participant().initials())
+        ? getFirstChar(this.participant().initials())
         : this.participant().initials();
     });
 

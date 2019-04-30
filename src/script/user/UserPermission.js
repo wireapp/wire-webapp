@@ -17,7 +17,7 @@
  *
  */
 
-import {StringUtil} from 'Util/StringUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 let bitsCounter = 0;
 
@@ -167,7 +167,7 @@ export function generatePermissionHelpers(boundRole = ROLE.NONE) {
     const camelCasedFeature = featureKey
       .toLowerCase()
       .split('_')
-      .map(StringUtil.capitalizeFirstChar)
+      .map(capitalizeFirstChar)
       .join('');
     return Object.assign(helpers, {
       [`can${camelCasedFeature}`]: (role = boundRole) => hasAccessToFeature(featureValue, role),

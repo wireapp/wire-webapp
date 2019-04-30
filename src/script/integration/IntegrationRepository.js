@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ACCESS_STATE} from '../conversation/AccessState';
@@ -233,9 +234,9 @@ export class IntegrationRepository {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
-            .filter(serviceEntity => z.util.StringUtil.compareTransliteration(serviceEntity.name, normalizedQuery))
+            .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
             .sort((serviceA, serviceB) => {
-              return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+              return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
             });
           this.services(serviceEntities);
         }
