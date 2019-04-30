@@ -142,24 +142,24 @@ export class CallLogger {
     return message;
   }
 
-  debug(): void {
-    this._log('debug', arguments);
+  debug(...args: any[]): void {
+    this._log('debug', ...args);
   }
 
-  error(): void {
-    this._log('error', arguments);
+  error(...args: any[]): void {
+    this._log('error', ...args);
   }
 
-  info(): void {
-    this._log('info', arguments);
+  info(...args: any[]): void {
+    this._log('info', ...args);
   }
 
-  warn(): void {
-    this._log('warn', arguments);
+  warn(...args: any[]): void {
+    this._log('warn', ...args);
   }
 
-  log(): void {
-    this._log('log', arguments);
+  log(...args: any[]): void {
+    this._log('log', ...args);
   }
 
   private _log(logFunctionName: 'debug' | 'error' | 'info' | 'log' | 'warn', ...args: any[]): void {
