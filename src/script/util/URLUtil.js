@@ -18,6 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
+import {includesString} from './StringUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
@@ -32,7 +33,7 @@ const URLUtil = {
   },
 
   appendParameter: (url, parameter) => {
-    const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
+    const separator = includesString(url, '?') ? '&' : '?';
     return `${url}${separator}${parameter}`;
   },
 

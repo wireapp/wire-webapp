@@ -20,6 +20,7 @@
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
 
 import 'src/script/localization/Localizer';
 
@@ -87,7 +88,7 @@ describe('NotificationRepository', () => {
           tag: conversation_et.id,
         },
         timeout: NotificationRepository.CONFIG.TIMEOUT,
-        title: z.util.StringUtil.truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
+        title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
       };
 
       // Mocks
@@ -123,7 +124,7 @@ describe('NotificationRepository', () => {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.title = '…';
           }
@@ -163,7 +164,7 @@ describe('NotificationRepository', () => {
             const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = z.string.notificationObfuscatedTitle;
@@ -522,7 +523,7 @@ describe('NotificationRepository', () => {
       const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
       const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-      notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+      notification_content.title = truncate(titleText, titleLength, false);
     });
 
     it('if a group is created', () => {
@@ -579,7 +580,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
@@ -613,7 +614,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {

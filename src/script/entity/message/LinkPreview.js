@@ -17,6 +17,8 @@
  *
  */
 
+import {obfuscate} from 'Util/StringUtil';
+
 export class LinkPreview {
   constructor(title, url) {
     this.title = title || '';
@@ -28,8 +30,8 @@ export class LinkPreview {
   }
 
   obfuscate() {
-    this.title = z.util.StringUtil.obfuscate(this.title);
-    this.url = z.util.StringUtil.obfuscate(this.url);
+    this.title = obfuscate(this.title);
+    this.url = obfuscate(this.url);
 
     this.image_resource(undefined);
     this.meta_data = undefined;

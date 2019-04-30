@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
+import {removeLineBreaks} from 'Util/StringUtil';
 
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
@@ -371,7 +372,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         .display_name()
         .trim();
 
-      const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
+      const newConversationName = removeLineBreaks(event.target.value.trim());
 
       this.isEditingName(false);
       const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;

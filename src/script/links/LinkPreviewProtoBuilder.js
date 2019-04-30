@@ -19,6 +19,8 @@
 
 import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 
+import {truncate} from 'Util/StringUtil';
+
 window.z = window.z || {};
 window.z.links = z.links || {};
 
@@ -40,8 +42,8 @@ z.links.LinkPreviewProtoBuilder = {
       if (data.title && data.url) {
         const {description = '', title = '', url: dataUrl} = data;
 
-        const truncatedDescription = z.util.StringUtil.truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
-        const truncatedTitle = z.util.StringUtil.truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
+        const truncatedDescription = truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
+        const truncatedTitle = truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
 
         const protoArticle = new Article({permanentUrl: dataUrl, summary: truncatedDescription, title: truncatedTitle}); // deprecated format
         const protoLinkPreview = new LinkPreview({

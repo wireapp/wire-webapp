@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {User} from '../User';
 import {ClientEvent} from '../../event/Client';
@@ -222,7 +223,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         const groupCreationString = this.user().is_me
           ? t('conversationCreatedNameYou')
           : t('conversationCreatedName', this.senderName());
-        return z.util.StringUtil.capitalizeFirstChar(groupCreationString);
+        return capitalizeFirstChar(groupCreationString);
       }
       return '';
     });

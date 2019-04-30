@@ -19,7 +19,8 @@
 
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
-import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil.js';
+import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -358,9 +359,7 @@ export class EmojiInputViewModel {
         const usageCountB = this._getUsageCount(emojiB.name);
 
         const sameUsageCount = usageCountA === usageCountB;
-        return sameUsageCount
-          ? z.util.StringUtil.sortByPriority(emojiA.name, emojiB.name, query)
-          : usageCountB - usageCountA;
+        return sameUsageCount ? sortByPriority(emojiA.name, emojiB.name, query) : usageCountB - usageCountA;
       })
       .slice(0, EmojiInputViewModel.CONFIG.LIST.LENGTH)
       .map(emoji => {

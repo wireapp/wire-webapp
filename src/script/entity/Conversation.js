@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
+import {truncate} from 'Util/StringUtil';
 
 import {Config} from '../auth/config';
 
@@ -300,7 +301,7 @@ export class Conversation {
             .join(', ');
 
           const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
+          return truncate(joinedNames, maxLength, false);
         }
 
         const hasUserIds = !!this.participating_user_ids().length;

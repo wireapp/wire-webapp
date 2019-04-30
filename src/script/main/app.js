@@ -28,6 +28,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
+import {includesString} from 'Util/StringUtil';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -721,7 +722,7 @@ class App {
         Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
           const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
           const deleteLabelKey = isCookieLabelKey && clearData;
-          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
+          const isCookieLabel = includesString(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
 
           if (!deleteLabelKey && isCookieLabel) {
             keysToKeep.push(keyInAmplifyStore);
