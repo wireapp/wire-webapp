@@ -76,7 +76,12 @@ export const obfuscate = (text: string) =>
  * @param fromStart - should the query match the string from the beginning of the string
  * @returns does the string matches the query
  */
-export const compareTransliteration = (string: string, query: string, excludedChars: Record<string, string> = {}, fromStart = false) => {
+export const compareTransliteration = (
+  string: string,
+  query: string,
+  excludedChars: Record<string, string> = {},
+  fromStart = false
+) => {
   const nameSlug = computeTransliteration(string, excludedChars);
   const querySlug = computeTransliteration(query, excludedChars);
   return fromStart ? nameSlug.startsWith(querySlug) : includesString(nameSlug, querySlug);
