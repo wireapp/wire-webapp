@@ -16,7 +16,6 @@ import configGlobal from '../config.js';
 import envGlobal from 'Util/Environment.js';
 import DebugUtilGlobal from 'Util/DebugUtil.js';
 import utilGlobal from 'Util/util.js';
-import SanitizationUtilGlobal from 'Util/SanitizationUtil.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 import helpersGlobal from 'Util/scroll-helpers.js';
 import URLUtilGlobal from 'Util/URLUtil.js';
