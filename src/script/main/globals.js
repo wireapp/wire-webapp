@@ -147,7 +147,6 @@ import MessageCategorizationGlobal from '../message/MessageCategorization.js';
 import MessageHasherGlobal from '../message/MessageHasher.js';
 import MentionEntityGlobal from '../message/MentionEntity.js';
 import TextGlobal from '../entity/message/Text.js';
-import LinkPreviewGlobal from '../entity/message/LinkPreview.js';
 import LocationGlobal from '../entity/message/Location.js';
 import MessageGlobal from '../entity/message/Message.js';
 import DeleteMessageGlobal from '../entity/message/DeleteMessage.js';
