@@ -13,11 +13,7 @@ import '../event/WebApp';
 
 import configGlobal from '../config.js';
 
-import envGlobal from 'Util/Environment.js';
-import DebugUtilGlobal from 'Util/DebugUtil.js';
-import utilGlobal from 'Util/util.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
-import helpersGlobal from 'Util/scroll-helpers.js';
 
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
