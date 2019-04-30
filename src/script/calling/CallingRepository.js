@@ -302,7 +302,6 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
-    // TODO handle saving activate/deactivate events
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = timestamp => Math.floor(timestamp / 1000);
@@ -457,67 +456,6 @@ export class CallingRepository {
 
       return conversationEntity;
     });
-  }
-
-  //##############################################################################
-  // Outbound call events
-  //##############################################################################
-
-  /**
-   * Send a call event.
-   *
-   * @param {Conversation} conversationEntity - Conversation to send message in
-   * @param {CallMessageEntity} callMessageEntity - Call message entity
-   * @returns {Promise} Resolves when the event has been sent
-   */
-  sendCallMessage(conversationEntity, callMessageEntity) {
-    if (!_.isObject(callMessageEntity)) {
-      throw new z.error.CallError(z.error.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
-    }
-
-    const {conversationId, remoteUserId, response, type} = callMessageEntity;
-
-    return this.getCallById(conversationId || conversationEntity.id)
-      .then(callEntity => {
-        if (!CallingRepository.CONFIG.DATA_CHANNEL_MESSAGE_TYPES.includes(type)) {
-          throw new z.error.CallError(z.error.CallError.TYPE.NO_DATA_CHANNEL);
-        }
-
-        return callEntity.getParticipantById(remoteUserId);
-      })
-      .then(({flowEntity}) => flowEntity.sendMessage(callMessageEntity))
-      .catch(error => {
-        const expectedErrorTypes = [z.error.CallError.TYPE.NO_DATA_CHANNEL, z.error.CallError.TYPE.NOT_FOUND];
-        const isExpectedError = expectedErrorTypes.includes(error.type);
-
-        if (!isExpectedError) {
-          throw error;
-        }
-
-        return this._limitMessageRecipients(callMessageEntity).then(({precondition, recipients}) => {
-          const isTypeHangup = type === CALL_MESSAGE_TYPE.HANGUP;
-          if (isTypeHangup) {
-            if (response) {
-              throw error;
-            }
-
-            callMessageEntity.type = CALL_MESSAGE_TYPE.CANCEL;
-          }
-
-          this._logMessage(true, callMessageEntity);
-
-          const protoCalling = new Calling({content: callMessageEntity.toContentString()});
-          const genericMessage = new GenericMessage({
-            [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-            messageId: createRandomUuid(),
-          });
-
-          const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-          return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationEntity);
-        });
-      });
   }
 
   /**
@@ -861,26 +799,6 @@ gled
   //##############################################################################
 
   /**
-   * Get a call entity for a given conversation ID.
-   * @param {string} conversationId - ID of Conversation of requested call
-   * @returns {Promise} Resolves with the call entity for conversation ID
-   */
-  getCallById(conversationId) {
-    if (!conversationId) {
-      return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NO_CONVERSATION_ID));
-    }
-
-    for (const callEntity of this.calls()) {
-      const isExpectedId = callEntity.id === conversationId;
-      if (isExpectedId) {
-        return Promise.resolve(callEntity);
-      }
-    }
-
-    return Promise.reject(new z.error.CallError(z.error.CallError.TYPE.NOT_FOUND));
-  }
-
-  /**
    * Leave a call we are joined immediately in case the browser window is closed.
    * @note Should only used by "window.onbeforeunload".
    * @returns {undefined} No return value
@@ -973,33 +891,6 @@ ${turnServersConfig}`;
   printLog() {
     this.callLogger.force_log(`Call message log contains '${this.messageLog.length}' events`, this.messageLog);
     this.messageLog.forEach(logMessage => this.callLogger.force_log(logMessage));
-  }
-
-  /**
-   * Report a call for call analysis.
-   * @param {string} conversationId - ID of conversation
-   * @returns {undefined} No return value
-   */
-  reportCall(conversationId) {
-    this.getCallById(conversationId)
-      .catch(() => {
-        for (const callEntity of this.calls()) {
-          if (!callEntity.isEndedState()) {
-            return callEntity;
-          }
-        }
-      })
-      .then(callEntity => {
-        if (callEntity) {
-          return this._sendReport(callEntity.getFlows().map(flowEntity => flowEntity.reportStatus()));
-        }
-
-        if (this.flowStatus) {
-          return this._sendReport(this.flowStatus);
-        }
-
-        this.callLogger.warn('Could not find flows to report for call analysis');
-      });
   }
 
   /**
