@@ -20,6 +20,7 @@
 import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 
 import {truncate} from 'Util/StringUtil';
+import {isTweetUrl} from 'Util/ValidationUtil';
 
 window.z = window.z || {};
 window.z.links = z.links || {};
@@ -55,7 +56,7 @@ z.links.LinkPreviewProtoBuilder = {
           urlOffset: offset,
         });
 
-        if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
+        if (data.site_name === 'Twitter' && isTweetUrl(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
           const username = data.url.match(/com\/([^/]*)\//)[1];
           const protoTweet = new Tweet({author, username});

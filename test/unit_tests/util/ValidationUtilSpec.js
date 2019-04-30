@@ -20,14 +20,26 @@
 import UUID from 'uuidjs';
 
 import {createRandomUuid} from 'Util/util';
+import {
+  isBearerToken,
+  isUUID,
+  isBase64,
+  isValidApiPath,
+  isTweetUrl,
+  legacyAsset,
+  assetRetentionPolicy,
+  assetV3,
+  ValidationUtilError,
+  isSameLocation,
+} from 'Util/ValidationUtil';
 
-describe('z.util.ValidationUtil', () => {
+describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {
     it('detects a valid asset below v3', () => {
       const assetId = createRandomUuid();
       const conversationId = createRandomUuid();
 
-      const actual = z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      const actual = legacyAsset(assetId, conversationId);
 
       expect(actual).toBe(true);
     });
@@ -36,9 +48,9 @@ describe('z.util.ValidationUtil', () => {
       const assetId = createRandomUuid();
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
-        z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+        legacyAsset(assetId, conversationId);
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
         return done();
       }
       done.fail('Detection failed');
@@ -49,7 +61,7 @@ describe('z.util.ValidationUtil', () => {
     it('detects a valid v3 asset (assetKey only)', () => {
       const assetKey = `3-1-${createRandomUuid()}`;
 
-      const actual = z.util.ValidationUtil.asset.v3(assetKey);
+      const actual = assetV3(assetKey);
 
       expect(actual).toBe(true);
     });
@@ -58,7 +70,7 @@ describe('z.util.ValidationUtil', () => {
       const assetKey = `3-1-${createRandomUuid()}`;
       const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
-      const actual = z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+      const actual = assetV3(assetKey, assetToken);
 
       expect(actual).toBe(true);
     });
@@ -67,9 +79,9 @@ describe('z.util.ValidationUtil', () => {
       const assetKey = `3-6-${createRandomUuid()}`;
 
       try {
-        z.util.ValidationUtil.asset.v3(assetKey);
+        assetV3(assetKey);
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
         return done();
       }
       done.fail('Detection failed');
@@ -80,9 +92,9 @@ describe('z.util.ValidationUtil', () => {
       const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
       try {
-        z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+        assetV3(assetKey, assetToken);
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
         return done();
       }
       done.fail('Detection failed');
@@ -91,30 +103,30 @@ describe('z.util.ValidationUtil', () => {
 
   describe('"asset.retentionPolicy"', () => {
     it('detects retention numbers', () => {
-      expect(z.util.ValidationUtil.asset.retentionPolicy(1)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(2)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(3)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(4)).toBe(true);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(5)).toBe(true);
+      expect(assetRetentionPolicy(1)).toBe(true);
+      expect(assetRetentionPolicy(2)).toBe(true);
+      expect(assetRetentionPolicy(3)).toBe(true);
+      expect(assetRetentionPolicy(4)).toBe(true);
+      expect(assetRetentionPolicy(5)).toBe(true);
     });
 
     it('detects invalid retention numbers', () => {
-      expect(z.util.ValidationUtil.asset.retentionPolicy(0)).toBe(false);
-      expect(z.util.ValidationUtil.asset.retentionPolicy(6)).toBe(false);
+      expect(assetRetentionPolicy(0)).toBe(false);
+      expect(assetRetentionPolicy(6)).toBe(false);
     });
   });
 
   describe('"isBase64"', () => {
     it('detects a correct Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh';
-      const actual = z.util.ValidationUtil.isBase64(encoded);
+      const actual = isBase64(encoded);
 
       expect(actual).toBe(true);
     });
 
     it('detects an incorrect Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh==';
-      const actual = z.util.ValidationUtil.isBase64(encoded);
+      const actual = isBase64(encoded);
 
       expect(actual).toBe(false);
     });
@@ -123,14 +135,14 @@ describe('z.util.ValidationUtil', () => {
   describe('"isBearerToken"', () => {
     it('detects a correct Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==';
-      const actual = z.util.ValidationUtil.isBearerToken(token);
+      const actual = isBearerToken(token);
 
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1';
-      const actual = z.util.ValidationUtil.isBearerToken(token);
+      const actual = isBearerToken(token);
 
       expect(actual).toBe(false);
     });
@@ -139,14 +151,14 @@ describe('z.util.ValidationUtil', () => {
   describe('"isUUID"', () => {
     it('detects a correct UUID', () => {
       const uuid = UUID.genV4().hexString;
-      const actual = z.util.ValidationUtil.isUUID(uuid);
+      const actual = isUUID(uuid);
 
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect UUID', () => {
       const uuid = 'i-c-o-r-r-e-c-t';
-      const actual = z.util.ValidationUtil.isUUID(uuid);
+      const actual = isUUID(uuid);
 
       expect(actual).toBe(false);
     });
@@ -162,16 +174,16 @@ describe('z.util.ValidationUtil', () => {
       ];
 
       urlPaths.forEach(urlPath => {
-        expect(z.util.ValidationUtil.isValidApiPath(urlPath)).toBe(true);
+        expect(isValidApiPath(urlPath)).toBe(true);
       });
     });
 
     it('detects a invalid API path', done => {
       const path = '../../../search/contacts';
       try {
-        z.util.ValidationUtil.isValidApiPath(path);
+        isValidApiPath(path);
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
         return done();
       }
       done.fail('Detection failed');
@@ -193,7 +205,7 @@ describe('z.util.ValidationUtil', () => {
         'ftp://twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(false);
+        expect(isTweetUrl(url)).toBe(false);
       }
     });
 
@@ -205,21 +217,21 @@ describe('z.util.ValidationUtil', () => {
         'http://www.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
     });
 
     it('detects a valid status with "statues" in the url', () => {
       const urls = ['https://twitter.com/pwnsdx/statuses/899574902050758656'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
     });
 
     it('detects a valid status when using moments', () => {
       const urls = ['https://twitter.com/i/moments/899675330595749888'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
     });
 
@@ -230,14 +242,14 @@ describe('z.util.ValidationUtil', () => {
         'https://twitter.com/pwnsdx/status/899574902050758656?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fdiscover.twitter.com%2Ffirst-tweet',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
     });
 
     it('detects a valid status with a short id', () => {
       const urls = ['https://twitter.com/Twitter/status/145344012'];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
     });
 
@@ -247,8 +259,66 @@ describe('z.util.ValidationUtil', () => {
         'https://0.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.urls.isTweet(url)).toBe(true);
+        expect(isTweetUrl(url)).toBe(true);
       }
+    });
+  });
+
+  describe('is_same_location', () => {
+    it('returns false if page was accessed directly', () => {
+      expect(isSameLocation('', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if page was accessed from https://wire.com', () => {
+      expect(isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if page was accessed from https://wire.com/download', () => {
+      expect(isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if page was accessed from https://get.wire.com', () => {
+      expect(isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if page was accessed from an external link', () => {
+      expect(isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if redirected from auth', () => {
+      expect(isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
+    });
+
+    it('returns false if redirected from auth with parameter', () => {
+      expect(isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')).toBeFalsy();
+    });
+
+    it('returns false if redirected from auth with history hashtag', () => {
+      expect(isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')).toBeFalsy();
+    });
+
+    it('returns false if redirected from auth with login hashtag', () => {
+      expect(
+        isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+      ).toBeFalsy();
+    });
+
+    it('returns false if redirected from auth with registration hashtag', () => {
+      expect(
+        isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+      ).toBeFalsy();
+    });
+
+    it('returns true if auth with login hashtag was reloaded', () => {
+      expect(isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
+    });
+
+    it('returns true if page was reloaded', () => {
+      expect(isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
+    });
+
+    it('returns true if page was reloaded with parameters', () => {
+      expect(isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
     });
   });
 });

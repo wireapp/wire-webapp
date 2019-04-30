@@ -19,6 +19,7 @@
 
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {TimeUtil} from 'Util/TimeUtil';
+import {isValidApiPath} from 'Util/ValidationUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';
@@ -126,7 +127,7 @@ export class BackendClient {
    * @returns {string} REST API endpoint URL
    */
   createUrl(path) {
-    z.util.ValidationUtil.isValidApiPath(path);
+    isValidApiPath(path);
     return `${this.restUrl}${path}`;
   }
 

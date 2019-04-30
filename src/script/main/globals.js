@@ -19,8 +19,6 @@ import utilGlobal from 'Util/util.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 import helpersGlobal from 'Util/scroll-helpers.js';
 import workerGlobal from 'Util/worker.js';
-import ValidationUtilGlobal from 'Util/ValidationUtil.js';
-import ValidationUtilErrorGlobal from 'Util/ValidationUtilError.js';
 
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
