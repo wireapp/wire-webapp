@@ -31,9 +31,6 @@ import {replaceInRange} from './StringUtil';
 import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
 export const checkIndexedDb = () => {
   if (!Environment.browser.supports.indexedDb) {
     const errorType = Environment.browser.edge

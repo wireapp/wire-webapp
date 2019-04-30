@@ -35,18 +35,13 @@ export class ValidationUtilError extends Error {
   }
 }
 
-export const isValidUsername = (username: string) => {
-  if (username.startsWith('@')) {
-    username = username.substring(1);
-  }
-  return /^[a-z_0-9]{2,21}$/.test(username);
-};
+export const isValidUsername = (username: string) => /^@?[a-z_0-9]{2,21}$/.test(username);
 
 /**
  * Checks if input has the format of an international phone number
  * @note Begins with + and contains only numbers
- * @param {string} phoneNumber - Input
- * @returns {boolean} True, if the input a phone number
+ * @param phoneNumber Input
+ * @returns True, if the input a phone number
  */
 export const isValidPhoneNumber = (phoneNumber: string) => {
   const allowDebugPhoneNumbers = config.FEATURE.ENABLE_DEBUG;
