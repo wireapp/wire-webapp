@@ -17,22 +17,39 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import ko from 'knockout';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
 
-import {AssetType} from '../../assets/AssetType';
+import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
+import {AssetType} from '../../assets/AssetType';
+import {AssetUploadFailedReason} from '../../assets/AssetUploadFailedReason';
+
+type AssetMetaData = ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData;
 
 export class File extends Asset {
-  constructor(id) {
+  downloadProgress: ko.PureComputed<number | undefined>;
+  file_name: string;
+  file_size: string;
+  logger: Logger;
+  meta: Partial<AssetMetaData>;
+  original_resource: ko.Observable<AssetRemoteData>;
+  preview_resource: ko.Observable<AssetRemoteData>;
+  status: ko.Observable<AssetTransferState>;
+  upload_failed_reason: ko.Observable<AssetUploadFailedReason>;
+
+  constructor(id?: string) {
     super(id);
     this.cancel_download = this.cancel_download.bind(this);
 
     this.type = AssetType.FILE;
-    this.logger = getLogger('z.entity.File');
+    this.logger = getLogger('File');
 
     // AssetTransferState
     this.status = ko.observable();
@@ -62,19 +79,15 @@ export class File extends Asset {
 
   /**
    * Loads and decrypts otr asset preview
-   *
-   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
-  load_preview() {
+  load_preview(): Promise<void | Blob> {
     return this.preview_resource().load();
   }
 
   /**
    * Loads and decrypts otr asset
-   *
-   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
-  load() {
+  load(): Promise<void | Blob> {
     this.status(AssetTransferState.DOWNLOADING);
 
     return this.original_resource()
@@ -91,10 +104,8 @@ export class File extends Asset {
 
   /**
    * Loads and decrypts otr asset as initiates download
-   *
-   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
-  download() {
+  download(): Promise<number | void> {
     if (this.status() !== AssetTransferState.UPLOADED) {
       return Promise.resolve(undefined);
     }
@@ -102,24 +113,26 @@ export class File extends Asset {
     const download_started = Date.now();
 
     return this.load()
-      .then(blob => downloadBlob(blob, this.file_name))
-      .then(() => {
+      .then(blob => {
+        if (!blob) {
+          throw new Error('No blob received.');
+        }
+        return downloadBlob(blob, this.file_name);
+      })
+      .then(blob => {
         const download_duration = (Date.now() - download_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);
+        return blob;
       })
       .catch(error => this.logger.error('Failed to download asset', error));
   }
 
-  cancel_download() {
+  cancel_download(): void {
     this.status(AssetTransferState.UPLOADED);
     return this.original_resource().cancelDownload();
   }
 
-  reload() {
+  reload(): void {
     this.logger.info('Restart upload');
   }
 }
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-z.entity.File = File;
