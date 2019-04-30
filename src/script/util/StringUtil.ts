@@ -31,10 +31,10 @@ export const trimEnd = (string = '') => string.replace(/\s*$/, '');
 export const trimStart = (string = '') => string.replace(/^\s*/, '');
 
 /**
- * @param {string} str - string to pad
- * @param {number} length - maximum length to pad
- * @param {string} [padCharacter] - character to pad with (default is space)
- * @returns {string} The padded string
+ * @param str - string to pad
+ * @param length - maximum length to pad
+ * @param padCharacter - character to pad with (default is space)
+ * @returns The padded string
  */
 export const padStart = (string: string, length: number, padCharacter = ' ') => {
   if (string.length >= length) {
@@ -44,8 +44,8 @@ export const padStart = (string: string, length: number, padCharacter = ' ') => 
 };
 
 /**
- * @param {ArrayLike} bytes - bytes to convert
- * @returns {string} bytes as hex string
+ * @param bytes - bytes to convert
+ * @returns bytes as hex string
  */
 export const bytesToHex = (bytes: number[]) => {
   const hexBase = 16;
@@ -70,11 +70,11 @@ export const obfuscate = (text: string) =>
 /**
  * Returns true if the string and the query match by applying transliteration first.
  *
- * @param {string} string - the string to compare the query against
- * @param {string} query - the query to compare to the string
- * @param {Object} excludedChars - extra characters to ignore when creating a slug ({[string]: string})
- * @param {boolean} fromStart=false - should the query match the string from the beginning of the string
- * @returns {boolean} does the string matches the query
+ * @param string - the string to compare the query against
+ * @param query - the query to compare to the string
+ * @param excludedChars - extra characters to ignore when creating a slug ({[string]: string})
+ * @param fromStart=false - should the query match the string from the beginning of the string
+ * @returns does the string matches the query
  */
 export const compareTransliteration = (string: string, query: string, excludedChars = {}, fromStart = false) => {
   const nameSlug = computeTransliteration(string, excludedChars);
@@ -97,9 +97,9 @@ export const truncate = (string: string, outputLength: number, wordBoundary = tr
  * Replaces designated places in the source string with the additional arguments
  * e.g. formatString('{0} {1}!!!', 'Hello', 'World') => 'Hello World!!!'
  *
- * @param {string} string - source string
- * @param  {...any} args - replacements for placeholders in source string
- * @returns {string} source string with replacements applied
+ * @param string - source string
+ * @param args - replacements for placeholders in source string
+ * @returns source string with replacements applied
  */
 export const formatString = (string: string, ...args: any[]) => {
   args.forEach((arg, index) => {
@@ -133,15 +133,15 @@ export const sortByPriority = (stringA = '', stringB = '', query: string) => {
 };
 
 /**
- * @param {string} str - The string to convert
- * @returns {number[]} Converted string as byte array
+ * @param str - The string to convert
+ * @returns Converted string as byte array
  */
 export const utf8ToUtf16BE = (str = '') => {
   const BOMChar = '\uFEFF';
 
   str = `${BOMChar}${str}`;
 
-  const bytes: Number[] = [];
+  const bytes: number[] = [];
   str
     .split('')
     .map(char => char.charCodeAt(0))
