@@ -21,8 +21,8 @@ import {Asset} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
-
 import {WebWorker} from 'Util/worker';
+
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
