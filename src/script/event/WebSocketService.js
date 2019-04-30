@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {loadValue} from 'Util/StorageUtil';
+import {appendParameter} from 'Util/URLUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';
@@ -86,7 +87,7 @@ export class WebSocketService {
     return new Promise(resolve => {
       this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
       if (this.clientId) {
-        this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
+        this.connectionUrl = appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
 
       const wrongSocketType = typeof this.socket === 'object';

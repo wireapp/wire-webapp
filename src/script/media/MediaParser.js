@@ -17,6 +17,8 @@
  *
  */
 
+import {getLinksFromHtml} from 'Util/URLUtil';
+
 import {MediaEmbeds} from './MediaEmbeds';
 
 class MediaParser {
@@ -35,7 +37,7 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   renderMediaEmbeds(message, themeColor) {
-    z.util.URLUtil.getLinksFromHtml(message).forEach(link => {
+    getLinksFromHtml(message).forEach(link => {
       this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
     });
 

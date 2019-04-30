@@ -29,6 +29,7 @@ import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
+import {appendParameter} from 'Util/URLUtil';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -810,7 +811,7 @@ class App {
       let url = `/auth/${location.search}`;
       const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
       if (isImmediateSignOutReason) {
-        url = z.util.URLUtil.appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
       }
 
       const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;

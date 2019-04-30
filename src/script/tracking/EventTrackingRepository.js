@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {includesString} from 'Util/StringUtil';
+import {getParameter} from 'Util/URLUtil';
 
 import * as trackingHelpers from './Helpers';
 import {WebAppEvents} from '../event/WebApp';
@@ -149,7 +150,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _isDomainAllowedForAnalytics() {
-    const trackingParameter = z.util.URLUtil.getParameter(URLParameter.TRACKING);
+    const trackingParameter = getParameter(URLParameter.TRACKING);
     return typeof trackingParameter === 'boolean'
       ? trackingParameter
       : !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {

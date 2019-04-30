@@ -21,6 +21,7 @@ import {escape} from 'underscore';
 
 import {t, Declension} from 'Util/LocalizerUtil';
 import {isValidEmail} from 'Util/util';
+import {prependProtocol} from 'Util/URLUtil';
 
 export const escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -51,7 +52,7 @@ export const getFirstName = (userEntity, declension, bypassSanitization = false)
  * @returns {Object} New window handle
  */
 export const safeWindowOpen = (url, focus = true) => {
-  const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
+  const newWindow = window.open(prependProtocol(url));
 
   if (newWindow) {
     newWindow.opener = null;

@@ -20,7 +20,7 @@
 import moment from 'moment';
 
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {URLUtil} from 'Util/URLUtil';
+import {getParameter} from 'Util/URLUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 
 import {URLParameter} from '../auth/URLParameter';
@@ -102,7 +102,7 @@ window.z.string = strings;
 setStrings(strings);
 
 (function setAppLocale() {
-  const queryParam = URLUtil.getParameter(URLParameter.LOCALE);
+  const queryParam = getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
   let storedLocale = loadValue(StorageKey.LOCALIZATION.LOCALE);
 
