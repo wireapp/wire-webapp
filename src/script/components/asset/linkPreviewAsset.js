@@ -18,6 +18,7 @@
  */
 
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {isTweetUrl} from 'Util/ValidationUtil';
 import {getDomainName} from 'Util/UrlUtil';
 
 window.z = window.z || {};
@@ -45,7 +46,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.element = componentInfo.element;
 
     const isTypeTweet = this.preview && this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET;
-    this.isTweet = isTypeTweet && z.util.ValidationUtil.urls.isTweet(this.preview.url);
+    this.isTweet = isTypeTweet && isTweetUrl(this.preview.url);
     this.author = this.isTweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
     if (!this.messageEntity.is_expired()) {
