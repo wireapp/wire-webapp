@@ -336,12 +336,8 @@ class FlowEntity {
   restartNegotiation(negotiationMode, isAnswer, mediaStream) {
     this.callLogger.info(`Negotiation restart triggered by '${negotiationMode}'`);
 
-    this.clearTimeouts();
-    this._closePeerConnection();
-    this._closeDataChannel();
-    this._resetSignalingStates();
+    this._teardownPeerConnection();
     this.isAnswer(isAnswer);
-    this._resetSdp();
 
     const isModeStateCollision = negotiationMode === SDP_NEGOTIATION_MODE.STATE_COLLISION;
     if (!isModeStateCollision) {
@@ -1483,28 +1479,11 @@ class FlowEntity {
     this._clearSendSdpTimeout();
   }
 
-  /**
-   * Reset the flow.
-   * @returns {undefined} No return value
-   */
-  resetFlow() {
+  _teardownPeerConnection() {
     if (this.mediaStream()) {
       this._removeMediaStream(this.mediaStream());
     }
-
     if (this.pcInitialized()) {
-      const logMessage = {
-        data: {
-          default: [this.remoteUser.id],
-          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-        },
-        message: `Resetting flow with user '{0}'`,
-      };
-      this.callLogger.debug(logMessage);
-
-      this.remoteClientId = undefined;
-      this.telemetry.disconnected();
-
       this.clearTimeouts();
       this.iceCandidatesGatheringAttempts = 1;
       this._closeDataChannel();
@@ -1513,6 +1492,26 @@ class FlowEntity {
       this._resetSdp();
       this.pcInitialized(false);
     }
+  }
+
+  /**
+   * Reset the flow.
+   * @returns {undefined} No return value
+   */
+  resetFlow() {
+    const logMessage = {
+      data: {
+        default: [this.remoteUser.id],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Resetting flow with user '{0}'`,
+    };
+    this.callLogger.debug(logMessage);
+
+    this._teardownPeerConnection();
+
+    this.remoteClientId = undefined;
+    this.telemetry.disconnected();
   }
 
   /**
