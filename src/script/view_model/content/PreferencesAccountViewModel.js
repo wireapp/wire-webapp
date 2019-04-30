@@ -40,6 +40,7 @@ import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -51,7 +52,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       PROFILE_IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      SAVE_ANIMATION_TIMEOUT: z.motion.MotionDuration.X_LONG * 2,
+      SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
     };
   }
 

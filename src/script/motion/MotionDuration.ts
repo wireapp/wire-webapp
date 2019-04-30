@@ -17,12 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.motion = z.motion || {};
-
-z.motion.MotionDuration = {
-  LONG: 550,
-  MEDIUM: 350,
-  SHORT: 150,
-  X_LONG: 700,
-};
+export enum MotionDuration {
+  LONG = 550,
+  MEDIUM = 350,
+  SHORT = 150,
+  X_LONG = 700,
+}

@@ -23,6 +23,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -117,7 +118,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
-    window.setTimeout(this.dismissImport.bind(this), z.motion.MotionDuration.X_LONG * 2);
+    window.setTimeout(this.dismissImport.bind(this), MotionDuration.X_LONG * 2);
   }
 
   onCancel() {

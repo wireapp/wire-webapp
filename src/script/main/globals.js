@@ -74,7 +74,6 @@ import WebSocketServiceGlobal from '../event/WebSocketService.js';
 import LinkPreviewMetaDataTypeGlobal from '../links/LinkPreviewMetaDataType.js';
 import LinkPreviewProtoBuilderGlobal from '../links/LinkPreviewProtoBuilder.js';
 import LinkPreviewBlackListGlobal from '../links/LinkPreviewBlackList.js';
-import MotionDurationGlobal from '../motion/MotionDuration.js';
 import FullTextSearchGlobal from '../search/FullTextSearch.js';
 import SearchServiceGlobal from '../search/SearchService.js';
 import SearchRepositoryGlobal from '../search/SearchRepository.js';
