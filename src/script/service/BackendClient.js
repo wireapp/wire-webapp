@@ -17,12 +17,14 @@
  *
  */
 
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {TimeUtil} from 'Util/TimeUtil';
+
 import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';
-import PromiseQueue from 'utils/PromiseQueue';
-import TimeUtil from 'utils/TimeUtil';
+import {WebAppEvents} from '../event/WebApp';
 
-export default class BackendClient {
+export class BackendClient {
   static get CONFIG() {
     return {
       CONNECTIVITY_CHECK: {
@@ -81,14 +83,14 @@ export default class BackendClient {
     this.connectivityQueue = new PromiseQueue({name: 'BackendClient.Connectivity'});
 
     this.requestQueue = new PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
-    this.queueState = ko.observable(z.service.QUEUE_STATE.READY);
+    this.queueState = ko.observable(QUEUE_STATE.READY);
     this.queueTimeout = undefined;
 
     this.accessToken = '';
     this.accessTokenType = '';
 
     this.numberOfRequests = ko.observable(0);
-    this.numberOfRequests.subscribe(newValue => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, newValue));
+    this.numberOfRequests.subscribe(newValue => amplify.publish(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, newValue));
 
     // Only allow JSON response by default
     $.ajaxSetup({
@@ -341,7 +343,7 @@ export default class BackendClient {
                 this._prependRequestQueue(config, resolve, reject);
 
                 const trigger = AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
-                return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
+                return amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
               }
             }
 

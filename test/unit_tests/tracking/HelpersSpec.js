@@ -17,24 +17,27 @@
  *
  */
 
-import Conversation from 'src/script/entity/Conversation';
-import {ConversationType} from 'src/script/tracking/attribute';
-import trackingHelpers from 'src/script/tracking/Helpers';
+import {createRandomUuid} from 'Util/util';
+
+import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationType as ConversationTypeAttribute} from 'src/script/tracking/attribute';
+import * as trackingHelpers from 'src/script/tracking/Helpers';
+import {ConversationType} from 'src/script/conversation/ConversationType';
 
 describe('trackingHelpers', () => {
   describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {
-      const conversation_et = new Conversation(z.util.createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      const conversation_et = new Conversation(createRandomUuid());
+      conversation_et.type(ConversationType.ONE2ONE);
 
-      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.ONE_TO_ONE);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.ONE_TO_ONE);
     });
 
     it('returns correct type for group conversation', () => {
-      const conversation_et = new Conversation(z.util.createRandomUuid());
-      conversation_et.type(z.conversation.ConversationType.GROUP);
+      const conversation_et = new Conversation(createRandomUuid());
+      conversation_et.type(ConversationType.GROUP);
 
-      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationType.GROUP);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.GROUP);
     });
 
     it('returns undefined if type cannot be determined', () => {

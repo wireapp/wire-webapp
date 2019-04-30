@@ -17,10 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
 
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   /**
@@ -33,7 +34,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
     this.dispose = this.dispose.bind(this);
-    this.logger = Logger('AudioAssetComponent');
+    this.logger = getLogger('AudioAssetComponent');
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
@@ -63,6 +64,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
 
     this.TimeUtil = TimeUtil;
+    this.AssetTransferState = AssetTransferState;
   }
 
   on_timeupdate() {
@@ -98,11 +100,11 @@ ko.components.register('audio-asset', {
       <!-- ko if: header -->
         <asset-header params="message: message"></asset-header>
       <!-- /ko -->
-      <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+      <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
         <div class="asset-placeholder loading-dots">
         </div>
       <!-- /ko -->
-      <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
+      <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
         <div class="audio-controls">
           <media-button params="src: audio_element,
                                 asset: asset,
@@ -113,7 +115,7 @@ ko.components.register('audio-asset', {
                                 uploadProgress: uploadProgress
                                 ">
           </media-button>
-          <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOADING -->
+          <!-- ko if: transferState() !== AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"
                   data-uie-name="status-audio-time"
                   data-bind="text: TimeUtil.formatSeconds(audio_time())">

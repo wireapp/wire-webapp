@@ -18,12 +18,13 @@
  */
 
 import {isNumber, isString} from 'underscore';
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
 
-import AppInitTimingsStep from './AppInitTimingsStep';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
 
-export default class AppInitTimings {
+import {AppInitTimingsStep} from './AppInitTimingsStep';
+
+export class AppInitTimings {
   static get CONFIG() {
     return {
       BUCKET_SIZE: 10,
@@ -33,7 +34,7 @@ export default class AppInitTimings {
   }
 
   constructor() {
-    this.logger = Logger('AppInitTimings');
+    this.logger = getLogger('AppInitTimings');
     this.init = window.performance.now();
   }
 

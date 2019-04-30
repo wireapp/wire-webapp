@@ -19,7 +19,7 @@
 import {Router} from 'express';
 import {ServerConfig} from '../../ServerConfig';
 
-const GoogleWebmasterRoute = (config: ServerConfig) => {
+export const GoogleWebmasterRoute = (config: ServerConfig) => {
   if (config.SERVER.GOOGLE_WEBMASTER_ID) {
     return Router().get(`/google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`, (req, res) => {
       const responseBody = `google-site-verification: google${config.SERVER.GOOGLE_WEBMASTER_ID}.html`;
@@ -28,5 +28,3 @@ const GoogleWebmasterRoute = (config: ServerConfig) => {
   }
   return Router();
 };
-
-export default GoogleWebmasterRoute;

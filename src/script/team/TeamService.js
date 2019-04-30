@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -32,11 +32,11 @@ z.team.TeamService = class TeamService {
   /**
    * Construct a new Team Service.
    * @class z.user.TeamService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.team.TeamService');
+    this.logger = getLogger('z.team.TeamService');
   }
 
   getTeamById(teamId) {

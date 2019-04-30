@@ -24,7 +24,7 @@ export const COOKIE_NAME_APP_OPENED = 'app_opened';
 
 export const isAppAlreadyOpen = (state: RootState) => {
   const selectedCookie: {[key: string]: any} = getCookies(state)[COOKIE_NAME_APP_OPENED];
-  // eslint-disable-next-line dot-notation
+  // @ts-ignore
   return selectedCookie ? selectedCookie['appInstanceId'] !== Config.APP_INSTANCE_ID : false;
 };
 export const getCookies = (state: RootState): {[key: string]: object} => state.cookieState.cookies || {};

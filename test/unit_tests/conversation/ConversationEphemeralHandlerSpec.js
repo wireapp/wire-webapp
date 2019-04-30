@@ -17,12 +17,13 @@
  *
  */
 
-import Conversation from 'src/script/entity/Conversation';
-import ConversationMapper from 'src/script/conversation/ConversationMapper';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {EventService} from 'src/script/event/EventService';
 
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new ConversationMapper();
-  const eventService = new z.event.EventService(null, null);
+  const eventService = new EventService(null, null);
   return new z.conversation.ConversationEphemeralHandler(conversationMapper, eventService, () => {});
 };
 

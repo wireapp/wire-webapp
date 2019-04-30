@@ -18,9 +18,8 @@
  */
 
 import moment from 'moment';
-/* eslint-disable no-unused-vars */
-import {isSameDay, isSameMonth, isCurrentYear, isToday} from '../../../src/script/util/moment';
-/* eslint-enable no-unused-vars */
+
+import {isSameDay, isSameMonth, isCurrentYear, isToday} from 'Util/moment';
 
 describe('z.util.moment', () => {
   describe('isToday', () => {

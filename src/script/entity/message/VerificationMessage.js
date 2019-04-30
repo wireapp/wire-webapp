@@ -17,7 +17,11 @@
  *
  */
 
-import {t, Declension, joinNames} from 'utils/LocalizerUtil';
+import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '../../event/WebApp';
+import {VerificationMessageType} from '../../message/VerificationMessageType';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -26,7 +30,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   constructor() {
     super();
 
-    this.super_type = z.message.SuperType.VERIFICATION;
+    this.super_type = SuperType.VERIFICATION;
     this.affect_order(false);
     this.verificationMessageType = ko.observable();
 
@@ -38,16 +42,16 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     });
 
     this.isTypeNewDevice = ko.pureComputed(() => {
-      return this.verificationMessageType() === z.message.VerificationMessageType.NEW_DEVICE;
+      return this.verificationMessageType() === VerificationMessageType.NEW_DEVICE;
     });
     this.isTypeNewMember = ko.pureComputed(() => {
-      return this.verificationMessageType() === z.message.VerificationMessageType.NEW_MEMBER;
+      return this.verificationMessageType() === VerificationMessageType.NEW_MEMBER;
     });
     this.isTypeUnverified = ko.pureComputed(() => {
-      return this.verificationMessageType() === z.message.VerificationMessageType.UNVERIFIED;
+      return this.verificationMessageType() === VerificationMessageType.UNVERIFIED;
     });
     this.isTypeVerified = ko.pureComputed(() => {
-      return this.verificationMessageType() === z.message.VerificationMessageType.VERIFIED;
+      return this.verificationMessageType() === VerificationMessageType.VERIFIED;
     });
 
     this.captionUser = ko.pureComputed(() => {
@@ -74,7 +78,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   }
 
   clickOnDevice() {
-    const topic = this.isSelfClient() ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES : z.event.WebApp.SHORTCUT.PEOPLE;
+    const topic = this.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
 };

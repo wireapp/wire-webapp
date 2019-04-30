@@ -18,12 +18,10 @@
  */
 
 import {defineMessages} from 'react-intl';
-import BackendError from './auth/module/action/BackendError';
-import LabeledError from './auth/module/action/LabeledError';
-import ValidationError from './auth/module/action/ValidationError';
+import {BackendError} from './auth/module/action/BackendError';
+import {LabeledError} from './auth/module/action/LabeledError';
+import {ValidationError} from './auth/module/action/ValidationError';
 import {LOGOUT_REASON} from './auth/route';
-
-/* eslint-disable sort-keys */
 
 export const footerStrings = defineMessages({
   copy: {
@@ -275,11 +273,6 @@ export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinMobileSubhead: {
     defaultMessage: 'Open this link on your computer.',
     id: 'conversationJoin.unsupportedJoinMobileSubhead',
-  },
-  unsupportedJoinSubhead: {
-    defaultMessage:
-      '<p>This browser is not supported.</p>Download the latest version of <b style="font-weight: 600">Google Chrome, Mozilla Firefox, Opera</b> or <b style="font-weight: 600">Microsoft Edge.</b>',
-    id: 'conversationJoin.unsupportedJoinSubhead',
   },
 });
 

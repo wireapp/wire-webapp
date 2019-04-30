@@ -17,7 +17,7 @@
  *
  */
 
-describe('z.storage.StorageRepository', () => {
+describe('StorageRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => test_factory.exposeStorageActors());

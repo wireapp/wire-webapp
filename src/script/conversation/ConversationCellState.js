@@ -17,7 +17,10 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {ConversationStatusIcon} from './ConversationStatusIcon';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -143,19 +146,19 @@ z.conversation.ConversationCellState = (() => {
       } = conversationEntity.unreadState();
 
       if (unreadSelfMentions.length) {
-        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+        return ConversationStatusIcon.UNREAD_MENTION;
       }
 
       if (unreadSelfReplies.length) {
-        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
+        return ConversationStatusIcon.UNREAD_REPLY;
       }
 
       if (unreadCalls.length) {
-        return z.conversation.ConversationStatusIcon.MISSED_CALL;
+        return ConversationStatusIcon.MISSED_CALL;
       }
 
       if (unreadPings.length) {
-        return z.conversation.ConversationStatusIcon.UNREAD_PING;
+        return ConversationStatusIcon.UNREAD_PING;
       }
     },
     match: conversationEntity => {
@@ -181,7 +184,7 @@ z.conversation.ConversationCellState = (() => {
       const creatorName = conversationEntity.call().creatingUser.first_name();
       return t('conversationsSecondaryLineIncomingCall', creatorName);
     },
-    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    icon: () => ConversationStatusIcon.NONE,
     match: conversationEntity => {
       return conversationEntity.call()
         ? conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined()
@@ -191,7 +194,7 @@ z.conversation.ConversationCellState = (() => {
 
   const _getStateDefault = {
     description: () => '',
-    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    icon: () => ConversationStatusIcon.NONE,
   };
 
   const _getStateGroupActivity = {
@@ -258,8 +261,8 @@ z.conversation.ConversationCellState = (() => {
 
       if (isMemberRemoval) {
         return conversationEntity.showNotificationsEverything()
-          ? z.conversation.ConversationStatusIcon.UNREAD_MESSAGES
-          : z.conversation.ConversationStatusIcon.MUTED;
+          ? ConversationStatusIcon.UNREAD_MESSAGES
+          : ConversationStatusIcon.MUTED;
       }
     },
     match: conversationEntity => {
@@ -282,14 +285,14 @@ z.conversation.ConversationCellState = (() => {
       const showRepliesIcon = hasSelfReplies && conversationEntity.showNotificationsMentionsAndReplies();
 
       if (showMentionsIcon) {
-        return z.conversation.ConversationStatusIcon.UNREAD_MENTION;
+        return ConversationStatusIcon.UNREAD_MENTION;
       }
 
       if (showRepliesIcon) {
-        return z.conversation.ConversationStatusIcon.UNREAD_REPLY;
+        return ConversationStatusIcon.UNREAD_REPLY;
       }
 
-      return z.conversation.ConversationStatusIcon.MUTED;
+      return ConversationStatusIcon.MUTED;
     },
     match: conversationEntity => !conversationEntity.showNotificationsEverything(),
   };
@@ -308,7 +311,7 @@ z.conversation.ConversationCellState = (() => {
 
       return '';
     },
-    icon: () => z.conversation.ConversationStatusIcon.NONE,
+    icon: () => ConversationStatusIcon.NONE,
     match: conversationEntity => conversationEntity.removed_from_conversation(),
   };
 
@@ -325,7 +328,7 @@ z.conversation.ConversationCellState = (() => {
           string = true;
         } else if (messageEntity.has_asset()) {
           const assetEntity = messageEntity.get_first_asset();
-          const isUploaded = assetEntity.status() === z.assets.AssetTransferState.UPLOADED;
+          const isUploaded = assetEntity.status() === AssetTransferState.UPLOADED;
 
           if (isUploaded) {
             if (assetEntity.is_audio()) {
@@ -355,7 +358,7 @@ z.conversation.ConversationCellState = (() => {
         }
       }
     },
-    icon: () => z.conversation.ConversationStatusIcon.UNREAD_MESSAGES,
+    icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
     match: conversationEntity => conversationEntity.unreadState().allMessages.length > 0,
   };
 
@@ -367,7 +370,7 @@ z.conversation.ConversationCellState = (() => {
     },
     icon: conversationEntity => {
       if (conversationEntity.isRequest()) {
-        return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
+        return ConversationStatusIcon.PENDING_CONNECTION;
       }
     },
     match: conversationEntity => {

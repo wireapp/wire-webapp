@@ -18,7 +18,7 @@
  */
 
 import {resolve, graph} from './../../api/testResolver';
-import PropertiesRepository from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;

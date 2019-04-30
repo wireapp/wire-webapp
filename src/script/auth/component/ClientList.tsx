@@ -23,17 +23,19 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-import EXTERNAL_ROUTE from '../externalRoute';
-import {getLogger} from '../LogProvider';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
+
+import {getLogger} from 'Util/Logger';
+
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
-import ClientItem from './ClientItem';
+import {ClientItem} from './ClientItem';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -61,7 +63,7 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 const logger = getLogger('ClientList');
 
-class ClientList extends React.Component<CombinedProps, State> {
+class _ClientList extends React.Component<CombinedProps, State> {
   state: State = {
     currentlySelectedClient: null,
     loadingTimeoutId: undefined,
@@ -143,7 +145,7 @@ class ClientList extends React.Component<CombinedProps, State> {
   }
 }
 
-export default withRouter(
+export const ClientList = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -164,6 +166,6 @@ export default withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
       }
-    )(ClientList)
+    )(_ClientList)
   )
 );

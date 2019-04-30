@@ -19,9 +19,23 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
+import {createRandomUuid} from 'Util/util';
+
 import {backendConfig} from '../../api/testResolver';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {ClientEvent} from 'src/script/event/Client';
+import {BackendEvent} from 'src/script/event/Backend';
+
+import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
+import {ConversationType} from 'src/script/conversation/ConversationType';
+import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+
+import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -36,10 +50,10 @@ describe('ConversationRepository', () => {
   };
 
   const _generate_conversation = (
-    conversation_type = z.conversation.ConversationType.GROUP,
+    conversation_type = ConversationType.GROUP,
     connection_status = z.connection.ConnectionStatus.ACCEPTED
   ) => {
-    const conversation = new Conversation(z.util.createRandomUuid());
+    const conversation = new Conversation(createRandomUuid());
     conversation.type(conversation_type);
 
     const connectionEntity = new z.connection.ConnectionEntity();
@@ -56,11 +70,11 @@ describe('ConversationRepository', () => {
     sinon.spy(jQuery, 'ajax');
 
     return test_factory.exposeConversationActors().then(conversation_repository => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       ({storageService: storage_service} = conversation_repository.conversation_service);
 
       spyOn(TestFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
-      conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
+      conversation_et = _generate_conversation(ConversationType.SELF);
       conversation_et.id = payload.conversations.knock.post.conversation;
 
       const ping_url = `${backendConfig.restUrl}/conversations/${conversation_et.id}/knock`;
@@ -88,12 +102,12 @@ describe('ConversationRepository', () => {
     let message_et = null;
 
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new z.entity.File();
-        file_et.status(z.assets.AssetTransferState.UPLOADING);
-        message_et = new z.entity.ContentMessage(z.util.createRandomUuid());
+        file_et.status(AssetTransferState.UPLOADING);
+        message_et = new z.entity.ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
         conversation_et.add_message(message_et);
 
@@ -110,14 +124,14 @@ describe('ConversationRepository', () => {
       const event = {
         conversation: conversation_et.id,
         data: {
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           otr_key: new Uint8Array([]),
           sha256: new Uint8Array([]),
         },
-        from: z.util.createRandomUuid(),
+        from: createRandomUuid(),
         id: message_et.id,
         time: Date.now(),
-        type: z.event.Client.CONVERSATION.ASSET_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
       return TestFactory.conversation_repository._on_asset_upload_complete(conversation_et, event).then(() => {
@@ -127,21 +141,21 @@ describe('ConversationRepository', () => {
 
         expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
         expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-        expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
+        expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
       });
     });
   });
 
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
-      conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+      conversation_et = _generate_conversation(ConversationType.GROUP);
       spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
     it('should not delete other users messages', done => {
       const user_et = new User();
       user_et.is_me = false;
-      const message_to_delete_et = new z.entity.Message(z.util.createRandomUuid());
+      const message_to_delete_et = new z.entity.Message(createRandomUuid());
       message_to_delete_et.user(user_et);
       conversation_et.add_message(message_to_delete_et);
 
@@ -160,7 +174,7 @@ describe('ConversationRepository', () => {
       const userEntity = new User();
       userEntity.is_me = true;
       const messageEntityToDelete = new z.entity.Message();
-      messageEntityToDelete.id = z.util.createRandomUuid();
+      messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
       conversation_et.add_message(messageEntityToDelete);
 
@@ -178,7 +192,7 @@ describe('ConversationRepository', () => {
 
   describe('filtered_conversations', () => {
     it('should not contain the self conversation', () => {
-      const self_conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
+      const self_conversation_et = _generate_conversation(ConversationType.SELF);
 
       return TestFactory.conversation_repository.save_conversation(self_conversation_et).then(() => {
         expect(
@@ -193,7 +207,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain a blocked conversations', () => {
       const blocked_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.BLOCKED
       );
 
@@ -210,7 +224,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain the conversation for a cancelled connection request', () => {
       const cancelled_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.CANCELLED
       );
 
@@ -227,7 +241,7 @@ describe('ConversationRepository', () => {
 
     it('should not contain the conversation for a pending connection request', () => {
       const pending_conversation_et = _generate_conversation(
-        z.conversation.ConversationType.ONE2ONE,
+        ConversationType.ONE2ONE,
         z.connection.ConnectionStatus.PENDING
       );
 
@@ -271,27 +285,27 @@ describe('ConversationRepository', () => {
 
   describe('getGroupsByName', () => {
     beforeEach(() => {
-      const group_a = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_a = _generate_conversation(ConversationType.GROUP);
       group_a.name('Web Dudes');
 
-      const group_b = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_b = _generate_conversation(ConversationType.GROUP);
       group_b.name('René, Benny, Gregor, Lipis');
 
-      const group_c = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_c = _generate_conversation(ConversationType.GROUP);
       self_user_et = new User();
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
-      const group_cleared = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_cleared = _generate_conversation(ConversationType.GROUP);
       group_cleared.name('Cleared');
       group_cleared.last_event_timestamp(Date.now() - 1000);
       group_cleared.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
 
-      const group_removed = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const group_removed = _generate_conversation(ConversationType.GROUP);
       group_removed.name('Removed');
       group_removed.last_event_timestamp(Date.now() - 1000);
       group_removed.setTimestamp(Date.now(), Conversation.TIMESTAMP_TYPE.CLEARED);
-      group_removed.status(z.conversation.ConversationStatus.PAST_MEMBER);
+      group_removed.status(ConversationStatus.PAST_MEMBER);
 
       return Promise.all([
         TestFactory.conversation_repository.save_conversation(group_a),
@@ -340,7 +354,7 @@ describe('ConversationRepository', () => {
     it('gets messages which are not broken by design', () => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new User()));
 
-      conversation_et = new Conversation(z.util.createRandomUuid());
+      conversation_et = new Conversation(createRandomUuid());
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const bad_message = {"conversation":`${conversation_et.id}`,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"};
@@ -351,8 +365,8 @@ describe('ConversationRepository', () => {
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
       return storage_service
-        .save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(z.storage.StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
+        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
+        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
@@ -415,11 +429,11 @@ describe('ConversationRepository', () => {
 
   describe('"_handleConversationEvent"', () => {
     it('detects events send by a user not in the conversation', () => {
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const conversationEntity = _generate_conversation(ConversationType.GROUP);
       const event = {
         conversation: conversationEntity.id,
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
         time: '2017-09-06T09:43:36.528Z',
         data: {},
         type: 'conversation.message-add',
@@ -526,8 +540,8 @@ describe('ConversationRepository', () => {
       });
 
       it('removes a file upload from the messages list of the sender when the upload gets canceled', () => {
-        const conversation_id = z.util.createRandomUuid();
-        const message_id = z.util.createRandomUuid();
+        const conversation_id = createRandomUuid();
+        const message_id = createRandomUuid();
         const sending_user_id = TestFactory.user_repository.self().id;
 
         // prettier-ignore
@@ -558,9 +572,9 @@ describe('ConversationRepository', () => {
       });
 
       it('removes a file upload from the messages list of the receiver when the upload gets canceled', () => {
-        const conversation_id = z.util.createRandomUuid();
-        const message_id = z.util.createRandomUuid();
-        const sending_user_id = z.util.createRandomUuid();
+        const conversation_id = createRandomUuid();
+        const message_id = createRandomUuid();
+        const sending_user_id = createRandomUuid();
 
         // prettier-ignore
         const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
@@ -590,8 +604,8 @@ describe('ConversationRepository', () => {
       });
 
       it("shows a failed message on the sender's side if the upload fails", () => {
-        const conversation_id = z.util.createRandomUuid();
-        const message_id = z.util.createRandomUuid();
+        const conversation_id = createRandomUuid();
+        const message_id = createRandomUuid();
         const sending_user_id = TestFactory.user_repository.self().id;
 
         // prettier-ignore
@@ -632,8 +646,8 @@ describe('ConversationRepository', () => {
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
-        conversationId = z.util.createRandomUuid();
-        createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
+        conversationId = createRandomUuid();
+        createEvent = {conversation: conversationId, data: {}, type: BackendEvent.CONVERSATION.CREATE};
       });
 
       it('should process create event for a new conversation created locally', () => {
@@ -702,9 +716,9 @@ describe('ConversationRepository', () => {
       let message_et = undefined;
 
       beforeEach(() => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+        conversation_et = _generate_conversation(ConversationType.GROUP);
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          message_et = new z.entity.Message(z.util.createRandomUuid());
+          message_et = new z.entity.Message(createRandomUuid());
           message_et.from = TestFactory.user_repository.self().id;
           conversation_et.add_message(message_et);
 
@@ -721,10 +735,10 @@ describe('ConversationRepository', () => {
           data: {
             message_id: message_et.id,
           },
-          from: z.util.createRandomUuid(),
-          id: z.util.createRandomUuid(),
+          from: createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -749,9 +763,9 @@ describe('ConversationRepository', () => {
             message_id: message_et.id,
           },
           from: TestFactory.user_repository.self().id,
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -764,7 +778,7 @@ describe('ConversationRepository', () => {
 
       it('should delete message and add delete message if user is not self', () => {
         spyOn(TestFactory.event_service, 'deleteEvent');
-        const other_user_id = z.util.createRandomUuid();
+        const other_user_id = createRandomUuid();
         message_et.from = other_user_id;
 
         const message_delete_event = {
@@ -773,9 +787,9 @@ describe('ConversationRepository', () => {
             message_id: message_et.id,
           },
           from: other_user_id,
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -788,7 +802,7 @@ describe('ConversationRepository', () => {
 
       it('should delete message and skip adding delete message for ephemeral messages', () => {
         spyOn(TestFactory.event_service, 'deleteEvent');
-        const other_user_id = z.util.createRandomUuid();
+        const other_user_id = createRandomUuid();
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
 
@@ -798,9 +812,9 @@ describe('ConversationRepository', () => {
             message_id: message_et.id,
           },
           from: other_user_id,
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+          type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
@@ -816,10 +830,10 @@ describe('ConversationRepository', () => {
       let messageId = null;
 
       beforeEach(() => {
-        conversation_et = _generate_conversation(z.conversation.ConversationType.GROUP);
+        conversation_et = _generate_conversation(ConversationType.GROUP);
 
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          const messageToHideEt = new z.entity.Message(z.util.createRandomUuid());
+          const messageToHideEt = new z.entity.Message(createRandomUuid());
           conversation_et.add_message(messageToHideEt);
 
           messageId = messageToHideEt.id;
@@ -834,10 +848,10 @@ describe('ConversationRepository', () => {
             message_id: messageId,
             conversation_id: conversation_et.id,
           },
-          from: z.util.createRandomUuid(),
-          id: z.util.createRandomUuid(),
+          from: createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
@@ -863,9 +877,9 @@ describe('ConversationRepository', () => {
             conversation_id: conversation_et.id,
           },
           from: TestFactory.user_repository.self().id,
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
@@ -879,15 +893,15 @@ describe('ConversationRepository', () => {
       it('should not hide message if not send via self conversation', () => {
         spyOn(TestFactory.event_service, 'deleteEvent');
         const messageHiddenEvent = {
-          conversation: z.util.createRandomUuid(),
+          conversation: createRandomUuid(),
           data: {
             message_id: messageId,
             conversation_id: conversation_et.id,
           },
           from: TestFactory.user_repository.self().id,
-          id: z.util.createRandomUuid(),
+          id: createRandomUuid(),
           time: new Date().toISOString(),
-          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+          type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
@@ -900,8 +914,8 @@ describe('ConversationRepository', () => {
 
       it('syncs message deletion with the database', () => {
         const deletedMessagePayload = {
-          conversation: z.util.createRandomUuid(),
-          id: z.util.createRandomUuid(),
+          conversation: createRandomUuid(),
+          id: createRandomUuid(),
         };
 
         const conversationEntity = new Conversation();
@@ -932,10 +946,10 @@ describe('ConversationRepository', () => {
           });
           const genericMessage = new GenericMessage({
             [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: text,
-            messageId: z.util.createRandomUuid(),
+            messageId: createRandomUuid(),
           });
 
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, largeConversationEntity.id);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
@@ -952,10 +966,10 @@ describe('ConversationRepository', () => {
         .then(() => {
           const genericMessage = new GenericMessage({
             [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
-            messageId: z.util.createRandomUuid(),
+            messageId: createRandomUuid(),
           });
 
-          const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage, smallConversationEntity.id);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
           return TestFactory.conversation_repository._shouldSendAsExternal(eventInfoEntity);
         })
         .then(shouldSendAsExternal => {
@@ -997,7 +1011,7 @@ describe('ConversationRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser(new User(z.util.createRandomUuid()));
+        conversation.selfUser(new User(createRandomUuid()));
         const messageText = 'hello there';
         return conversationRepository.sendTextWithLinkPreview(conversation, messageText);
       });
@@ -1041,18 +1055,18 @@ describe('ConversationRepository', () => {
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);
 
-      const dudes = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const dudes = _generate_conversation(ConversationType.GROUP);
       dudes.name('Web Dudes');
       dudes.participating_user_ets.push(bob);
       dudes.participating_user_ets.push(john);
 
-      const gals = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const gals = _generate_conversation(ConversationType.GROUP);
       gals.name('Web Gals');
       gals.participating_user_ets.push(anne);
       gals.participating_user_ets.push(jane);
       gals.participating_user_ets.push(lara);
 
-      const mixed_group = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const mixed_group = _generate_conversation(ConversationType.GROUP);
       mixed_group.name('Web Dudes & Gals');
       mixed_group.participating_user_ets.push(anne);
       mixed_group.participating_user_ets.push(bob);
@@ -1090,16 +1104,13 @@ describe('ConversationRepository', () => {
 
   describe('addMissingMember', () => {
     it('injects a member-join event if unknown user is detected', () => {
-      const conversationId = z.util.createRandomUuid();
+      const conversationId = createRandomUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(Promise.resolve({}));
       spyOn(z.conversation.EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return TestFactory.conversation_repository.addMissingMember(conversationId, ['unknown-user-id']).then(() => {
-        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(
-          event,
-          z.event.EventRepository.SOURCE.INJECTED
-        );
+        expect(TestFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
       });
     });
   });
@@ -1111,7 +1122,7 @@ describe('ConversationRepository', () => {
       TestFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.ONE2ONE);
+      const conversationEntity = _generate_conversation(ConversationType.ONE2ONE);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the account-level preference wins
@@ -1126,7 +1137,7 @@ describe('ConversationRepository', () => {
       TestFactory.propertyRepository.receiptMode(preferenceMode);
 
       // Set the opposite receipt mode on conversation-level
-      const conversationEntity = _generate_conversation(z.conversation.ConversationType.GROUP);
+      const conversationEntity = _generate_conversation(ConversationType.GROUP);
       conversationEntity.receiptMode(!preferenceMode);
 
       // Verify that the conversation-level preference wins

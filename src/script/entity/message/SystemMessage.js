@@ -17,7 +17,9 @@
  *
  */
 
-import Message from './Message';
+import {Message} from './Message';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -25,14 +27,14 @@ window.z.entity = z.entity || {};
 class SystemMessage extends Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.SYSTEM;
-    this.system_message_type = z.message.SystemMessageType.NORMAL;
+    this.super_type = SuperType.SYSTEM;
+    this.system_message_type = SystemMessageType.NORMAL;
   }
 
   is_conversation_rename() {
-    return this.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
+    return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }
 
-export default SystemMessage;
+export {SystemMessage};
 z.entity.SystemMessage = SystemMessage;

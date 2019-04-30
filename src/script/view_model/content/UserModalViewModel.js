@@ -17,7 +17,7 @@
  *
  */
 
-import {Actions} from '../../components/panel/userActions';
+import {Actions} from 'Components/panel/userActions';
 
 export class UserModalViewModel {
   constructor(userRepository, actionsViewModel) {

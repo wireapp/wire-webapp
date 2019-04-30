@@ -17,8 +17,11 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+
+import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
+import {Context} from '../ui/ContextMenu';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -52,7 +55,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
         label: t('ephemeralUnitsNone'),
       },
     ].concat(
-      z.ephemeral.timings.VALUES.map(milliseconds => {
+      EphemeralTimings.VALUES.map(milliseconds => {
         const {text} = TimeUtil.formatDuration(milliseconds);
 
         return {
@@ -62,7 +65,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
       })
     );
 
-    z.ui.Context.from(event, entries, 'message-timer-menu');
+    Context.from(event, entries, 'message-timer-menu');
   }
 };
 

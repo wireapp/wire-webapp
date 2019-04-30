@@ -17,7 +17,8 @@
  *
  */
 
-import WebappProperties from 'src/script/properties/WebappProperties';
+import {WebappProperties} from 'src/script/properties/WebappProperties';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('z.tracking.EventTrackingRepository', () => {
   const test_factory = new TestFactory();
@@ -59,16 +60,16 @@ describe('z.tracking.EventTrackingRepository', () => {
       return TestFactory.tracking_repository.init(true).then(() => {
         expect(TestFactory.tracking_repository.isErrorReportingActivated).toBe(true);
         expect(TestFactory.tracking_repository.isUserAnalyticsActivated).toBe(true);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_an_event');
 
         expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(1);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_another_event');
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_another_event');
 
         expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(2);
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, false);
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, false);
 
         expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(3);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_tracking');
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_not_tracking');
 
         expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(3);
       });
@@ -83,7 +84,7 @@ describe('z.tracking.EventTrackingRepository', () => {
     });
 
     it('immediately reports events', () => {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_an_event');
 
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalled();
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledTimes(1);
@@ -96,7 +97,7 @@ describe('z.tracking.EventTrackingRepository', () => {
         Section: 'Sports',
       };
 
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, event_name, attributes);
 
       expect(TestFactory.tracking_repository._trackEvent).toHaveBeenCalledWith(event_name, attributes);
     });

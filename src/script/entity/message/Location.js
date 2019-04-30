@@ -17,8 +17,8 @@
  *
  */
 
-import Asset from './Asset';
-import AssetType from '../../assets/AssetType';
+import {Asset} from './Asset';
+import {AssetType} from '../../assets/AssetType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};

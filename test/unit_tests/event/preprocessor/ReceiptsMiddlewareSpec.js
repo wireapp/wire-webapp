@@ -17,13 +17,14 @@
  *
  */
 
-// KARMA_SPECS=event/preprocessor/ReceiptsMiddleware yarn test:app
-
 import UUID from 'uuidjs';
-import ReceiptsMiddleware from 'src/script/event/preprocessor/ReceiptsMiddleware';
+
+import {noop} from 'Util/util';
+
+import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
+import {ClientEvent} from 'src/script/event/Client';
 
 describe('ReceiptsMiddleware', () => {
-  const noop = () => {};
   const selfId = UUID.genV4();
   let readReceiptMiddleware;
   const eventService = {loadEvents: noop, replaceEvent: noop};
@@ -119,6 +120,6 @@ function createConfirmationEvent(status, moreMessageIds = []) {
     },
     from: UUID.genV4(),
     time: '12-12-12',
-    type: z.event.Client.CONVERSATION.CONFIRMATION,
+    type: ClientEvent.CONVERSATION.CONFIRMATION,
   };
 }

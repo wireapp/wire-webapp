@@ -18,6 +18,9 @@
  */
 
 import Long from 'long';
+
+import {ClientEvent} from '../event/Client';
+
 const crypto = window.crypto;
 
 window.z = window.z || {};
@@ -77,7 +80,7 @@ z.message.MessageHasher = (() => {
    * @returns {ArrayBuffer} hashBuffer - buffer containing the bytes of the hash
    */
   const hashEvent = event => {
-    const EventTypes = z.event.Client.CONVERSATION;
+    const EventTypes = ClientEvent.CONVERSATION;
     const specificBytesGenerators = {
       [EventTypes.MESSAGE_ADD]: getTextBytes,
       [EventTypes.LOCATION]: getLocationBytes,

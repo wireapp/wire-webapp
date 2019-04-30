@@ -17,7 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+
+import {MediaType} from '../../media/MediaType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -39,7 +42,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
-    this.logger = Logger('z.viewModel.content.PreferencesAVViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesAVViewModel');
 
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
@@ -78,7 +81,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.permissionDenied = ko.observable(false);
 
     this.supportsAudioOutput = ko.pureComputed(() => {
-      return this.deviceSupport.audioOutput() && z.util.Environment.browser.supports.audioOutputSelection;
+      return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;
     });
   }
 
@@ -119,9 +122,9 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   _checkMediaSupport() {
     let mediaType;
     if (this.deviceSupport.audioInput()) {
-      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+      mediaType = this.deviceSupport.videoInput() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
     } else {
-      mediaType = this.deviceSupport.videoInput() ? z.media.MediaType.VIDEO : undefined;
+      mediaType = this.deviceSupport.videoInput() ? MediaType.VIDEO : undefined;
     }
 
     return mediaType
@@ -136,7 +139,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _getCurrentMediaStream() {
     const hasActiveStream = this.deviceSupport.videoInput()
-      ? !!this.mediaStream() && this.streamHandler.localMediaType() === z.media.MediaType.VIDEO
+      ? !!this.mediaStream() && this.streamHandler.localMediaType() === MediaType.VIDEO
       : !!this.mediaStream();
 
     return Promise.resolve(hasActiveStream ? this.mediaStream() : undefined);
@@ -165,7 +168,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
       })
       .then(mediaStreamInfo => {
         if (this.deviceSupport.videoInput()) {
-          this.streamHandler.localMediaType(z.media.MediaType.VIDEO);
+          this.streamHandler.localMediaType(MediaType.VIDEO);
         }
 
         this.streamHandler.localMediaStream(mediaStreamInfo.stream);

@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -32,11 +32,11 @@ z.connection.ConnectionService = class ConnectionService {
   /**
    * Construct a new Connection Service.
    * @class z.connection.ConnectionService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.connection.ConnectionService');
+    this.logger = getLogger('z.connection.ConnectionService');
   }
 
   /**

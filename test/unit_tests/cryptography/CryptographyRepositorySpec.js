@@ -22,6 +22,10 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
+import {createRandomUuid, arrayToBase64} from 'Util/util';
+
+import {ClientEvent} from 'src/script/event/Client';
+
 describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
@@ -75,7 +79,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const generic_message = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       const recipients = {};
@@ -116,7 +120,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const genericMessage = new GenericMessage({
         [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
-        messageId: z.util.createRandomUuid(),
+        messageId: createRandomUuid(),
       });
 
       const cipherText = await bob.encrypt(
@@ -124,14 +128,14 @@ describe('z.cryptography.CryptographyRepository', () => {
         GenericMessage.encode(genericMessage).finish(),
         aliceBundle.serialise()
       );
-      const encodedCipherText = z.util.arrayToBase64(cipherText);
+      const encodedCipherText = arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {
           text: encodedCipherText,
         },
-        from: z.util.createRandomUuid(),
-        id: z.util.createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
       };
 
       const decrypted = await TestFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
@@ -157,7 +161,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT);
       });
     });
 
@@ -175,7 +179,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
 
@@ -193,7 +197,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       return TestFactory.cryptography_repository.handleEncryptedEvent(event).then(mapped_event => {
-        expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+        expect(mapped_event.type).toBe(ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
       });
     });
   });

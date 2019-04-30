@@ -18,7 +18,10 @@
  */
 
 import ko from 'knockout';
-import AbstractAssetTransferStateTracker from '../AbstractAssetTransferStateTracker';
+
+import {noop} from 'Util/util';
+
+import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';
 
 import '../assetLoader';
 
@@ -49,8 +52,6 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     }
 
     this.isPlaying = ko.observable(false);
-
-    const noop = () => {};
 
     this.onClickPlay = typeof params.play === 'function' ? () => params.play() : noop;
     this.onClickPause = typeof params.pause === 'function' ? () => params.pause() : noop;

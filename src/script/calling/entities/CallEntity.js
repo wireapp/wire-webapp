@@ -17,21 +17,28 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {getRandomNumber} from 'Util/NumberUtil';
+
+import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
+import {CALL_STATE} from '../enum/CallState';
+import {CALL_STATE_GROUP} from '../enum/CallStateGroup';
+import {TERMINATION_REASON} from '../enum/TerminationReason';
+
 import {CallLogger} from '../../telemetry/calling/CallLogger';
-import CALL_MESSAGE_TYPE from '../enum/CallMessageType';
-import CALL_STATE from '../enum/CallState';
-import CALL_STATE_GROUP from '../enum/CallStateGroup';
-import TERMINATION_REASON from '../enum/TerminationReason';
-import {getRandomNumber} from 'utils/NumberUtil';
+import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
+
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
+import {AvailabilityType} from '../../user/AvailabilityType';
+import {MediaType} from '../../media/MediaType';
+import {ParticipantEntity} from './ParticipantEntity';
+import {AudioType} from '../../audio/AudioType';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
+import {WebAppEvents} from '../../event/WebApp';
+import {EventRepository} from '../../event/EventRepository';
 
-z.calling.entities.CallEntity = class CallEntity {
+export class CallEntity {
   static get CONFIG() {
     return {
       GROUP_CHECK: {
@@ -50,7 +57,6 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Construct a new call entity.
    *
-   * @class z.calling.entities.Call
    * @param {Conversation} conversationEntity - Conversation the call takes place in
    * @param {User} creatingUser - Entity of user starting the call
    * @param {string} sessionId - Session ID to identify call
@@ -68,8 +74,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.id = conversationId;
 
-    const loggerName = 'z.calling.entities.CallEntity';
-    this.callLogger = new CallLogger(loggerName, this.id, this.messageLog);
+    this.callLogger = new CallLogger('CallEntity', this.id, this.messageLog);
 
     this.callLogger.info(`Created new call entity in conversation ${this.id}`);
 
@@ -103,7 +108,7 @@ z.calling.entities.CallEntity = class CallEntity {
     // Media
     this.localMediaStream = mediaStreamHandler.localMediaStream;
     this.localMediaType = mediaStreamHandler.localMediaType;
-    this.remoteMediaType = ko.observable(z.media.MediaType.NONE);
+    this.remoteMediaType = ko.observable(MediaType.NONE);
 
     // Statistics
     this._resetTimer();
@@ -122,8 +127,8 @@ z.calling.entities.CallEntity = class CallEntity {
     this.isEndedState = ko.pureComputed(() => CALL_STATE_GROUP.IS_ENDED.includes(this.state()));
 
     this.isOngoingOnAnotherClient = ko.pureComputed(() => this.selfUserJoined() && !this.selfClientJoined());
-    this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.SCREEN);
-    this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === z.media.MediaType.VIDEO);
+    this.isRemoteScreenSend = ko.pureComputed(() => this.remoteMediaType() === MediaType.SCREEN);
+    this.isRemoteVideoSend = ko.pureComputed(() => this.remoteMediaType() === MediaType.VIDEO);
 
     this.isLocalVideoCall = ko.pureComputed(() => this.selfState.screenSend() || this.selfState.videoSend());
     this.isRemoteVideoCall = ko.pureComputed(() => this.isRemoteScreenSend() || this.isRemoteVideoSend());
@@ -170,9 +175,9 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.networkInterruption.subscribe(isInterrupted => {
       if (isInterrupted) {
-        return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+        return amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, AudioType.NETWORK_INTERRUPTION);
       }
-      amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+      amplify.publish(WebAppEvents.AUDIO.STOP, AudioType.NETWORK_INTERRUPTION);
     });
 
     this.selfClientJoined.subscribe(isJoined => {
@@ -180,7 +185,7 @@ z.calling.entities.CallEntity = class CallEntity {
         this.isConnected(false);
 
         if (this.isOngoing() || this.isDisconnecting()) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.TALK_LATER);
         }
 
         if (this.terminationReason) {
@@ -209,7 +214,11 @@ z.calling.entities.CallEntity = class CallEntity {
         const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
           const isIncomingCall = state === CALL_STATE.INCOMING;
-          this._onStateStartRinging(isIncomingCall);
+          const isUserAway = this.selfUser.availability() === AvailabilityType.AWAY;
+          const dontPlaySound = isIncomingCall && isUserAway;
+          if (!dontPlaySound) {
+            this._onStateStartRinging(isIncomingCall);
+          }
         } else {
           this._onStateStopRinging();
         }
@@ -237,7 +246,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Deactivate the call.
    *
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message for deactivation
+   * @param {CallMessageEntity} callMessageEntity - Call message for deactivation
    * @param {boolean} fromSelf - Deactivation triggered by self user change
    * @param {TERMINATION_REASON} [terminationReason=TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {Promise<boolean>} Resolves with a boolean whether the call was deleted
@@ -271,9 +280,7 @@ z.calling.entities.CallEntity = class CallEntity {
       this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
     }
 
-    const eventSource = onGroupCheck
-      ? z.event.EventRepository.SOURCE.INJECTED
-      : z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const eventSource = onGroupCheck ? EventRepository.SOURCE.INJECTED : EventRepository.SOURCE.WEB_SOCKET;
 
     callMessageEntity.userId = this.creatingUser.id;
     this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
@@ -292,7 +299,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Join the call.
-   * @param {z.media.MediaType} [mediaType] - Media type of the call
+   * @param {MediaType} [mediaType] - Media type of the call
    * @returns {void} No return value
    */
   joinCall(mediaType) {
@@ -317,12 +324,12 @@ z.calling.entities.CallEntity = class CallEntity {
    * Join group call.
    *
    * @private
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type of the call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type of the call
    * @returns {void} No return value
    */
-  _joinGroupCall(mediaType = z.media.MediaType.AUDIO) {
+  _joinGroupCall(mediaType = MediaType.AUDIO) {
     const additionalPayload = CallMessageBuilder.createPayload(this.id, this.selfUser.id);
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
 
     const response = !this.isOutgoing();
     const propSync = CallMessageBuilder.createPropSync(this.selfState, additionalPayload, videoSend);
@@ -376,7 +383,7 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Check if group call should continue after participant left.
    *
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Last member leaving call
+   * @param {CallMessageEntity} callMessageEntity - Last member leaving call
    * @param {TERMINATION_REASON} terminationReason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
@@ -431,12 +438,12 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Toggle media of this call.
-   * @param {z.media.MediaType} mediaType - MediaType to toggle
+   * @param {MediaType} mediaType - MediaType to toggle
    * @returns {Promise} Resolves when state has been toggled
    */
   toggleMedia(mediaType) {
-    const toggledVideo = mediaType === z.media.MediaType.SCREEN && !this.selfState.videoSend();
-    const toggledScreen = mediaType === z.media.MediaType.VIDEO && !this.selfState.screenSend();
+    const toggledVideo = mediaType === MediaType.SCREEN && !this.selfState.videoSend();
+    const toggledScreen = mediaType === MediaType.VIDEO && !this.selfState.screenSend();
     if (toggledVideo || toggledScreen) {
       this.telemetry.setAVToggled();
     }
@@ -544,7 +551,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Confirm an incoming message.
-   * @param {z.calling.entities.CallMessageEntity} incomingCallMessageEntity - Incoming call message to be confirmed
+   * @param {CallMessageEntity} incomingCallMessageEntity - Incoming call message to be confirmed
    * @returns {Promise} Resolves when message was confirmed
    */
   confirmMessage(incomingCallMessageEntity) {
@@ -576,7 +583,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Send call message.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to be send
+   * @param {CallMessageEntity} callMessageEntity - Call message to be send
    * @returns {Promise} Resolves when the event has been send
    */
   sendCallMessage(callMessageEntity) {
@@ -585,7 +592,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Set remote version of call
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to get remote version from
+   * @param {CallMessageEntity} callMessageEntity - Call message to get remote version from
    * @returns {undefined} No return value
    */
   setRemoteVersion(callMessageEntity) {
@@ -641,8 +648,8 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _playRingTone(isIncoming) {
-    const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, audioId);
+    const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
+    amplify.publish(WebAppEvents.AUDIO.PLAY_IN_LOOP, audioId);
   }
 
   /**
@@ -657,10 +664,10 @@ z.calling.entities.CallEntity = class CallEntity {
       this._stopRingTone(isIncoming);
 
       if (isIncoming) {
-        return this.isGroup ? this.rejectCall(false) : amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
+        return this.isGroup ? this.rejectCall(false) : amplify.publish(WebAppEvents.CALL.STATE.DELETE, this.id);
       }
 
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
+      amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.id, TERMINATION_REASON.TIMEOUT);
     }, CallEntity.CONFIG.STATE_TIMEOUT);
   }
 
@@ -672,8 +679,8 @@ z.calling.entities.CallEntity = class CallEntity {
    * @returns {undefined} No return value
    */
   _stopRingTone(isIncoming) {
-    const audioId = isIncoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, audioId);
+    const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
+    amplify.publish(WebAppEvents.AUDIO.STOP, audioId);
   }
 
   /**
@@ -686,16 +693,16 @@ z.calling.entities.CallEntity = class CallEntity {
 
     this.participants().forEach(({activeState}) => {
       if (activeState.screenSend()) {
-        this.remoteMediaType(z.media.MediaType.SCREEN);
+        this.remoteMediaType(MediaType.SCREEN);
         mediaTypeChanged = true;
       } else if (activeState.videoSend()) {
-        this.remoteMediaType(z.media.MediaType.VIDEO);
+        this.remoteMediaType(MediaType.VIDEO);
         mediaTypeChanged = true;
       }
     });
 
     if (!mediaTypeChanged) {
-      this.remoteMediaType(z.media.MediaType.AUDIO);
+      this.remoteMediaType(MediaType.AUDIO);
     }
   }
 
@@ -708,7 +715,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - User ID of the call participant
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message for participant change
+   * @param {CallMessageEntity} [callMessageEntity] - Call message for participant change
    * @returns {Promise} Resolves with participant entity
    */
   addOrUpdateParticipant(userId, negotiate, callMessageEntity) {
@@ -749,13 +756,13 @@ z.calling.entities.CallEntity = class CallEntity {
         if (this.selfClientJoined()) {
           switch (terminationReason) {
             case TERMINATION_REASON.OTHER_USER: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.TALK_LATER);
               break;
             }
 
             case TERMINATION_REASON.CONNECTION_DROP:
             case TERMINATION_REASON.MEMBER_LEAVE: {
-              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
+              amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.CALL_DROP);
               break;
             }
 
@@ -818,7 +825,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Verify call message belongs to call by session id.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity
+   * @param {CallMessageEntity} callMessageEntity - Call message entity
    * @returns {Promise} Resolves with the Call entity if verification passed
    */
   verifySessionId(callMessageEntity) {
@@ -844,7 +851,7 @@ z.calling.entities.CallEntity = class CallEntity {
    *
    * @param {string} userId - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message entity for participant change
+   * @param {CallMessageEntity} [callMessageEntity] - Call message entity for participant change
    * @returns {Promise} Resolves with the added participant
    */
   _addParticipant(userId, negotiate, callMessageEntity) {
@@ -855,7 +862,7 @@ z.calling.entities.CallEntity = class CallEntity {
     }
 
     return this.userRepository.get_user_by_id(userId).then(userEntity => {
-      const participantEntity = new z.calling.entities.ParticipantEntity(this, userEntity, this.timings);
+      const participantEntity = new ParticipantEntity(this, userEntity, this.timings);
 
       this.participants.push(participantEntity);
 
@@ -875,9 +882,9 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Update call participant with call message.
    *
-   * @param {z.calling.entities.ParticipantEntity} participantEntity - Participant entity to be updated in the call
+   * @param {ParticipantEntity} participantEntity - Participant entity to be updated in the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message to update user with
+   * @param {CallMessageEntity} callMessageEntity - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _updateParticipant(participantEntity, negotiate, callMessageEntity) {
@@ -900,9 +907,9 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Update call participant state.
    *
-   * @param {z.calling.entities.ParticipantEntity} participantEntity - User ID to be added to the call
+   * @param {ParticipantEntity} participantEntity - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {z.calling.entities.CallMessageEntity} [callMessageEntity] - Call message to update user with
+   * @param {CallMessageEntity} [callMessageEntity] - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _updateParticipantState(participantEntity, negotiate, callMessageEntity) {
@@ -929,7 +936,7 @@ z.calling.entities.CallEntity = class CallEntity {
 
   /**
    * Get all flows of the call.
-   * @returns {Array<z.calling.entities.FlowEntity>} Array of flows
+   * @returns {Array<FlowEntity>} Array of flows
    */
   getFlows() {
     return this.participants()
@@ -948,12 +955,12 @@ z.calling.entities.CallEntity = class CallEntity {
   /**
    * Initiate the call telemetry.
    * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateTelemetry(direction, mediaType = z.media.MediaType.AUDIO) {
+  initiateTelemetry(direction, mediaType = MediaType.AUDIO) {
     this.telemetry.initiateNewCall(direction, mediaType);
-    this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
+    this.timings = new CallSetupTimings(this.id);
   }
 
   /**
@@ -1026,7 +1033,7 @@ z.calling.entities.CallEntity = class CallEntity {
     this.isConnected(false);
     this.sessionId = undefined;
     this.terminationReason = undefined;
-    amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
+    amplify.publish(WebAppEvents.AUDIO.STOP, AudioType.NETWORK_INTERRUPTION);
   }
 
   /**
@@ -1076,4 +1083,4 @@ z.calling.entities.CallEntity = class CallEntity {
   logTimings() {
     this.getFlows().forEach(flowEntity => flowEntity.logTimings());
   }
-};
+}

@@ -17,6 +17,10 @@
  *
  */
 
+import {Environment} from 'Util/Environment';
+
+import {SDP_TYPE} from './rtc/SDPType';
+
 export const SDPMapper = {
   CONFIG: {
     AUDIO_BITRATE: '30',
@@ -38,14 +42,14 @@ export const SDPMapper = {
 
   /**
    * Map call setup message to RTCSessionDescription.
-   * @param {z.calling.entities.CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   mapCallMessageToObject(callMessageEntity) {
     const {response, sdp: sdpString} = callMessageEntity;
     const sdp = {
       sdp: sdpString,
-      type: response ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
+      type: response ? SDP_TYPE.ANSWER : SDP_TYPE.OFFER,
     };
 
     return Promise.resolve(sdp);
@@ -68,10 +72,10 @@ export const SDPMapper = {
     const iceCandidates = [];
     let sessionDescription;
 
-    const isFirefox = z.util.Environment.browser.firefox;
+    const isFirefox = Environment.browser.firefox;
 
     const isLocalSdpInGroup = isLocalSdp && isGroup;
-    const isOffer = rtcSdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+    const isOffer = rtcSdp.type === SDP_TYPE.OFFER;
 
     sessionDescription = isLocalSdp ? sdp.replace('UDP/TLS/', '') : sdp;
 
@@ -88,11 +92,11 @@ export const SDPMapper = {
         if (isLocalSdp) {
           sdpLines.push(sdpLine);
 
-          const browserString = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
-          const webappVersion = z.util.Environment.version(false);
+          const browserString = `${Environment.browser.name} ${Environment.browser.version}`;
+          const webappVersion = Environment.version(false);
 
-          outline = z.util.Environment.desktop
-            ? `a=tool:electron ${z.util.Environment.version(true)} ${webappVersion} (${browserString})`
+          outline = Environment.desktop
+            ? `a=tool:electron ${Environment.version(true)} ${webappVersion} (${browserString})`
             : `a=tool:webapp ${webappVersion} (${browserString})`;
         }
       } else if (sdpLine.startsWith('a=candidate')) {

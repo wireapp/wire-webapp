@@ -17,13 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-window.z.event.preprocessor = z.event.preprocessor || {};
+import {ClientEvent} from '../Client';
+import {BackendEvent} from '../Backend';
 
-z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
+export class ServiceMiddleware {
   /**
    * Construct a new ServiceMiddleware.
    *
@@ -33,15 +32,15 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
   constructor(conversationRepository, userRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('z.event.preprocessor.ServiceMiddleware');
+    this.logger = getLogger('ServiceMiddleware');
   }
 
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+      case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this._process1To1ConversationCreationEvent(event);
 
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+      case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._processMemberJoinEvent(event);
 
       default:
@@ -84,4 +83,4 @@ z.event.preprocessor.ServiceMiddleware = class ServiceMiddleware {
     const updatedData = Object.assign({}, event.data, {has_service: true});
     return Object.assign({}, event, {data: updatedData});
   }
-};
+}

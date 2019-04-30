@@ -17,7 +17,7 @@
  *
  */
 
-export default class LinkPreview {
+export class LinkPreview {
   constructor(title, url) {
     this.title = title || '';
     this.url = url || '';

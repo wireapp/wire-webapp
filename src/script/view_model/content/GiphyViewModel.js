@@ -17,7 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+
+import {WebAppEvents} from '../../event/WebApp';
+import {Modal} from '../../ui/Modal';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -44,7 +47,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this.clickToSelectGif = this.clickToSelectGif.bind(this);
 
     this.giphyRepository = repositories.giphy;
-    this.logger = Logger('z.viewModel.content.GiphyViewModel');
+    this.logger = getLogger('z.viewModel.content.GiphyViewModel');
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
@@ -73,7 +76,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.showGiphy.bind(this));
+    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.showGiphy.bind(this));
   }
 
   clickOnBack() {
@@ -122,7 +125,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
   clickToSend() {
     const selectedGif = this.selectedGif();
     if (selectedGif) {
-      amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND, selectedGif.animated, this.query());
+      amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, this.query());
       this.selectedGif(undefined);
       this.modal.hide();
     }
@@ -135,7 +138,7 @@ z.viewModel.content.GiphyViewModel = class GiphyViewModel {
     this._getRandomGif();
 
     if (!this.modal) {
-      this.modal = new z.ui.Modal('#giphy-modal');
+      this.modal = new Modal('#giphy-modal');
     }
 
     this.modal.show();

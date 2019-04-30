@@ -17,9 +17,12 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+
 import {backendConfig} from '../../api/testResolver';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('z.connection.ConnectionRepository', () => {
   let server = undefined;
@@ -43,8 +46,8 @@ describe('z.connection.ConnectionRepository', () => {
     let userEntity = undefined;
 
     beforeEach(() => {
-      const userId = z.util.createRandomUuid();
-      const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
+      const userId = createRandomUuid();
+      const connectionEntity = new z.connection.ConnectionEntity(createRandomUuid());
       connectionEntity.userId = userId;
 
       userEntity = new User(userId);
@@ -62,7 +65,7 @@ describe('z.connection.ConnectionRepository', () => {
 
     it('it switches the conversation if requested', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
-      amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, amplifySpy);
+      amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
       return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
         expect(connectionRepository._updateStatus).toHaveBeenCalled();
@@ -77,11 +80,11 @@ describe('z.connection.ConnectionRepository', () => {
 
     beforeEach(() => {
       firstConnectionEntity = new z.connection.ConnectionEntity();
-      firstConnectionEntity.conversationId = z.util.createRandomUuid();
+      firstConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(firstConnectionEntity);
 
       secondConnectionEntity = new z.connection.ConnectionEntity();
-      secondConnectionEntity.conversationId = z.util.createRandomUuid();
+      secondConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(secondConnectionEntity);
     });
 

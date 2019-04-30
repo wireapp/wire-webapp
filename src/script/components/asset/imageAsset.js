@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
-import viewportObserver from '../../ui/viewportObserver';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import {viewportObserver} from '../../ui/viewportObserver';
 
 import './assetLoader';
 

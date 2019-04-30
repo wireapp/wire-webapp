@@ -17,14 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
-import trackingHelpers from '../../tracking/Helpers';
+import * as trackingHelpers from '../../tracking/Helpers';
+import {WebAppEvents} from '../../event/WebApp';
 
-export default class AddParticipantsViewModel extends BasePanelViewModel {
+export class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'AddParticipantsViewModel.STATE.ADD_PEOPLE',
@@ -42,7 +43,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
     this.teamRepository = team;
     this.userRepository = user;
 
-    this.logger = Logger('z.viewModel.panel.AddParticipantsViewModel');
+    this.logger = getLogger('z.viewModel.panel.AddParticipantsViewModel');
 
     this.isTeam = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
@@ -136,7 +137,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -178,7 +179,7 @@ export default class AddParticipantsViewModel extends BasePanelViewModel {
         });
       }
 
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
 }

@@ -17,9 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import File from './File';
-import AssetType from '../../assets/AssetType';
+import {getLogger} from 'Util/Logger';
+import {downloadBlob} from 'Util/util';
+
+import {File} from './File';
+import {AssetType} from '../../assets/AssetType';
 
 class MediumImage extends File {
   constructor(id) {
@@ -31,9 +33,9 @@ class MediumImage extends File {
     this.width = '0px';
     this.height = '0px';
 
-    // z.assets.AssetRemoteData
+    // AssetRemoteData
     this.resource = ko.observable();
-    this.logger = Logger('MediumImage');
+    this.logger = getLogger('MediumImage');
   }
 
   /**
@@ -44,9 +46,9 @@ class MediumImage extends File {
   download(filename) {
     return this.resource()
       .load()
-      .then(blob => z.util.downloadBlob(blob, filename))
+      .then(blob => downloadBlob(blob, filename))
       .catch(error => this.logger.error('Failed to download image', error));
   }
 }
 
-export default MediumImage;
+export {MediumImage};

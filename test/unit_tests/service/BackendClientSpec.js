@@ -18,6 +18,7 @@
  */
 
 import {resolve, graph} from './../../api/testResolver';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('BackendClient', () => {
   let backend_client = null;
@@ -154,7 +155,7 @@ describe('BackendClient', () => {
 
     it('should cache the request if it was unauthorized', done => {
       const token_refresh = jasmine.createSpy('token_refresh');
-      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
+      amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
 
       backend_client
         ._sendRequest(config)

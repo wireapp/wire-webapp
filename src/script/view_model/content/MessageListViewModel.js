@@ -17,16 +17,18 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
-import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
 
-import Conversation from '../../entity/Conversation';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
+import {t} from 'Util/LocalizerUtil';
+
+import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 /*
  * Message list rendering view model.
@@ -57,7 +59,7 @@ class MessageListViewModel {
     this.integrationRepository = repositories.integration;
     this.serverTimeHandler = repositories.serverTime;
     this.userRepository = repositories.user;
-    this.logger = Logger('MessageListViewModel');
+    this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userRepository.self;
@@ -71,7 +73,7 @@ class MessageListViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.INPUT.RESIZE, this._handleInputResize.bind(this));
+    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this._handleInputResize.bind(this));
 
     this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
@@ -406,7 +408,7 @@ class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
-        amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
@@ -428,16 +430,14 @@ class MessageListViewModel {
       return;
     }
 
-    this.conversation_repository
-      .get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
-      .then(items => {
-        const message_ets = items.filter(
-          item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF)
-        );
-        const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
+    this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
+      const message_ets = items.filter(
+        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF)
+      );
+      const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
-      });
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
+    });
   }
 
   get_timestamp_class(messageEntity) {
@@ -592,7 +592,7 @@ class MessageListViewModel {
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
           z.util.SanitizationUtil.safeWindowOpen(href);
         },
@@ -637,4 +637,4 @@ class MessageListViewModel {
   }
 }
 
-export default MessageListViewModel;
+export {MessageListViewModel};

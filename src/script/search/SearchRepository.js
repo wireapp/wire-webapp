@@ -17,7 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {EMOJI_RANGES} from 'Util/EmojiUtil';
+
+import {validateHandle} from '../user/UserHandleGenerator';
 
 window.z = window.z || {};
 window.z.search = z.search || {};
@@ -57,7 +60,7 @@ class SearchRepository {
   constructor(searchService, userRepository) {
     this.searchService = searchService;
     this.userRepository = userRepository;
-    this.logger = Logger('z.search.SearchRepository');
+    this.logger = getLogger('z.search.SearchRepository');
   }
 
   /**
@@ -103,7 +106,7 @@ class SearchRepository {
 
   _matches(term, property, userEntity) {
     const excludedEmojis = Array.from(term).reduce((emojis, char) => {
-      const isEmoji = z.util.EmojiUtil.UNICODE_RANGES.includes(char);
+      const isEmoji = EMOJI_RANGES.includes(char);
       return isEmoji ? Object.assign({}, emojis, {[char]: char}) : emojis;
     }, {});
     const value = typeof userEntity[property] === 'function' ? userEntity[property]() : userEntity[property];
@@ -156,7 +159,7 @@ class SearchRepository {
 
     const searchPromises = [directorySearch];
 
-    if (z.user.UserHandleGenerator.validate_handle(name)) {
+    if (validateHandle(name)) {
       searchPromises.push(this.userRepository.get_user_id_by_handle(name));
     }
 
@@ -190,5 +193,5 @@ class SearchRepository {
   }
 }
 
-export default SearchRepository;
 z.search.SearchRepository = SearchRepository;
+export {SearchRepository};

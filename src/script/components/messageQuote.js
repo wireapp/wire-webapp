@@ -19,6 +19,11 @@
 
 import moment from 'moment';
 
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
+
+import {WebAppEvents} from '../event/WebApp';
+import {QuoteEntity} from '../message/QuoteEntity';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -56,6 +61,8 @@ z.components.MessageQuote = class MessageQuote {
     this.quotedMessageId = ko.observable();
     this.error = ko.observable(quote().error);
 
+    this.includesOnlyEmojis = includesOnlyEmojis;
+
     this.quotedMessage.subscribe(() => this.showFullText(false));
 
     this.quotedMessageIsBeforeToday = ko.pureComputed(() => {
@@ -76,7 +83,7 @@ z.components.MessageQuote = class MessageQuote {
         })
         .catch(error => {
           if (error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-            return this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+            return this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;
         });
@@ -84,7 +91,7 @@ z.components.MessageQuote = class MessageQuote {
 
     const handleQuoteDeleted = messageId => {
       if (this.quotedMessageId() === messageId) {
-        this.error(z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+        this.error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         this.quotedMessage(undefined);
       }
     };
@@ -96,12 +103,12 @@ z.components.MessageQuote = class MessageQuote {
       }
     };
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
 
     this.removedFromView = () => {
-      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
-      amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleQuoteDeleted);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleQuoteUpdated);
     };
   }
 
@@ -147,7 +154,7 @@ ko.components.register('message-quote', {
             <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()),
                                                         event: {click: $parent.handleClickOnMessage},
                                                         css: {'message-quote__text--full': $parent.showFullText(),
-                                                              'message-quote__text--large': z.util.EmojiUtil.includesOnlyEmojies(asset.text)}"
+                                                              'message-quote__text--large': $parent.includesOnlyEmojis(asset.text)}"
               dir="auto" data-uie-name="media-text-quote"></div>
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">

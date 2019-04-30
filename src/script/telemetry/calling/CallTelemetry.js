@@ -17,19 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from '../../tracking/Helpers';
-import {ConversationType} from '../../tracking/attribute';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {sortObjectByKeys} from 'Util/util';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+import * as trackingHelpers from '../../tracking/Helpers';
+import {ConversationType} from '../../tracking/attribute';
+import {MediaType} from '../../media/MediaType';
+import {WebAppEvents} from '../../event/WebApp';
 
 // Call traces entity.
-z.telemetry.calling.CallTelemetry = class CallTelemetry {
+class CallTelemetry {
   constructor() {
-    this.logger = Logger('z.telemetry.calling.CallTelemetry');
+    this.logger = getLogger('CallTelemetry');
 
     this.sessions = {};
     this.remote_version = undefined;
@@ -37,7 +37,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     this.maxNumberOfParticipants = 0;
     this.direction = undefined;
 
-    this.mediaType = z.media.MediaType.AUDIO;
+    this.mediaType = MediaType.AUDIO;
   }
 
   //##############################################################################
@@ -49,7 +49,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {Object} Containing all the sessions
    */
   log_sessions() {
-    const sortedSessions = z.util.sortObjectByKeys(this.sessions, true);
+    const sortedSessions = sortObjectByKeys(this.sessions, true);
 
     this.logger.force_log('Your last session IDs:');
     Object.values(sortedSessions).forEach(trackingInfo => this.logger.force_log(trackingInfo.to_string()));
@@ -86,10 +86,10 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
    * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiateNewCall(direction, mediaType = z.media.MediaType.AUDIO) {
+  initiateNewCall(direction, mediaType = MediaType.AUDIO) {
     this.mediaType = mediaType;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
@@ -116,7 +116,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Reports call events for call tracking to Localytics.
    * @param {z.tracking.EventName} eventName - String for call event
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
@@ -124,7 +124,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     if (callEntity) {
       const {conversationEntity, isGroup} = callEntity;
 
-      const videoTypes = [z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+      const videoTypes = [MediaType.VIDEO, MediaType.AUDIO_VIDEO];
 
       attributes = Object.assign(
         {
@@ -148,12 +148,12 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       );
     }
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, eventName, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
   /**
    * Track the call duration.
-   * @param {z.calling.entities.CallEntity} callEntity - Call entity
+   * @param {CallEntity} callEntity - Call entity
    * @returns {undefined} No return value
    */
   track_duration(callEntity) {
@@ -178,4 +178,6 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   numberOfParticipantsChanged(newNumberOfParticipants) {
     this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
-};
+}
+
+export {CallTelemetry};

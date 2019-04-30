@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -29,7 +29,7 @@ window.z.connection = z.connection || {};
 z.connection.ConnectionMapper = class ConnectionMapper {
   // Construct a new connection mapper.
   constructor() {
-    this.logger = Logger('z.connection.ConnectionMapper');
+    this.logger = getLogger('z.connection.ConnectionMapper');
 
     /**
      * Converts JSON connection into connection entity.

@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {AudioType} from './AudioType';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioPreference} from './AudioPreference';
-import {NotificationHandlingState} from '../event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 
 import {WebAppEvents} from '../event/WebApp';
 
@@ -31,7 +31,7 @@ const AUDIO_PLAY_PERMISSION = {
   DISALLOWED_BY_PREFERENCES: 2,
 };
 
-export default class AudioRepository {
+export class AudioRepository {
   constructor(logger) {
     this.logger = logger;
     this.audioElements = {};
@@ -232,7 +232,7 @@ export default class AudioRepository {
   }
 
   setMutedState(handlingNotifications) {
-    const updatedMutedState = handlingNotifications !== NotificationHandlingState.WEB_SOCKET;
+    const updatedMutedState = handlingNotifications !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.muted !== updatedMutedState;
     if (isStateChange) {

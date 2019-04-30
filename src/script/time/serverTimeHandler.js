@@ -20,10 +20,10 @@
 /* eslint-disable sort-keys */
 import ko from 'knockout';
 
-import logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 export const serverTimeHandler = {
-  logger: logger('serverTimeHandler'),
+  logger: getLogger('serverTimeHandler'),
   timeOffset: ko.observable(undefined),
 
   computeTimeOffset(serverTimeString) {

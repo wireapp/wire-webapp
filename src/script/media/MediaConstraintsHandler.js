@@ -17,9 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-export default class MediaConstraintsHandler {
+import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
+
+export class MediaConstraintsHandler {
   static get CONFIG() {
     return {
       DEFAULT_DEVICE_ID: 'default',
@@ -77,7 +80,7 @@ export default class MediaConstraintsHandler {
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('z.media.MediaConstraintsHandler');
+    this.logger = getLogger('MediaConstraintsHandler');
   }
 
   //##############################################################################
@@ -96,7 +99,7 @@ export default class MediaConstraintsHandler {
   getMediaStreamConstraints(requestAudio = false, requestVideo = false, isGroup = false) {
     return Promise.resolve().then(() => {
       const currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
-      const mode = isGroup ? z.media.VIDEO_QUALITY_MODE.GROUP : z.media.VIDEO_QUALITY_MODE.MOBILE;
+      const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
       return {
         audio: requestAudio ? this._getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
@@ -146,7 +149,7 @@ export default class MediaConstraintsHandler {
       return Promise.resolve(streamConstraints);
     }
 
-    if (z.util.Environment.browser.firefox) {
+    if (Environment.browser.firefox) {
       this.logger.info('Enabling screen sharing from Firefox');
 
       const streamConstraints = {
@@ -165,28 +168,28 @@ export default class MediaConstraintsHandler {
    *
    * @private
    * @param {string} mediaDeviceId - Optional ID of MediaDevice to be used
-   * @param {z.media.VIDEO_QUALITY_MODE} [mode=z.media.VIDEO_QUALITY_MODE.MOBILE] - Quality of video stream requested
+   * @param {VIDEO_QUALITY_MODE} [mode=VIDEO_QUALITY_MODE.MOBILE] - Quality of video stream requested
    * @returns {Object} Video stream constraints
    */
-  _getVideoStreamConstraints(mediaDeviceId, mode = z.media.VIDEO_QUALITY_MODE.MOBILE) {
+  _getVideoStreamConstraints(mediaDeviceId, mode = VIDEO_QUALITY_MODE.MOBILE) {
     let streamConstraints;
     switch (mode) {
-      case z.media.VIDEO_QUALITY_MODE.FULL_HD: {
+      case VIDEO_QUALITY_MODE.FULL_HD: {
         streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.FULL_HD;
         break;
       }
 
-      case z.media.VIDEO_QUALITY_MODE.GROUP: {
+      case VIDEO_QUALITY_MODE.GROUP: {
         streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.GROUP;
         break;
       }
 
-      case z.media.VIDEO_QUALITY_MODE.HD: {
+      case VIDEO_QUALITY_MODE.HD: {
         streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.HD;
         break;
       }
 
-      case z.media.VIDEO_QUALITY_MODE.MOBILE:
+      case VIDEO_QUALITY_MODE.MOBILE:
       default: {
         streamConstraints = MediaConstraintsHandler.CONFIG.VIDEO_CONSTRAINTS.MOBILE;
         break;

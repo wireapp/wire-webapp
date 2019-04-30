@@ -17,7 +17,9 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 export class ArchiveViewModel {
   /**
@@ -34,7 +36,7 @@ export class ArchiveViewModel {
 
     this.listViewModel = listViewModel;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('ArchiveViewModel');
+    this.logger = getLogger('ArchiveViewModel');
 
     this.archivedConversations = this.conversationRepository.conversations_archived;
 
@@ -48,7 +50,7 @@ export class ArchiveViewModel {
   clickOnConversation(conversationEntity) {
     this.conversationRepository.unarchiveConversation(conversationEntity, 'opened conversation from archive');
     this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
   clickOnClose() {

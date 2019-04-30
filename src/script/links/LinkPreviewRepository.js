@@ -17,7 +17,11 @@
  *
  */
 
+import {base64ToBlob} from 'Util/util';
+
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {WebAppEvents} from '../event/WebApp';
 
 class LinkPreviewRepository {
   constructor(assetService, propertiesRepository, logger) {
@@ -27,10 +31,10 @@ class LinkPreviewRepository {
     this.assetService = assetService;
     this.logger = logger;
 
-    this.shouldSendPreviews = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
+    this.shouldSendPreviews = propertiesRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updatedSendPreference);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
       this.updatedSendPreference(properties.settings.previews.send);
     });
   }
@@ -179,10 +183,10 @@ class LinkPreviewRepository {
    * @returns {Promise} Resolves with the uploaded asset
    */
   _uploadPreviewImage(dataUri) {
-    return Promise.resolve(z.util.base64ToBlob(dataUri)).then(blob =>
+    return Promise.resolve(base64ToBlob(dataUri)).then(blob =>
       this.assetService.uploadImageAsset(blob, {public: true})
     );
   }
 }
 
-export default LinkPreviewRepository;
+export {LinkPreviewRepository};

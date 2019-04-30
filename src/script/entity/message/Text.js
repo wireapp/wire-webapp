@@ -19,11 +19,14 @@
 
 import ko from 'knockout';
 
-import Asset from './Asset';
-import AssetType from '../../assets/AssetType';
-import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
+import {renderMessage} from 'Util/util';
 
-export default class Text extends Asset {
+import {Asset} from './Asset';
+import {AssetType} from '../../assets/AssetType';
+import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
+import {mediaParser} from '../../media/MediaParser';
+
+export class Text extends Asset {
   constructor(id, text = '') {
     super(id);
     this.type = AssetType.TEXT;
@@ -48,8 +51,8 @@ export default class Text extends Asset {
 
   // Process text before rendering it
   render(selfId, themeColor) {
-    const message = z.util.renderMessage(this.text, selfId, this.mentions());
-    return !this.previews().length ? z.media.MediaParser.renderMediaEmbeds(message, themeColor) : message;
+    const message = renderMessage(this.text, selfId, this.mentions());
+    return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
   isUserMentioned(userId) {

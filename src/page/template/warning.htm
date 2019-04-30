@@ -82,18 +82,18 @@
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature">
-          <!-- ko ifnot: z.util.Environment.browser.chrome -->
+          <!-- ko ifnot: Environment.browser.chrome -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedIncoming', name())"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
-          <!-- ko if: z.util.Environment.browser.chrome -->
-            <!-- ko if: z.util.Environment.desktop -->
+          <!-- ko if: Environment.browser.chrome -->
+            <!-- ko if: Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallIssues')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web')"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: z.util.Environment.desktop -->
+            <!-- ko ifnot: Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallUpgradeBrowser')"></span>
               </div>
@@ -105,18 +105,18 @@
 
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL -->
         <div class="warning-bar warning-bar-feature">
-          <!-- ko ifnot: z.util.Environment.browser.chrome -->
+          <!-- ko ifnot: Environment.browser.chrome -->
             <div class="warning-bar-message">
               <span data-bind="text: t('warningCallUnsupportedOutgoing')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="supportLink: z.config.SUPPORT.ID.CALLING, text: t('warningLearnMore')"></a>
             </div>
           <!-- /ko -->
-          <!-- ko if: z.util.Environment.browser.chrome -->
-            <!-- ko if: z.util.Environment.desktop -->
+          <!-- ko if: Environment.browser.chrome -->
+            <!-- ko if: Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallIssues')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web')"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: z.util.Environment.desktop -->
+            <!-- ko ifnot: Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="text: t('warningCallUpgradeBrowser')"></span>
               </div>
@@ -148,7 +148,7 @@
       <!-- ko if: visibleWarning() === z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE -->
         <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message">
-            <span data-bind="text: t('warningLifecycleUpdate')"></span>&nbsp;<a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="text: t('warningLifecycleUpdateNotes')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;<a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, text: t('warningLifecycleUpdateLink')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
+            <span data-bind="text: t('warningLifecycleUpdate')"></span>&nbsp;<a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="text: t('warningLifecycleUpdateNotes')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;<a class="warning-bar-link" data-bind="click: function(){amplify.publish(WebAppEvents.LIFECYCLE.REFRESH)}, text: t('warningLifecycleUpdateLink')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
           </div>
         </div>
       <!-- /ko -->

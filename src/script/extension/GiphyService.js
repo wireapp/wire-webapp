@@ -17,7 +17,7 @@
  *
  */
 
-export default class GiphyService {
+export class GiphyService {
   static get CONFIG() {
     return {
       ENDPOINT_BASE: '/proxy/giphy/v1/gifs',

@@ -19,14 +19,17 @@
 
 import moment from 'moment';
 
-import BasePanelViewModel from './BasePanelViewModel';
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
-export default class MessageDetailsViewModel extends BasePanelViewModel {
+import {BasePanelViewModel} from './BasePanelViewModel';
+import {WebAppEvents} from '../../event/WebApp';
+import {SuperType} from '../../message/SuperType';
+
+export class MessageDetailsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId, updatedMessageEntity) => {
       // listen for any changes to local message entities.
       // if the id of the message being viewed has changed, we store the new ID.
       if (oldId === this.messageId()) {
@@ -108,7 +111,7 @@ export default class MessageDetailsViewModel extends BasePanelViewModel {
       if (!this.message()) {
         return false;
       }
-      const isPing = this.message().super_type === z.message.SuperType.PING;
+      const isPing = this.message().super_type === SuperType.PING;
       const isEphemeral = this.message().is_ephemeral();
       return !isPing && !isEphemeral;
     });

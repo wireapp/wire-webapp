@@ -17,15 +17,17 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
 
-import MediaDevicesHandler from './MediaDevicesHandler';
-import MediaConstraintsHandler from './MediaConstraintsHandler';
-import MediaElementHandler from './MediaElementHandler';
-import MediaStreamHandler from './MediaStreamHandler';
+import {MediaDevicesHandler} from './MediaDevicesHandler';
+import {MediaConstraintsHandler} from './MediaConstraintsHandler';
+import {MediaElementHandler} from './MediaElementHandler';
+import {MediaStreamHandler} from './MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
-export default class MediaRepository {
+export class MediaRepository {
   // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
   static get AUDIO_CONTEXT_STATE() {
     return {
@@ -40,12 +42,12 @@ export default class MediaRepository {
    * @returns {boolean} True if MediaDevices are supported
    */
   static supportsMediaDevices() {
-    return z.util.Environment.browser.supports.mediaDevices;
+    return Environment.browser.supports.mediaDevices;
   }
 
   /**
    * Construct a new Media repository.
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {Logger} logger - Logger configured for that class
    */
   constructor(permissionRepository, logger) {
@@ -110,6 +112,6 @@ export default class MediaRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 }

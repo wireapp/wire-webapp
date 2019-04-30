@@ -22,6 +22,7 @@
 import moment from 'moment';
 
 import {t} from './LocalizerUtil';
+import {zeroPadding} from './util';
 
 /**
  * @typedef {object} DiscreteTimeUnit
@@ -117,7 +118,7 @@ const TimeUtil = {
     for (let index = 0; index < mappedUnits.length; index++) {
       const unit = mappedUnits[index];
       if (unit === hours && hasHours) {
-        validUnitStrings.push(`${z.util.zeroPadding(hours.value)}:${z.util.zeroPadding(minutes.value)}`);
+        validUnitStrings.push(`${zeroPadding(hours.value)}:${zeroPadding(minutes.value)}`);
         break;
       }
       if (unit.value > 0) {
@@ -151,7 +152,7 @@ const TimeUtil = {
     const divisor_for_seconds = divisorForMinutes % 60;
     const seconds = Math.ceil(divisor_for_seconds);
 
-    const components = [z.util.zeroPadding(minutes), z.util.zeroPadding(seconds)];
+    const components = [zeroPadding(minutes), zeroPadding(seconds)];
 
     if (hours > 0) {
       components.unshift(hours.toString());
@@ -208,4 +209,4 @@ const TimeUtil = {
   },
 };
 
-export default TimeUtil;
+export {TimeUtil};

@@ -17,20 +17,24 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import Asset from './Asset';
-import TimeUtil from 'utils/TimeUtil';
-import AssetType from '../../assets/AssetType';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
 
-export default class File extends Asset {
+import {Asset} from './Asset';
+
+import {AssetType} from '../../assets/AssetType';
+import {AssetTransferState} from '../../assets/AssetTransferState';
+
+export class File extends Asset {
   constructor(id) {
     super(id);
     this.cancel_download = this.cancel_download.bind(this);
 
     this.type = AssetType.FILE;
-    this.logger = Logger('z.entity.File');
+    this.logger = getLogger('z.entity.File');
 
-    // z.assets.AssetTransferState
+    // AssetTransferState
     this.status = ko.observable();
 
     this.file_name = '';
@@ -71,16 +75,16 @@ export default class File extends Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   load() {
-    this.status(z.assets.AssetTransferState.DOWNLOADING);
+    this.status(AssetTransferState.DOWNLOADING);
 
     return this.original_resource()
       .load()
       .then(blob => {
-        this.status(z.assets.AssetTransferState.UPLOADED);
+        this.status(AssetTransferState.UPLOADED);
         return blob;
       })
       .catch(error => {
-        this.status(z.assets.AssetTransferState.UPLOADED);
+        this.status(AssetTransferState.UPLOADED);
         throw error;
       });
   }
@@ -91,14 +95,14 @@ export default class File extends Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   download() {
-    if (this.status() !== z.assets.AssetTransferState.UPLOADED) {
+    if (this.status() !== AssetTransferState.UPLOADED) {
       return Promise.resolve(undefined);
     }
 
     const download_started = Date.now();
 
     return this.load()
-      .then(blob => z.util.downloadBlob(blob, this.file_name))
+      .then(blob => downloadBlob(blob, this.file_name))
       .then(() => {
         const download_duration = (Date.now() - download_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);
@@ -107,7 +111,7 @@ export default class File extends Asset {
   }
 
   cancel_download() {
-    this.status(z.assets.AssetTransferState.UPLOADED);
+    this.status(AssetTransferState.UPLOADED);
     return this.original_resource().cancelDownload();
   }
 

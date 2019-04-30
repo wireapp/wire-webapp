@@ -23,22 +23,24 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
+
+import {getLogger} from 'Util/Logger';
+
 import {createPersonalAccountStrings} from '../../strings';
-import AccountForm from '../component/AccountForm';
+import {AccountForm} from '../component/AccountForm';
 import {RouterLink} from '../component/RouterLink';
-import {getLogger} from '../LogProvider';
-import ROOT_ACTIONS from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
+import {Page} from './Page';
 
 interface URLParams {
   invitationCode: string;
 }
 
-interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
+interface Props extends React.HTMLAttributes<_CreatePersonalAccount>, RouteComponentProps<URLParams> {}
 
 interface ConnectedProps {
   account: RegistrationDataState;
@@ -58,7 +60,7 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 const logger = getLogger('CreatePersonalAccount');
 
-class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
+class _CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
   componentDidMount() {
     return this.props.enterPersonalCreationFlow();
   }
@@ -119,7 +121,7 @@ class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
   }
 }
 
-export default withRouter(
+export const CreatePersonalAccount = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({
@@ -134,6 +136,6 @@ export default withRouter(
         enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
       })
-    )(CreatePersonalAccount)
+    )(_CreatePersonalAccount)
   )
 );

@@ -17,18 +17,22 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
-/* eslint-disable no-unused-vars */
-import receiptModeToggle from 'components/receiptModeToggle';
-/* eslint-enable no-unused-vars */
-import BasePanelViewModel from './BasePanelViewModel';
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import 'Components/receiptModeToggle';
+import {BasePanelViewModel} from './BasePanelViewModel';
 
-import '../../components/panel/panelActions';
+import {NotificationSetting} from '../../conversation/NotificationSetting';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {WebAppEvents} from '../../event/WebApp';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
 
-export default class ConversationDetailsViewModel extends BasePanelViewModel {
+import 'Components/panel/panelActions';
+
+export class ConversationDetailsViewModel extends BasePanelViewModel {
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 7,
@@ -53,7 +57,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = Logger('z.viewModel.panel.ConversationDetailsViewModel');
+    this.logger = getLogger('z.viewModel.panel.ConversationDetailsViewModel');
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
@@ -104,7 +108,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.isVerified = ko.pureComputed(() => {
       return this.activeConversation()
-        ? this.activeConversation().verification_state() === z.conversation.ConversationVerificationState.VERIFIED
+        ? this.activeConversation().verification_state() === ConversationVerificationState.VERIFIED
         : false;
     });
 
@@ -180,7 +184,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.notificationStatusText = ko.pureComputed(() => {
       return this.activeConversation()
-        ? z.conversation.NotificationSetting.getText(this.activeConversation().notificationState())
+        ? NotificationSetting.getText(this.activeConversation().notificationState())
         : '';
     });
 
@@ -194,7 +198,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
       return t('ephemeralUnitsNone');
     });
 
-    const addPeopleShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    const addPeopleShortcut = Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
       return t('tooltipConversationDetailsAddPeople', addPeopleShortcut);
     });
@@ -294,7 +298,7 @@ export default class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
+    amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', this.firstParticipant());
   }
 
   clickOnDevices() {

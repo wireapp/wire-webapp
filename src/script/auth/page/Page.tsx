@@ -21,7 +21,7 @@ import {TeamData} from '@wireapp/api-client/dist/commonjs/team';
 import * as React from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -51,7 +51,7 @@ const redirects = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
-const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
+const _Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   hasAccountData,
   hasTeamData,
   currentFlow,
@@ -70,7 +70,7 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };
 
-export default connect(
+export const Page = connect(
   (state: RootState): ConnectedProps => {
     return {
       account: AuthSelector.getAccount(state),
@@ -81,4 +81,4 @@ export default connect(
   (dispatch: ThunkDispatch): DispatchProps => {
     return {};
   }
-)(Page);
+)(_Page);

@@ -19,10 +19,11 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
-import AssetTransferState from '../../assets/AssetTransferState';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 import {resolve, graph} from '../../config/appResolver';
+import {WebAppEvents} from '../../event/WebApp';
 
-export default class AbstractAssetTransferStateTracker {
+export class AbstractAssetTransferStateTracker {
   constructor(message = {}) {
     this.assetUploader = resolve(graph.AssetUploader);
     this.uploadProgress = this.assetUploader.getUploadProgress(message.id);
@@ -48,6 +49,6 @@ export default class AbstractAssetTransferStateTracker {
 
   cancelUpload(message) {
     this.assetUploader.cancelUpload(message.id);
-    amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message.id);
+    amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   }
 }

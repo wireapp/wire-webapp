@@ -17,12 +17,9 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.NotificationSetting = {
+export const NotificationSetting = {
   /* eslint-disable sort-keys */
 
   STATE: {
@@ -35,9 +32,9 @@ z.conversation.NotificationSetting = {
 
   getText(status) {
     const statusTexts = {
-      [z.conversation.NotificationSetting.STATE.EVERYTHING]: t('notificationSettingsEverything'),
-      [z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-      [z.conversation.NotificationSetting.STATE.NOTHING]: t('notificationSettingsNothing'),
+      [NotificationSetting.STATE.EVERYTHING]: t('notificationSettingsEverything'),
+      [NotificationSetting.STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+      [NotificationSetting.STATE.NOTHING]: t('notificationSettingsNothing'),
     };
     return statusTexts[status];
   },

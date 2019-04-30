@@ -17,19 +17,21 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {alias} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
-import {generatePermissionHelpers} from '../../user/UserPermission';
-import {t} from 'utils/LocalizerUtil';
-import User from '../../entity/User';
+import {User} from '../../entity/User';
+import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {generatePermissionHelpers} from '../../user/UserPermission';
+import {validateHandle} from '../../user/UserHandleGenerator';
+import {WebAppEvents} from '../../event/WebApp';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.StartUIViewModel = class StartUIViewModel {
+class StartUIViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
@@ -68,7 +70,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.StartUIViewModel');
+    this.logger = getLogger('z.viewModel.list.StartUIViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -175,7 +177,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
     this.inviteBubble = null;
 
     this.inviteHint = ko.pureComputed(() => {
-      const metaKey = z.util.Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
+      const metaKey = Environment.os.mac ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
 
       return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
     });
@@ -190,7 +192,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Selected user bubble
     this.userProfile = ko.observable(null);
-    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof z.integration.ServiceEntity);
+    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof ServiceEntity);
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
       return this.userProfileIsService() ? 'start-ui-service-bubble' : '';
@@ -227,7 +229,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
   }
 
   clickOnClose() {
@@ -243,27 +245,27 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'start_ui');
+    amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui');
   }
 
   clickOnCreateGuestRoom() {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   }
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -381,7 +383,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   _closeList() {
     $('user-input input').blur();
 
-    amplify.publish(z.event.WebApp.SEARCH.HIDE);
+    amplify.publish(WebAppEvents.SEARCH.HIDE);
     this.listViewModel.switchList(z.viewModel.ListViewModel.STATE.CONVERSATIONS);
 
     this.resetView();
@@ -446,7 +448,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   clickOnImportContacts() {
-    this._importContacts(z.connect.ConnectSource.ICLOUD);
+    this._importContacts(ConnectSource.ICLOUD);
   }
 
   clickToCloseGenericInvite() {
@@ -493,9 +495,9 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         $(event.currentTarget)
           .closest('.fade-wrapper')
           .addClass('bg-animation')
-          .on(z.util.alias.animationend, _event => {
+          .on(alias.animationend, _event => {
             if (_event.originalEvent.animationName === 'message-bg-fadeout') {
-              $(this).off(z.util.alias.animationend);
+              $(this).off(alias.animationend);
 
               if (this.inviteBubble) {
                 this.inviteBubble.hide();
@@ -517,7 +519,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
   /**
    * Connect with contacts.
-   * @param {z.connect.ConnectSource} source - Source for the contacts import
+   * @param {ConnectSource} source - Source for the contacts import
    * @returns {undefined} No return value
    */
   importContacts(source) {
@@ -533,7 +535,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
         if (!isNoContacts) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
-          amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             action: () => this.importContacts(source),
             text: {
               action: t('modalUploadContactsAction'),
@@ -565,7 +567,7 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
 
       // Contacts, groups and others
       const trimmedQuery = query.trim();
-      const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+      const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
       if (!this.showOnlyConnectedUsers()) {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)
@@ -606,4 +608,6 @@ z.viewModel.list.StartUIViewModel = class StartUIViewModel {
   dispose() {
     this.renderAvatarComputed.dispose();
   }
-};
+}
+
+export {StartUIViewModel};

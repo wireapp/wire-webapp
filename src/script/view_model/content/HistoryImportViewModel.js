@@ -17,11 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import JSZip from 'jszip';
 
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -39,7 +40,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
 
-    this.logger = Logger('z.viewModel.content.HistoryExportViewModel');
+    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
 
     this.error = ko.observable(null);
     this.errorHeadline = ko.observable('');
@@ -90,7 +91,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.BACKUP.IMPORT.START, this.importHistory.bind(this));
+    amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, this.importHistory.bind(this));
   }
 
   importHistory(file) {
@@ -115,7 +116,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
     window.setTimeout(this.dismissImport.bind(this), z.motion.MotionDuration.X_LONG * 2);
   }
 
@@ -124,7 +125,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   dismissImport() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   onError(error) {
@@ -134,6 +135,6 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
   }
 };

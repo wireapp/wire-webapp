@@ -21,14 +21,14 @@ import {CloseIcon, Content, Footer, Header, Link, Logo, Small} from '@wireapp/re
 import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
-import EXTERNAL_ROUTE from '../externalRoute';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
+export const _WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
   showCookiePolicyBanner,
   onCookiePolicyBannerClose,
   children,
@@ -86,4 +86,4 @@ export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
   </div>
 );
 
-export default injectIntl(WirelessContainer);
+export const WirelessContainer = injectIntl(_WirelessContainer);

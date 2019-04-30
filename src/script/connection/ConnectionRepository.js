@@ -17,7 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {koArrayPushAll} from 'Util/util';
+
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
+import {SystemMessageType} from '../message/SystemMessageType';
 
 window.z = window.z || {};
 window.z.connection = z.connection || {};
@@ -25,7 +31,7 @@ window.z.connection = z.connection || {};
 z.connection.ConnectionRepository = class ConnectionRepository {
   static get CONFIG() {
     return {
-      SUPPORTED_EVENTS: [z.event.Backend.USER.CONNECTION],
+      SUPPORTED_EVENTS: [BackendEvent.USER.CONNECTION],
     };
   }
   /**
@@ -38,19 +44,19 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.connection.ConnectionRepository');
+    this.logger = getLogger('z.connection.ConnectionRepository');
 
     this.connectionMapper = new z.connection.ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
 
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
   /**
    * Listener for incoming user events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   onUserEvent(eventJson, source) {
@@ -61,7 +67,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
       this.logger.info(`»» User Event: '${eventType}' (Source: ${source})`, logObject);
 
-      const isUserConnection = eventType === z.event.Backend.USER.CONNECTION;
+      const isUserConnection = eventType === BackendEvent.USER.CONNECTION;
       if (isUserConnection) {
         this.onUserConnection(eventJson, source);
       }
@@ -72,7 +78,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Convert a JSON event into an entity and get the matching conversation.
    *
    * @param {Object} eventJson - JSON data of 'user.connection' event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {boolean} [showConversation] - Should the new conversation be opened?
    * @returns {undefined} No return value
    */
@@ -99,7 +105,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         this.userRepository.updateUserById(connectionEntity.userId);
       }
       this._sendNotification(connectionEntity, source, previousStatus);
-      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
     });
   }
 
@@ -124,7 +130,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
     return this._updateStatus(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -140,7 +146,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
     return this._updateStatus(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
     });
   }
@@ -157,7 +163,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .postConnections(userEntity.id, userEntity.name())
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
@@ -266,7 +272,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
           throw z.error.ConnectionError(z.error.BaseError.TYPE.INVALID_PARAMETER);
         }
 
-        z.util.koArrayPushAll(this.connectionEntities, connectionEntities);
+        koArrayPushAll(this.connectionEntities, connectionEntities);
 
         return this.userRepository.updateUsersFromConnections(connectionEntities);
       })
@@ -297,7 +303,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .putConnections(userEntity.id, connectionStatus)
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
@@ -317,7 +323,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Send the user connection notification.
    *
    * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
@@ -326,7 +332,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
-    const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const isWebSocketEvent = source === EventRepository.SOURCE.WEB_SOCKET;
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
@@ -337,13 +343,13 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         if (connectionEntity.isConnected()) {
           const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
           messageEntity.memberMessageType = statusWasSent
-            ? z.message.SystemMessageType.CONNECTION_ACCEPTED
-            : z.message.SystemMessageType.CONNECTION_CONNECTED;
+            ? SystemMessageType.CONNECTION_ACCEPTED
+            : SystemMessageType.CONNECTION_CONNECTED;
         } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
-        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
+        amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
       });
     }
   }

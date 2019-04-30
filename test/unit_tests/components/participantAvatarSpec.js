@@ -19,8 +19,8 @@
 
 import {instantiateComponent} from '../../api/knockoutHelpers';
 
-import User from 'src/script/entity/User';
-import AssetRemoteData from 'src/script/assets/AssetRemoteData';
+import {User} from 'src/script/entity/User';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import 'src/script/components/participantAvatar';
 
 describe('participant-avatar', () => {

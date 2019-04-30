@@ -18,9 +18,13 @@
  */
 
 import ko from 'knockout';
-import viewportObserver from '../ui/viewportObserver';
-import User from '../entity/User';
-import Logger from 'utils/Logger';
+
+import {getLogger} from 'Util/Logger';
+import {createRandomUuid} from 'Util/util';
+
+import {viewportObserver} from '../ui/viewportObserver';
+import {User} from '../entity/User';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -48,13 +52,13 @@ class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
-    this.logger = Logger('ParticipantAvatar');
+    this.logger = getLogger('ParticipantAvatar');
 
     const isParticipantObservable = typeof params.participant === 'function';
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
     this.isService = ko.pureComputed(() => {
-      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isService;
+      return this.participant() instanceof ServiceEntity || this.participant().isService;
     });
 
     this.isUser = ko.pureComputed(() => {
@@ -93,7 +97,7 @@ class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.createRandomUuid(),
+      id: createRandomUuid(),
       'user-id': this.participant().id,
     });
 
@@ -238,7 +242,7 @@ ko.components.register('participant-avatar', {
   },
 });
 
-export default ParticipantAvatar;
+export {ParticipantAvatar};
 
 window.z = window.z || {};
 window.z.components = z.components || {};

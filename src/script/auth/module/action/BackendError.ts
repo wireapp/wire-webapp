@@ -17,7 +17,7 @@
  *
  */
 
-export default class BackendError extends Error {
+export class BackendError extends Error {
   public code: number;
   public label: string;
 

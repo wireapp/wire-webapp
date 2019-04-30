@@ -18,13 +18,14 @@
  */
 
 import getSlug from 'speakingurl';
-import {inRange} from 'utils/NumberUtil';
-import {randomElement} from 'utils/ArrayUtil';
+
+import {inRange} from 'Util/NumberUtil';
+import {randomElement} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-const stringUtil = {
+const StringUtil = {
   /**
    * @param {ArrayLike} bytes - bytes to convert
    * @returns {string} bytes as hex string
@@ -38,7 +39,7 @@ const stringUtil = {
     return bytes
       .map(byte => {
         const stringByte = byte.toString(hexBase);
-        return stringUtil.padStart(stringByte, padIndex, '0');
+        return StringUtil.padStart(stringByte, padIndex, '0');
       })
       .join('');
   },
@@ -55,9 +56,9 @@ const stringUtil = {
    * @returns {boolean} does the string matches the query
    */
   compareTransliteration: (string, query, excludedChars = {}, fromStart = false) => {
-    const nameSlug = stringUtil.computeTransliteration(string, excludedChars);
-    const querySlug = stringUtil.computeTransliteration(query, excludedChars);
-    return fromStart ? nameSlug.startsWith(querySlug) : stringUtil.includes(nameSlug, querySlug);
+    const nameSlug = StringUtil.computeTransliteration(string, excludedChars);
+    const querySlug = StringUtil.computeTransliteration(query, excludedChars);
+    return fromStart ? nameSlug.startsWith(querySlug) : StringUtil.includes(nameSlug, querySlug);
   },
 
   computeTransliteration: (string, excludedChars = {}) => {
@@ -149,12 +150,12 @@ const stringUtil = {
     stringB = stringB.toLowerCase();
 
     if (query) {
-      if (stringUtil.startsWith(stringA, query)) {
-        if (!stringUtil.startsWith(stringB, query)) {
+      if (StringUtil.startsWith(stringA, query)) {
+        if (!StringUtil.startsWith(stringB, query)) {
           return -1;
         }
-      } else if (stringUtil.startsWith(stringB, query)) {
-        if (!stringUtil.startsWith(stringA, query)) {
+      } else if (StringUtil.startsWith(stringB, query)) {
+        if (!StringUtil.startsWith(stringA, query)) {
           return 1;
         }
       }
@@ -208,5 +209,5 @@ const stringUtil = {
   },
 };
 
-export default stringUtil;
-z.util.StringUtil = stringUtil;
+z.util.StringUtil = StringUtil;
+export {StringUtil};

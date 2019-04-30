@@ -17,18 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import ReceiptMode from '../../conversation/ReceiptMode';
-import StatusType from '../../message/StatusType';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
+import {StatusType} from '../../message/StatusType';
+import {ClientEvent} from '../Client';
 
-export default class ReceiptsMiddleware {
+export class ReceiptsMiddleware {
   /**
    * Construct a new ReadReceiptMiddleware.
    * This class is responsible for parsing incoming confirmation messages
    * It will update original messages when a confirmation is received
    *
-   * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {EventService} eventService - Repository that handles events
    * @param {UserRepository} userRepository - Repository that handles users
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    */
@@ -36,7 +37,7 @@ export default class ReceiptsMiddleware {
     this.eventService = eventService;
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
-    this.logger = Logger('ReadReceiptMiddleware');
+    this.logger = getLogger('ReadReceiptMiddleware');
   }
 
   /**
@@ -47,10 +48,10 @@ export default class ReceiptsMiddleware {
    */
   processEvent(event) {
     switch (event.type) {
-      case z.event.Client.CONVERSATION.ASSET_ADD:
-      case z.event.Client.CONVERSATION.KNOCK:
-      case z.event.Client.CONVERSATION.LOCATION:
-      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+      case ClientEvent.CONVERSATION.ASSET_ADD:
+      case ClientEvent.CONVERSATION.KNOCK:
+      case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
           if (conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
@@ -59,7 +60,7 @@ export default class ReceiptsMiddleware {
           return event;
         });
       }
-      case z.event.Client.CONVERSATION.CONFIRMATION: {
+      case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService
           .loadEvents(event.conversation, messageIds)

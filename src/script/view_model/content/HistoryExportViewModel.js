@@ -17,9 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -44,7 +47,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.backupRepository = repositories.backup;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.HistoryExportViewModel');
+    this.logger = getLogger('z.viewModel.content.HistoryExportViewModel');
 
     this.hasError = ko.observable(false);
     this.state = ko.observable(HistoryExportViewModel.STATE.PREPARING);
@@ -86,7 +89,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.BACKUP.EXPORT.START, this.exportHistory.bind(this));
+    amplify.subscribe(WebAppEvents.BACKUP.EXPORT.START, this.exportHistory.bind(this));
   }
 
   exportHistory() {
@@ -118,8 +121,8 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     const filename = `Wire-${userName}-Backup_${TimeUtil.getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
-    z.util.downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
+    downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onCancel() {
@@ -133,12 +136,12 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
   onError(error) {
     if (error instanceof z.backup.CancelError) {
-      this.logger.log(`History export was cancelled`);
+      this.logger.log('History export was cancelled');
       return this.dismissExport();
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(archiveBlob) {
@@ -152,6 +155,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   dismissExport() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 };

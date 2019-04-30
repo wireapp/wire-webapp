@@ -18,9 +18,11 @@
  */
 
 import {backendConfig} from '../../api/testResolver';
-import User from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
+import {Environment} from 'src/script/util/Environment';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 
-describe('z.client.ClientRepository', () => {
+describe('ClientRepository', () => {
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
   let userId = undefined;
@@ -36,7 +38,7 @@ describe('z.client.ClientRepository', () => {
   describe('getClientsByUserId', () =>
     it('maps client entities from client payloads by the backend', () => {
       TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: clientId}));
-      spyOn(TestFactory.client_service, 'getClientsByUserId').and.returnValue(
+      spyOn(TestFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
         Promise.resolve([
           {class: 'desktop', id: '706f64373b1bcf79'},
           {class: 'phone', id: '809fd276d6709474'},
@@ -86,7 +88,9 @@ describe('z.client.ClientRepository', () => {
     afterEach(() => server.restore());
 
     it('resolves with a valid client', () => {
-      spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
+      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
+        Promise.resolve(clientPayloadDatabase)
+      );
 
       server.respondWith('GET', clientUrl, [
         200,
@@ -101,8 +105,8 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('rejects with an error if no client found locally', done => {
-      spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
+        Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       );
 
       TestFactory.client_repository
@@ -116,7 +120,9 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('rejects with an error if client removed on backend', done => {
-      spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
+      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
+        Promise.resolve(clientPayloadDatabase)
+      );
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
 
       TestFactory.client_repository
@@ -130,7 +136,7 @@ describe('z.client.ClientRepository', () => {
     });
 
     it('rejects with an error if something else fails', done => {
-      spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(
+      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
         Promise.reject(new Error('Expected unit test error'))
       );
 
@@ -168,7 +174,8 @@ describe('z.client.ClientRepository', () => {
 
   describe('isCurrentClientPermanent', () => {
     beforeEach(() => {
-      z.util.Environment.electron = false;
+      Environment.electron = false;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       TestFactory.client_repository.currentClient(undefined);
     });
 
@@ -176,7 +183,8 @@ describe('z.client.ClientRepository', () => {
       const clientPayload = {type: z.client.ClientType.PERMANENT};
       const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
@@ -186,14 +194,16 @@ describe('z.client.ClientRepository', () => {
       const clientPayload = {type: z.client.ClientType.TEMPORARY};
       const clientEntity = TestFactory.client_repository.clientMapper.mapClient(clientPayload, true);
       TestFactory.client_repository.currentClient(clientEntity);
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const isPermanent = TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(isPermanent).toBeTruthy();
     });
 
     it('throws an error on Electron if no current client', () => {
-      z.util.Environment.electron = true;
+      Environment.electron = true;
+      TestFactory.client_repository.__test__assignEnvironment(Environment);
       const functionCall = () => TestFactory.client_repository.isCurrentClientPermanent();
 
       expect(functionCall).toThrowError(z.error.ClientError, z.error.ClientError.MESSAGE.CLIENT_NOT_SET);

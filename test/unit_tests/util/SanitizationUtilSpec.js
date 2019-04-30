@@ -17,10 +17,12 @@
  *
  */
 
+import {LocalizerUtil, Declension} from 'Util/LocalizerUtil';
+
 import 'src/script/localization/Localizer';
-import LocalizerUtil, {Declension} from 'utils/LocalizerUtil';
-import SanitizationUtil from 'src/script/util/SanitizationUtil';
-import User from 'src/script/entity/User';
+
+import {SanitizationUtil} from 'src/script/util/SanitizationUtil';
+import {User} from 'src/script/entity/User';
 
 describe('SanitizationUtil', () => {
   describe('escapeRegex', () => {

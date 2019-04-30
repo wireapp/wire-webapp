@@ -17,10 +17,6 @@
  *
  */
 
-/**
- * Enum for different user availability types.
- * @type {AvailabilityType} Enum of availability types
- */
 export enum AvailabilityType {
   AVAILABLE = 1,
   AWAY = 2,

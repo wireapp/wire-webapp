@@ -17,15 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import BasePanelViewModel from './BasePanelViewModel';
-import {Actions} from '../../components/panel/userActions';
+import {Actions} from 'Components/panel/userActions';
+import 'Components/panel/enrichedFields';
+import 'Components/panel/userDetails';
 
-import '../../components/panel/enrichedFields';
-import '../../components/panel/userDetails';
+import {BasePanelViewModel} from './BasePanelViewModel';
 
-export default class GroupParticipantUserViewModel extends BasePanelViewModel {
+export class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -35,7 +35,7 @@ export default class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
 
-    this.logger = Logger('GroupParticipantUserViewModel');
+    this.logger = getLogger('GroupParticipantUserViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
 

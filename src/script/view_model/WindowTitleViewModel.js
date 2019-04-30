@@ -17,12 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
-import {t} from 'utils/LocalizerUtil';
 import ko from 'knockout';
 
-export default class WindowTitleViewModel {
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+
+export class WindowTitleViewModel {
   static get TITLE_DEBOUNCE() {
     return 250;
   }
@@ -33,16 +36,16 @@ export default class WindowTitleViewModel {
     this.contentState = mainViewModel.content.state;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('WindowTitleViewModel');
+    this.logger = getLogger('WindowTitleViewModel');
 
     this.updateWindowTitle = ko.observable(false);
 
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.setUpdateState.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setUpdateState.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
   }
 
   initiateTitleUpdates() {
-    amplify.unsubscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiateTitleUpdates);
+    amplify.unsubscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
 
     this.logger.info('Starting to update window title');
     this.updateWindowTitle(true);
@@ -75,7 +78,7 @@ export default class WindowTitleViewModel {
 
         let specificTitle = unreadCount > 0 ? `(${unreadCount}) ` : '';
 
-        amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unreadCount);
+        amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
         switch (this.contentState()) {
           case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
@@ -135,7 +138,7 @@ export default class WindowTitleViewModel {
   }
 
   setUpdateState(handlingNotifications) {
-    const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const updateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
     if (isStateChange) {

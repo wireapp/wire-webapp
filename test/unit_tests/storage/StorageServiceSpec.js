@@ -18,13 +18,14 @@
  */
 
 import {resolve, graph} from '../../api/testResolver';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 describe('StorageRepository', () => {
   describe('save', () => {
     it('does not save "null" values', () => {
       const storageService = resolve(graph.StorageService);
       return storageService
-        .save(z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
+        .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(fail)
         .catch(error => {
           expect(error.type).toEqual(z.error.StorageError.TYPE.NO_DATA);

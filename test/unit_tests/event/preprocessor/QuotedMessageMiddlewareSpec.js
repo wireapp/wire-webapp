@@ -19,16 +19,19 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
+import {arrayToBase64} from 'Util/util';
+
+import {ClientEvent} from 'src/script/event/Client';
+import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+
+describe('QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
   let quotedMessageMiddleware;
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new z.event.preprocessor.QuotedMessageMiddleware(
-        TestFactory.event_service,
-        z.message.MessageHasher
-      );
+      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service, z.message.MessageHasher);
     });
   });
 
@@ -39,7 +42,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'salut',
           quote: undefined,
         },
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(decoratedEvent => {
@@ -51,7 +54,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(undefined));
 
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+        type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
       };
 
       const quote = new Quote({
@@ -63,9 +66,9 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -76,7 +79,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
 
     it('adds an error if hashes do not match', () => {
       const expectedError = {
-        type: z.message.QuoteEntity.ERROR.INVALID_HASH,
+        type: QuoteEntity.ERROR.INVALID_HASH,
       };
 
       const quotedMessage = {
@@ -84,7 +87,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
           content: 'pas salut',
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
@@ -98,10 +101,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -117,7 +120,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         from: 'user-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
       spyOn(z.message.MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
@@ -131,10 +134,10 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         conversation: 'conversation-uuid',
         data: {
           content: 'salut',
-          quote: z.util.arrayToBase64(Quote.encode(quote).finish()),
+          quote: arrayToBase64(Quote.encode(quote).finish()),
         },
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(parsedEvent => {
@@ -180,7 +183,7 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         id: 'new-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       jasmine.clock().install();
@@ -232,13 +235,13 @@ describe('z.event.preprocessor.QuotedMessageMiddleware', () => {
         },
         id: 'new-id',
         time: 100,
-        type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+        type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
       };
 
       return quotedMessageMiddleware.processEvent(event).then(() => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
-            data: jasmine.objectContaining({quote: {error: {type: z.message.QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
+            data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
           })
         );
       });

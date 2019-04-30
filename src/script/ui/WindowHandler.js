@@ -17,11 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 export class WindowHandler {
   constructor() {
-    this.logger = Logger('z.ui.WindowHandler');
+    this.logger = getLogger('WindowHandler');
 
     this._listenToUnhandledPromiseRejection();
   }

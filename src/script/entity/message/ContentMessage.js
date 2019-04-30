@@ -20,9 +20,11 @@
 import moment from 'moment';
 import ko from 'knockout';
 
-import {copyText} from 'utils/ClipboardUtil';
-import Message from './Message';
-import {t} from 'utils/LocalizerUtil';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {Message} from './Message';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -32,7 +34,7 @@ class ContentMessage extends Message {
     super(id);
 
     this.assets = ko.observableArray([]);
-    this.super_type = z.message.SuperType.CONTENT;
+    this.super_type = SuperType.CONTENT;
     this.replacing_message_id = null;
     this.edited_timestamp = ko.observable(null);
 
@@ -180,5 +182,5 @@ class ContentMessage extends Message {
   }
 }
 
-export default ContentMessage;
+export {ContentMessage};
 z.entity.ContentMessage = ContentMessage;

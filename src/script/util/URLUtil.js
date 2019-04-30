@@ -17,43 +17,43 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-const URLUtil = (() => {
-  const TYPE = {
+const URLUtil = {
+  TYPE: {
     ACCOUNT: 'TYPE.ACCOUNT',
     SUPPORT: 'TYPE.SUPPORT',
     TEAM_SETTINGS: 'TYPE.TEAM_SETTINGS',
     WEBAPP: 'TYPE.WEBAPP',
     WEBSITE: 'TYPE.WEBSITE',
-  };
+  },
 
-  const _appendParameter = (url, parameter) => {
+  appendParameter: (url, parameter) => {
     const separator = z.util.StringUtil.includes(url, '?') ? '&' : '?';
     return `${url}${separator}${parameter}`;
-  };
+  },
 
-  const _buildSupportUrl = supportId => {
+  buildSupportUrl: supportId => {
     return _.isNumber(supportId)
       ? `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportArticles')}${supportId}`
       : `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportRequests')}`;
-  };
+  },
 
-  const _forwardParameter = (url, parameterName, locationSearch = window.location.search) => {
-    const parameterValue = _getParameter(parameterName, locationSearch);
+  forwardParameter: (url, parameterName, locationSearch = window.location.search) => {
+    const parameterValue = URLUtil.getParameter(parameterName, locationSearch);
     const hasValue = parameterValue != null;
-    return hasValue ? _appendParameter(url, `${parameterName}=${parameterValue}`) : url;
-  };
+    return hasValue ? URLUtil.appendParameter(url, `${parameterName}=${parameterValue}`) : url;
+  },
 
   /**
    * Removes protocol, www and trailing slashes in the given url
    * @param {string} url - URL
    * @returns {string} Plain URL
    */
-  const _getDomainName = (url = '') => {
+  getDomainName: (url = '') => {
     // force a protocol if there is none
     url = url.replace(/^(?!https?:\/\/)/i, 'http://');
     try {
@@ -62,9 +62,21 @@ const URLUtil = (() => {
     } catch (error) {
       return '';
     }
-  };
+  },
 
-  const _getParameter = (parameterName, locationSearch = window.location.search) => {
+  getLinksFromHtml: html => {
+    if (!html) {
+      return [];
+    }
+
+    const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
+    const links = html.match(anchorTags);
+
+    const hasLinks = links && links.length;
+    return hasLinks ? links.map(element => $(element)[0]) : [];
+  },
+
+  getParameter: (parameterName, locationSearch = window.location.search) => {
     const searchParameters = locationSearch.substring(1).split('&');
     for (const searchParam of searchParameters) {
       const [parameter, value] = searchParam.split('=');
@@ -89,39 +101,16 @@ const URLUtil = (() => {
     }
 
     return null;
-  };
-
-  const _getLinksFromHtml = html => {
-    if (!html) {
-      return [];
-    }
-
-    const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
-    const links = html.match(anchorTags);
-
-    const hasLinks = links && links.length;
-    return hasLinks ? links.map(element => $(element)[0]) : [];
-  };
+  },
 
   /**
    * Prepends http to given url if protocol missing
    * @param {string} url - URL you want to open in a new browser tab
    * @returns {undefined} No return value
    */
-  const _prependProtocol = url => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url);
-
-  return {
-    TYPE: TYPE,
-    appendParameter: _appendParameter,
-    buildSupportUrl: _buildSupportUrl,
-    forwardParameter: _forwardParameter,
-    getDomainName: _getDomainName,
-    getLinksFromHtml: _getLinksFromHtml,
-    getParameter: _getParameter,
-    prependProtocol: _prependProtocol,
-  };
-})();
-
-export default URLUtil;
+  prependProtocol: url => (!url.match(/^http[s]?:\/\//i) ? `http://${url}` : url),
+};
 
 z.util.URLUtil = URLUtil;
+
+export {URLUtil};

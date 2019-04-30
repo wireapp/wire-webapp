@@ -17,10 +17,12 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
-export default class TimedMessagesViewModel extends BasePanelViewModel {
+import {BasePanelViewModel} from './BasePanelViewModel';
+import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
+
+export class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -38,11 +40,11 @@ export default class TimedMessagesViewModel extends BasePanelViewModel {
     });
 
     const hasCustomTime = ko.pureComputed(() => {
-      return !!this.currentMessageTimer() && !z.ephemeral.timings.VALUES.includes(this.currentMessageTimer());
+      return !!this.currentMessageTimer() && !EphemeralTimings.VALUES.includes(this.currentMessageTimer());
     });
 
     this.messageTimes = ko.pureComputed(() => {
-      const times = z.ephemeral.timings.VALUES;
+      const times = EphemeralTimings.VALUES;
 
       times.sort((timeA, timeB) => timeA - timeB);
 

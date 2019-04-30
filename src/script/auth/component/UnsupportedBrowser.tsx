@@ -21,12 +21,13 @@ import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@w
 import * as React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {unsupportedStrings} from '../../strings';
+import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import WirelessContainer from './WirelessContainer';
+import {isMobileOs} from '../Runtime';
+import {WirelessContainer} from './WirelessContainer';
 
-interface UnsupportedProps extends React.HTMLAttributes<HTMLDivElement> {
+interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   headline: FormattedMessage.MessageDescriptor;
   subhead: FormattedMessage.MessageDescriptor;
 }
@@ -43,7 +44,9 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   </ContainerXS>
 );
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+export interface Props extends React.HTMLProps<HTMLDivElement> {
+  isTemporaryGuest?: boolean;
+}
 
 interface ConnectedProps {
   hasCookieSupport: boolean;
@@ -54,23 +57,36 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntlProps> = ({
+type CombinedProps = Props & DispatchProps & ConnectedProps & InjectedIntlProps;
+
+export const _UnsupportedBrowser = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
   isCheckingSupport,
   isSupportedBrowser,
-}) => {
+  isTemporaryGuest,
+}: CombinedProps) => {
   if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
         <Container verticalCenter>
           <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-            <FormattedHTMLMessage {...unsupportedStrings.headlineBrowser} />
+            <FormattedHTMLMessage
+              {...(isTemporaryGuest
+                ? unsupportedJoinStrings.unsupportedJoinHeadline
+                : unsupportedStrings.headlineBrowser)}
+            />
           </H2>
-          <H3 style={{marginBottom: '10px'}}>
-            <FormattedHTMLMessage {...unsupportedStrings.subheadBrowser} />
-          </H3>
+          {isTemporaryGuest && isMobileOs() ? (
+            <H3 style={{marginBottom: '10px'}}>
+              <FormattedHTMLMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
+            </H3>
+          ) : (
+            <H3 style={{marginBottom: '10px'}}>
+              <FormattedHTMLMessage {...unsupportedStrings.subheadBrowser} />
+            </H3>
+          )}
         </Container>
       </WirelessContainer>
     );
@@ -99,21 +115,17 @@ export const UnsupportedBrowser: React.SFC<Props & ConnectedProps & InjectedIntl
     );
   }
 
-  return <React.Fragment>{children}</React.Fragment>;
+  return <>{children}</>;
 };
 
-export default injectIntl(
+export const UnsupportedBrowser = injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
-        hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
-        isCheckingSupport: RuntimeSelector.isChecking(state),
-        isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
-  )(UnsupportedBrowser)
+    (state: RootState) => ({
+      hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
+      hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+      isCheckingSupport: RuntimeSelector.isChecking(state),
+      isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({})
+  )(_UnsupportedBrowser)
 );

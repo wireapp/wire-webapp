@@ -19,12 +19,14 @@
 
 import ko from 'knockout';
 
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
+
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
 import {AvailabilityType} from '../user/AvailabilityType';
+import {WebAppEvents} from '../event/WebApp';
 
 // Please note: The own user has a "locale"
 class User {
@@ -141,7 +143,7 @@ class User {
   }
 
   subscribeToChanges() {
-    this.availability.subscribe(() => amplify.publish(z.event.WebApp.USER.PERSIST, this));
+    this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
   add_client(new_client_et) {
@@ -220,11 +222,11 @@ class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        return amplify.publish(z.event.WebApp.USER.UPDATE, this.id);
+        return amplify.publish(WebAppEvents.USER.UPDATE, this.id);
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
-      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(z.event.WebApp.USER.UPDATE, this.id), timeout);
+      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(WebAppEvents.USER.UPDATE, this.id), timeout);
     }
   }
 
@@ -250,4 +252,4 @@ class User {
   }
 }
 
-export default User;
+export {User};

@@ -19,8 +19,15 @@
 
 import moment from 'moment';
 
-import EphemeralStatusType from '../message/EphemeralStatusType';
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
+
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
+import {WebAppEvents} from '../event/WebApp';
+import {Context} from '../ui/ContextMenu';
+
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -79,6 +86,7 @@ class Message {
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
+    this.includesOnlyEmojis = includesOnlyEmojis;
 
     const markedSubscription = ko.computed(() => {
       const marked = isMarked();
@@ -91,6 +99,7 @@ class Message {
 
     this.conversationRepository = conversationRepository;
     this.EphemeralStatusType = EphemeralStatusType;
+    this.StatusType = StatusType;
 
     if (message.has_asset_text()) {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
@@ -125,17 +134,15 @@ class Message {
 
   getSystemMessageIconComponent(message) {
     const iconComponents = {
-      [z.message.SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
-      [z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
-      [z.message.SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
+      [SystemMessageType.CONVERSATION_RENAME]: 'edit-icon',
+      [SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE]: 'timer-icon',
+      [SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE]: 'read-icon',
     };
     return iconComponents[message.system_message_type];
   }
 
   showDevice(messageEntity) {
-    const topic = messageEntity.isSelfClient()
-      ? z.event.WebApp.PREFERENCES.MANAGE_DEVICES
-      : z.event.WebApp.SHORTCUT.PEOPLE;
+    const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
 
@@ -160,14 +167,14 @@ class Message {
 
     if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
         label: t('conversationContextMenuEdit'),
       });
     }
 
     if (messageEntity.isReplyable() && !this.conversation().removed_from_conversation()) {
       entries.push({
-        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
         label: t('conversationContextMenuReply'),
       });
     }
@@ -197,7 +204,7 @@ class Message {
       });
     }
 
-    const isSendingMessage = messageEntity.status() === z.message.StatusType.SENDING;
+    const isSendingMessage = messageEntity.status() === StatusType.SENDING;
     const canDelete =
       messageEntity.user().is_me && !this.conversation().removed_from_conversation() && !isSendingMessage;
     if (canDelete) {
@@ -207,7 +214,7 @@ class Message {
       });
     }
 
-    z.ui.Context.from(event, entries, 'message-options-menu');
+    Context.from(event, entries, 'message-options-menu');
   }
 
   bindShowMore(elements, scope) {
@@ -282,7 +289,7 @@ const normalTemplate = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': z.util.EmojiUtil.includesOnlyEmojies(asset.text), 'text-foreground': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>

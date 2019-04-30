@@ -17,13 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
-export default class ParticipantDevicesViewModel extends BasePanelViewModel {
+export class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
     return {
       FOUND: 'ParticipantDevicesViewModel.MODE.FOUND',
@@ -41,7 +42,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
 
-    this.logger = Logger('z.viewModel.panel.ParticipantDevicesViewModel');
+    this.logger = getLogger('z.viewModel.panel.ParticipantDevicesViewModel');
 
     this.selfClient = this.clientRepository.currentClient;
 
@@ -142,7 +143,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickOnShowSelfDevices() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
   }
 
   clickToShowSelfFingerprint() {

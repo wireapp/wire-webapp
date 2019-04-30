@@ -21,26 +21,28 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
-import SanitizationUtil from 'utils/SanitizationUtil';
+import MarkdownIt from 'markdown-it';
+
+import {SanitizationUtil} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import MarkdownIt from 'markdown-it';
-import StringUtilGlobal from './StringUtil';
+import {StringUtilGlobal} from './StringUtil';
+import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */
 
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.checkIndexedDb = () => {
-  if (!z.util.Environment.browser.supports.indexedDb) {
-    const errorType = z.util.Environment.browser.edge
+export const checkIndexedDb = () => {
+  if (!Environment.browser.supports.indexedDb) {
+    const errorType = Environment.browser.edge
       ? z.error.AuthError.TYPE.PRIVATE_MODE
       : z.error.AuthError.TYPE.INDEXED_DB_UNSUPPORTED;
     return Promise.reject(new z.error.AuthError(errorType));
   }
 
-  if (z.util.Environment.browser.firefox) {
+  if (Environment.browser.firefox) {
     let dbOpenRequest;
 
     try {
@@ -80,11 +82,11 @@ z.util.checkIndexedDb = () => {
   return Promise.resolve();
 };
 
-z.util.isSameLocation = (pastLocation, currentLocation) => {
+export const isSameLocation = (pastLocation, currentLocation) => {
   return pastLocation !== '' && currentLocation.startsWith(pastLocation);
 };
 
-z.util.loadDataUrl = file => {
+export const loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -93,7 +95,7 @@ z.util.loadDataUrl = file => {
   });
 };
 
-z.util.loadUrlBuffer = (url, xhrAccessorFunction) => {
+export const loadUrlBuffer = (url, xhrAccessorFunction) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -115,7 +117,7 @@ z.util.loadUrlBuffer = (url, xhrAccessorFunction) => {
   });
 };
 
-z.util.loadImage = function(blob) {
+export const loadImage = function(blob) {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
@@ -128,7 +130,7 @@ z.util.loadImage = function(blob) {
   });
 };
 
-z.util.loadFileBuffer = file => {
+export const loadFileBuffer = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -137,8 +139,8 @@ z.util.loadFileBuffer = file => {
   });
 };
 
-z.util.loadUrlBlob = url => {
-  return z.util.loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
+export const loadUrlBlob = url => {
+  return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
 /**
@@ -146,7 +148,7 @@ z.util.loadUrlBlob = url => {
  * @param {string} filename - filename including extension
  * @returns {string} File extension
  */
-z.util.getFileExtension = filename => {
+export const getFileExtension = filename => {
   if (!_.isString(filename) || !filename.includes('.')) {
     return '';
   }
@@ -163,7 +165,7 @@ z.util.getFileExtension = filename => {
  * @param {string} filename - filename including extension
  * @returns {string} New String without extension
  */
-z.util.trimFileExtension = filename => {
+export const trimFileExtension = filename => {
   if (_.isString(filename)) {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
@@ -181,7 +183,7 @@ z.util.trimFileExtension = filename => {
  * @param {number} [decimals] - Number of decimals to keep
  * @returns {string} Bytes as a human readable string
  */
-z.util.formatBytes = (bytes, decimals) => {
+export const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
     return '0B';
   }
@@ -193,14 +195,14 @@ z.util.formatBytes = (bytes, decimals) => {
   return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
 };
 
-z.util.getContentTypeFromDataUrl = data_url => {
+export const getContentTypeFromDataUrl = data_url => {
   return data_url
     .split(',')[0]
     .split(':')[1]
     .split(';')[0];
 };
 
-z.util.stripDataUri = string => string.replace(/^data:.*,/, '');
+export const stripDataUri = string => string.replace(/^data:.*,/, '');
 
 /**
  * Convert base64 string to UInt8Array.
@@ -208,21 +210,21 @@ z.util.stripDataUri = string => string.replace(/^data:.*,/, '');
  * @param {string} base64 - base64 encoded string
  * @returns {UInt8Array} Typed array
  */
-z.util.base64ToArray = base64 => Decoder.fromBase64(z.util.stripDataUri(base64)).asBytes;
+export const base64ToArray = base64 => Decoder.fromBase64(stripDataUri(base64)).asBytes;
 
 /**
  * Convert ArrayBuffer or UInt8Array to base64 string
  * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
  * @returns {string} Base64-encoded string
  */
-z.util.arrayToBase64 = array => Encoder.toBase64(new Uint8Array(array)).asString;
+export const arrayToBase64 = array => Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
  * @param {Uint8Array} array - Input array
  * @returns {string} MD5 hash
  */
-z.util.arrayToMd5Base64 = array => {
+export const arrayToMd5Base64 = array => {
   const wordArray = CryptoJS.lib.WordArray.create(array);
   return CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Base64);
 };
@@ -233,9 +235,9 @@ z.util.arrayToMd5Base64 = array => {
  * @returns {Blob} Binary output
  */
 
-z.util.base64ToBlob = base64 => {
-  const mimeType = z.util.getContentTypeFromDataUrl(base64);
-  const bytes = z.util.base64ToArray(base64);
+export const base64ToBlob = base64 => {
+  const mimeType = getContentTypeFromDataUrl(base64);
+  const bytes = base64ToArray(base64);
   return new Blob([bytes], {type: mimeType});
 };
 
@@ -247,16 +249,16 @@ z.util.base64ToBlob = base64 => {
  * @returns {number} Timeout identifier
  */
 
-z.util.downloadBlob = (blob, filename, mimeType) => {
+export const downloadBlob = (blob, filename, mimeType) => {
   if (blob) {
     const url = window.URL.createObjectURL(blob);
-    return z.util.downloadFile(url, filename, mimeType);
+    return downloadFile(url, filename, mimeType);
   }
 
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-z.util.downloadFile = (url, fileName, mimeType) => {
+export const downloadFile = (url, fileName, mimeType) => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
@@ -278,16 +280,16 @@ z.util.downloadFile = (url, fileName, mimeType) => {
   }, 100);
 };
 
-z.util.phoneNumberToE164 = (phoneNumber, countryCode) => {
+export const phoneNumberToE164 = (phoneNumber, countryCode) => {
   return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
-z.util.createRandomUuid = () => UUID.genV4().hexString;
+export const createRandomUuid = () => UUID.genV4().hexString;
 
-z.util.encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
+export const encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
 // Note IE10 listens to "transitionend" instead of "animationend"
-z.util.alias = {
+export const alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
@@ -321,7 +323,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 
-z.util.renderMessage = (message, selfId, mentionEntities = []) => {
+export const renderMessage = (message, selfId, mentionEntities = []) => {
   const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -406,13 +408,16 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
       }
       link.attrSet('href', cleanString(href));
       if (nextToken && nextToken.type === 'text') {
-        nextToken.content = cleanString(text);
+        nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
     }
     if (isWireDeepLink) {
       link.attrPush(['data-uie-name', 'wire-deep-link']);
+    }
+    if (link.markup === 'linkify') {
+      nextToken.content = encodeURI(nextToken.content);
     }
     return self.renderToken(tokens, idx, options);
   };
@@ -431,7 +436,7 @@ z.util.renderMessage = (message, selfId, mentionEntities = []) => {
   return parsedText;
 };
 
-z.util.koArrayPushAll = (koArray, valuesToPush) => {
+export const koArrayPushAll = (koArray, valuesToPush) => {
   // append array to knockout observableArray
   // https://github.com/knockout/knockout/issues/416
   const underlyingArray = koArray();
@@ -440,7 +445,7 @@ z.util.koArrayPushAll = (koArray, valuesToPush) => {
   koArray.valueHasMutated();
 };
 
-z.util.koArrayUnshiftAll = (koArray, valuesToShift) => {
+export const koArrayUnshiftAll = (koArray, valuesToShift) => {
   // prepend array to knockout observableArray
   const underlyingArray = koArray();
   koArray.valueWillMutate();
@@ -448,13 +453,13 @@ z.util.koArrayUnshiftAll = (koArray, valuesToShift) => {
   koArray.valueHasMutated();
 };
 
-z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
+export const koPushDeferred = (target, src, number = 100, delay = 300) => {
   // push array deferred to knockout observableArray
   let interval;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
-    z.util.koArrayPushAll(target, chunk);
+    koArrayPushAll(target, chunk);
 
     if (src.length === 0) {
       return window.clearInterval(interval);
@@ -468,14 +473,14 @@ z.util.koPushDeferred = (target, src, number = 100, delay = 300) => {
  * @param {number} length - Final output length
  * @returns {string} Input value with leading zeros (padding)
  */
-z.util.zeroPadding = (value, length = 2) => {
+export const zeroPadding = (value, length = 2) => {
   const zerosNeeded = Math.max(0, length - value.toString().length);
   return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
-z.util.sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
+export const sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
-z.util.sortObjectByKeys = (object, reverse) => {
+export const sortObjectByKeys = (object, reverse) => {
   const keys = Object.keys(object);
   keys.sort();
 
@@ -491,9 +496,9 @@ z.util.sortObjectByKeys = (object, reverse) => {
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
-z.util.stripUrlWrapper = url => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+export const stripUrlWrapper = url => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-z.util.validateProfileImageResolution = (file, minWidth, minHeight) => {
+export const validateProfileImageResolution = (file, minWidth, minHeight) => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
@@ -502,7 +507,7 @@ z.util.validateProfileImageResolution = (file, minWidth, minHeight) => {
   });
 };
 
-z.util.isValidEmail = email => {
+export const isValidEmail = email => {
   const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 };
@@ -513,21 +518,21 @@ z.util.isValidEmail = email => {
  * @param {string} phoneNumber - Input
  * @returns {boolean} True, if the input a phone number
  */
-z.util.isValidPhoneNumber = phoneNumber => {
+export const isValidPhoneNumber = phoneNumber => {
   const allowDebugPhoneNumbers = z.config.FEATURE.ENABLE_DEBUG;
   const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
 
   return regularExpression.test(phoneNumber);
 };
 
-z.util.isValidUsername = username => {
+export const isValidUsername = username => {
   if (username.startsWith('@')) {
     username = username.substring(1);
   }
   return /^[a-z_0-9]{2,21}$/.test(username);
 };
 
-z.util.murmurhash3 = (key, seed) => {
+export const murmurhash3 = (key, seed) => {
   const remainder = key.length & 3; // key.length % 4
   const bytes = key.length - remainder;
   let h1 = seed;
@@ -585,12 +590,12 @@ z.util.murmurhash3 = (key, seed) => {
   return h1 >>> 0;
 };
 
-z.util.printDevicesId = id => {
+export const printDevicesId = id => {
   if (!id) {
     return '';
   }
 
-  const idWithPadding = z.util.zeroPadding(id, 16);
+  const idWithPadding = zeroPadding(id, 16);
   const parts = idWithPadding.match(/.{1,2}/g) || [];
   const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
 
@@ -598,10 +603,10 @@ z.util.printDevicesId = id => {
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-z.util.afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
+export const afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 
 /**
  * No operation
  * @returns {void}
  */
-z.util.noop = () => {};
+export const noop = () => {};

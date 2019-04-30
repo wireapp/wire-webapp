@@ -17,10 +17,10 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
-import Logger from 'utils/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {getLogger} from 'Util/Logger';
 
-const logger = Logger('LifecycleRepository');
+const logger = getLogger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 

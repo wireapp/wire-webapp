@@ -17,7 +17,7 @@
  *
  */
 
-import viewportObserver from '../ui/viewportObserver';
+import {viewportObserver} from '../ui/viewportObserver';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

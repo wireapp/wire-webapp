@@ -17,7 +17,7 @@
  *
  */
 
-import overlayedObserver from 'src/script/ui/overlayedObserver';
+import {overlayedObserver} from 'src/script/ui/overlayedObserver';
 
 describe('overlayedObserver', () => {
   beforeEach(() => {

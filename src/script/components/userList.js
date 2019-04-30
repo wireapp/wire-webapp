@@ -17,6 +17,8 @@
  *
  */
 
+import {validateHandle} from '../user/UserHandleGenerator';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -82,7 +84,7 @@ z.components.UserList = class UserList {
         if (normalizedQuery) {
           const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
           const trimmedQuery = this.filter().trim();
-          const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
           const searchResults = this.searchRepository.searchUserInSet(normalizedQuery, this.userEntities(), properties);
           const filteredResults = searchResults.filter(user => {

@@ -18,8 +18,12 @@
  */
 
 import {errors as ProteusErrors} from '@wireapp/proteus';
+
+import {t} from 'Util/LocalizerUtil';
+import {printDevicesId} from 'Util/util';
+
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
+import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -31,7 +35,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
   constructor() {
     super();
-    this.super_type = z.message.SuperType.UNABLE_TO_DECRYPT;
+    this.super_type = SuperType.UNABLE_TO_DECRYPT;
 
     this.error_code = '';
     this.client_id = '';
@@ -70,7 +74,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       }
 
       if (this.client_id) {
-        parts.push(`ID: ${z.util.printDevicesId(this.client_id)}`);
+        parts.push(`ID: ${printDevicesId(this.client_id)}`);
       }
 
       if (parts.length) {

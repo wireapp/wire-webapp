@@ -17,8 +17,8 @@
  *
  */
 
-// KARMA_SPECS=entity/message/MessageEntities yarn test:app
-import MediumImage from 'src/script/entity/message/MediumImage';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {StatusType} from 'src/script/message/StatusType';
 
 describe('Message Entities', () => {
   let message_et = null;
@@ -105,7 +105,7 @@ describe('Message Entities', () => {
       });
 
       it('isObfuscated returns false if it is ephemeral and still sending', () => {
-        message_et.status(z.message.StatusType.SENDING);
+        message_et.status(StatusType.SENDING);
         message_et.ephemeral_expires(12312123);
 
         expect(message_et.isObfuscated()).toBeFalsy();

@@ -17,20 +17,25 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 
+import {getLogger} from 'Util/Logger';
+
 import {checkVersion} from '../lifecycle/newVersionHandler';
+import {downloadFile} from './util';
+
+import {BackendEvent} from '../event/Backend';
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {EventRepository} from '../event/EventRepository';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return z.util.downloadFile(url, filename);
+  return downloadFile(url, filename);
 }
 
-export default class DebugUtil {
+export class DebugUtil {
   constructor(repositories) {
     const {calling, client, connection, conversation, cryptography, event, user, storage} = repositories;
 
@@ -46,7 +51,7 @@ export default class DebugUtil {
     this.sodium = sodium;
     this.Dexie = Dexie;
 
-    this.logger = Logger('DebugUtil');
+    this.logger = getLogger('DebugUtil');
   }
 
   blockAllConnections() {
@@ -71,7 +76,7 @@ export default class DebugUtil {
 
         cryptobox.cachedSessions.set(sessionId, cryptoboxSession);
 
-        const sessionStoreName = z.storage.StorageSchemata.OBJECT_STORE.SESSIONS;
+        const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
         return this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
       })
       .then(() => this.logger.log(`Corrupted Session ID '${sessionId}'`));
@@ -119,7 +124,7 @@ export default class DebugUtil {
     const clientId = this.clientRepository.currentClient().id;
     const userId = this.userRepository.self().id;
 
-    const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const isOTRMessage = notification => notification.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
     const isInCurrentConversation = notification => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = notification =>
       notification.from === userId && (notification.data && notification.data.sender === clientId);
@@ -132,7 +137,7 @@ export default class DebugUtil {
       })
       .then(message => {
         return this.eventRepository.notificationService
-          .getNotifications(undefined, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
+          .getNotifications(undefined, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
           .then(({notifications}) => ({
             message,
             notifications,
@@ -301,11 +306,11 @@ export default class DebugUtil {
     const clientId = this.clientRepository.currentClient().id;
 
     return this.eventRepository.notificationService
-      .getNotifications(clientId, undefined, z.event.EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
+      .getNotifications(clientId, undefined, EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX)
       .then(({notifications}) => {
         this.logger.info(`Fetched "${notifications.length}" notifications for client "${clientId}".`, notifications);
 
-        const isOTRMessage = notification => notification.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+        const isOTRMessage = notification => notification.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
         const isInCurrentConversation = notification => notification.conversation === conversationId;
 
         return notifications
@@ -317,7 +322,7 @@ export default class DebugUtil {
       })
       .then(events => {
         this.logger.info(`Reprocessing "${events.length}" OTR messages...`);
-        events.forEach(event => this.eventRepository.processEvent(event, z.event.EventRepository.SOURCE.STREAM));
+        events.forEach(event => this.eventRepository.processEvent(event, EventRepository.SOURCE.STREAM));
       });
   }
 }

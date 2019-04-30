@@ -17,13 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
+class PreferencesListViewModel {
   /**
    * View model for the preferences list.
    * @param {z.viewModel.ContentViewModel} contentViewModel - content view model
@@ -34,11 +31,12 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   constructor(contentViewModel, listViewModel, userRepository, callingRepository) {
     this.listViewModel = listViewModel;
     this.userRepository = userRepository;
-    this.logger = Logger('z.viewModel.list.PreferencesListViewModel');
+    this.logger = getLogger('PreferencesListViewModel');
 
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.Environment = Environment;
 
     this.supportsCalling = callingRepository.supportsCalling;
 
@@ -100,4 +98,6 @@ z.viewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
   _switchContent(newContentState) {
     this.contentViewModel.switchContent(newContentState);
   }
-};
+}
+
+export {PreferencesListViewModel};

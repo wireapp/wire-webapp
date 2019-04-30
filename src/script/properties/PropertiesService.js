@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 class PropertiesService {
   static get CONFIG() {
@@ -28,11 +28,11 @@ class PropertiesService {
 
   /**
    * Construct a new Properties Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.properties.PropertiesService');
+    this.logger = getLogger('PropertiesService');
   }
 
   /**
@@ -103,4 +103,4 @@ class PropertiesService {
   }
 }
 
-export default PropertiesService;
+export {PropertiesService};

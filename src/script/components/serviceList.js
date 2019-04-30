@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {noop} from 'Util/util';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -29,7 +30,7 @@ z.components.ServiceList = class ServiceList {
   }
 
   constructor(params) {
-    this.isSearching = params.isSearching || z.util.noop;
+    this.isSearching = params.isSearching || noop;
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
     this.onClick = params.click;
     this.services = params.services;

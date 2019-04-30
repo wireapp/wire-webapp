@@ -17,8 +17,10 @@
  *
  */
 
-import {isScrolledBottom} from 'utils/scroll-helpers';
 import moment from 'moment';
+
+import {isScrolledBottom} from 'Util/scroll-helpers';
+import {koArrayPushAll} from 'Util/util';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -83,7 +85,7 @@ z.components.FullSearch = class FullSearch {
       const showAdditionalMessages = isScrolledBottom(event.currentTarget) && this.messageEntities.length;
       if (showAdditionalMessages) {
         const additionalMessageEntities = this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES);
-        z.util.koArrayPushAll(this.visibleMessageEntities, additionalMessageEntities);
+        koArrayPushAll(this.visibleMessageEntities, additionalMessageEntities);
       }
     });
   }

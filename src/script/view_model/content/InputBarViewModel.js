@@ -17,15 +17,24 @@
  *
  */
 
-import Logger from 'utils/Logger';
 import moment from 'moment';
 
-import * as StorageUtil from 'utils/StorageUtil';
+import {getLogger} from 'Util/Logger';
+import * as StorageUtil from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {formatBytes, afterRender, renderMessage} from 'Util/util';
+
 import {resolve, graph} from '../../config/appResolver';
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {AvailabilityType} from '../../user/AvailabilityType';
+
+import {StorageKey} from '../../storage/StorageKey';
+import {WebAppEvents} from '../../event/WebApp';
+import {QuoteEntity} from '../../message/QuoteEntity';
+
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -72,7 +81,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.InputBarViewModel');
+    this.logger = getLogger('z.viewModel.content.InputBarViewModel');
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.selfUser = this.userRepository.self;
@@ -100,11 +109,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         if (isReplyingToMessage !== wasReplyingToMessage) {
           this.triggerInputChangeEvent();
           if (isReplyingToMessage) {
-            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-            amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+            amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
           } else {
-            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-            amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+            amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+            amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
           }
         }
       });
@@ -190,7 +199,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     this.richTextInput.subscribe(() => {
       if (this.textarea && this.shadowInput) {
-        z.util.afterRender(() => {
+        afterRender(() => {
           if (this.shadowInput.scrollTop !== this.textarea.scrollTop) {
             this.shadowInput.scrollTop = this.textarea.scrollTop;
           }
@@ -233,7 +242,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
     });
 
-    const pingShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.PING);
+    const pingShortcut = Shortcut.getShortcutTooltip(ShortcutType.PING);
     this.pingTooltip = t('tooltipConversationPing', pingShortcut);
 
     this.isEditing.subscribe(isEditing => {
@@ -271,16 +280,18 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
     });
 
+    this.renderMessage = renderMessage;
+
     this._initSubscriptions();
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
-    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversationHasFocus(false));
-    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, this.uploadImages.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, this.editMessage.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.replyMessage.bind(this));
+    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, this.sendGiphy.bind(this));
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, () => this.conversationHasFocus(false));
+    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => {
       window.requestAnimationFrame(() => this.conversationHasFocus(true));
     });
   }
@@ -323,7 +334,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   _generateStorageKey(conversationEntity) {
-    return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+    return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   }
 
   _loadDraftState(conversationEntity) {
@@ -393,7 +404,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   addedToView() {
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PING, this.clickToPing);
+    amplify.subscribe(WebAppEvents.SHORTCUT.PING, this.clickToPing);
   }
 
   cancelMessageEditing(resetDraft = true) {
@@ -423,7 +434,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   clickToShowGiphy() {
-    amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.input());
+    amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.input());
   }
 
   clickToPing() {
@@ -514,7 +525,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
-      return amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           message: t('modalConversationMessageTooLongMessage', z.config.MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
@@ -705,11 +716,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   }
 
   removedFromView() {
-    amplify.unsubscribeAll(z.event.WebApp.SHORTCUT.PING);
+    amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
   }
 
   triggerInputChangeEvent(newInputHeight = 0, previousInputHeight = 0) {
-    amplify.publish(z.event.WebApp.INPUT.RESIZE, newInputHeight - previousInputHeight);
+    amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
   }
 
   sendGiphy(gifUrl, tag) {
@@ -728,7 +739,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
           .then(this.messageHasher.hashEvent)
           .then(messageHash => {
-            return new z.message.QuoteEntity({
+            return new QuoteEntity({
               hash: messageHash,
               messageId: replyMessageEntity.id,
               userId: replyMessageEntity.from,
@@ -806,7 +817,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       for (const file of Array.from(files)) {
         const isTooLarge = file.size > uploadLimit;
         if (isTooLarge) {
-          const fileSize = z.util.formatBytes(uploadLimit);
+          const fileSize = formatBytes(uploadLimit);
           const options = {
             text: {
               message: t('modalAssetTooLargeMessage', fileSize),
@@ -814,7 +825,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             },
           };
 
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
         }
       }
 
@@ -835,14 +846,14 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         },
       };
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
     }
 
     return isHittingUploadLimit;
   }
 
   _moveCursorToEnd() {
-    z.util.afterRender(() => {
+    afterRender(() => {
       if (this.textarea) {
         const endPosition = this.textarea.value.length;
         this.textarea.setSelectionRange(endPosition, endPosition);
@@ -864,6 +875,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       },
     };
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };
