@@ -18,7 +18,7 @@
  */
 
 export class WebWorker {
-  post: (data: any) => Promise<ArrayBuffer>;
+  post: (data: string | ArrayBuffer) => Promise<ArrayBuffer>;
   constructor(uri: string) {
     this.post = data => {
       return new Promise((resolve, reject) => {
