@@ -17,6 +17,8 @@
  *
  */
 
+import {escapeRegex} from 'Util/SanitizationUtil';
+
 window.z = window.z || {};
 window.z.search = z.search || {};
 
@@ -27,7 +29,7 @@ z.search.FullTextSearch = (() => {
     const regex = query
       .trim()
       .split(delimiter)
-      .map(word => `(${z.util.SanitizationUtil.escapeRegex(word)})`)
+      .map(word => `(${escapeRegex(word)})`)
       .join('(?:.*)');
 
     return new RegExp(regex, flags);

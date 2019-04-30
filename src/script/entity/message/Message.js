@@ -21,6 +21,7 @@ import ko from 'knockout';
 import moment from 'moment';
 
 import {TimeUtil} from 'Util/TimeUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -104,7 +105,7 @@ class Message {
       return date.local().format('HH:mm');
     };
 
-    this.unsafeSenderName = ko.pureComputed(() => z.util.SanitizationUtil.getFirstName(this.user(), undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => getFirstName(this.user(), undefined, true));
     this.headerSenderName = ko.pureComputed(() => {
       return this.user().isService ? this.user().name() : this.user().first_name();
     });

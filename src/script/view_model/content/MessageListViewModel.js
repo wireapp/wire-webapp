@@ -24,6 +24,7 @@ import {groupBy} from 'underscore';
 import {getLogger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -589,12 +590,17 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
+    const emailTarget = event.target.closest('[data-email-link]');
+    if (emailTarget) {
+      safeMailOpen(emailTarget.href);
+      return false;
+    }
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
-          z.util.SanitizationUtil.safeWindowOpen(href);
+          safeWindowOpen(href);
         },
         text: {
           action: t('modalOpenLinkAction'),

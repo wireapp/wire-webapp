@@ -29,6 +29,7 @@ import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
 import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -701,8 +702,7 @@ class AuthViewModel {
   }
 
   clicked_on_password() {
-    const url = getAccountPagesUrl(URL_PATH.PASSWORD_RESET);
-    z.util.SanitizationUtil.safeWindowOpen(url);
+    safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   clicked_on_resend_code() {
@@ -739,7 +739,7 @@ class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = t('urlWebsiteRoot');
-    z.util.SanitizationUtil.safeWindowOpen(getWebsiteUrl(path));
+    safeWindowOpen(getWebsiteUrl(path));
   }
 
   keydown_auth(keyboard_event) {

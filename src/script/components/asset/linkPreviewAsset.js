@@ -17,6 +17,8 @@
  *
  */
 
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -50,7 +52,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
 
   onClick() {
     if (!this.messageEntity.is_expired()) {
-      z.util.SanitizationUtil.safeWindowOpen(this.preview.url);
+      safeWindowOpen(this.preview.url);
     }
   }
 

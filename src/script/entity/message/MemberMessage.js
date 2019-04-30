@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {User} from '../User';
@@ -90,9 +91,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave
-        ? this.name()
-        : z.util.SanitizationUtil.getFirstName(this.user(), Declension.NOMINATIVE, true);
+      return isTeamMemberLeave ? this.name() : getFirstName(this.user(), Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);

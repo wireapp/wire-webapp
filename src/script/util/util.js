@@ -23,7 +23,7 @@ import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
 import MarkdownIt from 'markdown-it';
 
-import {SanitizationUtil} from 'Util/SanitizationUtil';
+import {escapeString} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
@@ -332,7 +332,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
     const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${z.util.SanitizationUtil.escapeString(mentionText)}`;
+    const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
   const mentionTexts = {};
@@ -369,7 +369,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const cleanString = hashedString =>
-      SanitizationUtil.escapeString(
+      escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
           hashedString
@@ -390,8 +390,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       return `[${cleanString(text)}](${cleanString(href)})`;
     }
     if (isEmail) {
-      const email = href.replace(/^mailto:/, '');
-      link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+      link.attrPush(['data-email-link', 'true']);
     } else {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);

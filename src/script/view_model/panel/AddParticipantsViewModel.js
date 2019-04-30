@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
@@ -135,7 +136,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
+      safeWindowOpen(this.manageServicesUrl);
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
