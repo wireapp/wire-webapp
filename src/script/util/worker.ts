@@ -17,12 +17,16 @@
  *
  */
 
-window.z = window.z || {};
-window.z.motion = z.motion || {};
-
-z.motion.MotionDuration = {
-  LONG: 550,
-  MEDIUM: 350,
-  SHORT: 150,
-  X_LONG: 700,
-};
+export class WebWorker {
+  post: (data: string | ArrayBuffer) => Promise<ArrayBuffer>;
+  constructor(uri: string) {
+    this.post = data => {
+      return new Promise((resolve, reject) => {
+        const worker = new Worker(uri);
+        worker.onmessage = event => resolve(event.data);
+        worker.onerror = error => reject(error);
+        worker.postMessage(data);
+      });
+    };
+  }
+}

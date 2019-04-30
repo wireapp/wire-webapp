@@ -22,6 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -82,7 +83,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       .then(() => {
         window.setTimeout(() => {
           this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
-        }, z.motion.MotionDuration.LONG);
+        }, MotionDuration.LONG);
 
         window.setTimeout(() => {
           this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);

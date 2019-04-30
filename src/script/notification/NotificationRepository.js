@@ -23,6 +23,7 @@ import {getFirstName} from 'Util/SanitizationUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {truncate} from 'Util/StringUtil';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -532,7 +533,7 @@ class NotificationRepository {
         .previewPictureResource()
         .generateUrl()
         .catch(error => {
-          if (error instanceof z.util.ValidationUtilError) {
+          if (error instanceof ValidationUtilError) {
             this.logger.error(`Failed to validate an asset URL: ${error.message}`);
           }
           return '';

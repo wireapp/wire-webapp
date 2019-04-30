@@ -20,6 +20,8 @@
 import {Asset} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
+import {assetV3, legacyAsset} from 'Util/ValidationUtil';
+import {WebWorker} from 'Util/worker';
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {BackendClientInterface} from '../service/BackendClientInterface';
@@ -117,7 +119,7 @@ export class AssetService {
 
   generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      legacyAsset(assetId, conversationId);
       const url = this.backendClient.createUrl(`/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
@@ -128,7 +130,7 @@ export class AssetService {
 
   generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      legacyAsset(assetId, conversationId);
       const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
@@ -138,7 +140,7 @@ export class AssetService {
 
   generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+      assetV3(assetKey, assetToken);
       const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
       const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
@@ -219,7 +221,7 @@ export class AssetService {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
         }
-        return new z.util.Worker(pathToWorkerFile).post(buffer);
+        return new WebWorker(pathToWorkerFile).post(buffer);
       })
       .then(compressedBytes => {
         return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({

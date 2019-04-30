@@ -22,13 +22,14 @@ import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, isSameLocation, createRandomUuid} from 'Util/util';
+import {checkIndexedDb, createRandomUuid} from 'Util/util';
 import {DebugUtil} from 'Util/DebugUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
+import {isSameLocation} from 'Util/ValidationUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
 import {Config} from '../auth/config';

@@ -17,20 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
-z.util.ValidationUtilError = class ValidationUtilError extends Error {
-  constructor(message = 'Unknown ValidationUtilError') {
-    super();
-
-    this.message = message;
-    this.name = this.constructor.name;
-
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor);
-    } else {
-      this.stack = new Error(message).stack;
-    }
-  }
-};
+export enum MotionDuration {
+  LONG = 550,
+  MEDIUM = 350,
+  SHORT = 150,
+  X_LONG = 700,
+}

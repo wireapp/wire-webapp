@@ -19,6 +19,8 @@
 
 import {Mention} from '@wireapp/protocol-messaging';
 
+import {isUUID} from 'Util/ValidationUtil';
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -97,7 +99,7 @@ z.message.MentionEntity = class MentionEntity {
       throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
     }
 
-    const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
+    const isValidUserId = isUUID(this.userId);
     if (!isValidUserId) {
       throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
     }

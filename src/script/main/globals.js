@@ -13,14 +13,7 @@ import '../event/WebApp';
 
 import configGlobal from '../config.js';
 
-import envGlobal from 'Util/Environment.js';
-import DebugUtilGlobal from 'Util/DebugUtil.js';
-import utilGlobal from 'Util/util.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
-import helpersGlobal from 'Util/scroll-helpers.js';
-import workerGlobal from 'Util/worker.js';
-import ValidationUtilGlobal from 'Util/ValidationUtil.js';
-import ValidationUtilErrorGlobal from 'Util/ValidationUtilError.js';
 
 import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
@@ -75,7 +68,6 @@ import ServiceMiddlewareGlobal from '../event/preprocessor/ServiceMiddleware.js'
 import WebSocketServiceGlobal from '../event/WebSocketService.js';
 import LinkPreviewProtoBuilderGlobal from '../links/LinkPreviewProtoBuilder.js';
 import LinkPreviewBlackListGlobal from '../links/LinkPreviewBlackList.js';
-import MotionDurationGlobal from '../motion/MotionDuration.js';
 import FullTextSearchGlobal from '../search/FullTextSearch.js';
 import SearchServiceGlobal from '../search/SearchService.js';
 import SearchRepositoryGlobal from '../search/SearchRepository.js';

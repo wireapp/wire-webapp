@@ -25,11 +25,12 @@ import 'phoneformat.js';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util';
+import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
 import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
 import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
@@ -54,6 +55,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {NotificationService} from '../event/NotificationService';
 import {WebSocketService} from '../event/WebSocketService';
+import {MotionDuration} from '../motion/MotionDuration';
 
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 
@@ -732,7 +734,7 @@ class AuthViewModel {
             window.setTimeout(() => {
               $('.icon-error').fadeIn();
               this.disabled_by_animation(false);
-            }, z.motion.MotionDuration.LONG);
+            }, MotionDuration.LONG);
           });
       }
     }
@@ -892,7 +894,7 @@ class AuthViewModel {
 
     window.setTimeout(() => {
       $('.icon-check').fadeIn();
-    }, z.motion.MotionDuration.LONG);
+    }, MotionDuration.LONG);
 
     window.setTimeout(() => {
       $('.icon-check').fadeOut();
