@@ -56,7 +56,7 @@ class ConversationListCallingCell {
 
     this.isDeclined = ko.pureComputed(() => call.reason() === CALL_REASON.STILL_ONGOING);
 
-    this.isMuted = ko.observable(false);
+    this.isMuted = this.callingRepository.isMuted;
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval;
@@ -197,8 +197,7 @@ class ConversationListCallingCell {
 
   toggleMute(data, event) {
     event.stopPropagation();
-    this.isMuted(!this.isMuted());
-    this.callingRepository.muteCall(this.conversation.id, this.isMuted());
+    this.callingRepository.muteCall(this.conversation.id, !this.isMuted());
   }
 
   onToggleScreen(data, event) {

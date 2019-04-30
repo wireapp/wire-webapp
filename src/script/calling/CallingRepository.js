@@ -80,6 +80,7 @@ export class CallingRepository {
     this.wUser = undefined;
     this.callingApi = undefined;
     this.activeCalls = ko.observableArray();
+    this.isMuted = ko.observable(false);
 
     ko.computed(() => {
       if (userRepository.self() && clientRepository.currentClient()) {
@@ -207,6 +208,9 @@ export class CallingRepository {
       log('vstateh') //vstateh,
     );
 
+    callingApi.set_mute_handler(wUser, muted => {
+      this.isMuted(muted);
+    });
     callingApi.set_state_handler(wUser, (conversationId, state) => {
       log('state_handler')(conversationId, state);
       const storedCall = this.findCall(conversationId);
