@@ -24,6 +24,7 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
@@ -135,7 +136,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickToResetSession() {
-    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), z.motion.MotionDuration.LONG);
+    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
 
     this.isResettingSession(true);
     this.conversationRepository

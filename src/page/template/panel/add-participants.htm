@@ -6,7 +6,7 @@
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
     </div>
     <div class="panel__content panel__content--fill">
-      <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: t('addParticipantsSearchPlaceholder'), focusDelay: z.motion.MotionDuration.LONG" spellcheck="false"></user-input>
+      <user-input class="user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: t('addParticipantsSearchPlaceholder'), focusDelay: MotionDuration.LONG" spellcheck="false"></user-input>
       <!-- ko if: showIntegrations() -->
         <div class="panel__tabs">
           <div class="panel__tab" data-bind="css: {'panel__tab--active': isStateAddPeople}, click: clickOnAddPeople, text: t('addParticipantsTabsPeople')" data-uie-name="do-add-people"></div>
