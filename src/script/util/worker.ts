@@ -17,18 +17,16 @@
  *
  */
 
-window.z = window.z || {};
-window.z.util = z.util || {};
-
-z.util.Worker = class Worker {
-  constructor(uri) {
+export class WebWorker {
+  post: (data: any) => Promise<ArrayBuffer>;
+  constructor(uri: string) {
     this.post = data => {
       return new Promise((resolve, reject) => {
-        const worker = new window.Worker(uri);
+        const worker = new Worker(uri);
         worker.onmessage = event => resolve(event.data);
         worker.onerror = error => reject(error);
         worker.postMessage(data);
       });
     };
   }
-};
+}

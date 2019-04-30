@@ -21,6 +21,7 @@ import {Asset} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 
+import {WebWorker} from 'Util/worker';
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
 import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
@@ -219,7 +220,7 @@ export class AssetService {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
         }
-        return new z.util.Worker(pathToWorkerFile).post(buffer);
+        return new WebWorker(pathToWorkerFile).post(buffer);
       })
       .then(compressedBytes => {
         return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({
