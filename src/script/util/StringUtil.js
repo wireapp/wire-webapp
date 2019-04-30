@@ -92,8 +92,15 @@ export const truncate = (string, outputLength, wordBoundary = true) => {
   return string;
 };
 
-export const formatString = (...args) => {
-  let string = args.shift();
+/**
+ * Replaces designated places in the source string with the additional arguments
+ * e.g. formatString('{0} {1}!!!', 'Hello', 'World') => 'Hello World!!!'
+ *
+ * @param {string} string - source string
+ * @param  {...any} args - replacements for placeholders in source string
+ * @returns {string} source string with replacements applied
+ */
+export const formatString = (string, ...args) => {
   args.forEach((arg, index) => {
     const reg = new RegExp(`\\{${index}\\}`, 'gm');
     string = string.replace(reg, arg);
