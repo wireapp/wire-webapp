@@ -89,6 +89,22 @@ git push origin --tags
 
 If everything is done right, a deployment job ([Example](https://travis-ci.org/wireapp/wire-webapp/builds/523396493)) should be picked up on Travis CI based on the new tag.
 
+#### Production Release
+
+**Actions**
+
+1. Create a branch from the verified (approved by QA team) RC build. The easiest way to do that is to use the GitHub UI and to create the branch from the staging release tag because every RC build has a staging tag:
+
+![Production Release Step 1](./docs/release/prod-release-step-1.png)
+
+2. Create a pull request from the newly created branch into our "prod" branch:
+
+![Production Release Step 2](./docs/release/prod-release-step-2.png)
+
+3. Create **a merge commit** (don't squash or rebase!) to kickoff a production release via Travis CI. If you don't want that the release goes live (because you want to park a new feature for a later deployment) you can add `[skip travis]` to your commit message to [prevent the release build](https://docs.travis-ci.com/user/customizing-the-build#skipping-a-build) and its deployment.
+
+![Production Release Step 3](./docs/release/prod-release-step-3.png)
+
 #### Manual Deployments
 
 Based on the Git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
