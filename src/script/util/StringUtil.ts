@@ -31,7 +31,7 @@ export const trimEnd = (string = '') => string.replace(/\s*$/, '');
 export const trimStart = (string = '') => string.replace(/^\s*/, '');
 
 /**
- * @param str - string to pad
+ * @param string - string to pad
  * @param length - maximum length to pad
  * @param padCharacter - character to pad with (default is space)
  * @returns The padded string
