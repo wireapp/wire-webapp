@@ -18,7 +18,6 @@ import DebugUtilGlobal from 'Util/DebugUtil.js';
 import utilGlobal from 'Util/util.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 import helpersGlobal from 'Util/scroll-helpers.js';
-import URLUtilGlobal from 'Util/URLUtil.js';
 import workerGlobal from 'Util/worker.js';
 import ValidationUtilGlobal from 'Util/ValidationUtil.js';
 import ValidationUtilErrorGlobal from 'Util/ValidationUtilError.js';

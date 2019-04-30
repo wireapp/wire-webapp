@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 
@@ -173,7 +174,7 @@ export class ModalsViewModel {
       case ModalsViewModel.TYPE.SESSION_RESET:
         content.titleText = t('modalSessionResetHeadline');
         content.actionText = t('modalAcknowledgeAction');
-        const supportLink = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.FORM.BUG);
+        const supportLink = buildSupportUrl(z.config.SUPPORT.FORM.BUG);
         content.messageHtml = `${t(
           'modalSessionResetMessage1'
         )}<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">${t(

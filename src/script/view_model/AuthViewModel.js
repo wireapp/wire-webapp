@@ -30,6 +30,7 @@ import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes
 import {Environment} from 'Util/Environment';
 import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -295,7 +296,7 @@ class AuthViewModel {
   }
 
   _init_url_parameter() {
-    const mode = z.util.URLUtil.getParameter(URLParameter.MODE);
+    const mode = getParameter(URLParameter.MODE);
     if (mode) {
       const isExpectedMode = mode === AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
@@ -1487,7 +1488,7 @@ class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
-      url = z.util.URLUtil.forwardParameter(url, parameter_name);
+      url = forwardParameter(url, parameter_name);
     });
 
     return url;
