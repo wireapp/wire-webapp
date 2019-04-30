@@ -19,7 +19,7 @@
 
 import moment from 'moment';
 
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {URLUtil} from 'Util/URLUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 
@@ -104,10 +104,10 @@ setStrings(strings);
 (function setAppLocale() {
   const queryParam = URLUtil.getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.substr(0, 2);
-  let storedLocale = StorageUtil.getValue(StorageKey.LOCALIZATION.LOCALE);
+  let storedLocale = loadValue(StorageKey.LOCALIZATION.LOCALE);
 
   if (queryParam) {
-    storedLocale = StorageUtil.setValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
+    storedLocale = storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);
   }
 
   const locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;

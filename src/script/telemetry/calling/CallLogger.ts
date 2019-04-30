@@ -22,6 +22,7 @@ import sdpTransform from 'sdp-transform';
 import {isObject, isString} from 'underscore';
 
 import {Logger, getLogger} from 'Util/Logger';
+import {formatString} from 'Util/StringUtil';
 
 export class CallLogger {
   static CONFIG = {
@@ -142,24 +143,24 @@ export class CallLogger {
     return message;
   }
 
-  debug(): void {
-    this._log('debug', arguments);
+  debug(...args: any[]): void {
+    this._log('debug', ...args);
   }
 
-  error(): void {
-    this._log('error', arguments);
+  error(...args: any[]): void {
+    this._log('error', ...args);
   }
 
-  info(): void {
-    this._log('info', arguments);
+  info(...args: any[]): void {
+    this._log('info', ...args);
   }
 
-  warn(): void {
-    this._log('warn', arguments);
+  warn(...args: any[]): void {
+    this._log('warn', ...args);
   }
 
-  log(): void {
-    this._log('log', arguments);
+  log(...args: any[]): void {
+    this._log('log', ...args);
   }
 
   private _log(logFunctionName: 'debug' | 'error' | 'info' | 'log' | 'warn', ...args: any[]): void {
@@ -169,8 +170,8 @@ export class CallLogger {
     let loggerMessage = messageData;
     let inMemoryMessage = messageData;
     if (isString(message) && isObject(data)) {
-      loggerMessage = z.util.StringUtil.format(message, ...data.default);
-      inMemoryMessage = z.util.StringUtil.format(message, ...data.obfuscated);
+      loggerMessage = formatString(message, ...data.default);
+      inMemoryMessage = formatString(message, ...data.obfuscated);
     }
     this.logToMemory(inMemoryMessage);
     this.logger[logFunctionName](loggerMessage, ...extraArgs);

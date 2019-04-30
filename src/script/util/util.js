@@ -27,7 +27,7 @@ import {escapeString} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import {StringUtilGlobal} from './StringUtil';
+import {replaceInRange} from './StringUtil';
 import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */
 
@@ -349,12 +349,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
         text: mentionText,
         userId: mention.userId,
       };
-      return z.util.StringUtil.replaceInRange(
-        strippedText,
-        mentionKey,
-        mention.startIndex,
-        mention.startIndex + mention.length
-      );
+      return replaceInRange(strippedText, mentionKey, mention.startIndex, mention.startIndex + mention.length);
     }, message);
 
   markdownit.set({

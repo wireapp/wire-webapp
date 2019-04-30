@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue} from 'Util/StorageUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';
@@ -150,7 +150,7 @@ export class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(

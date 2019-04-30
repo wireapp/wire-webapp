@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
@@ -76,7 +77,7 @@ z.team.TeamRepository = class TeamRepository {
       return this.teamMembers()
         .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
     });
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());

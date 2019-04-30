@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {iterateIndex} from 'Util/ArrayUtil';
 import {koArrayPushAll} from 'Util/util';
 
@@ -94,13 +94,13 @@ export class MediaDevicesHandler {
   _setCurrentDevices() {
     const defaultDeviceId = MediaDevicesHandler.CONFIG.DEFAULT_DEVICE_ID;
 
-    const audioInputId = StorageUtil.getValue(MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
+    const audioInputId = loadValue(MediaDeviceType.AUDIO_INPUT) || defaultDeviceId;
     this.currentDeviceId.audioInput(audioInputId);
 
-    const audioOutputId = StorageUtil.getValue(MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
+    const audioOutputId = loadValue(MediaDeviceType.AUDIO_OUTPUT) || defaultDeviceId;
     this.currentDeviceId.audioOutput(audioOutputId);
 
-    const videoInputId = StorageUtil.getValue(MediaDeviceType.VIDEO_INPUT);
+    const videoInputId = loadValue(MediaDeviceType.VIDEO_INPUT);
     this.currentDeviceId.videoInput(videoInputId);
 
     const setDefaultVideoId = !this.currentDeviceId.videoInput() && this.deviceSupport.videoInput();
@@ -156,7 +156,7 @@ export class MediaDevicesHandler {
     });
 
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
-      StorageUtil.setValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
+      storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
 
       const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
       if (updateStream) {
@@ -165,7 +165,7 @@ export class MediaDevicesHandler {
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
-      StorageUtil.setValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
+      storeValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
 
       if (mediaDeviceId) {
         this.mediaRepository.elementHandler.switchMediaElementOutput(mediaDeviceId);
@@ -190,7 +190,7 @@ export class MediaDevicesHandler {
         this._updateCurrentIndexFromId(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
 
-      StorageUtil.setValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+      storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
       const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === MediaType.VIDEO;
       const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();

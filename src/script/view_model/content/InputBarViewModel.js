@@ -20,12 +20,13 @@
 import moment from 'moment';
 
 import {getLogger} from 'Util/Logger';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'Util/util';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
+import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -331,7 +332,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      StorageUtil.setValue(storageKey, {mentions, reply, text});
+      storeValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -341,7 +342,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = StorageUtil.getValue(storageKey);
+    const storageValue = loadValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};
@@ -517,13 +518,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const beforeLength = this.input().length;
-    const messageTrimmedStart = z.util.StringUtil.trimStart(this.input());
+    const messageTrimmedStart = trimStart(this.input());
     const afterLength = messageTrimmedStart.length;
 
     const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
     this.currentMentions(updatedMentions);
 
-    const messageText = z.util.StringUtil.trimEnd(messageTrimmedStart);
+    const messageText = trimEnd(messageTrimmedStart);
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {

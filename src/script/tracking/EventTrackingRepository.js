@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+import {includesString} from 'Util/StringUtil';
 
 import * as trackingHelpers from './Helpers';
 import {WebAppEvents} from '../event/WebApp';
@@ -152,7 +153,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return typeof trackingParameter === 'boolean'
       ? trackingParameter
       : !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
-          if (z.util.StringUtil.includes(window.location.hostname, domain)) {
+          if (includesString(window.location.hostname, domain)) {
             this.logger.debug(`Analytics is disabled for domain '${window.location.hostname}'`);
             return true;
           }

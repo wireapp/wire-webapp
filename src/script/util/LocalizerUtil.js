@@ -18,7 +18,7 @@
  */
 
 import {escapeString, getSelfName} from './SanitizationUtil';
-import {StringUtil} from './StringUtil';
+import {sortByPriority} from './StringUtil';
 import {isString, isNumber} from 'underscore';
 
 export const DEFAULT_LOCALE = 'en';
@@ -54,7 +54,7 @@ export const LocalizerUtil = {
         const firstName = userEntity.first_name();
         return boldNames ? `[bold]${firstName}[/bold]` : firstName;
       })
-      .sort((userNameA, userNameB) => StringUtil.sortByPriority(userNameA, userNameB));
+      .sort((userNameA, userNameB) => sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
       firstNames.push(getSelfName(declension));

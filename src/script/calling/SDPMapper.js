@@ -18,6 +18,7 @@
  */
 
 import {Environment} from 'Util/Environment';
+import {includesString} from 'Util/StringUtil';
 
 import {SDP_TYPE} from './rtc/SDPType';
 
@@ -115,7 +116,7 @@ export const SDPMapper = {
         }
       } else if (sdpLine.startsWith('a=rtpmap')) {
         const shouldAddPTime = isLocalSdpInGroup || isIceRestart;
-        if (shouldAddPTime && z.util.StringUtil.includes(sdpLine, 'opus')) {
+        if (shouldAddPTime && includesString(sdpLine, 'opus')) {
           sdpLines.push(sdpLine);
           outline = `a=ptime:${SDPMapper.CONFIG.AUDIO_PTIME}`;
         }

@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
+import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
 
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
@@ -90,8 +91,8 @@ class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.getFirstChar(this.first_name());
-        const last = z.util.StringUtil.getFirstChar(this.last_name());
+        const first = getFirstChar(this.first_name());
+        const last = getFirstChar(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);
@@ -179,9 +180,9 @@ class User {
    */
   matches(query, is_handle, excludedChars = []) {
     if (is_handle) {
-      return z.util.StringUtil.startsWith(this.username(), query);
+      return startsWith(this.username(), query);
     }
-    return z.util.StringUtil.compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
+    return compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {

@@ -17,9 +17,10 @@
  *
  */
 
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
-import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil.js';
+import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -120,7 +121,7 @@ export class EmojiInputViewModel {
 
     this.emojiDiv = $(`<div class='${EMOJI_DIV_CLASS}' />`);
     this.emojiStartPosition = -1;
-    this.emojiUsageCount = StorageUtil.getValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emojiUsageCount = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.shouldReplaceEmoji = propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
@@ -358,9 +359,7 @@ export class EmojiInputViewModel {
         const usageCountB = this._getUsageCount(emojiB.name);
 
         const sameUsageCount = usageCountA === usageCountB;
-        return sameUsageCount
-          ? z.util.StringUtil.sortByPriority(emojiA.name, emojiB.name, query)
-          : usageCountB - usageCountA;
+        return sameUsageCount ? sortByPriority(emojiA.name, emojiB.name, query) : usageCountB - usageCountA;
       })
       .slice(0, EmojiInputViewModel.CONFIG.LIST.LENGTH)
       .map(emoji => {
@@ -439,7 +438,7 @@ export class EmojiInputViewModel {
 
   _increaseUsageCount(emojiName) {
     this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
-    StorageUtil.setValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
+    storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
   }
 
   _escapeRegexp(string) {
