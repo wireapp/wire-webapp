@@ -20,7 +20,7 @@
 import {groupBy} from 'underscore';
 import {amplify} from 'amplify';
 
-import * as StorageUtil from 'Util/StorageUtil';
+import {storeValue, resetStoreValue, loadValue} from 'Util/StorageUtil';
 
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {BackendEvent} from '../event/Backend';
@@ -47,12 +47,12 @@ class PreferenceNotificationRepository {
    */
   constructor(selfUserObservable) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
-    const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
+    const storedNotifications = loadValue(notificationsStorageKey);
     this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
     this.notifications.subscribe(notifications => {
       return notifications.length > 0
-        ? StorageUtil.setValue(notificationsStorageKey, JSON.stringify(notifications))
-        : StorageUtil.resetValue(notificationsStorageKey);
+        ? storeValue(notificationsStorageKey, JSON.stringify(notifications))
+        : resetStoreValue(notificationsStorageKey);
     });
 
     const executeIfSelfUser = callback => {

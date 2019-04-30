@@ -17,7 +17,7 @@
  *
  */
 
-import * as StorageUtil from 'Util/StorageUtil';
+import {resetStoreValue} from 'Util/StorageUtil';
 
 import {StorageKey} from '../storage/StorageKey';
 
@@ -51,7 +51,7 @@ export class CacheRepository {
       const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
 
       if (shouldBeDeleted) {
-        StorageUtil.resetValue(storedKey);
+        resetStoreValue(storedKey);
         deletedKeys.push(storedKey);
       }
     }

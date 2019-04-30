@@ -19,7 +19,6 @@ import utilGlobal from 'Util/util.js';
 import SanitizationUtilGlobal from 'Util/SanitizationUtil.js';
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 import helpersGlobal from 'Util/scroll-helpers.js';
-import StorageUtilGlobal from 'Util/StorageUtil.js';
 import URLUtilGlobal from 'Util/URLUtil.js';
 import workerGlobal from 'Util/worker.js';
 import ValidationUtilGlobal from 'Util/ValidationUtil.js';

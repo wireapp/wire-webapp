@@ -20,7 +20,7 @@
 import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {murmurhash3} from 'Util/util';
 import {Environment} from 'Util/Environment';
@@ -384,7 +384,7 @@ export class ClientRepository {
    * @returns {string} Cookie label
    */
   _getCookieLabelValue(login) {
-    return StorageUtil.getValue(this.constructCookieLabelKey(login));
+    return loadValue(this.constructCookieLabelKey(login));
   }
 
   /**
@@ -403,7 +403,7 @@ export class ClientRepository {
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      StorageUtil.setValue(localStorageKey, cookieLabel);
+      loadValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
@@ -423,7 +423,7 @@ export class ClientRepository {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
+    const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return Environment.electron ? z.client.ClientType.PERMANENT : type;
   }

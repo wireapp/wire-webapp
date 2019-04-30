@@ -20,7 +20,7 @@
 import Dexie from 'dexie';
 
 import {getLogger} from 'Util/Logger';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue} from 'Util/StorageUtil';
 
 import {Config} from '../auth/config';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -59,7 +59,7 @@ export class StorageService {
    */
   init(userId = this.userId) {
     return Promise.resolve().then(() => {
-      const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
+      const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
       const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.userId = userId;
