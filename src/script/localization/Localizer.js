@@ -20,7 +20,7 @@
 import moment from 'moment';
 
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {getParameter} from 'Util/URLUtil';
+import {getParameter} from 'Util/UrlUtil';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
 
 import {URLParameter} from '../auth/URLParameter';

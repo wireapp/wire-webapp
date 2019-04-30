@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {includesString} from 'Util/StringUtil';
-import {getParameter} from 'Util/URLUtil';
+import {getParameter} from 'Util/UrlUtil';
 
 import * as trackingHelpers from './Helpers';
 import {WebAppEvents} from '../event/WebApp';

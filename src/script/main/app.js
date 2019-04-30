@@ -29,7 +29,7 @@ import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
-import {appendParameter} from 'Util/URLUtil';
+import {appendParameter} from 'Util/UrlUtil';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';

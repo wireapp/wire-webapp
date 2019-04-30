@@ -25,9 +25,9 @@ import {
   getDomainName,
   getLinksFromHtml,
   prependProtocol,
-} from 'Util/URLUtil';
+} from 'Util/UrlUtil';
 
-describe('URLUtil', () => {
+describe('UrlUtil', () => {
   describe('appendParameter', () => {
     it('append param with & when url contains param', () => {
       expect(appendParameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');

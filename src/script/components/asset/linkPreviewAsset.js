@@ -18,7 +18,7 @@
  */
 
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {getDomainName} from 'Util/URLUtil';
+import {getDomainName} from 'Util/UrlUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {loadValue} from 'Util/StorageUtil';
-import {appendParameter} from 'Util/URLUtil';
+import {appendParameter} from 'Util/UrlUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';

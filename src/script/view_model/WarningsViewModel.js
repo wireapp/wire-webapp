@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {buildSupportUrl} from 'Util/URLUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';

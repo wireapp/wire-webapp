@@ -30,7 +30,7 @@ import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes
 import {Environment} from 'Util/Environment';
 import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {forwardParameter, getParameter} from 'Util/URLUtil';
+import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';

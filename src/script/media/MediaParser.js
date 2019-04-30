@@ -17,7 +17,7 @@
  *
  */
 
-import {getLinksFromHtml} from 'Util/URLUtil';
+import {getLinksFromHtml} from 'Util/UrlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
 

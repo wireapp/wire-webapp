@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {buildSupportUrl} from 'Util/URLUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 

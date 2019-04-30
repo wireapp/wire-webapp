@@ -17,7 +17,7 @@
  *
  */
 
-import {buildSupportUrl} from 'Util/URLUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
 
 ko.bindingHandlers.supportLink = {
   update(element, valueAccessor) {
