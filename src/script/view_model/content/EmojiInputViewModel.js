@@ -19,8 +19,8 @@
 
 import * as StorageUtil from 'Util/StorageUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
-import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil.js';
-import {sortByPriority} from 'Util/StringUtil.js';
+import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
