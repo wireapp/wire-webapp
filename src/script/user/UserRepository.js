@@ -25,6 +25,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {ConsentValue} from './ConsentValue';
@@ -90,7 +91,7 @@ export class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.isConnected())
-          .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
+          .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
 

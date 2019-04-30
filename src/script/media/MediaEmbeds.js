@@ -20,6 +20,7 @@
 import 'url-search-params-polyfill';
 
 import {Environment} from 'Util/Environment';
+import {formatString} from 'Util/StringUtil';
 
 /**
  * Create and iframe.
@@ -52,7 +53,7 @@ const _createIframeContainer = options => {
     options.allowfullscreen = '';
   }
 
-  return z.util.StringUtil.format(
+  return formatString(
     iframeContainer,
     options.class,
     options.width,
@@ -205,7 +206,7 @@ export const MediaEmbeds = {
         video: false,
       });
 
-      const embed = z.util.StringUtil.format(iframe, height, linkSrc);
+      const embed = formatString(iframe, height, linkSrc);
       message = _appendIframe(link, message, embed);
     }
 

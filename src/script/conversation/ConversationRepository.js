@@ -43,6 +43,7 @@ import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
+import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -865,13 +866,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const queryString = isHandle ? `@${query}` : query;
-        if (z.util.StringUtil.compareTransliteration(conversationEntity.display_name(), queryString)) {
+        if (compareTransliteration(conversationEntity.display_name(), queryString)) {
           return true;
         }
 
         for (const userEntity of conversationEntity.participating_user_ets()) {
           const nameString = isHandle ? userEntity.username() : userEntity.name();
-          if (z.util.StringUtil.startsWith(nameString, query)) {
+          if (startsWith(nameString, query)) {
             return true;
           }
         }
@@ -879,7 +880,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return false;
       })
       .sort((conversationA, conversationB) => {
-        return z.util.StringUtil.sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
+        return sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
       })
       .map(conversationEntity => {
         this.updateParticipatingUserEntities(conversationEntity);
@@ -1226,7 +1227,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.user_repository
       .get_users_by_id(conversationEntity.participating_user_ids(), offline)
       .then(userEntities => {
-        userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
         conversationEntity.participating_user_ets(userEntities);
 
         if (updateGuests) {
@@ -2631,7 +2632,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
             const hasMultipleUsers = userEntities.length > 1;
             const userNames = joinNames(userEntities, Declension.NOMINATIVE);
-            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
+            const titleSubstitutions = capitalizeFirstChar(userNames);
 
             if (hasMultipleUsers) {
               titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
@@ -3746,7 +3747,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
         return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
-          userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+          userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
           messageEntity.userEntities(userEntities);
           return messageEntity;
         });

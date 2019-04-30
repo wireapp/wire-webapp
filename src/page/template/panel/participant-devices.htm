@@ -13,7 +13,7 @@
           <div class="panel__header__title" data-bind="text: selectedClient().label || selectedClient().model"></div>
         <!-- /ko -->
         <!-- ko ifnot: userEntity().is_me -->
-          <div class="panel__header__title" data-bind="text: z.util.StringUtil.capitalizeFirstChar(selectedClient().class)"></div>
+          <div class="panel__header__title" data-bind="text: capitalizeFirstChar(selectedClient().class)"></div>
         <!-- /ko -->
       <!-- /ko -->
       <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>

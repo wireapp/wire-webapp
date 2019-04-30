@@ -22,6 +22,7 @@ import sdpTransform from 'sdp-transform';
 import {isObject, isString} from 'underscore';
 
 import {Logger, getLogger} from 'Util/Logger';
+import {formatString} from 'Util/StringUtil';
 
 export class CallLogger {
   static CONFIG = {
@@ -169,8 +170,8 @@ export class CallLogger {
     let loggerMessage = messageData;
     let inMemoryMessage = messageData;
     if (isString(message) && isObject(data)) {
-      loggerMessage = z.util.StringUtil.format(message, ...data.default);
-      inMemoryMessage = z.util.StringUtil.format(message, ...data.obfuscated);
+      loggerMessage = formatString(message, ...data.default);
+      inMemoryMessage = formatString(message, ...data.obfuscated);
     }
     this.logToMemory(inMemoryMessage);
     this.logger[logFunctionName](loggerMessage, ...extraArgs);

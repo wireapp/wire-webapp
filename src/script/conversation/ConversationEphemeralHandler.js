@@ -23,6 +23,7 @@ import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {arrayToBase64, noop} from 'Util/util';
+import {obfuscate} from 'Util/StringUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
@@ -219,7 +220,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
-    obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);
+    obfuscatedAsset.text = obfuscate(assetEntity.text);
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
