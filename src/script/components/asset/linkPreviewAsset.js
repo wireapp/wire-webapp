@@ -19,6 +19,7 @@
 
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
+import {getDomainName} from 'Util/UrlUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -34,6 +35,8 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
     this.onClick = this.onClick.bind(this);
+
+    this.getDomainName = getDomainName;
 
     this.messageEntity = ko.unwrap(params.message);
     this.header = params.header || false;
@@ -87,7 +90,7 @@ ko.components.register('link-preview-asset', {
             </div>
           <!-- /ko -->
           <!-- ko ifnot: isTweet -->
-            <div class="link-preview-info-link text-foreground ellipsis" data-bind="text: z.util.URLUtil.getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
+            <div class="link-preview-info-link text-foreground ellipsis" data-bind="text: getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
           <!-- /ko -->
         <!-- /ko -->
       </div>
