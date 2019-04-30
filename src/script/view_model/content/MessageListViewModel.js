@@ -30,6 +30,7 @@ import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 /*
  * Message list rendering view model.
@@ -410,7 +411,7 @@ class MessageListViewModel {
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
-      }, z.motion.MotionDuration.LONG);
+      }, MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
     this.conversation_repository

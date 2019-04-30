@@ -31,6 +31,7 @@ import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '../../event/WebApp';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 class StartUIViewModel {
   static get STATE() {
@@ -311,7 +312,7 @@ class StartUIViewModel {
     });
 
     // Dismiss old bubble and wait with creating the new one when another bubble is open
-    const timeout = this.userBubble ? z.motion.MotionDuration.LONG : 0;
+    const timeout = this.userBubble ? MotionDuration.LONG : 0;
     if (this.userBubble) {
       this.userBubble.hide();
     }

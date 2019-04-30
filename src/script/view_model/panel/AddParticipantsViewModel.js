@@ -26,6 +26,7 @@ import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -44,6 +45,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.searchRepository = search;
     this.teamRepository = team;
     this.userRepository = user;
+    this.MotionDuration = MotionDuration;
 
     this.logger = getLogger('z.viewModel.panel.AddParticipantsViewModel');
 

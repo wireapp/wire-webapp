@@ -28,6 +28,7 @@ import {NotificationsViewModel} from './panel/NotificationsViewModel';
 import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 import {WebAppEvents} from '../event/WebApp';
+import {MotionDuration} from '../motion/MotionDuration';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -225,7 +226,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     window.setTimeout(() => {
       toPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
       this._hidePanel(fromState);
-    }, z.motion.MotionDuration.MEDIUM);
+    }, MotionDuration.MEDIUM);
   }
 
   _hidePanel(state) {

@@ -55,6 +55,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {NotificationService} from '../event/NotificationService';
 import {WebSocketService} from '../event/WebSocketService';
+import {MotionDuration} from '../motion/MotionDuration';
 
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 
@@ -733,7 +734,7 @@ class AuthViewModel {
             window.setTimeout(() => {
               $('.icon-error').fadeIn();
               this.disabled_by_animation(false);
-            }, z.motion.MotionDuration.LONG);
+            }, MotionDuration.LONG);
           });
       }
     }
@@ -893,7 +894,7 @@ class AuthViewModel {
 
     window.setTimeout(() => {
       $('.icon-check').fadeIn();
-    }, z.motion.MotionDuration.LONG);
+    }, MotionDuration.LONG);
 
     window.setTimeout(() => {
       $('.icon-check').fadeOut();
