@@ -41,7 +41,6 @@ import {MediaType} from '../media/MediaType';
 
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
-import {EventName} from '../tracking/EventName';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {getAvsInstance, CALL_TYPE, STATE as CALL_STATE, CONV_TYPE, ENV as AVS_ENV} from 'avs-web';
@@ -174,7 +173,7 @@ export class CallingRepository {
     ) => {
       const protoCalling = new Calling({content: payload});
       const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+        [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
         messageId: createRandomUuid(),
       });
 
@@ -351,223 +350,6 @@ export class CallingRepository {
     }
   }
 
-  /**
-   * Verify validity of incoming call.
-   *
-   * @param {CallMessageEntity} callMessageEntity - Call message to validate
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @param {z.error.CallError|Error} error - Error thrown during call message handling
-   * @returns {undefined} No return value
-   */
-  _validateIncomingCall(callMessageEntity, source, error) {
-    this._throwMessageError(error);
-
-    const {conversationId, response, type, userId} = callMessageEntity;
-
-    const isTypeGroupCheck = type === CALL_MESSAGE_TYPE.GROUP_CHECK;
-    const isSelfUser = userId === this.selfUserId();
-    const validMessage = response === isTypeGroupCheck;
-
-    if (!isSelfUser && validMessage) {
-      const eventFromStream = source === EventRepository.SOURCE.STREAM;
-      const silentCall = isTypeGroupCheck || eventFromStream;
-      const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
-
-      if (!eventFromStream) {
-        const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
-        eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-        const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
-        const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
-
-        promises.push(grantPromise);
-      }
-
-      Promise.all(promises)
-        .then(([callEntity, grantedCall]) => {
-          if (grantedCall) {
-            const mediaType = callEntity.isRemoteVideoCall() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
-            return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-              this.startCall(conversationEntity.id, mediaType);
-            });
-          }
-        })
-        .catch(_error => {
-          const isDegraded = _error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
-          if (!isDegraded) {
-            throw _error;
-          }
-
-          this.rejectCall(conversationId);
-        });
-    }
-  }
-
-  /**
-   * Validate that content of call message is targeted at local client.
-   * @param {CallEntity} callEntity - Call the message belongs to
-   * @param {CallMessageEntity} callMessageEntity - Call message to validate
-   * @returns {CallEntity} Call entity if message is valid
-   */
-  _validateMessageDestination(callEntity, callMessageEntity) {
-    if (callEntity.isGroup) {
-      const {destinationClientId: clientId, destinationUserId: userId, type} = callMessageEntity;
-
-      const isSelfUser = userId === this.selfUserId();
-      const isCurrentClient = clientId === this.clientRepository.currentClient().id;
-      const mistargetedMessage = !isSelfUser || !isCurrentClient;
-      if (mistargetedMessage) {
-        this.callLogger.log(`Ignored '${type}' call message for targeted at client '${clientId}' of user '${userId}'`);
-        throw new z.error.CallError(z.error.CallError.TYPE.MISTARGETED_MESSAGE);
-      }
-    }
-
-    return callEntity;
-  }
-
-  /**
-   * Validate that type of call message matches conversation type.
-   * @param {CallMessageEntity} callMessageEntity - Call message to validate
-   * @returns {Promise} Resolves if the message is valid
-   */
-  _validateMessageType(callMessageEntity) {
-    const {conversationId, type} = callMessageEntity;
-
-    return this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
-      if (conversationEntity.is1to1()) {
-        const groupMessageTypes = [
-          CALL_MESSAGE_TYPE.GROUP_CHECK,
-          CALL_MESSAGE_TYPE.GROUP_LEAVE,
-          CALL_MESSAGE_TYPE.GROUP_SETUP,
-          CALL_MESSAGE_TYPE.GROUP_START,
-        ];
-
-        if (groupMessageTypes.includes(type)) {
-          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
-        }
-      } else if (conversationEntity.isGroup()) {
-        const one2oneMessageTypes = [CALL_MESSAGE_TYPE.SETUP];
-
-        if (one2oneMessageTypes.includes(type)) {
-          throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
-        }
-      } else {
-        throw new z.error.CallError(z.error.CallError.TYPE.WRONG_CONVERSATION_TYPE);
-      }
-
-      return conversationEntity;
-    });
-  }
-
-  /**
-   *
-   * @private
-   * @param {CallEntity} callEntity - Call entity
-   * @param {CallMessageEntity} incomingCallMessageEntity - Incoming call message
-   * @returns {Promise} Resolves with the call
-   */
-  _confirmCallMessage(callEntity, incomingCallMessageEntity) {
-    const response = incomingCallMessageEntity.response;
-
-    const skipConfirmation = response || !callEntity.selfClientJoined();
-    return skipConfirmation
-      ? Promise.resolve(callEntity)
-      : callEntity
-          .confirmMessage(incomingCallMessageEntity)
-          .catch(error => {
-            const isNotDataChannel = error.type === z.error.CallError.TYPE.NO_DATA_CHANNEL;
-            if (!isNotDataChannel) {
-              throw error;
-            }
-          })
-          .then(() => callEntity);
-  }
-
-  /**
-   * Limit the message recipients for a call message.
-   *
-   * @private
-   * @param {CallMessageEntity} callMessageEntity - Call message to target at clients
-   * @returns {Promise} Resolves with the client user map and precondition option
-   */
-  _limitMessageRecipients(callMessageEntity) {
-    const {remoteClientId, remoteUser, remoteUserId, response, type} = callMessageEntity;
-    const recipientsPromise = remoteUserId
-      ? this.userRepository.get_user_by_id(remoteUserId)
-      : Promise.resolve(remoteUser);
-
-    return recipientsPromise.then(remoteUserEntity => {
-      const selfUserEntity = this.userRepository.self();
-      let precondition;
-      let recipients;
-
-      switch (type) {
-        case CALL_MESSAGE_TYPE.CANCEL: {
-          if (response) {
-            // Send to remote client that initiated call
-            precondition = true;
-            recipients = {
-              [remoteUserEntity.id]: [`${remoteClientId}`],
-            };
-          } else {
-            // Send to all clients of remote user
-            precondition = [remoteUserEntity.id];
-            recipients = {
-              [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
-            };
-          }
-          break;
-        }
-
-        case CALL_MESSAGE_TYPE.GROUP_SETUP:
-        case CALL_MESSAGE_TYPE.HANGUP:
-        case CALL_MESSAGE_TYPE.PROP_SYNC:
-        case CALL_MESSAGE_TYPE.UPDATE: {
-          // Send to remote client that call is connected with
-          if (remoteClientId) {
-            precondition = true;
-            recipients = {
-              [remoteUserEntity.id]: [`${remoteClientId}`],
-            };
-          }
-          break;
-        }
-
-        case CALL_MESSAGE_TYPE.REJECT: {
-          // Send to all clients of self user
-          precondition = [selfUserEntity.id];
-          recipients = {
-            [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
-          };
-          break;
-        }
-
-        case CALL_MESSAGE_TYPE.SETUP: {
-          if (response) {
-            // Send to remote client that initiated call and all clients of self user
-            precondition = [selfUserEntity.id];
-            recipients = {
-              [remoteUserEntity.id]: [`${remoteClientId}`],
-              [selfUserEntity.id]: selfUserEntity.devices().map(device => device.id),
-            };
-          } else {
-            // Send to all clients of remote user
-            precondition = [remoteUserEntity.id];
-            recipients = {
-              [remoteUserEntity.id]: remoteUserEntity.devices().map(device => device.id),
-            };
-          }
-          break;
-        }
-
-        default: {
-          break;
-        }
-      }
-
-      return {precondition, recipients};
-    });
-  }
-
   //##############################################################################
   // Call actions
   //##############################################################################
@@ -584,7 +366,11 @@ gled
     if (conversationEntity) {
       // TODO deduce active call from avs api
       const isActiveCall = false;
-      return isActiveCall ? this.leaveCall(conversationEntity.id) : this.startCall(conversationEntity.id, mediaType);
+      const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      const callType = this.callTypeFromMediaType(mediaType);
+      return isActiveCall
+        ? this.leaveCall(conversationEntity.id)
+        : this.startCall(conversationEntity.id, isGroupCall, callType);
     }
   }
 
@@ -592,17 +378,15 @@ gled
    * Join a call.
    *
    * @param {string} conversationId - id of the conversation to join call in
-   * @param {MediaType} mediaType - Media type for this call
+   * @param {CONV_TYPE} conversationType - Type of the conversation (group or 1:1)
+   * @param {CALL_TYPE} callType - Type of call (audio or video)
    * @returns {undefined} No return value
    */
-  startCall(conversationId, mediaType) {
-    // TODO pass on the conversation type
-    const callType = this.callTypeFromMediaType(mediaType);
-    this.callingApi.start(this.wUser, conversationId, callType, CONV_TYPE.ONEONONE, false);
+  startCall(conversationId, conversationType, callType) {
+    this.callingApi.start(this.wUser, conversationId, callType, conversationType, false);
   }
 
-  answerCall(conversationId, mediaType) {
-    const callType = this.callTypeFromMediaType(mediaType);
+  answerCall(conversationId, callType) {
     this.callingApi.answer(this.wUser, conversationId, callType, false);
   }
 

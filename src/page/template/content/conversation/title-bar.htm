@@ -26,12 +26,12 @@
       <!-- ko if: showCallControls() -->
         <!-- ko if: supportsVideoCall() -->
           <camera-icon class="conversation-title-bar-icon"
-                data-bind="clickOrDrag: clickOnVideoButton, attr: {title: t('tooltipConversationVideoCall')}"
+                data-bind="clickOrDrag: () => startVideoCall(conversationEntity()), attr: {title: t('tooltipConversationVideoCall')}"
                 data-uie-name="do-video-call">
           </camera-icon>
         <!-- /ko -->
         <pickup-icon class="conversation-title-bar-icon"
-              data-bind="clickOrDrag: () => startCall(conversationEntity().id), attr: {title: t('tooltipConversationCall')}"
+              data-bind="clickOrDrag: () => startAudioCall(conversationEntity()), attr: {title: t('tooltipConversationCall')}"
               data-uie-name="do-call">
         </pickup-icon>
       <!-- /ko -->

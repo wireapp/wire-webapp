@@ -22,6 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {CALL_TYPE} from 'avs-web';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -150,8 +151,8 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
-  answerCall = (conversationEntity, mediaType) => {
-    this.callingRepository.answerCall(conversationEntity.id, mediaType);
+  answerCall = conversationEntity => {
+    this.callingRepository.answerCall(conversationEntity.id, CALL_TYPE.AUDIO);
   };
 
   changeNotificationSetting() {

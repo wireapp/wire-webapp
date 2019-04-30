@@ -21,7 +21,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {MediaType} from '../../media/MediaType';
+import {CALL_TYPE} from 'avs-web';
 import {WebAppEvents} from '../../event/WebApp';
 import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
 import {AudioType} from '../../audio/AudioType';
@@ -167,11 +167,11 @@ class ConversationListCallingCell {
 
   onJoinCall(data, event) {
     event.stopPropagation();
-    this.callingRepository.answerCall(this.conversation().id);
+    this.callingRepository.answerCall(this.conversation().id, CALL_TYPE.AUDIO);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.startCall(this.conversation().id, MediaType.AUDIO);
+    this.callingRepository.startCall(this.conversation().id, CALL_TYPE.AUDIO);
   }
 
   onLeaveCall() {
@@ -207,7 +207,8 @@ class ConversationListCallingCell {
 
   onToggleVideo(data, event) {
     event.stopPropagation();
-    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
+    // TODO
+    //amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
   }
 }
 

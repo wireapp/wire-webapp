@@ -21,8 +21,9 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {CONV_TYPE, CALL_TYPE} from 'avs-web';
+
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -116,16 +117,21 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   }
 
-  startCall(conversationId) {
-    this.callingRepository.startCall(conversationId, MediaType.AUDIO);
+  startAudioCall(conversationEntity) {
+    this._startCall(conversationEntity, CALL_TYPE.NORMAL);
+  }
+
+  startVideoCall(conversationEntity) {
+    this._startCall(conversationEntity, CALL_TYPE.VIDEO);
+  }
+
+  _startCall(conversationEntity, callType) {
+    const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+    this.callingRepository.startCall(conversationEntity.id, convType, callType);
   }
 
   clickOnDetails() {
     this.showDetails();
-  }
-
-  clickOnVideoButton() {
-    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO_VIDEO);
   }
 
   clickOnCollectionButton() {
