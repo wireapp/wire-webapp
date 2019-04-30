@@ -17,7 +17,7 @@
  *
  */
 
-import {getValue, setValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {AvailabilityType} from './AvailabilityType';
@@ -26,14 +26,14 @@ import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 const initialKey = 'hide_initial_modal';
 
 function showModal(storageKey, title, message) {
-  const hideModal = getValue(storageKey);
+  const hideModal = loadValue(storageKey);
   if (!hideModal) {
     modals.showModal(
       ModalsViewModel.TYPE.OPTION,
       {
         action: dontShowAgain => {
           if (dontShowAgain) {
-            setValue(storageKey, 'true');
+            storeValue(storageKey, 'true');
           }
         },
         preventClose: true,
@@ -52,7 +52,7 @@ function showModal(storageKey, title, message) {
 
 export function showAvailabilityModal(availability) {
   if (availability !== AvailabilityType.NONE) {
-    setValue(initialKey, 'true');
+    storeValue(initialKey, 'true');
   }
   switch (availability) {
     case AvailabilityType.AWAY: {
@@ -74,7 +74,7 @@ export function showAvailabilityModal(availability) {
 }
 
 export function showInitialModal(availability) {
-  const hideInitialModal = getValue(initialKey);
+  const hideInitialModal = loadValue(initialKey);
   if (!hideInitialModal && availability !== AvailabilityType.NONE) {
     showAvailabilityModal(availability);
   }

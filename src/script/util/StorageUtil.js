@@ -21,15 +21,15 @@ import {amplify} from 'amplify';
 
 import {TimeUtil} from 'Util/TimeUtil';
 
-export function getValue(key) {
+export function loadValue(key) {
   return amplify.store(key);
 }
 
-export function resetValue(key) {
-  return setValue(key, null);
+export function resetStoreValue(key) {
+  return storeValue(key, null);
 }
 
-export function setValue(key, value, secondsToExpire) {
+export function storeValue(key, value, secondsToExpire) {
   const config = secondsToExpire ? {expires: secondsToExpire * TimeUtil.UNITS_IN_MILLIS.SECOND} : undefined;
   return amplify.store(key, value, config);
 }
