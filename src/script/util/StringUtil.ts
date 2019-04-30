@@ -109,7 +109,7 @@ export const formatString = (string: string, ...args: any[]) => {
   return string;
 };
 
-export const removeLineBreaks = (string = '') => string.replace(/(\r\n|\n|\r)/gm, '');
+export const removeLineBreaks = (string = '') => string.replace(/[\r\n]/gm, '');
 
 export const replaceInRange = (text: string, replacement: string, startIndex: number, endIndex: number) => {
   const beforePartial = text.slice(0, startIndex);
