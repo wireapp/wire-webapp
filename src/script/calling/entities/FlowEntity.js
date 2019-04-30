@@ -1483,13 +1483,15 @@ class FlowEntity {
     if (this.mediaStream()) {
       this._removeMediaStream(this.mediaStream());
     }
-    this.clearTimeouts();
-    this.iceCandidatesGatheringAttempts = 1;
-    this._closeDataChannel();
-    this._closePeerConnection();
-    this._resetSignalingStates();
-    this._resetSdp();
-    this.pcInitialized(false);
+    if (this.pcInitialized()) {
+      this.clearTimeouts();
+      this.iceCandidatesGatheringAttempts = 1;
+      this._closeDataChannel();
+      this._closePeerConnection();
+      this._resetSignalingStates();
+      this._resetSdp();
+      this.pcInitialized(false);
+    }
   }
 
   /**
@@ -1497,21 +1499,19 @@ class FlowEntity {
    * @returns {undefined} No return value
    */
   resetFlow() {
-    if (this.pcInitialized()) {
-      const logMessage = {
-        data: {
-          default: [this.remoteUser.id],
-          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-        },
-        message: `Resetting flow with user '{0}'`,
-      };
-      this.callLogger.debug(logMessage);
+    const logMessage = {
+      data: {
+        default: [this.remoteUser.id],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Resetting flow with user '{0}'`,
+    };
+    this.callLogger.debug(logMessage);
 
-      this._teardownPeerConnection();
+    this._teardownPeerConnection();
 
-      this.remoteClientId = undefined;
-      this.telemetry.disconnected();
-    }
+    this.remoteClientId = undefined;
+    this.telemetry.disconnected();
   }
 
   /**
