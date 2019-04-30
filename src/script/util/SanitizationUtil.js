@@ -20,7 +20,7 @@
 import {escape} from 'underscore';
 
 import {t, Declension} from 'Util/LocalizerUtil';
-import {isValidEmail} from 'Util/util';
+import {isValidEmail} from 'Util/ValidationUtil';
 
 export const escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

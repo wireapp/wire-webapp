@@ -82,10 +82,6 @@ export const checkIndexedDb = () => {
   return Promise.resolve();
 };
 
-export const isSameLocation = (pastLocation, currentLocation) => {
-  return pastLocation !== '' && currentLocation.startsWith(pastLocation);
-};
-
 export const loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -499,31 +495,6 @@ export const validateProfileImageResolution = (file, minWidth, minHeight) => {
     image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
-};
-
-export const isValidEmail = email => {
-  const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return regExp.test(email);
-};
-
-/**
- * Checks if input has the format of an international phone number
- * @note Begins with + and contains only numbers
- * @param {string} phoneNumber - Input
- * @returns {boolean} True, if the input a phone number
- */
-export const isValidPhoneNumber = phoneNumber => {
-  const allowDebugPhoneNumbers = z.config.FEATURE.ENABLE_DEBUG;
-  const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-  return regularExpression.test(phoneNumber);
-};
-
-export const isValidUsername = username => {
-  if (username.startsWith('@')) {
-    username = username.substring(1);
-  }
-  return /^[a-z_0-9]{2,21}$/.test(username);
 };
 
 export const murmurhash3 = (key, seed) => {

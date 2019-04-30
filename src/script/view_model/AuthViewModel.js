@@ -25,11 +25,12 @@ import 'phoneformat.js';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util';
+import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
 import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
