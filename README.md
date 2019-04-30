@@ -97,6 +97,8 @@ If everything is done right, a deployment job ([Example](https://travis-ci.org/w
 
 ![Production Release Step 1](./docs/release/prod-release-step-1.png)
 
+**Pro Tip:** If you are not sure which is the latest commit on our RC build, you can checkout: https://wire-webapp-rc.zinfra.io/commit
+
 2. Create a pull request from the newly created branch into our "prod" branch:
 
 ![Production Release Step 2](./docs/release/prod-release-step-2.png)
