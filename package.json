@@ -19,7 +19,7 @@
     "babel-plugin-emotion": "10.0.9",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-helmet": "5.2.0",
+    "react-helmet": "5.2.1",
     "react-hot-loader": "4.8.4",
     "rimraf": "2.6.3",
     "typescript": "3.4.4",
