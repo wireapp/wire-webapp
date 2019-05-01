@@ -23,7 +23,7 @@ import {TextTransformProperty} from 'csstype';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {TextProps} from '../Text';
-import {filterProps, inlineSVG} from '../util';
+import {filterProps} from '../util';
 
 export interface TextAreaProps<T = HTMLTextAreaElement> extends TextProps<T> {
   markInvalid?: boolean;

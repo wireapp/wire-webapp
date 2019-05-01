@@ -23,7 +23,7 @@ import {TextTransformProperty} from 'csstype';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {TextProps} from '../Text';
-import {filterProps, inlineSVG} from '../util';
+import {filterProps} from '../util';
 
 export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   markInvalid?: boolean;
