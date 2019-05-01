@@ -34,7 +34,7 @@ export function inRange(value: number, lowerBound: number, upperBound: number): 
   return value >= lowerBound && value <= upperBound;
 }
 
-export function rootMeanSquare(floatArray: number[]): number {
-  const sum = floatArray.reduce((power, number) => power + number ** 2, 0);
+export const rootMeanSquare = (floatArray: number[] | Float32Array): number => {
+  const sum = (floatArray as number[]).reduce((power, number) => power + number ** 2, 0);
   return Math.sqrt(sum) / floatArray.length;
-}
+};
