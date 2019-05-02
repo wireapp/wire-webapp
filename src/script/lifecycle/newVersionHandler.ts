@@ -37,7 +37,7 @@ let pollInterval: number;
 const fetchLatestVersion = async (): Promise<string> => {
   const response = await fetch(VERSION_URL);
   if (response.ok) {
-    const {version} = (await response.json()) as {version: string};
+    const {version} = await response.json();
     return version;
   }
   throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
