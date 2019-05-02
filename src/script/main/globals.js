@@ -163,9 +163,6 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-
-import backendClientGlobal from '../service/BackendClient.js';
-import backendEnvGlobal from '../service/BackendEnvironment.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;
