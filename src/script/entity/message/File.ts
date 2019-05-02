@@ -129,7 +129,7 @@ export class File extends Asset {
 
   cancel_download(): void {
     this.status(AssetTransferState.UPLOADED);
-    return this.original_resource().cancelDownload();
+    this.original_resource().cancelDownload();
   }
 
   reload(): void {
