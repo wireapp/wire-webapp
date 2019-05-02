@@ -23,18 +23,18 @@ import {ConnectionStatus} from './ConnectionStatus';
 export class ConnectionEntity {
   conversationId: string;
   from: string;
-  lastUpdate: string;
-  message: string;
-  status: ko.Observable<ConnectionStatus>;
-  userId: string;
   isBlocked: ko.PureComputed<boolean>;
   isCanceled: ko.PureComputed<boolean>;
   isConnected: ko.PureComputed<boolean>;
   isIgnored: ko.PureComputed<boolean>;
   isIncomingRequest: ko.PureComputed<boolean>;
   isOutgoingRequest: ko.PureComputed<boolean>;
-  isUnknown: ko.PureComputed<boolean>;
   isRequest: ko.PureComputed<boolean>;
+  isUnknown: ko.PureComputed<boolean>;
+  lastUpdate: string;
+  message: string;
+  status: ko.Observable<ConnectionStatus>;
+  userId: string;
 
   constructor() {
     this.conversationId = null;
