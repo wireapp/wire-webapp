@@ -163,7 +163,6 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
 
 import backendClientGlobal from '../service/BackendClient.js';
 import backendEnvGlobal from '../service/BackendEnvironment.js';

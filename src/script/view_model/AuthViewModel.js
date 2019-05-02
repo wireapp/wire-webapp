@@ -49,6 +49,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import '../auth/AuthView';
 import '../auth/ValidationError';
 import {AuthView} from '../auth/AuthView';
+import {SingleInstanceHandler} from '../main/SingleInstanceHandler';
 
 import {BackendEvent} from '../event/Backend';
 import {EventRepository} from '../event/EventRepository';
@@ -104,7 +105,7 @@ class AuthViewModel {
       serverTimeHandler
     );
 
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
+    this.singleInstanceHandler = new SingleInstanceHandler();
 
     const eventService = new EventService(this.storageService);
     this.notification_service = new NotificationService(backendClient, this.storageService);
