@@ -19,6 +19,7 @@
 
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {StatusType} from 'src/script/message/StatusType';
+import {File} from 'src/script/entity/message/File';
 
 describe('Message Entities', () => {
   let message_et = null;
@@ -40,7 +41,7 @@ describe('Message Entities', () => {
 
     it('message with file asset should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
-      message_et.assets.push(new z.entity.File());
+      message_et.assets.push(new File());
 
       expect(message_et.is_downloadable()).toBeTruthy();
     });

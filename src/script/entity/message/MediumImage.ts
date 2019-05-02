@@ -20,11 +20,17 @@
 import {getLogger} from 'Util/Logger';
 import {downloadBlob} from 'Util/util';
 
-import {File} from './File';
+import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
+import {File} from './File';
 
 class MediumImage extends File {
-  constructor(id) {
+  correlation_id: string;
+  height: string;
+  resource: ko.Observable<AssetRemoteData>;
+  width: string;
+
+  constructor(id: string) {
     super(id);
 
     this.correlation_id = '';
@@ -33,20 +39,22 @@ class MediumImage extends File {
     this.width = '0px';
     this.height = '0px';
 
-    // AssetRemoteData
     this.resource = ko.observable();
     this.logger = getLogger('MediumImage');
   }
 
   /**
    * Loads and decrypts otr asset as initiates download
-   * @param {string} filename - Filename
-   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
-  download(filename) {
+  download(filename?: string): Promise<number | void> {
     return this.resource()
       .load()
-      .then(blob => downloadBlob(blob, filename))
+      .then(blob => {
+        if (!blob) {
+          throw new Error('No blob received.');
+        }
+        return downloadBlob(blob, filename);
+      })
       .catch(error => this.logger.error('Failed to download image', error));
   }
 }

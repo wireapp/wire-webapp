@@ -17,11 +17,16 @@
  *
  */
 
-describe('z.entity.File', () => {
-  let file = null;
+//@ts-check
+
+import {File} from 'src/script/entity/message/File';
+
+describe('File', () => {
+  /** @type {File} */
+  let file;
 
   beforeEach(() => {
-    file = new z.entity.File();
+    file = new File();
   });
 
   describe('is_video', () => {
