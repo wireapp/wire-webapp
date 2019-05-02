@@ -30,7 +30,9 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+
 import {ClientService} from './ClientService';
+import {ClientType} from './ClientType';
 
 export class ClientRepository {
   static get CONFIG() {
@@ -241,7 +243,7 @@ export class ClientRepository {
   /**
    * Constructs the value for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
@@ -252,7 +254,7 @@ export class ClientRepository {
   /**
    * Constructs the key for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
@@ -331,7 +333,7 @@ export class ClientRepository {
    * Create payload for client registration.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Type of client to be registered
+   * @param {ClientType} clientType - Type of client to be registered
    * @param {string} password - User password
    * @param {string} lastResortKey - Last resort key
    * @param {Array<string>} preKeys - Pre-keys
@@ -360,7 +362,7 @@ export class ClientRepository {
       if (!Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
-    } else if (clientType === z.client.ClientType.TEMPORARY) {
+    } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
 
@@ -391,7 +393,7 @@ export class ClientRepository {
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @param {string} cookieLabel - Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
@@ -417,15 +419,15 @@ export class ClientRepository {
   /**
    * Load current client type from amplify store.
    * @private
-   * @returns {z.client.ClientType} Type of current client
+   * @returns {ClientType} Type of current client
    */
   _loadCurrentClientType() {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
-    const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
-    return Environment.electron ? z.client.ClientType.PERMANENT : type;
+    const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+    return Environment.electron ? ClientType.PERMANENT : type;
   }
 
   //##############################################################################
@@ -567,7 +569,7 @@ export class ClientRepository {
    * @param {string} userId - ID of user whose clients are updated
    * @param {Object} clientsData - Clients data from backend
    * @param {booelan} [publish=true] - Publish changes clients using amplify
-   * @returns {Promise<Array<z.client.Client>>} Resolves with the entities once clients have been updated
+   * @returns {Promise<Client[]>} Resolves with the entities once clients have been updated
    */
   _updateClientsOfUserById(userId, clientsData, publish = true) {
     const clientsFromBackend = {};

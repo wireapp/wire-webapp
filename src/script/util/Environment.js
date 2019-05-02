@@ -18,6 +18,7 @@
  */
 
 import platform from 'platform';
+import {BackendEnvironment} from '../service/BackendEnvironment';
 
 const APP_ENV = {
   LOCALHOST: 'localhost',
@@ -74,7 +75,7 @@ const _isWindows = () => platform.os.family && platform.os.family.includes(PLATF
 
 const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = () => {
-  const isProductionHost = window.wire.env.ENVIRONMENT === z.service.BackendEnvironment.PRODUCTION;
+  const isProductionHost = window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
   return isProductionHost;
 };
 

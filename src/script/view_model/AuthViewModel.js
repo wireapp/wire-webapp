@@ -49,6 +49,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import '../auth/AuthView';
 import '../auth/ValidationError';
 import {AuthView} from '../auth/AuthView';
+import {SingleInstanceHandler} from '../main/SingleInstanceHandler';
 
 import {BackendEvent} from '../event/Backend';
 import {EventRepository} from '../event/EventRepository';
@@ -61,6 +62,7 @@ import {resolve as resolveDependency, graph} from '../config/appResolver';
 
 import {Modal} from '../ui/Modal';
 import {ClientRepository} from '../client/ClientRepository';
+import {ClientType} from '../client/ClientType';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -104,7 +106,7 @@ class AuthViewModel {
       serverTimeHandler
     );
 
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
+    this.singleInstanceHandler = new SingleInstanceHandler();
 
     const eventService = new EventService(this.storageService);
     this.notification_service = new NotificationService(backendClient, this.storageService);
@@ -136,7 +138,7 @@ class AuthViewModel {
     this.is_public_computer.subscribe(is_public_computer => this.persist(!is_public_computer));
 
     this.client_type = ko.pureComputed(() => {
-      return this.persist() ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
+      return this.persist() ? ClientType.PERMANENT : ClientType.TEMPORARY;
     });
 
     this.self_user = ko.observable();
@@ -145,7 +147,7 @@ class AuthViewModel {
     this.remove_form_error = ko.observable(false);
     this.device_modal = undefined;
     this.permanent_devices = ko.pureComputed(() => {
-      return this.client_repository.clients().filter(client_et => client_et.type === z.client.ClientType.PERMANENT);
+      return this.client_repository.clients().filter(client_et => client_et.type === ClientType.PERMANENT);
     });
 
     this.code_digits = ko.observableArray([

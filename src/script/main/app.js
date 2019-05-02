@@ -61,6 +61,7 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 
 import {BackendClient} from '../service/BackendClient';
+import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -127,7 +128,7 @@ class App {
     this._publishGlobals();
 
     const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler(onExtraInstanceStarted);
+    this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
     this.initApp();
@@ -548,7 +549,7 @@ class App {
 
   /**
    * Initiate the current client of the self user.
-   * @returns {Promise<z.client.Client>} Resolves with the local client entity
+   * @returns {Promise<Client>} Resolves with the local client entity
    */
   _initiateSelfUserClients() {
     return this.repository.client

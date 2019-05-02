@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.client = z.client || {};
-
-z.client.ClientType = {
-  PERMANENT: 'permanent',
-  TEMPORARY: 'temporary',
-};
+export enum BackendEnvironment {
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+}

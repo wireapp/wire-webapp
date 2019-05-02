@@ -44,7 +44,6 @@ import ConnectionServiceGlobal from '../connection/ConnectionService.js';
 import ConnectionStatusGlobal from '../connection/ConnectionStatus.js';
 import ClientEntityGlobal from '../client/ClientEntity.js';
 import ClientMapperGlobal from '../client/ClientMapper.js';
-import ClientTypeGlobal from '../client/ClientType.js';
 import AbstractConversationEventHandlerGlobal from '../conversation/AbstractConversationEventHandler.js';
 import ClientMismatchHandlerGlobal from '../conversation/ClientMismatchHandler.js';
 import ConversationCellStateGlobal from '../conversation/ConversationCellState.js';
@@ -160,10 +159,6 @@ import PingMessageGlobal from '../entity/message/PingMessage.js';
 import CallMessageGlobal from '../entity/message/CallMessage.js';
 import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
 import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
-import SingleInstanceHandlerGlobal from '../main/SingleInstanceHandler.js';
-
-import backendClientGlobal from '../service/BackendClient.js';
-import backendEnvGlobal from '../service/BackendEnvironment.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;
