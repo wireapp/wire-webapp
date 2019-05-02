@@ -38,7 +38,7 @@ export class SingleInstanceHandler {
 
   /**
    * @param onOtherInstanceStarted A callback to be called if another instance starts.
-   *    If provided, will also run an interval that checks the instance integrity once an instance is registrated
+   * If provided, will also run an interval that checks the instance integrity once an instance is registrated
    */
   constructor(onOtherInstanceStarted?: () => void) {
     this.instanceId = undefined;
@@ -50,9 +50,9 @@ export class SingleInstanceHandler {
    * Returns true if the instance has been registered successfully.
    * Returns false if the app is already running in another instance.
    *
-   * Side Effects: will also start the interval check if a callback was provided in the constructor
+   * Side effects: will also start the interval check if a callback was provided in the constructor
    *
-   * @param instanceId - The instance id to register.
+   * @param instanceId The instance id to register.
    * @returns Was the app registered successfully.
    */
   registerInstance(instanceId: string): boolean {
@@ -73,7 +73,7 @@ export class SingleInstanceHandler {
    *
    * Side Effects: will also stop the interval check
    *
-   * @param forceRemoval - Do not check that the instance removing it is the current instance.
+   * @param forceRemoval Do not check that the instance removing it is the current instance.
    */
   deregisterInstance(forceRemoval = false): void {
     const singleInstanceCookie = Cookies.getJSON(CONFIG.COOKIE_NAME);
@@ -86,12 +86,11 @@ export class SingleInstanceHandler {
   }
 
   /**
-   * Returns true if another instance is running.
+   * Returns `true` if another instance is running.
    * Does not check for the id of the running instance and thus cannot be
    * invoked once the registering of the current instance has been done.
    *
    * @throws When the current app has already been registered.
-   * @returns True, if the webapp is running in another browser tab.
    */
   hasOtherRunningInstance(): boolean {
     if (this.instanceId) {
