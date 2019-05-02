@@ -17,15 +17,16 @@
  *
  */
 
-import adapter from 'webrtc-adapter';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {getLogger} from 'Util/Logger';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {getLogger} from 'Util/Logger';
+import adapter from 'webrtc-adapter';
 
-import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {createRandomUuid} from 'Util/util';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
@@ -34,18 +35,44 @@ import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
 
 import {WebAppEvents} from '../event/WebApp';
-import {EventRepository} from '../event/EventRepository';
 
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {getAvsInstance, CALL_TYPE, STATE as CALL_STATE, CONV_TYPE, ENV as AVS_ENV} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, getAvsInstance} from 'avs-web';
+
+type UserId = string;
+type ConversationId = string;
+
+interface Call {
+  conversationId: ConversationId;
+  reason: ko.Observable<number | undefined>;
+  startedAt: ko.Observable<number | undefined>;
+  state: ko.Observable<number>;
+  participants: ko.ObservableArray<string>;
+}
 
 export class CallingRepository {
+  private readonly backendClient: any;
+  private readonly conversationRepository: any;
+  private readonly eventRepository: any;
+  private readonly mediaConstraintsHandler: any;
+  private readonly serverTimeHandler: any;
+
+  private wUser: number | undefined;
+  private callingApi: any | undefined;
+  private readonly activeCalls: ko.ObservableArray<any>;
+  private readonly isMuted: ko.Observable<boolean>;
+
+  public readonly calls: ko.ObservableArray<any>;
+  public readonly joinedCall: ko.Observable<any>;
+
+  private callingConfig: any;
+  private callingConfigTimeout: number | undefined;
+  private readonly callLogger: CallLogger;
+
   static get CONFIG() {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
@@ -63,60 +90,52 @@ export class CallingRepository {
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    */
-  constructor(backendClient, conversationRepository, eventRepository, mediaRepository, serverTimeHandler) {
-    this.wUser = undefined;
-    this.callingApi = undefined;
+  constructor(
+    backendClient: any,
+    conversationRepository: any,
+    eventRepository: any,
+    mediaRepository: any,
+    serverTimeHandler: any
+  ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
+
+    this.calls = ko.observableArray();
+    this.joinedCall = ko.observable();
 
     this.backendClient = backendClient;
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
-    this.mediaRepository = mediaRepository;
     this.serverTimeHandler = serverTimeHandler;
+    // Media Handler
+    this.mediaConstraintsHandler = mediaRepository.constraintsHandler;
 
-    this.messageLog = [];
-    this.callLogger = new CallLogger('CallingRepository', null, this.messageLog);
+    this.callLogger = new CallLogger('CallingRepository', null, []);
 
     this.callingConfig = undefined;
     this.callingConfigTimeout = undefined;
-
-    // Media Handler
-    this.mediaConstraintsHandler = this.mediaRepository.constraintsHandler;
-
-    this.calls = ko.observableArray([]);
-    this.joinedCall = ko.pureComputed(() => {
-      for (const callEntity of this.calls()) {
-        if (callEntity.selfClientJoined()) {
-          return callEntity;
-        }
-      }
-    });
-
-    this.flowStatus = undefined;
 
     this.subscribeToEvents();
     this._enableDebugging();
   }
 
-  initAvs(selfUserId, clientId) {
-    getAvsInstance()
-      .then(callingInstance => this.configureCallingApi(callingInstance, selfUserId, clientId))
-      .then(({callingApi, wUser}) => {
-        this.callingApi = callingApi;
-        this.wUser = wUser;
-      });
+  initAvs(selfUserId: string, clientId: string) {
+    getAvsInstance().then((callingInstance: any) => {
+      const {callingApi, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
+      this.callingApi = callingApi;
+      this.wUser = wUser;
+    });
   }
 
-  configureCallingApi(callingApi, selfUserId, selfClientId) {
-    const log = name => {
+  configureCallingApi(callingApi: any, selfUserId: string, selfClientId: string): {wUser: number; callingApi: any} {
+    const log = (name: string) => {
       return function() {
         // eslint-disable-next-line no-console
         console.log('avs_cb', name, arguments);
       };
     };
     const avsLogger = getLogger('avs');
-    callingApi.set_log_handler((level, message) => {
+    callingApi.set_log_handler((level: number, message: string) => {
       // TODO handle levels
       avsLogger.debug(message);
     });
@@ -124,24 +143,24 @@ export class CallingRepository {
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     callingApi.init(avsEnv);
 
-    callingApi.setUserMediaHandler((audio, video, screen) => {
+    callingApi.setUserMediaHandler((audio: boolean, video: boolean, screen: boolean) => {
       const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
       return navigator.mediaDevices.getUserMedia(constraints);
     });
 
     const requestConfig = () => {
-      this.getConfig().then(config => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
+      this.getConfig().then((config: any) => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
       return 0;
     };
 
     const sendMessage = (
-      context,
-      conversationId,
-      userId,
-      clientId,
-      destinationUserId,
-      destinationClientId,
-      payload
+      context: any,
+      conversationId: ConversationId,
+      userId: UserId,
+      clientId: string,
+      destinationUserId: string,
+      destinationClientId: string,
+      payload: string
     ) => {
       const protoCalling = new Calling({content: payload});
       const genericMessage = new GenericMessage({
@@ -149,18 +168,25 @@ export class CallingRepository {
         messageId: createRandomUuid(),
       });
 
-      //const options = {precondition, recipients};
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId /*, options*/);
+      const options = {}; // TODO {precondition, recipients};
+      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
       this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
       return 0;
     };
 
-    const callClosed = (reason, conversationId) => {
+    const callClosed = (reason: string, conversationId: ConversationId) => {
       const storedCall = this.findCall(conversationId);
       if (!storedCall) {
         return;
       }
       storedCall.reason(reason);
+    };
+
+    const callEstablished = (conversationId: ConversationId, userId: UserId) => {
+      const call = this.findCall(conversationId);
+      if (call) {
+        call.participants.push(userId);
+      }
     };
 
     const wUser = callingApi.create(
@@ -171,7 +197,7 @@ export class CallingRepository {
       log('incomingh'), //incomingh,
       log('missedh'), //missedh,
       log('answerh'), //answerh,
-      log('estabh'), //estabh,
+      callEstablished, //estabh,
       callClosed, //closeh,
       log('metricsh'), //metricsh,
       requestConfig, //cfg_reqh,
@@ -182,10 +208,10 @@ export class CallingRepository {
     callingApi.set_mute_handler(wUser, muted => {
       this.isMuted(muted);
     });
-    callingApi.set_state_handler(wUser, (conversationId, state) => {
+    callingApi.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
       log('state_handler')(conversationId, state);
       const storedCall = this.findCall(conversationId);
-      const call = storedCall || {
+      const call: Call = storedCall || {
         conversationId,
         reason: ko.observable(),
         startedAt: ko.observable(),
@@ -216,15 +242,15 @@ export class CallingRepository {
     return {callingApi, wUser};
   }
 
-  findCall(conversationId) {
-    return this.activeCalls().find(callInstance => callInstance.conversationId === conversationId);
+  findCall(conversationId: ConversationId): Call | undefined {
+    return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  storeCall(call) {
+  storeCall(call: Call) {
     this.activeCalls.push(call);
   }
 
-  removeCall(call) {
+  removeCall(call: Call) {
     const index = this.activeCalls().indexOf(call);
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
@@ -235,7 +261,7 @@ export class CallingRepository {
    * Extended check for calling support of browser.
    * @returns {boolean} True if calling is supported
    */
-  get supportsCalling() {
+  get supportsCalling(): boolean {
     return Environment.browser.supports.calling;
   }
 
@@ -243,7 +269,7 @@ export class CallingRepository {
    * Extended check for screen sharing support of browser.
    * @returns {boolean} True if screen sharing is supported
    */
-  get supportsScreenSharing() {
+  get supportsScreenSharing(): boolean {
     return Environment.browser.supports.screenSharing;
   }
 
@@ -257,7 +283,6 @@ export class CallingRepository {
     amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
-    amplify.subscribe(WebAppEvents.DEBUG.UPDATE_LAST_CALL_STATUS, this.storeFlowStatus.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.getConfig);
   }
 
@@ -272,7 +297,7 @@ export class CallingRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  onCallEvent(event, source) {
+  onCallEvent(event: any, source: string) {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = timestamp => Math.floor(timestamp / 1000);
@@ -306,22 +331,6 @@ export class CallingRepository {
     }
   }
 
-  /**
-   * Throw error is not expected types.
-   *
-   * @private
-   * @param {z.error.CallError|Error} error - Error thrown during call message handling
-   * @returns {undefined} No return value
-   */
-  _throwMessageError(error) {
-    const expectedErrorTypes = [z.error.CallError.TYPE.MISTARGETED_MESSAGE, z.error.CallError.TYPE.NOT_FOUND];
-    const isExpectedError = expectedErrorTypes.includes(error.type);
-
-    if (!isExpectedError) {
-      throw error;
-    }
-  }
-
   //##############################################################################
   // Call actions
   //##############################################################################
@@ -329,12 +338,11 @@ export class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {MediaType} mediaType - Media type of call
-   * @param {Conversation} [conversationEntity=this.conversationRepository.active_conversation()] - Conversation for which state will be to
-gled
+   * @param mediaType - Media type of call
+   * @param [conversationEntity] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggleState(mediaType, conversationEntity = this.conversationRepository.active_conversation()) {
+  toggleState(mediaType: MediaType, conversationEntity: any = this.conversationRepository.active_conversation()) {
     if (conversationEntity) {
       // TODO deduce active call from avs api
       const isActiveCall = false;
@@ -354,28 +362,28 @@ gled
    * @param {CALL_TYPE} callType - Type of call (audio or video)
    * @returns {undefined} No return value
    */
-  startCall(conversationId, conversationType, callType) {
+  startCall(conversationId: ConversationId, conversationType: number, callType: number) {
     this.callingApi.start(this.wUser, conversationId, callType, conversationType, false);
   }
 
-  answerCall(conversationId, callType) {
+  answerCall(conversationId: ConversationId, callType: number) {
     this.callingApi.answer(this.wUser, conversationId, callType, false);
   }
 
-  rejectCall(conversationId) {
+  rejectCall(conversationId: ConversationId) {
     // TODO sort out if rejection should be shared accross devices (does avs handle it?)
     this.callingApi.reject(this.wUser, conversationId);
   }
 
-  removeParticipant(conversationId, userId) {
+  removeParticipant(conversationId: ConversationId, userId: UserId) {
     throw new Error('TODO: implement removeParticipant');
   }
 
-  muteCall(conversationId, isMuted) {
+  muteCall(conversationId: ConversationId, isMuted: boolean) {
     this.callingApi.set_mute(this.wUser, isMuted);
   }
 
-  callTypeFromMediaType(mediaType) {
+  callTypeFromMediaType(mediaType: MediaType): number {
     const types = {
       [MediaType.AUDIO]: CALL_TYPE.NORMAL,
       [MediaType.AUDIO_VIDEO]: CALL_TYPE.VIDEO,
@@ -391,7 +399,7 @@ gled
    * @param {string} conversationId - ID of conversation to leave call in
    * @returns {undefined} No return value
    */
-  leaveCall(conversationId) {
+  leaveCall(conversationId: ConversationId) {
     this.callingApi.end(this.wUser, conversationId);
   }
 
@@ -404,6 +412,7 @@ gled
    * @param {CALL_STATE} callState - Current state of call
    * @returns {Promise} Resolves when conversation supports calling
    */
+  /* TODO : migrate the error messages
   _checkCallingSupport(conversationEntity, mediaType, callState) {
     return new Promise((resolve, reject) => {
       const noConversationParticipants = !conversationEntity.participating_user_ids().length;
@@ -427,6 +436,248 @@ gled
     });
   }
 
+  //##############################################################################
+  // Notifications
+  //##############################################################################
+
+  /**
+   * Inject a call activate event.
+   *
+   * @param {string} conversationId - The conversation id the event occured on
+   * @param {string} userId - The user sending the event
+   * @param {string} time - Time of the event
+   * @param {EventRepository.SOURCE} source - Source of the event
+   * @returns {void} - nothing
+   */
+  injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string) {
+    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time);
+    this.eventRepository.injectEvent(event, source);
+  }
+
+  /**
+   * Inject a call deactivate event.
+   *
+   * @param {string} conversationId - The conversation id the event occured on
+   * @param {string} userId - The user sending the event
+   * @param {TERMINATION_REASON} reason - reason why the call was deactivated
+   * @param {string} time - Time of the event
+   * @param {EventRepository.SOURCE} source - Source of the event
+   * @returns {void} - nothing
+   */
+  injectDeactivateEvent(
+    conversationId: ConversationId,
+    userId: UserId,
+    reason: TERMINATION_REASON,
+    time: number,
+    source: string
+  ) {
+    const event = EventBuilder.buildVoiceChannelDeactivate(conversationId, userId, reason, time);
+    this.eventRepository.injectEvent(event, source);
+  }
+
+  //##############################################################################
+  // Helper functions
+  //##############################################################################
+
+  /**
+   * Leave a call we are joined immediately in case the browser window is closed.
+   * @note Should only used by "window.onbeforeunload".
+   * @returns {undefined} No return value
+   */
+  leaveCallOnUnload() {
+    this.activeCalls().forEach((call: Call) => this.callingApi.end(this.wUser, call.conversationId));
+  }
+
+  //##############################################################################
+  // Calling config
+  //##############################################################################
+
+  /**
+   * Get the current calling config.
+   * @returns {Promise} Resolves with calling config
+   */
+  getConfig = (): Promise<any> => {
+    if (this.callingConfig) {
+      const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
+
+      if (!isExpiredConfig) {
+        this.callLogger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
+        return Promise.resolve(this.callingConfig);
+      }
+
+      this._clearConfig();
+    }
+
+    return this._getConfigFromBackend();
+  };
+
+  /**
+   * Retrieves a calling config from the backend.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
+   * @see ./documentation/blob/master/topics/web/calling/calling-v3.md#limiting
+   *
+   * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
+   * @returns {Promise} Resolves with call config information
+   */
+  fetchConfig(limit: number | undefined): Promise<any> {
+    return this.backendClient.sendRequest({
+      cache: false,
+      data: {
+        limit,
+      },
+      type: 'GET',
+      url: '/calls/config/v2',
+    });
+  }
+
+  _clearConfig() {
+    if (this.callingConfig) {
+      const expirationDate = this.callingConfig.expiration.toISOString();
+      this.callLogger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
+      this.callingConfig = undefined;
+    }
+  }
+
+  _clearConfigTimeout() {
+    if (this.callingConfigTimeout) {
+      window.clearTimeout(this.callingConfigTimeout);
+      this.callingConfigTimeout = undefined;
+    }
+  }
+
+  /**
+   * Get the calling config from the backend and store it.
+   *
+   * @private
+   * @returns {Promise} Resolves with the updated calling config
+   */
+  _getConfigFromBackend(): Promise<any> {
+    const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+
+    return this.fetchConfig(limit).then(callingConfig => {
+      if (callingConfig) {
+        this._clearConfigTimeout();
+
+        const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+        const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
+        const expirationDate = new Date(Date.now() + timeout);
+        callingConfig.expiration = expirationDate;
+
+        const turnServersConfig = (callingConfig.ice_servers || []).map(server => server.urls.join('\n')).join('\n');
+        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
+${turnServersConfig}`;
+        this.callLogger.info(logMessage);
+        this.callingConfig = callingConfig;
+
+        this.callingConfigTimeout = window.setTimeout(() => {
+          this._clearConfig();
+          this.getConfig();
+        }, timeout);
+
+        return this.callingConfig;
+      }
+    });
+  }
+
+  //##############################################################################
+  // Logging
+  //##############################################################################
+
+  /**
+   * Set logging on adapter.js.
+   * @returns {undefined} No return value
+   */
+  _enableDebugging() {
+    adapter.disableLog = false;
+  }
+
+  /**
+   * Log call messages for debugging.
+   *
+   * @private
+   * @param {boolean} isOutgoing - Is message outgoing
+   * @param {CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
+   * @returns {undefined} No return value
+   */
+  /*
+  _logMessage(isOutgoing: boolean, callMessageEntity: any) {
+    const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
+
+    let log;
+    const target = `conversation '${conversationId}'`;
+    if (isOutgoing) {
+      const additionalMessage = remoteUserId ? `user '${remoteUserId}' in ${target}` : `${target}`;
+      log = `Sending '${type}' message (response: ${response}) to ${additionalMessage}`;
+    } else {
+      const isSelfUser = destinationUserId === this.selfUserId();
+      if (destinationUserId && !isSelfUser) {
+        return;
+      }
+
+      log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
+    }
+
+    if (callMessageEntity.properties) {
+      log = log.concat(`: ${JSON.stringify(callMessageEntity.properties)}`);
+    }
+
+    this.callLogger.info(log, callMessageEntity);
+  }
+  */
+
+  /**
+   * Send Raygun report.
+   *
+   * @private
+   * @param {Object} customData - Information to add to the call report
+   * @returns {undefined} No return value
+   */
+  /* TODO migrate?
+  _sendReport(customData) {
+    Raygun.send(new Error('Call failure report'), customData);
+    this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
+  }
+  */
+
+  /**
+   * Throw error is not expected types.
+   *
+   * @private
+   * @param {z.error.CallError|Error} error - Error thrown during call message handling
+   * @returns {undefined} No return value
+   */
+  /*
+  _throwMessageError(error) {
+    const expectedErrorTypes = [z.error.CallError.TYPE.MISTARGETED_MESSAGE, z.error.CallError.TYPE.NOT_FOUND];
+    const isExpectedError = expectedErrorTypes.includes(error.type);
+
+    if (!isExpectedError) {
+      throw error;
+    }
+  }
+  */
+
+  /**
+   * Show acknowledgement warning modal.
+   *
+   * @private
+   * @param {string} title - modal title
+   * @param {string} message - modal message
+   * @returns {undefined} No return value
+   */
+  /*
+  _showModal(title, message) {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message,
+        title,
+      },
+    });
+  }
+  */
+
   /**
    * Check whether we are actively participating in a call.
    *
@@ -435,6 +686,7 @@ gled
    * @param {CALL_STATE} callState - Call state of new call
    * @returns {Promise} Resolves when the new call was joined
    */
+  /* TODO use AVS
   _checkConcurrentJoinedCall(newCallId, callState) {
     // FIXME use info from avs lib
     const ongoingCallId = false;
@@ -476,21 +728,19 @@ gled
         }
 
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+          action: () => {
+            const terminationReason = 0;
+            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
+            window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
+          },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
             if (isIncomingCall) {
               amplify.publish(WebAppEvents.CALL.STATE.REJECT, newCallId);
             }
           },
-          primaryAction: {
-            action: () => {
-            const terminationReason = 0;
-            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
-            },
-            text: actionString,
-          },
           text: {
+            action: actionString,
             message: messageString,
             title: titleString,
           },
@@ -499,236 +749,5 @@ gled
       }
     });
   }
-
-  /**
-   * Show acknowledgement warning modal.
-   *
-   * @private
-   * @param {string} title - modal title
-   * @param {string} message - modal message
-   * @returns {undefined} No return value
-   */
-  _showModal(title, message) {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message,
-        title,
-      },
-    });
-  }
-
-  //##############################################################################
-  // Notifications
-  //##############################################################################
-
-  /**
-   * Inject a call activate event.
-   *
-   * @param {string} conversationId - The conversation id the event occured on
-   * @param {string} userId - The user sending the event
-   * @param {string} time - Time of the event
-   * @param {EventRepository.SOURCE} source - Source of the event
-   * @returns {void} - nothing
-   */
-  injectActivateEvent(conversationId, userId, time, source) {
-    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time);
-    this.eventRepository.injectEvent(event, source);
-  }
-
-  /**
-   * Inject a call deactivate event.
-   *
-   * @param {string} conversationId - The conversation id the event occured on
-   * @param {string} userId - The user sending the event
-   * @param {TERMINATION_REASON} reason - reason why the call was deactivated
-   * @param {string} time - Time of the event
-   * @param {EventRepository.SOURCE} source - Source of the event
-   * @returns {void} - nothing
-   */
-  injectDeactivateEvent(conversationId, userId, reason, time, source) {
-    const event = EventBuilder.buildVoiceChannelDeactivate(conversationId, userId, reason, time);
-    this.eventRepository.injectEvent(event, source);
-  }
-
-  //##############################################################################
-  // Helper functions
-  //##############################################################################
-
-  /**
-   * Leave a call we are joined immediately in case the browser window is closed.
-   * @note Should only used by "window.onbeforeunload".
-   * @returns {undefined} No return value
-   */
-  leaveCallOnUnload() {
-    this.activeCalls().forEach(callInstance => this.callingApi.end(this.wUser, callInstance.conversationId));
-  }
-
-  //##############################################################################
-  // Calling config
-  //##############################################################################
-
-  /**
-   * Get the current calling config.
-   * @returns {Promise} Resolves with calling config
-   */
-  getConfig = () => {
-    if (this.callingConfig) {
-      const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
-
-      if (!isExpiredConfig) {
-        this.callLogger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
-        return Promise.resolve(this.callingConfig);
-      }
-
-      this._clearConfig();
-    }
-
-    return this._getConfigFromBackend();
-  };
-
-  /**
-   * Retrieves a calling config from the backend.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
-   * @see ./documentation/blob/master/topics/web/calling/calling-v3.md#limiting
-   *
-   * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
-   * @returns {Promise} Resolves with call config information
-   */
-  fetchConfig(limit) {
-    return this.backendClient.sendRequest({
-      cache: false,
-      data: {
-        limit,
-      },
-      type: 'GET',
-      url: '/calls/config/v2',
-    });
-  }
-
-  _clearConfig() {
-    if (this.callingConfig) {
-      const expirationDate = this.callingConfig.expiration.toISOString();
-      this.callLogger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
-      this.callingConfig = undefined;
-    }
-  }
-
-  _clearConfigTimeout() {
-    if (this.callingConfigTimeout) {
-      window.clearTimeout(this.callingConfigTimeout);
-      this.callingConfigTimeout = undefined;
-    }
-  }
-
-  /**
-   * Get the calling config from the backend and store it.
-   *
-   * @private
-   * @returns {Promise} Resolves with the updated calling config
-   */
-  _getConfigFromBackend() {
-    const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-
-    return this.fetchConfig(limit).then(callingConfig => {
-      if (callingConfig) {
-        this._clearConfigTimeout();
-
-        const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-        const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
-        const expirationDate = new Date(Date.now() + timeout);
-        callingConfig.expiration = expirationDate;
-
-        const turnServersConfig = (callingConfig.ice_servers || []).map(server => server.urls.join('\n')).join('\n');
-        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
-${turnServersConfig}`;
-        this.callLogger.info(logMessage);
-        this.callingConfig = callingConfig;
-
-        this.callingConfigTimeout = window.setTimeout(() => {
-          this._clearConfig();
-          this.getConfig();
-        }, timeout);
-
-        return this.callingConfig;
-      }
-    });
-  }
-
-  //##############################################################################
-  // Logging
-  //##############################################################################
-
-  /**
-   * Print the call message log.
-   * @returns {undefined} No return value
-   */
-  printLog() {
-    this.callLogger.force_log(`Call message log contains '${this.messageLog.length}' events`, this.messageLog);
-    this.messageLog.forEach(logMessage => this.callLogger.force_log(logMessage));
-  }
-
-  /**
-   * Set logging on adapter.js.
-   * @returns {undefined} No return value
-   */
-  _enableDebugging() {
-    adapter.disableLog = false;
-  }
-
-  /**
-   * Store last flow status.
-   * @param {Object} flowStatus - Status to store
-   * @returns {undefined} No return value
-   */
-  storeFlowStatus(flowStatus) {
-    if (flowStatus) {
-      this.flowStatus = flowStatus;
-    }
-  }
-
-  /**
-   * Log call messages for debugging.
-   *
-   * @private
-   * @param {boolean} isOutgoing - Is message outgoing
-   * @param {CallMessageEntity} callMessageEntity - Call message to be logged in the sequence
-   * @returns {undefined} No return value
-   */
-  _logMessage(isOutgoing, callMessageEntity) {
-    const {conversationId, destinationUserId, remoteUserId, response, type, userId} = callMessageEntity;
-
-    let log;
-    const target = `conversation '${conversationId}'`;
-    if (isOutgoing) {
-      const additionalMessage = remoteUserId ? `user '${remoteUserId}' in ${target}` : `${target}`;
-      log = `Sending '${type}' message (response: ${response}) to ${additionalMessage}`;
-    } else {
-      const isSelfUser = destinationUserId === this.selfUserId();
-      if (destinationUserId && !isSelfUser) {
-        return;
-      }
-
-      log = `Received '${type}' message (response: ${response}) from user '${userId}' in ${target}`;
-    }
-
-    if (callMessageEntity.properties) {
-      log = log.concat(`: ${JSON.stringify(callMessageEntity.properties)}`);
-    }
-
-    this.callLogger.info(log, callMessageEntity);
-  }
-
-  /**
-   * Send Raygun report.
-   *
-   * @private
-   * @param {Object} customData - Information to add to the call report
-   * @returns {undefined} No return value
-   */
-  _sendReport(customData) {
-    Raygun.send(new Error('Call failure report'), customData);
-    this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
-  }
+  */
 }
