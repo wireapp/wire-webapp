@@ -236,8 +236,8 @@ export class UserRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all connections have been updated
+   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
+   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
   updateUsersFromConnections(connectionEntities) {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);

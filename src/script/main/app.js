@@ -52,6 +52,9 @@ import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
+import {ConnectionService} from '../connection/ConnectionService';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
+
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
@@ -168,7 +171,7 @@ class App {
       serverTimeHandler,
       repositories.properties
     );
-    repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
+    repositories.connection = new ConnectionRepository(this.service.connection, repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -269,7 +272,7 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       connect: new ConnectService(this.backendClient),
-      connection: new z.connection.ConnectionService(this.backendClient),
+      connection: new ConnectionService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
       cryptography: new z.cryptography.CryptographyService(this.backendClient),
       event: eventService,

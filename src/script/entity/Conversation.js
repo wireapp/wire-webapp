@@ -36,6 +36,7 @@ import {ConversationVerificationState} from '../conversation/ConversationVerific
 import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -109,7 +110,7 @@ export class Conversation {
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity && connectionEntity.userId;
       if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {

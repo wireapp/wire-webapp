@@ -43,6 +43,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -659,7 +660,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(ConversationType.ONE2ONE);
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
