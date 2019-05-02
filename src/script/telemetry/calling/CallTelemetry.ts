@@ -35,7 +35,7 @@ import {CALL_STATE} from '../../calling/enum/CallState';
 
 declare const Raygun: RaygunStatic;
 
-class CallTelemetry {
+export class CallTelemetry {
   direction?: CALL_STATE;
   hasToggledAV?: boolean;
   logger: Logger;
@@ -76,8 +76,7 @@ class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
-   * @param direction - direction of the call (outgoing or incoming)
-   * @param Media type for this call
+   * @param direction direction of the call (outgoing or incoming)
    */
   initiateNewCall(direction: CALL_STATE, mediaType = MediaType.AUDIO): void {
     this.mediaType = mediaType;
@@ -148,5 +147,3 @@ class CallTelemetry {
     this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
 }
-
-export {CallTelemetry};
