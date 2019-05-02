@@ -57,63 +57,26 @@ export class CallingRepository {
   /**
    * Construct a new Calling repository.
    *
-   * @param {CallingService} callingService -  Backend REST API calling service implementation
-   * @param {ClientRepository} clientRepository - Repository for client interactions
+   * @param {BackendClient} backendClient - Client for the backend API
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    * @param {EventRepository} eventRepository -  Repository that handles events
    * @param {MediaRepository} mediaRepository -  Repository for media interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {UserRepository} userRepository -  Repository for all user interactions
    */
-  constructor(
-    callingService,
-    clientRepository,
-    conversationRepository,
-    eventRepository,
-    mediaRepository,
-    serverTimeHandler,
-    userRepository,
-  ) {
-    this.getConfig = this.getConfig.bind(this);
-
+  constructor(backendClient, conversationRepository, eventRepository, mediaRepository, serverTimeHandler) {
     this.wUser = undefined;
     this.callingApi = undefined;
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
 
-    ko.computed(() => {
-      if (userRepository.self() && clientRepository.currentClient()) {
-        getAvsInstance()
-          .then(callingInstance => {
-            return this.configureCallingApi(
-              callingInstance,
-              userRepository.self().id,
-              clientRepository.currentClient().id
-            );
-          })
-          .then(({callingApi, wUser}) => {
-            this.callingApi = callingApi;
-            this.wUser = wUser;
-          });
-      }
-    });
-
-    this.callingService = callingService;
-    this.clientRepository = clientRepository;
+    this.backendClient = backendClient;
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.mediaRepository = mediaRepository;
     this.serverTimeHandler = serverTimeHandler;
-    this.userRepository = userRepository;
 
     this.messageLog = [];
     this.callLogger = new CallLogger('CallingRepository', null, this.messageLog);
-
-    this.selfUserId = ko.pureComputed(() => {
-      if (this.userRepository.self()) {
-        return this.userRepository.self().id;
-      }
-    });
 
     this.callingConfig = undefined;
     this.callingConfigTimeout = undefined;
@@ -134,6 +97,15 @@ export class CallingRepository {
 
     this.subscribeToEvents();
     this._enableDebugging();
+  }
+
+  initAvs(selfUserId, clientId) {
+    getAvsInstance()
+      .then(callingInstance => this.configureCallingApi(callingInstance, selfUserId, clientId))
+      .then(({callingApi, wUser}) => {
+        this.callingApi = callingApi;
+        this.wUser = wUser;
+      });
   }
 
   configureCallingApi(callingApi, selfUserId, selfClientId) {
@@ -599,7 +571,7 @@ gled
    * Get the current calling config.
    * @returns {Promise} Resolves with calling config
    */
-  getConfig() {
+  getConfig = () => {
     if (this.callingConfig) {
       const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
 
@@ -612,6 +584,26 @@ gled
     }
 
     return this._getConfigFromBackend();
+  };
+
+  /**
+   * Retrieves a calling config from the backend.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
+   * @see ./documentation/blob/master/topics/web/calling/calling-v3.md#limiting
+   *
+   * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
+   * @returns {Promise} Resolves with call config information
+   */
+  fetchConfig(limit) {
+    return this.backendClient.sendRequest({
+      cache: false,
+      data: {
+        limit,
+      },
+      type: 'GET',
+      url: '/calls/config/v2',
+    });
   }
 
   _clearConfig() {
@@ -638,7 +630,7 @@ gled
   _getConfigFromBackend() {
     const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
 
-    return this.callingService.getConfig(limit).then(callingConfig => {
+    return this.fetchConfig(limit).then(callingConfig => {
       if (callingConfig) {
         this._clearConfigTimeout();
 

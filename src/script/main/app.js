@@ -238,13 +238,11 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.CallingService),
-      repositories.client,
+      resolve(graph.BackendClient),
       repositories.conversation,
       repositories.event,
       repositories.media,
       serverTimeHandler,
-      repositories.user,
     );
     repositories.integration = new IntegrationRepository(
       this.service.integration,
@@ -327,6 +325,11 @@ class App {
         loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
         telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
+      })
+      .then(clientEntity => {
+        const selfId = this.repository.user.self().id;
+        this.repository.calling.initAvs(selfId, clientEntity.id);
+        return clientEntity;
       })
       .then(clientEntity => {
         loadingView.updateProgress(7.5, t('initValidatedClient'));
