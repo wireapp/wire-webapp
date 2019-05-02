@@ -27,6 +27,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from './IntegrationMapper';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
+import {EventName} from '../tracking/EventName';
 
 export class IntegrationRepository {
   /**
@@ -102,7 +103,7 @@ export class IntegrationRepository {
           services_size: conversationEntity.getNumberOfServices(),
         };
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 
       return event;
@@ -219,7 +220,7 @@ export class IntegrationRepository {
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
         const attributes = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, attributes);
         return event;
       }
     });

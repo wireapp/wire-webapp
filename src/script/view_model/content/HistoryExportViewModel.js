@@ -23,6 +23,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -122,7 +123,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onCancel() {
@@ -141,7 +142,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(archiveBlob) {

@@ -47,6 +47,7 @@ import {MediaType} from '../media/MediaType';
 import {ClientEvent} from '../event/Client';
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
+import {EventName} from '../tracking/EventName';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -1406,7 +1407,7 @@ export class CallingRepository {
         callEntity.state(callState);
 
         return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
-          this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
+          this.telemetry.track_event(EventName.CALLING.RECEIVED_CALL, callEntity);
           this.injectActivateEvent(callMessageEntity, source);
 
           const eventFromWebSocket = source === EventRepository.SOURCE.WEB_SOCKET;
@@ -1458,7 +1459,7 @@ export class CallingRepository {
 
       callEntity.state(CALL_STATE.OUTGOING);
 
-      this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
+      this.telemetry.track_event(EventName.CALLING.INITIATED_CALL, callEntity);
       return callEntity;
     });
   }

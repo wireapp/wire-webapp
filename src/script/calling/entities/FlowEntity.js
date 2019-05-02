@@ -31,6 +31,7 @@ import {EventRepository} from '../../event/EventRepository';
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
 import {FlowTelemetry} from '../../telemetry/calling/FlowTelemetry';
+import {EventName} from '../../tracking/EventName';
 
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 import {CALL_STATE} from '../enum/CallState';
@@ -1025,7 +1026,7 @@ class FlowEntity {
     this.callLogger.error(`Creating '${sdpType}' failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
-    this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.track_event(EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
   }
@@ -1158,7 +1159,7 @@ class FlowEntity {
     this.callLogger.error(`Setting ${sdpSource} '${sdpType}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
-    this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.track_event(EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     this._removeDroppedParticipant(TERMINATION_REASON.SDP_FAILED);
   }

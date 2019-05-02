@@ -17,14 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
-
 /**
- * Definition of events used for user analytics.
- * @returns {z.tracking.EventName} Event names (defined by Business Intelligence Team)
+ * Definition of events used for user analytics (defined by Business Intelligence Team)
  */
-z.tracking.EventName = {
+export const EventName = {
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
     ENDED_VIDEO_CALL: 'calling.ended_video_call',

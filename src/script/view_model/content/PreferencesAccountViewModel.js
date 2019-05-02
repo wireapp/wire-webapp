@@ -41,6 +41,7 @@ import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -292,7 +293,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 

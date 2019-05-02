@@ -27,6 +27,7 @@ import {MediaStreamSource} from './MediaStreamSource';
 import {MediaStreamInfo} from './MediaStreamInfo';
 import {MediaType} from './MediaType';
 import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
 
 export class MediaStreamHandler {
   /**
@@ -173,7 +174,7 @@ export class MediaStreamHandler {
       .catch(error => {
         this._initiateMediaStreamFailure(error, conversationId);
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
           video: videoSend,
         });

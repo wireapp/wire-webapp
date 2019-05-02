@@ -30,6 +30,7 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SuperProperty} from '../tracking/SuperProperty';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -82,7 +83,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
     });
 
     this.userRepository.isTeam = this.isTeam;

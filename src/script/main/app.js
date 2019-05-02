@@ -51,6 +51,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 
 import {EventRepository} from '../event/EventRepository';
@@ -182,7 +183,7 @@ class App {
     repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
-    repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
+    repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
     repositories.conversation = new z.conversation.ConversationRepository(
       this.service.conversation,

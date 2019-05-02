@@ -37,6 +37,7 @@ import {AudioType} from '../../audio/AudioType';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {EventRepository} from '../../event/EventRepository';
+import {EventName} from '../../tracking/EventName';
 
 export class CallEntity {
   static get CONFIG() {
@@ -157,7 +158,7 @@ export class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
@@ -226,7 +227,7 @@ export class CallEntity {
 
       const isConnectingCall = state === CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;

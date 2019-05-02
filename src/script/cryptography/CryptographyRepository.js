@@ -27,6 +27,7 @@ import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
 
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
@@ -518,7 +519,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {undefined} No return value
    */
   _reportDecryptionFailure(error, {type: eventType}) {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: error.code || error.message,
     });
 

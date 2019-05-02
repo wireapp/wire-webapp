@@ -77,12 +77,13 @@ import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {QUEUE_STATE} from '../service/QueueState';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {EventName} from '../tracking/EventName';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
@@ -3977,7 +3978,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
     }
   }
 };

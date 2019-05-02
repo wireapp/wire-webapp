@@ -23,14 +23,14 @@ import {Environment} from 'Util/Environment';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 
-import * as trackingHelpers from './Helpers';
 import {WebAppEvents} from '../event/WebApp';
 import {URLParameter} from '../auth/URLParameter';
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
+import * as trackingHelpers from './Helpers';
+import {EventName} from './EventName';
+import {SuperProperty} from './SuperProperty';
 
-z.tracking.EventTrackingRepository = class EventTrackingRepository {
+export class EventTrackingRepository {
   static get CONFIG() {
     return {
       ERROR_REPORTING: {
@@ -42,10 +42,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         DISABLED_EVENTS: [
-          z.tracking.EventName.CALLING.FAILED_REQUEST,
-          z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA,
-          z.tracking.EventName.CALLING.FAILED_RTC,
-          z.tracking.EventName.TELEMETRY.APP_INITIALIZATION,
+          EventName.CALLING.FAILED_REQUEST,
+          EventName.CALLING.FAILED_REQUESTING_MEDIA,
+          EventName.CALLING.FAILED_RTC,
+          EventName.TELEMETRY.APP_INITIALIZATION,
         ],
       },
     };
@@ -61,7 +61,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = getLogger('z.tracking.EventTrackingRepository');
+    this.logger = getLogger('EventTrackingRepository');
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
@@ -103,7 +103,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return this._isDomainAllowedForAnalytics()
       ? this._enableAnalytics().then(() => {
           if (isOptIn) {
-            this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING);
+            this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
           }
         })
       : Promise.resolve();
@@ -111,7 +111,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disableServices() {
     this._disableErrorReporting();
-    this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this._trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this._disableAnalytics();
   }
 
@@ -184,17 +184,17 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _setSuperProperties() {
-    this._setSuperProperty(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSuperProperty(z.tracking.SuperProperty.APP_VERSION, Environment.version(false));
-    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
+    this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
+    this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
     if (Environment.desktop) {
-      this._setSuperProperty(z.tracking.SuperProperty.WRAPPER_VERSION, Environment.version(true));
+      this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
     }
 
     if (this.userRepository) {
-      this._setSuperProperty(z.tracking.SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSuperProperty(z.tracking.SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSuperProperty(z.tracking.SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
+      this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
@@ -283,4 +283,4 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
     Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
   }
-};
+}

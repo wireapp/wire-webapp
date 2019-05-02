@@ -34,11 +34,15 @@ import {ConsentType} from './ConsentType';
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
+
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
+
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {EventName} from '../tracking/EventName';
+import {SuperProperty} from '../tracking/SuperProperty';
 
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
@@ -107,7 +111,7 @@ export class UserRepository {
       return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
     });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
@@ -358,7 +362,7 @@ export class UserRepository {
    * @returns {undefined} No return value
    */
   _trackAvailability(availability, method) {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
       status: valueFromType(availability),
     });

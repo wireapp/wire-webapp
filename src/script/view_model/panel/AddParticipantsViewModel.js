@@ -25,6 +25,7 @@ import {sortByPriority} from 'Util/StringUtil';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {EventName} from '../../tracking/EventName';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -139,7 +140,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -181,7 +182,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
         });
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
 }
