@@ -249,7 +249,7 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
       TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
 
       TestFactory.connection_repository = new ConnectionRepository(
-        TestFactory.connection_service,
+        resolve(graph.BackendClient),
         TestFactory.user_repository
       );
 

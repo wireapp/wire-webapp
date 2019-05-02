@@ -27,6 +27,7 @@ import {SystemMessageType} from '../message/SystemMessageType';
 
 import {ConnectionStatus} from './ConnectionStatus';
 import {ConnectionMapper} from './ConnectionMapper';
+import {ConnectionService} from './ConnectionService';
 
 export class ConnectionRepository {
   static get CONFIG() {
@@ -35,12 +36,8 @@ export class ConnectionRepository {
     };
   }
 
-  /**
-   * @param {ConnectionService} connectionService - Backend REST API connection service implementation
-   * @param {UserRepository} userRepository - Repository for all user interactions
-   */
-  constructor(connectionService, userRepository) {
-    this.connectionService = connectionService;
+  constructor(backendClient, userRepository) {
+    this.connectionService = new ConnectionService(backendClient);
     this.userRepository = userRepository;
 
     this.logger = getLogger('ConnectionRepository');
