@@ -19,6 +19,7 @@
 
 import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
@@ -618,7 +619,7 @@ export class CallingRepository {
 
       if (!eventFromStream) {
         const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
-        eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING);
+        eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
         const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
@@ -750,7 +751,7 @@ export class CallingRepository {
 
           const protoCalling = new Calling({content: callMessageEntity.toContentString()});
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+            [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
             messageId: createRandomUuid(),
           });
 

@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
@@ -346,7 +347,7 @@ export class UserRepository {
 
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 

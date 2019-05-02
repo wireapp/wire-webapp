@@ -20,6 +20,7 @@
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import * as Proteus from '@wireapp/proteus';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
@@ -45,7 +46,7 @@ async function createEncodedCiphertext(
   await sender.create();
 
   const genericMessage = new GenericMessage({
-    [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
+    [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
     messageId: createRandomUuid(),
   });
 

@@ -48,7 +48,6 @@ import EventBuilderGlobal from '../conversation/EventBuilder.js';
 import CryptographyMapperGlobal from '../cryptography/CryptographyMapper.js';
 import CryptographyRepositoryGlobal from '../cryptography/CryptographyRepository.js';
 import CryptographyServiceGlobal from '../cryptography/CryptographyService.js';
-import GenericMessageTypeGlobal from '../cryptography/GenericMessageType.js';
 import ProtoMessageTypeGlobal from '../cryptography/ProtoMessageType.js';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
