@@ -17,20 +17,27 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
 import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+
+type OnNewVersionAvailableFn = (serverVersion: string) => void;
+
+interface VersionListener {
+  currentVersion: string;
+  onNewVersionAvailable: OnNewVersionAvailableFn;
+}
 
 const logger = getLogger('LifecycleRepository');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
 
-let newVersionListeners = [];
-let pollInterval;
+let newVersionListeners: VersionListener[] = [];
+let pollInterval: number;
 
-const fetchLatestVersion = async () => {
+const fetchLatestVersion = async (): Promise<string> => {
   const response = await fetch(VERSION_URL);
   if (response.ok) {
-    const {version} = await response.json();
+    const {version} = (await response.json()) as {version: string};
     return version;
   }
   throw new Error(`Failed to fetch '${VERSION_URL}': ${response.statusText}`);
@@ -39,10 +46,10 @@ const fetchLatestVersion = async () => {
 /**
  * Check all the registered version listeners if the server version is newer than the version they registered.
  *
- * @param {string} overrideCurrentVersion - will ignore the version set for the listener and use this one instead
- * @returns {Promise<number>} - Promise that resolves when the check has been done
+ * @param overrideCurrentVersion will ignore the version set for the listener and use this one instead
+ * @returns Promise that resolves when the check has been done
  */
-export async function checkVersion(overrideCurrentVersion) {
+export const checkVersion = async (overrideCurrentVersion: string): Promise<string | void> => {
   if (navigator.onLine) {
     const serverVersion = await fetchLatestVersion();
     newVersionListeners.forEach(({currentVersion, onNewVersionAvailable}) => {
@@ -54,25 +61,27 @@ export async function checkVersion(overrideCurrentVersion) {
     });
     return serverVersion;
   }
-}
+};
 
 /**
  * Will register an interval that will poll the server for the latest version of the app.
  * If a new version is detected, will then call the given callback.
  *
- * @param {type} currentVersion - current version of the app
- * @param {type} onNewVersionAvailable - callback to be called when a new version is detected
- * @returns {void} - nothing
+ * @param currentVersion current version of the app
+ * @param onNewVersionAvailable callback to be called when a new version is detected
  */
-export function startNewVersionPolling(currentVersion, onNewVersionAvailable) {
+export const startNewVersionPolling = (
+  currentVersion: string,
+  onNewVersionAvailable: OnNewVersionAvailableFn
+): void => {
   newVersionListeners.push({currentVersion, onNewVersionAvailable});
   if (newVersionListeners.length === 1) {
     // starts the interval when we have our first listener
     pollInterval = window.setInterval(checkVersion, CHECK_INTERVAL);
   }
-}
+};
 
-export function stopNewVersionPolling() {
+export const stopNewVersionPolling = (): void => {
   newVersionListeners = [];
   window.clearInterval(pollInterval);
-}
+};
