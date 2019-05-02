@@ -148,7 +148,7 @@ class NotificationRepository {
   /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification has been handled
    */
@@ -331,7 +331,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.MemberMessage} messageEntity - Member message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message body
    */
@@ -444,7 +444,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves with the notification content
    */
@@ -478,7 +478,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
+   * @param {ConnectionEntity} connectionEntity - Connection entity
    * @param {Conversation} conversationEntity - Conversation entity
    * @returns {string|undefined} The notification message body
    */
@@ -504,7 +504,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Object} Notification message data
    */
@@ -548,7 +548,7 @@ class NotificationRepository {
    * Creates the notification tag.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message tag
    */
@@ -593,7 +593,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Function} Function to be called when notification is clicked
    */
@@ -620,7 +620,7 @@ class NotificationRepository {
    * Retrieve conversation ID from either conversation or connection.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} ID of conversation
    */
@@ -657,7 +657,7 @@ class NotificationRepository {
    * @private
    * @see https://developer.mozilla.org/en/docs/Web/API/notification#Parameters
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification was handled
    */

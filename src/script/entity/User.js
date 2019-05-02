@@ -28,6 +28,7 @@ import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 
 // Please note: The own user has a "locale"
 class User {
@@ -105,7 +106,7 @@ class User {
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();
 
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
 
     this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
     this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());

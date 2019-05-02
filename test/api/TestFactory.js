@@ -40,6 +40,8 @@ import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {WebSocketService} from 'src/script/event/WebSocketService';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -218,7 +220,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
 window.TestFactory.prototype.exposeUserActors = function() {
   return this.exposeClientActors().then(() => {
     TestFactory.asset_service = resolve(graph.AssetService);
-    TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
+    TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
     TestFactory.user_service = resolve(graph.UserService);
     TestFactory.propertyRepository = resolve(graph.PropertiesRepository);
 
@@ -238,16 +240,16 @@ window.TestFactory.prototype.exposeUserActors = function() {
 
 /**
  *
- * @returns {Promise<z.connection.ConnectionRepository>} The connection repository.
+ * @returns {Promise<ConnectionRepository>} The connection repository.
  */
 window.TestFactory.prototype.exposeConnectionActors = function() {
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
+      TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
 
-      TestFactory.connection_repository = new z.connection.ConnectionRepository(
-        TestFactory.connection_service,
+      TestFactory.connection_repository = new ConnectionRepository(
+        resolve(graph.BackendClient),
         TestFactory.user_repository
       );
 

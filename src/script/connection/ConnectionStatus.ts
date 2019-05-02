@@ -17,15 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.connection = z.connection || {};
-
-z.connection.ConnectionStatus = {
-  ACCEPTED: 'accepted',
-  BLOCKED: 'blocked',
-  CANCELLED: 'cancelled',
-  IGNORED: 'ignored',
-  PENDING: 'pending',
-  SENT: 'sent',
-  UNKNOWN: '',
-};
+export enum ConnectionStatus {
+  ACCEPTED = 'accepted',
+  BLOCKED = 'blocked',
+  CANCELLED = 'cancelled',
+  IGNORED = 'ignored',
+  PENDING = 'pending',
+  SENT = 'sent',
+  UNKNOWN = '',
+}
