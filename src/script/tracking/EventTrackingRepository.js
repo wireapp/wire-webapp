@@ -26,6 +26,7 @@ import {getParameter} from 'Util/UrlUtil';
 import * as trackingHelpers from './Helpers';
 import {WebAppEvents} from '../event/WebApp';
 import {URLParameter} from '../auth/URLParameter';
+import {EventName} from './EventName';
 
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
@@ -42,10 +43,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         DISABLED_EVENTS: [
-          z.tracking.EventName.CALLING.FAILED_REQUEST,
-          z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA,
-          z.tracking.EventName.CALLING.FAILED_RTC,
-          z.tracking.EventName.TELEMETRY.APP_INITIALIZATION,
+          EventName.CALLING.FAILED_REQUEST,
+          EventName.CALLING.FAILED_REQUESTING_MEDIA,
+          EventName.CALLING.FAILED_RTC,
+          EventName.TELEMETRY.APP_INITIALIZATION,
         ],
       },
     };
@@ -103,7 +104,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return this._isDomainAllowedForAnalytics()
       ? this._enableAnalytics().then(() => {
           if (isOptIn) {
-            this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING);
+            this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
           }
         })
       : Promise.resolve();
@@ -111,7 +112,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disableServices() {
     this._disableErrorReporting();
-    this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this._trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this._disableAnalytics();
   }
 

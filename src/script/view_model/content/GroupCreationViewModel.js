@@ -24,6 +24,7 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {WebAppEvents} from '../../event/WebApp';
 
@@ -127,7 +128,7 @@ export class GroupCreationViewModel {
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_GROUP_CREATION, {
       method: this.method,
     });
   };
@@ -186,7 +187,7 @@ export class GroupCreationViewModel {
         return this.nameError(t('groupCreationPreferencesErrorNameShort'));
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
         method: this.method,
       });
 
@@ -221,7 +222,7 @@ export class GroupCreationViewModel {
       attributes.is_allow_guests = !conversationEntity.isTeamOnly();
     }
 
-    const eventName = z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
+    const eventName = EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
@@ -243,6 +244,6 @@ export class GroupCreationViewModel {
       });
     }
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 }

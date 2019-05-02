@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -117,7 +118,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   onSuccess() {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_SUCCEEDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_SUCCEEDED);
     window.setTimeout(this.dismissImport.bind(this), MotionDuration.X_LONG * 2);
   }
 
@@ -136,6 +137,6 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
     }
     this.error(error);
     this.logger.error(`Failed to import history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.RESTORE_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.RESTORE_FAILED);
   }
 };

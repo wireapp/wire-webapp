@@ -17,21 +17,35 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import {RaygunStatic} from 'raygun4js';
+
+import {Logger, getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
-import {sortObjectByKeys} from 'Util/util';
 
-import * as trackingHelpers from '../../tracking/Helpers';
 import {ConversationType} from '../../tracking/attribute';
-import {MediaType} from '../../media/MediaType';
-import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
+import * as trackingHelpers from '../../tracking/Helpers';
 
-// Call traces entity.
+import {WebAppEvents} from '../../event/WebApp';
+import {MediaType} from '../../media/MediaType';
+
+import {CallEntity} from '../../calling/entities/CallEntity';
+import {CALL_STATE} from '../../calling/enum/CallState';
+
+declare const Raygun: RaygunStatic;
+
 class CallTelemetry {
+  direction?: CALL_STATE;
+  hasToggledAV?: boolean;
+  logger: Logger;
+  maxNumberOfParticipants: number;
+  mediaType: MediaType;
+  remote_version?: string;
+
   constructor() {
     this.logger = getLogger('CallTelemetry');
 
-    this.sessions = {};
     this.remote_version = undefined;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
@@ -41,33 +55,10 @@ class CallTelemetry {
   }
 
   //##############################################################################
-  // Sessions
-  //##############################################################################
-
-  /**
-   * Force log last call session IDs.
-   * @returns {Object} Containing all the sessions
-   */
-  log_sessions() {
-    const sortedSessions = sortObjectByKeys(this.sessions, true);
-
-    this.logger.force_log('Your last session IDs:');
-    Object.values(sortedSessions).forEach(trackingInfo => this.logger.force_log(trackingInfo.to_string()));
-
-    return sortedSessions;
-  }
-
-  //##############################################################################
   // Error reporting
   //##############################################################################
 
-  /**
-   * Report an error to Raygun.
-   * @param {string} description - Error description
-   * @param {Error} passed_error - Error to be attached to the report
-   * @returns {undefined} No return value
-   */
-  report_error(description, passed_error) {
+  report_error(description: string, passed_error: Error): void {
     let custom_data;
     const raygun_error = new Error(description);
 
@@ -85,11 +76,10 @@ class CallTelemetry {
 
   /**
    * Prepare the call telemetry for a new call (resets to initial values)
-   * @param {CALL_STATE} direction - direction of the call (outgoing or incoming)
-   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
-   * @returns {undefined} No return value
+   * @param direction - direction of the call (outgoing or incoming)
+   * @param Media type for this call
    */
-  initiateNewCall(direction, mediaType = MediaType.AUDIO) {
+  initiateNewCall(direction: CALL_STATE, mediaType = MediaType.AUDIO): void {
     this.mediaType = mediaType;
     this.hasToggledAV = false;
     this.maxNumberOfParticipants = 0;
@@ -97,16 +87,11 @@ class CallTelemetry {
     this.logger.info(`Initiate new '${direction}' call of type '${this.mediaType}'`);
   }
 
-  setAVToggled() {
+  setAVToggled(): void {
     this.hasToggledAV = true;
   }
 
-  /**
-   * Sets the remove version of the call.
-   * @param {string} remote_version - Remove version string
-   * @returns {undefined} No return value
-   */
-  set_remote_version(remote_version) {
+  set_remote_version(remote_version: string): void {
     if (this.remote_version !== remote_version) {
       this.remote_version = remote_version;
       this.logger.info(`Identified remote call version as '${remote_version}'`);
@@ -115,53 +100,37 @@ class CallTelemetry {
 
   /**
    * Reports call events for call tracking to Localytics.
-   * @param {z.tracking.EventName} eventName - String for call event
-   * @param {CallEntity} callEntity - Call entity
-   * @param {Object} [attributes={}] - Attributes for the event
-   * @returns {undefined} No return value
    */
-  track_event(eventName, callEntity, attributes = {}) {
+  track_event(eventName: string, callEntity: CallEntity, attributes = {}): void {
     if (callEntity) {
       const {conversationEntity, isGroup} = callEntity;
 
       const videoTypes = [MediaType.VIDEO, MediaType.AUDIO_VIDEO];
 
-      attributes = Object.assign(
-        {
-          conversation_participants: conversationEntity.getNumberOfParticipants(),
-          conversation_participants_in_call_max: this.maxNumberOfParticipants
-            ? this.maxNumberOfParticipants
-            : undefined,
-          conversation_type: isGroup ? ConversationType.GROUP : ConversationType.ONE_TO_ONE,
-          direction: this.direction,
-          remote_version: [
-            z.tracking.EventName.CALLING.ESTABLISHED_CALL,
-            z.tracking.EventName.CALLING.JOINED_CALL,
-          ].includes(eventName)
-            ? this.remote_version
-            : undefined,
-          started_as_video: videoTypes.includes(this.mediaType),
-          with_service: conversationEntity.hasService(),
-        },
-        trackingHelpers.getGuestAttributes(conversationEntity),
-        attributes
-      );
+      attributes = {
+        conversation_participants: conversationEntity.getNumberOfParticipants(),
+        conversation_participants_in_call_max: this.maxNumberOfParticipants ? this.maxNumberOfParticipants : undefined,
+        conversation_type: isGroup ? ConversationType.GROUP : ConversationType.ONE_TO_ONE,
+        direction: this.direction,
+        remote_version: [EventName.CALLING.ESTABLISHED_CALL, EventName.CALLING.JOINED_CALL].includes(eventName)
+          ? this.remote_version
+          : undefined,
+        started_as_video: videoTypes.includes(this.mediaType),
+        with_service: conversationEntity.hasService(),
+        ...trackingHelpers.getGuestAttributes(conversationEntity),
+        ...attributes,
+      };
     }
 
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
-  /**
-   * Track the call duration.
-   * @param {CallEntity} callEntity - Call entity
-   * @returns {undefined} No return value
-   */
-  track_duration(callEntity) {
+  track_duration(callEntity: CallEntity): void {
     const {terminationReason, timerStart, durationTime} = callEntity;
 
     const duration = Math.floor((Date.now() - timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
 
-    if (!window.isNaN(duration)) {
+    if (!isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());
 
       const attributes = {
@@ -171,11 +140,11 @@ class CallTelemetry {
         remote_version: this.remote_version,
       };
 
-      this.track_event(z.tracking.EventName.CALLING.ENDED_CALL, callEntity, attributes);
+      this.track_event(EventName.CALLING.ENDED_CALL, callEntity, attributes);
     }
   }
 
-  numberOfParticipantsChanged(newNumberOfParticipants) {
+  numberOfParticipantsChanged(newNumberOfParticipants: number): void {
     this.maxNumberOfParticipants = Math.max(this.maxNumberOfParticipants, newNumberOfParticipants);
   }
 }

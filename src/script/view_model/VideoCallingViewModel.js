@@ -22,6 +22,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
 import * as trackingHelpers from '../tracking/Helpers';
+import {EventName} from '../tracking/EventName';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {MediaType} from '../media/MediaType';
 import {MediaDeviceType} from '../media/MediaDeviceType';
@@ -227,7 +228,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
               Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
             }
 
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, attributes);
+            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SHARED_SCREEN, attributes);
 
             const hasMultipleScreens = screenSources.length > 1;
             if (hasMultipleScreens) {

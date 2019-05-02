@@ -32,6 +32,7 @@ import {validateHandle} from '../../user/UserHandleGenerator';
 import {WebAppEvents} from '../../event/WebApp';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
 
 class StartUIViewModel {
   static get STATE() {
@@ -253,21 +254,21 @@ class StartUIViewModel {
   clickOnCreateGuestRoom() {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   }
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 

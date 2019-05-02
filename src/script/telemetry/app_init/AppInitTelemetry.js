@@ -23,6 +23,7 @@ import {Environment} from 'Util/Environment';
 import {AppInitStatistics} from './AppInitStatistics';
 import {AppInitTimings} from './AppInitTimings';
 import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
 
 export class AppInitTelemetry {
   constructor() {
@@ -60,7 +61,7 @@ export class AppInitTelemetry {
     this.log_statistics();
     this.log_timings();
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.TELEMETRY.APP_INITIALIZATION, statistics);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, statistics);
   }
 
   time_step(step) {
