@@ -17,25 +17,22 @@
  *
  */
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  EXTERNAL: 'external',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
-};
+export enum GENERIC_MESSAGE_TYPE {
+  ASSET = 'asset',
+  AVAILABILITY = 'availability',
+  CALLING = 'calling',
+  CLEARED = 'cleared',
+  CLIENT_ACTION = 'clientAction',
+  CONFIRMATION = 'confirmation',
+  DELETED = 'deleted',
+  EDITED = 'edited',
+  EPHEMERAL = 'ephemeral',
+  EXTERNAL = 'external',
+  HIDDEN = 'hidden',
+  IMAGE = 'image',
+  KNOCK = 'knock',
+  LAST_READ = 'lastRead',
+  LOCATION = 'location',
+  REACTION = 'reaction',
+  TEXT = 'text',
+}

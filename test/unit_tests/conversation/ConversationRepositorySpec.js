@@ -18,6 +18,7 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -941,7 +942,7 @@ describe('ConversationRepository', () => {
               'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
           });
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: text,
+            [GENERIC_MESSAGE_TYPE.TEXT]: text,
             messageId: createRandomUuid(),
           });
 
@@ -961,7 +962,7 @@ describe('ConversationRepository', () => {
         .save_conversation(smallConversationEntity)
         .then(() => {
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+            [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
             messageId: createRandomUuid(),
           });
 
@@ -996,8 +997,8 @@ describe('ConversationRepository', () => {
         (conversationId, genericMessage) => {
           const {content, ephemeral} = genericMessage;
 
-          expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
-          expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
+          expect(content).toBe(GENERIC_MESSAGE_TYPE.EPHEMERAL);
+          expect(ephemeral.content).toBe(GENERIC_MESSAGE_TYPE.TEXT);
           expect(ephemeral.expireAfterMillis.toString()).toBe(expectedValues.shift());
           return Promise.resolve({
             recipients: {},

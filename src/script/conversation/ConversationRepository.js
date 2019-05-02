@@ -35,6 +35,7 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
@@ -1146,7 +1147,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       lastReadTimestamp: timestamp,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
+      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
       messageId: createRandomUuid(),
     });
 
@@ -1366,7 +1367,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversationId: conversationEntity.id,
       });
       const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
+        [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
         messageId: createRandomUuid(),
       });
 
@@ -1754,7 +1755,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(asset => {
         genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          [GENERIC_MESSAGE_TYPE.ASSET]: asset,
           messageId,
         });
 
@@ -1822,7 +1823,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(asset => {
         let genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          [GENERIC_MESSAGE_TYPE.ASSET]: asset,
           messageId: createRandomUuid(),
         });
 
@@ -1873,7 +1874,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             });
 
             const genericMessage = new GenericMessage({
-              [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+              [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
               messageId,
             });
 
@@ -1904,7 +1905,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     const generic_message = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
       messageId,
     });
 
@@ -1944,7 +1945,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       type,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
+      [GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
       messageId: createRandomUuid(),
     });
 
@@ -2008,7 +2009,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     let genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
       messageId: createRandomUuid(),
     });
 
@@ -2050,7 +2051,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             [linkPreview],
             this.expectReadReceipt(conversationEntity)
           );
-          genericMessage[z.cryptography.GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
         }
@@ -2099,7 +2100,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       zoom,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
+      [GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
       messageId: createRandomUuid(),
     });
 
@@ -2137,7 +2138,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
+      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
       messageId,
     });
 
@@ -2179,7 +2180,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   sendReaction(conversationEntity, messageEntity, reaction) {
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
+      [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
     });
 
@@ -2200,7 +2201,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendSessionReset(userId, clientId, conversationId) {
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+      [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
     });
 
@@ -2242,7 +2243,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.expectReadReceipt(conversationEntity)
     );
     let genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: protoText,
+      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
       messageId,
     });
 
@@ -2333,7 +2334,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
+      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
       messageId: genericMessage.messageId,
     });
 
@@ -2391,7 +2392,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
-        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
+        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
         const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
@@ -2473,7 +2474,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const externalMessage = new External({otrKey: keyBytes, sha256});
 
         const genericMessageExternal = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+          [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
           messageId: createRandomUuid(),
         });
 
@@ -2538,7 +2539,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
-    if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+    if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
       messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
     }
 
@@ -2598,7 +2599,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
 
-    const isCallingMessage = messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
+    const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
@@ -2804,7 +2805,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const protoMessageDelete = new MessageDelete({messageId});
         const genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
           messageId: createRandomUuid(),
         });
 
@@ -2847,7 +2848,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           messageId: messageEntity.id,
         });
         const genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
+          [GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
           messageId: createRandomUuid(),
         });
 
@@ -3910,7 +3911,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
     let messageTimer;
-    const isEphemeral = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;

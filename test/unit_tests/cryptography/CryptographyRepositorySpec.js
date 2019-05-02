@@ -21,6 +21,7 @@ import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
@@ -78,7 +79,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       );
 
       const generic_message = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
         messageId: createRandomUuid(),
       });
 
@@ -119,7 +120,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       const plainText = 'Hello, Alice!';
 
       const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
         messageId: createRandomUuid(),
       });
 

@@ -18,6 +18,7 @@
  */
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from './GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
@@ -64,52 +65,52 @@ export class CryptographyMapper {
     let specificContent;
 
     switch (genericMessage.content) {
-      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
+      case GENERIC_MESSAGE_TYPE.ASSET: {
         specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING: {
+      case GENERIC_MESSAGE_TYPE.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling, event.data);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED: {
+      case GENERIC_MESSAGE_TYPE.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED: {
+      case GENERIC_MESSAGE_TYPE.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED: {
+      case GENERIC_MESSAGE_TYPE.EDITED: {
         specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL: {
+      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
         specificContent = this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case GENERIC_MESSAGE_TYPE.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
+      case GENERIC_MESSAGE_TYPE.IMAGE: {
         specificContent = addExpectReadReceiptData(
           this._mapImage(genericMessage.image, event.data.id),
           genericMessage.image
@@ -117,27 +118,27 @@ export class CryptographyMapper {
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
+      case GENERIC_MESSAGE_TYPE.KNOCK: {
         specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case GENERIC_MESSAGE_TYPE.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
+      case GENERIC_MESSAGE_TYPE.LOCATION: {
         specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION: {
+      case GENERIC_MESSAGE_TYPE.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
+      case GENERIC_MESSAGE_TYPE.TEXT: {
         specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
