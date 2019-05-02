@@ -49,11 +49,11 @@ describe('SingleInstanceHandler', () => {
 
     it("doesn't register the current instance if instance already running", () => {
       const singleInstanceHandler = new SingleInstanceHandler();
-      spyOn(Cookies, 'get').and.returnValue(true);
+      spyOn(Cookies, 'get').and.returnValue({status: 'true'});
       spyOn(Cookies, 'set').and.returnValue(undefined);
       const result = singleInstanceHandler.registerInstance('instance-id');
 
-      expect(Cookies.set.calls.any()).toBe(false);
+      expect(Cookies.set).not.toHaveBeenCalled();
       expect(result).toBe(false);
     });
   });
@@ -83,7 +83,7 @@ describe('SingleInstanceHandler', () => {
 
       singleInstanceHandler.deregisterInstance();
 
-      expect(Cookies.remove.calls.any()).toBe(false);
+      expect(Cookies.remove).not.toHaveBeenCalled();
     });
 
     it('forces deregistration even if ids do not match', () => {
@@ -109,7 +109,7 @@ describe('SingleInstanceHandler', () => {
     });
 
     it('throws an error if the current instance has be registered', () => {
-      spyOn(Cookies, 'get').and.returnValue('instance-id');
+      spyOn(Cookies, 'get').and.returnValue({appInstanceId: 'instance-id'});
       const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
 
       expect(hasOtherInstance).toBe(true);

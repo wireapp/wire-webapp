@@ -549,7 +549,7 @@ class App {
 
   /**
    * Initiate the current client of the self user.
-   * @returns {Promise<z.client.Client>} Resolves with the local client entity
+   * @returns {Promise<Client>} Resolves with the local client entity
    */
   _initiateSelfUserClients() {
     return this.repository.client

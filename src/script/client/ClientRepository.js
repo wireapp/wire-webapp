@@ -569,7 +569,7 @@ export class ClientRepository {
    * @param {string} userId - ID of user whose clients are updated
    * @param {Object} clientsData - Clients data from backend
    * @param {booelan} [publish=true] - Publish changes clients using amplify
-   * @returns {Promise<Array<z.client.Client>>} Resolves with the entities once clients have been updated
+   * @returns {Promise<Client[]>} Resolves with the entities once clients have been updated
    */
   _updateClientsOfUserById(userId, clientsData, publish = true) {
     const clientsFromBackend = {};

@@ -317,7 +317,7 @@ export class UserRepository {
   /**
    * Update clients for given user.
    * @param {string} user_id - ID of user
-   * @param {Array<z.client.ClientEntity>} client_ets - Clients which should get updated
+   * @param {Array<ClientEntity>} client_ets - Clients which should get updated
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
