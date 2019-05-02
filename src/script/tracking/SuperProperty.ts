@@ -17,14 +17,10 @@
  *
  */
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
-
 /**
  * Enumeration of properties that should get send with every user tracking call.
- * @returns {z.tracking.SuperProperty} Super property identifier
  */
-z.tracking.SuperProperty = {
+export const SuperProperty = {
   APP: 'app',
   APP_VERSION: 'App Version',
   CONTACTS: 'contacts',

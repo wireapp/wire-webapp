@@ -34,6 +34,7 @@ import {ConnectRepository} from 'src/script/connect/ConnectRepository';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
+import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
@@ -381,13 +382,13 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
 
 /**
  *
- * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
+ * @returns {Promise<EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function() {
   return Promise.resolve()
     .then(() => this.exposeTeamActors())
     .then(() => {
-      TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
+      TestFactory.tracking_repository = new EventTrackingRepository(
         TestFactory.team_repository,
         TestFactory.user_repository
       );

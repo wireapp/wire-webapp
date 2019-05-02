@@ -42,6 +42,7 @@ import {EventRepository} from '../event/EventRepository';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {EventName} from '../tracking/EventName';
+import {SuperProperty} from '../tracking/SuperProperty';
 
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
@@ -110,7 +111,7 @@ export class UserRepository {
       return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
     });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));

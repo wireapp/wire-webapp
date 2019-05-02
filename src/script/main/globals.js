@@ -33,8 +33,6 @@ import StorageErrorGlobal from '../error/StorageError.js';
 import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
 import LocalizerGlobal from '../localization/Localizer.js';
-import EventTrackingRepositoryGlobal from '../tracking/EventTrackingRepository.js';
-import SuperPropertyGlobal from '../tracking/SuperProperty.js';
 import ErrorGlobal from '../backup/Error.js';
 import ConnectionEntityGlobal from '../connection/ConnectionEntity.js';
 import ConnectionMapperGlobal from '../connection/ConnectionMapper.js';
