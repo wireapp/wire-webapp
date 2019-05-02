@@ -205,14 +205,14 @@ export class CallingRepository {
       log('vstateh') //vstateh,
     );
 
-    callingApi.set_mute_handler(wUser, muted => {
-      this.isMuted(muted);
-    });
+    callingApi.set_group_changed_handler(wUser, log('groupchangedh'));
+
+    callingApi.set_mute_handler(wUser, this.isMuted);
     callingApi.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
-      log('state_handler')(conversationId, state);
       const storedCall = this.findCall(conversationId);
       const call: Call = storedCall || {
         conversationId,
+        participants: ko.observableArray(),
         reason: ko.observable(),
         startedAt: ko.observable(),
         state: ko.observable(state),

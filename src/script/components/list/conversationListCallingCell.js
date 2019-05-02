@@ -19,6 +19,7 @@
 
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
 import {CALL_TYPE} from 'avs-web';
@@ -45,6 +46,8 @@ class ConversationListCallingCell {
       screenSend: () => false,
       videoSend: () => false,
     };
+
+    this.callParticipants = call.participants;
 
     const isState = state => () => call.state() === state;
     this.isIdle = ko.pureComputed(isState(CALL_STATE.NONE));
@@ -84,7 +87,12 @@ class ConversationListCallingCell {
       }
     });
 
-    this.showParticipantsButton = ko.pureComputed(() => this.isConnected() && this.conversation().isGroup());
+    this.showParticipants = ko.observable(false);
+    this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
+    this.participantsButtonLabel = ko.pureComputed(() => {
+      return t('callParticipants', this.callParticipants().length);
+    });
+
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
 
     this.dispose = () => {
@@ -108,7 +116,6 @@ class ConversationListCallingCell {
     this.selfInTeam = this.selfUser.inTeam();
 
 
-    this.showParticipants = ko.observable(false);
 
     this.callParticipants = ko.pureComputed(() => {
       const callParticipants = this.call().participants();
@@ -132,10 +139,6 @@ class ConversationListCallingCell {
       return isOutgoingVideoCall || isVideoUnsupported;
     });
     this.disableScreenButton = ko.pureComputed(() => !this.callingRepository.supportsScreenSharing);
-
-    this.participantsButtonLabel = ko.pureComputed(() => {
-      return t('callParticipants', this.callParticipants().length);
-    });
 
     this.showVideoPreview = ko.pureComputed(() => {
       const hasOtherOngoingCalls = this.calls().some(callEntity => {
@@ -183,7 +186,7 @@ class ConversationListCallingCell {
     this.multitasking.isMinimized(false);
   }
 
-  onParticipantsClick() {
+  toggleShowParticipants() {
     this.showParticipants(!this.showParticipants());
 
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
@@ -209,6 +212,10 @@ class ConversationListCallingCell {
     event.stopPropagation();
     // TODO
     //amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
+  }
+
+  findUsers(userIds) {
+    return this.conversationParticipants().filter(user => userIds.includes(user.id));
   }
 }
 
@@ -277,8 +284,8 @@ ko.components.register('conversation-list-calling-cell', {
         </div>
 
         <div class="conversation-list-calling-cell-controls-right">
-          <!-- ko if: false && showParticipantsButton() -->
-            <div class="call-ui__button call-ui__button--participants" data-bind="click: onParticipantsClick, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
+          <!-- ko if: showParticipantsButton() -->
+            <div class="call-ui__button call-ui__button--participants" data-bind="click: toggleShowParticipants, css: {'call-ui__button--active': showParticipants()}" data-uie-name="do-toggle-participants">
               <span data-bind="text: participantsButtonLabel"></span><chevron-icon></chevron-icon>
             </div>
           <!-- /ko -->
@@ -292,6 +299,12 @@ ko.components.register('conversation-list-calling-cell', {
               <pickup-icon class="small-icon"></pickup-icon>
             </div>
           <!-- /ko -->
+        </div>
+      </div>
+
+      <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
+        <div class="call-ui__participant-list" data-bind="foreach: {data: findUsers(callParticipants()), as: 'participant'}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+          <participant-item params="participant: participant, hideInfo: true, showCamera: false" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
     <!-- /ko -->
@@ -324,11 +337,6 @@ const oldTmpl = `
 
 
 
-      </div>
-      <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: callParticipants, fadingscrollbar" data-uie-name="list-call-ui-participants">
-          <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
-        </div>
       </div>
     <!-- /ko -->
  `;
