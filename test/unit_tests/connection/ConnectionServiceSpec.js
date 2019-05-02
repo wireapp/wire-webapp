@@ -18,6 +18,7 @@
  */
 
 import {resolve, graph, backendConfig} from './../../api/testResolver';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
 
 describe('ConnectionService', () => {
   let server = null;
@@ -28,7 +29,7 @@ describe('ConnectionService', () => {
     server = sinon.fakeServer.create();
 
     const backendClient = resolve(graph.BackendClient);
-    connectionService = new z.connection.ConnectionService(backendClient);
+    connectionService = new ConnectionService(backendClient);
   });
 
   afterEach(() => server.restore());

@@ -75,6 +75,7 @@ import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
+import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -206,11 +207,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversation_et => {
-        const states_to_filter = [
-          z.connection.ConnectionStatus.BLOCKED,
-          z.connection.ConnectionStatus.CANCELLED,
-          z.connection.ConnectionStatus.PENDING,
-        ];
+        const states_to_filter = [ConnectionStatus.BLOCKED, ConnectionStatus.CANCELLED, ConnectionStatus.PENDING];
 
         if (conversation_et.isSelf() || states_to_filter.includes(conversation_et.connection().status())) {
           return false;
@@ -1047,7 +1044,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connections
+   * @param {ConnectionEntity} connectionEntity - Connections
    * @param {boolean} [show_conversation=false] - Open the new conversation
    * @returns {Promise} Resolves when connection was mapped return value
    */
@@ -1091,7 +1088,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connections entities
+   * @param {Array<ConnectionEntity>} connectionEntities - Connections entities
    * @returns {undefined} No return value
    */
   map_connections(connectionEntities) {
