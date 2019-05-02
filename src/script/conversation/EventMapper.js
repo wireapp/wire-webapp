@@ -26,7 +26,10 @@ import {base64ToArray} from 'Util/util';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {MediumImage} from '../entity/message/MediumImage';
+import {File} from '../entity/message/File';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
@@ -618,7 +621,7 @@ export class EventMapper {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const assetEntity = new z.entity.File(id);
+    const assetEntity = new File(id);
 
     assetEntity.conversationId = conversationId;
 
@@ -704,7 +707,7 @@ export class EventMapper {
 
       const meta_data = linkPreview.metaData || linkPreview.meta_data;
 
-      const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
+      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 

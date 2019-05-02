@@ -36,6 +36,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {EventRepository} from 'src/script/event/EventRepository';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {File} from 'src/script/entity/message/File';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -105,7 +106,7 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-        const file_et = new z.entity.File();
+        const file_et = new File();
         file_et.status(AssetTransferState.UPLOADING);
         message_et = new z.entity.ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);

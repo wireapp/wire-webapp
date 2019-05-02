@@ -32,7 +32,7 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
    * @param {Object} params - Component parameters
    * @param {HTMLElement} params.src - Media source
    * @param {boolean} params.large - Display large button
-   * @param {z.entity.File} params.asset - Asset file
+   * @param {File} params.asset - Asset file
    * @param {Object} componentInfo - Component information
    */
   constructor(params, componentInfo) {

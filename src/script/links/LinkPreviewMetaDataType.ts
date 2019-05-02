@@ -17,9 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.links = z.links || {};
-
-z.links.LinkPreviewMetaDataType = {
-  TWEET: 'tweet',
-};
+export enum LinkPreviewMetaDataType {
+  TWEET = 'tweet',
+}

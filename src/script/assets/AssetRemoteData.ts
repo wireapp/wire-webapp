@@ -47,10 +47,10 @@ export interface AssetUrlDataVersion1 {
   version: 1;
 }
 
-class AssetRemoteData {
-  public cancelDownload: Function;
+export class AssetRemoteData {
+  public cancelDownload: () => void;
 
-  private readonly downloadProgress: ko.Observable<number>;
+  public readonly downloadProgress: ko.Observable<number>;
   private readonly identifier?: string;
   private loadPromise: Promise<void | Blob> | undefined;
   private readonly logger: Logger;
@@ -206,5 +206,3 @@ class AssetRemoteData {
       });
   }
 }
-
-export {AssetRemoteData};

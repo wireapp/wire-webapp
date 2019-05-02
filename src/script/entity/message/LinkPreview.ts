@@ -17,10 +17,20 @@
  *
  */
 
+import ko from 'knockout';
+
 import {obfuscate} from 'Util/StringUtil';
+import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export class LinkPreview {
-  constructor(title, url) {
+  image_resource: ko.Observable<AssetRemoteData>;
+  meta_data_type?: LinkPreviewMetaDataType;
+  meta_data?: string;
+  title: string;
+  url: string;
+
+  constructor(title?: string, url?: string) {
     this.title = title || '';
     this.url = url || '';
 
@@ -38,8 +48,3 @@ export class LinkPreview {
     this.meta_data_type = undefined;
   }
 }
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.LinkPreview = LinkPreview;
