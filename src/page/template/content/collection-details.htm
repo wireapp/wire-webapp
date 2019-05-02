@@ -28,6 +28,9 @@
           <!-- ko if: messageEntity.get_first_asset().is_audio() -->
             <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
           <!-- /ko -->
+          <!-- ko if: messageEntity.get_first_asset().is_video() -->
+            <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
+          <!-- /ko -->
         </div>
       </div>
     </div>
