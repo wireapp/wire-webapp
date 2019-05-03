@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
+import {noop} from 'Util/util';
 
 import {resolve, graph} from '../../config/appResolver';
 
@@ -37,7 +38,7 @@ ko.components.register('enriched-fields', {
     <!-- /ko -->
   `,
   viewModel: {
-    createViewModel: function({user, onFieldsLoaded = () => {}}, {element}) {
+    createViewModel: function({user, onFieldsLoaded = noop}, {element}) {
       this.richProfileRepository = resolve(graph.RichProfileRepository);
       this.fields = ko.observable([]);
       ko.computed(
@@ -51,7 +52,7 @@ ko.components.register('enriched-fields', {
                   fields.push(...richProfile.fields);
                 }
               })
-              .catch(() => {})
+              .catch(noop)
               .finally(() => {
                 this.fields(fields);
                 onFieldsLoaded(this.fields());

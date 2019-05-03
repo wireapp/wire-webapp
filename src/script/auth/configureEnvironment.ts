@@ -22,6 +22,8 @@ import {amplify} from 'amplify';
 import * as bazinga64 from 'bazinga64';
 import * as platform from 'platform';
 
+import {noop} from 'Util/util';
+
 import '../config';
 import '../event/Client';
 import '../event/WebApp';
@@ -47,6 +49,6 @@ window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-const configureEnvironment = () => {};
+const configureEnvironment = noop;
 
 export {configureEnvironment};

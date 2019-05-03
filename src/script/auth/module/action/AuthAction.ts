@@ -21,6 +21,9 @@ import {LoginData, RegisterData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/index';
 import {Account} from '@wireapp/core';
 import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+
+import {noop} from 'Util/util';
+
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -50,8 +53,8 @@ export class AuthAction {
 
   doLoginPlain = (
     loginData: LoginData,
-    onBeforeLogin: LoginLifecycleFunction = () => {},
-    onAfterLogin: LoginLifecycleFunction = () => {}
+    onBeforeLogin: LoginLifecycleFunction = noop,
+    onAfterLogin: LoginLifecycleFunction = noop
   ): ThunkAction => {
     return (dispatch, getState, global) => {
       const {
