@@ -40,6 +40,7 @@ import {CALL_STATE} from './enum/CallState';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
@@ -283,7 +284,7 @@ export class CallingRepository {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
             const warningOptions = {name: userEntity.name()};
-            const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
+            const warningType = WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
 
             amplify.publish(WebAppEvents.WARNING.SHOW, warningType, warningOptions);
           });
@@ -291,7 +292,7 @@ export class CallingRepository {
         }
 
         case CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -1003,7 +1004,7 @@ export class CallingRepository {
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
       if (isOutgoingCall && !this.supportsCalling) {
-        amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 

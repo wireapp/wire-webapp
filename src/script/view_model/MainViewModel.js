@@ -22,6 +22,7 @@ import {afterRender} from 'Util/util';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
+import {WarningsViewModel} from './WarningsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -77,7 +78,7 @@ export class MainViewModel {
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
-    this.warnings = new z.viewModel.WarningsViewModel();
+    this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {

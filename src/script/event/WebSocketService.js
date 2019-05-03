@@ -25,6 +25,7 @@ import {appendParameter} from 'Util/UrlUtil';
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {WebAppEvents} from './WebApp';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class WebSocketService {
   static get CHANGE_TRIGGER() {
@@ -182,7 +183,7 @@ export class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
     amplify.publish(WebAppEvents.CONNECTION.ONLINE);
   }
@@ -206,7 +207,7 @@ export class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }
