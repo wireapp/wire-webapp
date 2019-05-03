@@ -32,6 +32,7 @@ import {EventTypeHandling} from './EventTypeHandling';
 import {BackendEvent} from './Backend';
 import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class EventRepository {
   static get CONFIG() {
@@ -102,7 +103,7 @@ export class EventRepository {
         this._handleBufferedNotifications();
         const previouslyHandlingRecovery = this.previousHandlingState === NOTIFICATION_HANDLING_STATE.RECOVERY;
         if (previouslyHandlingRecovery) {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
       }
       this.previousHandlingState = handling_state;
@@ -365,7 +366,7 @@ export class EventRepository {
    */
   recoverFromStream() {
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
     return this._updateFromStream(this._getLastKnownNotificationId())
       .then(numberOfNotifications => {
@@ -377,7 +378,7 @@ export class EventRepository {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         }
       });
   }

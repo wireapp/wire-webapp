@@ -26,6 +26,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from './SignOutReason';
 import {QUEUE_STATE} from '../service/QueueState';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class AuthRepository {
   static get CONFIG() {
@@ -128,7 +129,7 @@ export class AuthRepository {
 
           this.queueState(QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
-          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         });
     }
   }

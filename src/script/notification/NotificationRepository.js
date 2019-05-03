@@ -36,6 +36,7 @@ import {AudioType} from '../audio/AudioType';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -705,12 +706,12 @@ class NotificationRepository {
   // Request browser permission for notifications.
   _requestPermission() {
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
           this.updatePermissionState(permissionState).then(resolve);
         });
       }

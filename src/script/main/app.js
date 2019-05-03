@@ -92,6 +92,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 class App {
   static get CONFIG() {
@@ -417,8 +418,8 @@ class App {
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
     });
   }
@@ -430,7 +431,7 @@ class App {
   onInternetConnectionLost() {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   _appInitFailure(error, isReload) {
@@ -789,7 +790,7 @@ class App {
    * @returns {undefined} No return value
    */
   update() {
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**
