@@ -22,6 +22,7 @@ import moment from 'moment';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
 import {escapeString} from 'Util/SanitizationUtil';
+import {getSearchRegex} from '../search/FullTextSearch';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -97,7 +98,7 @@ z.components.FullSearch = class FullSearch {
 
     messageEntity.matchesCount = 0;
 
-    const replaceRegex = z.search.FullTextSearch.getSearchRegex(input);
+    const replaceRegex = getSearchRegex(input);
     const replaceFunction = match => {
       messageEntity.matchesCount += 1;
       return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
@@ -130,7 +131,7 @@ z.components.FullSearch = class FullSearch {
   }
 
   resultTimestamp(messageEntity) {
-    return moment(messageEntity.timestamp()).format('MMMM D, YYYY');
+    return moment(messageEntity.timestamp()).format('LL');
   }
 
   clickOnDismiss() {

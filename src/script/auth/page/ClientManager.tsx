@@ -23,6 +23,9 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps} from 'react-router';
+
+import {noop} from 'Util/util';
+
 import {clientManagerStrings} from '../../strings';
 import {ClientList} from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -47,7 +50,7 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
   logout = () =>
     this.props
       .doLogout()
-      .catch(() => {})
+      .catch(noop)
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
   render() {

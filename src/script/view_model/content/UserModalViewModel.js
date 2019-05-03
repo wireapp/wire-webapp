@@ -17,6 +17,8 @@
  *
  */
 
+import {noop} from 'Util/util';
+
 import {Actions} from 'Components/panel/userActions';
 
 export class UserModalViewModel {
@@ -27,7 +29,7 @@ export class UserModalViewModel {
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
     this.userNotFound = ko.observable(false);
-    this.onClosedCallback = () => {};
+    this.onClosedCallback = noop;
     this.onClosed = () => {
       this.user(null);
       this.userNotFound(false);
@@ -46,7 +48,7 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId, onModalClosed = () => {}) {
+  showUser(userId, onModalClosed = noop) {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);

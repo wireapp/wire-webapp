@@ -46,6 +46,7 @@ import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {TeamRepository} from 'src/script/team/TeamRepository';
+import {SearchRepository} from 'src/script/search/SearchRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -272,14 +273,12 @@ window.TestFactory.prototype.exposeConnectActors = function() {
 
 /**
  *
- * @returns {Promise<z.search.SearchRepository>} The search repository.
+ * @returns {Promise<SearchRepository>} The search repository.
  */
 window.TestFactory.prototype.exposeSearchActors = function() {
   return this.exposeUserActors().then(() => {
-    TestFactory.search_service = new z.search.SearchService(resolveDependency(graph.BackendClient));
-
-    TestFactory.search_repository = new z.search.SearchRepository(
-      TestFactory.search_service,
+    TestFactory.search_repository = new SearchRepository(
+      resolveDependency(graph.BackendClient),
       TestFactory.user_repository
     );
 

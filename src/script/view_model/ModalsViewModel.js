@@ -23,10 +23,10 @@ import {amplify} from 'amplify';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
+import {noop} from 'Util/util';
 
 import {WebAppEvents} from '../event/WebApp';
 
-const noop = () => {};
 const defaultContent = {
   actionFn: noop,
   actionText: '',
@@ -144,7 +144,7 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
-            const deviceTime = moment(device.time).format('MMMM Do YYYY, HH:mm');
+            const deviceTime = moment(device.time).format('LL, LT');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${device.model}`;
             return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
           })

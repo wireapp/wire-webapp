@@ -31,6 +31,7 @@ import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
 import {isEnterKey} from 'Util/KeyboardUtil';
+import {LLDM} from 'Util/moment';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -544,18 +545,18 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return $(element).text(date.local().format('HH:mm'));
+      return $(element).text(date.local().format('LT'));
     }
 
     if (current_day === yesterday) {
-      return $(element).text(`${t('conversationYesterday')} ${date.local().format('HH:mm')}`);
+      return $(element).text(`${t('conversationYesterday')} ${date.local().format('LT')}`);
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return $(element).text(date.local().format('dddd HH:mm'));
+      return $(element).text(date.local().format('dddd LT'));
     }
 
-    return $(element).text(date.local().format('dddd, MMMM D, HH:mm'));
+    return $(element).text(date.local().format(`dddd, ${LLDM}, LT`));
   };
 
   return {

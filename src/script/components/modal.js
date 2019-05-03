@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import {noop} from 'Util/util';
+
 ko.components.register('modal', {
   template: `
     <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
@@ -27,7 +29,7 @@ ko.components.register('modal', {
       </div>
     </div>
     `,
-  viewModel: function({isShown, large, onBgClick = () => {}, onClosed = () => {}}) {
+  viewModel: function({isShown, large, onBgClick = noop, onClosed = noop}) {
     this.large = large;
     this.onBgClick = onBgClick;
     this.displayNone = ko.observable(!ko.unwrap(isShown));

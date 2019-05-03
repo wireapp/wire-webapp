@@ -21,12 +21,10 @@ import {getLogger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {compareTransliteration, startsWith, computeTransliteration, sortByPriority} from 'Util/StringUtil';
 
+import {SearchService} from './SearchService';
 import {validateHandle} from '../user/UserHandleGenerator';
 
-window.z = window.z || {};
-window.z.search = z.search || {};
-
-class SearchRepository {
+export class SearchRepository {
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -54,14 +52,13 @@ class SearchRepository {
   }
 
   /**
-   * Construct a new Conversation Repository.
-   * @param {z.search.SearchService} searchService - Backend REST API search service implementation
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
-  constructor(searchService, userRepository) {
-    this.searchService = searchService;
+  constructor(backendClient, userRepository) {
+    this.searchService = new SearchService(backendClient);
     this.userRepository = userRepository;
-    this.logger = getLogger('z.search.SearchRepository');
+    this.logger = getLogger('SearchRepository');
   }
 
   /**
@@ -70,7 +67,7 @@ class SearchRepository {
    *
    * @param {string} term - the search term
    * @param {Array<User>} userEntities - entities to match the search term against
-   * @param {Array<z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
+   * @param {Array<SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns {Array<User>} the filtered list of users
    */
@@ -193,6 +190,3 @@ class SearchRepository {
       });
   }
 }
-
-z.search.SearchRepository = SearchRepository;
-export {SearchRepository};

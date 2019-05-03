@@ -55,6 +55,7 @@ import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
+import {SearchRepository} from '../search/SearchRepository';
 
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
@@ -180,7 +181,7 @@ class App {
       repositories.user
     );
     repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
-    repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
+    repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
@@ -274,7 +275,6 @@ class App {
       event: eventService,
       integration: new IntegrationService(this.backendClient),
       notification: new NotificationService(this.backendClient, storageService),
-      search: new z.search.SearchService(this.backendClient),
       storage: storageService,
       webSocket: new WebSocketService(this.backendClient),
     };

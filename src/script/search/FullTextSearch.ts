@@ -19,33 +19,24 @@
 
 import {escapeRegex} from 'Util/SanitizationUtil';
 
-window.z = window.z || {};
-window.z.search = z.search || {};
+export const getSearchRegex = (query: string): RegExp => {
+  const delimiter = ' ';
+  const flags = 'gumi';
+  const regex = query
+    .trim()
+    .split(delimiter)
+    .map(word => `(${escapeRegex(word)})`)
+    .join('(?:.*)');
 
-z.search.FullTextSearch = (() => {
-  const _getSearchRegex = query => {
-    const delimiter = ' ';
-    const flags = 'gumi';
-    const regex = query
-      .trim()
-      .split(delimiter)
-      .map(word => `(${escapeRegex(word)})`)
-      .join('(?:.*)');
+  return new RegExp(regex, flags);
+};
 
-    return new RegExp(regex, flags);
-  };
+export const search = (text: string, query = ''): boolean => {
+  query = query.trim();
 
-  const _search = (text, query = '') => {
-    query = query.trim();
+  if (query.length > 0) {
+    return getSearchRegex(query).test(text);
+  }
 
-    if (query.length > 0) {
-      return _getSearchRegex(query).test(text);
-    }
-    return false;
-  };
-
-  return {
-    getSearchRegex: _getSearchRegex,
-    search: _search,
-  };
-})();
+  return false;
+};

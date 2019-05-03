@@ -17,21 +17,33 @@
  *
  */
 
-import moment from 'moment';
+const soundCloudStatic = [
+  'about',
+  'channels',
+  'charts',
+  'discover',
+  'discussion',
+  'featured',
+  'home',
+  'messages',
+  'mobile',
+  'pages',
+  'playlists',
+  'sets',
+  'settings',
+  'stream',
+  'terms-of-use',
+  'upload',
+  'videos',
+  'you',
+];
 
-import {t} from 'Util/LocalizerUtil';
+const BLACKLIST = [
+  `soundcloud.com/(?!${soundCloudStatic.join('|')})`,
+  'spotify.com/(?!\\w\\w/)',
+  'youtu.be',
+  'youtube(-nocookie)?.com/(watch|embed)',
+  'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
+];
 
-import {SuperType} from '../../message/SuperType';
-
-z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
-  constructor() {
-    super();
-
-    this.super_type = SuperType.DELETE;
-    this.deleted_timestamp = null;
-
-    this.display_deleted_timestamp = () => {
-      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
-    };
-  }
-};
+export const isBlacklisted = (url: string) => new RegExp(BLACKLIST.join('|')).test(url);

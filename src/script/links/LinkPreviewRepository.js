@@ -23,6 +23,8 @@ import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {isBlacklisted} from './LinkPreviewBlackList';
+import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 
 class LinkPreviewRepository {
   constructor(assetService, propertiesRepository, logger) {
@@ -75,18 +77,17 @@ class LinkPreviewRepository {
   _getLinkPreview(url, offset = 0) {
     let openGraphData;
 
-    return Promise.resolve()
-      .then(() => {
-        if (z.links.LinkPreviewBlackList.isBlacklisted(url)) {
-          throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
-        }
+    return new Promise(resolve => {
+      if (isBlacklisted(url)) {
+        throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
+      }
 
-        return this._fetchOpenGraphData(url);
-      })
+      resolve(this._fetchOpenGraphData(url));
+    })
       .then(fetchedData => {
         if (fetchedData) {
           openGraphData = fetchedData;
-          return z.links.LinkPreviewProtoBuilder.buildFromOpenGraphData(openGraphData, url, offset);
+          return buildFromOpenGraphData(openGraphData, url, offset);
         }
         throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
       })
