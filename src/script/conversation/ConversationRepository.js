@@ -170,7 +170,7 @@ export class ConversationRepository {
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
-    this.verification_state_handler = new ConversationVerificationStateHandler(
+    this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
@@ -3247,7 +3247,7 @@ export class ConversationRepository {
             this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
           }
 
-          this.verification_state_handler.onConversationCreate(conversationEntity);
+          this.verificationStateHandler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       })
@@ -3321,7 +3321,7 @@ export class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this._addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -3374,7 +3374,7 @@ export class ConversationRepository {
           return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.onMemberLeft(conversationEntity);
+          this.verificationStateHandler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archiveConversation(conversationEntity);
