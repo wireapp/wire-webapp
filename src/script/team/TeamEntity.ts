@@ -18,13 +18,14 @@
  */
 
 import ko from 'knockout';
+import {TeamMemberEntity} from './TeamMemberEntity';
 
 export class TeamEntity {
   creator?: string;
   icon: string;
   iconKey?: string;
   id: string;
-  members: ko.ObservableArray<any>;
+  members: ko.ObservableArray<TeamMemberEntity>;
   name: ko.Observable<string>;
 
   constructor(id: string) {

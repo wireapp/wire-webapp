@@ -17,8 +17,10 @@
  *
  */
 
+import {Permissions} from '@wireapp/api-client/dist/commonjs/team/member/Permissions';
+
 export class TeamMemberEntity {
-  permissions?: any;
+  permissions?: Permissions;
   userId?: string;
 
   constructor() {
