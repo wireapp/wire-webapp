@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
+import {noop} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
 
@@ -40,7 +41,7 @@ export const Actions = {
 
 ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
-  viewModel: function({user, conversation = () => false, actionsViewModel, onAction = () => {}, isSelfActivated}) {
+  viewModel: function({user, conversation = () => false, actionsViewModel, onAction = noop, isSelfActivated}) {
     isSelfActivated = ko.unwrap(isSelfActivated);
     const isMe = ko.computed(() => user() && user().is_me);
     const isNotMe = ko.computed(() => !isMe() && isSelfActivated);

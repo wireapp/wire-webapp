@@ -19,6 +19,7 @@
 
 import {TimeUtil} from 'Util/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
+import {noop} from 'Util/util';
 
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaStreamSource} from '../../media/MediaStreamSource';
@@ -473,8 +474,8 @@ class FlowEntity {
     }
 
     // disabling connection state and signaling state handlers
-    this.peerConnection.oniceconnectionstatechange = () => {};
-    this.peerConnection.onsignalingstatechange = () => {};
+    this.peerConnection.oniceconnectionstatechange = noop;
+    this.peerConnection.onsignalingstatechange = noop;
 
     const connectionMediaStreamTracks = this.peerConnection.getReceivers
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
