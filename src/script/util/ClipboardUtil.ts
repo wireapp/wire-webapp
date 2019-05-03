@@ -19,7 +19,7 @@
 
 import {Environment} from './Environment';
 
-export function copyText(text) {
+export function copyText(text: string) {
   if (Environment.browser.supports.clipboard) {
     return navigator.clipboard.writeText(text);
   }
@@ -31,7 +31,7 @@ export function copyText(text) {
     let selectedRange;
 
     if (window.getSelection) {
-      selectedRange = window.getSelection().rangeCount ? window.getSelection().getRangeAt(0) : false;
+      selectedRange = window.getSelection().rangeCount ? window.getSelection().getRangeAt(0) : undefined;
     }
 
     document.body.appendChild(fallbackSource);

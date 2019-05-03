@@ -23,21 +23,18 @@ export const EMOJI_RANGES = 'U+1f000-1f02b, U+1f004, U+1f02c-1f02f, U+1f030-1f09
   .replace(/U\+/g, '')
   .split(', ')
   .reduce((list, codepoint) => {
-    if (codepoint.indexOf('-') === -1) {
-      list.push(String.fromCodePoint(`0x${codepoint}`));
-    } else {
-      const hex_base = 16;
-      const [start, end] = codepoint.split('-').map(code => parseInt(code, hex_base));
-      for (let code = start; code <= end; code++) {
-        list.push(String.fromCodePoint(`0x${code.toString(hex_base)}`));
-      }
+    const hexBase = 16;
+    const [start, end = start]: number[] = codepoint.split('-').map(code => parseInt(code, hexBase));
+    for (let code = start; code <= end; code++) {
+      list.push(String.fromCodePoint(code));
     }
     return list;
   }, []);
 
 const UNICODE_RANGE_REGEXP = new RegExp(`[${EMOJI_RANGES.join('')}]`, 'g');
-const removeWhitespace = string => string.replace(/\s+/g, '');
-const removeEmojis = string => string.replace(UNICODE_RANGE_REGEXP, '');
-const isValidString = string => typeof string === 'string' && string.length > 0;
+const removeWhitespace = (string: string) => string.replace(/\s+/g, '');
+const removeEmojis = (string: string) => string.replace(UNICODE_RANGE_REGEXP, '');
+const isValidString = (string: string) => typeof string === 'string' && string.length > 0;
 
-export const includesOnlyEmojis = text => isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
+export const includesOnlyEmojis = (text: string) =>
+  isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
