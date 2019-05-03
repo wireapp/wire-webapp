@@ -324,8 +324,10 @@ describe('Event Repository', () => {
     it('processes OTR events', () => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
+      const client = new ClientEntity();
+      client.id = ownClientId;
 
-      TestFactory.client_repository.currentClient(new ClientEntity({id: ownClientId}));
+      TestFactory.client_repository.currentClient(client);
       TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
       return Promise.resolve()

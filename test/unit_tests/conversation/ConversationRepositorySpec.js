@@ -1041,14 +1041,21 @@ describe('ConversationRepository', () => {
       john = new User(entities.user.john_doe.id);
       john.name('John');
 
-      const johns_computer = new ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
+      const johns_computer = new ClientEntity();
+      johns_computer.id = '83ad5d3c31d3c76b';
+      johns_computer.class = 'tabconst';
       john.devices.push(johns_computer);
 
       lara = new User();
       lara.name('Lara');
 
-      const bobs_computer = new ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
-      const bobs_phone = new ClientEntity({id: '8f63631e129ed19d', class: 'phone'});
+      const bobs_computer = new ClientEntity();
+      bobs_computer.id = '74606e4c02b2c7f9';
+      bobs_computer.class = 'desktop';
+
+      const bobs_phone = new ClientEntity();
+      bobs_phone.id = '8f63631e129ed19d';
+      bobs_phone.class = 'phone';
 
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);

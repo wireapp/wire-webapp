@@ -138,11 +138,10 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
  */
 window.TestFactory.prototype.exposeClientActors = function() {
   return this.exposeCryptographyActors().then(() => {
-    const clientEntity = new ClientEntity({
-      address: '192.168.0.1',
-      class: 'desktop',
-      id: '60aee26b7f55a99f',
-    });
+    const clientEntity = new ClientEntity();
+    clientEntity.address = '192.168.0.1';
+    clientEntity.class = 'desktop';
+    clientEntity.id = '60aee26b7f55a99f';
 
     const user = new User(entities.user.john_doe.id);
     user.devices.push(clientEntity);
@@ -158,19 +157,19 @@ window.TestFactory.prototype.exposeClientActors = function() {
       TestFactory.cryptography_repository
     );
     TestFactory.client_repository.init(user);
-    const payload = {
-      address: '62.96.148.44',
-      class: 'desktop',
-      cookie: 'webapp@2153234453@temporary@1470926647664',
-      id: '132b3653b33f851f',
-      label: 'Windows 10',
-      location: {lat: 52.5233, lon: 13.4138},
-      meta: {is_verified: true, primary_key: 'local_identity'},
-      model: 'Chrome (Temporary)',
-      time: '2016-10-07T16:01:42.133Z',
-      type: 'temporary',
-    };
-    const currentClient = new ClientEntity(payload);
+
+    const currentClient = new ClientEntity();
+    currentClient.address = '62.96.148.44';
+    currentClient.class = 'desktop';
+    currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
+    currentClient.id = '132b3653b33f851f';
+    currentClient.label = 'Windows 10';
+    currentClient.location = {lat: 52.5233, lon: 13.4138};
+    currentClient.meta = {is_verified: true, primary_key: 'local_identity'};
+    currentClient.model = 'Chrome (Temporary)';
+    currentClient.time = '2016-10-07T16:01:42.133Z';
+    currentClient.type = 'temporary';
+
     TestFactory.client_repository.currentClient(currentClient);
 
     return TestFactory.client_repository;

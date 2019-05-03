@@ -40,7 +40,11 @@ describe('ClientRepository', () => {
 
   describe('getClientsByUserId', () =>
     it('maps client entities from client payloads by the backend', () => {
-      TestFactory.client_repository.currentClient(new ClientEntity({id: clientId}));
+      const client = new ClientEntity();
+      client.id = clientId;
+
+      TestFactory.client_repository.currentClient(client);
+
       spyOn(TestFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
         Promise.resolve([
           {class: 'desktop', id: '706f64373b1bcf79'},
@@ -54,7 +58,7 @@ describe('ClientRepository', () => {
       return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
         const [firstClientEntity] = clientEntities;
 
-        expect(firstClientEntity instanceof ClientEntity).toBeTruthy();
+        expect(firstClientEntity).toEqual(jasmine.any(ClientEntity));
         expect(Object.keys(clientEntities).length).toBe(5);
       });
     }));
