@@ -44,6 +44,7 @@ import {WebSocketService} from 'src/script/event/WebSocketService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 
 window.testConfig = {
   connection: backendConfig,
