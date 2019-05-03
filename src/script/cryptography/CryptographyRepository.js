@@ -42,7 +42,6 @@ export class CryptographyRepository {
   }
 
   /**
-   * Construct a new Cryptography repository.
    * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageRepository} storageRepository - Repository for all storage interactions
    */

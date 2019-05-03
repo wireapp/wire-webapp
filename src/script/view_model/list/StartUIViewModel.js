@@ -33,6 +33,7 @@ import {WebAppEvents} from '../../event/WebApp';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
+import {SearchRepository} from '../../search/SearchRepository';
 
 class StartUIViewModel {
   static get STATE() {
@@ -564,7 +565,7 @@ class StartUIViewModel {
   }
 
   _searchPeople(query) {
-    const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
+    const normalizedQuery = SearchRepository.normalizeQuery(query);
     if (normalizedQuery) {
       this.showMatches(false);
 
@@ -575,7 +576,7 @@ class StartUIViewModel {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)
           .then(userEntities => {
-            const isCurrentQuery = normalizedQuery === z.search.SearchRepository.normalizeQuery(this.searchInput());
+            const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
             if (isCurrentQuery) {
               this.searchResults.others(userEntities);
             }
@@ -589,7 +590,7 @@ class StartUIViewModel {
         ? this.conversationRepository.connectedUsers()
         : allLocalUsers;
 
-      const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
