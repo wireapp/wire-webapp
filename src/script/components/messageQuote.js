@@ -183,7 +183,7 @@ ko.components.register('message-quote', {
         <div class="message-quote__timestamp"
           data-bind="text: quotedMessageIsBeforeToday()
             ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('L'))
-            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('HH:mm')),
+            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('LT')),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">
         </div>

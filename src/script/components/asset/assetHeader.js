@@ -19,6 +19,8 @@
 
 import moment from 'moment';
 
+import {LDM} from 'Util/moment';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -37,7 +39,7 @@ class AssetHeader {
 ko.components.register('asset-header', {
   template: `
     <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('D.M H:mm')"></span>
+    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('${LDM} LT')"></span>
   `,
   viewModel: AssetHeader,
 });

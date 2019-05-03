@@ -52,7 +52,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       RECEIPTS_OFF: 'receipts-off',
     };
 
-    const formatTime = time => moment(time).format('L, HH:mm');
+    const formatTime = time => moment(time).format('L, LT');
 
     this.message = ko.pureComputed(() => {
       if (!this.isVisible()) {

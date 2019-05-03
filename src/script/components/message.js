@@ -128,7 +128,7 @@ class Message {
         return '';
       }
       const is1to1 = this.conversation().is1to1();
-      return is1to1 ? moment(receipts[0].time).format('HH:mm') : receipts.length.toString(10);
+      return is1to1 ? moment(receipts[0].time).format('LT') : receipts.length.toString(10);
     });
   }
 
