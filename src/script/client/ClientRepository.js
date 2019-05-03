@@ -33,6 +33,8 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
 import {ClientService} from './ClientService';
 import {ClientType} from './ClientType';
+import {ClientEntity} from './ClientEntity';
+import {ClientMapper} from './ClientMapper';
 
 export class ClientRepository {
   static get CONFIG() {
@@ -51,7 +53,7 @@ export class ClientRepository {
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
 
-    this.clientMapper = new z.client.ClientMapper();
+    this.clientMapper = new ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
@@ -96,7 +98,7 @@ export class ClientRepository {
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
-        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] = recipients[userId] || [];
           recipients[userId].push(this.clientMapper.mapClient(client, false));
@@ -125,7 +127,7 @@ export class ClientRepository {
 
   /**
    * Loads a client from the database (if it exists).
-   * @returns {Promise<z.client.ClientEntity>} Resolves with the local client
+   * @returns {Promise<ClientEntity>} Resolves with the local client
    */
   getCurrentClientFromDb() {
     return this.clientService
@@ -197,7 +199,7 @@ export class ClientRepository {
    * Change verification state of client.
    *
    * @param {string} userId - User ID of the client owner
-   * @param {z.client.ClientEntity} clientEntity - Client which needs to get updated
+   * @param {ClientEntity} clientEntity - Client which needs to get updated
    * @param {boolean} isVerified - New state to apply
    * @returns {Promise} Resolves when the verification state has been updated
    */
@@ -289,7 +291,7 @@ export class ClientRepository {
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
    * @param {string|undefined} password - User password for verification
-   * @returns {Promise<z.client.ClientEntity>} Resolve with the newly registered client
+   * @returns {Promise<ClientEntity>} Resolve with the newly registered client
    */
   registerClient(password) {
     const clientType = this._loadCurrentClientType();
@@ -519,7 +521,7 @@ export class ClientRepository {
   getClientByUserIdFromDb(requestedUserId) {
     return this.clientService.loadAllClientsFromDb().then(clients => {
       return clients.filter(client => {
-        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         return userId === requestedUserId;
       });
     });

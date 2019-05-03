@@ -18,9 +18,10 @@
  */
 
 import {ClientType} from 'src/script/client/ClientType';
+import {ClientMapper} from 'src/script/client/ClientMapper';
 
-describe('z.client.ClientMapper', () => {
-  const mapper = new z.client.ClientMapper();
+describe('ClientMapper', () => {
+  const mapper = new ClientMapper();
 
   describe('mapClient', () => {
     it('can map a permanent client payload from the backend', () => {

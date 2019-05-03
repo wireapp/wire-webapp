@@ -34,6 +34,7 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 
 import {BackendEvent} from 'src/script/event/Backend';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -520,13 +521,13 @@ describe('Conversation', () => {
 
   describe('getNumberOfClients', () => {
     it('should return the number of all known clients  (including own clients)', () => {
-      const first_client = new z.client.ClientEntity();
+      const first_client = new ClientEntity();
       first_client.id = '5021d77752286cac';
 
-      const second_client = new z.client.ClientEntity();
+      const second_client = new ClientEntity();
       second_client.id = '575b7a890cdb7635';
 
-      const third_client = new z.client.ClientEntity();
+      const third_client = new ClientEntity();
       third_client.id = '6c0daa855d6b8b6e';
 
       const user_et = new User();
@@ -549,7 +550,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when self user has no remote clients', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User(createRandomUuid());
@@ -564,8 +565,8 @@ describe('Conversation', () => {
     });
 
     it('is not verified when participant has unverified device', () => {
-      const unverified_client_et = new z.client.ClientEntity();
-      const verified_client_et = new z.client.ClientEntity();
+      const unverified_client_et = new ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();
@@ -586,7 +587,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when all users are verified', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();

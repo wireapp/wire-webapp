@@ -29,6 +29,7 @@ import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
+import {ClientEntity} from '../client/ClientEntity';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -113,7 +114,7 @@ export class CryptographyRepository {
       });
 
       this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
-        const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+        const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
         amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
       });
     });
@@ -394,7 +395,7 @@ export class CryptographyRepository {
     const missingRecipients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
-      const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+      const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
 
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;

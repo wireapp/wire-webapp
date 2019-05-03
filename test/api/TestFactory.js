@@ -35,6 +35,7 @@ import {NotificationRepository} from 'src/script/notification/NotificationReposi
 import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
@@ -112,7 +113,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
 window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
   return this.exposeStorageActors()
     .then(() => {
-      const currentClient = new z.client.ClientEntity(true);
+      const currentClient = new ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
       TestFactory.cryptography_service = new CryptographyService(resolveDependency(graph.BackendClient));
 
@@ -137,7 +138,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
  */
 window.TestFactory.prototype.exposeClientActors = function() {
   return this.exposeCryptographyActors().then(() => {
-    const clientEntity = new z.client.ClientEntity({
+    const clientEntity = new ClientEntity({
       address: '192.168.0.1',
       class: 'desktop',
       id: '60aee26b7f55a99f',
@@ -169,7 +170,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       time: '2016-10-07T16:01:42.133Z',
       type: 'temporary',
     };
-    const currentClient = new z.client.ClientEntity(payload);
+    const currentClient = new ClientEntity(payload);
     TestFactory.client_repository.currentClient(currentClient);
 
     return TestFactory.client_repository;

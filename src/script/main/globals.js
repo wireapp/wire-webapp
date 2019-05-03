@@ -34,7 +34,6 @@ import TeamErrorGlobal from '../error/TeamError.js';
 import UserErrorGlobal from '../error/UserError.js';
 import LocalizerGlobal from '../localization/Localizer.js';
 import ErrorGlobal from '../backup/Error.js';
-import ClientEntityGlobal from '../client/ClientEntity.js';
 import ClientMapperGlobal from '../client/ClientMapper.js';
 import AbstractConversationEventHandlerGlobal from '../conversation/AbstractConversationEventHandler.js';
 import ClientMismatchHandlerGlobal from '../conversation/ClientMismatchHandler.js';
