@@ -53,7 +53,6 @@ import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {CryptographyService} from '../cryptography/CryptographyService';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 import {EventRepository} from '../event/EventRepository';
@@ -271,7 +270,6 @@ class App {
       asset: resolve(graph.AssetService),
       connect: new ConnectService(this.backendClient),
       conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
-      cryptography: new CryptographyService(this.backendClient),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
       notification: new NotificationService(this.backendClient, storageService),
