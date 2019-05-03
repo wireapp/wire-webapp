@@ -17,12 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+export class TeamMemberEntity {
+  permissions?: any;
+  userId?: string;
 
-z.team.TeamMemberEntity = class TeamMemberEntity {
   constructor() {
     this.permissions = undefined;
     this.userId = undefined;
   }
-};
+}
