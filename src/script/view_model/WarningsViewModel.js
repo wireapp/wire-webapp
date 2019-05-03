@@ -22,15 +22,13 @@ import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
+import {afterRender} from 'Util/util';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.WarningsViewModel = class WarningsViewModel {
+export class WarningsViewModel {
   static get CONFIG() {
     return {
       DIMMED_MODES: [
@@ -69,12 +67,13 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = getLogger('z.viewModel.WarningsViewModel');
+    this.logger = getLogger('WarningsViewModel');
 
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
     this.Environment = Environment;
+    this.TYPE = WarningsViewModel.TYPE;
 
     this.warnings.subscribe(warnings => {
       let topMargin;
@@ -89,8 +88,8 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
         topMargin = isMiniMode ? '32px' : '64px';
       }
 
-      $('#app').css({top: topMargin});
-      window.requestAnimationFrame(() => $(window).trigger('resize'));
+      document.querySelector('#app').style.top = topMargin;
+      afterRender(() => window.dispatchEvent(new Event('resize')));
     });
 
     this.name = ko.observable();
@@ -172,4 +171,4 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
     }
     this.warnings.push(type);
   }
-};
+}
