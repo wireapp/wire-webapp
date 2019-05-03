@@ -43,7 +43,6 @@ import {NotificationService} from 'src/script/event/NotificationService';
 import {WebSocketService} from 'src/script/event/WebSocketService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 
 window.testConfig = {
@@ -115,10 +114,9 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
     .then(() => {
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
-      TestFactory.cryptography_service = new CryptographyService(resolve(graph.BackendClient));
 
       TestFactory.cryptography_repository = new CryptographyRepository(
-        TestFactory.cryptography_service,
+        resolve(graph.BackendClient),
         TestFactory.storage_repository
       );
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
