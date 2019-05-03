@@ -37,6 +37,7 @@ import {AudioType} from '../audio/AudioType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ContentViewModel} from '../view_model/ContentViewModel';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -610,7 +611,7 @@ class NotificationRepository {
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       };
     }
 
@@ -752,7 +753,7 @@ class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = this.contentViewModelState.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
+    const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =
       this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 

@@ -44,6 +44,7 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -100,7 +101,7 @@ describe('NotificationRepository', () => {
       window.wire.app = {
         service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
-      contentViewModelState.state = ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };

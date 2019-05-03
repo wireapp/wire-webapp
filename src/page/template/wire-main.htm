@@ -24,43 +24,43 @@
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS -->
+        <!-- ko if: state() === ContentViewModel.STATE.CONNECTION_REQUESTS -->
           #include('content/connect-requests.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.CONVERSATION -->
+        <!-- ko if: state() === ContentViewModel.STATE.CONVERSATION -->
           #include('content/conversation.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION -->
+        <!-- ko if: state() === ContentViewModel.STATE.COLLECTION -->
           #include('content/collection.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS -->
+        <!-- ko if: state() === ContentViewModel.STATE.COLLECTION_DETAILS -->
           #include('content/collection-details.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT -->
+        <!-- ko if: state() === ContentViewModel.STATE.HISTORY_EXPORT -->
           #include('content/history-export.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT -->
+        <!-- ko if: state() === ContentViewModel.STATE.HISTORY_IMPORT -->
           #include('content/history-import.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_ABOUT -->
           #include('content/preferences-about.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_AV -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_AV -->
           #include('content/preferences-av.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_DEVICES -->
           #include('content/preferences-devices.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS -->
+        <!-- ko if: state() === ContentViewModel.STATE.PREFERENCES_OPTIONS -->
           #include('content/preferences-options.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.viewModel.ContentViewModel.STATE.WATERMARK -->
+        <!-- ko if: state() === ContentViewModel.STATE.WATERMARK -->
           <div class="watermark">
             <watermark-icon class="absolute-center" data-uie-name="no-conversation"></watermark-icon>
           </div>

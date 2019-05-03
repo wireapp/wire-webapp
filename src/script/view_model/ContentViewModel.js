@@ -31,7 +31,7 @@ import {WebAppEvents} from '../event/WebApp';
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
-z.viewModel.ContentViewModel = class ContentViewModel {
+export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
@@ -58,7 +58,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.ContentViewModel');
+    this.logger = getLogger('ContentViewModel');
+    this.ContentViewModel = ContentViewModel;
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -341,4 +342,4 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.state(newContentState);
     return this._shiftContent(this._getElementOfContent(newContentState));
   }
-};
+}
