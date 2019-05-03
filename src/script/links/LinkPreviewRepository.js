@@ -23,7 +23,7 @@ import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {WebAppEvents} from '../event/WebApp';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {LinkPreviewBlackList} from './LinkPreviewBlackList';
+import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 
 class LinkPreviewRepository {
@@ -78,7 +78,7 @@ class LinkPreviewRepository {
     let openGraphData;
 
     return new Promise(resolve => {
-      if (LinkPreviewBlackList.isBlacklisted(url)) {
+      if (isBlacklisted(url)) {
         throw new z.error.LinkPreviewError(z.error.LinkPreviewError.TYPE.BLACKLISTED);
       }
 
