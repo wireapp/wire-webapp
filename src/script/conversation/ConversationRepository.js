@@ -63,7 +63,9 @@ import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
 import {ConversationType} from './ConversationType';
+import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
+import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
@@ -72,6 +74,8 @@ import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {NotificationSetting} from './NotificationSetting';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ClientMismatchHandler} from './ClientMismatchHandler';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
@@ -93,11 +97,8 @@ import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation repository for all conversation interactions with the conversation service
-z.conversation.ConversationRepository = class ConversationRepository {
+export class ConversationRepository {
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.WEEK,
@@ -165,7 +166,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = getLogger('z.conversation.ConversationRepository');
+    this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
@@ -174,7 +175,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler
     );
-    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+    this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
@@ -243,12 +244,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this.conversationMapper);
-    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
-      this.conversationMapper,
-      this.eventService,
-      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
-    );
+    this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
+    this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
+      onMessageTimeout: this.handleMessageExpiration.bind(this),
+    });
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
@@ -618,8 +617,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const creationEvent = conversationEntity.isGroup()
-      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : EventBuilder.build1to1Creation(conversationEntity);
 
     this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1265,7 +1264,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   addMissingMember(conversationId, userIds, timestamp) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const [sender] = userIds;
-      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+      const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
       return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
     });
   }
@@ -1399,7 +1398,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1419,7 +1418,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1450,7 +1449,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
-    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return this.conversation_service
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
@@ -1531,7 +1530,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
-          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
           this.eventRepository.injectEvent(leaveEvent);
         });
     });
@@ -1781,7 +1780,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         };
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
+        const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2328,7 +2327,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
-    const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
@@ -2390,7 +2389,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -3179,7 +3178,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
+        const missed_event = EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -3828,7 +3827,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
-    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 
@@ -3982,4 +3981,4 @@ z.conversation.ConversationRepository = class ConversationRepository {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
     }
   }
-};
+}

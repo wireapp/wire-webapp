@@ -29,6 +29,7 @@ import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
+import {EventBuilder} from '../conversation/EventBuilder';
 
 export class CryptographyRepository {
   static get CONFIG() {
@@ -297,7 +298,7 @@ export class CryptographyRepository {
     const externalMessageIsTooBig = isExternal && eventData.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
     if (genericMessageIsTooBig || externalMessageIsTooBig) {
       const error = new ProteusErrors.DecryptError.InvalidMessage('The received message was too big.', 300);
-      const errorEvent = z.conversation.EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
+      const errorEvent = EventBuilder.buildIncomingMessageTooBig(event, error, error.code);
       return Promise.resolve(errorEvent);
     }
 
@@ -503,7 +504,7 @@ export class CryptographyRepository {
     );
     this._reportDecryptionFailure(error, event);
 
-    return z.conversation.EventBuilder.buildUnableToDecrypt(event, error, errorCode);
+    return EventBuilder.buildUnableToDecrypt(event, error, errorCode);
   }
 
   /**

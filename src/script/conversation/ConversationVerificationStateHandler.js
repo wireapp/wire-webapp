@@ -22,6 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {WebAppEvents} from '../event/WebApp';
 import {VerificationMessageType} from '../message/VerificationMessageType';
+import {EventBuilder} from './EventBuilder';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -136,7 +137,7 @@ export class ConversationVerificationStateHandler {
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = z.conversation.EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
+      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
@@ -169,7 +170,7 @@ export class ConversationVerificationStateHandler {
       }
 
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
+      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event);
 
       return true;

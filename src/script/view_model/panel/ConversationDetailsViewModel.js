@@ -30,6 +30,7 @@ import {ConversationVerificationState} from '../../conversation/ConversationVeri
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 import 'Components/panel/panelActions';
 
@@ -55,6 +56,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.searchRepository = search;
     this.teamRepository = team;
     this.userRepository = user;
+
+    this.ConversationRepository = ConversationRepository;
 
     this.actionsViewModel = mainViewModel.actions;
 

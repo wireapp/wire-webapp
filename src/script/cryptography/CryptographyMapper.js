@@ -32,6 +32,7 @@ import {BackendEvent} from '../event/Backend';
 import {StatusType} from '../message/StatusType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 
 export class CryptographyMapper {
   static get CONFIG() {
@@ -314,7 +315,7 @@ export class CryptographyMapper {
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
   }

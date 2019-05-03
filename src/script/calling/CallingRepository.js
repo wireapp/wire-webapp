@@ -50,6 +50,9 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
 import {EventName} from '../tracking/EventName';
 
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {EventBuilder} from '../conversation/EventBuilder';
+
 export class CallingRepository {
   static get CONFIG() {
     return {
@@ -620,7 +623,7 @@ export class CallingRepository {
       if (!eventFromStream) {
         const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
         eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+        const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
         promises.push(grantPromise);
@@ -1476,7 +1479,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   injectActivateEvent(callMessageEntity, source) {
-    const event = z.conversation.EventBuilder.buildVoiceChannelActivate(callMessageEntity);
+    const event = EventBuilder.buildVoiceChannelActivate(callMessageEntity);
     this.eventRepository.injectEvent(event, source);
   }
 
@@ -1489,7 +1492,7 @@ export class CallingRepository {
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
+    const event = EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
     this.eventRepository.injectEvent(event, source);
   }
 

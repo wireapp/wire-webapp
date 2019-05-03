@@ -38,7 +38,7 @@
             <textarea class="conversation-details__name conversation-details__name--input"
                       dir="auto"
                       spellcheck="false"
-                      data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: activeConversation() && activeConversation().display_name(), visible: isEditingName()"
+                      data-bind="attr: {maxlength: ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}, enter: renameConversation, resize, value: activeConversation() && activeConversation().display_name(), visible: isEditingName()"
                       data-uie-name="enter-name">
             </textarea>
           <!-- /ko -->
@@ -66,7 +66,7 @@
               <!-- /ko -->
             </div>
             <!-- ko if: isTeam() -->
-              <div class="panel__info-text conversation-details__group-size-info" data-bind="text: t('groupSizeInfo', z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info-conversation-details"></div>
+              <div class="panel__info-text conversation-details__group-size-info" data-bind="text: t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info-conversation-details"></div>
             <!-- /ko -->
           <!-- /ko -->
         </div>

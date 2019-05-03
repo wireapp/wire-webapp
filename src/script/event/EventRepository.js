@@ -68,7 +68,7 @@ export class EventRepository {
    * @param {EventService} eventService - Service that handles interactions with events
    * @param {NotificationService} notificationService - Service handling the notification stream
    * @param {WebSocketService} webSocketService - Service that connects to WebSocket
-   * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
+   * @param {ConversationService} conversationService - Service to handle conversation related tasks
    * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions

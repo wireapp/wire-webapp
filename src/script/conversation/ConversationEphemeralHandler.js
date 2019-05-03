@@ -28,12 +28,9 @@ import {obfuscate} from 'Util/StringUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
 import {BackendEvent} from '../event/Backend';
+import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler extends z.conversation
-  .AbstractConversationEventHandler {
+export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   static get CONFIG() {
     return {
       INTERVAL_TIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
@@ -65,7 +62,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = getLogger('z.conversation.ConversationEphemeralHandler');
+    this.logger = getLogger('ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 
@@ -292,4 +289,4 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       });
     }
   }
-};
+}

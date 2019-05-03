@@ -19,11 +19,9 @@
 
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
+import {EventBuilder} from './EventBuilder';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
+export class ClientMismatchHandler {
   constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
@@ -31,7 +29,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
-    this.logger = getLogger('z.conversation.ClientMismatchHandler');
+    this.logger = getLogger('ClientMismatchHandler');
   }
 
   /**
@@ -172,7 +170,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
             const timestamp = this.serverTimeHandler.toServerTimestamp();
-            const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
+            const event = EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);
           }
@@ -215,4 +213,4 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
     return result;
   }
-};
+}

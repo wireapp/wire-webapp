@@ -19,23 +19,24 @@
 
 import {t} from 'Util/LocalizerUtil';
 
+/* tslint:disable:object-literal-sort-keys */
+enum STATE {
+  EVERYTHING = 0b00,
+  MENTIONS_AND_REPLIES = 0b01,
+  NOTHING = 0b11,
+}
+/* tslint:enable:object-literal-sort-keys */
+
+const getText = (status: STATE) => {
+  const statusTexts: Record<STATE, string> = {
+    [STATE.EVERYTHING]: t('notificationSettingsEverything'),
+    [STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+    [STATE.NOTHING]: t('notificationSettingsNothing'),
+  };
+  return statusTexts[status];
+};
+
 export const NotificationSetting = {
-  /* eslint-disable sort-keys */
-
-  STATE: {
-    EVERYTHING: 0b00,
-    MENTIONS_AND_REPLIES: 0b01,
-    NOTHING: 0b11,
-  },
-
-  /* eslint-enable sort-keys */
-
-  getText(status) {
-    const statusTexts = {
-      [NotificationSetting.STATE.EVERYTHING]: t('notificationSettingsEverything'),
-      [NotificationSetting.STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-      [NotificationSetting.STATE.NOTHING]: t('notificationSettingsNothing'),
-    };
-    return statusTexts[status];
-  },
+  STATE,
+  getText,
 };
