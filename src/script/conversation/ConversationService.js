@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
-import {search as searchFullText} from '../search/FullTextSearch';
+import {search as fullTextSearch} from '../search/FullTextSearch';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -488,7 +488,7 @@ z.conversation.ConversationService = class ConversationService {
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
     return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
-      return events.filter(({data: event_data}) => searchFullText(event_data.content, query));
+      return events.filter(({data: event_data}) => fullTextSearch(event_data.content, query));
     });
   }
 };
