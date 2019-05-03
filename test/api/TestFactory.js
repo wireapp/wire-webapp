@@ -114,6 +114,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
     .then(() => {
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
+      TestFactory.cryptography_service = new CryptographyService(resolve(graph.BackendClient));
 
       TestFactory.cryptography_repository = new CryptographyRepository(
         resolve(graph.BackendClient),
