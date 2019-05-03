@@ -26,12 +26,13 @@ import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.viewModel.ContentViewModel
+// Parent: ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
@@ -127,7 +128,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
   }
 
   clickOnCollectionButton() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   }
 
   showAddParticipant() {

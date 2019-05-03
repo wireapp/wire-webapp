@@ -24,6 +24,7 @@ import {downloadBlob} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -156,6 +157,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   dismissExport() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 };
