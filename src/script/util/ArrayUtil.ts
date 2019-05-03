@@ -17,7 +17,7 @@
  *
  */
 
-export const chunk = (array, size) => {
+export const chunk = <T>(array: T[] | Float32Array, size: number) => {
   const chunks = [];
   for (let index = 0, length = array.length; index < length; index += size) {
     chunks.push(array.slice(index, index + size));
@@ -28,13 +28,13 @@ export const chunk = (array, size) => {
 /**
  * Gets all the values that are in array2 which are not in array1.
  *
- * @param {Array} array1 - the base array
- * @param {Array} array2 - the array to compare with
- * @returns {Array} - the array containing values in array2 that are not in array1
+ * @param array1 the base array
+ * @param array2 the array to compare with
+ * @returns the array containing values in array2 that are not in array1
  */
-export const getDifference = (array1, array2) => array2.filter(element => !array1.includes(element));
+export const getDifference = <T>(array1: T[], array2: T[]) => array2.filter(element => !array1.includes(element));
 
-export const getNextItem = (array, currentItem) => {
+export const getNextItem = <T>(array: T[], currentItem: T) => {
   const currentIndex = array.indexOf(currentItem);
 
   // couldn't find the item
@@ -55,11 +55,11 @@ export const getNextItem = (array, currentItem) => {
 /**
  * Interpolates an array of numbers using linear interpolation
  *
- * @param {Array<any>} array - source
- * @param {number} length - new length
- * @returns {Array<any>} new array with interpolated values
+ * @param array source
+ * @param length new length
+ * @returns new array with interpolated values
  */
-export const interpolate = (array, length) => {
+export const interpolate = (array: number[], length: number) => {
   const newArray = [];
   const scaleFactor = (array.length - 1) / (length - 1);
 
@@ -68,8 +68,8 @@ export const interpolate = (array, length) => {
 
   for (let index = 1; index < length - 1; index++) {
     const originalIndex = index * scaleFactor;
-    const before = Math.floor(originalIndex).toFixed();
-    const after = Math.ceil(originalIndex).toFixed();
+    const before = Math.floor(originalIndex);
+    const after = Math.ceil(originalIndex);
     const point = originalIndex - before;
     newArray[index] = array[before] + (array[after] - array[before]) * point; // linear interpolation
   }
@@ -77,9 +77,9 @@ export const interpolate = (array, length) => {
   return newArray;
 };
 
-export const isLastItem = (array, item) => array.indexOf(item) === array.length - 1;
+export const isLastItem = <T>(array: T[], item: T) => array.indexOf(item) === array.length - 1;
 
-export const iterateIndex = (array, currentIndex, reverse = false) => {
+export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false) => {
   if (Array.isArray(array) && array.length && Number.isFinite(currentIndex)) {
     if (reverse) {
       const isZeroIndex = currentIndex === 0;
@@ -88,9 +88,10 @@ export const iterateIndex = (array, currentIndex, reverse = false) => {
 
     return (currentIndex + 1) % array.length;
   }
+  return undefined;
 };
 
-export const iterateItem = (array, currentItem, reverse = false) => {
+export const iterateItem = <T>(array: T[], currentItem: T, reverse = false) => {
   if (Array.isArray(array) && array.length) {
     const currentIndex = array.indexOf(currentItem);
 
@@ -98,24 +99,26 @@ export const iterateItem = (array, currentItem, reverse = false) => {
     const isNegativeIndex = currentIndex === -1;
     return isNegativeIndex ? undefined : array[iterateIndex(array, currentIndex, reverse)];
   }
+  return undefined;
 };
 
 /**
  * Returns random element
- * @param {Array} array - source
- * @returns {Object} random element
+ * @param array source
+ * @returns random element
  */
-export const randomElement = (array = []) => array[Math.floor(Math.random() * array.length)];
+export const randomElement = <T>(array: T[] = []) => array[Math.floor(Math.random() * array.length)];
 
 /**
  * Remove given element from array
- * @param {Array} array - source
- * @param {Object} element - Element which should be removed
- * @returns {Array|undefined} containing the removed element
+ * @param array source
+ * @param element Element which should be removed
+ * @returns containing the removed element
  */
-export const removeElement = (array = [], element) => {
+export const removeElement = <T>(array: T[] = [], element: T) => {
   const index = array.indexOf(element);
   if (index > -1) {
     return array.splice(index, 1);
   }
+  return undefined;
 };
