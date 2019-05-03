@@ -150,7 +150,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   formatTimestamp(timestamp) {
-    return moment(timestamp).format('DD/MM/YYYY H:mm');
+    return moment(timestamp).format('L H:mm');
   }
 
   _loadImage() {
