@@ -112,7 +112,7 @@ export class AssetService {
           size: compressedBytes.length,
         });
 
-        (protoAsset as any)[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+        protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });
