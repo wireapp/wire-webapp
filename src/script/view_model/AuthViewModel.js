@@ -91,8 +91,10 @@ class AuthViewModel {
     this.storageService = new StorageService();
     this.storage_repository = new StorageRepository(this.storageService);
 
-    this.cryptography_service = new CryptographyRepository(backendClient);
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
+    this.cryptography_repository = new CryptographyRepository(
+      resolveDependency(graph.BackendClient),
+      this.storage_repository
+    );
     this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
 
     this.selfService = resolveDependency(graph.SelfService);

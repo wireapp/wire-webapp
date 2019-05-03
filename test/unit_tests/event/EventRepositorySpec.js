@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import Proteus from '@wireapp/proteus';
+import * as Proteus from '@wireapp/proteus';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
