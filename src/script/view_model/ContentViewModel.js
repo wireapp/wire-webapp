@@ -28,9 +28,6 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
 export class ContentViewModel {
   static get STATE() {
     return {
