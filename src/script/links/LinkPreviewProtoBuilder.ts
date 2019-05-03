@@ -21,7 +21,7 @@ import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 import {Data as OpenGraphData} from 'open-graph';
 import {isEmpty} from 'underscore';
 
-import {deArrify} from 'Util/ArrayUtil';
+import {deArrayify} from 'Util/ArrayUtil';
 import {truncate} from 'Util/StringUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
@@ -33,42 +33,45 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
  * Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
  *
  * @param data Open graph data
- * @param url Link entered by the user
+ * @param link Link entered by the user
  * @param offset Starting index of the link
  */
-export const buildFromOpenGraphData = (data: OpenGraphData, url: string, offset = 0): LinkPreview | void => {
+export const buildFromOpenGraphData = (data: OpenGraphData, link: string, offset = 0): LinkPreview | void => {
   if (isEmpty(data)) {
     return;
   }
 
-  const {description, site_name, title, url: dataUrl} = data;
+  data.url = data.url || link;
 
   if (!data.title || !data.url) {
     return;
   }
 
-  const truncatedDescription = truncate(deArrify(description), config.MAXIMUM_LINK_PREVIEW_CHARS);
-  const truncatedTitle = truncate(deArrify(title), config.MAXIMUM_LINK_PREVIEW_CHARS);
+  const {description, site_name, title, url: dataUrl} = data;
+
+  const truncatedDescription = truncate(deArrayify(description), config.MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedTitle = truncate(deArrayify(title), config.MAXIMUM_LINK_PREVIEW_CHARS);
 
   const protoArticle = new Article({
-    permanentUrl: deArrify(dataUrl),
+    permanentUrl: deArrayify(dataUrl),
     summary: truncatedDescription,
     title: truncatedTitle,
   }); // deprecated format
+
   const protoLinkPreview = new LinkPreview({
     article: protoArticle,
-    permanentUrl: deArrify(dataUrl),
+    permanentUrl: deArrayify(dataUrl),
     summary: truncatedDescription,
     title: truncatedTitle,
-    url: url,
+    url: link,
     urlOffset: offset,
   });
 
-  if (site_name === 'Twitter' && isTweetUrl(deArrify(dataUrl))) {
-    const author = deArrify(title)
+  if (deArrayify(site_name) === 'Twitter' && isTweetUrl(deArrayify(dataUrl))) {
+    const author = deArrayify(title)
       .replace('on Twitter', '')
       .trim();
-    const username = deArrify(dataUrl).match(/com\/([^/]*)\//)[1];
+    const username = deArrayify(dataUrl).match(/com\/([^/]*)\//)[1];
     const protoTweet = new Tweet({author, username});
 
     protoLinkPreview[PROTO_MESSAGE_TYPE.TWEET] = protoTweet;

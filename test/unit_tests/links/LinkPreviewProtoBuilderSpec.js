@@ -20,7 +20,7 @@
 import {buildFromOpenGraphData} from 'src/script/links/LinkPreviewProtoBuilder';
 
 const OpenGraphMocks = {
-  getHeiseMock: function() {
+  getHeiseMock() {
     return {
       description:
         'Eine Woche nach ihrer Ankunft im System hat die NASA-Sonde Juno ein erstes Bild aus dem Orbit um den Jupiter gemacht und zur Erde geschickt.',
@@ -35,7 +35,7 @@ const OpenGraphMocks = {
     };
   },
 
-  getWireMock: function() {
+  getWireMock() {
     return {
       description:
         'HD quality calls, private and group chats with inline photos, music and video. Secure and perfectly synced across your devices.',
@@ -51,7 +51,7 @@ const OpenGraphMocks = {
 };
 
 describe('LinkPreviewProtoBuilder', () => {
-  const compare_article_with_mock = function(url, offset, preview, mock) {
+  const compare_article_with_mock = (url, offset, preview, mock) => {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
     expect(preview.url).toBe(url);

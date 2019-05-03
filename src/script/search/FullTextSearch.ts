@@ -37,5 +37,6 @@ export const search = (text: string, query = ''): boolean => {
   if (query.length > 0) {
     return getSearchRegex(query).test(text);
   }
+
   return false;
 };

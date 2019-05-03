@@ -123,4 +123,4 @@ export const removeElement = <T>(array: T[] = [], element: T) => {
   return undefined;
 };
 
-export const deArrify = <T>(value: T[] | T): T => (value instanceof Array ? value[0] : value);
+export const deArrayify = <T>(value: T[] | T): T => (value instanceof Array ? value[0] : value);
