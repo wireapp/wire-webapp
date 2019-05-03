@@ -42,15 +42,9 @@ class PreferencesListViewModel {
 
     this.supportsCalling = callingRepository.supportsCalling;
 
-    this.selectedAbout = ko.pureComputed(() => {
-      return this.contentState() === ContentViewModel.STATE.PREFERENCES_ABOUT;
-    });
-    this.selectedAccount = ko.pureComputed(() => {
-      return this.contentState() === ContentViewModel.STATE.PREFERENCES_ACCOUNT;
-    });
-    this.selectedAV = ko.pureComputed(() => {
-      return this.contentState() === ContentViewModel.STATE.PREFERENCES_AV;
-    });
+    this.selectedAbout = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_ABOUT);
+    this.selectedAccount = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    this.selectedAV = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_AV);
     this.selectedDevices = ko.pureComputed(() => {
       const devicesState = [
         ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS,
@@ -58,9 +52,7 @@ class PreferencesListViewModel {
       ];
       return devicesState.includes(this.contentState());
     });
-    this.selectedOptions = ko.pureComputed(() => {
-      return this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS;
-    });
+    this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 
   clickOnClosePreferences() {

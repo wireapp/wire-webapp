@@ -56,7 +56,7 @@ export class ContentViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.logger = getLogger('ContentViewModel');
-    this.ContentViewModel = ContentViewModel;
+    this.STATE = ContentViewModel.STATE;
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
