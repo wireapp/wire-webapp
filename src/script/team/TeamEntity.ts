@@ -24,11 +24,11 @@ export class TeamEntity {
   creator?: string;
   icon: string;
   iconKey?: string;
-  id: string;
+  id?: string;
   members: ko.ObservableArray<TeamMemberEntity>;
   name: ko.Observable<string>;
 
-  constructor(id: string) {
+  constructor(id?: string) {
     this.creator = undefined;
     this.icon = '';
     this.iconKey = undefined;
