@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import 'src/script/main/globals';
 
-import {resolve, graph, backendConfig} from './testResolver';
+import {resolve as resolveDependency, graph, backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
@@ -45,6 +45,7 @@ import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {CryptographyService} from 'src/script/cryptography/CryptographyService';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 
 window.testConfig = {
@@ -62,9 +63,9 @@ window.TestFactory = function() {};
  * @returns {Promise<AuthRepository>} The authentication repository.
  */
 window.TestFactory.prototype.exposeAuthActors = function() {
-  return Promise.resolve().then(() => {
-    TestFactory.auth_repository = resolve(graph.AuthRepository);
-    return TestFactory.auth_repository;
+  return new Promise(resolve => {
+    TestFactory.auth_repository = resolveDependency(graph.AuthRepository);
+    resolve(TestFactory.auth_repository);
   });
 };
 
@@ -73,25 +74,23 @@ window.TestFactory.prototype.exposeAuthActors = function() {
  * @returns {Promise<StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
-  return Promise.resolve()
-    .then(() => {
-      TestFactory.storage_service = resolve(graph.StorageService);
-      if (!TestFactory.storage_service.db) {
-        TestFactory.storage_service.init(entities.user.john_doe.id, false);
-      }
-    })
-    .then(() => {
-      TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
-      return TestFactory.storage_repository;
-    });
+  return new Promise(resolve => {
+    TestFactory.storage_service = resolveDependency(graph.StorageService);
+    if (!TestFactory.storage_service.db) {
+      TestFactory.storage_service.init(entities.user.john_doe.id, false);
+    }
+    resolve();
+  }).then(() => {
+    TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
+    return TestFactory.storage_repository;
+  });
 };
 
 window.TestFactory.prototype.exposeBackupActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeStorageActors())
+  return this.exposeStorageActors()
     .then(() => this.exposeConversationActors())
     .then(() => {
-      TestFactory.backup_service = resolve(graph.BackupService);
+      TestFactory.backup_service = resolveDependency(graph.BackupService);
 
       TestFactory.backup_repository = new BackupRepository(
         TestFactory.backup_service,
@@ -111,15 +110,14 @@ window.TestFactory.prototype.exposeBackupActors = function() {
  * @returns {Promise<CryptographyRepository>} The cryptography repository.
  */
 window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
-  return Promise.resolve()
-    .then(() => this.exposeStorageActors())
+  return this.exposeStorageActors()
     .then(() => {
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
-      TestFactory.cryptography_service = new CryptographyService(resolve(graph.BackendClient));
+      TestFactory.cryptography_service = new CryptographyService(resolveDependency(graph.BackendClient));
 
       TestFactory.cryptography_repository = new CryptographyRepository(
-        resolve(graph.BackendClient),
+        resolveDependency(graph.BackendClient),
         TestFactory.storage_repository
       );
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
@@ -138,46 +136,44 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
  * @returns {Promise<ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeCryptographyActors())
-    .then(() => {
-      const clientEntity = new z.client.ClientEntity({
-        address: '192.168.0.1',
-        class: 'desktop',
-        id: '60aee26b7f55a99f',
-      });
-
-      const user = new User(entities.user.john_doe.id);
-      user.devices.push(clientEntity);
-      user.email(entities.user.john_doe.email);
-      user.is_me = true;
-      user.locale = entities.user.john_doe.locale;
-      user.name(entities.user.john_doe.name);
-      user.phone(entities.user.john_doe.phone);
-
-      TestFactory.client_repository = new ClientRepository(
-        resolve(graph.BackendClient),
-        TestFactory.storage_service,
-        TestFactory.cryptography_repository
-      );
-      TestFactory.client_repository.init(user);
-      const payload = {
-        address: '62.96.148.44',
-        class: 'desktop',
-        cookie: 'webapp@2153234453@temporary@1470926647664',
-        id: '132b3653b33f851f',
-        label: 'Windows 10',
-        location: {lat: 52.5233, lon: 13.4138},
-        meta: {is_verified: true, primary_key: 'local_identity'},
-        model: 'Chrome (Temporary)',
-        time: '2016-10-07T16:01:42.133Z',
-        type: 'temporary',
-      };
-      const currentClient = new z.client.ClientEntity(payload);
-      TestFactory.client_repository.currentClient(currentClient);
-
-      return TestFactory.client_repository;
+  return this.exposeCryptographyActors().then(() => {
+    const clientEntity = new z.client.ClientEntity({
+      address: '192.168.0.1',
+      class: 'desktop',
+      id: '60aee26b7f55a99f',
     });
+
+    const user = new User(entities.user.john_doe.id);
+    user.devices.push(clientEntity);
+    user.email(entities.user.john_doe.email);
+    user.is_me = true;
+    user.locale = entities.user.john_doe.locale;
+    user.name(entities.user.john_doe.name);
+    user.phone(entities.user.john_doe.phone);
+
+    TestFactory.client_repository = new ClientRepository(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_service,
+      TestFactory.cryptography_repository
+    );
+    TestFactory.client_repository.init(user);
+    const payload = {
+      address: '62.96.148.44',
+      class: 'desktop',
+      cookie: 'webapp@2153234453@temporary@1470926647664',
+      id: '132b3653b33f851f',
+      label: 'Windows 10',
+      location: {lat: 52.5233, lon: 13.4138},
+      meta: {is_verified: true, primary_key: 'local_identity'},
+      model: 'Chrome (Temporary)',
+      time: '2016-10-07T16:01:42.133Z',
+      type: 'temporary',
+    };
+    const currentClient = new z.client.ClientEntity(payload);
+    TestFactory.client_repository.currentClient(currentClient);
+
+    return TestFactory.client_repository;
+  });
 };
 
 /**
@@ -185,19 +181,21 @@ window.TestFactory.prototype.exposeClientActors = function() {
  * @returns {Promise<EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeCryptographyActors())
+  return this.exposeCryptographyActors()
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.web_socket_service = new WebSocketService(resolve(graph.BackendClient), TestFactory.storage_service);
+      TestFactory.web_socket_service = new WebSocketService(
+        resolveDependency(graph.BackendClient),
+        TestFactory.storage_service
+      );
       TestFactory.event_service = new EventService(TestFactory.storage_service);
       TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
       TestFactory.notification_service = new NotificationService(
-        resolve(graph.BackendClient),
+        resolveDependency(graph.BackendClient),
         TestFactory.storage_service
       );
       TestFactory.conversation_service = new z.conversation.ConversationService(
-        resolve(graph.BackendClient),
+        resolveDependency(graph.BackendClient),
         TestFactory.event_service,
         TestFactory.storage_service
       );
@@ -223,15 +221,15 @@ window.TestFactory.prototype.exposeEventActors = function() {
  */
 window.TestFactory.prototype.exposeUserActors = function() {
   return this.exposeClientActors().then(() => {
-    TestFactory.asset_service = resolve(graph.AssetService);
-    TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
-    TestFactory.user_service = resolve(graph.UserService);
-    TestFactory.propertyRepository = resolve(graph.PropertiesRepository);
+    TestFactory.asset_service = resolveDependency(graph.AssetService);
+    TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
+    TestFactory.user_service = resolveDependency(graph.UserService);
+    TestFactory.propertyRepository = resolveDependency(graph.PropertiesRepository);
 
     TestFactory.user_repository = new UserRepository(
       TestFactory.user_service,
       TestFactory.asset_service,
-      resolve(graph.SelfService),
+      resolveDependency(graph.SelfService),
       TestFactory.client_repository,
       serverTimeHandler,
       TestFactory.propertyRepository
@@ -247,18 +245,16 @@ window.TestFactory.prototype.exposeUserActors = function() {
  * @returns {Promise<ConnectionRepository>} The connection repository.
  */
 window.TestFactory.prototype.exposeConnectionActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeUserActors())
-    .then(() => {
-      TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
+  return this.exposeUserActors().then(() => {
+    TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
 
-      TestFactory.connection_repository = new ConnectionRepository(
-        resolve(graph.BackendClient),
-        TestFactory.user_repository
-      );
+    TestFactory.connection_repository = new ConnectionRepository(
+      resolveDependency(graph.BackendClient),
+      TestFactory.user_repository
+    );
 
-      return TestFactory.connect_repository;
-    });
+    return TestFactory.connect_repository;
+  });
 };
 
 /**
@@ -266,15 +262,13 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
  * @returns {Promise<ConnectRepository>} The connect repository.
  */
 window.TestFactory.prototype.exposeConnectActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeUserActors())
-    .then(() => {
-      TestFactory.connectService = new ConnectService(resolve(graph.BackendClient));
+  return this.exposeUserActors().then(() => {
+    TestFactory.connectService = new ConnectService(resolveDependency(graph.BackendClient));
 
-      TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
+    TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
 
-      return TestFactory.connect_repository;
-    });
+    return TestFactory.connect_repository;
+  });
 };
 
 /**
@@ -283,23 +277,23 @@ window.TestFactory.prototype.exposeConnectActors = function() {
  */
 window.TestFactory.prototype.exposeSearchActors = function() {
   return this.exposeUserActors().then(() => {
-    TestFactory.search_repository = new SearchRepository(resolve(graph.BackendClient), TestFactory.user_repository);
+    TestFactory.search_repository = new SearchRepository(
+      resolveDependency(graph.BackendClient),
+      TestFactory.user_repository
+    );
 
     return TestFactory.search_repository;
   });
 };
 
 window.TestFactory.prototype.exposeTeamActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeUserActors())
-    .then(() => {
-      TestFactory.teamService = new z.team.TeamService(resolve(graph.BackendClient));
-      return TestFactory.teamService;
-    })
-    .then(() => {
-      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.teamService, TestFactory.user_repository);
-      return TestFactory.team_repository;
-    });
+  return this.exposeUserActors().then(() => {
+    TestFactory.team_repository = new TeamRepository(
+      resolveDependency(graph.BackendClient),
+      TestFactory.user_repository
+    );
+    return TestFactory.team_repository;
+  });
 };
 
 /**
@@ -307,13 +301,12 @@ window.TestFactory.prototype.exposeTeamActors = function() {
  * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
  */
 window.TestFactory.prototype.exposeConversationActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeConnectionActors())
+  return this.exposeConnectionActors()
     .then(() => this.exposeTeamActors())
     .then(() => this.exposeEventActors())
     .then(() => {
       TestFactory.conversation_service = new z.conversation.ConversationService(
-        resolve(graph.BackendClient),
+        resolveDependency(graph.BackendClient),
         TestFactory.event_service,
         TestFactory.storage_service
       );
@@ -326,8 +319,8 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.cryptography_repository,
         TestFactory.event_repository,
         undefined,
-        resolve(graph.LinkPreviewRepository),
-        resolve(graph.MessageSender),
+        resolveDependency(graph.LinkPreviewRepository),
+        resolveDependency(graph.MessageSender),
         serverTimeHandler,
         TestFactory.team_repository,
         TestFactory.user_repository,
@@ -345,11 +338,11 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {
     TestFactory.calling_repository = new CallingRepository(
-      resolve(graph.CallingService),
+      resolveDependency(graph.CallingService),
       TestFactory.client_repository,
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolve(graph.MediaRepository),
+      resolveDependency(graph.MediaRepository),
       TestFactory.user_repository
     );
 
@@ -363,14 +356,12 @@ window.TestFactory.prototype.exposeCallingActors = function() {
  */
 window.TestFactory.prototype.exposeNotificationActors = function() {
   return this.exposeConversationActors()
-    .then(() => {
-      return this.exposeCallingActors();
-    })
+    .then(() => this.exposeCallingActors())
     .then(() => {
       TestFactory.notification_repository = new NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
-        resolve(graph.PermissionRepository),
+        resolveDependency(graph.PermissionRepository),
         TestFactory.user_repository
       );
 
@@ -383,16 +374,14 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
  * @returns {Promise<EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeTeamActors())
-    .then(() => {
-      TestFactory.tracking_repository = new EventTrackingRepository(
-        TestFactory.team_repository,
-        TestFactory.user_repository
-      );
+  return this.exposeTeamActors().then(() => {
+    TestFactory.tracking_repository = new EventTrackingRepository(
+      TestFactory.team_repository,
+      TestFactory.user_repository
+    );
 
-      return TestFactory.tracking_repository;
-    });
+    return TestFactory.tracking_repository;
+  });
 };
 
 /**
@@ -400,17 +389,15 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
  * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
  */
 window.TestFactory.prototype.exposeLifecycleActors = function() {
-  return Promise.resolve()
-    .then(() => this.exposeUserActors())
-    .then(() => {
-      TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
+  return this.exposeUserActors().then(() => {
+    TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
 
-      TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
-        TestFactory.lifecycle_service,
-        TestFactory.user_repository
-      );
-      return TestFactory.lifecycle_repository;
-    });
+    TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
+      TestFactory.lifecycle_service,
+      TestFactory.user_repository
+    );
+    return TestFactory.lifecycle_repository;
+  });
 };
 
 const actorsCache = new Map();

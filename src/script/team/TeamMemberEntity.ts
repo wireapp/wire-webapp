@@ -17,16 +17,14 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+import {Permissions} from '@wireapp/api-client/dist/commonjs/team/member/Permissions';
 
-z.team.TeamEntity = class TeamEntity {
-  constructor(id) {
-    this.creator = undefined;
-    this.icon = '';
-    this.iconKey = undefined;
-    this.members = ko.observableArray([]);
-    this.id = id;
-    this.name = ko.observable('');
+export class TeamMemberEntity {
+  permissions?: Permissions;
+  userId?: string;
+
+  constructor() {
+    this.permissions = undefined;
+    this.userId = undefined;
   }
-};
+}

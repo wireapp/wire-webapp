@@ -19,10 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.team = z.team || {};
-
-z.team.TeamService = class TeamService {
+export class TeamService {
   static get URL() {
     return {
       TEAMS: '/teams',
@@ -36,7 +33,7 @@ z.team.TeamService = class TeamService {
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('z.team.TeamService');
+    this.logger = getLogger('TeamService');
   }
 
   getTeamById(teamId) {
@@ -81,4 +78,4 @@ z.team.TeamService = class TeamService {
       url: `${TeamService.URL.TEAMS}/${teamId}/services/whitelisted`,
     });
   }
-};
+}

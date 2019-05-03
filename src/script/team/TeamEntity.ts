@@ -17,12 +17,23 @@
  *
  */
 
-window.z = window.z || {};
-window.z.team = z.team || {};
+import ko from 'knockout';
+import {TeamMemberEntity} from './TeamMemberEntity';
 
-z.team.TeamMemberEntity = class TeamMemberEntity {
-  constructor() {
-    this.permissions = undefined;
-    this.userId = undefined;
+export class TeamEntity {
+  creator?: string;
+  icon: string;
+  iconKey?: string;
+  id?: string;
+  members: ko.ObservableArray<TeamMemberEntity>;
+  name: ko.Observable<string>;
+
+  constructor(id?: string) {
+    this.creator = undefined;
+    this.icon = '';
+    this.iconKey = undefined;
+    this.members = ko.observableArray([]);
+    this.id = id;
+    this.name = ko.observable('');
   }
-};
+}

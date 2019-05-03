@@ -19,7 +19,7 @@
 
 import {backendConfig} from '../../api/testResolver';
 
-describe('z.team.TeamRepository', () => {
+describe('TeamRepository', () => {
   const test_factory = new TestFactory();
 
   /* eslint sort-keys: "off" */
