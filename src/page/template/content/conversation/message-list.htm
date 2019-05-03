@@ -23,6 +23,7 @@
           shouldShowAvatar: !should_hide_user_avatar(message),
           shouldShowInvitePeople: showInvitePeople(),
           selfId: selfUser().id,
+          isMarked: focusedMessage() === message.id,
           isSelfTemporaryGuest: selfUser().isTemporaryGuest(),
           isLastDeliveredMessage: is_last_delivered_message(message),
           conversationRepository: conversation_repository,
@@ -38,6 +39,7 @@
           onClickReceipts: view => showMessageDetails(view, false),
           onClickLikes: view => showMessageDetails(view, true),
           onLike: click_on_like,
+          onMessageMarked: onMessageMarked,
           actionsViewModel: actionsViewModel"
         data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
     </div>

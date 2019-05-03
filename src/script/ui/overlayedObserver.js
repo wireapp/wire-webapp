@@ -84,4 +84,4 @@ const overlayedObserver = {
   trackElement,
 };
 
-export default overlayedObserver;
+export {overlayedObserver};

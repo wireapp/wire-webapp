@@ -17,16 +17,18 @@
  *
  */
 
-import AddParticipantsViewModel from './panel/AddParticipantsViewModel';
-import ConversationDetailsViewModel from './panel/ConversationDetailsViewModel';
-import ConversationParticipantsViewModel from './panel/ConversationParticipantsViewModel';
-import GroupParticipantServiceViewModel from './panel/GroupParticipantServiceViewModel';
-import GroupParticipantUserViewModel from './panel/GroupParticipantUserViewModel';
-import GuestsAndServicesViewModel from './panel/GuestsAndServicesViewModel';
-import MessageDetailsViewModel from './panel/MessageDetailsViewModel';
-import NotificationsViewModel from './panel/NotificationsViewModel';
-import ParticipantDevicesViewModel from './panel/ParticipantDevicesViewModel';
-import TimedMessagesViewModel from './panel/TimedMessagesViewModel';
+import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
+import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
+import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
+import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
+import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
+import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
+import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
+import {NotificationsViewModel} from './panel/NotificationsViewModel';
+import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
+import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
+import {WebAppEvents} from '../event/WebApp';
+import {MotionDuration} from '../motion/MotionDuration';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -97,7 +99,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.conversationEntity.subscribe(this._forceClosePanel.bind(this), null, 'beforeChange');
     this.subViews = this.buildSubViews();
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this._switchContent.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent.bind(this));
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
@@ -224,7 +226,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     window.setTimeout(() => {
       toPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
       this._hidePanel(fromState);
-    }, z.motion.MotionDuration.MEDIUM);
+    }, MotionDuration.MEDIUM);
   }
 
   _hidePanel(state) {

@@ -17,6 +17,9 @@
  *
  */
 
+import {AvailabilityType} from '../../user/AvailabilityType';
+import {nameFromType} from '../../user/AvailabilityMapper';
+
 ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">
@@ -64,9 +67,9 @@ ko.components.register('panel-user-details', {
       this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
       this.badge = params.badge;
       this.availabilityLabel = ko.pureComputed(() => {
-        const availabilitySetToNone = this.participant().availability() === z.user.AvailabilityType.NONE;
+        const availabilitySetToNone = this.participant().availability() === AvailabilityType.NONE;
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(this.participant().availability());
+          return nameFromType(this.participant().availability());
         }
       });
     }

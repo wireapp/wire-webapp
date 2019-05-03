@@ -19,6 +19,10 @@
 
 import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 
+import {truncate} from 'Util/StringUtil';
+import {isTweetUrl} from 'Util/ValidationUtil';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+
 window.z = window.z || {};
 window.z.links = z.links || {};
 
@@ -40,8 +44,8 @@ z.links.LinkPreviewProtoBuilder = {
       if (data.title && data.url) {
         const {description = '', title = '', url: dataUrl} = data;
 
-        const truncatedDescription = z.util.StringUtil.truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
-        const truncatedTitle = z.util.StringUtil.truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
+        const truncatedDescription = truncate(description, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
+        const truncatedTitle = truncate(title, z.config.MAXIMUM_LINK_PREVIEW_CHARS);
 
         const protoArticle = new Article({permanentUrl: dataUrl, summary: truncatedDescription, title: truncatedTitle}); // deprecated format
         const protoLinkPreview = new LinkPreview({
@@ -53,13 +57,13 @@ z.links.LinkPreviewProtoBuilder = {
           urlOffset: offset,
         });
 
-        if (data.site_name === 'Twitter' && z.util.ValidationUtil.urls.isTweet(data.url)) {
+        if (data.site_name === 'Twitter' && isTweetUrl(data.url)) {
           const author = data.title.replace('on Twitter', '').trim();
           const username = data.url.match(/com\/([^/]*)\//)[1];
           const protoTweet = new Tweet({author, username});
 
-          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
-          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
+          protoLinkPreview[PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
+          protoLinkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
         }
 
         return protoLinkPreview;

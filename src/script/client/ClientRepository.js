@@ -17,17 +17,24 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import platform from 'platform';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
+import {murmurhash3} from 'Util/util';
+import {Environment} from 'Util/Environment';
 
-window.z = window.z || {};
-window.z.client = z.client || {};
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+import {StorageKey} from '../storage/StorageKey';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 
-z.client.ClientRepository = class ClientRepository {
+import {ClientService} from './ClientService';
+import {ClientType} from './ClientType';
+
+export class ClientRepository {
   static get CONFIG() {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
@@ -38,11 +45,11 @@ z.client.ClientRepository = class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(clientService, cryptographyRepository) {
-    this.clientService = clientService;
+  constructor(backendClient, storageService, cryptographyRepository) {
+    this.clientService = new ClientService(backendClient, storageService);
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
-    this.logger = Logger('z.client.ClientRepository');
+    this.logger = getLogger('ClientRepository');
 
     this.clientMapper = new z.client.ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
@@ -50,13 +57,17 @@ z.client.ClientRepository = class ClientRepository {
 
     this.isTemporaryClient = ko.pureComputed(() => this.currentClient() && this.currentClient().isTemporary());
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
   init(selfUser) {
     this.selfUser(selfUser);
     this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
+  }
+
+  __test__assignEnvironment(data) {
+    Object.assign(Environment, data);
   }
 
   //##############################################################################
@@ -82,7 +93,7 @@ z.client.ClientRepository = class ClientRepository {
   getAllClientsFromDb() {
     return this.clientService.loadAllClientsFromDb().then(clients => {
       const recipients = {};
-      const skippedUserIds = [this.selfUser().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
+      const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
         const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
@@ -118,7 +129,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   getCurrentClientFromDb() {
     return this.clientService
-      .loadClientFromDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      .loadClientFromDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
         throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
@@ -193,7 +204,7 @@ z.client.ClientRepository = class ClientRepository {
   verifyClient(userId, clientEntity, isVerified) {
     return this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}).then(() => {
       clientEntity.meta.isVerified(isVerified);
-      amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+      amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
     });
   }
 
@@ -206,7 +217,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   _saveCurrentClientInDb(clientPayload) {
     clientPayload.meta = {is_verified: true};
-    return this.clientService.saveClientInDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
+    return this.clientService.saveClientInDb(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
   }
 
   /**
@@ -232,23 +243,23 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Constructs the value for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
+    const loginHash = murmurhash3(login || this.selfUser().id, 42);
     return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
   /**
    * Constructs the key for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
-    const loginHash = z.util.murmurhash3(login || this.selfUser().id, 42);
-    return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
+    const loginHash = murmurhash3(login || this.selfUser().id, 42);
+    return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
   /**
@@ -322,7 +333,7 @@ z.client.ClientRepository = class ClientRepository {
    * Create payload for client registration.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Type of client to be registered
+   * @param {ClientType} clientType - Type of client to be registered
    * @param {string} password - User password
    * @param {string} lastResortKey - Last resort key
    * @param {Array<string>} preKeys - Pre-keys
@@ -338,20 +349,20 @@ z.client.ClientRepository = class ClientRepository {
 
     let deviceModel = platform.name;
 
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       let modelString;
-      if (z.util.Environment.os.mac) {
+      if (Environment.os.mac) {
         modelString = t('wireMacos');
-      } else if (z.util.Environment.os.win) {
+      } else if (Environment.os.win) {
         modelString = t('wireWindows');
       } else {
         modelString = t('wireLinux');
       }
       deviceModel = modelString;
-      if (!z.util.Environment.frontend.isProduction()) {
+      if (!Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
-    } else if (clientType === z.client.ClientType.TEMPORARY) {
+    } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
 
@@ -375,26 +386,26 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {string} Cookie label
    */
   _getCookieLabelValue(login) {
-    return StorageUtil.getValue(this.constructCookieLabelKey(login));
+    return loadValue(this.constructCookieLabelKey(login));
   }
 
   /**
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @param {string} cookieLabel - Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
   _transferCookieLabel(clientType, cookieLabel) {
-    const indexedDbKey = z.storage.StorageKey.AUTH.COOKIE_LABEL;
+    const indexedDbKey = StorageKey.AUTH.COOKIE_LABEL;
     const userIdentifier = this.selfUser().email() || this.selfUser().phone();
     const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
 
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      StorageUtil.setValue(localStorageKey, cookieLabel);
+      loadValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
@@ -408,15 +419,15 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Load current client type from amplify store.
    * @private
-   * @returns {z.client.ClientType} Type of current client
+   * @returns {ClientType} Type of current client
    */
   _loadCurrentClientType() {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
-    const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
-    return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
+    const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
+    const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+    return Environment.electron ? ClientType.PERMANENT : type;
   }
 
   //##############################################################################
@@ -436,7 +447,7 @@ z.client.ClientRepository = class ClientRepository {
       .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
       .then(() => {
         this.selfUser().remove_client(clientId);
-        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
+        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
         return this.clients();
       })
       .catch(error => {
@@ -453,7 +464,7 @@ z.client.ClientRepository = class ClientRepository {
   removeLocalClient() {
     this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
       const shouldClearData = this.currentClient().isTemporary();
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
   }
 
@@ -461,13 +472,13 @@ z.client.ClientRepository = class ClientRepository {
     if (this.currentClient()) {
       if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
+          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true)
         );
       }
 
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.OPTION, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
         action: clearData => {
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
+          return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
         },
         preventClose: true,
         text: {
@@ -536,7 +547,7 @@ z.client.ClientRepository = class ClientRepository {
     if (!this.currentClient()) {
       throw new z.error.ClientError(z.error.ClientError.TYPE.CLIENT_NOT_SET);
     }
-    return z.util.Environment.electron || this.currentClient().isPermanent();
+    return Environment.electron || this.currentClient().isPermanent();
   }
 
   /**
@@ -558,7 +569,7 @@ z.client.ClientRepository = class ClientRepository {
    * @param {string} userId - ID of user whose clients are updated
    * @param {Object} clientsData - Clients data from backend
    * @param {booelan} [publish=true] - Publish changes clients using amplify
-   * @returns {Promise<Array<z.client.Client>>} Resolves with the entities once clients have been updated
+   * @returns {Promise<Client[]>} Resolves with the entities once clients have been updated
    */
   _updateClientsOfUserById(userId, clientsData, publish = true) {
     const clientsFromBackend = {};
@@ -625,7 +636,7 @@ z.client.ClientRepository = class ClientRepository {
       .then(newRecords => this.clientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser))
       .then(clientEntities => {
         if (publish) {
-          amplify.publish(z.event.WebApp.CLIENT.UPDATE, userId, clientEntities);
+          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
         }
         return clientEntities;
       })
@@ -669,12 +680,12 @@ z.client.ClientRepository = class ClientRepository {
   onUserEvent(eventJson) {
     const type = eventJson.type;
 
-    const isClientAdd = type === z.event.Backend.USER.CLIENT_ADD;
+    const isClientAdd = type === BackendEvent.USER.CLIENT_ADD;
     if (isClientAdd) {
       return this.onClientAdd(eventJson);
     }
 
-    const isClientRemove = type === z.event.Backend.USER.CLIENT_REMOVE;
+    const isClientRemove = type === BackendEvent.USER.CLIENT_REMOVE;
     if (isClientRemove) {
       this.onClientRemove(eventJson);
     }
@@ -687,7 +698,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   onClientAdd(eventJson) {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
+    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
   }
 
   /**
@@ -703,7 +714,7 @@ z.client.ClientRepository = class ClientRepository {
         return this.removeLocalClient();
       }
 
-      amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.selfUser().id, clientId);
+      amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
     }
   }
-};
+}

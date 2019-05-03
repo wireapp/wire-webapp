@@ -17,16 +17,17 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import Dexie from 'dexie';
 
+import {getLogger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
+
 import {Config} from '../auth/config';
-import StorageSchemata from '../storage/StorageSchemata';
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageKey} from '../storage/StorageKey';
+import {ClientType} from '../client/ClientType';
 
-import * as StorageUtil from 'utils/StorageUtil';
-
-class StorageService {
+export class StorageService {
   static get CONFIG() {
     return {
       DEXIE_CRUD_EVENTS: {
@@ -38,7 +39,7 @@ class StorageService {
   }
   // Construct an new StorageService.
   constructor() {
-    this.logger = Logger('StorageService');
+    this.logger = getLogger('StorageService');
 
     this.db = undefined;
     this.dbName = undefined;
@@ -59,8 +60,8 @@ class StorageService {
    */
   init(userId = this.userId) {
     return Promise.resolve().then(() => {
-      const isPermanent = StorageUtil.getValue(z.storage.StorageKey.AUTH.PERSIST);
-      const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
+      const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
+      const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
       this.userId = userId;
       this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
@@ -306,5 +307,3 @@ class StorageService {
       });
   }
 }
-
-export default StorageService;

@@ -17,11 +17,18 @@
  *
  */
 
-import {backendConfig} from '../../api/testResolver';
-import Conversation from 'src/script/entity/Conversation';
-import User from 'src/script/entity/User';
+import {createRandomUuid} from 'Util/util';
 
-describe('z.connection.ConnectionRepository', () => {
+import {backendConfig} from '../../api/testResolver';
+
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {WebAppEvents} from 'src/script/event/WebApp';
+
+import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
+import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
+
+describe('ConnectionRepository', () => {
   let server = undefined;
   let connectionRepository = undefined;
   const testFactory = new TestFactory();
@@ -43,8 +50,8 @@ describe('z.connection.ConnectionRepository', () => {
     let userEntity = undefined;
 
     beforeEach(() => {
-      const userId = z.util.createRandomUuid();
-      const connectionEntity = new z.connection.ConnectionEntity(z.util.createRandomUuid());
+      const userId = createRandomUuid();
+      const connectionEntity = new ConnectionEntity(createRandomUuid());
       connectionEntity.userId = userId;
 
       userEntity = new User(userId);
@@ -62,7 +69,7 @@ describe('z.connection.ConnectionRepository', () => {
 
     it('it switches the conversation if requested', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
-      amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, amplifySpy);
+      amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
       return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
         expect(connectionRepository._updateStatus).toHaveBeenCalled();
@@ -76,12 +83,12 @@ describe('z.connection.ConnectionRepository', () => {
     let secondConnectionEntity = null;
 
     beforeEach(() => {
-      firstConnectionEntity = new z.connection.ConnectionEntity();
-      firstConnectionEntity.conversationId = z.util.createRandomUuid();
+      firstConnectionEntity = new ConnectionEntity();
+      firstConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(firstConnectionEntity);
 
-      secondConnectionEntity = new z.connection.ConnectionEntity();
-      secondConnectionEntity.conversationId = z.util.createRandomUuid();
+      secondConnectionEntity = new ConnectionEntity();
+      secondConnectionEntity.conversationId = createRandomUuid();
       connectionRepository.connectionEntities.push(secondConnectionEntity);
     });
 
@@ -114,7 +121,7 @@ describe('z.connection.ConnectionRepository', () => {
         expect(connectionRepository.connectionEntities().length).toBe(2);
         const [firstConnectionEntity, secondConnectionEntity] = connectionRepository.connectionEntities();
 
-        expect(firstConnectionEntity.status()).toEqual(z.connection.ConnectionStatus.ACCEPTED);
+        expect(firstConnectionEntity.status()).toEqual(ConnectionStatus.ACCEPTED);
         expect(secondConnectionEntity.conversationId).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
       });
     });

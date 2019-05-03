@@ -18,8 +18,14 @@
  */
 
 import ko from 'knockout';
-import viewportObserver from '../ui/viewportObserver';
-import User from '../entity/User';
+
+import {getLogger} from 'Util/Logger';
+import {createRandomUuid} from 'Util/util';
+import {getFirstChar} from 'Util/StringUtil';
+
+import {viewportObserver} from '../ui/viewportObserver';
+import {User} from '../entity/User';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 class ParticipantAvatar {
   static get SIZE() {
@@ -47,11 +53,13 @@ class ParticipantAvatar {
   }
 
   constructor(params, componentInfo) {
+    this.logger = getLogger('ParticipantAvatar');
+
     const isParticipantObservable = typeof params.participant === 'function';
     this.participant = isParticipantObservable ? params.participant : ko.observable(params.participant);
 
     this.isService = ko.pureComputed(() => {
-      return this.participant() instanceof z.integration.ServiceEntity || this.participant().isService;
+      return this.participant() instanceof ServiceEntity || this.participant().isService;
     });
 
     this.isUser = ko.pureComputed(() => {
@@ -90,7 +98,7 @@ class ParticipantAvatar {
     this.dispose = this.dispose.bind(this);
 
     this.element.attr({
-      id: z.util.createRandomUuid(),
+      id: createRandomUuid(),
       'user-id': this.participant().id,
     });
 
@@ -100,7 +108,7 @@ class ParticipantAvatar {
       }
 
       return this.element.hasClass('avatar-xs')
-        ? z.util.StringUtil.getFirstChar(this.participant().initials())
+        ? getFirstChar(this.participant().initials())
         : this.participant().initials();
     });
 
@@ -158,15 +166,20 @@ class ParticipantAvatar {
         if (pictureResource) {
           const isCached = pictureResource.downloadProgress() === 100;
 
-          pictureResource.getObjectUrl().then(url => {
-            if (url) {
-              const image = new Image();
-              image.src = url;
-              this.element.find('.avatar-image').html(image);
-              this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-            }
-            this.avatarLoadingBlocked = false;
-          });
+          pictureResource
+            .getObjectUrl()
+            .then(url => {
+              if (url) {
+                const image = new Image();
+                image.src = url;
+                this.element.find('.avatar-image').html(image);
+                this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
+              }
+              this.avatarLoadingBlocked = false;
+            })
+            .catch(error => {
+              this.logger.warn('Failed to load avatar picture.', error);
+            });
         } else {
           this.avatarLoadingBlocked = false;
         }
@@ -230,7 +243,7 @@ ko.components.register('participant-avatar', {
   },
 });
 
-export default ParticipantAvatar;
+export {ParticipantAvatar};
 
 window.z = window.z || {};
 window.z.components = z.components || {};

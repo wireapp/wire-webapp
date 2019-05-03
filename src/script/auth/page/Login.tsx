@@ -46,15 +46,18 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+
+import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
 import {Config} from '../config';
-import EXTERNAL_ROUTE from '../externalRoute';
-import ROOT_ACTIONS from '../module/action/';
-import BackendError from '../module/action/BackendError';
-import LabeledError from '../module/action/LabeledError';
-import ValidationError from '../module/action/ValidationError';
+import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
+import {BackendError} from '../module/action/BackendError';
+import {LabeledError} from '../module/action/LabeledError';
+import {ValidationError} from '../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
@@ -63,7 +66,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
-import Page from './Page';
+import {Page} from './Page';
 
 declare global {
   interface Window {
@@ -71,7 +74,7 @@ declare global {
   }
 }
 
-interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<_Login>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -106,7 +109,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class Login extends React.Component<CombinedProps, State> {
+class _Login extends React.Component<CombinedProps, State> {
   private readonly inputs: {
     email: React.RefObject<any>;
     password: React.RefObject<any>;
@@ -227,11 +230,11 @@ class Login extends React.Component<CombinedProps, State> {
         const email = this.state.email.trim();
         const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
-        if (this.isValidEmail(email)) {
+        if (isValidEmail(email)) {
           login.email = email;
-        } else if (this.isValidUsername(email)) {
+        } else if (isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
+        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(email)) {
           login.phone = email;
         }
 
@@ -281,27 +284,6 @@ class Login extends React.Component<CombinedProps, State> {
           throw error;
         }
       });
-  };
-
-  isValidEmail = (email: string) => {
-    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailRegex.test(email);
-  };
-
-  isValidPhoneNumber = (phoneNumber: string) => {
-    const allowDebugPhoneNumbers = Config.FEATURE.ENABLE_DEBUG;
-    const e164regex = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-    return e164regex.test(phoneNumber);
-  };
-
-  isValidUsername = (username: string) => {
-    if (username.startsWith('@')) {
-      username = username.substring(1);
-    }
-
-    const usernameRegex = /^[a-z_0-9]{2,21}$/;
-    return usernameRegex.test(username);
   };
 
   render() {
@@ -377,9 +359,7 @@ class Login extends React.Component<CombinedProps, State> {
                           autoComplete="section-login password"
                           type="password"
                           placeholder={_(loginStrings.passwordPlaceholder)}
-                          maxLength={1024}
-                          minLength={8}
-                          pattern=".{8,1024}"
+                          pattern={`.{1,1024}`}
                           required
                           data-uie-name="enter-password"
                         />
@@ -387,6 +367,7 @@ class Login extends React.Component<CombinedProps, State> {
                           <Loading size={32} />
                         ) : (
                           <RoundIconButton
+                            style={{marginLeft: 16}}
                             tabIndex={4}
                             disabled={!email || !password}
                             type="submit"
@@ -476,7 +457,7 @@ class Login extends React.Component<CombinedProps, State> {
   }
 }
 
-export default withRouter(
+export const Login = withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -502,6 +483,6 @@ export default withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
       }
-    )(Login)
+    )(_Login)
   )
 );

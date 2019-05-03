@@ -17,11 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import moment from 'moment';
-import {isToday, isCurrentYear, isSameDay, isSameMonth} from '../../util/moment';
-import {t} from 'utils/LocalizerUtil';
+
+import {getLogger} from 'Util/Logger';
+import {isToday, isCurrentYear, isSameDay, isSameMonth} from 'Util/moment';
+import {t} from 'Util/LocalizerUtil';
+import {koPushDeferred} from 'Util/util';
+
+import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -36,7 +40,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.removedFromView = this.removedFromView.bind(this);
     this.setConversation = this.setConversation.bind(this);
 
-    this.logger = Logger('z.viewModel.CollectionDetailsViewModel');
+    this.logger = getLogger('z.viewModel.CollectionDetailsViewModel');
 
     this.template = ko.observable();
     this.conversationEntity = ko.observable();
@@ -44,15 +48,16 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.items = ko.observableArray();
 
     this.lastMessageTimestamp = undefined;
+    this.MessageCategory = MessageCategory;
   }
 
   setConversation(conversationEntity, category, items) {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.template(category);
     this.conversationEntity(conversationEntity);
-    z.util.koPushDeferred(this.items, items);
+    koPushDeferred(this.items, items);
   }
 
   itemAdded(messageEntity) {
@@ -60,8 +65,8 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
-          const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
-          const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+          const isImage = messageEntity.category & MessageCategory.IMAGE;
+          const isGif = messageEntity.category & MessageCategory.GIF;
           if (isImage && !isGif) {
             this.items.push(messageEntity);
           }
@@ -69,7 +74,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
         }
 
         case 'files': {
-          const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+          const isFile = messageEntity.category & MessageCategory.FILE;
           if (isFile) {
             this.items.push(messageEntity);
           }
@@ -77,7 +82,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
         }
 
         case 'links':
-          const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+          const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
           if (isLinkPreview) {
             this.items.push(messageEntity);
           }
@@ -104,20 +109,20 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   removedFromView() {
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     this.lastMessageTimestamp = undefined;
     this.conversationEntity(null);
     this.items.removeAll();
   }
 
   clickOnBackButton() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
   }
 
   clickOnImage(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
   }
 
   shouldShowHeader(messageEntity) {

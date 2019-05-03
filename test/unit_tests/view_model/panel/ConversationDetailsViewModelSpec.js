@@ -17,8 +17,11 @@
  *
  */
 
-import ConversationDetailsViewModel from 'src/script/view_model/panel/ConversationDetailsViewModel';
-import Conversation from 'src/script/entity/Conversation';
+import {noop} from 'Util/util';
+
+import {ConversationDetailsViewModel} from 'src/script/view_model/panel/ConversationDetailsViewModel';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationType} from 'src/script/conversation/ConversationType';
 
 describe('ConversationDetailsViewModel', () => {
   const testFactory = new window.TestFactory();
@@ -26,7 +29,6 @@ describe('ConversationDetailsViewModel', () => {
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
-      const noop = () => {};
       conversationDetailsViewModel = new ConversationDetailsViewModel({
         isVisible: noop,
         mainViewModel: {},
@@ -51,22 +53,22 @@ describe('ConversationDetailsViewModel', () => {
 
       const tests = [
         {
-          conversationType: z.conversation.ConversationType.ONE2ONE,
+          conversationType: ConversationType.ONE2ONE,
           expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: z.conversation.ConversationType.ONE2ONE,
+          conversationType: ConversationType.ONE2ONE,
           expected: ['do-archive', 'do-clear', 'do-block'],
           permission: {canCreateGroupConversation: () => false},
         },
         {
-          conversationType: z.conversation.ConversationType.GROUP,
+          conversationType: ConversationType.GROUP,
           expected: ['do-archive', 'do-clear', 'do-leave'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
-          conversationType: z.conversation.ConversationType.CONNECT,
+          conversationType: ConversationType.CONNECT,
           expected: ['do-archive', 'do-cancel-request', 'do-block'],
           permission: {canCreateGroupConversation: () => true},
         },

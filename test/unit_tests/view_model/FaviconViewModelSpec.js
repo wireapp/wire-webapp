@@ -17,6 +17,8 @@
  *
  */
 
+import {WebAppEvents} from 'src/script/event/WebApp';
+
 describe('z.viewModel.FaviconViewModel', () => {
   it('subscribes to uread count events', () => {
     const dispatcher = {subscribe: () => {}};
@@ -25,7 +27,7 @@ describe('z.viewModel.FaviconViewModel', () => {
     const faviconViewModel = new z.viewModel.FaviconViewModel(dispatcher);
 
     expect(dispatcher.subscribe).toHaveBeenCalledWith(
-      z.event.WebApp.LIFECYCLE.UNREAD_COUNT,
+      WebAppEvents.LIFECYCLE.UNREAD_COUNT,
       faviconViewModel,
       faviconViewModel._updateUnreadCount
     );
@@ -47,7 +49,7 @@ describe('z.viewModel.FaviconViewModel', () => {
     it('updates internal unread count state according to incoming events', () => {
       const unreads = [1, 2, 3, 4, 0];
       unreads.forEach(unread => {
-        dispatcher.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, unread);
+        dispatcher.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unread);
 
         expect(faviconViewModel.unreadCount()).toBe(unread);
       });

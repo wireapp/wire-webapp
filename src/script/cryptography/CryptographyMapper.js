@@ -19,10 +19,21 @@
 
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
-export default class CryptographyMapper {
+import {AvailabilityType} from '../user/AvailabilityType';
+import {decryptAesAsset} from '../assets/AssetCrypto';
+import {AssetTransferState} from '../assets/AssetTransferState';
+
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
+import {StatusType} from '../message/StatusType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+
+export class CryptographyMapper {
   static get CONFIG() {
     return {
       MAX_MENTIONS_PER_MESSAGE: 500,
@@ -31,14 +42,14 @@ export default class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = Logger('z.cryptography.CryptographyMapper');
+    this.logger = getLogger('CryptographyMapper');
   }
 
   /**
    * Maps a generic message into an event in JSON.
    *
    * @param {GenericMessage} genericMessage - Received ProtoBuffer message
-   * @param {JSON} event - Event of z.event.Backend.CONVERSATION.OTR-ASSET-ADD or z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {JSON} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   mapGenericMessage(genericMessage, event) {
@@ -55,52 +66,52 @@ export default class CryptographyMapper {
     let specificContent;
 
     switch (genericMessage.content) {
-      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
+      case GENERIC_MESSAGE_TYPE.ASSET: {
         specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING: {
+      case GENERIC_MESSAGE_TYPE.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling, event.data);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED: {
+      case GENERIC_MESSAGE_TYPE.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED: {
+      case GENERIC_MESSAGE_TYPE.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED: {
+      case GENERIC_MESSAGE_TYPE.EDITED: {
         specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL: {
+      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
         specificContent = this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case GENERIC_MESSAGE_TYPE.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
+      case GENERIC_MESSAGE_TYPE.IMAGE: {
         specificContent = addExpectReadReceiptData(
           this._mapImage(genericMessage.image, event.data.id),
           genericMessage.image
@@ -108,27 +119,27 @@ export default class CryptographyMapper {
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
+      case GENERIC_MESSAGE_TYPE.KNOCK: {
         specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case GENERIC_MESSAGE_TYPE.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
+      case GENERIC_MESSAGE_TYPE.LOCATION: {
         specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION: {
+      case GENERIC_MESSAGE_TYPE.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
+      case GENERIC_MESSAGE_TYPE.TEXT: {
         specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
@@ -193,17 +204,17 @@ export default class CryptographyMapper {
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
-        status: z.assets.AssetTransferState.UPLOADED,
+        status: AssetTransferState.UPLOADED,
         token: uploaded.assetToken,
       });
     } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
       data = Object.assign(data, {
         reason: notUploaded,
-        status: z.assets.AssetTransferState.UPLOAD_FAILED,
+        status: AssetTransferState.UPLOAD_FAILED,
       });
     }
 
-    return {data, type: z.event.Client.CONVERSATION.ASSET_ADD};
+    return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
   }
 
   _mapAssetMetaData(original) {
@@ -227,20 +238,20 @@ export default class CryptographyMapper {
         availability: (() => {
           switch (availability.type) {
             case Availability.Type.NONE:
-              return z.user.AvailabilityType.NONE;
+              return AvailabilityType.NONE;
             case Availability.Type.AVAILABLE:
-              return z.user.AvailabilityType.AVAILABLE;
+              return AvailabilityType.AVAILABLE;
             case Availability.Type.AWAY:
-              return z.user.AvailabilityType.AWAY;
+              return AvailabilityType.AWAY;
             case Availability.Type.BUSY:
-              return z.user.AvailabilityType.BUSY;
+              return AvailabilityType.BUSY;
             default:
               const message = 'Unhandled availability type';
               throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
-      type: z.event.Client.USER.AVAILABILITY,
+      type: ClientEvent.USER.AVAILABILITY,
     };
   }
 
@@ -248,7 +259,7 @@ export default class CryptographyMapper {
     return {
       content: JSON.parse(calling.content),
       sender: eventData.sender,
-      type: z.event.Client.CALL.E_CALL,
+      type: ClientEvent.CALL.E_CALL,
     };
   }
 
@@ -258,7 +269,7 @@ export default class CryptographyMapper {
         cleared_timestamp: cleared.clearedTimestamp.toString(),
         conversationId: cleared.conversationId,
       },
-      type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
     };
   }
 
@@ -270,16 +281,16 @@ export default class CryptographyMapper {
         status: (() => {
           switch (confirmation.type) {
             case Confirmation.Type.DELIVERED:
-              return z.message.StatusType.DELIVERED;
+              return StatusType.DELIVERED;
             case Confirmation.Type.READ:
-              return z.message.StatusType.SEEN;
+              return StatusType.SEEN;
             default:
               const message = 'Unhandled confirmation type';
               throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
-      type: z.event.Client.CONVERSATION.CONFIRMATION,
+      type: ClientEvent.CONVERSATION.CONFIRMATION,
     };
   }
 
@@ -288,7 +299,7 @@ export default class CryptographyMapper {
       data: {
         message_id: deleted.messageId,
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_DELETE,
+      type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
     };
   }
 
@@ -299,7 +310,7 @@ export default class CryptographyMapper {
   }
 
   _mapEphemeral(genericMessage, event) {
-    const messageTimer = genericMessage.ephemeral[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
+    const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
@@ -325,11 +336,11 @@ export default class CryptographyMapper {
           throw new Error('Not all expected properties defined');
         }
 
-        const cipherText = z.util.base64ToArray(eventData.data).buffer;
+        const cipherText = base64ToArray(eventData.data).buffer;
         const keyBytes = new Uint8Array(otrKey).buffer;
         const referenceSha256 = new Uint8Array(sha256).buffer;
 
-        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, referenceSha256);
+        return decryptAesAsset(cipherText, keyBytes, referenceSha256);
       })
       .then(externalMessageBuffer => GenericMessage.decode(new Uint8Array(externalMessageBuffer)))
       .catch(error => {
@@ -344,7 +355,7 @@ export default class CryptographyMapper {
         conversation_id: hidden.conversationId,
         message_id: hidden.messageId,
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+      type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
     };
   }
 
@@ -360,7 +371,7 @@ export default class CryptographyMapper {
 
   _mapImageMedium(image, eventId) {
     // set ID even if asset id is missing
-    eventId = eventId || z.util.createRandomUuid();
+    eventId = eventId || createRandomUuid();
 
     return {
       data: {
@@ -375,14 +386,14 @@ export default class CryptographyMapper {
         otr_key: new Uint8Array(image.otrKey ? image.otrKey : []),
         sha256: new Uint8Array(image.sha256 ? image.sha256 : []),
       },
-      type: z.event.Client.CONVERSATION.ASSET_ADD,
+      type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   }
 
   _mapKnock() {
     return {
       data: {},
-      type: z.event.Client.CONVERSATION.KNOCK,
+      type: ClientEvent.CONVERSATION.KNOCK,
     };
   }
 
@@ -392,7 +403,7 @@ export default class CryptographyMapper {
         conversationId: lastRead.conversationId,
         last_read_timestamp: lastRead.lastReadTimestamp.toString(),
       },
-      type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+      type: BackendEvent.CONVERSATION.MEMBER_UPDATE,
     };
   }
 
@@ -406,7 +417,7 @@ export default class CryptographyMapper {
           zoom: location.zoom,
         },
       },
-      type: z.event.Client.CONVERSATION.LOCATION,
+      type: ClientEvent.CONVERSATION.LOCATION,
     };
   }
 
@@ -416,14 +427,14 @@ export default class CryptographyMapper {
         message_id: reaction.messageId,
         reaction: reaction.emoji,
       },
-      type: z.event.Client.CONVERSATION.REACTION,
+      type: ClientEvent.CONVERSATION.REACTION,
     };
   }
 
   _mapText(text) {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
-    const protoLinkPreviews = text[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
+    const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
@@ -433,13 +444,13 @@ export default class CryptographyMapper {
     return {
       data: {
         content: `${text.content}`,
-        mentions: protoMentions.map(protoMention => z.util.arrayToBase64(Mention.encode(protoMention).finish())),
+        mentions: protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
         previews: protoLinkPreviews.map(protoLinkPreview =>
-          z.util.arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
+          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
         ),
-        quote: protoQuote && z.util.arrayToBase64(Quote.encode(protoQuote).finish()),
+        quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
       },
-      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   }
 }

@@ -21,17 +21,17 @@
           <input type="radio" id="preferences-options-audio-all" name="preferences-options-audio" value="all" data-bind="checked: optionAudio">
           <label for="preferences-options-audio-all">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsAudioAll')"></span>
-            <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.ALL"> · <span data-bind="text: t('preferencesOptionsAudioAllDetail')"></span></span>
+            <span class="preferences-hint" data-bind="visible: optionAudio() === AudioPreference.ALL"> · <span data-bind="text: t('preferencesOptionsAudioAllDetail')"></span></span>
           </label>
           <input type="radio" id="preferences-options-audio-some" name="preferences-options-audio" value="some" data-bind="checked: optionAudio">
           <label for="preferences-options-audio-some">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsAudioSome')"></span>
-            <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.SOME"> · <span data-bind="text: t('preferencesOptionsAudioSomeDetail')"></span></span>
+            <span class="preferences-hint" data-bind="visible: optionAudio() === AudioPreference.SOME"> · <span data-bind="text: t('preferencesOptionsAudioSomeDetail')"></span></span>
           </label>
           <input type="radio" id="preferences-options-audio-none" name="preferences-options-audio" value="none" data-bind="checked: optionAudio">
           <label for="preferences-options-audio-none">
             <span class="preferences-label" data-bind="text: t('preferencesOptionsAudioNone')"></span>
-            <span class="preferences-hint" data-bind="visible: optionAudio() === z.audio.AudioPreference.NONE"> · <span data-bind="text: t('preferencesOptionsAudioNoneDetail')"></span></span>
+            <span class="preferences-hint" data-bind="visible: optionAudio() === AudioPreference.NONE"> · <span data-bind="text: t('preferencesOptionsAudioNoneDetail')"></span></span>
           </label>
         </div>
       </div>
@@ -75,7 +75,7 @@
           </div>
         </div>
         <div class="preferences-detail preferences-detail-emoji" data-bind="html: t('preferencesOptionsEmojiReplaceDetail', {}, {'icon': '<span class=\'font-size-xs icon-emoji\'></span>'})"></div>
-        <!-- ko if: z.util.Environment.desktop -->
+        <!-- ko if: Environment.desktop -->
           <div class="preferences-option preferences-options-multiple">
             <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionSendPreviews}" data-uie-name="status-preference-previews-send">
               <input type="checkbox" id="send-preview-checkbox" data-bind="checked: optionSendPreviews">

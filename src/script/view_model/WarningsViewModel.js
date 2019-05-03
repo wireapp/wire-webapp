@@ -17,9 +17,15 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
 
-import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from './ModalsViewModel';
+import {PermissionState} from '../notification/PermissionState';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -63,11 +69,12 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = Logger('z.viewModel.WarningsViewModel');
+    this.logger = getLogger('z.viewModel.WarningsViewModel');
 
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
+    this.Environment = Environment;
 
     this.warnings.subscribe(warnings => {
       let topMargin;
@@ -100,10 +107,12 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
       })
       .extend({rateLimit: 200});
 
-    amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.showWarning.bind(this));
-    amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismissWarning.bind(this));
+    amplify.subscribe(WebAppEvents.WARNING.SHOW, this.showWarning.bind(this));
+    amplify.subscribe(WebAppEvents.WARNING.DISMISS, this.dismissWarning.bind(this));
 
     ko.applyBindings(this, document.getElementById(this.elementId));
+
+    this.WebAppEvents = WebAppEvents;
   }
 
   /**
@@ -117,10 +126,10 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
     switch (warningToClose) {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
-            const url = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
-            z.util.SanitizationUtil.safeWindowOpen(url);
+            const url = buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+            safeWindowOpen(url);
           },
           text: {
             action: t('modalCallNoMicrophoneAction'),
@@ -133,7 +142,7 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
       case WarningsViewModel.TYPE.REQUEST_NOTIFICATION: {
         // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, z.notification.PermissionState.IGNORED);
+        amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
         break;
       }
 

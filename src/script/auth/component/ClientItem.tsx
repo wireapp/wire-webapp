@@ -35,7 +35,7 @@ import {
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {clientItemStrings} from '../../strings';
-import ValidationError from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
@@ -57,7 +57,7 @@ interface State {
 
 type CombinedProps = Props & InjectedIntlProps;
 
-class ClientItem extends React.Component<CombinedProps, State> {
+class _ClientItem extends React.Component<CombinedProps, State> {
   private readonly passwordInput: React.RefObject<any> = React.createRef();
   state: State;
 
@@ -81,8 +81,8 @@ class ClientItem extends React.Component<CombinedProps, State> {
   constructor(props: CombinedProps) {
     super(props);
     this.state = {
-      ...ClientItem.initialState,
-      animationStep: props.selected ? ClientItem.CONFIG.animationSteps : 0,
+      ..._ClientItem.initialState,
+      animationStep: props.selected ? _ClientItem.CONFIG.animationSteps : 0,
       isAnimating: false,
     };
   }
@@ -100,7 +100,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
   }
 
   executeAnimateIn() {
-    if (this.state.animationStep < ClientItem.CONFIG.animationSteps) {
+    if (this.state.animationStep < _ClientItem.CONFIG.animationSteps) {
       window.requestAnimationFrame(this.executeAnimateIn.bind(this));
       this.setState(state => ({animationStep: state.animationStep + 1}));
     } else {
@@ -138,7 +138,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
     ) ||
     '?';
 
-  resetState = () => this.setState(ClientItem.initialState);
+  resetState = () => this.setState(_ClientItem.initialState);
 
   wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
     this.resetState();
@@ -202,7 +202,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
     } = this.props;
 
     const {validationError, validPassword, password, animationStep, isAnimating} = this.state;
-    const animationPosition = animationStep / ClientItem.CONFIG.animationSteps;
+    const animationPosition = animationStep / _ClientItem.CONFIG.animationSteps;
     const height = animationPosition * 56;
     const marginTop = animationPosition * 16;
     const paddingHorizontal = animationPosition * 2;
@@ -260,8 +260,6 @@ class ClientItem extends React.Component<CombinedProps, State> {
                     autoFocus
                     data-uie-name="remove-device-password"
                     ref={this.passwordInput}
-                    maxLength={1024}
-                    minLength={8}
                     name="password"
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       this.setState({
@@ -269,7 +267,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
                         validPassword: true,
                       })
                     }
-                    pattern=".{8,1024}"
+                    pattern={`.{1,1024}`}
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required
                     style={{background: 'transparent'}}
@@ -303,4 +301,4 @@ class ClientItem extends React.Component<CombinedProps, State> {
   }
 }
 
-export default injectIntl(ClientItem);
+export const ClientItem = injectIntl(_ClientItem);

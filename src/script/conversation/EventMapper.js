@@ -19,20 +19,34 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import MediumImage from '../entity/message/MediumImage';
-import Logger from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {base64ToArray} from 'Util/util';
 
-import ReceiptModeUpdateMessage from '../entity/message/ReceiptModeUpdateMessage';
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
+import {AssetTransferState} from '../assets/AssetTransferState';
+
+import {MediumImage} from '../entity/message/MediumImage';
+import {File} from '../entity/message/File';
+import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+
+import {SystemMessageType} from '../message/SystemMessageType';
+import {StatusType} from '../message/StatusType';
+import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
+import {QuoteEntity} from '../message/QuoteEntity';
 
 // Event Mapper to convert all server side JSON events into core entities.
-export default class EventMapper {
+export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
   constructor() {
-    this.logger = Logger('EventMapper');
+    this.logger = getLogger('EventMapper');
   }
 
   /**
@@ -104,7 +118,7 @@ export default class EventMapper {
 
       if (eventData.quote) {
         const {message_id: messageId, user_id: userId, error} = eventData.quote;
-        originalEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+        originalEntity.quote(new QuoteEntity({error, messageId, userId}));
       }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
@@ -121,8 +135,8 @@ export default class EventMapper {
       const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
       if (preview_otr_key) {
         const remoteDataPreview = preview_key
-          ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-          : z.assets.AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+          ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+          : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         asset.preview_resource(remoteDataPreview);
       }
     }
@@ -135,7 +149,7 @@ export default class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.is_content() || originalEntity.is_ping()) {
-      originalEntity.status(event.status || z.message.StatusType.SENT);
+      originalEntity.status(event.status || StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -157,93 +171,93 @@ export default class EventMapper {
     let messageEntity;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.MEMBER_JOIN: {
+      case BackendEvent.CONVERSATION.MEMBER_JOIN: {
         messageEntity = this._mapEventMemberJoin(event, conversationEntity);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.MEMBER_LEAVE: {
+      case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
         messageEntity = this._mapEventMemberLeave(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.RECEIPT_MODE_UPDATE: {
+      case BackendEvent.CONVERSATION.RECEIPT_MODE_UPDATE: {
         messageEntity = this._mapEventReceiptModeUpdate(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE: {
+      case BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE: {
         messageEntity = this._mapEventMessageTimerUpdate(event);
         break;
       }
 
-      case z.event.Backend.CONVERSATION.RENAME: {
+      case BackendEvent.CONVERSATION.RENAME: {
         messageEntity = this._mapEventRename(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.ASSET_ADD: {
+      case ClientEvent.CONVERSATION.ASSET_ADD: {
         messageEntity = addReadReceiptData(this._mapEventAssetAdd(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.DELETE_EVERYWHERE: {
+      case ClientEvent.CONVERSATION.DELETE_EVERYWHERE: {
         messageEntity = this._mapEventDeleteEverywhere(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.GROUP_CREATION: {
+      case ClientEvent.CONVERSATION.GROUP_CREATION: {
         messageEntity = this._mapEventGroupCreation(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
-      case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT: {
+      case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
+      case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT: {
         messageEntity = this._mapEventUnableToDecrypt(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.KNOCK: {
+      case ClientEvent.CONVERSATION.KNOCK: {
         messageEntity = addReadReceiptData(this._mapEventPing(), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.LOCATION: {
+      case ClientEvent.CONVERSATION.LOCATION: {
         messageEntity = addReadReceiptData(this._mapEventLocation(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD: {
+      case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         messageEntity = addReadReceiptData(this._mapEventMessageAdd(event), event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES: {
+      case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
         break;
       }
 
-      case z.event.Client.CONVERSATION.ONE2ONE_CREATION: {
+      case ClientEvent.CONVERSATION.ONE2ONE_CREATION: {
         messageEntity = this._mapEvent1to1Creation(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE: {
+      case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
         messageEntity = this._mapEventTeamMemberLeave(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.VERIFICATION: {
+      case ClientEvent.CONVERSATION.VERIFICATION: {
         messageEntity = this._mapEventVerification(event);
         break;
       }
 
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE: {
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE: {
         messageEntity = this._mapEventVoiceChannelActivate();
         break;
       }
 
-      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
+      case ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE: {
         messageEntity = this._mapEventVoiceChannelDeactivate(event);
         break;
       }
@@ -266,7 +280,7 @@ export default class EventMapper {
     messageEntity.version = version || 1;
 
     if (messageEntity.is_content() || messageEntity.is_ping()) {
-      messageEntity.status(event.status || z.message.StatusType.SENT);
+      messageEntity.status(event.status || StatusType.SENT);
     }
 
     if (messageEntity.isReactable()) {
@@ -301,7 +315,7 @@ export default class EventMapper {
     const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+    messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
 
     if (hasService) {
@@ -349,7 +363,7 @@ export default class EventMapper {
    */
   _mapEventGroupCreation({data: eventData}) {
     const messageEntity = new z.entity.MemberMessage();
-    messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+    messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
@@ -402,7 +416,7 @@ export default class EventMapper {
 
       if (creatorIsJoiningMember) {
         userIds.splice(creatorIndex, 1);
-        messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+        messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
       if (hasService) {
@@ -445,7 +459,7 @@ export default class EventMapper {
 
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      messageEntity.quote(new z.message.QuoteEntity({error, messageId, userId}));
+      messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
     return messageEntity;
@@ -557,12 +571,12 @@ export default class EventMapper {
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity.
    * @private
-   * @returns {z.calling.entities.CallMessageEntity} Call message entity
+   * @returns {CallMessageEntity} Call message entity
    */
   _mapEventVoiceChannelActivate() {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
     messageEntity.visible(false);
 
     return messageEntity;
@@ -573,12 +587,12 @@ export default class EventMapper {
    *
    * @private
    * @param {Object} eventData - Message data
-   * @returns {z.calling.entities.CallMessageEntity} Call message entity
+   * @returns {CallMessageEntity} Call message entity
    */
   _mapEventVoiceChannelDeactivate({data: eventData}) {
     const messageEntity = new z.entity.CallMessage();
 
-    messageEntity.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+    messageEntity.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
     messageEntity.finished_reason = eventData.reason;
     messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
 
@@ -607,7 +621,7 @@ export default class EventMapper {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const assetEntity = new z.entity.File(id);
+    const assetEntity = new File(id);
 
     assetEntity.conversationId = conversationId;
 
@@ -626,20 +640,20 @@ export default class EventMapper {
     // Remote data - full
     const {key, otr_key, sha256, token} = eventData;
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
       const remoteDataPreview = preview_key
-        ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        : z.assets.AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+        ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
     }
 
-    assetEntity.status(status || z.assets.AssetTransferState.UPLOAD_PENDING);
+    assetEntity.status(status || AssetTransferState.UPLOAD_PENDING);
 
     return assetEntity;
   }
@@ -672,8 +686,8 @@ export default class EventMapper {
     }
 
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
     assetEntity.resource(remoteData);
     return assetEntity;
@@ -693,7 +707,7 @@ export default class EventMapper {
 
       const meta_data = linkPreview.metaData || linkPreview.meta_data;
 
-      const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
+      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 
@@ -707,7 +721,7 @@ export default class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
+          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 
@@ -724,7 +738,7 @@ export default class EventMapper {
    */
   _mapAssetLinkPreviews(linkPreviews) {
     return linkPreviews
-      .map(encodedLinkPreview => LinkPreview.decode(z.util.base64ToArray(encodedLinkPreview)))
+      .map(encodedLinkPreview => LinkPreview.decode(base64ToArray(encodedLinkPreview)))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
       .filter(linkPreviewEntity => linkPreviewEntity);
   }
@@ -740,7 +754,7 @@ export default class EventMapper {
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => {
-        const protoMention = Mention.decode(z.util.base64ToArray(encodedMention));
+        const protoMention = Mention.decode(base64ToArray(encodedMention));
         return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {

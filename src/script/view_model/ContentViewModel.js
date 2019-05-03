@@ -17,13 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import MessageListViewModel from './content/MessageListViewModel';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {alias} from 'Util/util';
+
+import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
-
-import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from './ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -55,7 +58,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.ContentViewModel');
+    this.logger = getLogger('z.viewModel.ContentViewModel');
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -141,8 +144,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.showConversation);
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
   /**
@@ -155,12 +158,12 @@ z.viewModel.ContentViewModel = class ContentViewModel {
 
     $(contentSelector)
       .removeClass(incomingCssClass)
-      .off(z.util.alias.animationend)
+      .off(alias.animationend)
       .addClass(incomingCssClass)
-      .one(z.util.alias.animationend, function() {
+      .one(alias.animationend, function() {
         $(this)
           .removeClass(incomingCssClass)
-          .off(z.util.alias.animationend);
+          .off(alias.animationend);
       });
   }
 
@@ -243,7 +246,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         });
       })
       .catch(() => {
-        this.mainViewModel.modals.showModal('.modal-template-acknowledge', {
+        this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('conversationNotFoundMessage'),
             title: t('conversationNotFoundTitle'),

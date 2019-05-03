@@ -17,10 +17,12 @@
  *
  */
 
-import CALL_MESSAGE_TYPE from './enum/CallMessageType';
+import {serverTimeHandler} from '../time/serverTimeHandler';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CallMessageEntity} from './entities/CallMessageEntity';
 
 const buildCallMessage = (type, response, sessionId, additionalPayload) => {
-  const callMessageEntity = new z.calling.entities.CallMessageEntity(type, response, sessionId);
+  const callMessageEntity = new CallMessageEntity(type, response, sessionId);
 
   if (additionalPayload) {
     callMessageEntity.addProperties(additionalPayload);
@@ -79,7 +81,8 @@ const buildUpdate = (response, sessionId, additionalPayload) => {
  * @returns {{conversationId: string, remoteClientId: string, remoteUserId: *, time: string, userId: string}} Additional payload
  */
 const createPayload = (conversationId, selfUserId, remoteUserId, remoteClientId) => {
-  return {conversationId, remoteClientId, remoteUserId, time: new Date().toISOString(), userId: selfUserId};
+  const time = serverTimeHandler.toServerTimestamp(Date.now());
+  return {conversationId, remoteClientId, remoteUserId, time: new Date(time).toISOString(), userId: selfUserId};
 };
 
 /**

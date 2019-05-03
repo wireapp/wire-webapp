@@ -16,11 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {base64ToArray} from 'Util/util';
 
-window.z = window.z || {};
-window.z.storage = z.storage || {};
-
-class StorageSchemata {
+export class StorageSchemata {
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
@@ -35,9 +33,11 @@ class StorageSchemata {
     };
   }
 
-  // @see https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
-  // @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
-  // @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
+  /**
+   * @see https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
+   * @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
+   * @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
+   */
   static get SCHEMATA() {
     return [
       {
@@ -84,7 +84,7 @@ class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
+        upgrade: (transaction, db) => {
           transaction[StorageSchemata.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
             client.meta = {is_verified: true, primary_key: 'local_identity'};
           });
@@ -239,13 +239,13 @@ class StorageSchemata {
         },
         upgrade: transaction => {
           transaction[StorageSchemata.OBJECT_STORE.KEYS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
           transaction[StorageSchemata.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
           transaction[StorageSchemata.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
-            record.serialised = z.util.base64ToArray(record.serialised).buffer;
+            record.serialised = base64ToArray(record.serialised).buffer;
           });
         },
         version: 12,
@@ -317,6 +317,3 @@ class StorageSchemata {
     ];
   }
 }
-
-export default StorageSchemata;
-z.storage.StorageSchemata = StorageSchemata;

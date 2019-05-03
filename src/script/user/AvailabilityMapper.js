@@ -19,53 +19,48 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.user = z.user || {};
+import {AvailabilityType} from './AvailabilityType';
 
-z.user.AvailabilityMapper = (() => {
-  const AVAILABILITY_VALUES = {
-    AVAILABLE: 'available',
-    AWAY: 'away',
-    BUSY: 'busy',
-    NONE: 'none',
+const AVAILABILITY_VALUES = {
+  AVAILABLE: 'available',
+  AWAY: 'away',
+  BUSY: 'busy',
+  NONE: 'none',
+};
+
+export const valueFromType = availabilityType => {
+  const TYPE_VALUES = {
+    [AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+    [AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
+    [AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
+    [AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
   };
 
-  const valueFromType = availabilityType => {
-    const TYPE_VALUES = {
-      [z.user.AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
-      [z.user.AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
-      [z.user.AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
-      [z.user.AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
-    };
+  const value = TYPE_VALUES[availabilityType];
+  if (value) {
+    return value;
+  }
+  throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+};
 
-    const value = TYPE_VALUES[availabilityType];
-    if (value) {
-      return value;
-    }
-    throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+export const nameFromType = availabilityType => {
+  const TYPE_STRINGS = {
+    [AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
+    [AvailabilityType.AWAY]: t('userAvailabilityAway'),
+    [AvailabilityType.BUSY]: t('userAvailabilityBusy'),
+    [AvailabilityType.NONE]: t('userAvailabilityNone'),
   };
 
-  return {
-    nameFromType: availabilityType => {
-      const TYPE_STRINGS = {
-        [z.user.AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
-        [z.user.AvailabilityType.AWAY]: t('userAvailabilityAway'),
-        [z.user.AvailabilityType.BUSY]: t('userAvailabilityBusy'),
-        [z.user.AvailabilityType.NONE]: t('userAvailabilityNone'),
-      };
+  const string = TYPE_STRINGS[availabilityType];
+  if (string) {
+    return string;
+  }
+  throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+};
 
-      const string = TYPE_STRINGS[availabilityType];
-      if (string) {
-        return string;
-      }
-      throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
-    },
-    protoFromType: availabilityType => {
-      const typeValue = valueFromType(availabilityType).toUpperCase();
-      return Availability.Type[typeValue];
-    },
-    valueFromType,
-  };
-})();
+export const protoFromType = availabilityType => {
+  const typeValue = valueFromType(availabilityType).toUpperCase();
+  return Availability.Type[typeValue];
+};

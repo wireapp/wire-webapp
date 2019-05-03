@@ -17,73 +17,62 @@
  *
  */
 
-import {t, Declension} from 'utils/LocalizerUtil';
+import {escape} from 'underscore';
 
-window.z = window.z || {};
-window.z.util = z.util || {};
+import {t, Declension} from 'Util/LocalizerUtil';
+import {isValidEmail} from 'Util/ValidationUtil';
+import {prependProtocol} from 'Util/UrlUtil';
 
-z.util.SanitizationUtil = (() => {
-  const _getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
-    const selfNameDeclensions = {
-      [Declension.NOMINATIVE]: t('conversationYouNominative'),
-      [Declension.DATIVE]: t('conversationYouDative'),
-      [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
-    };
+export const escapeRegex = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    const selfName = selfNameDeclensions[declension];
-    return bypassSanitization ? selfName : z.util.SanitizationUtil.escapeString(selfName);
+export const escapeString = string => escape(string);
+
+export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
+  const selfNameDeclensions = {
+    [Declension.NOMINATIVE]: t('conversationYouNominative'),
+    [Declension.DATIVE]: t('conversationYouDative'),
+    [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
   };
+  const selfName = selfNameDeclensions[declension];
+  return bypassSanitization ? selfName : escapeString(selfName);
+};
 
-  return {
-    escapeRegex: string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+export const getFirstName = (userEntity, declension, bypassSanitization = false) => {
+  if (userEntity.is_me) {
+    return getSelfName(declension, bypassSanitization);
+  }
+  return bypassSanitization ? userEntity.first_name() : escapeString(userEntity.first_name());
+};
 
-    escapeString: string => _.escape(string),
+/**
+ * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
+ * @see https://mathiasbynens.github.io/rel-noopener/
+ * @param {string} url - URL you want to open in a new browser tab
+ * @param {boolean} focus - True, if the new windows should get browser focus
+ * @returns {Object} New window handle
+ */
+export const safeWindowOpen = (url, focus = true) => {
+  const newWindow = window.open(prependProtocol(url));
 
-    getFirstName: (userEntity, declension, bypassSanitization = false) => {
-      if (userEntity.is_me) {
-        return _getSelfName(declension, bypassSanitization);
-      }
-      return bypassSanitization
-        ? userEntity.first_name()
-        : z.util.SanitizationUtil.escapeString(userEntity.first_name());
-    },
+  if (newWindow) {
+    newWindow.opener = null;
+    if (focus) {
+      newWindow.focus();
+    }
+  }
 
-    getSelfName: _getSelfName,
+  return newWindow;
+};
 
-    safeMailtoOpen: (event, email) => {
-      event.preventDefault();
-      event.stopPropagation();
+export const safeMailOpen = email => {
+  const pureEmail = email.replace(/^(mailto:)?/i, '');
 
-      if (!z.util.isValidEmail(email)) {
-        return;
-      }
+  if (!isValidEmail(pureEmail)) {
+    return;
+  }
 
-      const newWindow = window.open(`mailto:${email}`);
-      if (newWindow) {
-        window.setTimeout(() => newWindow.close(), 10);
-      }
-    },
-
-    /**
-     * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
-     * @see https://mathiasbynens.github.io/rel-noopener/
-     * @param {string} url - URL you want to open in a new browser tab
-     * @param {boolean} focus - True, if the new windows should get browser focus
-     * @returns {Object} New window handle
-     */
-    safeWindowOpen: (url, focus = true) => {
-      const newWindow = window.open(z.util.URLUtil.prependProtocol(url));
-
-      if (newWindow) {
-        newWindow.opener = null;
-        if (focus) {
-          newWindow.focus();
-        }
-      }
-
-      return newWindow;
-    },
-  };
-})();
-
-export default z.util.SanitizationUtil;
+  const newWindow = window.open(`mailto:${pureEmail}`);
+  if (newWindow) {
+    window.setTimeout(() => newWindow.close(), 10);
+  }
+};

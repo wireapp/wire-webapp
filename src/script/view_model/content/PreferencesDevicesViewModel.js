@@ -17,10 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {WebAppEvents} from '../../event/WebApp';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -35,7 +36,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.clientRepository = repositories.client;
     this.cryptographyRepository = repositories.cryptography;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.content.PreferencesDevicesViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesDevicesViewModel');
 
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
@@ -54,7 +55,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   clickOnShowDevice(clientEntity) {
     this.preferencesDeviceDetails.device(clientEntity);
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   }
 
   clickOnRemoveDevice(clientEntity, event) {

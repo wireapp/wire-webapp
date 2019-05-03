@@ -17,6 +17,8 @@
  *
  */
 
+import {MediaType} from 'src/script/media/MediaType';
+
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
@@ -54,9 +56,9 @@ describe('CallingRepository', () => {
         toggleMedia: () => Promise.resolve(),
       };
       const tests = [
-        {mediaType: z.media.MediaType.AUDIO, methodCalled: 'toggleAudioSend'},
-        {mediaType: z.media.MediaType.VIDEO, methodCalled: 'toggleVideoSend'},
-        {mediaType: z.media.MediaType.SCREEN, methodCalled: 'toggleScreenSend'},
+        {mediaType: MediaType.AUDIO, methodCalled: 'toggleAudioSend'},
+        {mediaType: MediaType.VIDEO, methodCalled: 'toggleVideoSend'},
+        {mediaType: MediaType.SCREEN, methodCalled: 'toggleScreenSend'},
       ];
 
       spyOn(callingRepository, 'getCallById').and.returnValue(Promise.resolve(callEntityMock));

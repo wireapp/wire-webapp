@@ -17,7 +17,10 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+
 import {resolve, graph} from './../../api/testResolver';
+import {StorageKey} from 'src/script/storage/StorageKey';
 
 describe('CacheRepository', () => {
   const cache_repository = resolve(graph.CacheRepository);
@@ -27,9 +30,9 @@ describe('CacheRepository', () => {
     beforeEach(() => {
       cache_repository.clearCache();
 
-      const conversationInputKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${z.util.createRandomUuid()}`;
+      const conversationInputKey = `${StorageKey.CONVERSATION.INPUT}|${createRandomUuid()}`;
       amplify.store(conversationInputKey, {mentions: [], reply: {}, text: 'test'});
-      amplify.store(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      amplify.store(StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);
     });
 

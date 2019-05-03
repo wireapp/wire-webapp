@@ -17,12 +17,16 @@
  *
  */
 
+import {bytesToHex} from 'Util/StringUtil';
+
+import {ClientEvent} from 'src/script/event/Client';
+
 describe('z.message.MessageHasher', () => {
   describe('hashEvent', () => {
     describe('unhandled event type', () => {
       it('throws if the event type is not handled', () => {
         const event = {
-          type: z.event.Client.CONVERSATION.KNOCK,
+          type: ClientEvent.CONVERSATION.KNOCK,
         };
 
         expect(() => z.message.MessageHasher.hashEvent(event)).toThrow();
@@ -52,7 +56,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -78,7 +82,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -114,7 +118,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -131,7 +135,7 @@ describe('z.message.MessageHasher', () => {
         key,
       },
       time: new Date(timestamp),
-      type: z.event.Client.CONVERSATION.ASSET_ADD,
+      type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   }
   function createTextEvent(text, timestamp) {
@@ -140,7 +144,7 @@ describe('z.message.MessageHasher', () => {
         content: text,
       },
       time: new Date(timestamp),
-      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+      type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   }
 
@@ -153,7 +157,7 @@ describe('z.message.MessageHasher', () => {
         },
       },
       time: new Date(timestamp),
-      type: z.event.Client.CONVERSATION.LOCATION,
+      type: ClientEvent.CONVERSATION.LOCATION,
     };
   }
 });

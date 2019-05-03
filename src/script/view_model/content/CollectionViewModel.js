@@ -17,7 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {isEscapeKey} from 'Util/KeyboardUtil';
+
+import {WebAppEvents} from '../../event/WebApp';
+import {MessageCategory} from '../../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -38,7 +42,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.collectionDetails = contentViewModel.collectionDetails;
     this.conversation_repository = repositories.conversation;
-    this.logger = Logger('z.viewModel.CollectionViewModel');
+    this.logger = getLogger('z.viewModel.CollectionViewModel');
 
     this.conversationEntity = ko.observable();
 
@@ -51,12 +55,12 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   addedToView() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
+      if (isEscapeKey(keyboardEvent)) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
       }
     });
   }
@@ -89,9 +93,9 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   removedFromView() {
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
+    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).off('keydown.collection');
     this.conversationEntity(null);
     this.searchInput('');
@@ -103,7 +107,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
       this.conversationEntity(conversationEntity);
 
       this.conversation_repository
-        .get_events_for_category(conversationEntity, z.message.MessageCategory.LINK_PREVIEW)
+        .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
         .then(messageEntities => this._populateItems(messageEntities));
     }
   }
@@ -112,19 +116,19 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     messageEntities.forEach(messageEntity => {
       if (!messageEntity.is_expired()) {
         // TODO: create binary map helper
-        const isImage = messageEntity.category & z.message.MessageCategory.IMAGE;
-        const isGif = messageEntity.category & z.message.MessageCategory.GIF;
+        const isImage = messageEntity.category & MessageCategory.IMAGE;
+        const isGif = messageEntity.category & MessageCategory.GIF;
         if (isImage && !isGif) {
           return this.images.push(messageEntity);
         }
 
-        const isFile = messageEntity.category & z.message.MessageCategory.FILE;
+        const isFile = messageEntity.category & MessageCategory.FILE;
         if (isFile) {
           const isAudio = messageEntity.get_first_asset().is_audio();
           return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
         }
 
-        const isLinkPreview = messageEntity.category & z.message.MessageCategory.LINK_PREVIEW;
+        const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
         if (isLinkPreview) {
           this.links.push(messageEntity);
         }
@@ -133,19 +137,19 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   clickOnMessage(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
   }
 
   clickOnBackButton() {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversationEntity());
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
   }
 
   clickOnSection(category, items) {
     this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
   clickOnImage(messageEntity) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
   }
 };

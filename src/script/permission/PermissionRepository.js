@@ -17,30 +17,34 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+
+import {PermissionStatusState} from './PermissionStatusState';
+import {PermissionType} from './PermissionType';
 
 /**
  * Permission repository to check browser permissions.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
  */
-export default class PermissionRepository {
+export class PermissionRepository {
   static get CONFIG() {
     return {
-      MEDIA_TYPES: [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE],
+      MEDIA_TYPES: [PermissionType.CAMERA, PermissionType.MICROPHONE],
     };
   }
   /**
    * Construct a new Permission Repository.
    */
   constructor() {
-    this.logger = Logger('z.permission.PermissionRepository');
+    this.logger = getLogger('PermissionRepository');
 
     this.permissionState = {
-      [z.permission.PermissionType.CAMERA]: ko.observable(undefined),
-      [z.permission.PermissionType.GEO_LOCATION]: ko.observable(undefined),
-      [z.permission.PermissionType.MICROPHONE]: ko.observable(undefined),
-      [z.permission.PermissionType.NOTIFICATIONS]: ko.observable(undefined),
+      [PermissionType.CAMERA]: ko.observable(undefined),
+      [PermissionType.GEO_LOCATION]: ko.observable(undefined),
+      [PermissionType.MICROPHONE]: ko.observable(undefined),
+      [PermissionType.NOTIFICATIONS]: ko.observable(undefined),
     };
   }
 
@@ -48,12 +52,12 @@ export default class PermissionRepository {
     return Promise.resolve().then(() => {
       const setPermissionState = permissionState => this.permissionState[permissionType](permissionState);
 
-      if (!z.util.Environment.browser.supports.permissions) {
+      if (!Environment.browser.supports.permissions) {
         throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED);
       }
 
       const isMediaPermission = PermissionRepository.CONFIG.MEDIA_TYPES.includes(permissionType);
-      if (isMediaPermission && !z.util.Environment.browser.supports.mediaPermissions) {
+      if (isMediaPermission && !Environment.browser.supports.mediaPermissions) {
         throw new z.error.PermissionError(z.error.PermissionError.TYPE.UNSUPPORTED_TYPE);
       }
 
@@ -81,7 +85,7 @@ export default class PermissionRepository {
     const permissionPromises = permissionTypes.map(permissionType => {
       return this.getPermissionState(permissionType)
         .then(permissionState => ({permissionState, permissionType}))
-        .catch(() => ({permissionState: z.permission.PermissionStatusState.PROMPT, permissionType}));
+        .catch(() => ({permissionState: PermissionStatusState.PROMPT, permissionType}));
     });
 
     return Promise.all(permissionPromises);

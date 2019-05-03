@@ -17,9 +17,10 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
 
-export default class ConversationParticipantsViewModel extends BasePanelViewModel {
+export class ConversationParticipantsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
     this.clickOnShowUser = this.clickOnShowUser.bind(this);
@@ -41,6 +42,7 @@ export default class ConversationParticipantsViewModel extends BasePanelViewMode
     this.highlightedUsers = ko.observable([]);
 
     this.searchInput = ko.observable('');
+    this.MotionDuration = MotionDuration;
   }
 
   getElementId() {

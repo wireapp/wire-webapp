@@ -17,15 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
-import {t} from 'utils/LocalizerUtil';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {WebAppEvents} from '../../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
+class TemporaryGuestViewModel {
   /**
    * View model for the temporary guest experience.
    *
@@ -41,18 +39,18 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
 
-    this.logger = Logger('z.viewModel.list.TemporaryGuestViewModel');
+    this.logger = getLogger('TemporaryGuestViewModel');
 
     this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;
   }
 
   clickOnPreferencesButton() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   }
 
   clickToCreateAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       action: () => window.location.replace(`/auth/${location.search}`),
       preventClose: true,
       text: {
@@ -66,4 +64,6 @@ z.viewModel.list.TemporaryGuestViewModel = class TemporaryGuestViewModel {
   isSelectedConversation() {
     return true;
   }
-};
+}
+
+export {TemporaryGuestViewModel};

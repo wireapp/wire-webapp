@@ -41,7 +41,7 @@ export interface ActionRoot {
   userAction: UserAction;
 }
 
-const actionRoot: ActionRoot = {
+export const actionRoot: ActionRoot = {
   authAction,
   clientAction,
   conversationAction,
@@ -53,5 +53,3 @@ const actionRoot: ActionRoot = {
   selfAction,
   userAction,
 };
-
-export default actionRoot;

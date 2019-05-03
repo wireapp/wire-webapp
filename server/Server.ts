@@ -23,13 +23,13 @@ import * as hbs from 'hbs';
 import * as helmet from 'helmet';
 import * as http from 'http';
 import * as path from 'path';
-import HealthCheckRoute from './routes/_health/HealthRoute';
-import AppleAssociationRoute from './routes/appleassociation/AppleAssociationRoute';
-import ConfigRoute from './routes/config/ConfigRoute';
+import {HealthCheckRoute} from './routes/_health/HealthRoute';
+import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
+import {ConfigRoute} from './routes/config/ConfigRoute';
 import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
-import GoogleWebmasterRoute from './routes/googlewebmaster/GoogleWebmasterRoute';
-import RedirectRoutes from './routes/RedirectRoutes';
-import Root from './routes/Root';
+import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
+import {RedirectRoutes} from './routes/RedirectRoutes';
+import {Root} from './routes/Root';
 import {ServerConfig} from './ServerConfig';
 import * as BrowserUtil from './util/BrowserUtil';
 
@@ -121,7 +121,7 @@ class Server {
     this.app.use(helmet.xssFilter());
     this.app.use(
       helmet.hsts({
-        includeSubdomains: true,
+        includeSubDomains: true,
         maxAge: 31536000,
         preload: true,
       })
@@ -231,4 +231,4 @@ class Server {
   }
 }
 
-export default Server;
+export {Server};

@@ -17,8 +17,15 @@
  *
  */
 
+import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getCursorPixelPosition} from 'Util/PopupUtil';
+import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
+
 import emojiBindings from './emoji.json';
-import * as StorageUtil from 'utils/StorageUtil';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {WebAppEvents} from '../../event/WebApp';
+import {StorageKey} from '../../storage/StorageKey';
 
 export class EmojiInputViewModel {
   static get CONFIG() {
@@ -114,9 +121,9 @@ export class EmojiInputViewModel {
 
     this.emojiDiv = $(`<div class='${EMOJI_DIV_CLASS}' />`);
     this.emojiStartPosition = -1;
-    this.emojiUsageCount = StorageUtil.getValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+    this.emojiUsageCount = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.shouldReplaceEmoji = propertiesRepository.getPreference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+    this.shouldReplaceEmoji = propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
     $(document).on('click', `.${EMOJI_DIV_CLASS}`, event => {
       const clicked = $(event.target);
@@ -161,14 +168,14 @@ export class EmojiInputViewModel {
 
     // Handling just entered inline emoji
     switch (keyboardEvent.key) {
-      case z.util.KeyboardUtil.KEY.SPACE: {
+      case KEY.SPACE: {
         if (this._tryReplaceInlineEmoji(input)) {
           return false;
         }
         break;
       }
 
-      case z.util.KeyboardUtil.KEY.TAB: {
+      case KEY.TAB: {
         if (this._tryReplaceInlineEmoji(input)) {
           keyboardEvent.preventDefault();
           return true;
@@ -183,23 +190,23 @@ export class EmojiInputViewModel {
     // Handling emoji popup
     if (this.isVisible) {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ESC: {
+        case KEY.ESC: {
           this.removeEmojiPopup();
           keyboardEvent.preventDefault();
           return true;
         }
 
-        case z.util.KeyboardUtil.KEY.ARROW_UP:
-        case z.util.KeyboardUtil.KEY.ARROW_DOWN: {
-          this._rotateEmojiPopup(z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.ARROW_UP));
+        case KEY.ARROW_UP:
+        case KEY.ARROW_DOWN: {
+          this._rotateEmojiPopup(isKey(keyboardEvent, KEY.ARROW_UP));
           this.suppressKeyUp = true;
           keyboardEvent.preventDefault();
           return true;
         }
 
-        case z.util.KeyboardUtil.KEY.ENTER:
-        case z.util.KeyboardUtil.KEY.TAB: {
-          if (keyboardEvent.shiftKey && z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
+        case KEY.ENTER:
+        case KEY.TAB: {
+          if (keyboardEvent.shiftKey && isEnterKey(keyboardEvent)) {
             break;
           }
 
@@ -214,7 +221,7 @@ export class EmojiInputViewModel {
     }
 
     // Handling inline emoji in the whole text
-    if (z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
+    if (isEnterKey(keyboardEvent)) {
       this._replaceAllInlineEmoji(input);
     }
 
@@ -249,9 +256,9 @@ export class EmojiInputViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.removeEmojiPopup);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.removeEmojiPopup);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updatedReplaceEmojiPreference);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties => {
       this.updatedReplaceEmojiPreference(properties.settings.emoji.replace_inline);
     });
   }
@@ -352,9 +359,7 @@ export class EmojiInputViewModel {
         const usageCountB = this._getUsageCount(emojiB.name);
 
         const sameUsageCount = usageCountA === usageCountB;
-        return sameUsageCount
-          ? z.util.StringUtil.sortByPriority(emojiA.name, emojiB.name, query)
-          : usageCountB - usageCountA;
+        return sameUsageCount ? sortByPriority(emojiA.name, emojiB.name, query) : usageCountB - usageCountA;
       })
       .slice(0, EmojiInputViewModel.CONFIG.LIST.LENGTH)
       .map(emoji => {
@@ -377,7 +382,7 @@ export class EmojiInputViewModel {
       .show();
     this.emojiDiv.find('.emoji:nth(0)').addClass('selected');
 
-    const position = z.util.popup.getCursorPixelPosition(input);
+    const position = getCursorPixelPosition(input);
     const top = position.top - this.emojiDiv.height() - EmojiInputViewModel.CONFIG.LIST.OFFSET_TOP;
     const left = position.left - EmojiInputViewModel.CONFIG.LIST.OFFSET_LEFT;
 
@@ -433,7 +438,7 @@ export class EmojiInputViewModel {
 
   _increaseUsageCount(emojiName) {
     this.emojiUsageCount[emojiName] = this._getUsageCount(emojiName) + 1;
-    StorageUtil.setValue(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
+    storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emojiUsageCount);
   }
 
   _escapeRegexp(string) {

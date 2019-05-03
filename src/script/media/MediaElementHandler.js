@@ -17,16 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-export default class MediaElementHandler {
+import {MediaType} from './MediaType';
+
+export class MediaElementHandler {
   /**
    * Construct an new MediaElement handler.
    * @param {MediaRepository} mediaRepository - Repository for media interactions
    */
   constructor(mediaRepository) {
     this.mediaRepository = mediaRepository;
-    this.logger = Logger('MediaElementHandler');
+    this.logger = getLogger('MediaElementHandler');
 
     this.currentDeviceId = this.mediaRepository.devicesHandler.currentDeviceId;
     this.remoteMediaElements = ko.observableArray([]);
@@ -34,11 +37,11 @@ export default class MediaElementHandler {
 
   /**
    * Add MediaElement for new stream.
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {undefined} No return value
    */
   addMediaElement(mediaStreamInfo) {
-    const isVideoStream = mediaStreamInfo.getType() === z.media.MediaType.VIDEO;
+    const isVideoStream = mediaStreamInfo.getType() === MediaType.VIDEO;
     if (!isVideoStream) {
       const remoteMediaElement = this._createMediaElement(mediaStreamInfo);
       this.remoteMediaElements.push(remoteMediaElement);
@@ -77,7 +80,7 @@ export default class MediaElementHandler {
    * Create a new media element.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {Element} HTMLAudioElement that has the stream attached to it
    */
   _createMediaElement(mediaStreamInfo) {
@@ -88,7 +91,7 @@ export default class MediaElementHandler {
       mediaElement.dataset.flowId = mediaStreamInfo.flowId;
       mediaElement.muted = false;
       mediaElement.setAttribute('autoplay', true);
-      if (z.util.Environment.browser.supports.audioOutputSelection) {
+      if (Environment.browser.supports.audioOutputSelection) {
         this._setMediaElementOutput(mediaElement, this.currentDeviceId.audioOutput());
       }
       return mediaElement;

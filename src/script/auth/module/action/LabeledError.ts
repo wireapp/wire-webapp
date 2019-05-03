@@ -17,7 +17,7 @@
  *
  */
 
-export default class LabeledError extends Error {
+export class LabeledError extends Error {
   public label: string;
 
   constructor(label: string, error: Error);

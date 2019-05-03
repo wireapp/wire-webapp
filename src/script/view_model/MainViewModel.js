@@ -17,9 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {afterRender} from 'Util/util';
 
-import WindowTitleViewModel from '../view_model/WindowTitleViewModel';
+import {WindowTitleViewModel} from './WindowTitleViewModel';
+import {modals} from './ModalsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -57,7 +59,7 @@ export class MainViewModel {
 
   constructor(repositories) {
     this.userRepository = repositories.user;
-    this.logger = Logger('MainViewModel');
+    this.logger = getLogger('MainViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -69,7 +71,7 @@ export class MainViewModel {
     this.content = new z.viewModel.ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.modals = new z.viewModel.ModalsViewModel();
+    this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
@@ -160,7 +162,7 @@ export class MainViewModel {
         }
       }
 
-      z.util.afterRender(() => {
+      afterRender(() => {
         const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
         this._applyStyle(panel, {transition: 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)'});
         this._applyStyle(titleBar, {transition: widthTransition});

@@ -17,7 +17,9 @@
  *
  */
 
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'utils/scroll-helpers';
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function() {
@@ -40,7 +42,7 @@ ko.bindingHandlers.bordered_list = (function() {
       element.addEventListener('scroll', () => calculate_borders(element));
       $('.left').on('click', () => calculate_borders(element));
       $(window).on('resize', () => calculate_borders(element));
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => calculate_borders(element));
+      amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => calculate_borders(element));
     },
 
     update(element, valueAccessor) {

@@ -17,19 +17,17 @@
  *
  */
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.entities = z.calling.entities || {};
+import {Environment} from 'Util/Environment';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
-import MediaRepository from '../../media/MediaRepository';
+import {MediaRepository} from '../../media/MediaRepository';
+import {WebAppEvents} from '../../event/WebApp';
 
-z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
+class FlowAudioEntity {
   /**
    * Create a new flow audio.
    *
-   * @class z.calling.entities.FlowAudioEntity
-   * @param {z.calling.entities.FlowEntity} flowEntity - Flow entity
+   * @param {FlowEntity} flowEntity - Flow entity
    * @param {MediaRepository} mediaRepository - Media repository
    */
   constructor(flowEntity, mediaRepository) {
@@ -41,8 +39,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
     this.messageLog = this.flowEntity.messageLog;
 
     const id = this.flowEntity.id;
-    const loggerName = 'z.calling.entities.FlowAudio';
-    this.callLogger = new CallLogger(loggerName, id, this.messageLog);
+    this.callLogger = new CallLogger('FlowAudioEntity', id, this.messageLog);
 
     this.callLogger.info({
       data: {
@@ -73,7 +70,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
     this.audioSource = undefined;
     this.audioRemote = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, this.setGainNode);
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.MUTE_AUDIO, this.setGainNode);
   }
 
   /**
@@ -141,7 +138,7 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
    * @returns {MediaStream} Wrapped MediaStream
    */
   wrapAudioOutputStream(mediaStream) {
-    if (z.util.Environment.browser.firefox) {
+    if (Environment.browser.firefox) {
       const audioContext = this._getAudioContext();
 
       if (audioContext) {
@@ -185,4 +182,6 @@ z.calling.entities.FlowAudioEntity = class FlowAudioEntity {
       this.gainNode.connect(this.audioRemote);
     }
   }
-};
+}
+
+export {FlowAudioEntity};

@@ -20,9 +20,11 @@
 import {groupBy} from 'underscore';
 import {amplify} from 'amplify';
 
-import PropertiesRepository from '../properties/PropertiesRepository';
-import backendEvent from '../event/Backend';
-import * as StorageUtil from 'utils/StorageUtil';
+import {storeValue, resetStoreValue, loadValue} from 'Util/StorageUtil';
+
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
 
 /**
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
@@ -45,12 +47,12 @@ class PreferenceNotificationRepository {
    */
   constructor(selfUserObservable) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
-    const storedNotifications = StorageUtil.getValue(notificationsStorageKey);
+    const storedNotifications = loadValue(notificationsStorageKey);
     this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
     this.notifications.subscribe(notifications => {
       return notifications.length > 0
-        ? StorageUtil.setValue(notificationsStorageKey, JSON.stringify(notifications))
-        : StorageUtil.resetValue(notificationsStorageKey);
+        ? storeValue(notificationsStorageKey, JSON.stringify(notifications))
+        : resetStoreValue(notificationsStorageKey);
     });
 
     const executeIfSelfUser = callback => {
@@ -61,26 +63,22 @@ class PreferenceNotificationRepository {
       };
     };
 
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, executeIfSelfUser(this.onClientAdd.bind(this)));
-    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, executeIfSelfUser(this.onClientRemove.bind(this)));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, executeIfSelfUser(this.onClientAdd.bind(this)));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, executeIfSelfUser(this.onClientRemove.bind(this)));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
-  popNotification() {
-    if (!this.notifications().length) {
-      return;
-    }
+  getNotifications() {
     const notificationPriorities = [
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
     ];
-    const groupedNotifications = groupBy(this.notifications(), notification => notification.type);
-    for (const type of notificationPriorities) {
-      if (groupedNotifications[type]) {
-        this.notifications.remove(notification => notification.type === type);
-        return {notification: groupedNotifications[type], type};
-      }
-    }
+    const prio = item => notificationPriorities.indexOf(item.type);
+    const notifications = this.notifications.removeAll();
+    const groupedNotifications = groupBy(notifications, notification => notification.type);
+    return Object.entries(groupedNotifications)
+      .map(([type, notification]) => ({notification, type}))
+      .sort((a, b) => prio(a) - prio(b));
   }
 
   onClientAdd(userId, clientEntity) {
@@ -98,7 +96,7 @@ class PreferenceNotificationRepository {
   }
 
   onUserEvent(event) {
-    if (event.type === backendEvent.USER.PROPERTIES_DELETE || event.type === backendEvent.USER.PROPERTIES_SET) {
+    if (event.type === BackendEvent.USER.PROPERTIES_DELETE || event.type === BackendEvent.USER.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
         this.notifications.push({
@@ -110,4 +108,4 @@ class PreferenceNotificationRepository {
   }
 }
 
-export default PreferenceNotificationRepository;
+export {PreferenceNotificationRepository};

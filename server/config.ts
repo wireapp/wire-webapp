@@ -133,6 +133,8 @@ const config: ServerConfig = {
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
     },
+    NEW_PASSWORD_MINIMUM_LENGTH:
+      (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
@@ -164,4 +166,4 @@ const config: ServerConfig = {
   },
 };
 
-export default config;
+export {config};

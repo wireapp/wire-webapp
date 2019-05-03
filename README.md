@@ -71,6 +71,44 @@ The command to run is:
 
 ### Deployment
 
+#### Staging Bumps
+
+**Actions**
+
+1. Checkout commit ID which has been approved by QA team
+1. Create a Git tag with the following format: `YYYY-MM-DD-staging.X`
+1. Push the newly created tag
+
+**Example**
+
+```
+git checkout 90fda951916f0d60a5bffce69a7267830e313391
+git tag 2019-04-23-staging.0
+git push origin --tags
+```
+
+If everything is done right, a deployment job ([Example](https://travis-ci.org/wireapp/wire-webapp/builds/523396493)) should be picked up on Travis CI based on the new tag.
+
+#### Production Release
+
+**Actions**
+
+1. Create a branch from the verified (approved by QA team) RC build. The easiest way to do that is to use the GitHub UI and to create the branch from the staging release tag because every RC build has a staging tag:
+
+![Production Release Step 1](./docs/release/prod-release-step-1.png)
+
+**Pro Tip:** If you are not sure which is the latest commit on our RC build, you can checkout: https://wire-webapp-rc.zinfra.io/commit
+
+2. Create a pull request from the newly created branch into our "prod" branch:
+
+![Production Release Step 2](./docs/release/prod-release-step-2.png)
+
+3. Create **a merge commit** (don't squash or rebase!) to kickoff a production release via Travis CI. If you don't want that the release goes live (because you want to park a new feature for a later deployment) you can add `[skip travis]` to your commit message to [prevent the release build](https://docs.travis-ci.com/user/customizing-the-build#skipping-a-build) and its deployment.
+
+![Production Release Step 3](./docs/release/prod-release-step-3.png)
+
+#### Manual Deployments
+
 Based on the Git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
 
 A manual deployment requires the local setup of the Elastic Beanstalk Command Line Interface ([EB CLI](https://docs.aws.amazon.com/en_us/elasticbeanstalk/latest/dg/eb-cli3.html)). Manual deployments are also based on branch defaults which are configured [here](./.elasticbeanstalk/config.yml).

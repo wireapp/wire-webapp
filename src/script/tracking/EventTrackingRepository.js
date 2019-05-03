@@ -17,14 +17,20 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import trackingHelpers from './Helpers';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
+import {includesString} from 'Util/StringUtil';
+import {getParameter} from 'Util/UrlUtil';
 
-window.z = window.z || {};
-window.z.tracking = z.tracking || {};
+import {WebAppEvents} from '../event/WebApp';
+import {URLParameter} from '../auth/URLParameter';
 
-z.tracking.EventTrackingRepository = class EventTrackingRepository {
+import * as trackingHelpers from './Helpers';
+import {EventName} from './EventName';
+import {SuperProperty} from './SuperProperty';
+
+export class EventTrackingRepository {
   static get CONFIG() {
     return {
       ERROR_REPORTING: {
@@ -36,10 +42,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         DISABLED_EVENTS: [
-          z.tracking.EventName.CALLING.FAILED_REQUEST,
-          z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA,
-          z.tracking.EventName.CALLING.FAILED_RTC,
-          z.tracking.EventName.TELEMETRY.APP_INITIALIZATION,
+          EventName.CALLING.FAILED_REQUEST,
+          EventName.CALLING.FAILED_REQUESTING_MEDIA,
+          EventName.CALLING.FAILED_RTC,
+          EventName.TELEMETRY.APP_INITIALIZATION,
         ],
       },
     };
@@ -55,7 +61,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(teamRepository, userRepository) {
     this.updatePrivacyPreference = this.updatePrivacyPreference.bind(this);
 
-    this.logger = Logger('z.tracking.EventTrackingRepository');
+    this.logger = getLogger('EventTrackingRepository');
 
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
@@ -79,7 +85,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     const privacyPromise = this.privacyPreference ? this._enableServices(false) : Promise.resolve();
     return privacyPromise.then(() => {
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, this.updatePrivacyPreference);
     });
   }
 
@@ -97,7 +103,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return this._isDomainAllowedForAnalytics()
       ? this._enableAnalytics().then(() => {
           if (isOptIn) {
-            this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING);
+            this._trackEvent(EventName.SETTINGS.OPTED_IN_TRACKING);
           }
         })
       : Promise.resolve();
@@ -105,7 +111,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disableServices() {
     this._disableErrorReporting();
-    this._trackEvent(z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING);
+    this._trackEvent(EventName.SETTINGS.OPTED_OUT_TRACKING);
     this._disableAnalytics();
   }
 
@@ -144,11 +150,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _isDomainAllowedForAnalytics() {
-    const trackingParameter = z.util.URLUtil.getParameter(z.auth.URLParameter.TRACKING);
+    const trackingParameter = getParameter(URLParameter.TRACKING);
     return typeof trackingParameter === 'boolean'
       ? trackingParameter
       : !EventTrackingRepository.CONFIG.USER_ANALYTICS.DISABLED_DOMAINS.some(domain => {
-          if (z.util.StringUtil.includes(window.location.hostname, domain)) {
+          if (includesString(window.location.hostname, domain)) {
             this.logger.debug(`Analytics is disabled for domain '${window.location.hostname}'`);
             return true;
           }
@@ -162,33 +168,33 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _subscribeToAnalyticsEvents() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
       if (this.isUserAnalyticsActivated) {
         this._setSuperProperty(...args);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this, (...args) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (...args) => {
       if (this.isUserAnalyticsActivated) {
         this._trackEvent(...args);
       }
     });
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this._resetSuperProperties.bind(this));
   }
 
   _setSuperProperties() {
-    this._setSuperProperty(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._setSuperProperty(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
-    this._setSuperProperty(z.tracking.SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
-    if (z.util.Environment.desktop) {
-      this._setSuperProperty(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
+    this._setSuperProperty(SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._setSuperProperty(SuperProperty.APP_VERSION, Environment.version(false));
+    this._setSuperProperty(SuperProperty.DESKTOP_APP, trackingHelpers.getPlatform());
+    if (Environment.desktop) {
+      this._setSuperProperty(SuperProperty.WRAPPER_VERSION, Environment.version(true));
     }
 
     if (this.userRepository) {
-      this._setSuperProperty(z.tracking.SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
-      this._setSuperProperty(z.tracking.SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
-      this._setSuperProperty(z.tracking.SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
+      this._setSuperProperty(SuperProperty.CONTACTS, this.userRepository.number_of_contacts());
+      this._setSuperProperty(SuperProperty.TEAM.IN_TEAM, this.teamRepository.isTeam());
+      this._setSuperProperty(SuperProperty.TEAM.SIZE, this.teamRepository.teamSize());
     }
   }
 
@@ -210,8 +216,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _unsubscribeFromAnalyticsEvents() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.SUPER_PROPERTY);
+    amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 
   //##############################################################################
@@ -259,7 +265,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       ignoreAjaxError: true,
     };
 
-    options.debugMode = !z.util.Environment.frontend.isProduction();
+    options.debugMode = !Environment.frontend.isProduction();
 
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
     Raygun.disableAutoBreadcrumbs();
@@ -269,12 +275,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     @note We cannot use our own version string as it has to be in a certain format
     @see https://github.com/MindscapeHQ/raygun4js#version-filtering
     */
-    if (!z.util.Environment.frontend.isLocalhost()) {
-      Raygun.setVersion(z.util.Environment.version(false));
+    if (!Environment.frontend.isLocalhost()) {
+      Raygun.setVersion(Environment.version(false));
     }
-    if (z.util.Environment.desktop) {
-      Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
+    if (Environment.desktop) {
+      Raygun.withCustomData({electron_version: Environment.version(true)});
     }
     Raygun.onBeforeSend(this._checkErrorPayload.bind(this));
   }
-};
+}

@@ -17,16 +17,25 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t, Declension} from 'Util/LocalizerUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
-import {t, Declension} from 'utils/LocalizerUtil';
-import SanitizationUtil from 'utils/SanitizationUtil';
-import TimeUtil from 'utils/TimeUtil';
+import {AvailabilityType} from '../user/AvailabilityType';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {PermissionState} from './PermissionState';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
+import {NotificationPreference} from './NotificationPreference';
+import {WebAppEvents} from '../event/WebApp';
+import {AudioType} from '../audio/AudioType';
 
-import TERMINATION_REASON from '../calling/enum/TerminationReason';
-
-window.z = window.z || {};
-window.z.notification = z.notification || {};
+import {SystemMessageType} from '../message/SystemMessageType';
+import {SuperType} from '../message/SuperType';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -34,7 +43,7 @@ window.z.notification = z.notification || {};
  * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
-z.notification.NotificationRepository = class NotificationRepository {
+class NotificationRepository {
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
@@ -45,21 +54,14 @@ z.notification.NotificationRepository = class NotificationRepository {
   }
 
   static get EVENTS_TO_NOTIFY() {
-    return [
-      z.message.SuperType.CALL,
-      z.message.SuperType.CONTENT,
-      z.message.SuperType.MEMBER,
-      z.message.SuperType.PING,
-      z.message.SuperType.REACTION,
-      z.message.SuperType.SYSTEM,
-    ];
+    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
   }
 
   /**
    * Construct a new Notification Repository.
    * @param {CallingRepository} callingRepository - Repository for all call interactions
    * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users
    */
   constructor(callingRepository, conversationRepository, permissionRepository, userRepository) {
@@ -69,21 +71,25 @@ z.notification.NotificationRepository = class NotificationRepository {
     this.userRepository = userRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
-    this.logger = Logger('z.notification.NotificationRepository');
+    this.logger = getLogger('NotificationRepository');
 
     this.notifications = [];
 
     this.subscribeToEvents();
-    this.notificationsPreference = ko.observable(z.notification.NotificationPreference.ON);
+    this.notificationsPreference = ko.observable(NotificationPreference.ON);
     this.notificationsPreference.subscribe(notificationsPreference => {
-      const preferenceIsNone = notificationsPreference === z.notification.NotificationPreference.NONE;
+      const preferenceIsNone = notificationsPreference === NotificationPreference.NONE;
       if (!preferenceIsNone) {
         this.checkPermission();
       }
     });
 
-    this.permissionState = this.permissionRepository.permissionState[z.permission.PermissionType.NOTIFICATIONS];
+    this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
     this.selfUser = this.userRepository.self;
+  }
+
+  __test__assignEnvironment(data) {
+    Object.assign(Environment, data);
   }
 
   setContentViewModelStates(state, multitasking) {
@@ -91,11 +97,11 @@ z.notification.NotificationRepository = class NotificationRepository {
   }
 
   subscribeToEvents() {
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.NOTIFY, this.notify.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
-    amplify.subscribe(z.event.WebApp.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
   }
 
   /**
@@ -108,19 +114,19 @@ z.notification.NotificationRepository = class NotificationRepository {
         return isPermitted;
       }
 
-      if (!z.util.Environment.browser.supports.notifications) {
-        return this.updatePermissionState(z.notification.PermissionState.UNSUPPORTED);
+      if (!Environment.browser.supports.notifications) {
+        return this.updatePermissionState(PermissionState.UNSUPPORTED);
       }
 
-      if (z.util.Environment.browser.supports.permissions) {
-        return this.permissionRepository.getPermissionState(z.permission.PermissionType.NOTIFICATIONS).then(() => {
-          const shouldRequestPermission = this.permissionState() === z.permission.PermissionStatusState.PROMPT;
+      if (Environment.browser.supports.permissions) {
+        return this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS).then(() => {
+          const shouldRequestPermission = this.permissionState() === PermissionStatusState.PROMPT;
           return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
         });
       }
 
       const currentPermission = window.Notification.permission;
-      const shouldRequestPermission = currentPermission === z.notification.PermissionState.DEFAULT;
+      const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
       return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
     });
   }
@@ -142,11 +148,25 @@ z.notification.NotificationRepository = class NotificationRepository {
   /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
+    const isUserAway = this.selfUser().availability() === AvailabilityType.AWAY;
+
+    if (isUserAway) {
+      return Promise.resolve();
+    }
+
+    const isUserBusy = this.selfUser().availability() === AvailabilityType.BUSY;
+    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
+    const isCallMessage = messageEntity.super_type === SuperType.CALL;
+
+    if (isUserBusy && !isSelfMentionOrReply && !isCallMessage) {
+      return Promise.resolve();
+    }
+
     const notifyInConversation = conversationEntity
       ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
       : true;
@@ -188,7 +208,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
   /**
    * Set the permission state.
-   * @param {z.permission.PermissionStatusState} permissionState - State of browser permission
+   * @param {PermissionStatusState} permissionState - State of browser permission
    * @returns {Promise} Resolves with true if notifications are enabled
    */
   updatePermissionState(permissionState) {
@@ -233,7 +253,7 @@ z.notification.NotificationRepository = class NotificationRepository {
             notificationText = assetEntity.text;
           }
 
-          return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
+          return truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     }
@@ -276,7 +296,7 @@ z.notification.NotificationRepository = class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = SanitizationUtil.getFirstName(otherUserEntity, declension);
+      const nameOfJoinedUser = getFirstName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
@@ -311,7 +331,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.MemberMessage} messageEntity - Member message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message body
    */
@@ -319,7 +339,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const isGroup = conversationEntity && conversationEntity.isGroup();
 
     switch (messageEntity.memberMessageType) {
-      case z.message.SystemMessageType.NORMAL:
+      case SystemMessageType.NORMAL:
         if (isGroup) {
           if (messageEntity.isMemberJoin()) {
             return this._createBodyMemberJoin(messageEntity);
@@ -329,13 +349,13 @@ z.notification.NotificationRepository = class NotificationRepository {
           }
         }
         break;
-      case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+      case SystemMessageType.CONNECTION_ACCEPTED:
         return t('notificationConnectionAccepted');
-      case z.message.SystemMessageType.CONNECTION_CONNECTED:
+      case SystemMessageType.CONNECTION_CONNECTED:
         return t('notificationConnectionConnected');
-      case z.message.SystemMessageType.CONNECTION_REQUEST:
+      case SystemMessageType.CONNECTION_REQUEST:
         return t('notificationConnectionRequest');
-      case z.message.SystemMessageType.CONVERSATION_CREATE:
+      case SystemMessageType.CONVERSATION_CREATE:
         return t('notificationConversationCreate', messageEntity.user().first_name(), {}, true);
     }
   }
@@ -409,11 +429,11 @@ z.notification.NotificationRepository = class NotificationRepository {
     };
 
     switch (messageEntity.system_message_type) {
-      case z.message.SystemMessageType.CONVERSATION_RENAME: {
+      case SystemMessageType.CONVERSATION_RENAME: {
         return createBodyRename();
       }
 
-      case z.message.SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
+      case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
         return createBodyMessageTimerUpdate(messageEntity);
       }
     }
@@ -424,40 +444,33 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves with the notification content
    */
   _createNotificationContent(messageEntity, connectionEntity, conversationEntity) {
-    let optionsBody = undefined;
-
-    return this._createOptionsBody(messageEntity, connectionEntity, conversationEntity)
-      .then(body => {
-        optionsBody = body;
-        if (optionsBody) {
-          return this._shouldObfuscateNotificationSender(messageEntity);
-        }
-        throw new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION);
-      })
-      .then(shouldObfuscateSender => {
-        return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
-          const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
-          return {
-            options: {
-              body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : optionsBody,
-              data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
-              icon: iconUrl,
-              silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-              tag: this._createOptionsTag(connectionEntity, conversationEntity),
-            },
-            timeout: NotificationRepository.CONFIG.TIMEOUT,
-            title: shouldObfuscateSender
-              ? this._createTitleObfuscated()
-              : this._createTitle(messageEntity, conversationEntity),
-            trigger: this._createTrigger(messageEntity, connectionEntity, conversationEntity),
-          };
-        });
-      });
+    const body = this._createOptionsBody(messageEntity, connectionEntity, conversationEntity);
+    if (!body) {
+      return Promise.resolve();
+    }
+    const shouldObfuscateSender = this._shouldObfuscateNotificationSender(messageEntity);
+    return this._createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
+      const shouldObfuscateMessage = this._shouldObfuscateNotificationMessage(messageEntity);
+      return {
+        options: {
+          body: shouldObfuscateMessage ? this._createBodyObfuscated(messageEntity) : body,
+          data: this._createOptionsData(messageEntity, connectionEntity, conversationEntity),
+          icon: iconUrl,
+          silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
+          tag: this._createOptionsTag(connectionEntity, conversationEntity),
+        },
+        timeout: NotificationRepository.CONFIG.TIMEOUT,
+        title: shouldObfuscateSender
+          ? this._createTitleObfuscated()
+          : this._createTitle(messageEntity, conversationEntity),
+        trigger: this._createTrigger(messageEntity, connectionEntity, conversationEntity),
+      };
+    });
   }
 
   /**
@@ -465,27 +478,25 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
+   * @param {ConnectionEntity} connectionEntity - Connection entity
    * @param {Conversation} conversationEntity - Conversation entity
-   * @returns {Promise} Resolves with the notification message body
+   * @returns {string|undefined} The notification message body
    */
   _createOptionsBody(messageEntity, connectionEntity, conversationEntity) {
-    return Promise.resolve().then(() => {
-      switch (messageEntity.super_type) {
-        case z.message.SuperType.CALL:
-          return this._createBodyCall(messageEntity);
-        case z.message.SuperType.CONTENT:
-          return this._createBodyContent(messageEntity);
-        case z.message.SuperType.MEMBER:
-          return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
-        case z.message.SuperType.PING:
-          return this._createBodyPing();
-        case z.message.SuperType.REACTION:
-          return this._createBodyReaction(messageEntity);
-        case z.message.SuperType.SYSTEM:
-          return this._createBodySystem(messageEntity);
-      }
-    });
+    switch (messageEntity.super_type) {
+      case SuperType.CALL:
+        return this._createBodyCall(messageEntity);
+      case SuperType.CONTENT:
+        return this._createBodyContent(messageEntity);
+      case SuperType.MEMBER:
+        return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
+      case SuperType.PING:
+        return this._createBodyPing();
+      case SuperType.REACTION:
+        return this._createBodyReaction(messageEntity);
+      case SuperType.SYSTEM:
+        return this._createBodySystem(messageEntity);
+    }
   }
 
   /**
@@ -493,7 +504,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Object} Notification message data
    */
@@ -522,14 +533,14 @@ z.notification.NotificationRepository = class NotificationRepository {
         .previewPictureResource()
         .generateUrl()
         .catch(error => {
-          if (error instanceof z.util.ValidationUtilError) {
+          if (error instanceof ValidationUtilError) {
             this.logger.error(`Failed to validate an asset URL: ${error.message}`);
           }
           return '';
         });
     }
 
-    const isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    const isMacOsWrapper = Environment.electron && Environment.os.mac;
     return Promise.resolve(isMacOsWrapper ? '' : NotificationRepository.CONFIG.ICON_URL);
   }
 
@@ -537,7 +548,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Creates the notification tag.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message tag
    */
@@ -564,7 +575,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         : conversationName;
     }
 
-    return z.util.StringUtil.truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -574,7 +585,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _createTitleObfuscated() {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return z.util.StringUtil.truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -582,7 +593,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Function} Function to be called when notification is clicked
    */
@@ -592,24 +603,24 @@ z.notification.NotificationRepository = class NotificationRepository {
     const containsSelfMention = messageEntity.is_content() && messageEntity.isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
-      return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, showOptions);
+      return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
     }
 
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
       };
     }
 
-    return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity || conversationId);
+    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId);
   }
 
   /**
    * Retrieve conversation ID from either conversation or connection.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} ID of conversation
    */
@@ -624,13 +635,13 @@ z.notification.NotificationRepository = class NotificationRepository {
    */
   _checkPermissionState() {
     switch (this.permissionState()) {
-      case z.permission.PermissionStatusState.GRANTED: {
+      case PermissionStatusState.GRANTED: {
         return Promise.resolve(true);
       }
 
-      case z.notification.PermissionState.IGNORED:
-      case z.notification.PermissionState.UNSUPPORTED:
-      case z.permission.PermissionStatusState.DENIED: {
+      case PermissionState.IGNORED:
+      case PermissionState.UNSUPPORTED:
+      case PermissionStatusState.DENIED: {
         return Promise.resolve(false);
       }
 
@@ -646,24 +657,23 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @private
    * @see https://developer.mozilla.org/en/docs/Web/API/notification#Parameters
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification was handled
    */
   _notifyBanner(messageEntity, connectionEntity, conversationEntity) {
-    return this._shouldShowNotification(messageEntity, conversationEntity)
-      .then(() => this._createNotificationContent(messageEntity, connectionEntity, conversationEntity))
-      .then(notificationContent => {
-        return this.checkPermission().then(isPermitted => {
-          return isPermitted ? this._showNotification(notificationContent) : undefined;
-        });
-      })
-      .catch(error => {
-        const hideNotification = error.type === z.error.NotificationError.TYPE.HIDE_NOTIFICATION;
-        if (!hideNotification) {
-          throw error;
+    if (!this._shouldShowNotification(messageEntity, conversationEntity)) {
+      return Promise.resolve();
+    }
+    return this._createNotificationContent(messageEntity, connectionEntity, conversationEntity).then(
+      notificationContent => {
+        if (notificationContent) {
+          return this.checkPermission().then(isPermitted => {
+            return isPermitted ? this._showNotification(notificationContent) : undefined;
+          });
         }
-      });
+      }
+    );
   }
 
   /**
@@ -673,19 +683,19 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {undefined} No return value
    */
   _notifySound(messageEntity) {
-    const muteSound = !document.hasFocus() && z.util.Environment.browser.firefox && z.util.Environment.os.mac;
+    const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
     const isFromSelf = messageEntity.user().is_me;
     const shouldPlaySound = !muteSound && !isFromSelf;
 
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
-        case z.message.SuperType.CONTENT: {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
+        case SuperType.CONTENT: {
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
           break;
         }
 
-        case z.message.SuperType.PING: {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
+        case SuperType.PING: {
+          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.INCOMING_PING);
           break;
         }
       }
@@ -695,12 +705,12 @@ z.notification.NotificationRepository = class NotificationRepository {
   // Request browser permission for notifications.
   _requestPermission() {
     return new Promise(resolve => {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
           this.updatePermissionState(permissionState).then(resolve);
         });
       }
@@ -714,10 +724,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {boolean} Obfuscate message in notification
    */
   _shouldObfuscateNotificationMessage(messageEntity) {
-    const preferencesToObfuscateMessage = [
-      z.notification.NotificationPreference.OBFUSCATE,
-      z.notification.NotificationPreference.OBFUSCATE_MESSAGE,
-    ];
+    const preferencesToObfuscateMessage = [NotificationPreference.OBFUSCATE, NotificationPreference.OBFUSCATE_MESSAGE];
 
     return preferencesToObfuscateMessage.includes(this.notificationsPreference()) || messageEntity.is_ephemeral();
   }
@@ -729,7 +736,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {boolean} Obfuscate sender in notification
    */
   _shouldObfuscateNotificationSender(messageEntity) {
-    const isSetToObfuscate = this.notificationsPreference() === z.notification.NotificationPreference.OBFUSCATE;
+    const isSetToObfuscate = this.notificationsPreference() === NotificationPreference.OBFUSCATE;
     return isSetToObfuscate || messageEntity.is_ephemeral();
   }
 
@@ -750,16 +757,14 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().is_me;
-    const permissionDenied = this.permissionState() === z.permission.PermissionStatusState.DENIED;
-    const preferenceIsNone = this.notificationsPreference() === z.notification.NotificationPreference.NONE;
-    const supportsNotification = z.util.Environment.browser.supports.notifications;
+    const permissionDenied = this.permissionState() === PermissionStatusState.DENIED;
+    const preferenceIsNone = this.notificationsPreference() === NotificationPreference.NONE;
+    const supportsNotification = Environment.browser.supports.notifications;
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
 
-    return hideNotification
-      ? Promise.reject(new z.error.NotificationError(z.error.NotificationError.TYPE.HIDE_NOTIFICATION))
-      : Promise.resolve();
+    return !hideNotification;
   }
 
   /**
@@ -773,7 +778,7 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {undefined} No return value
    */
   _showNotification(notificationContent) {
-    amplify.publish(z.event.WebApp.NOTIFICATION.SHOW, notificationContent);
+    amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
     this._showNotificationInBrowser(notificationContent);
   }
 
@@ -800,7 +805,7 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
     notification.onclick = () => {
-      amplify.publish(z.event.WebApp.NOTIFICATION.CLICK);
+      amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
       this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();
@@ -855,4 +860,6 @@ z.notification.NotificationRepository = class NotificationRepository {
 
     return isEventToNotify && isSelfMentionOrReply;
   }
-};
+}
+
+export {NotificationRepository};

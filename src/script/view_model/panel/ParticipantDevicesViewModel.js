@@ -17,13 +17,16 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
+import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
-export default class ParticipantDevicesViewModel extends BasePanelViewModel {
+export class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
     return {
       FOUND: 'ParticipantDevicesViewModel.MODE.FOUND',
@@ -40,8 +43,9 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.clientRepository = client;
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
+    this.capitalizeFirstChar = capitalizeFirstChar;
 
-    this.logger = Logger('z.viewModel.panel.ParticipantDevicesViewModel');
+    this.logger = getLogger('z.viewModel.panel.ParticipantDevicesViewModel');
 
     this.selfClient = this.clientRepository.currentClient;
 
@@ -132,7 +136,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickToResetSession() {
-    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), z.motion.MotionDuration.LONG);
+    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
 
     this.isResettingSession(true);
     this.conversationRepository
@@ -142,7 +146,7 @@ export default class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickOnShowSelfDevices() {
-    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
+    amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
   }
 
   clickToShowSelfFingerprint() {

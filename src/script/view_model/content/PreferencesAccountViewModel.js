@@ -17,17 +17,31 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {validateProfileImageResolution} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {KEY, isKey} from 'Util/KeyboardUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
-import PreferenceNotificationRepository from '../../notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
-import ConsentValue from '../../user/ConsentValue';
-import ReceiptMode from '../../conversation/ReceiptMode';
-import PropertiesRepository from '../../properties/PropertiesRepository';
+import {ReceiptMode} from '../../conversation/ReceiptMode';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
-import User from '../../entity/User';
-import UserRepository from '../../user/UserRepository';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {User} from '../../entity/User';
+
+import {AvailabilityType} from '../../user/AvailabilityType';
+import {ConsentValue} from '../../user/ConsentValue';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import {UserRepository} from '../../user/UserRepository';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {WebAppEvents} from '../../event/WebApp';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -39,7 +53,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       PROFILE_IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      SAVE_ANIMATION_TIMEOUT: z.motion.MotionDuration.X_LONG * 2,
+      SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
     };
   }
 
@@ -54,7 +68,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.changeAccentColor = this.changeAccentColor.bind(this);
     this.removedFromView = this.removedFromView.bind(this);
 
-    this.logger = Logger('z.viewModel.content.PreferencesAccountViewModel');
+    this.logger = getLogger('z.viewModel.content.PreferencesAccountViewModel');
 
     this.mainViewModel = mainViewModel;
     this.backupRepository = repositories.backup;
@@ -64,6 +78,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.propertiesRepository = repositories.properties;
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
+    this.Environment = Environment;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
@@ -72,9 +87,9 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availability = ko.pureComputed(() => this.selfUser().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+      let label = nameFromType(this.availability());
 
-      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      const noStatusSet = this.availability() === AvailabilityType.NONE;
       if (noStatusSet) {
         label = t('preferencesAccountAvaibilityUnset');
       }
@@ -97,13 +112,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
-      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacyPreference);
+      this.propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, privacyPreference);
     });
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.isMacOsWrapper = z.util.Environment.electron && z.util.Environment.os.mac;
+    this.isMacOsWrapper = Environment.electron && Environment.os.mac;
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
@@ -115,7 +130,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
   }
 
   changeAccentColor(id) {
@@ -182,40 +197,36 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   checkUsernameInput(username, keyboardEvent) {
-    if (z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+    if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
 
     // Automation: KeyboardEvent triggered during tests is missing key property
     const inputChar = keyboardEvent.key || String.fromCharCode(event.charCode);
-    return z.user.UserHandleGenerator.validate_character(inputChar.toLowerCase());
+    return validateCharacter(inputChar.toLowerCase());
   }
 
   popNotification() {
-    const notificationData = this.preferenceNotificationRepository.popNotification();
-    if (notificationData) {
-      const {type, notification} = notificationData;
-      return this._showNotification(type, notification, this.popNotification.bind(this));
-    }
+    this.preferenceNotificationRepository
+      .getNotifications()
+      .forEach(({type, notification}) => this._showNotification(type, notification));
   }
 
-  _showNotification(type, aggregatedNotifications, closeAction) {
+  _showNotification(type, aggregatedNotifications) {
     switch (type) {
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
-          close: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
-            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+            amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
           },
         });
         break;
       }
 
       case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
-          close: closeAction,
+        modals.showModal(ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED, {
           data: aggregatedNotifications.pop().data,
           preventClose: true,
         });
@@ -236,24 +247,24 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+    AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   clickOnBackupExport() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
-    amplify.publish(z.event.WebApp.BACKUP.EXPORT.START);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
+    amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (file) {
-      amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
-      amplify.publish(z.event.WebApp.BACKUP.IMPORT.START, file);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
+      amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
     }
   }
 
   clickOnDeleteAccount() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.userRepository.delete_me(),
       text: {
         action: t('modalAccountDeletionAction'),
@@ -264,7 +275,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnLeaveGuestRoom() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+    modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
       text: {
@@ -281,13 +292,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOnResetPassword() {
-    z.util.SanitizationUtil.safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
+    safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   removedFromView() {
@@ -328,7 +339,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
-    return z.util.validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
+    return validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
       if (isValid) {
         return this.userRepository.change_picture(newUserPicture);
       }
@@ -354,7 +365,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.enteredUsername(enteredUsername);
 
-    if (z.user.UserHandleGenerator.validate_handle(enteredUsername)) {
+    if (validateHandle(enteredUsername)) {
       this.userRepository
         .verify_username(enteredUsername)
         .then(() => {
@@ -375,7 +386,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _showUploadWarning(title, message) {
     const modalOptions = {text: {message, title}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
 
     return Promise.reject(new z.error.UserError(z.error.UserError.TYPE.INVALID_UPDATE));
   }

@@ -17,15 +17,23 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import {t} from 'utils/LocalizerUtil';
-import CALL_MESSAGE_TYPE from '../calling/enum/CallMessageType';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {koArrayPushAll} from 'Util/util';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
+import {AssetTransferState} from '../assets/AssetTransferState';
 
-z.event.EventRepository = class EventRepository {
+import {EVENT_TYPE} from './EventType';
+import {ClientEvent} from './Client';
+import {EventTypeHandling} from './EventTypeHandling';
+import {BackendEvent} from './Backend';
+import {WebAppEvents} from './WebApp';
+import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+
+export class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
@@ -57,12 +65,12 @@ z.event.EventRepository = class EventRepository {
   /**
    * Construct a new Event Repository.
    *
-   * @param {z.event.EventService} eventService - Service that handles interactions with events
-   * @param {z.event.NotificationService} notificationService - Service handling the notification stream
-   * @param {z.event.WebSocketService} webSocketService - Service that connects to WebSocket
+   * @param {EventService} eventService - Service that handles interactions with events
+   * @param {NotificationService} notificationService - Service handling the notification stream
+   * @param {WebSocketService} webSocketService - Service that connects to WebSocket
    * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
-   * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(
@@ -71,7 +79,7 @@ z.event.EventRepository = class EventRepository {
     webSocketService,
     conversationService,
     cryptographyRepository,
-    serverTimeRepository,
+    serverTimeHandler,
     userRepository
   ) {
     this.eventService = eventService;
@@ -79,22 +87,22 @@ z.event.EventRepository = class EventRepository {
     this.webSocketService = webSocketService;
     this.conversationService = conversationService;
     this.cryptographyRepository = cryptographyRepository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
-    this.logger = Logger('z.event.EventRepository');
+    this.logger = getLogger('EventRepository');
 
     this.currentClient = undefined;
 
-    this.notificationHandlingState = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
+    this.notificationHandlingState = ko.observable(NOTIFICATION_HANDLING_STATE.STREAM);
     this.notificationHandlingState.subscribe(handling_state => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
-      const isHandlingWebSocket = handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      const isHandlingWebSocket = handling_state === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         this._handleBufferedNotifications();
-        const previouslyHandlingRecovery = this.previousHandlingState === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
+        const previouslyHandlingRecovery = this.previousHandlingState === NOTIFICATION_HANDLING_STATE.RECOVERY;
         if (previouslyHandlingRecovery) {
-          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
       }
       this.previousHandlingState = handling_state;
@@ -130,17 +138,17 @@ z.event.EventRepository = class EventRepository {
             this.notificationsQueue.shift();
             this.notificationsHandled++;
 
-            const isHandlingStream = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.STREAM;
+            const isHandlingStream = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.STREAM;
             if (isHandlingStream) {
               this._updateProgress();
             }
           });
       }
 
-      const isHandlingWebSocket = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (this.notificationsLoaded() && !isHandlingWebSocket) {
         this.logger.info(`Done handling '${this.notificationsTotal}' notifications from the stream`);
-        this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         this.notificationsLoaded(false);
         this.notificationsPromises[0](this.lastNotificationId());
       }
@@ -153,7 +161,7 @@ z.event.EventRepository = class EventRepository {
 
     this.eventProcessMiddlewares = [];
 
-    amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
+    amplify.subscribe(WebAppEvents.CONNECTION.ONLINE, this.recoverFromStream.bind(this));
   }
 
   /**
@@ -182,7 +190,7 @@ z.event.EventRepository = class EventRepository {
 
     this.webSocketService.clientId = this.currentClient().id;
     this.webSocketService.connect(notification => {
-      const isHandlingWebSocket = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       if (isHandlingWebSocket) {
         return this.notificationsQueue.push(notification);
       }
@@ -192,7 +200,7 @@ z.event.EventRepository = class EventRepository {
 
   /**
    * Close the WebSocket connection.
-   * @param {z.event.WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the disconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the disconnect
    * @returns {undefined} No return value
    */
   disconnectWebSocket(trigger) {
@@ -201,11 +209,11 @@ z.event.EventRepository = class EventRepository {
 
   /**
    * Re-connect the WebSocket connection.
-   * @param {z.event.WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
+   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
    * @returns {undefined} No return value
    */
   reconnectWebSocket(trigger) {
-    this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
+    this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
     this.webSocketService.reconnect(trigger);
   }
 
@@ -225,7 +233,7 @@ z.event.EventRepository = class EventRepository {
   _handleBufferedNotifications() {
     this.logger.info(`Received '${this.webSocketBuffer.length}' notifications via WebSocket while handling stream`);
     if (this.webSocketBuffer.length) {
-      z.util.koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
+      koArrayPushAll(this.notificationsQueue, this.webSocketBuffer);
       this.webSocketBuffer.length = 0;
     }
   }
@@ -245,14 +253,14 @@ z.event.EventRepository = class EventRepository {
     return new Promise((resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
-          this.serverTimeRepository.computeTimeOffset(time);
+          this.serverTimeHandler.computeTimeOffset(time);
         }
 
         if (notifications.length > 0) {
           notificationId = notifications[notifications.length - 1].id;
 
           this.logger.info(`Added '${notifications.length}' notifications to the queue`);
-          z.util.koArrayPushAll(this.notificationsQueue, notifications);
+          koArrayPushAll(this.notificationsQueue, notifications);
 
           if (!this.notificationsPromises) {
             this.notificationsPromises = [resolve, reject];
@@ -339,7 +347,7 @@ z.event.EventRepository = class EventRepository {
     return this.getStreamState()
       .then(({notificationId}) => this._updateFromStream(notificationId))
       .catch(error => {
-        this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
         const isNoLastId = error.type === z.error.EventError.TYPE.NO_LAST_ID;
         if (isNoLastId) {
@@ -356,8 +364,8 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves when all missed notifications have been handled
    */
   recoverFromStream() {
-    this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
-    amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+    this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
+    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
     return this._updateFromStream(this._getLastKnownNotificationId())
       .then(numberOfNotifications => {
@@ -367,9 +375,9 @@ z.event.EventRepository = class EventRepository {
         const isNoNotifications = error.type === z.error.EventError.TYPE.NO_NOTIFICATIONS;
         if (!isNoNotifications) {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
-          this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         }
       });
   }
@@ -404,12 +412,12 @@ z.event.EventRepository = class EventRepository {
       return eventDate;
     }
 
-    const isTypeUserClientAdd = eventType === z.event.Backend.USER.CLIENT_ADD;
+    const isTypeUserClientAdd = eventType === BackendEvent.USER.CLIENT_ADD;
     if (isTypeUserClientAdd) {
       return client.time;
     }
 
-    const isTypeUserConnection = eventType === z.event.Backend.USER.CONNECTION;
+    const isTypeUserConnection = eventType === BackendEvent.USER.CONNECTION;
     if (isTypeUserConnection) {
       return connection.lastUpdate;
     }
@@ -436,7 +444,7 @@ z.event.EventRepository = class EventRepository {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
       const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
       if (!lastNotificationIdEqualsMissedId) {
-        amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
         this.notificationService.saveMissedIdToDb(this.lastNotificationId());
       }
     });
@@ -460,7 +468,7 @@ z.event.EventRepository = class EventRepository {
         return this.notificationsTotal;
       })
       .catch(error => {
-        this.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
         const isNoNotifications = error.type === z.error.EventError.TYPE.NO_NOTIFICATIONS;
         if (isNoNotifications) {
@@ -510,7 +518,7 @@ z.event.EventRepository = class EventRepository {
       };
       const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
 
-      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
+      amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
     }
   }
 
@@ -523,7 +531,7 @@ z.event.EventRepository = class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event - Event payload to be injected
-   * @param {z.event.EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
+   * @param {EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
    * @returns {Promise<Event>} Resolves when the event has been processed
    */
   injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
@@ -531,7 +539,7 @@ z.event.EventRepository = class EventRepository {
       throw new z.error.EventError(z.error.EventError.TYPE.NO_EVENT);
     }
 
-    const isHandlingWebSocket = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const isHandlingWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
     if (!isHandlingWebSocket) {
       source = EventRepository.SOURCE.INJECTED;
     }
@@ -550,7 +558,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {Object} event - Mapped event to be distributed
-   * @param {z.event.EventRepository.SOURCE} source - Source of notification
+   * @param {EventRepository.SOURCE} source - Source of notification
    * @returns {undefined} No return value
    */
   _distributeEvent(event, source) {
@@ -564,17 +572,17 @@ z.event.EventRepository = class EventRepository {
 
     const [category] = type.split('.');
     switch (category) {
-      case z.event.EVENT_TYPE.CALL:
-        amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.CALL:
+        amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.CONVERSATION:
-        amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.CONVERSATION:
+        amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.TEAM:
-        amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.TEAM:
+        amplify.publish(WebAppEvents.TEAM.EVENT_FROM_BACKEND, event, source);
         break;
-      case z.event.EVENT_TYPE.USER:
-        amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, event, source);
+      case EVENT_TYPE.USER:
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, event, source);
         break;
       default:
         amplify.publish(type, event, source);
@@ -586,7 +594,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handleEvent(event, source) {
@@ -606,11 +614,11 @@ z.event.EventRepository = class EventRepository {
    * Decrypts, saves and distributes an event received from the backend.
    *
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   processEvent(event, source) {
-    const isEncryptedEvent = event.type === z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD;
+    const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
     const mapEvent = isEncryptedEvent
       ? this.cryptographyRepository.handleEncryptedEvent(event)
       : Promise.resolve(event);
@@ -624,7 +632,7 @@ z.event.EventRepository = class EventRepository {
         }, Promise.resolve(mappedEvent));
       })
       .then(mappedEvent => {
-        const shouldSaveEvent = z.event.EventTypeHandling.STORE.includes(mappedEvent.type);
+        const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
       .then(savedEvent => this._handleEventDistribution(savedEvent, source));
@@ -635,7 +643,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {JSON} The distributed event
    */
   _handleEventDistribution(event, source) {
@@ -646,7 +654,7 @@ z.event.EventRepository = class EventRepository {
       this._updateLastEventDate(eventDate);
     }
 
-    const isCallEvent = event.type === z.event.Client.CALL.E_CALL;
+    const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
     if (isCallEvent) {
       this._validateCallEventLifetime(event);
     }
@@ -721,10 +729,10 @@ z.event.EventRepository = class EventRepository {
 
   _handleDuplicatedEvent(originalEvent, newEvent) {
     switch (newEvent.type) {
-      case z.event.Client.CONVERSATION.ASSET_ADD:
+      case ClientEvent.CONVERSATION.ASSET_ADD:
         return this._handleAssetUpdate(originalEvent, newEvent);
 
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
         return this._handleLinkPreviewUpdate(originalEvent, newEvent);
 
       default:
@@ -741,16 +749,16 @@ z.event.EventRepository = class EventRepository {
 
     switch (status) {
       case ASSET_PREVIEW:
-      case z.assets.AssetTransferState.UPLOADED: {
+      case AssetTransferState.UPLOADED: {
         const updatedData = Object.assign({}, originalEvent.data, newEventData);
         const updatedEvent = Object.assign({}, originalEvent, {data: updatedData});
         return this.eventService.replaceEvent(updatedEvent);
       }
 
-      case z.assets.AssetTransferState.UPLOAD_FAILED: {
+      case AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromOther = newEvent.from !== this.userRepository.self().id;
-        const selfCancel = !fromOther && newEvent.data.reason === z.assets.AssetUploadFailedReason.CANCELLED;
+        const selfCancel = !fromOther && newEvent.data.reason === AssetUploadFailedReason.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
         const shouldDeleteEvent = fromOther || selfCancel;
         return shouldDeleteEvent
@@ -850,14 +858,14 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the event
    */
   _handleEventValidation(event, source) {
     return Promise.resolve().then(() => {
       const {time: eventDate, type: eventType} = event;
 
-      const isIgnoredEvent = z.event.EventTypeHandling.IGNORE.includes(eventType);
+      const isIgnoredEvent = EventTypeHandling.IGNORE.includes(eventType);
       if (isIgnoredEvent) {
         this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
         const errorMessage = 'Event ignored: Type ignored';
@@ -919,12 +927,12 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const correctedTimestamp = this.serverTimeRepository.toServerTimestamp();
+    const correctedTimestamp = this.serverTimeHandler.toServerTimestamp();
     const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const isForcedEventType = forcedEventTypes.includes(content.type);
     const eventWithinThreshold = correctedTimestamp < thresholdTimestamp;
-    const stateIsWebSocket = this.notificationHandlingState() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const stateIsWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isValidEvent = isForcedEventType || eventWithinThreshold || stateIsWebSocket;
     if (isValidEvent) {
@@ -942,4 +950,4 @@ z.event.EventRepository = class EventRepository {
     this.logger.info(logMessage, logObject);
     throw new z.error.EventError(z.error.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
-};
+}

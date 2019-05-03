@@ -19,11 +19,16 @@
 
 import ko from 'knockout';
 
+import {t} from 'Util/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
+import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
+
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {t} from 'utils/LocalizerUtil';
-import TimeUtil from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
+import {AvailabilityType} from '../user/AvailabilityType';
+import {WebAppEvents} from '../event/WebApp';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 
 // Please note: The own user has a "locale"
 class User {
@@ -87,8 +92,8 @@ class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.getFirstChar(this.first_name());
-        const last = z.util.StringUtil.getFirstChar(this.last_name());
+        const first = getFirstChar(this.first_name());
+        const last = getFirstChar(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);
@@ -101,7 +106,7 @@ class User {
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();
 
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
 
     this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
     this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
@@ -128,7 +133,7 @@ class User {
       return this.devices().every(client_et => client_et.meta.isVerified());
     });
 
-    this.availability = ko.observable(z.user.AvailabilityType.NONE);
+    this.availability = ko.observable(AvailabilityType.NONE);
 
     this.expirationRemaining = ko.observable(0);
     this.expirationText = ko.observable('');
@@ -140,7 +145,7 @@ class User {
   }
 
   subscribeToChanges() {
-    this.availability.subscribe(() => amplify.publish(z.event.WebApp.USER.PERSIST, this));
+    this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
   add_client(new_client_et) {
@@ -176,9 +181,9 @@ class User {
    */
   matches(query, is_handle, excludedChars = []) {
     if (is_handle) {
-      return z.util.StringUtil.startsWith(this.username(), query);
+      return startsWith(this.username(), query);
     }
-    return z.util.StringUtil.compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
+    return compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {
@@ -219,11 +224,11 @@ class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        return amplify.publish(z.event.WebApp.USER.UPDATE, this.id);
+        return amplify.publish(WebAppEvents.USER.UPDATE, this.id);
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
-      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(z.event.WebApp.USER.UPDATE, this.id), timeout);
+      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(WebAppEvents.USER.UPDATE, this.id), timeout);
     }
   }
 
@@ -249,4 +254,4 @@ class User {
   }
 }
 
-export default User;
+export {User};

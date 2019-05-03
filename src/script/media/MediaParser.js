@@ -17,19 +17,15 @@
  *
  */
 
-window.z = window.z || {};
-window.z.media = z.media || {};
+import {getLinksFromHtml} from 'Util/UrlUtil';
+
+import {MediaEmbeds} from './MediaEmbeds';
 
 class MediaParser {
   constructor() {
     this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
 
-    this.embeds = [
-      z.media.MediaEmbeds.soundcloud,
-      z.media.MediaEmbeds.spotify,
-      z.media.MediaEmbeds.vimeo,
-      z.media.MediaEmbeds.youtube,
-    ];
+    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
   }
 
   /**
@@ -41,7 +37,7 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   renderMediaEmbeds(message, themeColor) {
-    z.util.URLUtil.getLinksFromHtml(message).forEach(link => {
+    getLinksFromHtml(message).forEach(link => {
       this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
     });
 
@@ -49,4 +45,4 @@ class MediaParser {
   }
 }
 
-z.media.MediaParser = new MediaParser();
+export const mediaParser = new MediaParser();

@@ -25,8 +25,26 @@ import 'src/script/main/globals';
 
 import {resolve, graph, backendConfig} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import User from 'src/script/entity/User';
-import UserRepository from 'src/script/user/UserRepository';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {User} from 'src/script/entity/User';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {ConnectService} from 'src/script/connect/ConnectService';
+import {ConnectRepository} from 'src/script/connect/ConnectRepository';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+
+import {EventRepository} from 'src/script/event/EventRepository';
+import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
+import {EventService} from 'src/script/event/EventService';
+import {NotificationService} from 'src/script/event/NotificationService';
+import {WebSocketService} from 'src/script/event/WebSocketService';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
+import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -51,7 +69,7 @@ window.TestFactory.prototype.exposeAuthActors = function() {
 
 /**
  *
- * @returns {Promise<z.storage.StorageRepository>} The storage repository.
+ * @returns {Promise<StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function() {
   return Promise.resolve()
@@ -62,7 +80,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
       }
     })
     .then(() => {
-      TestFactory.storage_repository = singleton(z.storage.StorageRepository, TestFactory.storage_service);
+      TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
       return TestFactory.storage_repository;
     });
 };
@@ -74,7 +92,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
     .then(() => {
       TestFactory.backup_service = resolve(graph.BackupService);
 
-      TestFactory.backup_repository = new z.backup.BackupRepository(
+      TestFactory.backup_repository = new BackupRepository(
         TestFactory.backup_service,
         TestFactory.client_repository,
         TestFactory.connection_repository,
@@ -89,7 +107,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
 /**
  *
  * @param {boolean} mockCryptobox - do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
- * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.
+ * @returns {Promise<CryptographyRepository>} The cryptography repository.
  */
 window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
   return Promise.resolve()
@@ -97,10 +115,10 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
     .then(() => {
       const currentClient = new z.client.ClientEntity(true);
       currentClient.id = entities.clients.john_doe.permanent.id;
-      TestFactory.cryptography_service = new z.cryptography.CryptographyService(resolve(graph.BackendClient));
+      TestFactory.cryptography_service = new CryptographyService(resolve(graph.BackendClient));
 
-      TestFactory.cryptography_repository = new z.cryptography.CryptographyRepository(
-        TestFactory.cryptography_service,
+      TestFactory.cryptography_repository = new CryptographyRepository(
+        resolve(graph.BackendClient),
         TestFactory.storage_repository
       );
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
@@ -116,7 +134,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
 
 /**
  *
- * @returns {Promise<z.client.ClientRepository>} The client repository.
+ * @returns {Promise<ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function() {
   return Promise.resolve()
@@ -136,13 +154,9 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(
+      TestFactory.client_repository = new ClientRepository(
         resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-
-      TestFactory.client_repository = new z.client.ClientRepository(
-        TestFactory.client_service,
+        TestFactory.storage_service,
         TestFactory.cryptography_repository
       );
       TestFactory.client_repository.init(user);
@@ -167,20 +181,17 @@ window.TestFactory.prototype.exposeClientActors = function() {
 
 /**
  *
- * @returns {Promise<z.event.EventRepository>} The event repository.
+ * @returns {Promise<EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function() {
   return Promise.resolve()
     .then(() => this.exposeCryptographyActors())
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.web_socket_service = new z.event.WebSocketService(
-        resolve(graph.BackendClient),
-        TestFactory.storage_service
-      );
-      TestFactory.event_service = new z.event.EventService(TestFactory.storage_service);
-      TestFactory.event_service_no_compound = new z.event.EventServiceNoCompound(TestFactory.storage_service);
-      TestFactory.notification_service = new z.event.NotificationService(
+      TestFactory.web_socket_service = new WebSocketService(resolve(graph.BackendClient), TestFactory.storage_service);
+      TestFactory.event_service = new EventService(TestFactory.storage_service);
+      TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
+      TestFactory.notification_service = new NotificationService(
         resolve(graph.BackendClient),
         TestFactory.storage_service
       );
@@ -190,13 +201,13 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.storage_service
       );
 
-      TestFactory.event_repository = new z.event.EventRepository(
+      TestFactory.event_repository = new EventRepository(
         TestFactory.event_service,
         TestFactory.notification_service,
         TestFactory.web_socket_service,
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
-        resolve(graph.ServerTimeRepository),
+        serverTimeHandler,
         TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
@@ -212,7 +223,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
 window.TestFactory.prototype.exposeUserActors = function() {
   return this.exposeClientActors().then(() => {
     TestFactory.asset_service = resolve(graph.AssetService);
-    TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
+    TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
     TestFactory.user_service = resolve(graph.UserService);
     TestFactory.propertyRepository = resolve(graph.PropertiesRepository);
 
@@ -221,7 +232,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
       TestFactory.asset_service,
       resolve(graph.SelfService),
       TestFactory.client_repository,
-      resolve(graph.ServerTimeRepository),
+      serverTimeHandler,
       TestFactory.propertyRepository
     );
     TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
@@ -232,16 +243,16 @@ window.TestFactory.prototype.exposeUserActors = function() {
 
 /**
  *
- * @returns {Promise<z.connection.ConnectionRepository>} The connection repository.
+ * @returns {Promise<ConnectionRepository>} The connection repository.
  */
 window.TestFactory.prototype.exposeConnectionActors = function() {
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.connection_service = new z.connection.ConnectionService(resolve(graph.BackendClient));
+      TestFactory.connection_service = new ConnectionService(resolve(graph.BackendClient));
 
-      TestFactory.connection_repository = new z.connection.ConnectionRepository(
-        TestFactory.connection_service,
+      TestFactory.connection_repository = new ConnectionRepository(
+        resolve(graph.BackendClient),
         TestFactory.user_repository
       );
 
@@ -251,18 +262,15 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
 
 /**
  *
- * @returns {Promise<z.connect.ConnectRepository>} The connect repository.
+ * @returns {Promise<ConnectRepository>} The connect repository.
  */
 window.TestFactory.prototype.exposeConnectActors = function() {
   return Promise.resolve()
     .then(() => this.exposeUserActors())
     .then(() => {
-      TestFactory.connectService = new z.connect.ConnectService(resolve(graph.BackendClient));
+      TestFactory.connectService = new ConnectService(resolve(graph.BackendClient));
 
-      TestFactory.connect_repository = new z.connect.ConnectRepository(
-        TestFactory.connectService,
-        TestFactory.user_repository
-      );
+      TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
 
       return TestFactory.connect_repository;
     });
@@ -326,7 +334,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         undefined,
         resolve(graph.LinkPreviewRepository),
         resolve(graph.MessageSender),
-        resolve(graph.ServerTimeRepository),
+        serverTimeHandler,
         TestFactory.team_repository,
         TestFactory.user_repository,
         TestFactory.propertyRepository
@@ -338,7 +346,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 
 /**
  *
- * @returns {Promise<z.calling.CallCenter>} The call center.
+ * @returns {Promise<CallingRepository>} The call center.
  */
 window.TestFactory.prototype.exposeCallingActors = function() {
   return this.exposeConversationActors().then(() => {
@@ -357,7 +365,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
 
 /**
  *
- * @returns {Promise<z.notification.NotificationRepository>} The repository for system notifications.
+ * @returns {Promise<NotificationRepository>} The repository for system notifications.
  */
 window.TestFactory.prototype.exposeNotificationActors = function() {
   return this.exposeConversationActors()
@@ -365,7 +373,7 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
       return this.exposeCallingActors();
     })
     .then(() => {
-      TestFactory.notification_repository = new z.notification.NotificationRepository(
+      TestFactory.notification_repository = new NotificationRepository(
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
         resolve(graph.PermissionRepository),
@@ -378,13 +386,13 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
 
 /**
  *
- * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
+ * @returns {Promise<EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function() {
   return Promise.resolve()
     .then(() => this.exposeTeamActors())
     .then(() => {
-      TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
+      TestFactory.tracking_repository = new EventTrackingRepository(
         TestFactory.team_repository,
         TestFactory.user_repository
       );

@@ -17,7 +17,7 @@
  *
  */
 
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

@@ -23,7 +23,7 @@ import * as Runtime from '../../Runtime';
 import * as StringUtil from '../../util/stringUtil';
 import {ThunkAction} from '../reducer';
 import * as SelfSelector from '../selector/SelfSelector';
-import BackendError from './BackendError';
+import {BackendError} from './BackendError';
 import {ClientActionCreator} from './creator/';
 
 export class ClientAction {

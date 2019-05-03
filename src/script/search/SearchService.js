@@ -17,7 +17,7 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 window.z = window.z || {};
 window.z.search = z.search || {};
@@ -25,11 +25,11 @@ window.z.search = z.search || {};
 z.search.SearchService = class SearchService {
   /**
    * Construct a new Search Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = Logger('z.search.SearchService');
+    this.logger = getLogger('z.search.SearchService');
   }
 
   /**

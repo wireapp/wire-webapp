@@ -20,11 +20,15 @@
 import ko from 'knockout';
 import moment from 'moment';
 
-import AssetTransferState from '../../assets/AssetTransferState';
-import AssetType from '../../assets/AssetType';
-import EphemeralStatusType from '../../message/EphemeralStatusType';
-import User from '../User';
-import TimeUtil from 'utils/TimeUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
+
+import {AssetTransferState} from '../../assets/AssetTransferState';
+import {AssetType} from '../../assets/AssetType';
+import {EphemeralStatusType} from '../../message/EphemeralStatusType';
+import {StatusType} from '../../message/StatusType';
+import {SuperType} from '../../message/SuperType';
+import {User} from '../User';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -72,7 +76,7 @@ class Message {
     });
 
     this.isObfuscated = ko.pureComputed(() => {
-      const messageIsAtLeastSent = this.status() > z.message.StatusType.SENDING;
+      const messageIsAtLeastSent = this.status() > StatusType.SENDING;
       const isEphemeralInactive = this.ephemeral_status() === EphemeralStatusType.INACTIVE;
       return messageIsAtLeastSent && (isEphemeralInactive || this.is_expired());
     });
@@ -83,7 +87,7 @@ class Message {
     this.expectsReadConfirmation = false;
     this.from = '';
     this.primary_key = undefined;
-    this.status = ko.observable(z.message.StatusType.UNSPECIFIED);
+    this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
     this.user = ko.observable(new User());
     this.visible = ko.observable(true);
@@ -93,7 +97,7 @@ class Message {
     this.timestamp = ko.observable(Date.now());
     this.timestamp_affects_order = ko.pureComputed(() => this.visible() && this.affect_order());
 
-    // z.message.MessageCategory
+    // MessageCategory
     this.category = undefined;
 
     this.display_timestamp_short = () => {
@@ -101,7 +105,7 @@ class Message {
       return date.local().format('HH:mm');
     };
 
-    this.unsafeSenderName = ko.pureComputed(() => z.util.SanitizationUtil.getFirstName(this.user(), undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => getFirstName(this.user(), undefined, true));
     this.headerSenderName = ko.pureComputed(() => {
       return this.user().isService ? this.user().name() : this.user().first_name();
     });
@@ -158,7 +162,7 @@ class Message {
    * @returns {boolean} Is message of type call
    */
   is_call() {
-    return this.super_type === z.message.SuperType.CALL;
+    return this.super_type === SuperType.CALL;
   }
 
   /**
@@ -166,7 +170,7 @@ class Message {
    * @returns {boolean} Is message of type content
    */
   is_content() {
-    return this.super_type === z.message.SuperType.CONTENT;
+    return this.super_type === SuperType.CONTENT;
   }
 
   /**
@@ -174,7 +178,7 @@ class Message {
    * @returns {boolean} True, if message is deletable.
    */
   is_deletable() {
-    return this.status() !== z.message.StatusType.SENDING;
+    return this.status() !== StatusType.SENDING;
   }
 
   /**
@@ -216,7 +220,7 @@ class Message {
    * @returns {boolean} Is message of type member
    */
   is_member() {
-    return this.super_type === z.message.SuperType.MEMBER;
+    return this.super_type === SuperType.MEMBER;
   }
 
   /**
@@ -224,7 +228,7 @@ class Message {
    * @returns {boolean} Is message of type ping
    */
   is_ping() {
-    return this.super_type === z.message.SuperType.PING;
+    return this.super_type === SuperType.PING;
   }
 
   /**
@@ -232,7 +236,7 @@ class Message {
    * @returns {boolean} Is message of type system
    */
   is_system() {
-    return this.super_type === z.message.SuperType.SYSTEM;
+    return this.super_type === SuperType.SYSTEM;
   }
 
   /**
@@ -240,7 +244,7 @@ class Message {
    * @returns {boolean} Is message of type system
    */
   is_unable_to_decrypt() {
-    return this.super_type === z.message.SuperType.UNABLE_TO_DECRYPT;
+    return this.super_type === SuperType.UNABLE_TO_DECRYPT;
   }
 
   /**
@@ -248,7 +252,7 @@ class Message {
    * @returns {boolean} Is message of type system
    */
   is_verification() {
-    return this.super_type === z.message.SuperType.VERIFICATION;
+    return this.super_type === SuperType.VERIFICATION;
   }
 
   /**
@@ -309,10 +313,7 @@ class Message {
    */
   isReactable() {
     return (
-      this.is_content() &&
-      !this.is_ephemeral() &&
-      this.status() !== z.message.StatusType.SENDING &&
-      !this.hasUnavailableAsset()
+      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
     );
   }
 
@@ -322,10 +323,7 @@ class Message {
    */
   isReplyable() {
     return (
-      this.is_content() &&
-      !this.is_ephemeral() &&
-      this.status() !== z.message.StatusType.SENDING &&
-      !this.hasUnavailableAsset()
+      this.is_content() && !this.is_ephemeral() && this.status() !== StatusType.SENDING && !this.hasUnavailableAsset()
     );
   }
 
@@ -349,11 +347,11 @@ class Message {
 
   /**
    * Update the status of a message.
-   * @param {z.message.StatusType} updated_status - New status of message
-   * @returns {z.message.StatusType|boolean} Returns the new status on a successful update, otherwise "false"
+   * @param {StatusType} updated_status - New status of message
+   * @returns {StatusType|boolean} Returns the new status on a successful update, otherwise "false"
    */
   update_status(updated_status) {
-    if (this.status() >= z.message.StatusType.SENT) {
+    if (this.status() >= StatusType.SENT) {
       if (updated_status > this.status()) {
         return this.status(updated_status);
       }
@@ -364,5 +362,5 @@ class Message {
   }
 }
 
-export default Message;
+export {Message};
 z.entity.Message = Message;

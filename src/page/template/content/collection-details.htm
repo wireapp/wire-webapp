@@ -16,10 +16,10 @@
           <!-- ko if: $parent.shouldShowHeader(messageEntity) -->
             <header class="collection-date-separator" data-bind="text: $parent.getTitleForHeader(messageEntity)"></header>
           <!-- /ko -->
-          <!-- ko if: messageEntity.category & z.message.MessageCategory.IMAGE -->
+          <!-- ko if: messageEntity.category & $parent.MessageCategory.IMAGE -->
             <image-component class="collection-image" params="asset: messageEntity.get_first_asset().resource, click: function() {$parent.clickOnImage(messageEntity)}"></image-component>
           <!-- /ko -->
-          <!-- ko if: messageEntity.category & z.message.MessageCategory.LINK -->
+          <!-- ko if: messageEntity.category & $parent.MessageCategory.LINK -->
             <link-preview-asset params="message: messageEntity, header: true"></link-preview-asset>
           <!-- /ko -->
           <!-- ko if: messageEntity.get_first_asset().is_file() -->
@@ -27,6 +27,9 @@
           <!-- /ko -->
           <!-- ko if: messageEntity.get_first_asset().is_audio() -->
             <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
+          <!-- /ko -->
+          <!-- ko if: messageEntity.get_first_asset().is_video() -->
+            <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
           <!-- /ko -->
         </div>
       </div>

@@ -17,32 +17,33 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.ui = z.ui || {};
+import {AvailabilityType} from '../user/AvailabilityType';
+import {WebAppEvents} from '../event/WebApp';
+import {Context} from '../ui/ContextMenu';
 
-z.ui.AvailabilityContextMenu = {
+export const AvailabilityContextMenu = {
   show: (event, method, elementName) => {
     const entries = [
       {
-        click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.NONE, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.NONE, method),
         label: t('userAvailabilityNone'),
       },
       {
-        click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AVAILABLE, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.AVAILABLE, method),
         label: t('userAvailabilityAvailable'),
       },
       {
-        click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.BUSY, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.BUSY, method),
         label: t('userAvailabilityBusy'),
       },
       {
-        click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AWAY, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.AWAY, method),
         label: t('userAvailabilityAway'),
       },
     ];
 
-    z.ui.Context.from(event, entries, elementName);
+    Context.from(event, entries, elementName);
   },
 };

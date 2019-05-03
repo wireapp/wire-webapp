@@ -17,11 +17,17 @@
  *
  */
 
-describe('z.connection.ConnectionMapper', () => {
+//@ts-check
+
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
+
+describe('ConnectionMapper', () => {
+  /** @type {ConnectionMapper} */
   let connectionMapper = undefined;
 
   beforeAll(() => {
-    connectionMapper = new z.connection.ConnectionMapper();
+    connectionMapper = new ConnectionMapper();
   });
 
   describe('mapConnectionFromJson', () => {
@@ -31,7 +37,7 @@ describe('z.connection.ConnectionMapper', () => {
         from: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
         last_update: '2017-02-14T12:43:31.460Z',
         message: '',
-        status: 'accepted',
+        status: ConnectionStatus.ACCEPTED,
         to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 

@@ -46,24 +46,24 @@ import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {Config} from '../config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
-import ROOT_ACTIONS from '../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
-import ChooseHandle from './ChooseHandle';
-import ClientManager from './ClientManager';
-import ConversationJoin from './ConversationJoin';
-import ConversationJoinInvalid from './ConversationJoinInvalid';
-import CreateAccount from './CreateAccount';
-import CreatePersonalAccount from './CreatePersonalAccount';
-import HistoryInfo from './HistoryInfo';
-import Index from './Index';
-import InitialInvite from './InitialInvite';
-import Login from './Login';
-import SingleSignOn from './SingleSignOn';
-import TeamName from './TeamName';
-import Verify from './Verify';
+import {ChooseHandle} from './ChooseHandle';
+import {ClientManager} from './ClientManager';
+import {ConversationJoin} from './ConversationJoin';
+import {ConversationJoinInvalid} from './ConversationJoinInvalid';
+import {CreateAccount} from './CreateAccount';
+import {CreatePersonalAccount} from './CreatePersonalAccount';
+import {HistoryInfo} from './HistoryInfo';
+import {Index} from './Index';
+import {InitialInvite} from './InitialInvite';
+import {Login} from './Login';
+import {SingleSignOn} from './SingleSignOn';
+import {TeamName} from './TeamName';
+import {Verify} from './Verify';
 
 addLocaleData([
   ...cs,
@@ -90,7 +90,7 @@ addLocaleData([
   ...uk,
 ]);
 
-interface Props extends React.HTMLAttributes<Root> {}
+interface Props extends React.HTMLAttributes<_Root> {}
 
 interface ConnectedProps {
   language: string;
@@ -104,7 +104,7 @@ interface DispatchProps {
 
 interface State {}
 
-class Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
+class _Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
   componentDidMount = () => {
     this.props.startPolling();
     window.onbeforeunload = () => {
@@ -114,14 +114,14 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
   };
 
   loadLanguage = (language: string) => {
-    return require(`resource/translation/${mapLanguage(language)}.json`);
+    return require(`Resource/translation/${mapLanguage(language)}.json`);
   };
 
   render = () => {
     const {language} = this.props;
     return (
       <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
-        <StyledApp>
+        <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
           <Router hashType="noslash">
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
@@ -152,7 +152,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
   };
 }
 
-export default connect(
+export const Root = connect(
   (state: RootState): ConnectedProps => {
     return {language: LanguageSelector.getLanguage(state)};
   },
@@ -167,4 +167,4 @@ export default connect(
       stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
     };
   }
-)(Root);
+)(_Root);

@@ -17,9 +17,14 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-// @ts-check
+import {ACCESS_MODE} from './AccessMode';
+import {ACCESS_ROLE} from './AccessRole';
+import {ACCESS_STATE} from './AccessState';
+import {NotificationSetting} from './NotificationSetting';
+import {ConversationType} from './ConversationType';
+import {ConversationStatus} from './ConversationStatus';
 
 /**
  * @typedef {object} ConversationBackendData
@@ -85,13 +90,13 @@ import Logger from 'utils/Logger';
  */
 
 import ko from 'knockout';
-import Conversation from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
-    this.logger = Logger('ConversationMapper');
+    this.logger = getLogger('ConversationMapper');
   }
 
   /**
@@ -300,17 +305,17 @@ class ConversationMapper {
    * Get the valid muted state.
    *
    * @param {boolean} mutedState - Outdated muted state
-   * @param {z.conversation.NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
-   * @returns {z.conversation.NotificationSetting.STATE} validated notification setting
+   * @param {NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
+   * @returns {NotificationSetting.STATE} validated notification setting
    */
   getMutedState(mutedState, notificationState) {
-    const validNotifcationStates = Object.values(z.conversation.NotificationSetting.STATE);
+    const validNotifcationStates = Object.values(NotificationSetting.STATE);
     if (validNotifcationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
-      return mutedState ? notificationState | 0b1 : z.conversation.NotificationSetting.STATE.EVERYTHING;
+      return mutedState ? notificationState | 0b1 : NotificationSetting.STATE.EVERYTHING;
     }
 
-    return typeof mutedState === 'boolean' ? mutedState : z.conversation.NotificationSetting.STATE.EVERYTHING;
+    return typeof mutedState === 'boolean' ? mutedState : NotificationSetting.STATE.EVERYTHING;
   }
 
   /**
@@ -358,11 +363,11 @@ class ConversationMapper {
 
       const mergedConversation = Object.assign({}, localConversationData, updates);
 
-      const isGroup = type === z.conversation.ConversationType.GROUP;
+      const isGroup = type === ConversationType.GROUP;
       const noOthers = !mergedConversation.others || !mergedConversation.others.length;
       if (isGroup || noOthers) {
         mergedConversation.others = othersStates
-          .filter(otherState => otherState.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+          .filter(otherState => otherState.status === ConversationStatus.CURRENT_MEMBER)
           .map(otherState => otherState.id);
       }
 
@@ -418,39 +423,39 @@ class ConversationMapper {
   mapAccessState(conversationEntity, accessModes, accessRole) {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
-        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.ONE2ONE);
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      const isTeamRole = accessRole === z.conversation.ACCESS_ROLE.TEAM;
+      const isTeamRole = accessRole === ACCESS_ROLE.TEAM;
 
-      const includesInviteMode = accessModes.includes(z.conversation.ACCESS_MODE.INVITE);
+      const includesInviteMode = accessModes.includes(ACCESS_MODE.INVITE);
       const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
 
       const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
       if (isTeamOnlyMode) {
-        return conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
-      const isNonVerifiedRole = accessRole === z.conversation.ACCESS_ROLE.NON_ACTIVATED;
+      const isNonVerifiedRole = accessRole === ACCESS_ROLE.NON_ACTIVATED;
 
-      const includesCodeMode = accessModes.includes(z.conversation.ACCESS_MODE.CODE);
+      const includesCodeMode = accessModes.includes(ACCESS_MODE.CODE);
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
       return isGuestRoomMode
-        ? conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM)
-        : conversationEntity.accessState(z.conversation.ACCESS_STATE.TEAM.LEGACY);
+        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM)
+        : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
     }
 
     if (conversationEntity.isSelf()) {
-      return conversationEntity.accessState(z.conversation.ACCESS_STATE.SELF);
+      return conversationEntity.accessState(ACCESS_STATE.SELF);
     }
 
     const personalAccessState = conversationEntity.isGroup()
-      ? z.conversation.ACCESS_STATE.PERSONAL.GROUP
-      : z.conversation.ACCESS_STATE.PERSONAL.ONE2ONE;
+      ? ACCESS_STATE.PERSONAL.GROUP
+      : ACCESS_STATE.PERSONAL.ONE2ONE;
     return conversationEntity.accessState(personalAccessState);
   }
 }
 
-export default ConversationMapper;
+export {ConversationMapper};

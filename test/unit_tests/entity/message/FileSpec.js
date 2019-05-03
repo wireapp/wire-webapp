@@ -17,13 +17,16 @@
  *
  */
 
-// KARMA_SPECS=entity/message/File yarn test:app
+//@ts-check
 
-describe('z.entity.File', () => {
-  let file = null;
+import {File} from 'src/script/entity/message/File';
+
+describe('File', () => {
+  /** @type {File} */
+  let file;
 
   beforeEach(() => {
-    file = new z.entity.File();
+    file = new File();
   });
 
   describe('is_video', () => {

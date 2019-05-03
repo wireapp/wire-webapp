@@ -17,9 +17,11 @@
  *
  */
 
+import {buildSupportUrl} from 'Util/UrlUtil';
+
 ko.bindingHandlers.supportLink = {
   update(element, valueAccessor) {
     const supportId = valueAccessor();
-    element.setAttribute('href', z.util.URLUtil.buildSupportUrl(supportId));
+    element.setAttribute('href', buildSupportUrl(supportId));
   },
 };

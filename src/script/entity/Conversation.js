@@ -17,14 +17,28 @@
  *
  */
 
-import Logger from 'utils/Logger';
-
 import ko from 'knockout';
-import ReceiptMode from '../conversation/ReceiptMode';
-import {t} from 'utils/LocalizerUtil';
-import {CallingRepository} from '../calling/CallingRepository';
 
-export default class Conversation {
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
+import {truncate} from 'Util/StringUtil';
+
+import {Config} from '../auth/config';
+
+import {ReceiptMode} from '../conversation/ReceiptMode';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {NotificationSetting} from '../conversation/NotificationSetting';
+import {ConversationType} from '../conversation/ConversationType';
+import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+
+import {WebAppEvents} from '../event/WebApp';
+import {ClientRepository} from '../client/ClientRepository';
+import {StatusType} from '../message/StatusType';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+
+export class Conversation {
   static get TIMESTAMP_TYPE() {
     return {
       ARCHIVED: 'archivedTimestamp',
@@ -44,9 +58,9 @@ export default class Conversation {
   constructor(conversation_id = '') {
     this.id = conversation_id;
 
-    this.logger = Logger(`Conversation (${this.id})`);
+    this.logger = getLogger(`Conversation (${this.id})`);
 
-    this.accessState = ko.observable(z.conversation.ACCESS_STATE.UNKNOWN);
+    this.accessState = ko.observable(ACCESS_STATE.UNKNOWN);
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
@@ -69,25 +83,25 @@ export default class Conversation {
     this.isManaged = false;
 
     this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
-    this.isGuestRoom = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM);
-    this.isTeamOnly = ko.pureComputed(() => this.accessState() === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(undefined);
 
     this.isTeam1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
+      const isGroupConversation = this.type() === ConversationType.GROUP;
       const hasOneParticipant = this.participating_user_ids().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === z.conversation.ConversationType.GROUP;
+      const isGroupConversation = this.type() === ConversationType.GROUP;
       return isGroupConversation && !this.isTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
-      const is1to1Conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
+      const is1to1Conversation = this.type() === ConversationType.ONE2ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
-    this.isSelf = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
+    this.isRequest = ko.pureComputed(() => this.type() === ConversationType.CONNECT);
+    this.isSelf = ko.pureComputed(() => this.type() === ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
@@ -96,7 +110,7 @@ export default class Conversation {
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity && connectionEntity.userId;
       if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
@@ -106,8 +120,8 @@ export default class Conversation {
 
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
-    this.mutedState = ko.observable(z.conversation.NotificationSetting.STATE.EVERYTHING);
-    this.verification_state = ko.observable(z.conversation.ConversationVerificationState.UNVERIFIED);
+    this.mutedState = ko.observable(NotificationSetting.STATE.EVERYTHING);
+    this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -118,7 +132,7 @@ export default class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
-      const NOTIFICATION_STATE = z.conversation.NotificationSetting.STATE;
+      const NOTIFICATION_STATE = NotificationSetting.STATE;
       if (!this.selfUser()) {
         return NOTIFICATION_STATE.NOTHING;
       }
@@ -155,18 +169,18 @@ export default class Conversation {
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.EVERYTHING;
+      return this.notificationState() === NotificationSetting.STATE.EVERYTHING;
     });
     this.showNotificationsNothing = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.NOTHING;
+      return this.notificationState() === NotificationSetting.STATE.NOTHING;
     });
     this.showNotificationsMentionsAndReplies = ko.pureComputed(() => {
-      return this.notificationState() === z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES;
+      return this.notificationState() === NotificationSetting.STATE.MENTIONS_AND_REPLIES;
     });
 
-    this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
+    this.status = ko.observable(ConversationStatus.CURRENT_MEMBER);
     this.removed_from_conversation = ko.pureComputed(() => {
-      return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
+      return this.status() === ConversationStatus.PAST_MEMBER;
     });
     this.isActiveParticipant = ko.pureComputed(() => !this.removed_from_conversation() && !this.isGuest());
     this.isClearable = ko.pureComputed(() => !this.isRequest() && !this.is_cleared());
@@ -288,7 +302,7 @@ export default class Conversation {
             .join(', ');
 
           const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
+          return truncate(joinedNames, maxLength, false);
         }
 
         const hasUserIds = !!this.participating_user_ids().length;
@@ -301,7 +315,7 @@ export default class Conversation {
     });
 
     this.shouldPersistStateChanges = false;
-    this.publishPersistState = _.debounce(() => amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this), 100);
+    this.publishPersistState = _.debounce(() => amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this), 100);
 
     this._initSubscriptions();
   }
@@ -402,7 +416,7 @@ export default class Conversation {
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
-      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, messageEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
   }
@@ -425,7 +439,7 @@ export default class Conversation {
       }
     }
 
-    z.util.koArrayPushAll(this.messages_unordered, message_ets);
+    koArrayPushAll(this.messages_unordered, message_ets);
   }
 
   getFirstUnreadSelfMention() {
@@ -468,11 +482,11 @@ export default class Conversation {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
-          : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+          : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.selfUser().devices().length);
     }
 
-    return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**
@@ -483,7 +497,7 @@ export default class Conversation {
   prepend_messages(message_ets) {
     message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
-    z.util.koArrayUnshiftAll(this.messages_unordered, message_ets);
+    koArrayUnshiftAll(this.messages_unordered, message_ets);
   }
 
   /**
@@ -661,7 +675,7 @@ export default class Conversation {
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= z.message.StatusType.DELIVERED;
+        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
         return isDelivered && messageEntity.user().is_me;
       });
   }
@@ -701,7 +715,7 @@ export default class Conversation {
     }
 
     const participantCount = this.getNumberOfParticipants(true, false);
-    const passesParticipantLimit = participantCount <= CallingRepository.CONFIG.MAX_VIDEO_PARTICIPANTS;
+    const passesParticipantLimit = participantCount <= Config.MAX_VIDEO_PARTICIPANTS;
 
     if (!passesParticipantLimit) {
       return false;

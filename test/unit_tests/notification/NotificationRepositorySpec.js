@@ -17,18 +17,38 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
+
 import 'src/script/localization/Localizer';
 
-import Conversation from 'src/script/entity/Conversation';
-import MediumImage from 'src/script/entity/message/MediumImage';
-import User from 'src/script/entity/User';
-import TERMINATION_REASON from 'src/script/calling/enum/TerminationReason';
+import {Conversation} from 'src/script/entity/Conversation';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {User} from 'src/script/entity/User';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {NotificationPreference} from 'src/script/notification/NotificationPreference';
+import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
+import {AvailabilityType} from 'src/script/user/AvailabilityType';
+import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {ConversationType} from 'src/script/conversation/ConversationType';
+import {BackendEvent} from 'src/script/event/Backend';
+import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
-describe('z.notification.NotificationRepository', () => {
+describe('NotificationRepository', () => {
   const test_factory = new TestFactory();
   let conversation_et = null;
   let message_et = null;
@@ -44,14 +64,14 @@ describe('z.notification.NotificationRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
-      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
       user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.one[0]);
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
-      const selfUserEntity = new User(z.util.createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
@@ -68,15 +88,15 @@ describe('z.notification.NotificationRepository', () => {
           silent: true,
           tag: conversation_et.id,
         },
-        timeout: z.notification.NotificationRepository.CONFIG.TIMEOUT,
-        title: z.util.StringUtil.truncate(title, z.notification.NotificationRepository.CONFIG.TITLE_LENGTH, false),
+        timeout: NotificationRepository.CONFIG.TIMEOUT,
+        title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
       };
 
       // Mocks
       document.hasFocus = () => false;
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.GRANTED);
-      z.util.Environment.browser.supports.notifications = true;
-
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+      Environment.browser.supports.notifications = true;
+      TestFactory.notification_repository.__test__assignEnvironment(Environment);
       window.wire.app = {
         service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
@@ -102,10 +122,10 @@ describe('z.notification.NotificationRepository', () => {
           notification_content.trigger = trigger;
 
           if (_conversation.isGroup()) {
-            const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
+            const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.title = '…';
           }
@@ -139,13 +159,13 @@ describe('z.notification.NotificationRepository', () => {
           const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
           notification_content.trigger = trigger;
 
-          const obfuscateMessage = _setting === z.notification.NotificationPreference.OBFUSCATE_MESSAGE;
+          const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
           if (obfuscateMessage) {
-            const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
+            const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = z.string.notificationObfuscatedTitle;
@@ -188,7 +208,8 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the browser does not support them', () => {
-      z.util.Environment.browser.supports.notifications = false;
+      Environment.browser.supports.notifications = false;
+      TestFactory.notification_repository.__test__assignEnvironment(Environment);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -223,7 +244,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the conversation is muted', () => {
-      conversation_et.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversation_et.mutedState(NotificationSetting.STATE.NOTHING);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -232,7 +253,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('for a successfully completed call', () => {
       message_et = new z.entity.CallMessage();
-      message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+      message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
       message_et.finished_reason = TERMINATION_REASON.COMPLETED;
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
@@ -241,7 +262,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if preference is set to none', () => {
-      TestFactory.notification_repository.notificationsPreference(z.notification.NotificationPreference.NONE);
+      TestFactory.notification_repository.notificationsPreference(NotificationPreference.NONE);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -249,10 +270,95 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('if the user permission was denied', () => {
-      TestFactory.notification_repository.permissionState(z.permission.PermissionStatusState.DENIED);
+      TestFactory.notification_repository.permissionState(PermissionStatusState.DENIED);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('reacts according to availability status', () => {
+    let allMessageTypes;
+    function generateTextAsset() {
+      const textEntity = new z.entity.Text(createRandomUuid(), 'hey there');
+      return textEntity;
+    }
+
+    beforeEach(() => {
+      const mentionMessage = new ContentMessage(createRandomUuid());
+      mentionMessage.add_asset(generateTextAsset());
+      spyOn(mentionMessage, 'isUserMentioned').and.returnValue(true);
+
+      const textMessage = new ContentMessage(createRandomUuid());
+      textMessage.add_asset(generateTextAsset());
+
+      const callMessage = new z.entity.CallMessage();
+      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+      allMessageTypes = {
+        call: callMessage,
+        content: textMessage,
+        mention: mentionMessage,
+        ping: new z.entity.PingMessage(),
+      };
+    });
+
+    it('filters all notifications if user is "away"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.AWAY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const testPromises = Object.values(allMessageTypes).map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et).then(() => {
+          expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+        });
+      });
+
+      return Promise.all(testPromises);
+    });
+
+    it('filters content and ping messages when user is "busy"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.BUSY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const ignoredMessages = Object.entries(allMessageTypes)
+        .filter(([type]) => ['content', 'ping'].includes(type))
+        .map(([, message]) => message);
+
+      const testPromises = ignoredMessages.map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
+      });
+
+      return Promise.all(testPromises).then(() => {
+        expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
+      });
+    });
+
+    it('it allows mentions and calls when user is "busy"', () => {
+      spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return Object.assign({}, TestFactory.user_repository.self(), {
+          availability: () => AvailabilityType.BUSY,
+        });
+      });
+      TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
+
+      const notifiedMessages = Object.entries(allMessageTypes)
+        .filter(([type]) => ['mention', 'call'].includes(type))
+        .map(([, message]) => message);
+
+      const testPromises = notifiedMessages.map(messageEntity => {
+        return TestFactory.notification_repository.notify(messageEntity, undefined, conversation_et);
+      });
+
+      return Promise.all(testPromises).then(() => {
+        expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(notifiedMessages.length);
       });
     });
   });
@@ -263,12 +369,12 @@ describe('z.notification.NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
         message_et.user(user_et);
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -282,13 +388,13 @@ describe('z.notification.NotificationRepository', () => {
 
       beforeEach(() => {
         message_et = new z.entity.CallMessage();
-        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
+        message_et.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
         message_et.finished_reason = TERMINATION_REASON.MISSED;
         message_et.user(user_et);
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -302,7 +408,7 @@ describe('z.notification.NotificationRepository', () => {
     let expected_body = undefined;
 
     beforeEach(() => {
-      message_et = new z.entity.ContentMessage();
+      message_et = new ContentMessage();
       message_et.user(user_et);
     });
 
@@ -314,7 +420,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -323,13 +429,13 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('when preference is set to obfuscate-message', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE_MESSAGE;
+        const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE;
+        const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
@@ -342,7 +448,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -351,13 +457,13 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('when preference is set to obfuscate-message', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE_MESSAGE;
+        const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE;
+        const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
@@ -370,7 +476,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('in a 1:1 conversation', () => {
-        conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+        conversation_et.type(ConversationType.ONE2ONE);
         return verify_notification(conversation_et, message_et, expected_body);
       });
 
@@ -379,13 +485,13 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('when preference is set to obfuscate-message', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE_MESSAGE;
+        const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
-        const notification_preference = z.notification.NotificationPreference.OBFUSCATE;
+        const notification_preference = NotificationPreference.OBFUSCATE;
         TestFactory.notification_repository.notificationsPreference(notification_preference);
         return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
       });
@@ -415,18 +521,18 @@ describe('z.notification.NotificationRepository', () => {
 
   describe('shows a well-formed group notification', () => {
     beforeEach(() => {
-      const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
+      const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
       const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-      notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+      notification_content.title = truncate(titleText, titleLength, false);
     });
 
     it('if a group is created', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.type = z.event.Backend.CONVERSATION.CREATE;
-      message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+      message_et.type = BackendEvent.CONVERSATION.CREATE;
+      message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
       return verify_notification_system(conversation_et, message_et, expected_body);
@@ -464,18 +570,18 @@ describe('z.notification.NotificationRepository', () => {
     beforeEach(() => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
+      message_et.memberMessageType = SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
     describe('if people are added', () => {
       beforeEach(() => {
-        message_et.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_JOIN;
 
-        const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
+        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
@@ -505,11 +611,11 @@ describe('z.notification.NotificationRepository', () => {
 
     describe('if people are removed', () => {
       beforeEach(() => {
-        message_et.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
-        const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
+        message_et.type = BackendEvent.CONVERSATION.MEMBER_LEAVE;
+        const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {
@@ -552,9 +658,9 @@ describe('z.notification.NotificationRepository', () => {
     const expected_title = '…';
 
     beforeEach(() => {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
@@ -562,21 +668,21 @@ describe('z.notification.NotificationRepository', () => {
 
     it('if a connection request is incoming', () => {
       connectionEntity.status = 'pending';
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
-      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
       return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
@@ -596,7 +702,7 @@ describe('z.notification.NotificationRepository', () => {
     });
 
     it('in a 1:1 conversation', () => {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      conversation_et.type(ConversationType.ONE2ONE);
       return verify_notification(conversation_et, message_et, expected_body);
     });
 
@@ -614,13 +720,13 @@ describe('z.notification.NotificationRepository', () => {
     let conversationEntity;
     let messageEntity;
 
-    const userId = z.util.createRandomUuid();
-    const shouldNotifyInConversation = z.notification.NotificationRepository.shouldNotifyInConversation;
+    const userId = createRandomUuid();
+    const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
-      const mentionId = selfMentioned ? userId : z.util.createRandomUuid();
+      const mentionId = selfMentioned ? userId : createRandomUuid();
 
-      const textEntity = new z.entity.Text(z.util.createRandomUuid(), '@Gregor can you take a look?');
+      const textEntity = new z.entity.Text(createRandomUuid(), '@Gregor can you take a look?');
       const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
       textEntity.mentions([mentionEntity]);
 
@@ -632,16 +738,16 @@ describe('z.notification.NotificationRepository', () => {
       selfUserEntity.is_me = true;
       selfUserEntity.inTeam(true);
 
-      conversationEntity = new Conversation(z.util.createRandomUuid());
+      conversationEntity = new Conversation(createRandomUuid());
       conversationEntity.selfUser(selfUserEntity);
 
-      messageEntity = new z.entity.ContentMessage(z.util.createRandomUuid());
+      messageEntity = new ContentMessage(createRandomUuid());
       messageEntity.user(selfUserEntity);
     });
 
     it('returns the correct value for all notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -649,7 +755,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for no notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -657,7 +763,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset(true));
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -665,7 +771,7 @@ describe('z.notification.NotificationRepository', () => {
 
     it('returns the correct value for non-self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -674,10 +780,10 @@ describe('z.notification.NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({messageId: z.util.createRandomUuid(), userId});
+      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -686,13 +792,13 @@ describe('z.notification.NotificationRepository', () => {
     it('returns the correct value for non-self replies', () => {
       messageEntity.add_asset(generateTextAsset());
 
-      const quoteEntity = new z.message.QuoteEntity({
-        messageId: z.util.createRandomUuid(),
-        userId: z.util.createRandomUuid(),
+      const quoteEntity = new QuoteEntity({
+        messageId: createRandomUuid(),
+        userId: createRandomUuid(),
       });
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(z.conversation.NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);

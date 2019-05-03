@@ -109,7 +109,7 @@
     <section class="preferences-section preferences-section-info" data-uie-name="preferences-info-section" data-bind="visible: richProfileFields().length > 0">
       <hr class="preferences-separator">
       <header class="preferences-header" data-bind="text: t('preferencesAccountInfo')"></header>
-      <enriched-fields params="userId: selfUser().id, onFieldsLoaded: richProfileFields"></enriched-fields>
+      <enriched-fields params="user: selfUser, onFieldsLoaded: richProfileFields"></enriched-fields>
     </section>
 
     <!-- ko if: isConsentCheckEnabled() -->
@@ -182,7 +182,7 @@
       </section>
     <!-- /ko -->
 
-    <!-- ko if: isActivatedAccount() && !z.util.Environment.desktop -->
+    <!-- ko if: isActivatedAccount() && !Environment.desktop -->
       <section class="preferences-section">
         <div class="preferences-link accent-text" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
       </section>

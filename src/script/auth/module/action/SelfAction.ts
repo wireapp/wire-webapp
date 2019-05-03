@@ -18,7 +18,10 @@
  */
 
 import {ConsentType, Self} from '@wireapp/api-client/dist/commonjs/self';
-import {getLogger} from '../../LogProvider';
+
+import {Environment} from 'Util/Environment';
+import {getLogger} from 'Util/Logger';
+
 import {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';
 
@@ -91,7 +94,7 @@ export class SelfAction {
       }
       dispatch(SelfActionCreator.startSetConsent());
       const consent = {
-        source: `${config.APP_NAME} ${window.z.util.Environment.version(false)}`,
+        source: `${config.APP_NAME} ${Environment.version(false)}`,
         type: consentType,
         value,
       };

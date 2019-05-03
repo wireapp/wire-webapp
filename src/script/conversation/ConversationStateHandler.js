@@ -17,7 +17,16 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+
+import {ACCESS_MODE} from './AccessMode';
+import {ACCESS_ROLE} from './AccessRole';
+import {ACCESS_STATE} from './AccessState';
+import {EventName} from '../tracking/EventName';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -32,9 +41,9 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
   constructor(conversationService, conversationMapper) {
     super();
     const eventHandlingConfig = {
-      [z.event.Backend.CONVERSATION.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
-      [z.event.Backend.CONVERSATION.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
-      [z.event.Backend.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
+      [BackendEvent.CONVERSATION.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
+      [BackendEvent.CONVERSATION.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
+      [BackendEvent.CONVERSATION.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
     };
     this.setEventHandlingConfig(eventHandlingConfig);
     this.conversationMapper = conversationMapper;
@@ -50,14 +59,14 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         let accessModes;
         let accessRole;
 
-        const changeToGuestRoom = accessState === z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM;
-        const changeToTeamOnly = accessState === z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY;
+        const changeToGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
+        const changeToTeamOnly = accessState === ACCESS_STATE.TEAM.TEAM_ONLY;
         if (changeToGuestRoom) {
-          accessModes = [z.conversation.ACCESS_MODE.INVITE, z.conversation.ACCESS_MODE.CODE];
-          accessRole = z.conversation.ACCESS_ROLE.NON_ACTIVATED;
+          accessModes = [ACCESS_MODE.INVITE, ACCESS_MODE.CODE];
+          accessRole = ACCESS_ROLE.NON_ACTIVATED;
         } else if (changeToTeamOnly) {
-          accessModes = [z.conversation.ACCESS_MODE.INVITE];
-          accessRole = z.conversation.ACCESS_ROLE.TEAM;
+          accessModes = [ACCESS_MODE.INVITE];
+          accessRole = ACCESS_ROLE.TEAM;
         }
 
         if (accessModes && accessRole) {
@@ -71,7 +80,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
               }
 
               const attribute = {is_allow_guests: changeToGuestRoom};
-              amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
+              amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
             .catch(() => {
               const messageString = changeToGuestRoom
@@ -107,7 +116,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         const accessCode = response && response.data;
         if (accessCode) {
           this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_CREATED);
         }
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
@@ -118,7 +127,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
       .deleteConversationCode(conversationEntity.id)
       .then(() => {
         conversationEntity.accessCode(undefined);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
@@ -138,6 +147,6 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
 
   _showModal(message) {
     const modalOptions = {text: {message}};
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 };

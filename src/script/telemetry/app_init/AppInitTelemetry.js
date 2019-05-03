@@ -16,14 +16,18 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import AppInitStatistics from './AppInitStatistics';
-import Logger from 'utils/Logger';
 
-import AppInitTimings from './AppInitTimings';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-export default class AppInitTelemetry {
+import {AppInitStatistics} from './AppInitStatistics';
+import {AppInitTimings} from './AppInitTimings';
+import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
+
+export class AppInitTelemetry {
   constructor() {
-    this.logger = Logger('AppInitTelemetry');
+    this.logger = getLogger('AppInitTelemetry');
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }
@@ -52,12 +56,12 @@ export default class AppInitTelemetry {
     const statistics = this.get_statistics();
 
     statistics.loading_time = this.timings.get_app_load();
-    statistics.app_version = z.util.Environment.version(false);
+    statistics.app_version = Environment.version(false);
     this.logger.info(`App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`);
     this.log_statistics();
     this.log_timings();
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TELEMETRY.APP_INITIALIZATION, statistics);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.TELEMETRY.APP_INITIALIZATION, statistics);
   }
 
   time_step(step) {

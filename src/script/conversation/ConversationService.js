@@ -17,7 +17,10 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {MessageCategory} from '../message/MessageCategory';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -40,10 +43,10 @@ z.conversation.ConversationService = class ConversationService {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
-    this.logger = Logger('z.conversation.ConversationService');
+    this.logger = getLogger('z.conversation.ConversationService');
 
-    this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.CONVERSATION_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   //##############################################################################
@@ -266,8 +269,8 @@ z.conversation.ConversationService = class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
    *
    * @param {string} conversationId - ID of conversation
-   * @param {Array<z.conversation.ACCESS_MODE>} accessModes - Conversation access mode
-   * @param {z.conversation.ACCESS_ROLE} accessRole - Conversation access role
+   * @param {ACCESS_MODE[]} accessModes - Conversation access mode
+   * @param {ACCESS_ROLE} accessRole - Conversation access role
    * @returns {Promise} Resolves with the server response
    */
   putConversationAccess(conversationId, accessModes, accessRole) {
@@ -480,9 +483,8 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the matching events
    */
   search_in_conversation(conversation_id, query) {
-    const category_min = z.message.MessageCategory.TEXT;
-    const category_max =
-      z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
+    const category_min = MessageCategory.TEXT;
+    const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
     return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
       return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));

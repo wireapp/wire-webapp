@@ -17,13 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.EventInfoEntity = class EventInfoEntity {
+export class EventInfoEntity {
   /**
    * Constructs a new event info entity.
-   * @class z.conversation.EventInfoEntity
    * @param {GenericMessage} [genericMessage] - Generic message
    * @param {string} [conversationId=''] - Conversation ID
    * @param {Object} options - Message sending options
@@ -61,4 +57,4 @@ z.conversation.EventInfoEntity = class EventInfoEntity {
   updateOptions(updatedOptions) {
     this.options = Object.assign(this.options, updatedOptions);
   }
-};
+}

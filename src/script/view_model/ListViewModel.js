@@ -17,12 +17,23 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {iterateItem} from 'Util/ArrayUtil';
+import {Environment} from 'Util/Environment';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {t} from 'utils/LocalizerUtil';
-import {iterateItem} from 'utils/ArrayUtil';
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
+import {PreferencesListViewModel} from './list/PreferencesListViewModel';
+import {StartUIViewModel} from './list/StartUIViewModel';
+import {TakeoverViewModel} from './list/TakeoverViewModel';
+import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
+import {WebAppEvents} from '../event/WebApp';
+
+import {Context} from '../ui/ContextMenu';
+import {Shortcut} from '../ui/Shortcut';
+import {ShortcutType} from '../ui/ShortcutType';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -68,7 +79,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.isProAccount = this.teamRepository.isTeam;
     this.selfUser = this.userRepository.self;
 
-    this.logger = Logger('z.viewModel.ListViewModel');
+    this.logger = getLogger('z.viewModel.ListViewModel');
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
@@ -92,7 +103,7 @@ z.viewModel.ListViewModel = class ListViewModel {
           z.viewModel.ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
-        if (!z.util.Environment.desktop) {
+        if (!Environment.desktop) {
           preferenceItems.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
@@ -109,15 +120,15 @@ z.viewModel.ListViewModel = class ListViewModel {
     // Nested view models
     this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
     this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
-    this.preferences = new z.viewModel.list.PreferencesListViewModel(
+    this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
       repositories.user,
       repositories.calling
     );
-    this.start = new z.viewModel.list.StartUIViewModel(mainViewModel, this, repositories);
-    this.takeover = new z.viewModel.list.TakeoverViewModel(mainViewModel, this, repositories);
-    this.temporaryGuest = new z.viewModel.list.TemporaryGuestViewModel(mainViewModel, this, repositories);
+    this.start = new StartUIViewModel(mainViewModel, this, repositories);
+    this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, this, repositories);
 
     this._initSubscriptions();
 
@@ -125,17 +136,17 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _initSubscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.openConversations.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webappLoaded(true));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
-    amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.openStartUI.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.goToNext.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.goToPrevious.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.clickToClear.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount.bind(this));
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices.bind(this));
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear.bind(this));
+    amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
+    amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
   joinCall = (conversationEntity, mediaType) => {
@@ -177,7 +188,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
 
     if (nextItem) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextItem);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem);
     }
   }
 
@@ -254,7 +265,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.lastUpdate(Date.now());
 
     $(document).on('keydown.listView', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey(keyboardEvent)) {
         const newState = this.isActivatedAccount()
           ? ListViewModel.STATE.CONVERSATIONS
           : ListViewModel.STATE.TEMPORARY_GUEST;
@@ -272,7 +283,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         this.start.updateList();
         break;
       case ListViewModel.STATE.PREFERENCES:
-        amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respectLastState) {
@@ -308,7 +319,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
   //##############################################################################
@@ -319,7 +330,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
-      const notificationsShortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.NOTIFICATIONS);
+      const notificationsShortcut = Shortcut.getShortcutTooltip(ShortcutType.NOTIFICATIONS);
 
       if (this.isProAccount()) {
         entries.push({
@@ -349,7 +360,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: t('conversationsPopoverUnarchive'),
       });
     } else {
-      const shortcut = z.ui.Shortcut.getShortcutTooltip(z.ui.ShortcutType.ARCHIVE);
+      const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
@@ -391,7 +402,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       });
     }
 
-    z.ui.Context.from(event, entries, 'conversation-list-options-menu');
+    Context.from(event, entries, 'conversation-list-options-menu');
   }
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
@@ -429,7 +440,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   clickToOpenNotificationSettings(conversationEntity = this.conversationRepository.active_conversation()) {
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   }
 
   clickToUnarchive(conversationEntity) {

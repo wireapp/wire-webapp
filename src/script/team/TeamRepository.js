@@ -17,11 +17,20 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {loadDataUrl} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
-import TeamMapper from './TeamMapper';
+import {TeamMapper} from './TeamMapper';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
-import {t} from 'utils/LocalizerUtil';
+
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SuperProperty} from '../tracking/SuperProperty';
 
 window.z = window.z || {};
 window.z.team = z.team || {};
@@ -35,7 +44,7 @@ z.team.TeamRepository = class TeamRepository {
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(teamService, userRepository) {
-    this.logger = Logger('z.team.TeamRepository');
+    this.logger = getLogger('z.team.TeamRepository');
 
     this.teamMapper = new TeamMapper();
     this.teamService = teamService;
@@ -69,20 +78,20 @@ z.team.TeamRepository = class TeamRepository {
       return this.teamMembers()
         .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
     });
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
     });
 
     this.userRepository.isTeam = this.isTeam;
     this.userRepository.teamMembers = this.teamMembers;
     this.userRepository.teamUsers = this.teamUsers;
 
-    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
-    amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
   getTeam() {
@@ -117,7 +126,7 @@ z.team.TeamRepository = class TeamRepository {
 
   getWhitelistedServices(teamId, size, prefix) {
     return this.teamService.getWhitelistedServices(teamId, size, prefix).then(({services: servicesData}) => {
-      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+      return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
@@ -125,7 +134,7 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} eventJson - JSON data for team event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onTeamEvent(eventJson, source) {
@@ -135,28 +144,28 @@ z.team.TeamRepository = class TeamRepository {
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case z.event.Backend.TEAM.CONVERSATION_CREATE:
-      case z.event.Backend.TEAM.CONVERSATION_DELETE: {
+      case BackendEvent.TEAM.CONVERSATION_CREATE:
+      case BackendEvent.TEAM.CONVERSATION_DELETE: {
         this._onUnhandled(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.DELETE: {
+      case BackendEvent.TEAM.DELETE: {
         this._onDelete(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_JOIN: {
+      case BackendEvent.TEAM.MEMBER_JOIN: {
         this._onMemberJoin(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_LEAVE: {
+      case BackendEvent.TEAM.MEMBER_LEAVE: {
         this._onMemberLeave(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.MEMBER_UPDATE: {
+      case BackendEvent.TEAM.MEMBER_UPDATE: {
         this._onMemberUpdate(eventJson);
         break;
       }
-      case z.event.Backend.TEAM.UPDATE: {
+      case BackendEvent.TEAM.UPDATE: {
         this._onUpdate(eventJson);
         break;
       }
@@ -167,14 +176,14 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   sendAccountInfo() {
-    if (z.util.Environment.desktop) {
+    if (Environment.desktop) {
       const imageResource = this.isTeam() ? undefined : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
       imagePromise
         .then(imageBlob => {
           if (imageBlob) {
-            return z.util.loadDataUrl(imageBlob);
+            return loadDataUrl(imageBlob);
           }
         })
         .then(imageDataUrl => {
@@ -188,7 +197,7 @@ z.team.TeamRepository = class TeamRepository {
           };
 
           this.logger.info('Publishing account info', accountInfo);
-          amplify.publish(z.event.WebApp.TEAM.INFO, accountInfo);
+          amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
         });
     }
   }
@@ -241,7 +250,7 @@ z.team.TeamRepository = class TeamRepository {
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
@@ -275,7 +284,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === userId);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
     }
   }
 

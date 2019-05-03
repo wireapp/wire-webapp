@@ -17,23 +17,39 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {chunk} from 'Util/ArrayUtil';
+import {t} from 'Util/LocalizerUtil';
+import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {UNSPLASH_URL} from '../externalRoute';
-import {t} from 'utils/LocalizerUtil';
-import ConsentValue from './ConsentValue';
-import ConsentType from './ConsentType';
+import {ConsentValue} from './ConsentValue';
+import {ConsentType} from './ConsentType';
 
-import User from '../entity/User';
-import UserMapper from './UserMapper';
+import {User} from '../entity/User';
+import {UserMapper} from './UserMapper';
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
 
-import {chunk} from 'utils/ArrayUtil';
+import {ClientEvent} from '../event/Client';
+import {BackendEvent} from '../event/Backend';
+import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
 
-export default class UserRepository {
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {EventName} from '../tracking/EventName';
+import {SuperProperty} from '../tracking/SuperProperty';
+
+import {createSuggestions} from './UserHandleGenerator';
+import {valueFromType, protoFromType} from './AvailabilityMapper';
+import {showAvailabilityModal} from './AvailabilityModal';
+
+export class UserRepository {
   static get CONFIG() {
     return {
       MINIMUM_NAME_LENGTH: 2,
@@ -51,12 +67,12 @@ export default class UserRepository {
    * @param {UserService} user_service - Backend REST API user service implementation
    * @param {AssetService} asset_service - Backend REST API asset service implementation
    * @param {z.self.SelfService} selfService - Backend REST API self service implementation
-   * @param {z.client.ClientRepository} client_repository - Repository for all client interactions
-   * @param {ServerTimeRepository} serverTimeRepository - Handles time shift between server and client
+   * @param {ClientRepository} client_repository - Repository for all client interactions
+   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {PropertiesRepository} propertyRepository - Handles account level properties
    */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeRepository, propertyRepository) {
-    this.logger = Logger('UserRepository');
+  constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
+    this.logger = getLogger('UserRepository');
 
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -64,7 +80,7 @@ export default class UserRepository {
     this.selfService = selfService;
     this.user_service = user_service;
 
-    this.user_mapper = new UserMapper(serverTimeRepository);
+    this.user_mapper = new UserMapper(serverTimeHandler);
     this.should_set_username = false;
 
     this.self = ko.observable();
@@ -80,7 +96,7 @@ export default class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.isConnected())
-          .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
+          .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
       .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
 
@@ -96,23 +112,23 @@ export default class UserRepository {
       return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
     });
 
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.addClientToUser.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
-    amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.UPDATE, this.updateUserById.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
+    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
 
   /**
    * Listener for incoming user events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   on_user_event(event_json, source) {
@@ -122,24 +138,24 @@ export default class UserRepository {
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case z.event.Backend.USER.DELETE:
+      case BackendEvent.USER.DELETE:
         this.user_delete(event_json);
         break;
-      case z.event.Backend.USER.UPDATE:
+      case BackendEvent.USER.UPDATE:
         this.user_update(event_json);
         break;
-      case z.event.Client.USER.AVAILABILITY:
+      case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(event_json);
         break;
     }
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
-    if (source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
+    if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
-        case z.event.Backend.USER.PROPERTIES_DELETE:
+        case BackendEvent.USER.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(event_json.key);
           break;
-        case z.event.Backend.USER.PROPERTIES_SET:
+        case BackendEvent.USER.PROPERTIES_SET:
           this.propertyRepository.setProperty(event_json.key, event_json.value);
           break;
       }
@@ -184,7 +200,7 @@ export default class UserRepository {
     const is_self_user = id === this.self().id;
     if (is_self_user) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
@@ -216,7 +232,7 @@ export default class UserRepository {
       this.user_mapper.updateUserFromObject(user_et, user);
 
       if (is_self_user) {
-        amplify.publish(z.event.WebApp.TEAM.UPDATE_INFO);
+        amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       }
 
       return user_et;
@@ -225,8 +241,8 @@ export default class UserRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all connections have been updated
+   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
+   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
   updateUsersFromConnections(connectionEntities) {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
@@ -280,7 +296,7 @@ export default class UserRepository {
       if (wasClientAdded) {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
           if (publishClient) {
-            amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, userId, clientEntity);
+            amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
         });
       }
@@ -299,56 +315,57 @@ export default class UserRepository {
       .then(() => this.get_user_by_id(user_id))
       .then(user_et => {
         user_et.remove_client(client_id);
-        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id);
+        amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
       });
   }
 
   /**
    * Update clients for given user.
    * @param {string} user_id - ID of user
-   * @param {Array<z.client.ClientEntity>} client_ets - Clients which should get updated
+   * @param {Array<ClientEntity>} client_ets - Clients which should get updated
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
     this.get_user_by_id(user_id).then(user_et => {
       user_et.devices(client_ets);
-      amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
   }
 
   setAvailability(availability, method) {
     const hasAvailabilityChanged = availability !== this.self().availability();
-    const newAvailabilityValue = z.user.AvailabilityMapper.valueFromType(availability);
+    const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = z.user.AvailabilityMapper.valueFromType(this.self().availability());
+      const oldAvailabilityValue = valueFromType(this.self().availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
+      showAvailabilityModal(availability);
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
-    const protoAvailability = new Availability({type: z.user.AvailabilityMapper.protoFromType(availability)});
+    const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
-      messageId: z.util.createRandomUuid(),
+      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      messageId: createRandomUuid(),
     });
 
     const recipients = this.teamUsers().concat(this.self());
-    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
   /**
    * Track availability action.
    *
-   * @param {z.user.AvailabilityType} availability - Type of availability
+   * @param {AvailabilityType} availability - Type of availability
    * @param {string} method - Method used for availability change
    * @returns {undefined} No return value
    */
   _trackAvailability(availability, method) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
-      status: z.user.AvailabilityMapper.valueFromType(availability),
+      status: valueFromType(availability),
     });
   }
 
@@ -468,7 +485,7 @@ export default class UserRepository {
     if (hasPicture) {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
-        const {medium} = z.assets.AssetMapper.mapProfileAssetsV1(userData.id, userData.picture);
+        const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
         medium.load().then(imageBlob => this.change_picture(imageBlob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
@@ -599,7 +616,7 @@ export default class UserRepository {
     const find_users = user_ets.map(user_et => _find_users(user_et));
 
     return Promise.all(find_users).then(resolve_array => {
-      z.util.koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
+      koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
       return user_ets;
     });
   }
@@ -691,7 +708,7 @@ export default class UserRepository {
 
     return Promise.resolve()
       .then(() => {
-        suggestions = z.user.UserHandleGenerator.create_suggestions(this.self().name());
+        suggestions = createSuggestions(this.self().name());
         return this.verify_usernames(suggestions);
       })
       .then(valid_suggestions => {
@@ -797,7 +814,7 @@ export default class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
+    return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()) {

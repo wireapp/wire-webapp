@@ -17,11 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
 
-export default class GroupParticipantServiceViewModel extends BasePanelViewModel {
+export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -30,7 +30,7 @@ export default class GroupParticipantServiceViewModel extends BasePanelViewModel
     this.integrationRepository = repositories.integration;
     this.actionsViewModel = mainViewModel.actions;
 
-    this.logger = Logger('z.viewModel.panel.GroupParticipantServiceViewModel');
+    this.logger = getLogger('z.viewModel.panel.GroupParticipantServiceViewModel');
 
     this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);

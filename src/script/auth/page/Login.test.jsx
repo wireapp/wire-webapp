@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 import {mockStore, mountWithIntl} from '../util/TestUtil';
-import Login from './Login';
+import {Login} from './Login';
 import {Config} from '../config';
 
 describe('when visiting the login page', () => {

@@ -18,6 +18,11 @@
  */
 
 import Long from 'long';
+
+import {utf8ToUtf16BE} from 'Util/StringUtil';
+
+import {ClientEvent} from '../event/Client';
+
 const crypto = window.crypto;
 
 window.z = window.z || {};
@@ -39,7 +44,7 @@ z.message.MessageHasher = (() => {
    * @returns {number[]} Array of assetId bytes
    * @private
    */
-  const getAssetBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.key);
+  const getAssetBytes = event => utf8ToUtf16BE(event.data.key);
 
   /**
    * @param {Event} event - The event
@@ -68,7 +73,7 @@ z.message.MessageHasher = (() => {
     return Long.fromInt(timestampSeconds).toBytesBE();
   };
 
-  const getTextBytes = event => z.util.StringUtil.utf8ToUtf16BE(event.data.content);
+  const getTextBytes = event => utf8ToUtf16BE(event.data.content);
 
   /**
    * Creates a hash of the given event.
@@ -77,7 +82,7 @@ z.message.MessageHasher = (() => {
    * @returns {ArrayBuffer} hashBuffer - buffer containing the bytes of the hash
    */
   const hashEvent = event => {
-    const EventTypes = z.event.Client.CONVERSATION;
+    const EventTypes = ClientEvent.CONVERSATION;
     const specificBytesGenerators = {
       [EventTypes.MESSAGE_ADD]: getTextBytes,
       [EventTypes.LOCATION]: getLocationBytes,

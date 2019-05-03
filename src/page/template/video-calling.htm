@@ -52,7 +52,7 @@
                   <camera-icon></camera-icon>
                   <!-- ko if: showSwitchCamera() -->
                     <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
-                                          params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: z.media.MediaDeviceType.VIDEO_INPUT">
+                                          params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: MediaDeviceType.VIDEO_INPUT">
                     </device-toggle-button>
                   <!-- /ko -->
                   <!-- ko ifnot: showSwitchCamera() -->
@@ -67,7 +67,7 @@
                 <screenshare-icon></screenshare-icon>
                 <!-- ko if: showSwitchScreen() -->
                   <device-toggle-button data-bind="click: clickedOnToggleScreen, clickBubble: false"
-                                        params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: z.media.MediaDeviceType.SCREEN_INPUT">
+                                        params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: MediaDeviceType.SCREEN_INPUT">
                   </device-toggle-button>
                 <!-- /ko -->
                 <!-- ko ifnot: showSwitchScreen() -->

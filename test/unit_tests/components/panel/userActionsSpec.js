@@ -19,8 +19,9 @@
 
 import {instantiateComponent} from '../../../api/knockoutHelpers';
 
-import User from 'src/script/entity/User';
-import Conversation from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 
 import 'src/script/components/icons';
 import 'src/script/components/panel/userActions';
@@ -55,7 +56,7 @@ describe('user-actions', () => {
         getParams: () => {
           const user = new User();
           const conversation = new Conversation();
-          user.connection().status(z.connection.ConnectionStatus.ACCEPTED);
+          user.connection().status(ConnectionStatus.ACCEPTED);
           spyOn(conversation, 'isGroup').and.returnValue(true);
           return {conversation: () => conversation, isSelfActivated: true, user: () => user};
         },

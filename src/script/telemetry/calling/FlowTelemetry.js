@@ -17,19 +17,20 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+import {CallSetupTimings} from './CallSetupTimings';
+import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';
+import {WebAppEvents} from '../../event/WebApp';
 
-z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
+class FlowTelemetry {
   /**
    * Construct new flow telemetry entity.
    *
    * @param {string} id - Flow ID
    * @param {string} remote_user_id - Remote user ID
-   * @param {z.calling.entities.CallEntity} call_et - Call entity
+   * @param {CallEntity} call_et - Call entity
    * @param {CallSetupTimings} timings - Timings of call setup steps
    */
   constructor(id, remote_user_id, call_et, timings) {
@@ -39,12 +40,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
     const loggerId = this.id.substr(0, 8);
     const loggerTimestamp = new Date().getMilliseconds();
-    const loggerName = `z.telemetry.calling.FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
-    this.logger = Logger(loggerName);
+    const loggerName = `FlowTelemetry - ${loggerId} (${loggerTimestamp})`;
+    this.logger = getLogger(loggerName);
     this.is_answer = false;
     this.peer_connection = undefined;
 
-    this.timings = $.extend(new z.telemetry.calling.CallSetupTimings(this.id), timings ? timings.get() : {});
+    this.timings = $.extend(new CallSetupTimings(this.id), timings ? timings.get() : {});
   }
 
   //##############################################################################
@@ -69,8 +70,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   create_report(passed_error) {
     const report = {
       meta: {
-        browser_name: z.util.Environment.browser.name,
-        browser_version: z.util.Environment.browser.version,
+        browser_name: Environment.browser.name,
+        browser_version: Environment.browser.version,
         flow_id: this.id,
         id: this.call_et.id,
         is_answer: this.is_answer,
@@ -88,7 +89,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         signaling_state: this.peer_connection.signalingState,
       };
 
-      const isSignalingStateClosed = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const isSignalingStateClosed = this.peer_connection.signalingState === SIGNALING_STATE.CLOSED;
       if (!isSignalingStateClosed) {
         if (this.peer_connection.localDescription) {
           $.extend(report.rtc_peer_connection, {
@@ -118,7 +119,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   disconnected() {
-    amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
+    amplify.publish(WebAppEvents.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
   }
 
   /**
@@ -178,7 +179,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Log the flow to the browser console.
-   * @param {z.calling.entities.ParticipantEntity} participant_et - Call participant
+   * @param {ParticipantEntity} participant_et - Call participant
    * @returns {undefined} No return value
    */
   log_status(participant_et) {
@@ -241,4 +242,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     Raygun.send(new Error('Call setup step timings'), custom_data);
     this.logger.info(`Reported setup step timings of flow id '${this.id}' for call analysis`, custom_data);
   }
-};
+}
+
+export {FlowTelemetry};

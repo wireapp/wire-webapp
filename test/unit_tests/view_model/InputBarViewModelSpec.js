@@ -17,7 +17,9 @@
  *
  */
 
-import User from 'src/script/entity/User';
+import {createRandomUuid} from 'Util/util';
+
+import {User} from 'src/script/entity/User';
 
 describe('z.viewModel.content.InputBarViewModel', () => {
   const testFactory = new TestFactory();
@@ -47,7 +49,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
       const mentionCandidate = viewModel.getMentionCandidate(selectionStart, selectionEnd, inputValue);
       viewModel.editedMention(mentionCandidate);
 
-      const userEntity = new User(z.util.createRandomUuid());
+      const userEntity = new User(createRandomUuid());
       userEntity.name(userName);
 
       const mentionEntity = viewModel._createMentionEntity(userEntity);

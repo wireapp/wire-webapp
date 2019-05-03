@@ -17,9 +17,19 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
-export default class MediaStreamHandler {
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
+import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
+import {MediaStreamSource} from './MediaStreamSource';
+import {MediaStreamInfo} from './MediaStreamInfo';
+import {MediaType} from './MediaType';
+import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
+
+export class MediaStreamHandler {
   /**
    * Detect whether a MediaStream has a video MediaStreamTrack attached
    * @param {MediaStream} mediaStream - MediaStream to detect the type off
@@ -32,34 +42,34 @@ export default class MediaStreamHandler {
     const hasAudioTrack = audioTracks && audioTracks.length;
     const hasVideoTrack = videoTracks && videoTracks.length;
     if (hasVideoTrack) {
-      return hasAudioTrack ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.VIDEO;
+      return hasAudioTrack ? MediaType.AUDIO_VIDEO : MediaType.VIDEO;
     }
-    return hasAudioTrack ? z.media.MediaType.AUDIO : z.media.MediaType.NONE;
+    return hasAudioTrack ? MediaType.AUDIO : MediaType.NONE;
   }
 
   /**
    * Get MediaStreamTracks from a MediaStream.
    *
    * @param {MediaStream} mediaStream - MediaStream to get tracks from
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO_VIDEO] - Type of requested tracks
+   * @param {MediaType} [mediaType=MediaType.AUDIO_VIDEO] - Type of requested tracks
    * @returns {Array} MediaStreamTracks
    */
-  static getMediaTracks(mediaStream, mediaType = z.media.MediaType.AUDIO_VIDEO) {
+  static getMediaTracks(mediaStream, mediaType = MediaType.AUDIO_VIDEO) {
     if (!mediaStream) {
       throw new z.error.MediaError(z.error.MediaError.TYPE.STREAM_NOT_FOUND);
     }
 
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         return mediaStream.getAudioTracks();
       }
 
-      case z.media.MediaType.AUDIO_VIDEO: {
+      case MediaType.AUDIO_VIDEO: {
         return mediaStream.getTracks();
       }
 
-      case z.media.MediaType.SCREEN:
-      case z.media.MediaType.VIDEO: {
+      case MediaType.SCREEN:
+      case MediaType.VIDEO: {
         return mediaStream.getVideoTracks();
       }
 
@@ -72,8 +82,8 @@ export default class MediaStreamHandler {
   static get CONFIG() {
     return {
       MEDIA_TYPE: {
-        CONTAINS_AUDIO: [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO],
-        CONTAINS_VIDEO: [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO],
+        CONTAINS_AUDIO: [MediaType.AUDIO, MediaType.AUDIO_VIDEO],
+        CONTAINS_VIDEO: [MediaType.AUDIO_VIDEO, MediaType.VIDEO],
       },
       PERMISSION_HINT_DELAY: 200,
     };
@@ -82,7 +92,7 @@ export default class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
-   * @param {z.permission.PermissionRepository} permissionRepository - Repository for all permission interactions
+   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    */
   constructor(mediaRepository, permissionRepository) {
     this._toggleScreenSend = this._toggleScreenSend.bind(this);
@@ -90,7 +100,7 @@ export default class MediaStreamHandler {
 
     this.mediaRepository = mediaRepository;
     this.permissionRepository = permissionRepository;
-    this.logger = Logger('MediaStreamHandler');
+    this.logger = getLogger('MediaStreamHandler');
 
     this.currentCalls = new Map();
     this.joinedCall = ko.observable();
@@ -102,17 +112,17 @@ export default class MediaStreamHandler {
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
     this.localMediaStream = ko.observable();
-    this.localMediaType = ko.observable(z.media.MediaType.AUDIO);
+    this.localMediaType = ko.observable(MediaType.AUDIO);
 
     this.remoteMediaStreamInfo = ko.observableArray([]);
     this.remoteMediaStreamInfoIndex = {
       audio: ko.pureComputed(() => {
         return this.remoteMediaStreamInfo().filter(mediaStreamInfo => {
-          return mediaStreamInfo.getType() === z.media.MediaType.AUDIO;
+          return mediaStreamInfo.getType() === MediaType.AUDIO;
         });
       }),
       video: ko.pureComputed(() => {
-        const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+        const videoTypes = [MediaType.AUDIO_VIDEO, MediaType.VIDEO];
         return this.remoteMediaStreamInfo().filter(mediaStreamInfo => videoTypes.includes(mediaStreamInfo.getType()));
       }),
     };
@@ -124,21 +134,21 @@ export default class MediaStreamHandler {
     };
 
     this.selfStreamState.audioSend.subscribe(audioSend => {
-      this._toggleStreamEnabled(z.media.MediaType.AUDIO, audioSend);
+      this._toggleStreamEnabled(MediaType.AUDIO, audioSend);
     });
     this.selfStreamState.screenSend.subscribe(screenSend => {
-      this._toggleStreamEnabled(z.media.MediaType.VIDEO, screenSend);
+      this._toggleStreamEnabled(MediaType.VIDEO, screenSend);
     });
     this.selfStreamState.videoSend.subscribe(videoSend => {
-      this._toggleStreamEnabled(z.media.MediaType.VIDEO, videoSend);
+      this._toggleStreamEnabled(MediaType.VIDEO, videoSend);
     });
 
     this.hasActiveVideo = ko.pureComputed(() => this.selfStreamState.screenSend() || this.selfStreamState.videoSend());
 
     this.requestHintTimeout = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.ADD_STREAM, this.addRemoteMediaStream.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.MEDIA.CONNECTION_CLOSED, this.removeRemoteMediaStreamTracks.bind(this));
   }
 
   //##############################################################################
@@ -149,12 +159,12 @@ export default class MediaStreamHandler {
    * Initiate the MediaStream.
    *
    * @param {string} conversationId - Conversation ID of call
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO] - Media type for this call
+   * @param {MediaType} [mediaType=MediaType.AUDIO] - Media type for this call
    * @param {boolean} [isGroup=false] - Set constraints for group
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
-  initiateMediaStream(conversationId, mediaType = z.media.MediaType.AUDIO, isGroup = false) {
-    const videoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+  initiateMediaStream(conversationId, mediaType = MediaType.AUDIO, isGroup = false) {
+    const videoSend = mediaType === MediaType.AUDIO_VIDEO;
 
     return this.devicesHandler
       .updateCurrentDevices(videoSend)
@@ -164,7 +174,7 @@ export default class MediaStreamHandler {
       .catch(error => {
         this._initiateMediaStreamFailure(error, conversationId);
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
           video: videoSend,
         });
@@ -185,7 +195,7 @@ export default class MediaStreamHandler {
 
   /**
    * Replace the MediaStream after a change of the selected input device.
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Info about new MediaStream
+   * @param {MediaStreamInfo} mediaStreamInfo - Info about new MediaStream
    * @returns {undefined} No return value
    */
   changeMediaStream(mediaStreamInfo) {
@@ -234,7 +244,7 @@ export default class MediaStreamHandler {
 
   /**
    * Update the used MediaStream after a new input device was selected.
-   * @param {z.media.MediaType} mediaType - Media type of device that was replaced
+   * @param {MediaType} mediaType - Media type of device that was replaced
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replaceInputSource(mediaType) {
@@ -242,17 +252,17 @@ export default class MediaStreamHandler {
 
     let constraintsPromise;
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(true, isPreferenceChange);
         break;
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         constraintsPromise = this.constraintsHandler.getScreenStreamConstraints();
         break;
       }
 
-      case z.media.MediaType.VIDEO: {
+      case MediaType.VIDEO: {
         constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(isPreferenceChange, true);
         break;
       }
@@ -276,7 +286,7 @@ export default class MediaStreamHandler {
         this.changeMediaStream(mediaStreamInfo);
       })
       .catch(error => {
-        const isMediaTypeScreen = mediaType === z.media.MediaType.SCREEN;
+        const isMediaTypeScreen = mediaType === MediaType.SCREEN;
         const logMessage = isMediaTypeScreen
           ? `Could not enable screen sharing: ${error.message}`
           : `Could not replace '${mediaType}' input source: ${error.message}`;
@@ -289,7 +299,7 @@ export default class MediaStreamHandler {
   /**
    * Request a MediaStream.
    *
-   * @param {z.media.MediaType} mediaType - Type of MediaStream to be requested
+   * @param {MediaType} mediaType - Type of MediaStream to be requested
    * @param {RTCMediaStreamConstraints} mediaStreamConstraints - Constraints for the MediaStream to be requested
    * @returns {Promise} Resolves with the stream and its type
    */
@@ -311,7 +321,7 @@ export default class MediaStreamHandler {
    * @private
    * @param {MediaStream} sourceStream - MediaStream to take tracks from
    * @param {MediaStream} targetStream - MediaStream to add tracks to
-   * @param {z.media.MediaType} mediaType - Type of track to add
+   * @param {MediaType} mediaType - Type of track to add
    * @returns {undefined} Not return value
    */
   _addTracksToStream(sourceStream, targetStream, mediaType) {
@@ -323,21 +333,21 @@ export default class MediaStreamHandler {
    * Check for devices of requested media type.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Requested media type
+   * @param {MediaType} mediaType - Requested media type
    * @returns {Promise} Resolves when the device availability has been verified
    */
   _checkDeviceAvailability(mediaType) {
-    const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+    const videoTypes = [MediaType.AUDIO_VIDEO, MediaType.VIDEO];
     const noVideoTypes = !this.deviceSupport.videoInput() && videoTypes.includes(mediaType);
     if (noVideoTypes) {
-      const mediaError = new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO);
+      const mediaError = new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaType.VIDEO);
       return Promise.reject(mediaError);
     }
 
-    const audioTypes = [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO];
+    const audioTypes = [MediaType.AUDIO, MediaType.AUDIO_VIDEO];
     const noAudioDevice = !this.deviceSupport.audioInput() && audioTypes.includes(mediaType);
     if (noAudioDevice) {
-      const mediaError = new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO);
+      const mediaError = new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaType.AUDIO);
       return Promise.reject(mediaError);
     }
 
@@ -348,11 +358,11 @@ export default class MediaStreamHandler {
    * Check for permission for the requested media type.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Requested media type
+   * @param {MediaType} mediaType - Requested media type
    * @returns {Promise} Resolves true when permissions is granted
    */
   _hasPermissionToAccess(mediaType) {
-    if (!z.util.Environment.browser.supports.mediaPermissions) {
+    if (!Environment.browser.supports.mediaPermissions) {
       return Promise.resolve(false);
     }
 
@@ -360,13 +370,13 @@ export default class MediaStreamHandler {
       return this.permissionRepository.getPermissionStates(typesToCheck).then(permissions => {
         for (const permission of permissions) {
           const {permissionState, permissionType} = permission;
-          const isPermissionPrompt = permissionState === z.permission.PermissionStatusState.PROMPT;
+          const isPermissionPrompt = permissionState === PermissionStatusState.PROMPT;
           if (isPermissionPrompt) {
             this.logger.info(`Need to prompt for '${permissionType}' permission`, permissions);
             return Promise.resolve(false);
           }
 
-          const isPermissionDenied = permissionState === z.permission.PermissionStatusState.DENIED;
+          const isPermissionDenied = permissionState === PermissionStatusState.DENIED;
           if (isPermissionDenied) {
             this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
             return Promise.reject(new z.error.PermissionError(z.error.PermissionError.TYPE.DENIED));
@@ -386,21 +396,21 @@ export default class MediaStreamHandler {
    * Get permission types for the requested media type.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Requested media type
-   * @returns {Array<z.permission.PermissionType>} Array containing the necessary permission types
+   * @param {MediaType} mediaType - Requested media type
+   * @returns {Array<PermissionType>} Array containing the necessary permission types
    */
   _getPermissionTypes(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
-        return [z.permission.PermissionType.MICROPHONE];
+      case MediaType.AUDIO: {
+        return [PermissionType.MICROPHONE];
       }
 
-      case z.media.MediaType.AUDIO_VIDEO: {
-        return [z.permission.PermissionType.CAMERA, z.permission.PermissionType.MICROPHONE];
+      case MediaType.AUDIO_VIDEO: {
+        return [PermissionType.CAMERA, PermissionType.MICROPHONE];
       }
 
-      case z.media.MediaType.VIDEO: {
-        return [z.permission.PermissionType.CAMERA];
+      case MediaType.VIDEO: {
+        return [PermissionType.CAMERA];
       }
     }
   }
@@ -409,7 +419,7 @@ export default class MediaStreamHandler {
    * Clear the permission request hint timeout or hide the warning.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of requested stream
+   * @param {MediaType} mediaType - Type of requested stream
    * @returns {undefined} No return value
    */
   _clearPermissionRequestHint(mediaType) {
@@ -423,25 +433,25 @@ export default class MediaStreamHandler {
    * Hide the permission denied hint banner.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of requested stream
+   * @param {MediaType} mediaType - Type of requested stream
    * @returns {undefined} No return value
    */
   _hidePermissionFailedHint(mediaType) {
     const warningType = this._selectPermissionDeniedWarningType(mediaType);
-    amplify.publish(z.event.WebApp.WARNING.DISMISS, warningType);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
   }
 
   /**
    * Hide the permission request hint banner.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of requested stream
+   * @param {MediaType} mediaType - Type of requested stream
    * @returns {undefined} No return value
    */
   _hidePermissionRequestHint(mediaType) {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.DISMISS, warningType);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
     }
   }
 
@@ -450,7 +460,7 @@ export default class MediaStreamHandler {
    *
    * @private
    * @param {string} conversationId - ID of conversation to initiate MediaStream for
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - Type of requested MediaStream
+   * @param {MediaStreamInfo} mediaStreamInfo - Type of requested MediaStream
    * @returns {undefined} No return value
    */
   _initiateMediaStreamSuccess(conversationId, mediaStreamInfo) {
@@ -465,10 +475,10 @@ export default class MediaStreamHandler {
       }
 
       const mediaType = mediaStreamInfo.getType();
-      const isVideoSend = mediaType === z.media.MediaType.AUDIO_VIDEO;
+      const isVideoSend = mediaType === MediaType.AUDIO_VIDEO;
       this.selfStreamState.videoSend(isVideoSend);
       if (isVideoSend) {
-        this.localMediaType(z.media.MediaType.VIDEO);
+        this.localMediaType(MediaType.VIDEO);
       }
 
       const logMessage = `Received initial MediaStream containing '${mediaStream.getTracks().length}' tracks/s`;
@@ -508,10 +518,10 @@ export default class MediaStreamHandler {
    *
    * @private
    * @param {MediaStream} mediaStream - MediaStream to be released
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
+   * @param {MediaType} [mediaType=MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
    * @returns {boolean} Have tracks been stopped
    */
-  _releaseMediaStream(mediaStream, mediaType = z.media.MediaType.AUDIO_VIDEO) {
+  _releaseMediaStream(mediaStream, mediaType = MediaType.AUDIO_VIDEO) {
     return mediaStream ? this._releaseTracksFromStream(mediaStream, mediaType) : false;
   }
 
@@ -520,7 +530,7 @@ export default class MediaStreamHandler {
    *
    * @private
    * @param {MediaStream} mediaStream - MediaStream to release tracks from
-   * @param {z.media.MediaType} [mediaType=z.media.MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
+   * @param {MediaType} [mediaType=MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
    * @returns {boolean} Have tracks been stopped
    */
   _releaseTracksFromStream(mediaStream, mediaType) {
@@ -552,7 +562,7 @@ export default class MediaStreamHandler {
    * Request a MediaStream.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of MediaStream to be requested
+   * @param {MediaType} mediaType - Type of MediaStream to be requested
    * @param {RTCMediaStreamConstraints} mediaStreamConstraints - Constraints for the MediaStream to be requested
    * @param {boolean} hasPermission - Has required media permissions
    * @returns {Promise} Resolves with the stream and its type
@@ -560,7 +570,7 @@ export default class MediaStreamHandler {
   _requestMediaStream(mediaType, mediaStreamConstraints, hasPermission) {
     this.logger.info(`Requesting MediaStream access for '${mediaType}'`, mediaStreamConstraints);
 
-    const willPromptForPermission = !hasPermission && !z.util.Environment.desktop;
+    const willPromptForPermission = !hasPermission && !Environment.desktop;
     if (willPromptForPermission) {
       this._schedulePermissionHint(mediaType);
     }
@@ -574,22 +584,22 @@ export default class MediaStreamHandler {
       .call(navigator.mediaDevices, mediaStreamConstraints)
       .then(mediaStream => {
         this._clearPermissionRequestHint(mediaType);
-        return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', mediaStream);
+        return new MediaStreamInfo(MediaStreamSource.LOCAL, 'self', mediaStream);
       })
       .catch(error => {
         const {message, name} = error;
         this.logger.warn(`MediaStream request for '${mediaType}' failed: ${name} ${message}`, error);
         this._clearPermissionRequestHint(mediaType);
 
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
+        if (MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
           throw new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE, mediaType);
         }
 
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.MISC.includes(name)) {
+        if (MEDIA_STREAM_ERROR_TYPES.MISC.includes(name)) {
           throw new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_MISC, mediaType);
         }
 
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(name)) {
+        if (MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(name)) {
           throw new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION, mediaType);
         }
 
@@ -599,16 +609,16 @@ export default class MediaStreamHandler {
 
   _selectPermissionDeniedWarningType(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         return z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE;
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         return z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN;
       }
 
-      case z.media.MediaType.AUDIO_VIDEO:
-      case z.media.MediaType.VIDEO: {
+      case MediaType.AUDIO_VIDEO:
+      case MediaType.VIDEO: {
         return z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA;
       }
 
@@ -620,16 +630,16 @@ export default class MediaStreamHandler {
 
   _selectPermissionRequestWarningType(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         return z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE;
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         return z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN;
       }
 
-      case z.media.MediaType.AUDIO_VIDEO:
-      case z.media.MediaType.VIDEO: {
+      case MediaType.AUDIO_VIDEO:
+      case MediaType.VIDEO: {
         return z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA;
       }
 
@@ -643,19 +653,19 @@ export default class MediaStreamHandler {
    * Show microphone not found hint banner.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of device not found
+   * @param {MediaType} mediaType - Type of device not found
    * @param {string} conversationId - Optional conversation ID
    * @returns {undefined} No return value
    */
   _showDeviceNotFoundHint(mediaType, conversationId) {
-    if (mediaType === z.media.MediaType.AUDIO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
-    } else if (mediaType === z.media.MediaType.VIDEO) {
-      amplify.publish(z.event.WebApp.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
+    if (mediaType === MediaType.AUDIO) {
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
+    } else if (mediaType === MediaType.VIDEO) {
+      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
     }
 
     if (conversationId) {
-      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversationId);
+      amplify.publish(WebAppEvents.CALL.STATE.REJECT, conversationId);
     }
   }
 
@@ -663,14 +673,14 @@ export default class MediaStreamHandler {
    * Show permission denied hint banner.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of media access request
+   * @param {MediaType} mediaType - Type of media access request
    * @returns {undefined} No return value
    */
   _showPermissionDeniedHint(mediaType) {
-    const videoTypes = [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO];
+    const videoTypes = [MediaType.AUDIO_VIDEO, MediaType.VIDEO];
     if (!videoTypes.includes(mediaType)) {
       const warningType = this._selectPermissionDeniedWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
+      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
     }
   }
 
@@ -678,13 +688,13 @@ export default class MediaStreamHandler {
    * Show permission request hint banner.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of requested MediaStream
+   * @param {MediaType} mediaType - Type of requested MediaStream
    * @returns {undefined} No return value
    */
   _showPermissionRequestHint(mediaType) {
-    if (!z.util.Environment.electron) {
+    if (!Environment.electron) {
       const warningType = this._selectPermissionRequestWarningType(mediaType);
-      amplify.publish(z.event.WebApp.WARNING.SHOW, warningType);
+      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
     }
   }
 
@@ -692,7 +702,7 @@ export default class MediaStreamHandler {
    * Update MediaStream used in joined call.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - New MediaStream to use
+   * @param {MediaStreamInfo} mediaStreamInfo - New MediaStream to use
    * @returns {Promise} Resolves when MediaStream was replaced
    */
   _updateJoinedCall(mediaStreamInfo) {
@@ -732,8 +742,8 @@ export default class MediaStreamHandler {
    * Upgrade the local MediaStream with new MediaStreamTracks.
    *
    * @private
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStreamInfo containing new MediaStreamTracks
-   * @returns {Promise<z.media.MediaStreamInfo>} Resolves with new MediaStream to be used
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStreamInfo containing new MediaStreamTracks
+   * @returns {Promise<MediaStreamInfo>} Resolves with new MediaStream to be used
    */
   _updateMediaStream(mediaStreamInfo) {
     if (!this.localMediaStream()) {
@@ -751,7 +761,7 @@ export default class MediaStreamHandler {
     this._addTracksToStream(newMediaStream, clonedMediaStream, mediaType);
 
     this.logger.info(`Upgraded the MediaStream to update '${mediaType}'`, clonedMediaStream);
-    return Promise.resolve(new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', clonedMediaStream));
+    return Promise.resolve(new MediaStreamInfo(MediaStreamSource.LOCAL, 'self', clonedMediaStream));
   }
 
   //##############################################################################
@@ -760,11 +770,11 @@ export default class MediaStreamHandler {
 
   /**
    * Add a remote MediaStream.
-   * @param {z.media.MediaStreamInfo} mediaStreamInfo - MediaStream information
+   * @param {MediaStreamInfo} mediaStreamInfo - MediaStream information
    * @returns {undefined} No return value
    */
   addRemoteMediaStream(mediaStreamInfo) {
-    const handledStreamTypes = [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO, z.media.MediaType.AUDIO_VIDEO];
+    const handledStreamTypes = [MediaType.AUDIO, MediaType.VIDEO, MediaType.AUDIO_VIDEO];
     if (!handledStreamTypes.includes(mediaStreamInfo.getType())) {
       throw new z.error.MediaError(z.error.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
@@ -818,12 +828,12 @@ export default class MediaStreamHandler {
 
   // Toggle the screen.
   toggleScreenSend() {
-    return this._toggleMediaSend(z.media.MediaType.SCREEN, this._toggleScreenSend);
+    return this._toggleMediaSend(MediaType.SCREEN, this._toggleScreenSend);
   }
 
   // Toggle the camera.
   toggleVideoSend() {
-    return this._toggleMediaSend(z.media.MediaType.VIDEO, this._toggleVideoSend);
+    return this._toggleMediaSend(MediaType.VIDEO, this._toggleVideoSend);
   }
 
   // Reset the enabled states of media types.
@@ -831,7 +841,7 @@ export default class MediaStreamHandler {
     this.selfStreamState.audioSend(true);
     this.selfStreamState.screenSend(false);
     this.selfStreamState.videoSend(false);
-    this.localMediaType(z.media.MediaType.AUDIO);
+    this.localMediaType(MediaType.AUDIO);
   }
 
   // Reset the MediaStream and states.
@@ -845,27 +855,27 @@ export default class MediaStreamHandler {
 
   /**
    * Set the self stream state to reflect current media type.
-   * @param {z.media.MediaType} mediaType - Type of state to enable
+   * @param {MediaType} mediaType - Type of state to enable
    * @returns {undefined} No return value
    */
   _setSelfStreamState(mediaType) {
     switch (mediaType) {
-      case z.media.MediaType.AUDIO: {
+      case MediaType.AUDIO: {
         this.selfStreamState.audioSend(true);
         break;
       }
 
-      case z.media.MediaType.SCREEN: {
+      case MediaType.SCREEN: {
         this.selfStreamState.videoSend(false);
         this.selfStreamState.screenSend(true);
-        this.localMediaType(z.media.MediaType.SCREEN);
+        this.localMediaType(MediaType.SCREEN);
         break;
       }
 
-      case z.media.MediaType.VIDEO: {
+      case MediaType.VIDEO: {
         this.selfStreamState.videoSend(true);
         this.selfStreamState.screenSend(false);
-        this.localMediaType(z.media.MediaType.VIDEO);
+        this.localMediaType(MediaType.VIDEO);
         break;
       }
 
@@ -879,18 +889,18 @@ export default class MediaStreamHandler {
    * Set the enabled state of a new MediaStream.
    * @private
    * @param {MediaStream} mediaStream - MediaStream to set state on
-   * @param {z.media.MediaType} mediaType - Type to set state for
+   * @param {MediaType} mediaType - Type to set state for
    * @returns {undefined} No return value
    */
   _setStreamState(mediaStream, mediaType) {
     const includesAudioTracks = MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_AUDIO.includes(mediaType);
     if (includesAudioTracks) {
-      this._setTrackState(mediaStream, z.media.MediaType.AUDIO);
+      this._setTrackState(mediaStream, MediaType.AUDIO);
     }
 
     const includesVideoTracks = MediaStreamHandler.CONFIG.MEDIA_TYPE.CONTAINS_VIDEO.includes(mediaType);
     if (includesVideoTracks) {
-      this._setTrackState(mediaStream, z.media.MediaType.VIDEO);
+      this._setTrackState(mediaStream, MediaType.VIDEO);
     }
   }
 
@@ -901,7 +911,7 @@ export default class MediaStreamHandler {
       this.logger.warn(`Media stream contains multiple '${mediaType}' tracks`, streamTracks);
     }
 
-    const isVideo = mediaType === z.media.MediaType.VIDEO;
+    const isVideo = mediaType === MediaType.VIDEO;
     const isEnabledState = isVideo ? this.hasActiveVideo() : this.selfStreamState.audioSend();
 
     streamTracks.forEach(streamTrack => (streamTrack.enabled = isEnabledState));
@@ -922,7 +932,7 @@ export default class MediaStreamHandler {
    * Toggle the screen stream.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Type of media to toggle
+   * @param {MediaType} mediaType - Type of media to toggle
    * @param {Function} toggleFn - Function to toggle type of media
    * @returns {Promise} Resolves when the stream has been toggled
    */
@@ -969,14 +979,14 @@ export default class MediaStreamHandler {
    * Toggle the enabled state of a MediaStream.
    *
    * @private
-   * @param {z.media.MediaType} mediaType - Media type to toggle
+   * @param {MediaType} mediaType - Media type to toggle
    * @param {boolean} sendState - New call property send state
    * @returns {undefined} No return value
    */
   _toggleStreamEnabled(mediaType, sendState) {
-    const isTypeAudio = mediaType === z.media.MediaType.AUDIO;
+    const isTypeAudio = mediaType === MediaType.AUDIO;
     if (isTypeAudio) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !sendState);
+      amplify.publish(WebAppEvents.CALL.MEDIA.MUTE_AUDIO, !sendState);
     }
 
     if (this.localMediaStream()) {

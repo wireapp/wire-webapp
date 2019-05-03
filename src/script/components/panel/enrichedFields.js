@@ -18,6 +18,9 @@
  */
 
 import ko from 'knockout';
+
+import {t} from 'Util/LocalizerUtil';
+
 import {resolve, graph} from '../../config/appResolver';
 
 ko.components.register('enriched-fields', {
@@ -33,18 +36,34 @@ ko.components.register('enriched-fields', {
       </div>
     <!-- /ko -->
   `,
-  viewModel: function({userId, onFieldsLoaded = () => {}}) {
-    this.richProfileRepository = resolve(graph.RichProfileRepository);
-    this.fields = ko.observable([]);
-
-    this.richProfileRepository
-      .getUserRichProfile(ko.unwrap(userId))
-      .then(richProfile => {
-        if (richProfile.fields) {
-          this.fields(richProfile.fields);
-          onFieldsLoaded(this.fields());
-        }
-      })
-      .catch(() => {});
+  viewModel: {
+    createViewModel: function({user, onFieldsLoaded = () => {}}, {element}) {
+      this.richProfileRepository = resolve(graph.RichProfileRepository);
+      this.fields = ko.observable([]);
+      ko.computed(
+        () => {
+          if (user()) {
+            const fields = user().email() ? [{type: t('userProfileEmail'), value: user().email()}] : [];
+            this.richProfileRepository
+              .getUserRichProfile(ko.unwrap(user).id)
+              .then(richProfile => {
+                if (richProfile.fields) {
+                  fields.push(...richProfile.fields);
+                }
+              })
+              .catch(() => {})
+              .finally(() => {
+                this.fields(fields);
+                onFieldsLoaded(this.fields());
+              });
+          } else {
+            this.fields([]);
+          }
+        },
+        this,
+        {disposeWhenNodeIsRemoved: element}
+      );
+      return this;
+    },
   },
 });

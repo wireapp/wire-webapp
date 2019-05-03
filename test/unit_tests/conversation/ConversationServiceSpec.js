@@ -17,7 +17,8 @@
  *
  */
 
-import ConversationMapper from 'src/script/conversation/ConversationMapper';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 describe('ConversationService', () => {
   let conversation_mapper = null;
@@ -25,7 +26,7 @@ describe('ConversationService', () => {
   let server = null;
   let storage_service = null;
   const test_factory = new TestFactory();
-  const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+  const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
   beforeAll(() => {
     return test_factory.exposeConversationActors().then(() => {

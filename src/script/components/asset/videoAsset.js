@@ -17,10 +17,11 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
 
-import AbstractAssetTransferStateTracker from './AbstractAssetTransferStateTracker';
+import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import {AssetTransferState} from '../../assets/AssetTransferState';
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {
   /**
@@ -32,7 +33,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
    */
   constructor(params, component_info) {
     super(ko.unwrap(params.message));
-    this.logger = Logger('VideoAssetComponent');
+    this.logger = getLogger('VideoAssetComponent');
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
@@ -59,6 +60,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.displaySmall = ko.observable(!!params.isQuote);
 
     this.TimeUtil = TimeUtil;
+    this.AssetTransferState = AssetTransferState;
   }
 
   on_loadedmetadata() {
@@ -120,7 +122,7 @@ ko.components.register('video-asset', {
         data-uie-name="video-asset">
         <video playsinline
                data-bind="attr: {src: video_src, poster: preview},
-                          css: {hidden: transferState() === z.assets.AssetTransferState.UPLOADING},
+                          css: {hidden: transferState() === AssetTransferState.UPLOADING},
                           style: {backgroundColor: preview() ? '#000': ''},
                           event: {loadedmetadata: on_loadedmetadata,
                                   timeupdate: on_timeupdate,
@@ -131,12 +133,12 @@ ko.components.register('video-asset', {
           <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
         <!-- /ko -->
         <!-- ko ifnot: video_playback_error -->
-          <!-- ko if: transferState() === z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
             <div class="asset-placeholder loading-dots">
             </div>
           <!-- /ko -->
 
-          <!-- ko if: transferState() !== z.assets.AssetTransferState.UPLOAD_PENDING -->
+          <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
             <div class="video-controls-center">
               <!-- ko if: displaySmall() -->
                 <media-button params="src: video_element,

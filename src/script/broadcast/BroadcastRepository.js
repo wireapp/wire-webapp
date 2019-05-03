@@ -17,13 +17,13 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.broadcast = z.broadcast || {};
+import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {WebAppEvents} from '../event/WebApp';
 
 // Broadcast repository for all broadcast interactions with the broadcast service
-z.broadcast.BroadcastRepository = class BroadcastRepository {
+class BroadcastRepository {
   /**
    * Construct a new Broadcast Repository.
    *
@@ -39,7 +39,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.messageSender = messageSender;
-    this.logger = Logger('z.broadcast.BroadcastRepository');
+    this.logger = getLogger('BroadcastRepository');
 
     this.clientMismatchHandler = this.conversationRepository.clientMismatchHandler;
 
@@ -55,7 +55,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     Needing the ConversationRepository in the BroadcastRepository doesn't make sense. We need to get rid of that dependency
     The heavy lifting resides in generalizing the `clientMismatchHandler` so that it doesn't need to directly call the ConversationRepo
     */
-    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
+    amplify.subscribe(WebAppEvents.BROADCAST.SEND_MESSAGE, ({genericMessage, recipients}) => {
       this.broadcastGenericMessage(genericMessage, recipients);
     });
   }
@@ -69,7 +69,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     return this.messageSender.queueMessage(() => {
       const recipients = this._createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
-        const eventInfoEntity = new z.conversation.EventInfoEntity(genericMessage);
+        const eventInfoEntity = new EventInfoEntity(genericMessage);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
@@ -96,7 +96,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Event to be broadcasted
+   * @param {EventInfoEntity} eventInfoEntity - Event to be broadcasted
    * @param {Object} payload - Payload
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
@@ -128,4 +128,6 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
         });
       });
   }
-};
+}
+
+export {BroadcastRepository};

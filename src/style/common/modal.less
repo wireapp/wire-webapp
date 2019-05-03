@@ -194,15 +194,7 @@
   }
 }
 
-.modal-acount-new-devices {
-  .label-xs;
-
-  margin-bottom: 16px;
-  line-height: @line-height-sm;
-
-  & div:nth-child(even) {
-    margin-bottom: 16px;
-  }
+.modal-account-new-devices {
 }
 
 // mixings
@@ -260,10 +252,21 @@
     border-radius: 4px;
     cursor: default;
     font-size: 14px;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     transform: scale(0.8);
     transition: transform 0.35s @ease-out-quart;
+
+    &__device-list {
+      .label-xs;
+
+      margin-bottom: 16px;
+      line-height: @line-height-sm;
+
+      & div:nth-child(even) {
+        margin-bottom: 16px;
+      }
+    }
 
     .modal__overlay--visible & {
       transform: scale(1);
@@ -311,6 +314,12 @@
       justify-content: center;
       cursor: pointer;
     }
+  }
+
+  &__body {
+    padding: 0 16px 16px;
+    margin: 0 -16px -16px;
+    overflow-y: auto;
   }
 
   &__buttons {
@@ -364,6 +373,12 @@
     margin: 8px 0;
   }
 
+  &__text {
+    margin-bottom: 16px;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+  }
+
   &__input {
     width: calc(100% + 16px);
     height: 48px;
@@ -372,6 +387,7 @@
     border: none;
     background: var(--app-bg-secondary);
     border-radius: 4px;
+    color: currentColor;
     outline: none;
 
     &::placeholder {

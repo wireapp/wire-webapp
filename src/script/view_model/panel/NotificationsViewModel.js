@@ -17,9 +17,10 @@
  *
  */
 
-import BasePanelViewModel from './BasePanelViewModel';
+import {BasePanelViewModel} from './BasePanelViewModel';
+import {NotificationSetting} from '../../conversation/NotificationSetting';
 
-export default class NotificationsViewModel extends BasePanelViewModel {
+export class NotificationsViewModel extends BasePanelViewModel {
   constructor(params) {
     super(params);
 
@@ -27,8 +28,8 @@ export default class NotificationsViewModel extends BasePanelViewModel {
 
     this.conversationRepository = params.repositories.conversation;
 
-    this.settings = Object.values(z.conversation.NotificationSetting.STATE).map(status => ({
-      text: z.conversation.NotificationSetting.getText(status),
+    this.settings = Object.values(NotificationSetting.STATE).map(status => ({
+      text: NotificationSetting.getText(status),
       value: status,
     }));
 

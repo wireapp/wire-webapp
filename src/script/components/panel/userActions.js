@@ -18,7 +18,10 @@
  */
 
 import ko from 'knockout';
-import {t} from 'utils/LocalizerUtil';
+
+import {t} from 'Util/LocalizerUtil';
+
+import {WebAppEvents} from '../../event/WebApp';
 
 import './panelActions';
 
@@ -48,7 +51,7 @@ ko.components.register('user-actions', {
         condition: () => isMe(),
         item: {
           click: () => {
-            amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+            amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
             onAction(Actions.OPEN_PROFILE);
           },
           icon: 'profile-icon',

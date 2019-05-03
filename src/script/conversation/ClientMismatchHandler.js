@@ -17,28 +17,28 @@
  *
  */
 
-import Logger from 'utils/Logger';
-import {getDifference} from 'utils/ArrayUtil';
+import {getLogger} from 'Util/Logger';
+import {getDifference} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
-  constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeRepository, userRepository) {
+  constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
     this.eventRepository = eventRepository;
-    this.serverTimeRepository = serverTimeRepository;
+    this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
-    this.logger = Logger('z.conversation.ClientMismatchHandler');
+    this.logger = getLogger('z.conversation.ClientMismatchHandler');
   }
 
   /**
    * Handle client mismatch response from backend.
    *
    * @note As part of 412 or general response when sending encrypted message
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about message
+   * @param {EventInfoEntity} eventInfoEntity - Info about message
    * @param {Object} clientMismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
    * @param {Object} payload - Initial payload resulting in a 412
    * @returns {Promise} Resolve when mismatch was handled
@@ -94,7 +94,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    * @private
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
@@ -142,7 +142,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
    *
    * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Payload of the request
-   * @param {z.conversation.EventInfoEntity} eventInfoEntity - Info about event
+   * @param {EventInfoEntity} eventInfoEntity - Info about event
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
@@ -171,7 +171,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         if (noRemainingClients) {
           const isGroupConversation = conversationEntity && conversationEntity.isGroup();
           if (isGroupConversation) {
-            const timestamp = this.serverTimeRepository.toServerTimestamp();
+            const timestamp = this.serverTimeHandler.toServerTimestamp();
             const event = z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, false, timestamp);
 
             this.eventRepository.injectEvent(event);

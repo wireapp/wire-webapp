@@ -17,31 +17,33 @@
  *
  */
 
-describe('z.util.emoji', () => {
-  describe('includes_only_emojies', () => {
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
+
+describe('EmojiUtil', () => {
+  describe('includesOnlyEmojis', () => {
     it('returns false for empty string', () => {
-      expect(z.util.EmojiUtil.includesOnlyEmojies('')).toBeFalsy();
+      expect(includesOnlyEmojis('')).toBeFalsy();
     });
 
     it('returns false for undefined', () => {
-      expect(z.util.EmojiUtil.includesOnlyEmojies('')).toBeFalsy();
+      expect(includesOnlyEmojis()).toBeFalsy();
     });
 
-    it('returns true for text containing only emojies (Miscellaneous Symbols)', () => {
-      expect(z.util.EmojiUtil.includesOnlyEmojies('☕')).toBeTruthy();
-      expect(z.util.EmojiUtil.includesOnlyEmojies('⛄')).toBeTruthy();
-      expect(z.util.EmojiUtil.includesOnlyEmojies('⚽')).toBeTruthy();
-      expect(z.util.EmojiUtil.includesOnlyEmojies('🇩🇰')).toBeTruthy();
-      expect(z.util.EmojiUtil.includesOnlyEmojies('🏌️‍♀️')).toBeTruthy();
+    it('returns true for text containing only emojis (Miscellaneous Symbols)', () => {
+      expect(includesOnlyEmojis('☕')).toBeTruthy();
+      expect(includesOnlyEmojis('⛄')).toBeTruthy();
+      expect(includesOnlyEmojis('⚽')).toBeTruthy();
+      expect(includesOnlyEmojis('🇩🇰')).toBeTruthy();
+      expect(includesOnlyEmojis('🏌️‍♀️')).toBeTruthy();
     });
 
-    it('returns true for text containing only emojies and whitespaces (Miscellaneous Symbols)', () => {
-      expect(z.util.EmojiUtil.includesOnlyEmojies('☕ ⚽')).toBeTruthy();
-      expect(z.util.EmojiUtil.includesOnlyEmojies('☕  ⚽')).toBeTruthy();
+    it('returns true for text containing only emojis and whitespaces (Miscellaneous Symbols)', () => {
+      expect(includesOnlyEmojis('☕ ⚽')).toBeTruthy();
+      expect(includesOnlyEmojis('☕  ⚽')).toBeTruthy();
     });
 
-    it('returns false for text containing only text and emojies', () => {
-      expect(z.util.EmojiUtil.includesOnlyEmojies('Hey 💩')).toBeFalsy();
+    it('returns false for text containing only text and emojis', () => {
+      expect(includesOnlyEmojis('Hey 💩')).toBeFalsy();
     });
   });
 });

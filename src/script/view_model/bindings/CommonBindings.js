@@ -26,10 +26,14 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
-import TimeUtil from 'utils/TimeUtil';
-import overlayedObserver from '../../ui/overlayedObserver';
-import viewportObserver from '../../ui/viewportObserver';
-import {t} from 'utils/LocalizerUtil';
+import {TimeUtil} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {stripUrlWrapper} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {isEnterKey} from 'Util/KeyboardUtil';
+
+import {overlayedObserver} from '../../ui/overlayedObserver';
+import {viewportObserver} from '../../ui/viewportObserver';
 
 /**
  * Use it on the drop area.
@@ -225,7 +229,7 @@ ko.bindingHandlers.enter = {
     const wrapper = function(_data, jquery_event) {
       const keyboard_event = jquery_event.originalEvent || jquery_event;
 
-      if (z.util.KeyboardUtil.isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+      if (isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, keyboard_event);
@@ -284,7 +288,7 @@ ko.bindingHandlers.file_select = {
  */
 ko.bindingHandlers.loadImage = {
   init(element, valueAccessor) {
-    const image_src = z.util.stripUrlWrapper(ko.unwrap(valueAccessor()));
+    const image_src = stripUrlWrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
@@ -499,7 +503,7 @@ ko.bindingHandlers.simplebar = {
 
 ko.bindingHandlers.electron_remove = {
   init(element) {
-    if (z.util.Environment.electron) {
+    if (Environment.electron) {
       $(element).remove();
     }
   },
@@ -685,7 +689,7 @@ ko.bindingHandlers.tooltip = {
  */
 ko.bindingHandlers.clickOrDrag = {
   init(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    const isMacDesktop = z.util.Environment.electron && z.util.Environment.os.mac;
+    const isMacDesktop = Environment.electron && Environment.os.mac;
     const context = bindingContext.$data;
     const callback = valueAccessor().bind(context, context);
     if (!isMacDesktop) {

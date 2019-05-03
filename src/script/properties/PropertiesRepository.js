@@ -17,13 +17,18 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
 
-import ConsentType from '../user/ConsentType';
-import ConsentValue from '../user/ConsentValue';
-import ReceiptMode from '../conversation/ReceiptMode';
-import WebappProperties from './WebappProperties';
-import {t} from 'utils/LocalizerUtil';
+import {ConsentType} from '../user/ConsentType';
+import {ConsentValue} from '../user/ConsentValue';
+import {ReceiptMode} from '../conversation/ReceiptMode';
+import {WebappProperties} from './WebappProperties';
+import {PROPERTIES_TYPE} from './PropertiesType';
+
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WebAppEvents} from '../event/WebApp';
 
 class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -44,7 +49,7 @@ class PropertiesRepository {
   constructor(propertiesService, selfService) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
-    this.logger = Logger('PropertiesRepository');
+    this.logger = getLogger('PropertiesRepository');
 
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
@@ -54,20 +59,20 @@ class PropertiesRepository {
 
   checkPrivacyPermission() {
     const isCheckConsentDisabled = !z.config.FEATURE.CHECK_CONSENT;
-    const isPrivacyPreferenceSet = this.getPreference(z.properties.PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
 
     return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
       : new Promise(resolve => {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.viewModel.ModalsViewModel.TYPE.CONFIRM, {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
             action: () => {
-              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, true);
+              this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
               this._publishProperties();
               resolve();
             },
             preventClose: true,
             secondary: () => {
-              this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
+              this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
               resolve();
             },
             text: {
@@ -82,7 +87,7 @@ class PropertiesRepository {
 
   /**
    * Get the current preference for a property type.
-   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to get
+   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to get
    * @returns {*} Preference value
    */
   getPreference(propertiesType) {
@@ -152,26 +157,26 @@ class PropertiesRepository {
 
   _initTemporaryGuestAccount() {
     this.logger.info('Temporary guest user: Using default properties');
-    this.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, false);
+    this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
     return Promise.resolve(this._publishProperties());
   }
 
   _publishProperties() {
-    amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
+    amplify.publish(WebAppEvents.PROPERTIES.UPDATED, this.properties);
     return this.properties;
   }
 
   /**
    * Save property setting.
    *
-   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to update
+   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to update
    * @param {*} updatedPreference - New property setting
    * @returns {undefined} No return value
    */
   savePreference(propertiesType, updatedPreference) {
     if (updatedPreference === undefined) {
       switch (propertiesType) {
-        case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
+        case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
           updatedPreference = Date.now();
           break;
         default:
@@ -232,7 +237,7 @@ class PropertiesRepository {
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         return this.selfService
-          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${z.util.Environment.version(false)}`)
+          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`)
           .then(() => {
             if (value === ConsentValue.NOT_GIVEN) {
               return this.propertiesService.deletePropertiesByKey(key);
@@ -256,29 +261,29 @@ class PropertiesRepository {
 
   _publishPropertyUpdate(propertiesType, updatedPreference) {
     switch (propertiesType) {
-      case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
+      case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.INTERFACE.THEME:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
+      case PROPERTIES_TYPE.INTERFACE.THEME:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
+      case PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-        amplify.publish(Logger.prototype.LOG_ON_DEBUG, updatedPreference);
+      case PROPERTIES_TYPE.ENABLE_DEBUGGING:
+        amplify.publish(getLogger.prototype.LOG_ON_DEBUG, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
+      case PROPERTIES_TYPE.NOTIFICATIONS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
+      case PROPERTIES_TYPE.PREVIEWS.SEND:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.PRIVACY:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
+      case PROPERTIES_TYPE.PRIVACY:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
-      case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-        amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
+      case PROPERTIES_TYPE.SOUND_ALERTS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
@@ -289,7 +294,7 @@ class PropertiesRepository {
    * Set the preference of specified type
    *
    * @private
-   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to set
+   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to set
    * @param {*} changedPreference - New preference to set
    * @returns {undefined} No return value
    */
@@ -313,4 +318,4 @@ class PropertiesRepository {
   }
 }
 
-export default PropertiesRepository;
+export {PropertiesRepository};

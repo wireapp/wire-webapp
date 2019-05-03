@@ -17,15 +17,12 @@
  *
  */
 
-import Logger from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
+import {WebAppEvents} from '../../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.list = z.viewModel.list || {};
-
-z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
+class TakeoverViewModel {
   /**
    * View model for the username takeover screen.
    *
@@ -37,7 +34,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.listViewModel = listViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = Logger('z.viewModel.list.TakeoverViewModel');
+    this.logger = getLogger('TakeoverViewModel');
 
     this.selfUser = this.userRepository.self;
 
@@ -48,7 +45,7 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
 
   chooseUsername() {
     this.listViewModel.dismissModal();
-    window.requestAnimationFrame(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT));
+    window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
   }
 
   keepUsername() {
@@ -57,14 +54,16 @@ z.viewModel.list.TakeoverViewModel = class TakeoverViewModel {
       .then(() => {
         const conversationEntity = this.conversationRepository.getMostRecentConversation();
         if (conversationEntity) {
-          return amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+          return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
         }
       })
-      .catch(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT))
+      .catch(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT))
       .then(() => this.listViewModel.dismissModal());
   }
-};
+}
+
+export {TakeoverViewModel};

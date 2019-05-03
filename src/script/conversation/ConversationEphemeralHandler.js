@@ -19,10 +19,15 @@
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import EphemeralStatusType from '../message/EphemeralStatusType';
-import Logger from 'utils/Logger';
-import TimeUtil from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
+import {getLogger} from 'Util/Logger';
+import {TimeUtil} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
+import {arrayToBase64, noop} from 'Util/util';
+import {obfuscate} from 'Util/StringUtil';
+
+import {EphemeralStatusType} from '../message/EphemeralStatusType';
+import {StatusType} from '../message/StatusType';
+import {BackendEvent} from '../event/Backend';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -49,18 +54,18 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   constructor(conversationMapper, eventService, eventListeners) {
     super();
 
-    const defaultEventListeners = {onMessageTimeout: z.util.noop};
+    const defaultEventListeners = {onMessageTimeout: noop};
     this.eventListeners = Object.assign({}, defaultEventListeners, eventListeners);
     this.eventService = eventService;
 
     this.setEventHandlingConfig({
-      [z.event.Backend.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
+      [BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
 
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = Logger('z.conversation.ConversationEphemeralHandler');
+    this.logger = getLogger('z.conversation.ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 
@@ -90,7 +95,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
    * @returns {undefined} No return value
    */
   checkMessageTimer(messageEntity, timeOffset) {
-    const hasHitBackend = messageEntity.status() > z.message.StatusType.SENDING;
+    const hasHitBackend = messageEntity.status() > StatusType.SENDING;
     if (!hasHitBackend) {
       return;
     }
@@ -212,10 +217,10 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
         url: linkPreview.url,
         urlOffset: 0,
       });
-      return z.util.arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
+      return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
-    obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);
+    obfuscatedAsset.text = obfuscate(assetEntity.text);
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
