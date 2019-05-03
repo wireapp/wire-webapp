@@ -65,7 +65,6 @@ import ListBackgroundBindingsGlobal from '../view_model/bindings/ListBackgroundB
 import LocalizationBindingsGlobal from '../view_model/bindings/LocalizationBindings.js';
 import MessageListBindingsGlobal from '../view_model/bindings/MessageListBindings.js';
 import VideoCallingBindingsGlobal from '../view_model/bindings/VideoCallingBindings.js';
-import ContentViewModelGlobal from '../view_model/ContentViewModel.js';
 import CollectionDetailsViewModelGlobal from '../view_model/content/CollectionDetailsViewModel.js';
 import CollectionViewModelGlobal from '../view_model/content/CollectionViewModel.js';
 import ConnectRequestsViewModelGlobal from '../view_model/content/ConnectRequestsViewModel.js';

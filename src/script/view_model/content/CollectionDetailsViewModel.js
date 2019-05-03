@@ -26,12 +26,13 @@ import {koPushDeferred} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.viewModel.ContentViewModel
+// Parent: ContentViewModel
 z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
   constructor() {
     this.itemAdded = this.itemAdded.bind(this);
@@ -118,7 +119,7 @@ z.viewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   clickOnBackButton() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   }
 
   clickOnImage(messageEntity) {

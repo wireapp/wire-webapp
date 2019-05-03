@@ -29,6 +29,7 @@ import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 import {WebAppEvents} from '../event/WebApp';
 import {MotionDuration} from '../motion/MotionDuration';
+import {ContentViewModel} from './ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -187,7 +188,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _switchContent(newContentState) {
-    const stateIsCollection = newContentState === z.viewModel.ContentViewModel.STATE.COLLECTION;
+    const stateIsCollection = newContentState === ContentViewModel.STATE.COLLECTION;
     if (stateIsCollection) {
       this._forceClosePanel();
     }

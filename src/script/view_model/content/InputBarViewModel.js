@@ -43,7 +43,7 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.viewModel.ContentViewModel
+// Parent: ContentViewModel
 z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   static get CONFIG() {
     return {

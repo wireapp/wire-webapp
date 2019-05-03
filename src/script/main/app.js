@@ -94,6 +94,7 @@ import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ContentViewModel} from '../view_model/ContentViewModel';
 
 class App {
   static get CONFIG() {
@@ -638,7 +639,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
