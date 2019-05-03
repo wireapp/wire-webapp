@@ -283,10 +283,7 @@ window.TestFactory.prototype.exposeConnectActors = function() {
  */
 window.TestFactory.prototype.exposeSearchActors = function() {
   return this.exposeUserActors().then(() => {
-    TestFactory.search_repository = new SearchRepository(
-      resolveDependency(graph.BackendClient),
-      TestFactory.user_repository
-    );
+    TestFactory.search_repository = new SearchRepository(resolve(graph.BackendClient), TestFactory.user_repository);
 
     return TestFactory.search_repository;
   });
