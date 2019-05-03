@@ -17,21 +17,18 @@
  *
  */
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.PROTO_MESSAGE_TYPE = {
-  ASSET_NOT_UPLOADED: 'notUploaded',
-  ASSET_ORIGINAL: 'original',
-  ASSET_PREVIEW: 'preview',
-  ASSET_UPLOADED: 'uploaded',
-  EPHEMERAL_EXPIRATION: 'expireAfterMillis',
-  EXPECTS_READ_CONFIRMATION: 'expectsReadConfirmation',
-  LINK_PREVIEW_IMAGE: 'image',
-  LINK_PREVIEW_TITLE: 'title',
-  LINK_PREVIEWS: 'linkPreview',
-  MENTION_TYPE_USER_ID: 'userId',
-  MENTIONS: 'mentions',
-  QUOTE: 'quote',
-  TWEET: 'tweet',
-};
+export enum PROTO_MESSAGE_TYPE {
+  ASSET_NOT_UPLOADED = 'notUploaded',
+  ASSET_ORIGINAL = 'original',
+  ASSET_PREVIEW = 'preview',
+  ASSET_UPLOADED = 'uploaded',
+  EPHEMERAL_EXPIRATION = 'expireAfterMillis',
+  EXPECTS_READ_CONFIRMATION = 'expectsReadConfirmation',
+  LINK_PREVIEW_IMAGE = 'image',
+  LINK_PREVIEW_TITLE = 'title',
+  LINK_PREVIEWS = 'linkPreview',
+  MENTION_TYPE_USER_ID = 'userId',
+  MENTIONS = 'mentions',
+  QUOTE = 'quote',
+  TWEET = 'tweet',
+}

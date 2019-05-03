@@ -24,6 +24,7 @@ import {assetV3, legacyAsset} from 'Util/ValidationUtil';
 import {WebWorker} from 'Util/worker';
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
 
@@ -84,8 +85,8 @@ export class AssetService {
         });
 
         const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
         });
 
         return protoAsset;
@@ -111,7 +112,7 @@ export class AssetService {
           size: compressedBytes.length,
         });
 
-        (protoAsset as any)[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+        protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });

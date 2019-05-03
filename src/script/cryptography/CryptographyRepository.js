@@ -26,13 +26,11 @@ import {getLogger} from 'Util/Logger';
 import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
+import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.CryptographyRepository = class CryptographyRepository {
+export class CryptographyRepository {
   static get CONFIG() {
     return {
       UNKNOWN_DECRYPTION_ERROR_CODE: 999,
@@ -45,13 +43,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
   /**
    * Construct a new Cryptography repository.
-   * @param {z.cryptography.CryptographyService} cryptographyService - Backend REST API cryptography service implementation
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageRepository} storageRepository - Repository for all storage interactions
    */
-  constructor(cryptographyService, storageRepository) {
-    this.cryptographyService = cryptographyService;
+  constructor(backendClient, storageRepository) {
+    this.cryptographyService = new CryptographyService(backendClient);
     this.storageRepository = storageRepository;
-    this.logger = getLogger('z.cryptography.CryptographyRepository');
+    this.logger = getLogger('CryptographyRepository');
 
     this.cryptographyMapper = new CryptographyMapper();
 
@@ -535,4 +533,4 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     raygunError.stack = error.stack;
     Raygun.send(raygunError, customData);
   }
-};
+}
