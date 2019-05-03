@@ -36,6 +36,7 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {getLogger} from 'Util/Logger';
 import {TimeUtil} from 'Util/TimeUtil';
@@ -1816,8 +1817,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+          [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
         });
 
         return protoAsset;
@@ -1870,8 +1871,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             const protoAsset = new Asset({
-              [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
-              [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+              [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
+              [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
             });
 
             const genericMessage = new GenericMessage({
@@ -1901,8 +1902,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
-      [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
     });
 
     const generic_message = new GenericMessage({
@@ -2005,7 +2006,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendKnock(conversationEntity) {
     const protoKnock = new Knock({
-      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
       hotKnock: false,
     });
 
@@ -2298,22 +2299,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .map(mentionEntity => mentionEntity.toProto());
 
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
+      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
     }
 
     if (quoteEntity) {
       const protoQuote = quoteEntity.toProto();
       this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
+      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
     }
 
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
+      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
     }
 
     if (expectsReadConfirmation) {
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
+      protoText[PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
     }
 
     return protoText;
@@ -2331,7 +2332,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
-      [z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
+      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
     });
 
     genericMessage = new GenericMessage({
@@ -3916,8 +3917,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
-      messageTimer =
-        genericMessage[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TimeUtil.UNITS_IN_MILLIS.SECOND;
+      messageTimer = genericMessage[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TimeUtil.UNITS_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -3951,7 +3951,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
         if (!length) {
           actionType = 'text';
           numberOfMentions = protoText.mentions.length;

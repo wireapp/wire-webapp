@@ -21,6 +21,7 @@ import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 
 import {truncate} from 'Util/StringUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 window.z = window.z || {};
 window.z.links = z.links || {};
@@ -61,8 +62,8 @@ z.links.LinkPreviewProtoBuilder = {
           const username = data.url.match(/com\/([^/]*)\//)[1];
           const protoTweet = new Tweet({author, username});
 
-          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
-          protoLinkPreview[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
+          protoLinkPreview[PROTO_MESSAGE_TYPE.TWEET] = protoTweet;
+          protoLinkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_TITLE] = truncatedDescription;
         }
 
         return protoLinkPreview;

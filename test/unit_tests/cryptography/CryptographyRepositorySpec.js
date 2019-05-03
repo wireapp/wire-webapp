@@ -19,15 +19,15 @@
 
 import StoreEngine from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import * as Proteus from '@wireapp/proteus';
+import Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 
-describe('z.cryptography.CryptographyRepository', () => {
+describe('CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => test_factory.exposeCryptographyActors(false));

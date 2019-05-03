@@ -22,6 +22,7 @@ import {base64ToBlob} from 'Util/util';
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {WebAppEvents} from '../event/WebApp';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 class LinkPreviewRepository {
   constructor(assetService, propertiesRepository, logger) {
@@ -118,8 +119,8 @@ class LinkPreviewRepository {
     if (openGraphImage.data) {
       return this._uploadPreviewImage(openGraphImage.data)
         .then(asset => {
-          linkPreview.article[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
-          linkPreview[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
+          linkPreview.article[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
+          linkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
           return linkPreview;
         })
         .catch(error => {

@@ -63,6 +63,7 @@ import {resolve as resolveDependency, graph} from '../config/appResolver';
 import {Modal} from '../ui/Modal';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientType} from '../client/ClientType';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -90,11 +91,8 @@ class AuthViewModel {
     this.storageService = new StorageService();
     this.storage_repository = new StorageRepository(this.storageService);
 
-    this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
-    this.cryptography_repository = new z.cryptography.CryptographyRepository(
-      this.cryptography_service,
-      this.storage_repository
-    );
+    this.cryptography_service = new CryptographyRepository(backendClient);
+    this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
 
     this.selfService = resolveDependency(graph.SelfService);
