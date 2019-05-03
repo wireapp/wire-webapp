@@ -23,10 +23,10 @@ import {amplify} from 'amplify';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
+import {noop} from 'Util/util';
 
 import {WebAppEvents} from '../event/WebApp';
 
-const noop = () => {};
 const defaultContent = {
   actionFn: noop,
   actionText: '',

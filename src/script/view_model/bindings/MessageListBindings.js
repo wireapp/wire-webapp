@@ -25,6 +25,7 @@ import 'jquery-mousewheel';
 import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
+import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
 
@@ -143,7 +144,7 @@ ko.bindingHandlers.background_image = {
           objectUrl = window.URL.createObjectURL(blob);
           imageElement[0].src = objectUrl;
         })
-        .catch(() => {});
+        .catch(noop);
     };
 
     viewportObserver.onElementInViewport(element, loadImage);

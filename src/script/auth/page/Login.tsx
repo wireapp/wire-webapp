@@ -47,6 +47,7 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 
+import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
 import {loginStrings, logoutReasonStrings} from '../../strings';
@@ -189,7 +190,7 @@ class _Login extends React.Component<CombinedProps, State> {
       .then(() => this.props.doInit({isImmediateLogin: true}))
       .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
-      .catch(() => {});
+      .catch(noop);
   };
 
   navigateChooseHandleOrWebapp = () => {
