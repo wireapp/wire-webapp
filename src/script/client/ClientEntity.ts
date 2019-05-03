@@ -29,17 +29,17 @@ export class ClientEntity {
     DEFAULT_VALUE: '?',
   };
 
-  isSelfClient: boolean;
-  class: string;
-  id: string;
   address?: string;
+  class: string;
   cookie?: string;
+  id: string;
+  isSelfClient: boolean;
   label?: string;
   location?: object;
+  meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
   model?: string;
   time?: string;
   type?: ClientType;
-  meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
 
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;
