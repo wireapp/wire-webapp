@@ -19,7 +19,7 @@
 
 import {User} from 'src/script/entity/User';
 
-describe('z.search.SearchRepository', () => {
+describe('SearchRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => {

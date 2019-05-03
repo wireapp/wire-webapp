@@ -27,18 +27,18 @@ const linkify = new Linkify();
  * @param {string} text - Text to parse
  * @returns {boolean} Text contains only a link
  */
-export function containsOnlyLink(text) {
+export const containsOnlyLink = (text: string): boolean => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
   const urls = linkify.match(textWithoutCode) || [];
   return urls.length === 1 && urls[0].raw === textWithoutCode;
-}
+};
 
 /**
  * Get first link and link offset for given text.
  * @param {string} text - Text to parse
  * @returns {Object} Containing link and its offset
  */
-export function getFirstLinkWithOffset(text) {
+export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | void => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
 
   const links = linkify.match(textWithoutCode) || [];
@@ -50,4 +50,4 @@ export function getFirstLinkWithOffset(text) {
       url: firstLink.raw,
     };
   }
-}
+};
