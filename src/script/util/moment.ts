@@ -25,3 +25,17 @@ export const isSameDay = (momentDate: moment.Moment, otherDate: moment.MomentInp
   momentDate.isSame(otherDate, 'd');
 export const isSameMonth = (momentDate: moment.Moment, otherDate: moment.MomentInput) =>
   momentDate.isSame(otherDate, 'M');
+
+// https://stackoverflow.com/questions/27360102/locale-and-specific-date-format-with-moment-js/29641375#29641375
+export const LLDM = moment
+  .localeData()
+  .longDateFormat('LL')
+  .replace(/Y/g, '')
+  .replace(/^\W|\W$|\W\W/, '');
+
+export const LDM = moment
+  .localeData()
+  .longDateFormat('L')
+  .replace(/Y/g, '')
+  // keep the trailing '.' if locale is 'de'
+  .replace(moment.locale() === 'de' ? /\W$|\W\W/ : /^\W|\W$|\W\W/, '');

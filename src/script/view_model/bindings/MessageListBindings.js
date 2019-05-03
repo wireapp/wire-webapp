@@ -26,6 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {TimeUtil} from 'Util/TimeUtil';
 import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
+import {LLDM} from 'Util/moment';
 
 import {viewportObserver} from '../../ui/viewportObserver';
 
@@ -180,18 +181,18 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return date.local().format('HH:mm');
+      return date.local().format('LT');
     }
 
     if (current_day === yesterday) {
-      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('LT')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return date.local().format('dddd HH:mm');
+      return date.local().format('dddd LT');
     }
 
-    return date.local().format('MMMM D, HH:mm');
+    return date.local().format(`${LLDM}, LT`);
   };
 
   const calculate_timestamp_day = function(date) {
@@ -209,18 +210,18 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return `${t('conversationToday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationToday')} ${date.local().format('LT')}`;
     }
 
     if (current_day === yesterday) {
-      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('LT')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return date.local().format('dddd HH:mm');
+      return date.local().format('dddd LT');
     }
 
-    return date.local().format('dddd, MMMM D, HH:mm');
+    return date.local().format(`dddd, ${LLDM}, LT`);
   };
 
   // should be fine to update every minute

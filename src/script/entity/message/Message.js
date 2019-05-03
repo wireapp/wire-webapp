@@ -102,7 +102,7 @@ class Message {
 
     this.display_timestamp_short = () => {
       const date = moment.unix(this.timestamp() / TimeUtil.UNITS_IN_MILLIS.SECOND);
-      return date.local().format('HH:mm');
+      return date.local().format('LT');
     };
 
     this.unsafeSenderName = ko.pureComputed(() => getFirstName(this.user(), undefined, true));
