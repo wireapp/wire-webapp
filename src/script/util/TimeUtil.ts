@@ -17,7 +17,6 @@
  *
  */
 
-
 import moment from 'moment';
 
 import {t} from './LocalizerUtil';
