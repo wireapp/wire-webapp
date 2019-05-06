@@ -17,7 +17,7 @@
  *
  */
 
-export const getCursorPixelPosition = (input: HTMLTextAreaElement) => {
+export const getCursorPixelPosition = (input: HTMLTextAreaElement): DOMRect => {
   const css = getComputedStyle(input);
   const boundingRectangleInput = input.getBoundingClientRect();
   const mask = document.createElement('div');
@@ -51,7 +51,7 @@ export const getCursorPixelPosition = (input: HTMLTextAreaElement) => {
   document.body.appendChild(mask);
   span.scrollIntoView();
 
-  const boundingRectangleSpan = span.getBoundingClientRect();
+  const boundingRectangleSpan = span.getBoundingClientRect() as DOMRect;
 
   mask.remove();
   return boundingRectangleSpan;
