@@ -116,7 +116,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ .*-staging.* && $DISTRIBUTION = wire
+      condition: $TRAVIS_TAG =~ .*-staging.* AND $DISTRIBUTION = wire
 
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
@@ -132,7 +132,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ .*-staging.* && $DISTRIBUTION = wire
+      condition: $TRAVIS_TAG =~ .*-staging.* AND $DISTRIBUTION = wire
 
   # https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
