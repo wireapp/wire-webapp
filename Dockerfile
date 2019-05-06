@@ -1,21 +1,16 @@
 FROM node:10-alpine
 
 # For some extra dependencies...
-RUN apk add --no-cache dumb-init git bash python
+RUN apk add --no-cache dumb-init git bash
 
-# This is required to build some of the webapp modules
-RUN echo '{ "allow_root": true }' > /root/.bowerrc
+COPY /server .
+COPY /run.sh .
+COPY /env.defaults .
+ENV NODE_PATH=/node_modules
+ENV PATH=$PATH:/node_modules/.bin
 
-COPY . /src
-ENV NODE_PATH=/src/node_modules
-ENV PATH=$PATH:/src/node_modules/.bin
-
-ARG WIRE_CONFIGURATION_REPOSITORY
-ARG WIRE_CONFIGURATION_EXTERNAL_DIR
-
-WORKDIR /src
-RUN yarn && yarn build:prod
+RUN yarn
 
 EXPOSE 8080
 
-ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/src/run.sh"]
+ENTRYPOINT ["dumb-init", "--", "/bin/bash", "/run.sh"]
