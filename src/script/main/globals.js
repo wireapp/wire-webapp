@@ -36,6 +36,7 @@ import LocalizerGlobal from '../localization/Localizer.js';
 import ErrorGlobal from '../backup/Error.js';
 import ClientEntityGlobal from '../client/ClientEntity.js';
 import ClientMapperGlobal from '../client/ClientMapper.js';
+import EventBuilderGlobal from '../conversation/EventBuilder.js';
 import EventRepositoryGlobal from '../event/EventRepository.js';
 import EventServiceGlobal from '../event/EventService.js';
 import EventServiceNoCompoundGlobal from '../event/EventServiceNoCompound.js';

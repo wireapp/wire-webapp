@@ -52,7 +52,6 @@ import {EventRepository} from '../event/EventRepository';
 import {EventName} from '../tracking/EventName';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -1480,7 +1479,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   injectActivateEvent(callMessageEntity, source) {
-    const event = EventBuilder.buildVoiceChannelActivate(callMessageEntity);
+    const event = z.conversation.EventBuilder.buildVoiceChannelActivate(callMessageEntity);
     this.eventRepository.injectEvent(event, source);
   }
 
@@ -1493,7 +1492,7 @@ export class CallingRepository {
    */
   injectDeactivateEvent(callMessageEntity, source, reason) {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
+    const event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(callMessageEntity, reason, currentTimestamp);
     this.eventRepository.injectEvent(event, source);
   }
 

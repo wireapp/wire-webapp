@@ -65,7 +65,6 @@ import {ConversationMapper} from './ConversationMapper';
 import {ConversationType} from './ConversationType';
 import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
-import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
@@ -617,8 +616,8 @@ export class ConversationRepository {
     }
 
     const creationEvent = conversationEntity.isGroup()
-      ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
-      : EventBuilder.build1to1Creation(conversationEntity);
+      ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
+      : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
 
     this.eventRepository.injectEvent(creationEvent, eventSource);
   }
@@ -1264,7 +1263,7 @@ export class ConversationRepository {
   addMissingMember(conversationId, userIds, timestamp) {
     return this.get_conversation_by_id(conversationId).then(conversationEntity => {
       const [sender] = userIds;
-      const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+      const event = z.conversation.EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
       return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
     });
   }
@@ -1398,7 +1397,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = !!response
         ? response
-        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1418,7 +1417,7 @@ export class ConversationRepository {
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1530,7 +1529,7 @@ export class ConversationRepository {
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
-          const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
           this.eventRepository.injectEvent(leaveEvent);
         });
     });
@@ -1780,7 +1779,7 @@ export class ConversationRepository {
         };
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
+        const assetAddEvent = z.conversation.EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
 
         assetAddEvent.id = messageId;
         assetAddEvent.time = payload.time;
@@ -2389,7 +2388,7 @@ export class ConversationRepository {
         }
 
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+        const optimisticEvent = z.conversation.EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
@@ -3178,7 +3177,7 @@ export class ConversationRepository {
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = EventBuilder.buildMissed(conversation_et, currentTimestamp);
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -3827,7 +3826,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   _addDeleteMessage(conversationId, messageId, time, messageEntity) {
-    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

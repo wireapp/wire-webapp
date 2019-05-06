@@ -50,7 +50,6 @@ import {ICE_CONNECTION_STATE} from '../rtc/ICEConnectionState';
 import {ICE_GATHERING_STATE} from '../rtc/ICEGatheringState';
 import {SDP_TYPE} from '../rtc/SDPType';
 import {SIGNALING_STATE} from '../rtc/SignalingState';
-import {EventBuilder} from '../../conversation/EventBuilder';
 
 class FlowEntity {
   static get CONFIG() {
@@ -783,7 +782,7 @@ class FlowEntity {
       : `Received '${type}' (response: ${response}) message via data channel`;
     this.callLogger.debug(logMessage, callMessage);
 
-    const callEvent = EventBuilder.buildCalling(
+    const callEvent = z.conversation.EventBuilder.buildCalling(
       conversationEntity,
       callMessage,
       this.remoteUserId,
