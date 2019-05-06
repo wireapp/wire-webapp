@@ -20,7 +20,7 @@
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {arrayToBase64, noop} from 'Util/util';
 import {obfuscate} from 'Util/StringUtil';
@@ -36,10 +36,10 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
   .AbstractConversationEventHandler {
   static get CONFIG() {
     return {
-      INTERVAL_TIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
+      INTERVAL_TIME: TIME_IN_MILLIS.SECOND * 0.25,
       TIMER_RANGE: {
-        MAX: TimeUtil.UNITS_IN_MILLIS.YEAR,
-        MIN: TimeUtil.UNITS_IN_MILLIS.SECOND,
+        MAX: TIME_IN_MILLIS.YEAR,
+        MIN: TIME_IN_MILLIS.SECOND,
       },
     };
   }

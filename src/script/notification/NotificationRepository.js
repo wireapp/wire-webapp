@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t, Declension} from 'Util/LocalizerUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {truncate} from 'Util/StringUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -50,7 +50,7 @@ class NotificationRepository {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
       TITLE_LENGTH: 38,
     };
   }
@@ -418,7 +418,7 @@ class NotificationRepository {
       const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
 
       if (messageTimer) {
-        const timeString = TimeUtil.formatDuration(messageTimer).text;
+        const timeString = formatDuration(messageTimer).text;
         const substitutions = {time: timeString, user: messageEntity.user().first_name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }

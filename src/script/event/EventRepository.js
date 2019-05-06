@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {koArrayPushAll} from 'Util/util';
 
@@ -37,7 +37,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 export class EventRepository {
   static get CONFIG() {
     return {
-      E_CALL_EVENT_LIFETIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
+      E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         z.error.CryptographyError.TYPE.IGNORED_ASSET,
         z.error.CryptographyError.TYPE.IGNORED_PREVIEW,

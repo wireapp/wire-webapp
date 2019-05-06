@@ -17,15 +17,15 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export const EphemeralTimings = {
   VALUES: [
-    TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-    TimeUtil.UNITS_IN_MILLIS.MINUTE * 5,
-    TimeUtil.UNITS_IN_MILLIS.HOUR,
-    TimeUtil.UNITS_IN_MILLIS.DAY,
-    TimeUtil.UNITS_IN_MILLIS.WEEK,
-    TimeUtil.UNITS_IN_MILLIS.WEEK * 4,
+    TIME_IN_MILLIS.SECOND * 10,
+    TIME_IN_MILLIS.MINUTE * 5,
+    TIME_IN_MILLIS.HOUR,
+    TIME_IN_MILLIS.DAY,
+    TIME_IN_MILLIS.WEEK,
+    TIME_IN_MILLIS.WEEK * 4,
   ],
 };

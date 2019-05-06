@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
 import * as trackingHelpers from '../tracking/Helpers';
@@ -34,8 +34,8 @@ window.z.viewModel = z.viewModel || {};
 z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
   static get CONFIG() {
     return {
-      AUTO_MINIMIZE_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
-      HIDE_CONTROLS_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 4,
+      AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
+      HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
     };
   }
 
@@ -198,7 +198,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     ko.applyBindings(this, document.getElementById(this.elementId));
 
-    this.TimeUtil = TimeUtil;
+    this.formatSeconds = formatSeconds;
     this.MediaDeviceType = MediaDeviceType;
   }
 

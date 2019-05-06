@@ -22,7 +22,7 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
@@ -98,7 +98,7 @@ export class UserRepository {
           .filter(user_et => user_et.isConnected())
           .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
-      .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
+      .extend({rateLimit: TIME_IN_MILLIS.SECOND});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());

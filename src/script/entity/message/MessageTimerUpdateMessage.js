@@ -18,7 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
@@ -37,7 +37,7 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
 
     this.caption = ko.pureComputed(() => {
       if (this.message_timer) {
-        const timeString = TimeUtil.formatDuration(this.message_timer).text;
+        const timeString = formatDuration(this.message_timer).text;
         return this.user().is_me
           ? t('conversationUpdatedTimerYou', timeString)
           : t('conversationUpdatedTimer', timeString);

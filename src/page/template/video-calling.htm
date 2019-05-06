@@ -21,7 +21,7 @@
       <!-- ko if: showControls() -->
         <div id="video-title" class="video-title hide-controls-hidden">
           <div class="video-remote-name" data-bind="text: videodCall().conversationEntity.display_name()"></div>
-          <div class="video-timer label-xs" data-bind="text: TimeUtil.formatSeconds(videodCall().durationTime())"></div>
+          <div class="video-timer label-xs" data-bind="text: formatSeconds(videodCall().durationTime())"></div>
         </div>
 
         <!-- ko ifnot: isChoosingScreen() -->

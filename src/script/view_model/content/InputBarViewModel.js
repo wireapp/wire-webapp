@@ -22,7 +22,7 @@ import moment from 'moment';
 import {getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'Util/util';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
@@ -54,7 +54,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
 

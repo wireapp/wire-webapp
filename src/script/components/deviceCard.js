@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatTimestamp} from 'Util/TimeUtil';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -46,7 +46,7 @@ z.components.DeviceCard = class DeviceCard {
       $(componentInfo.element).addClass('device-card-detailed');
     }
 
-    this.TimeUtil = TimeUtil;
+    this.formatTimestamp = formatTimestamp;
   }
 
   clickOnDevice() {
@@ -66,7 +66,7 @@ ko.components.register('device-card', {
           <span data-bind="text: t('preferencesDevicesId')"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
-        <div class="label-xs" data-bind="text: TimeUtil.formatTimestamp(device.time)"></div>
+        <div class="label-xs" data-bind="text: formatTimestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->
         <div class="label-xs">

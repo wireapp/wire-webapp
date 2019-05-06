@@ -20,7 +20,7 @@
 import {isNumber, isString} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
@@ -53,7 +53,7 @@ export class AppInitTimings {
   get_app_load() {
     const CONFIG = AppInitTimings.CONFIG;
     const appLoaded = this[AppInitTimingsStep.APP_LOADED];
-    const appLoadedInSeconds = appLoaded / TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const appLoadedInSeconds = appLoaded / TIME_IN_MILLIS.SECOND;
 
     return (Math.floor(appLoadedInSeconds / CONFIG.BUCKET_SIZE) + 1) * CONFIG.BUCKET_SIZE;
   }

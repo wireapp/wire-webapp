@@ -20,7 +20,7 @@
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {AvailabilityType} from '../user/AvailabilityType';
@@ -221,9 +221,7 @@ export class CryptographyMapper {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : [];
-      const durationInSeconds = audioData.durationInMillis
-        ? audioData.durationInMillis / TimeUtil.UNITS_IN_MILLIS.SECOND
-        : 0;
+      const durationInSeconds = audioData.durationInMillis ? audioData.durationInMillis / TIME_IN_MILLIS.SECOND : 0;
 
       return {
         duration: durationInSeconds,
