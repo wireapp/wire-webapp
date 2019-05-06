@@ -6,19 +6,27 @@ dist: trusty
 env:
   global:
     # GH_TOKEN
-    - secure: "Fpze1ZU5I5MryhhWsJlcQJ61D4wvscUMfaOV0O1hczv880jhFT0Hisy47bn1stUfWyLkEMYOCxDonceEiC3j5fc0qg4HXm1fqR1dfqe+3uAbXvTPd6fbzb8ZhdOOpzvIyC2vUgB0qxh+b6/KFmJ7A1L0Bjz2lpYUhwgHnyHFEsi1cMKwFJLwdOZi6h/BglrbLgQgQGYIvhI76ZEH+RGvjNKeFENxd1/hht2j447iVRe8nePp0jf4PUn0WlFXvoETP1yP+Kk/oZyhx7YNg3jRA0Uue4I1HaVyPI0yz/nKY5W7CBjkSvqI78omCQ3YIXQhqdzGLi0JyR4wj4wwBZGGuTTCo1fqRW4OjfgA4A/PyOgHG3OfvZzdr/NI+qF22XCJEx+dzvbQDn7WYgsxjHdjoBd3QZpZlB3sF223zTpueL7XoaFnSqM92SvuUSvhPceDvkUyS3eJJ0OHzQcxWIjdve/+CtL6oiN4nEJYBg/wgfLBHB81Qhrck1j5nT12daBHRE8yN6hEG8T/8EE/+m+Reu7Bxa2Rl0pwElGT3rT2RFcPK8RBqfzrAWWA/bjMWDIGpLcriXAyO99IIC2zj+fOuk57Ioe7Y6G+e0kV0sRQrzqqKiEf1yJyca9fFrEoGsKI/e7j5h8ybZz8cszhpqGJqPfnnHJfZXm717fNDWM8vaw="
+    - secure: 'Fpze1ZU5I5MryhhWsJlcQJ61D4wvscUMfaOV0O1hczv880jhFT0Hisy47bn1stUfWyLkEMYOCxDonceEiC3j5fc0qg4HXm1fqR1dfqe+3uAbXvTPd6fbzb8ZhdOOpzvIyC2vUgB0qxh+b6/KFmJ7A1L0Bjz2lpYUhwgHnyHFEsi1cMKwFJLwdOZi6h/BglrbLgQgQGYIvhI76ZEH+RGvjNKeFENxd1/hht2j447iVRe8nePp0jf4PUn0WlFXvoETP1yP+Kk/oZyhx7YNg3jRA0Uue4I1HaVyPI0yz/nKY5W7CBjkSvqI78omCQ3YIXQhqdzGLi0JyR4wj4wwBZGGuTTCo1fqRW4OjfgA4A/PyOgHG3OfvZzdr/NI+qF22XCJEx+dzvbQDn7WYgsxjHdjoBd3QZpZlB3sF223zTpueL7XoaFnSqM92SvuUSvhPceDvkUyS3eJJ0OHzQcxWIjdve/+CtL6oiN4nEJYBg/wgfLBHB81Qhrck1j5nT12daBHRE8yN6hEG8T/8EE/+m+Reu7Bxa2Rl0pwElGT3rT2RFcPK8RBqfzrAWWA/bjMWDIGpLcriXAyO99IIC2zj+fOuk57Ioe7Y6G+e0kV0sRQrzqqKiEf1yJyca9fFrEoGsKI/e7j5h8ybZz8cszhpqGJqPfnnHJfZXm717fNDWM8vaw='
     # WIRE_WEBAPP_BOT_EMAIL
-    - secure: "cRgk2yvpezpf2/Z/49wgJ1rm8i3e7h7nAOkbF8ykOcka9VanaGy5pn2JJs9/EMEBbKK8+tUkD9MKm1k4xd2qotxXZsOeonvzMV5yBcF/XZ887vW7FByvfFQ9iqSq+VA7sgUr6qr6+N51Wp4DZh++ojFBh6D8LB1hHqKCCRnM2PFECrMG03CXVc0rbSNLdGh7xm11pCteLxANciQv9xCUAVCyQNy3QorEczTyY50k/0nT29Axqn2FFjaLnLtG+nM7ufLaySPfOVAnWX7sb2yf08yC38bBktwnpbWKjJlveK6aFA4LVuj7eXLTfA1DF/0AUmlk0MNmUPCHz7Xo+YLLIua8+Rms6bzLCeUswJyDp69/2WdidrTUDNtRjNQ2BkNowfhOOuSrsf/3WLP/Sli9fX7G70RBHICBNZ3qJ40V8PkQJTKTQYUtVL7cmnH94OjBxy/rwmBfHQSa4zx8JNFn+IDHCATVb7RIPARTHBiAK+C0kne/Ito0k59MLbWiic+y+1Y2CtDHJqlgxYMMSnrPd3+4z0/LFbkMwnyL3QQlt1U4kFn4XOlOSp6aHg5ke2HGueQBiUJcfj52rbLRceBay9A+HrNLfVhzDTiUUbkfx544sdUv8PyITpZxYXKrGSqvIvDUFOA5rwj90NwwokTi+tHzPTbbDFYRn0IvNdHCJbo="
+    - secure: 'cRgk2yvpezpf2/Z/49wgJ1rm8i3e7h7nAOkbF8ykOcka9VanaGy5pn2JJs9/EMEBbKK8+tUkD9MKm1k4xd2qotxXZsOeonvzMV5yBcF/XZ887vW7FByvfFQ9iqSq+VA7sgUr6qr6+N51Wp4DZh++ojFBh6D8LB1hHqKCCRnM2PFECrMG03CXVc0rbSNLdGh7xm11pCteLxANciQv9xCUAVCyQNy3QorEczTyY50k/0nT29Axqn2FFjaLnLtG+nM7ufLaySPfOVAnWX7sb2yf08yC38bBktwnpbWKjJlveK6aFA4LVuj7eXLTfA1DF/0AUmlk0MNmUPCHz7Xo+YLLIua8+Rms6bzLCeUswJyDp69/2WdidrTUDNtRjNQ2BkNowfhOOuSrsf/3WLP/Sli9fX7G70RBHICBNZ3qJ40V8PkQJTKTQYUtVL7cmnH94OjBxy/rwmBfHQSa4zx8JNFn+IDHCATVb7RIPARTHBiAK+C0kne/Ito0k59MLbWiic+y+1Y2CtDHJqlgxYMMSnrPd3+4z0/LFbkMwnyL3QQlt1U4kFn4XOlOSp6aHg5ke2HGueQBiUJcfj52rbLRceBay9A+HrNLfVhzDTiUUbkfx544sdUv8PyITpZxYXKrGSqvIvDUFOA5rwj90NwwokTi+tHzPTbbDFYRn0IvNdHCJbo='
     # WIRE_WEBAPP_BOT_PASSWORD
-    - secure: "U9Fq+z04H9EbI55M6VDAVelLtETVSS9oNNCJo5llDSij0pjrNZpxj3MeKhRZQc8yiZ4hOC5nUbNPHpvIKBkw+xD/Pg32t6SVZl4ZSDPm3XZTFYpWj/U/NB+/l/ivK4bNmx62hLOL8Dhr5A67UlwwCr4tYVmLu7wcUNwgtkyAii1mqoAC0yT4qzDQBalGAk/Q+ZatmjAZM/5ZU8H3jags0+bubJlJKlU0YOmSzXFdFSQLFMQSwEeVEH7vMIkOmFIK6L6qveSDJDmNj2tvgn8ZLr6p7TvOLovGbfPiNKcrEyeADJQrG0J3IQ6dHYOCIN1SzibdJEWqluk6T/N0mNq27AKEzXsV8VHl6VAnswxAq1pljlGF5Nj0OUt5JAUzavbt7tw3TBwC96+55YJdvPZ9ESg2S4afj94nEUISLldNDVEQPBUt4qfkTznKMOeBNzVItO9IhSQK65wUQ07//nxHsV38GMMKMWhtujFrqhAdtC6TCBGVxdCYQziCKW3xsmt2nNosxIkxESF9Osw7A5YbjwoREu7nIZOA0TYrJxZRz0AlV1D1WfNv/7KP5J0LQCR90jdoAnTvkTP4+WfX7C8UkyowpxpBUKvbe9d65cYTCzN69eT/lEQBmQz06Y8Wh+ou5q4BeNQmfgwUK7tYr1/vY9DqNskpaLyJsXKPO+gkTm4="
+    - secure: 'U9Fq+z04H9EbI55M6VDAVelLtETVSS9oNNCJo5llDSij0pjrNZpxj3MeKhRZQc8yiZ4hOC5nUbNPHpvIKBkw+xD/Pg32t6SVZl4ZSDPm3XZTFYpWj/U/NB+/l/ivK4bNmx62hLOL8Dhr5A67UlwwCr4tYVmLu7wcUNwgtkyAii1mqoAC0yT4qzDQBalGAk/Q+ZatmjAZM/5ZU8H3jags0+bubJlJKlU0YOmSzXFdFSQLFMQSwEeVEH7vMIkOmFIK6L6qveSDJDmNj2tvgn8ZLr6p7TvOLovGbfPiNKcrEyeADJQrG0J3IQ6dHYOCIN1SzibdJEWqluk6T/N0mNq27AKEzXsV8VHl6VAnswxAq1pljlGF5Nj0OUt5JAUzavbt7tw3TBwC96+55YJdvPZ9ESg2S4afj94nEUISLldNDVEQPBUt4qfkTznKMOeBNzVItO9IhSQK65wUQ07//nxHsV38GMMKMWhtujFrqhAdtC6TCBGVxdCYQziCKW3xsmt2nNosxIkxESF9Osw7A5YbjwoREu7nIZOA0TYrJxZRz0AlV1D1WfNv/7KP5J0LQCR90jdoAnTvkTP4+WfX7C8UkyowpxpBUKvbe9d65cYTCzN69eT/lEQBmQz06Y8Wh+ou5q4BeNQmfgwUK7tYr1/vY9DqNskpaLyJsXKPO+gkTm4='
+    # DOCKER_USERNAME
+    - secure: 'D4gSHJXAukTxzK9Ap1gvuoCSj1q5q/5hUDVZ93ml/9DN+4hc2iI8i9aVuAkL5eaEe+XuroJZwUN1jIqEKbt83N4dGkzXRHHEH3A+mbzViULpv0H2VainJBtqUY3AxsRyJ7DDmpI/RHAej2ZY6xYMKtOKGMxMfrNcJhZwwbMSVJCpvowJH/rHlT/x4u0VM4mPcboInwiGZpITC0OLtYOF2G/2svVMmECFgGCKRSs9eOWw7M5bp3KDKkWB1Zdmhmc8tqpjrBm2o8yzF7E/31LTMMa0A56o96bDxK9FWcz0h5+mUBH4hXeJsmaB7Pb7rJaTY1f9Mnd2WA0BlQIAnWI+Vid3PSzmsJ5eW0ZxUueDZ1zsYwjrlFOn699rDfVXuAdbg74M7fMYTzb+pw+uVLQ4MNfhv7uyc3vFx5GOPHEL9w4BxFOYLQOWMDOu9pRfJrXB0p4WPmeC3a/U9b9uqJWuuUACxgQ03R2w9VAJRNUao/AEXZPzh8QyRNH5fGumsZ9TyMVzLmnBRKMZ4EisdlaegNjg4AsDibBSx/u9KlCqRYu7J8rRhZD0EvQBGK14dnqV8Tb0Z7RkiCxGc+zjTXRetLo4soyVA0C5HzEdG1wSWnCRN7mwOptdcT7HuNLVU407MGGLCJaCONDhzcDiXVy5J1XyAn+amIMgSUgiBRkTaWE='
+    # DOCKER_PASSWORD
+    - secure: 'e7ubyFQ5K6rQAJCYX7iuUZMJW7V9XKkUFqEuGcsA0/UowIPvytpQRTnrqp22F6a5lIp1/EvcZ1luglgxkgYX/G4FeVV7F2WjIwh0sMHO6ix/P14N7Arp2vtRllg7jqMT/0QRuXLApRBG0jvs8FhiGtXFeeKP4UgiRdLXUId1vEW8MPDvPzh4yzl1ZgkaeVswid0S0pRDEeue08mkwC5WS9TL/Ns5jvGAr4fgeibpoGRIeE7gCxGVy6yjXq+qXRoL9MCvkloKUfyrwhOtq0vFlPigHsssxx3KUTjOanDjqhQasVGqMFMA0c9jBGLotDkF1245lv9ie9DD6MmnmcYHLVXXdcBH+jzOppAJ9iqA6ftPiRU6FPh7zDNVfjc8laI6sj3A/KbAsa0lin/H2dROfjB1AcGISh4RdzLFWILUV6fob842AU+6KcVE3qhSoL/Q6z3B/9lX4v20NgBnM68u4wjiwziOVfeaBxnEN+btseG193IpzSEU5hUDZzc9s0c+HwytuDDYq8Pa3MeJ69ZKcrYVteUyW0W+pCivlGwJSNPdT3iruGrWfBA1YAvazQM1mDg2CsIJBntO9m0SeW2hOil0j7g9nrOINKvh3C4FQ6VqT14eILhHPUGoFwarxz9rLRQwjtbzR6VZpCBorBKWgsNgZ5HA7jjdTDhQySS/0og='
+  matrix:
+    - DISTRIBUTION="$DISTRIBUTION_1"
+    - DISTRIBUTION="wire"
 
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
-  - "10"
+  - '10'
 
 # http://docs.travis-ci.com/user/gui-and-headless-browsers/
 before_install:
+  - echo -e "machine github.com\n  login $GH_TOKEN" > ~/.netrc
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
@@ -32,7 +40,7 @@ before_script:
   - npm rebuild node-sass
 
 after_script:
-  - "bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info"
+  - 'bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info'
 
 notifications:
   email: false
@@ -40,8 +48,24 @@ notifications:
 # http://docs.travis-ci.com/user/deployment/
 after_success:
   - if [[ "${TRAVIS_BRANCH}" =~ ^(dev|edge)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
-  - if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then yarn build:prod; fi
-  - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
+  - |
+    if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then
+      yarn build:prod
+      if [ "$DISTRIBUTION" == "wire" ]; then
+        yarn docker '' staging
+      else
+        yarn docker "$DISTRIBUTION" staging
+      fi
+    fi
+  - |
+    if [ "$TRAVIS_BRANCH" == "prod" ]; then
+      yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; }
+      if [ "$DISTRIBUTION" == "wire" ]; then
+        yarn docker '' production
+      else
+        yarn docker "$DISTRIBUTION" production
+      fi
+    fi
 
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
@@ -60,6 +84,7 @@ deploy:
     on:
       repo: wireapp/wire-webapp
       branch: edge
+      condition: $DISTRIBUTION = wire
 
   # https://wire-webapp-dev.zinfra.io/
   - provider: elasticbeanstalk
@@ -76,6 +101,7 @@ deploy:
     on:
       repo: wireapp/wire-webapp
       branch: dev
+      condition: $DISTRIBUTION = wire
 
   # https://wire-webapp-rc.zinfra.io/
   - provider: elasticbeanstalk
@@ -91,7 +117,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ .*-staging.*
+      condition: $TRAVIS_TAG =~ .*-staging.* AND $DISTRIBUTION = wire
 
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
@@ -107,7 +133,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ .*-staging.*
+      condition: $TRAVIS_TAG =~ .*-staging.* AND $DISTRIBUTION = wire
 
   # https://wire-webapp-prod.wire.com/
   - provider: elasticbeanstalk
@@ -124,6 +150,7 @@ deploy:
     on:
       repo: wireapp/wire-webapp
       branch: prod
+      condition: $DISTRIBUTION = wire
 
 after_deploy:
   - |
