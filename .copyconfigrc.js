@@ -5,7 +5,9 @@ const path = require('path');
 const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
   .toString()
   .trim();
-const configurationEntry = `wire-web-config-default-${currentBranch === 'prod' ? 'prod' : 'staging'}`;
+const suffix =
+  process.env.DISTRIBUTION !== 'wire' ? process.env.DISTRIBUTION : currentBranch === 'master' ? 'master' : 'staging';
+const configurationEntry = `wire-web-config-default-${suffix}`;
 const repositoryUrl = pkg.dependencies[configurationEntry];
 
 module.exports = {
