@@ -36,6 +36,7 @@ import {AudioType} from '../audio/AudioType';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 
@@ -45,7 +46,7 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
  * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
-class NotificationRepository {
+export class NotificationRepository {
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
@@ -62,7 +63,7 @@ class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param {CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users
    */
@@ -415,7 +416,7 @@ class NotificationRepository {
    */
   _createBodySystem(messageEntity) {
     const createBodyMessageTimerUpdate = () => {
-      const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
+      const messageTimer = ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
 
       if (messageTimer) {
         const timeString = formatDuration(messageTimer).text;
@@ -863,5 +864,3 @@ class NotificationRepository {
     return isEventToNotify && isSelfMentionOrReply;
   }
 }
-
-export {NotificationRepository};

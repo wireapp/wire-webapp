@@ -51,6 +51,8 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
 import {EventName} from '../tracking/EventName';
 
+import {ConversationRepository} from '../conversation/ConversationRepository';
+
 export class CallingRepository {
   static get CONFIG() {
     return {
@@ -621,7 +623,7 @@ export class CallingRepository {
       if (!eventFromStream) {
         const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
         eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+        const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
         promises.push(grantPromise);

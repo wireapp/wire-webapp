@@ -31,6 +31,7 @@ import {ACCESS_STATE} from '../conversation/AccessState';
 import {NotificationSetting} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
 import {WebAppEvents} from '../event/WebApp';
@@ -301,7 +302,7 @@ export class Conversation {
             .map(userEntity => userEntity.first_name())
             .join(', ');
 
-          const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
           return truncate(joinedNames, maxLength, false);
         }
 

@@ -27,6 +27,7 @@ import * as trackingHelpers from '../../tracking/Helpers';
 import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {WebAppEvents} from '../../event/WebApp';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 export class GroupCreationViewModel {
   static get STATE() {
@@ -45,6 +46,8 @@ export class GroupCreationViewModel {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
     this.isTeam = this.teamRepository.isTeam;
+
+    this.ConversationRepository = ConversationRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -175,10 +178,10 @@ export class GroupCreationViewModel {
   clickOnNext() {
     if (this.nameInput().length) {
       const trimmedNameInput = this.nameInput().trim();
-      const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      const nameTooLong = trimmedNameInput.length > ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       const nameTooShort = !trimmedNameInput.length;
 
-      this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      this.nameInput(trimmedNameInput.slice(0, ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(t('groupCreationPreferencesErrorNameLong'));
       }

@@ -20,10 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
+export class ClientMismatchHandler {
   constructor(conversationRepository, cryptographyRepository, eventRepository, serverTimeHandler, userRepository) {
     this.conversationRepository = conversationRepository;
     this.cryptographyRepository = cryptographyRepository;
@@ -31,7 +28,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
 
-    this.logger = getLogger('z.conversation.ClientMismatchHandler');
+    this.logger = getLogger('ClientMismatchHandler');
   }
 
   /**
@@ -83,7 +80,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     };
 
     return Promise.all(this._mapRecipients(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
-      this.conversationRepository.verification_state_handler.onClientRemoved();
+      this.conversationRepository.verificationStateHandler.onClientRemoved();
       return payload;
     });
   }
@@ -127,7 +124,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));
       })
       .then(() => {
-        this.conversationRepository.verification_state_handler.onClientsAdded(Object.keys(recipients));
+        this.conversationRepository.verificationStateHandler.onClientsAdded(Object.keys(recipients));
         return payload;
       });
   }
@@ -215,4 +212,4 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
 
     return result;
   }
-};
+}

@@ -63,6 +63,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
 import {ConversationType} from './ConversationType';
+import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
@@ -72,6 +73,8 @@ import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {NotificationSetting} from './NotificationSetting';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ClientMismatchHandler} from './ClientMismatchHandler';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
@@ -93,11 +96,8 @@ import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation repository for all conversation interactions with the conversation service
-z.conversation.ConversationRepository = class ConversationRepository {
+export class ConversationRepository {
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
@@ -165,16 +165,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = getLogger('z.conversation.ConversationRepository');
+    this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
-    this.verification_state_handler = new ConversationVerificationStateHandler(
+    this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
     );
-    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+    this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
@@ -243,12 +243,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this.conversationMapper);
-    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
-      this.conversationMapper,
-      this.eventService,
-      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
-    );
+    this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
+    this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
+      onMessageTimeout: this.handleMessageExpiration.bind(this),
+    });
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
@@ -1450,7 +1448,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
-    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return this.conversation_service
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
@@ -2328,7 +2326,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
-    const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
@@ -3248,7 +3246,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
           }
 
-          this.verification_state_handler.onConversationCreate(conversationEntity);
+          this.verificationStateHandler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       })
@@ -3322,7 +3320,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this._addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -3375,7 +3373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.onMemberLeft(conversationEntity);
+          this.verificationStateHandler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archiveConversation(conversationEntity);
@@ -3982,4 +3980,4 @@ z.conversation.ConversationRepository = class ConversationRepository {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
     }
   }
-};
+}

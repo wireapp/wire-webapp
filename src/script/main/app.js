@@ -56,6 +56,7 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
 
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
@@ -64,6 +65,7 @@ import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
+import {ConversationService} from '../conversation/ConversationService';
 
 import {BackendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
@@ -187,7 +189,7 @@ class App {
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
-    repositories.conversation = new z.conversation.ConversationRepository(
+    repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
       repositories.client,
@@ -273,7 +275,7 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       connect: new ConnectService(this.backendClient),
-      conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
+      conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
       notification: new NotificationService(this.backendClient, storageService),

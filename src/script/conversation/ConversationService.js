@@ -23,11 +23,8 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation service for all conversation calls to the backend REST API.
-z.conversation.ConversationService = class ConversationService {
+export class ConversationService {
   static get CONFIG() {
     return {
       URL_CONVERSATIONS: '/conversations',
@@ -44,7 +41,7 @@ z.conversation.ConversationService = class ConversationService {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
-    this.logger = getLogger('z.conversation.ConversationService');
+    this.logger = getLogger('ConversationService');
 
     this.CONVERSATION_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
     this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
@@ -491,4 +488,4 @@ z.conversation.ConversationService = class ConversationService {
       return events.filter(({data: event_data}) => fullTextSearch(event_data.content, query));
     });
   }
-};
+}
