@@ -48,9 +48,7 @@
     "underscore": "1.9.1",
     "url-search-params-polyfill": "5.1.0",
     "uuidjs": "4.2.1",
-    "webrtc-adapter": "6.4.8",
-    "wire-web-config-default-prod": "https://github.com/wireapp/wire-web-config-wire#v0.17.27-0",
-    "wire-web-config-default-staging": "https://github.com/wireapp/wire-web-config-default#v0.17.27"
+    "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
     "@babel/core": "7.4.4",
@@ -196,6 +194,7 @@
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
+    "docker": "node bin/push_docker.js",
     "fix": "yarn fix:assets && yarn fix:js && yarn fix:ts",
     "fix:assets": "yarn prettier --write && yarn stylelint",
     "fix:js": "yarn lint:js --fix",
@@ -222,6 +221,7 @@
     "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'"
   },
+  "version": "0.1.0",
   "private": true,
   "repository": {
     "type": "git",
