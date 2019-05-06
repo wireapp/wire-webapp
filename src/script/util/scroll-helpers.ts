@@ -17,35 +17,36 @@
  *
  */
 
-export function scrollEnd(element) {
+export function scrollEnd(element: HTMLElement): number {
   return element.scrollHeight - element.clientHeight;
 }
 
-export function scrollToBottom(element) {
+export function scrollToBottom(element: HTMLElement): number {
   element.scrollTop = element.scrollHeight;
   return window.setTimeout(() => {
     if (!isScrolledBottom(element)) {
       return (element.scrollTop = element.scrollHeight);
     }
+    return undefined;
   }, 200);
 }
 
-export function isScrolledBottom(element) {
+export function isScrolledBottom(element: HTMLElement): boolean {
   const scrollTop = Math.ceil(element.scrollTop);
   const scrollHeight = element.scrollHeight;
   const height = element.clientHeight;
   return scrollTop + height >= scrollHeight;
 }
 
-export function isScrolledTop(element) {
+export function isScrolledTop(element: HTMLElement): boolean {
   return element.scrollTop === 0;
 }
 
-export function scrollBy(element, distance) {
+export function scrollBy(element: HTMLElement, distance: number): void {
   const scrollTop = element.scrollTop;
   element.scrollTop = scrollTop + distance;
 }
 
-export function isScrollable(element) {
+export function isScrollable(element: HTMLElement): boolean {
   return element.scrollHeight > element.clientHeight;
 }
