@@ -56,10 +56,7 @@ describe('ClientRepository', () => {
       );
 
       return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
-        const [firstClientEntity] = clientEntities;
-
-        expect(firstClientEntity).toEqual(jasmine.any(ClientEntity));
-        expect(Object.keys(clientEntities).length).toBe(5);
+        expect(clientEntities.length).toBe(5);
       });
     }));
 

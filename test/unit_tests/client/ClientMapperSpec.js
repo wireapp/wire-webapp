@@ -36,13 +36,13 @@ describe('ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
-      expect(clientEntity.isPermanent()).toBeTruthy();
-      expect(clientEntity.isRemote()).toBeFalsy();
-      expect(clientEntity.isTemporary()).toBeFalsy();
+      expect(clientEntity.isPermanent()).toBe(true);
+      expect(clientEntity.isRemote()).toBe(false);
+      expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('can map a temporary client payload from the backend', () => {
@@ -57,13 +57,13 @@ describe('ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.TEMPORARY);
-      expect(clientEntity.isPermanent()).toBeFalsy();
-      expect(clientEntity.isRemote()).toBeFalsy();
-      expect(clientEntity.isTemporary()).toBeTruthy();
+      expect(clientEntity.isPermanent()).toBe(false);
+      expect(clientEntity.isRemote()).toBe(false);
+      expect(clientEntity.isTemporary()).toBe(true);
     });
 
     it('can map a remote client payload from the backend', () => {
@@ -73,10 +73,10 @@ describe('ClientMapper', () => {
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.isVerified()).toBeFalsy();
-      expect(clientEntity.isPermanent()).toBeFalsy();
-      expect(clientEntity.isRemote()).toBeTruthy();
-      expect(clientEntity.isTemporary()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.isPermanent()).toBe(false);
+      expect(clientEntity.isRemote()).toBe(true);
+      expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('can map a remote client payload from our local database', () => {
@@ -92,10 +92,10 @@ describe('ClientMapper', () => {
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.isVerified()).toBeTruthy();
-      expect(clientEntity.isPermanent()).toBeFalsy();
-      expect(clientEntity.isRemote()).toBeTruthy();
-      expect(clientEntity.isTemporary()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(true);
+      expect(clientEntity.isPermanent()).toBe(false);
+      expect(clientEntity.isRemote()).toBe(true);
+      expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('can serialize a remote client payload to store it in our local database', () => {
@@ -121,9 +121,9 @@ describe('ClientMapper', () => {
 
       expect(clientEntities.length).toBe(2);
       expect(firstClientEntity.id).toBe(entities.clients.john_doe.temporary.id);
-      expect(firstClientEntity.isTemporary()).toBeTruthy();
+      expect(firstClientEntity.isTemporary()).toBe(true);
       expect(secondClientEntity.id).toBe(entities.clients.john_doe.permanent.id);
-      expect(secondClientEntity.isPermanent()).toBeTruthy();
+      expect(secondClientEntity.isPermanent()).toBe(true);
     }));
 
   describe('updateClient', () => {
@@ -133,7 +133,7 @@ describe('ClientMapper', () => {
 
       const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
 
-      expect(wasUpdated).toBeTruthy();
+      expect(wasUpdated).toBe(true);
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
@@ -141,13 +141,13 @@ describe('ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
-      expect(clientEntity.isPermanent()).toBeTruthy();
-      expect(clientEntity.isRemote()).toBeFalsy();
-      expect(clientEntity.isTemporary()).toBeFalsy();
+      expect(clientEntity.isPermanent()).toBe(true);
+      expect(clientEntity.isRemote()).toBe(false);
+      expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('does not change the client if there are no updates', () => {
@@ -156,7 +156,7 @@ describe('ClientMapper', () => {
 
       const {client: clientEntity, wasUpdated} = mapper.updateClient(initialClientEntity, clientPayload);
 
-      expect(wasUpdated).toBeFalsy();
+      expect(wasUpdated).toBe(false);
       expect(clientEntity.address).toBe(clientPayload.address);
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
@@ -164,13 +164,13 @@ describe('ClientMapper', () => {
       expect(clientEntity.label).toBe(clientPayload.label);
       expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
       expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBeFalsy();
+      expect(clientEntity.meta.isVerified()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
-      expect(clientEntity.isPermanent()).toBeTruthy();
-      expect(clientEntity.isRemote()).toBeFalsy();
-      expect(clientEntity.isTemporary()).toBeFalsy();
+      expect(clientEntity.isPermanent()).toBe(true);
+      expect(clientEntity.isRemote()).toBe(false);
+      expect(clientEntity.isTemporary()).toBe(false);
     });
   });
 });
