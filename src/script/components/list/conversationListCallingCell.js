@@ -22,7 +22,7 @@ import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {CALL_TYPE} from 'avs-web';
+import {CALL_TYPE, VIDEO_STATE} from 'avs-web';
 import {WebAppEvents} from '../../event/WebApp';
 import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
 import {AudioType} from '../../audio/AudioType';
@@ -30,12 +30,20 @@ import {AudioType} from '../../audio/AudioType';
 import 'Components/list/participantItem';
 
 class ConversationListCallingCell {
-  constructor({call, conversation, temporaryUserStyle = false, callingRepository, audioRepository}) {
+  constructor({
+    call,
+    conversation,
+    temporaryUserStyle = false,
+    callingRepository,
+    audioRepository,
+    videoGridRepository,
+  }) {
     this.call = call;
     this.conversation = conversation;
     this.temporaryUserStyle = temporaryUserStyle;
     this.callingRepository = callingRepository;
     this.audioRepository = audioRepository;
+    this.videoGridRepository = videoGridRepository;
 
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
@@ -92,6 +100,8 @@ class ConversationListCallingCell {
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.callParticipants().length);
     });
+    this.showVideoPreview = () => call.initialType === CALL_TYPE.VIDEO;
+    this.showMaximize = ko.pureComputed(() => false /*TODOthis.multitasking.isMinimized() && this.isConnected()*/);
 
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
 
@@ -106,7 +116,6 @@ class ConversationListCallingCell {
     const permissionRepository = params.permissionRepository;
 
     this.multitasking = params.multitasking;
-    this.videoGridRepository = params.videoGridRepository;
 
     this.calls = this.callingRepository.calls;
     this.call = this.conversation.call;
@@ -157,7 +166,6 @@ class ConversationListCallingCell {
       return this.call().isRemoteVideoCall() && !this.showVideoPreview() && !this.isConnected() && isNotGranted;
     });
 
-    this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isConnected());
 
     this.TimeUtil = TimeUtil;
     */
@@ -170,11 +178,11 @@ class ConversationListCallingCell {
 
   onJoinCall(data, event) {
     event.stopPropagation();
-    this.callingRepository.answerCall(this.conversation().id, CALL_TYPE.AUDIO);
+    this.callingRepository.answerCall(this.conversation().id, CALL_TYPE.NORMAL);
   }
 
   onJoinDeclinedCall() {
-    this.callingRepository.startCall(this.conversation().id, CALL_TYPE.AUDIO);
+    this.callingRepository.startCall(this.conversation().id, CALL_TYPE.NORMAL);
   }
 
   onLeaveCall() {
@@ -214,8 +222,13 @@ class ConversationListCallingCell {
     //amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
   }
 
-  findUsers(userIds) {
-    return this.conversationParticipants().filter(user => userIds.includes(user.id));
+  findUser(userId) {
+    return this.conversationParticipants().find(user => user.id === userId);
+  }
+
+  hasVideoStream(participant) {
+    const activeVideoStates = [VIDEO_STATE.STARTED, VIDEO_STATE.SCREENSHARING];
+    return activeVideoStates.includes(participant.videoState());
   }
 }
 
@@ -265,6 +278,17 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
 
+    <!-- ko if: showVideoPreview() -->
+      <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
+        <group-video-grid params="minimized: true, videoGridRepository: videoGridRepository"></group-video-grid>
+        <!-- ko if: showMaximize() -->
+          <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+            <fullscreen-icon></fullscreen-icon>
+          </div>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
+
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
@@ -303,8 +327,8 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
-        <div class="call-ui__participant-list" data-bind="foreach: {data: findUsers(callParticipants()), as: 'participant'}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-          <participant-item params="participant: participant, hideInfo: true, showCamera: false" data-bind="css: {'no-underline': true}"></participant-item>
+        <div class="call-ui__participant-list" data-bind="foreach: {data: callParticipants(), as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
+            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: hasVideoStream(participant)" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
     <!-- /ko -->
@@ -319,16 +343,6 @@ const oldTmpl = `
 
     </div>
 
-    <!-- ko if: showVideoPreview() -->
-      <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="minimized: true, videoGridRepository: videoGridRepository"></group-video-grid>
-        <!-- ko if: showMaximize() -->
-          <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-            <fullscreen-icon></fullscreen-icon>
-          </div>
-        <!-- /ko -->
-      </div>
-    <!-- /ko -->
     <!-- ko if: showNoCameraPreview() -->
       <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="text: t('callNoCameraAccess')" data-uie-name="label-no-camera-access-preview"></div>
     <!-- /ko -->

@@ -152,7 +152,7 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   answerCall = conversationEntity => {
-    this.callingRepository.answerCall(conversationEntity.id, CALL_TYPE.AUDIO);
+    this.callingRepository.answerCall(conversationEntity.id, CALL_TYPE.NORMAL);
   };
 
   changeNotificationSetting() {

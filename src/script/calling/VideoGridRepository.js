@@ -31,7 +31,7 @@ class VideoGridRepository {
     const {hasActiveVideo, localMediaStream, selfStreamState} = streamHandler;
 
     const calls = callingRepository.calls;
-    this.grid = ko.observableArray([0, 0, 0, 0]);
+    this.grid = ko.observable([0, 0, 0, 0]);
     this.thumbnailStream = ko.observable();
 
     const selfStream = ko.pureComputed(() => {

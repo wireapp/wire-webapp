@@ -39,17 +39,32 @@ import {MediaType} from '../media/MediaType';
 
 import {WebAppEvents} from '../event/WebApp';
 
-import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, getAvsInstance} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, VIDEO_STATE, getAvsInstance} from 'avs-web';
 
 type UserId = string;
 type ConversationId = string;
 
-interface Call {
-  conversationId: ConversationId;
-  reason: ko.Observable<number | undefined>;
-  startedAt: ko.Observable<number | undefined>;
-  state: ko.Observable<number>;
-  participants: ko.ObservableArray<string>;
+interface Participant {
+  userId: UserId;
+  videoState: ko.Observable<number>;
+}
+
+class Call {
+  public readonly conversationId: ConversationId;
+  public readonly reason: ko.Observable<number | undefined>;
+  public readonly startedAt: ko.Observable<number | undefined>;
+  public readonly state: ko.Observable<number>;
+  public readonly participants: ko.ObservableArray<Participant>;
+  public readonly initialType: number;
+
+  constructor(conversationId: ConversationId, state: number, initialType: number) {
+    this.conversationId = conversationId;
+    this.state = ko.observable(state);
+    this.participants = ko.observableArray();
+    this.reason = ko.observable();
+    this.startedAt = ko.observable();
+    this.initialType = initialType;
+  }
 }
 
 export class CallingRepository {
@@ -61,7 +76,7 @@ export class CallingRepository {
 
   private wUser: number | undefined;
   private callingApi: any | undefined;
-  private readonly activeCalls: ko.ObservableArray<any>;
+  private readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
 
   public readonly calls: ko.ObservableArray<any>;
@@ -180,12 +195,33 @@ export class CallingRepository {
       storedCall.reason(reason);
     };
 
+    const videoStateChanged = (conversationId: ConversationId, userId: UserId, deviceId: string, state: number) => {
+      const call = this.findCall(conversationId);
+      if (call) {
+        call
+          .participants()
+          .filter(participant => participant.userId === userId)
+          .forEach(participant => participant.videoState(state));
+      }
+    };
+
+    const incomingCall = (
+      conversationId: ConversationId,
+      timestamp: number,
+      userId: UserId,
+      hasVideo: boolean,
+      shouldRing: boolean
+    ) => {
+      const call = new Call(conversationId, CALL_STATE.INCOMING, hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.AUDIO);
+      this.storeCall(call);
+    };
+
     const wUser = callingApi.create(
       selfUserId,
       selfClientId,
       log('readyh'), //readyh,
       sendMessage, //sendh,
-      log('incomingh'), //incomingh,
+      incomingCall, //incomingh,
       log('missedh'), //missedh,
       log('answerh'), //answerh,
       log('estabh'), //estabh,
@@ -193,27 +229,29 @@ export class CallingRepository {
       log('metricsh'), //metricsh,
       requestConfig, //cfg_reqh,
       log('acbrh'), //acbrh,
-      log('vstateh') //vstateh,
+      videoStateChanged //vstateh,
     );
 
     callingApi.set_group_chgjson_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
       const call = this.findCall(conversationId);
       if (call) {
         const {members} = JSON.parse(membersJson);
-        call.participants(members.map((member: any) => member.userid));
+        call.participants(
+          members.map((member: any) => ({
+            userId: member.userid,
+            videoState: ko.observable(VIDEO_STATE.STOPPED),
+          }))
+        );
       }
     });
 
     callingApi.set_mute_handler(wUser, this.isMuted);
     callingApi.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
-      const storedCall = this.findCall(conversationId);
-      const call: Call = storedCall || {
-        conversationId,
-        participants: ko.observableArray(),
-        reason: ko.observable(),
-        startedAt: ko.observable(),
-        state: ko.observable(state),
-      };
+      const call = this.findCall(conversationId);
+      if (!call) {
+        this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
+        return;
+      }
 
       call.state(state);
       call.reason(undefined);
@@ -222,16 +260,12 @@ export class CallingRepository {
         case CALL_STATE.TERM_REMOTE:
         case CALL_STATE.TERM_LOCAL:
         case CALL_STATE.NONE:
-          this.removeCall(storedCall);
+          this.removeCall(call);
           return;
 
         case CALL_STATE.MEDIA_ESTAB:
           call.startedAt(Date.now());
           break;
-      }
-
-      if (!storedCall) {
-        this.storeCall(call);
       }
     });
     setInterval(callingApi.poll, 500);
@@ -360,6 +394,8 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   startCall(conversationId: ConversationId, conversationType: number, callType: number) {
+    const call = new Call(conversationId, CALL_STATE.NONE, callType);
+    this.storeCall(call);
     this.callingApi.start(this.wUser, conversationId, callType, conversationType, false);
   }
 
