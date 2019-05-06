@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 
 import {getSupportUsernameUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';
+import {ContentViewModel} from '../ContentViewModel';
 
 class TakeoverViewModel {
   /**
@@ -58,7 +59,7 @@ class TakeoverViewModel {
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
         }
       })
       .catch(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT))

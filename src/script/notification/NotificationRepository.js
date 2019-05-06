@@ -38,6 +38,7 @@ import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ContentViewModel} from '../view_model/ContentViewModel';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -611,7 +612,7 @@ export class NotificationRepository {
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       };
     }
 
@@ -753,7 +754,7 @@ export class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = this.contentViewModelState.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
+    const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =
       this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 

@@ -42,6 +42,7 @@ import {WebAppEvents} from '../../event/WebApp';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -219,7 +220,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
           },
         });
         break;
@@ -251,14 +252,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (file) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
       amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
     }
   }

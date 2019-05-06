@@ -25,6 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -127,7 +128,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
   }
 
   dismissImport() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   onError(error) {

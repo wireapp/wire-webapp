@@ -23,6 +23,7 @@ import {TimeUtil} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -70,7 +71,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnDetailsClose() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 
