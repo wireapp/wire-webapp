@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
@@ -103,7 +103,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       const selfUserId = this.userRepository.self().id;
       const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
+      const filename = `Wire-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       return downloadBlob(blob, filename);
     }

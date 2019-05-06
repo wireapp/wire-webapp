@@ -21,7 +21,7 @@ import {Asset} from '@wireapp/protocol-messaging';
 
 import {chunk} from 'Util/ArrayUtil';
 import {capToByte, rootMeanSquare} from 'Util/NumberUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
 
 export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMetaData;
@@ -59,7 +59,7 @@ const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData
       return audioContext.decodeAudioData(buffer);
     })
     .then(audioBuffer => {
-      const durationInMillis = audioBuffer.duration * TimeUtil.UNITS_IN_MILLIS.SECOND;
+      const durationInMillis = audioBuffer.duration * TIME_IN_MILLIS.SECOND;
       const normalizedLoudness = normaliseLoudness(audioBuffer);
       return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
     });

@@ -23,7 +23,7 @@ import moment from 'moment';
 import 'jquery-mousewheel';
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 import {LLDM} from 'Util/moment';
@@ -225,11 +225,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   // should be fine to update every minute
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp, is_day) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
 
     if (is_day) {
       return $(element).text(calculate_timestamp_day(date));

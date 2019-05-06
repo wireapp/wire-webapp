@@ -24,7 +24,7 @@ import 'phoneformat.js';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, getUnixTimestamp} from 'Util/TimeUtil';
 import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
@@ -69,7 +69,7 @@ class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [URLParameter.ENVIRONMENT, URLParameter.LOCALE, URLParameter.TRACKING],
-      RESET_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      RESET_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -182,7 +182,7 @@ class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= TimeUtil.getUnixTimestamp()) {
+        if (timestamp <= getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -201,7 +201,7 @@ class AuthViewModel {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < TimeUtil.getUnixTimestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_account = ko.pureComputed(() => !this.disabled_by_animation());
@@ -450,9 +450,9 @@ class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + response.expires_in);
+          this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);

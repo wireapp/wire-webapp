@@ -18,7 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 
 import {PermissionState} from '../../notification/PermissionState';
@@ -105,7 +105,7 @@ class ConversationListCallingCell {
       .pureComputed(() => this.callParticipants() && this.showParticipants())
       .extend({notify: 'always', rateLimit: 100});
 
-    this.TimeUtil = TimeUtil;
+    this.formatSeconds = formatSeconds;
   }
 
   onEndCall(data, event) {
@@ -193,7 +193,7 @@ ko.components.register('conversation-list-calling-cell', {
           <span class="conversation-list-cell-description" data-bind="text: t('callStateConnecting')" data-uie-name="call-label-connecting"></span>
         <!-- /ko -->
         <!-- ko if: isConnected() -->
-          <span class="conversation-list-cell-description" data-bind="text: TimeUtil.formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
+          <span class="conversation-list-cell-description" data-bind="text: formatSeconds(call().durationTime())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
 

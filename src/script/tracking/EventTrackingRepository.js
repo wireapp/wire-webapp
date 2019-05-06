@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
@@ -35,7 +35,7 @@ export class EventTrackingRepository {
     return {
       ERROR_REPORTING: {
         API_KEY: window.wire.env.RAYGUN_API_KEY,
-        REPORTING_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+        REPORTING_THRESHOLD: TIME_IN_MILLIS.MINUTE,
       },
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,

@@ -18,7 +18,7 @@
  */
 
 import {PromiseQueue} from 'Util/PromiseQueue';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidApiPath} from 'Util/ValidationUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
@@ -30,10 +30,10 @@ export class BackendClient {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
-        REQUEST_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        RECHECK_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      QUEUE_CHECK_TIMEOUT: TIME_IN_MILLIS.MINUTE,
     };
   }
 

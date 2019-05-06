@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/TimeUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import 'Components/receiptModeToggle';
@@ -193,7 +193,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       if (this.activeConversation()) {
         const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+          return formatDuration(this.activeConversation().messageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');
