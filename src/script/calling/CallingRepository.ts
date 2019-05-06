@@ -17,12 +17,12 @@
  *
  */
 
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
-import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import adapter from 'webrtc-adapter';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
@@ -33,8 +33,6 @@ import {TERMINATION_REASON} from './enum/TerminationReason';
 import {CallLogger} from '../telemetry/calling/CallLogger';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
@@ -174,19 +172,12 @@ export class CallingRepository {
       return 0;
     };
 
-    const callClosed = (reason: string, conversationId: ConversationId) => {
+    const callClosed = (reason: number, conversationId: ConversationId) => {
       const storedCall = this.findCall(conversationId);
       if (!storedCall) {
         return;
       }
       storedCall.reason(reason);
-    };
-
-    const callEstablished = (conversationId: ConversationId, userId: UserId) => {
-      const call = this.findCall(conversationId);
-      if (call) {
-        call.participants.push(userId);
-      }
     };
 
     const wUser = callingApi.create(
@@ -197,7 +188,7 @@ export class CallingRepository {
       log('incomingh'), //incomingh,
       log('missedh'), //missedh,
       log('answerh'), //answerh,
-      callEstablished, //estabh,
+      log('estabh'), //estabh,
       callClosed, //closeh,
       log('metricsh'), //metricsh,
       requestConfig, //cfg_reqh,
@@ -205,7 +196,13 @@ export class CallingRepository {
       log('vstateh') //vstateh,
     );
 
-    callingApi.set_group_changed_handler(wUser, log('groupchangedh'));
+    callingApi.set_group_chgjson_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
+      const call = this.findCall(conversationId);
+      if (call) {
+        const {members} = JSON.parse(membersJson);
+        call.participants(members.map((member: any) => member.userid));
+      }
+    });
 
     callingApi.set_mute_handler(wUser, this.isMuted);
     callingApi.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
