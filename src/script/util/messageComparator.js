@@ -21,7 +21,7 @@
  * Checks if two arrays with mentions contain different values.
  *
  * @param {z.entity.Message} originalMessageEntity - Message entity
- * @param {Array<z.message.MentionEntity>} [updatedMentions] - Updated mentions
+ * @param {Array<MentionEntity>} [updatedMentions] - Updated mentions
  * @returns {boolean} Are the mentions different from each other
  */
 export function areMentionsDifferent(originalMessageEntity, updatedMentions) {

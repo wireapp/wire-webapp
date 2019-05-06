@@ -33,6 +33,7 @@ import {BackendEvent} from './Backend';
 import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {categoryFromEvent} from '../message/MessageCategorization';
 
 export class EventRepository {
   static get CONFIG() {
@@ -837,7 +838,7 @@ export class EventRepository {
     }
 
     return Object.assign({}, newEvent, {
-      category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+      category: categoryFromEvent(newEvent),
       ephemeral_expires: originalEvent.ephemeral_expires,
       ephemeral_started: originalEvent.ephemeral_started,
       ephemeral_time: originalEvent.ephemeral_time,

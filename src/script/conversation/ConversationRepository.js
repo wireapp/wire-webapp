@@ -2031,7 +2031,7 @@ export class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of message
    * @param {QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2114,7 +2114,7 @@ export class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
@@ -2227,7 +2227,7 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2259,7 +2259,7 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions part of the message
    * @param {QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */

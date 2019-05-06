@@ -34,6 +34,7 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 
 import {BackendEvent} from 'src/script/event/Backend';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -889,7 +890,7 @@ describe('Conversation', () => {
       pingMessage.timestamp(timestamp + 200);
 
       selfMentionMessage = new ContentMessage();
-      const mentionEntity = new z.message.MentionEntity(0, 7, selfUserEntity.id);
+      const mentionEntity = new MentionEntity(0, 7, selfUserEntity.id);
       const textAsset = new z.entity.Text('id', '@Gregor, Hello there');
       textAsset.mentions.push(mentionEntity);
       selfMentionMessage.assets([textAsset]);

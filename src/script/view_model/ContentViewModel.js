@@ -72,12 +72,7 @@ export class ContentViewModel {
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(
-      mainViewModel,
-      this,
-      repositories,
-      z.message.MessageHasher
-    );
+    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
       repositories.search,

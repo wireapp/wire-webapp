@@ -39,6 +39,7 @@ import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
+import {MentionEntity} from '../message/MentionEntity';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -749,13 +750,13 @@ export class EventMapper {
    * @private
    * @param {Array} mentions - Mentions as base64 encoded proto messages
    * @param {string} messageText - Text of message
-   * @returns {Array<z.message.MentionEntity>} Array of mapped mentions
+   * @returns {Array<MentionEntity>} Array of mapped mentions
    */
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => {
         const protoMention = Mention.decode(base64ToArray(encodedMention));
-        return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
+        return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {
         if (mentionEntity) {

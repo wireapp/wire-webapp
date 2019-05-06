@@ -42,6 +42,7 @@ import {
 } from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 
@@ -268,7 +269,7 @@ describe('renderMessage', () => {
 
     tests.forEach(({expected, mentions, testCase, text}) => {
       const mentionEntities = mentions.map(mention => {
-        const mentionEntity = new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+        const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
         return mentionEntity;
       });
 

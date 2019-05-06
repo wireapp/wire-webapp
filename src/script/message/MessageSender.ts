@@ -20,14 +20,17 @@
 import {PromiseQueue} from 'Util/PromiseQueue';
 
 export class MessageSender {
+  private readonly sendingQueue: PromiseQueue;
+
   constructor() {
     this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
   }
-  queueMessage(sendingFunction) {
+
+  queueMessage<T extends Function>(sendingFunction: T): Promise<void> {
     return this.sendingQueue.push(sendingFunction);
   }
 
-  pauseQueue(pauseState = true) {
+  pauseQueue(pauseState = true): void {
     this.sendingQueue.pause(pauseState);
   }
 }
