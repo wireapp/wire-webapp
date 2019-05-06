@@ -17,7 +17,6 @@
  *
  */
 
-//@ts-check
 
 import moment from 'moment';
 
