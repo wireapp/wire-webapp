@@ -187,11 +187,11 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
           }
           default: {
             this.setState({ssoError: error});
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
+            const isValidationError = Object.values(ValidationError.ERROR).some(
+              errorType => error.label && error.label.endsWith(errorType)
             );
             if (!isValidationError) {
-              throw error;
+              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)));
             }
           }
         }
