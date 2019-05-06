@@ -90,9 +90,9 @@
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
           <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
-                type="file"
-                data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
-                data-uie-name="do-select-picture"/>
+                 type="file"
+                 data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
+                 data-uie-name="do-select-picture"/>
           <span class="icon-camera"></span>
         </label>
       <!-- /ko -->
