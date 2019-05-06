@@ -6,10 +6,13 @@ const path = require('path');
 const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
   .toString()
   .trim();
-const suffix =
-  process.env.DISTRIBUTION !== 'wire' ? process.env.DISTRIBUTION : currentBranch === 'prod' ? 'prod' : 'staging';
+const configBranchSelection = currentBranch === 'prod' ? 'prod' : 'staging';
+const distribution = process.env.DISTRIBUTION !== 'wire' && process.env.DISTRIBUTION;
+const suffix = distribution ? distribution : configBranchSelection;
 const configurationEntry = `wire-web-config-default-${suffix}`;
 const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
+
+console.log('repo url', repositoryUrl, suffix);
 
 module.exports = {
   files: {
