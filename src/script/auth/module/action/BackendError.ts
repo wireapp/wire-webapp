@@ -89,40 +89,40 @@ export class BackendError extends Error {
     EXPIRED_CARD: 'expired_card',
   };
 
-  static SSO_ERRORS = {
-    SSO_FORBIDDEN: 'forbidden',
-
-    // this list must match https://github.com/wireapp/wire-server/blob/eb4726136a6739639af1a6bf4b2f27683b591f3b/services/spar/src/Spar/Error.hs#L177
-    // (TODO: change this commit to something more permanent once https://github.com/wireapp/wire-server/pull/734 is merged.)
-    SSO_FORBIDDEN_STATUS_FAILURE_FROM_IDP: 'forbidden-status-failure-from-idp',
-    SSO_FORBIDDEN_BAD_USER_REFS: 'forbidden-bad-user-refs',
-    SSO_FORBIDDEN_BAD_IN_RESPONSE_TOS: 'forbidden-bad-in-response-tos',
-    SSO_FORBIDDEN_ISSUE_INSTANT_NOT_IN_PAST: 'forbidden-issue-instant-not-in-past',
+  // forbidden errors must match https://github.com/wireapp/wire-server/blob/eb4726136a6739639af1a6bf4b2f27683b591f3b/services/spar/src/Spar/Error.hs#L177
+  // (TODO: change this commit to something more permanent once https://github.com/wireapp/wire-server/pull/734 is merged.)
+  /* tslint:disable:object-literal-sort-keys */
+  static SSO_ERRORS: any = {
     SSO_FORBIDDEN_ASSERTION_ISSUE_INSTANT_NOT_IN_PAST: 'forbidden-assertion-issue-instant-not-in-past',
+    SSO_FORBIDDEN_AUDIENCE_MISMATCH: 'forbidden-audience-mismatch',
     SSO_FORBIDDEN_AUTHN_STATEMENT_ISSUE_INSTANT_NOT_IN_PAST: 'forbidden-authn-statement-issue-instant-not-in-past',
-    SSO_FORBIDDEN_BAD_DESTINATION: 'forbidden-bad-destination',
-    SSO_FORBIDDEN_BAD_RECIPIENT: 'forbidden-bad-recipient',
-    SSO_FORBIDDEN_ISSUER_MISMATCH: 'forbidden-issuer-mismatch',
-    SSO_FORBIDDEN_NO_STATEMENTS: 'forbidden-no-statements',
-    SSO_FORBIDDEN_NO_AUTHN_STATEMENT: 'forbidden-no-authn-statement',
     SSO_FORBIDDEN_AUTHN_STATMENT_EXPIRED_AT: 'forbidden-authn-statment-expired-at',
+    SSO_FORBIDDEN_BAD_DESTINATION: 'forbidden-bad-destination',
+    SSO_FORBIDDEN_BAD_IN_RESPONSE_TOS: 'forbidden-bad-in-response-tos',
+    SSO_FORBIDDEN_BAD_RECIPIENT: 'forbidden-bad-recipient',
+    SSO_FORBIDDEN_BAD_USER_REFS: 'forbidden-bad-user-refs',
+    SSO_FORBIDDEN_BEARER_CONF_ASSERTIONS_WITHOUT_AUDIENCE_RESTRICTION:
+      'forbidden-bearer-conf-assertions-without-audience-restriction',
+    SSO_FORBIDDEN_ISSUE_INSTANT_NOT_IN_PAST: 'forbidden-issue-instant-not-in-past',
+    SSO_FORBIDDEN_ISSUER_MISMATCH: 'forbidden-issuer-mismatch',
+    SSO_FORBIDDEN_NO_AUTHN_STATEMENT: 'forbidden-no-authn-statement',
     SSO_FORBIDDEN_NO_BEARER_CONF_SUBJ: 'forbidden-no-bearer-conf-subj',
-    SSO_FORBIDDEN_BEARER_CONF_ASSERTIONS_WITHOUT_AUDIENCE_RESTRICTION: 'forbidden-bearer-conf-assertions-without-audience-restriction',
-    SSO_FORBIDDEN_NOT_ON_OR_AFTER_SUBJECT_CONFIRMATION: 'forbidden-not-on-or-after-subject-confirmation',
+    SSO_FORBIDDEN_NO_STATEMENTS: 'forbidden-no-statements',
+    SSO_FORBIDDEN_NOT_BEFORE_CONDITION: 'forbidden-not-before-condition',
     SSO_FORBIDDEN_NOT_BEFORE_SUBJECT_CONFIRMATION: 'forbidden-not-before-subject-confirmation',
     SSO_FORBIDDEN_NOT_ON_OR_AFTER_CONDITION: 'forbidden-not-on-or-after-condition',
-    SSO_FORBIDDEN_NOT_BEFORE_CONDITION: 'forbidden-not-before-condition',
-    SSO_FORBIDDEN_AUDIENCE_MISMATCH: 'forbidden-audience-mismatch',
-
+    SSO_FORBIDDEN_NOT_ON_OR_AFTER_SUBJECT_CONFIRMATION: 'forbidden-not-on-or-after-subject-confirmation',
+    SSO_FORBIDDEN_STATUS_FAILURE_FROM_IDP: 'forbidden-status-failure-from-idp',
+    SSO_FORBIDDEN: 'forbidden',
     SSO_GENERIC_ERROR: 'generic-sso-error', // Synthetic error label
     SSO_INSUFFICIENT_PERMISSIONS: 'insufficient-permissions',
     SSO_INVALID_FAILURE_REDIRECT: 'bad-failure-redirect',
     SSO_INVALID_SUCCESS_REDIRECT: 'bad-success-redirect',
     SSO_INVALID_UPSTREAM: 'bad-upstream',
     SSO_INVALID_USERNAME: 'bad-username',
-    SSO_NOT_FOUND: 'not-found',
     SSO_NO_MATCHING_AUTH: 'no-matching-auth-req',
     SSO_NO_SSO_CODE: 'no-sso-code-found', // Synthetic error label
+    SSO_NOT_FOUND: 'not-found',
     SSO_SERVER_ERROR: 'server-error',
     SSO_UNSUPPORTED_SAML: 'server-error-unsupported-saml',
     SSO_USER_CANCELLED_ERROR: 'user-cancelled-sso-error', // Synthetic error label
