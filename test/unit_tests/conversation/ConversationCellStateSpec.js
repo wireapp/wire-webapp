@@ -22,13 +22,11 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
 
 describe('ConversationCellState', () => {
-  const NOTIFICATION_STATES = NotificationSetting.STATE;
-
   describe('Notification state icon', () => {
     const conversationEntity = new Conversation(createRandomUuid());
 
@@ -38,19 +36,19 @@ describe('ConversationCellState', () => {
     conversationEntity.selfUser(selfUserEntity);
 
     it('returns empty state if notifications are set to everything', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
       expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if state is set to mentions and replies', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
       expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
-      conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
       expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
@@ -74,7 +72,7 @@ describe('ConversationCellState', () => {
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
 
-    conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
+    conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
     const contentMessage = new z.entity.ContentMessage();
     const text = new z.entity.Text('id', 'Hello there');

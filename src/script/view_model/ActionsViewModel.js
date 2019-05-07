@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from './ModalsViewModel';
-import {NotificationSetting} from '../conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {WebAppEvents} from '../event/WebApp';
 
 window.z = window.z || {};
@@ -259,8 +259,8 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
   toggleMuteConversation(conversationEntity) {
     if (conversationEntity) {
       const notificationState = conversationEntity.showNotificationsEverything()
-        ? NotificationSetting.STATE.NOTHING
-        : NotificationSetting.STATE.EVERYTHING;
+        ? NOTIFICATION_STATE.NOTHING
+        : NOTIFICATION_STATE.EVERYTHING;
       this.conversationRepository.setNotificationState(conversationEntity, notificationState);
     }
   }

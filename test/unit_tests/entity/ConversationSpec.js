@@ -26,7 +26,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 
 import {StatusType} from 'src/script/message/StatusType';
@@ -920,7 +920,7 @@ describe('Conversation', () => {
     });
 
     it('returns false if conversation is in no notification state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -941,7 +941,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -962,7 +962,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in everything notifications state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -1023,7 +1023,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.mutedState(NotificationSetting.STATE.EVERYTHING);
+      conversation_et.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -1054,7 +1054,7 @@ describe('Conversation', () => {
 
   describe('notificationState', () => {
     it('returns expected values', () => {
-      const NOTIFICATION_STATES = NotificationSetting.STATE;
+      const NOTIFICATION_STATES = NOTIFICATION_STATE;
       const conversationEntity = new Conversation(createRandomUuid());
       const selfUserEntity = new User(createRandomUuid());
 
