@@ -25,10 +25,11 @@ export const NOTIFICATION_STATE = {
   NOTHING: 0b11,
 };
 
-const statusTexts: Record<number, string> = {
-  [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
-  [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-  [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
+export const getNotificationText = (status: number) => {
+  const statusTexts: Record<number, string> = {
+    [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
+    [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+    [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
+  };
+  return statusTexts[status];
 };
-
-export const getNotificationText = (status: number) => statusTexts[status];
