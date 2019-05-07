@@ -75,8 +75,8 @@ module.exports = function(config) {
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/unit_tests/**/*.js': ['webpack', 'sourcemap'],
-      'test/api/TestFactory.js': ['webpack', 'sourcemap'],
+      'test/unit_tests/**/*.js': ['webpack'],
+      'test/api/TestFactory.js': ['webpack'],
     },
 
     webpack: {
@@ -101,14 +101,13 @@ module.exports = function(config) {
             test: /\.svg$/,
           },
           {
+            enforce: 'post',
             exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
             include: [path.resolve('src/script/')],
-            test: /\.js$/,
+            test: /\.[tj]s$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
-              query: {
-                esModules: true,
-              },
+              options: {esModules: true},
             },
           },
         ],
