@@ -255,12 +255,12 @@ export const unsupportedStrings = defineMessages({
     id: 'unsupported.subheadBrowser',
   },
   subheadCookies: {
-    defaultMessage: 'Enable cookies to log in to Wire.',
+    defaultMessage: 'Enable cookies to log in to {brandName}.',
     id: 'unsupported.subheadCookies',
   },
   subheadIndexedDb: {
     defaultMessage:
-      'Wire needs access to local storage to display your messages. Local storage is not available in private mode.',
+      '{brandName} needs access to local storage to display your messages. Local storage is not available in private mode.',
     id: 'unsupported.subheadIndexedDb',
   },
 });

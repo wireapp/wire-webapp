@@ -37,10 +37,10 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   <ContainerXS verticalCenter centerText>
     <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
-      <FormattedHTMLMessage {...headline} />
+      <FormattedMessage {...headline} values={{brandName: Config.BRAND_NAME}} />
     </H1>
     <Text center>
-      <FormattedHTMLMessage {...subhead} />
+      <FormattedMessage {...subhead} values={{brandName: Config.BRAND_NAME}} />
     </Text>
   </ContainerXS>
 );
