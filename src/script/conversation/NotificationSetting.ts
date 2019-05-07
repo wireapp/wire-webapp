@@ -25,8 +25,8 @@ export const NOTIFICATION_STATE = {
   MENTIONS_AND_REPLIES: 0b01,
   NOTHING: 0b11,
 };
-
 /* tslint:enable:object-literal-sort-keys */
+
 const statusTexts: Record<number, string> = {
   [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
   [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
