@@ -104,7 +104,7 @@ module.exports = function(config) {
             enforce: 'post',
             exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
             include: [path.resolve('src/script/')],
-            test: /\.js$/,
+            test: /\.[tj]s$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
               options: {esModules: true},
