@@ -1390,7 +1390,8 @@ export class CallingRepository {
       })
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
-        const conversationName = callEntity.conversationEntity.display_name();
+        const conversation = callEntity.conversationEntity;
+        const conversationName = conversation.display_name();
 
         const logMessage = {
           data: {
@@ -1403,7 +1404,7 @@ export class CallingRepository {
 
         callEntity.setRemoteVersion(callMessageEntity);
 
-        if (!callEntity.conversationEntity.showNotificationsEverything()) {
+        if (conversation.showNotificationsNothing()) {
           silent = true;
         }
 
