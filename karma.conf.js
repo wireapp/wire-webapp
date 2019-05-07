@@ -101,14 +101,13 @@ module.exports = function(config) {
             test: /\.svg$/,
           },
           {
+            enforce: 'post',
             exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
             include: [path.resolve('src/script/')],
             test: /\.js$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
-              query: {
-                esModules: true,
-              },
+              options: {esModules: true},
             },
           },
         ],
