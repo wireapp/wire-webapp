@@ -17,19 +17,24 @@
  *
  */
 
+import ko from 'knockout';
 import {afterRender} from 'Util/util';
 
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
+import {Participant} from '../calling/Participant';
+import {getGrid} from '../calling/videoGridHandler';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
+class GroupVideoGrid {
+  private readonly grid: ko.PureComputed<(Participant | null)[]>;
+  private readonly videoParticipants: ko.PureComputed<Participant[]>;
+  private readonly minimized: boolean;
 
-z.components.GroupVideoGrid = class GroupVideoGrid {
   static get CONFIG() {
     return {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',
       RATIO_THRESHOLD: 0.4,
       VIDEO_ELEMENT_SIZE: {
+        EMPTY: 'empty',
         FULL_SCREEN: 'full_screen',
         HALF_SCREEN: 'half_screen',
         HIDDEN: 'hidden',
@@ -38,10 +43,16 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     };
   }
 
-  constructor({minimized, videoGridRepository}, rootElement) {
+  constructor(
+    {minimized, participants}: {minimized: boolean; participants: ko.Observable<Participant[]>},
+    rootElement: HTMLElement
+  ) {
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
-    this.doubleClickedOnVideo = this.doubleClickedOnVideo.bind(this);
+    this.grid = getGrid(participants);
+    this.videoParticipants = ko.pureComputed(() => this.grid().filter(participant => !!participant));
 
+    this.minimized = minimized;
+    /*
     this.grid = videoGridRepository.grid;
     this.thumbnailStream = videoGridRepository.thumbnailStream;
     this.streams = videoGridRepository.streams;
@@ -49,45 +60,46 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     this.getStreamInfo = id => this.streams().find(stream => stream.id === id);
     this.gridInfo = ko.pureComputed(() => this.grid().map(this.getStreamInfo));
 
-    this.minimized = minimized;
-
-    this.hasBlackBackground = ko.pureComputed(() => {
-      const gridElementsCount = this.grid().filter(id => id !== 0).length;
-      return this.minimized && gridElementsCount > 1;
-    });
 
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => afterRender(this.scaleVideos));
 
     this.PROPERTY_STATE = PROPERTY_STATE;
+    */
   }
 
-  scaleVideos(rootElement) {
+  hasBlackBackground() {
+    const gridElementsCount = this.grid().filter(participant => !!participant).length;
+    return this.minimized && gridElementsCount > 1;
+  }
+
+  scaleVideos(rootElement: HTMLElement) {
     const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-    const setScale = (videoElement, wrapper) => {
-      const streamId = wrapper.dataset.streamId;
-      const streamInfo = this.getStreamInfo(streamId);
-      if (streamInfo) {
-        const isScreenSend = streamInfo.screenSend();
-        updateContainClass(videoElement, wrapper, isScreenSend, streamInfo);
-        streamInfo.screenSend.subscribe(screenSend => {
-          delete streamInfo.fitContain;
-          updateContainClass(videoElement, wrapper, screenSend, streamInfo);
-        });
+    const setScale = (videoElement: HTMLVideoElement, wrapper: HTMLElement) => {
+      const userId = wrapper.dataset.userId;
+      const participant = this.videoParticipants().find(participant => participant.userId === userId);
+      if (participant) {
+        const isScreenSend = false; //TODO participant.screenSend();
+        updateContainClass(videoElement, wrapper, isScreenSend, participant);
       }
     };
 
-    const updateContainClass = (videoElement, wrapper, isScreenSend, streamInfo) => {
-      const hasFitSet = streamInfo.hasOwnProperty('fitContain');
+    const updateContainClass = (
+      videoElement: HTMLVideoElement,
+      wrapper: HTMLElement,
+      isScreenSend: boolean,
+      participant: Participant
+    ) => {
+      const hasFitSet = false; // TODO streamInfo.hasOwnProperty('fitContain');
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const shouldBeContain = isVeryDifferent || isScreenSend === PROPERTY_STATE.TRUE;
-      const forceClass = hasFitSet ? streamInfo.fitContain : shouldBeContain;
+      const shouldBeContain = isVeryDifferent || false; // TODO isScreenSend === PROPERTY_STATE.TRUE;
+      const forceClass = hasFitSet ? false /*TODOstreamInfo.fitContain*/ : shouldBeContain;
       videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
     };
 
-    elements.forEach(element => {
+    elements.forEach((element: HTMLElement) => {
       const videoElement = element.querySelector('video');
       if (videoElement.videoWidth > 0) {
         afterRender(() => setScale(videoElement, element));
@@ -97,27 +109,25 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo(viewModel, {currentTarget}) {
+  doubleClickedOnVideo = (viewModel, {currentTarget}) => {
+    return; // TODO
     const childVideo = currentTarget.querySelector('video');
-    const streamId = currentTarget.dataset.streamId;
-    const streamInfo = this.getStreamInfo(streamId);
+    const userId = currentTarget.dataset.userId;
+    const participant = this.videoParticipants().find(participant => participant.userId === userId);
 
-    const hasFitProperty = streamInfo.hasOwnProperty('fitContain');
+    const hasFitProperty = participant.hasOwnProperty('fitContain');
     const hasFitClass = childVideo.classList.contains(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
-    streamInfo.fitContain = hasFitProperty ? !streamInfo.fitContain : !hasFitClass;
+    participant.fitContain = hasFitProperty ? !participant.fitContain : !hasFitClass;
 
-    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, streamInfo.fitContain);
-  }
+    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, participant.fitContain);
+  };
 
-  getSizeForVideo(index) {
-    const grid = this.grid();
+  getSizeForVideo(index: number, participant: Participant) {
     const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-    if (grid[index] === 0) {
-      return SIZES.EMPTY;
-    }
+    const grid = this.grid();
 
-    const isAlone = grid.every((value, i) => i === index || value === 0);
-    const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== 0 : grid[index - 1] !== 0;
+    const isAlone = grid.filter(member => !!member).length === 1;
+    const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== null : grid[index - 1] !== null;
 
     if (isAlone) {
       return SIZES.FULL_SCREEN;
@@ -127,8 +137,8 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     return SIZES.QUARTER_SCREEN;
   }
 
-  getClassNameForVideo(index, isMirrored) {
-    const size = this.getSizeForVideo(index);
+  getClassNameForVideo(index: number, participant: Participant) {
+    const size = this.getSizeForVideo(index, participant);
     const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
     const extraClasses = {
       [SIZES.EMPTY]: 'group-video-grid__element--empty',
@@ -137,13 +147,14 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
       [SIZES.QUARTER_SCREEN]: '',
     };
 
-    const roundedClass = this.streams().length === 1 && this.minimized ? ' group-video-grid__element--rounded' : '';
-    const mirrorClass = isMirrored ? ' mirror' : '';
+    const roundedClass =
+      this.minimized && this.videoParticipants().length === 1 ? ' group-video-grid__element--rounded' : '';
+    const mirrorClass = ''; //TODO isMirrored ? ' mirror' : '';
     return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
   }
 
-  getUIEValueForVideo(index) {
-    const size = this.getSizeForVideo(index);
+  getUIEValueForVideo(index: number, participant: Participant) {
+    const size = this.getSizeForVideo(index, participant);
     const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
     const extraClasses = {
       [SIZES.EMPTY]: '',
@@ -153,11 +164,31 @@ z.components.GroupVideoGrid = class GroupVideoGrid {
     };
     return extraClasses[size];
   }
-};
+}
 
 ko.components.register('group-video-grid', {
   template: `
-      <div class="group-video">
+    <div class="group-video">
+      <div class="group-video-grid" data-bind="
+        foreach: {data: grid, as: 'participant', noChildContext: true, afterRender: scaleVideos},
+        css: {'group-video-grid--black-background': hasBlackBackground()}"
+      >
+        <!-- ko if: participant -->
+          <div class="group-video-grid__element" data-bind="
+            css: getClassNameForVideo($index(), participant),
+            attr: {'data-uie-name': 'item-grid', 'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
+            event: {dblclick: doubleClickedOnVideo}"
+          >
+            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream">
+            </video>
+          </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  `,
+  templateold: `
+    <div class="group-video">
+
         <div class="group-video-grid" data-bind="foreach: {data: gridInfo, as: 'streamInfo', afterRender: scaleVideos}, css: {'group-video-grid--black-background': hasBlackBackground()}">
           <!-- ko if: streamInfo -->
             <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), streamInfo.isSelf && streamInfo.videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()), 'data-stream-id': streamInfo.id}, event: {dblclick: $parent.doubleClickedOnVideo}">
@@ -194,6 +225,6 @@ ko.components.register('group-video-grid', {
       </div>
     `,
   viewModel: {
-    createViewModel: (params, componentInfo) => new z.components.GroupVideoGrid(params, componentInfo.element),
+    createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
   },
 });

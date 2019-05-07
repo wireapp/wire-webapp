@@ -24,8 +24,8 @@ import {getLogger} from 'Util/Logger';
 import adapter from 'webrtc-adapter';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {TERMINATION_REASON} from './enum/TerminationReason';
@@ -37,35 +37,12 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
 
+import {Call, ConversationId} from './Call';
+import {DeviceId, Participant, UserId} from './Participant';
+
 import {WebAppEvents} from '../event/WebApp';
 
 import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, VIDEO_STATE, getAvsInstance} from 'avs-web';
-
-type UserId = string;
-type ConversationId = string;
-
-interface Participant {
-  userId: UserId;
-  videoState: ko.Observable<number>;
-}
-
-class Call {
-  public readonly conversationId: ConversationId;
-  public readonly reason: ko.Observable<number | undefined>;
-  public readonly startedAt: ko.Observable<number | undefined>;
-  public readonly state: ko.Observable<number>;
-  public readonly participants: ko.ObservableArray<Participant>;
-  public readonly initialType: number;
-
-  constructor(conversationId: ConversationId, state: number, initialType: number) {
-    this.conversationId = conversationId;
-    this.state = ko.observable(state);
-    this.participants = ko.observableArray();
-    this.reason = ko.observable();
-    this.startedAt = ko.observable();
-    this.initialType = initialType;
-  }
-}
 
 export class CallingRepository {
   private readonly backendClient: any;
@@ -161,6 +138,22 @@ export class CallingRepository {
       return navigator.mediaDevices.getUserMedia(constraints);
     });
 
+    callingApi.setVideoTrackHandler(
+      (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
+        let participant = this.findParticipant(conversationId, userId);
+        if (!participant) {
+          participant = new Participant(userId, deviceId);
+          this.findCall(conversationId).participants.push(participant);
+        }
+
+        if (tracks.length === 0) {
+          return;
+        }
+
+        participant.videoStream = new MediaStream(tracks);
+      }
+    );
+
     const requestConfig = () => {
       this.getConfig().then((config: any) => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
       return 0;
@@ -195,7 +188,7 @@ export class CallingRepository {
       storedCall.reason(reason);
     };
 
-    const videoStateChanged = (conversationId: ConversationId, userId: UserId, deviceId: string, state: number) => {
+    const videoStateChanged = (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, state: number) => {
       const call = this.findCall(conversationId);
       if (call) {
         call
@@ -236,12 +229,15 @@ export class CallingRepository {
       const call = this.findCall(conversationId);
       if (call) {
         const {members} = JSON.parse(membersJson);
-        call.participants(
-          members.map((member: any) => ({
-            userId: member.userid,
-            videoState: ko.observable(VIDEO_STATE.STOPPED),
-          }))
-        );
+        const newMemberList: Participant[] = members.map(({userid, clientid}: any) => {
+          const existingParticipant = this.findParticipant(conversationId, userid);
+          if (existingParticipant) {
+            // TODO update participant with new state if needed
+            return existingParticipant;
+          }
+          return new Participant(userid, clientid);
+        });
+        call.participants(newMemberList);
       }
     });
 
@@ -275,6 +271,14 @@ export class CallingRepository {
 
   findCall(conversationId: ConversationId): Call | undefined {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
+  }
+
+  findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+    return call.participants().find(participant => participant.userId === userId);
   }
 
   storeCall(call: Call) {

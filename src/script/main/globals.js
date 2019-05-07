@@ -68,7 +68,6 @@ import deviceRemoveGlobal from 'Components/deviceRemove.js';
 import ephemeralTimerGlobal from 'Components/ephemeralTimer.js';
 import fullSearchGlobal from 'Components/fullSearch.js';
 import groupListGlobal from 'Components/groupList.js';
-import groupVideoGridGlobal from 'Components/groupVideoGrid.js';
 import imageGlobal from 'Components/image.js';
 import inputLevelGlobal from 'Components/inputLevel.js';
 import messageGlobal from 'Components/message.js';
