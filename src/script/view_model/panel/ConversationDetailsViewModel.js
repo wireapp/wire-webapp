@@ -25,7 +25,7 @@ import {removeLineBreaks} from 'Util/StringUtil';
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
-import {NotificationSetting} from '../../conversation/NotificationSetting';
+import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
@@ -187,9 +187,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? NotificationSetting.getText(this.activeConversation().notificationState())
-        : '';
+      return this.activeConversation() ? getNotificationText(this.activeConversation().notificationState()) : '';
     });
 
     this.timedMessagesText = ko.pureComputed(() => {

@@ -28,7 +28,7 @@ import {Config} from '../auth/config';
 
 import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {NotificationSetting} from '../conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -121,7 +121,7 @@ export class Conversation {
 
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
-    this.mutedState = ko.observable(NotificationSetting.STATE.EVERYTHING);
+    this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
     this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
@@ -133,7 +133,6 @@ export class Conversation {
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
-      const NOTIFICATION_STATE = NotificationSetting.STATE;
       if (!this.selfUser()) {
         return NOTIFICATION_STATE.NOTHING;
       }
@@ -170,13 +169,13 @@ export class Conversation {
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
-      return this.notificationState() === NotificationSetting.STATE.EVERYTHING;
+      return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });
     this.showNotificationsNothing = ko.pureComputed(() => {
-      return this.notificationState() === NotificationSetting.STATE.NOTHING;
+      return this.notificationState() === NOTIFICATION_STATE.NOTHING;
     });
     this.showNotificationsMentionsAndReplies = ko.pureComputed(() => {
-      return this.notificationState() === NotificationSetting.STATE.MENTIONS_AND_REPLIES;
+      return this.notificationState() === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
     });
 
     this.status = ko.observable(ConversationStatus.CURRENT_MEMBER);

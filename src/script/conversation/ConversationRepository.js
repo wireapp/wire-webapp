@@ -72,7 +72,7 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {NotificationSetting} from './NotificationSetting';
+import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 
@@ -1547,13 +1547,13 @@ export class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    const validNotificationStates = Object.values(NotificationSetting.STATE);
+    const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== NotificationSetting.STATE.EVERYTHING;
+    const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(currentTimestamp)).toISOString(),
