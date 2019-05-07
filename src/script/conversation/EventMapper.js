@@ -19,17 +19,21 @@
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {base64ToArray} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {base64ToArray} from 'Util/util';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {MediumImage} from '../entity/message/MediumImage';
+import {File} from '../entity/message/File';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
@@ -131,8 +135,8 @@ export class EventMapper {
       const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
       if (preview_otr_key) {
         const remoteDataPreview = preview_key
-          ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-          : z.assets.AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+          ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+          : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         asset.preview_resource(remoteDataPreview);
       }
     }
@@ -617,7 +621,7 @@ export class EventMapper {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const assetEntity = new z.entity.File(id);
+    const assetEntity = new File(id);
 
     assetEntity.conversationId = conversationId;
 
@@ -636,16 +640,16 @@ export class EventMapper {
     // Remote data - full
     const {key, otr_key, sha256, token} = eventData;
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
-      : z.assets.AssetRemoteData.v2(conversationId, id, otr_key, sha256);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+      : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
       const remoteDataPreview = preview_key
-        ? z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        : z.assets.AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+        ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
     }
 
@@ -682,8 +686,8 @@ export class EventMapper {
     }
 
     const remoteData = key
-      ? z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
-      : z.assets.AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
+      ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
+      : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
     assetEntity.resource(remoteData);
     return assetEntity;
@@ -703,7 +707,7 @@ export class EventMapper {
 
       const meta_data = linkPreview.metaData || linkPreview.meta_data;
 
-      const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
+      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 
@@ -717,7 +721,7 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(z.assets.AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
+          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {StatusType} from '../../message/StatusType';
@@ -29,7 +29,7 @@ export class ReceiptsMiddleware {
    * This class is responsible for parsing incoming confirmation messages
    * It will update original messages when a confirmation is received
    *
-   * @param {z.event.EventService} eventService - Repository that handles events
+   * @param {EventService} eventService - Repository that handles events
    * @param {UserRepository} userRepository - Repository that handles users
    * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
    */

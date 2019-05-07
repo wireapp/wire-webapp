@@ -17,9 +17,9 @@
  *
  */
 
-import {resolver as dependenciesResolver} from 'utils/dependenciesResolver';
-import * as graph from 'src/script/config/dependenciesGraph';
+import {resolver as dependenciesResolver} from 'Util/dependenciesResolver';
 
+import * as graph from 'src/script/config/dependenciesGraph';
 import {BackendClient} from 'src/script/service/BackendClient';
 
 export const backendConfig = {

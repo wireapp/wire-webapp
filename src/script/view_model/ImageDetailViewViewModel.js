@@ -19,7 +19,8 @@
 
 import moment from 'moment';
 
-import {iterateItem} from 'utils/ArrayUtil';
+import {iterateItem} from 'Util/ArrayUtil';
+import {KEY} from 'Util/KeyboardUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {Modal} from '../ui/Modal';
@@ -102,19 +103,19 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this._loadImage();
     $(document).on('keydown.lightbox', keyboardEvent => {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ESC: {
+        case KEY.ESC: {
           this.clickOnClose();
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-        case z.util.KeyboardUtil.KEY.ARROW_RIGHT: {
+        case KEY.ARROW_DOWN:
+        case KEY.ARROW_RIGHT: {
           this.clickOnShowNext(this, keyboardEvent);
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ARROW_LEFT:
-        case z.util.KeyboardUtil.KEY.ARROW_UP: {
+        case KEY.ARROW_LEFT:
+        case KEY.ARROW_UP: {
           this.clickOnShowPrevious(this, keyboardEvent);
           break;
         }
@@ -149,7 +150,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   formatTimestamp(timestamp) {
-    return moment(timestamp).format('DD/MM/YYYY H:mm');
+    return moment(timestamp).format('L LT');
   }
 
   _loadImage() {

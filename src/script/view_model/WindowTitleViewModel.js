@@ -19,10 +19,12 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {ContentViewModel} from './ContentViewModel';
 
 export class WindowTitleViewModel {
   static get TITLE_DEBOUNCE() {
@@ -80,7 +82,7 @@ export class WindowTitleViewModel {
         amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
         switch (this.contentState()) {
-          case z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS: {
+          case ContentViewModel.STATE.CONNECTION_REQUESTS: {
             const multipleRequests = connectionRequests > 1;
             const requestsString = multipleRequests
               ? t('conversationsConnectionRequestMany', connectionRequests)
@@ -89,39 +91,39 @@ export class WindowTitleViewModel {
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.CONVERSATION: {
+          case ContentViewModel.STATE.CONVERSATION: {
             if (this.conversationRepository.active_conversation()) {
               specificTitle += this.conversationRepository.active_conversation().display_name();
             }
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT: {
+          case ContentViewModel.STATE.PREFERENCES_ABOUT: {
             specificTitle += t('preferencesAbout');
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
+          case ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
             specificTitle += t('preferencesAccount');
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_AV: {
+          case ContentViewModel.STATE.PREFERENCES_AV: {
             specificTitle += t('preferencesAV');
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
+          case ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
             specificTitle += t('preferencesDeviceDetails');
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES: {
+          case ContentViewModel.STATE.PREFERENCES_DEVICES: {
             specificTitle += t('preferencesDevices');
             break;
           }
 
-          case z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS: {
+          case ContentViewModel.STATE.PREFERENCES_OPTIONS: {
             specificTitle += t('preferencesOptions');
             break;
           }
@@ -137,7 +139,7 @@ export class WindowTitleViewModel {
   }
 
   setUpdateState(handlingNotifications) {
-    const updateWindowTitle = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const updateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.updateWindowTitle() !== updateWindowTitle;
     if (isStateChange) {

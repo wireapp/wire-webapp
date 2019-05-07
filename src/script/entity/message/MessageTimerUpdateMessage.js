@@ -17,11 +17,12 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 
 window.z = window.z || {};
 window.z.entity = z.entity || {};
@@ -33,11 +34,11 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
     this.type = BackendEvent.CONVERSATION.MESSAGE_TIMER_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
-    this.message_timer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     this.caption = ko.pureComputed(() => {
       if (this.message_timer) {
-        const timeString = TimeUtil.formatDuration(this.message_timer).text;
+        const timeString = formatDuration(this.message_timer).text;
         return this.user().is_me
           ? t('conversationUpdatedTimerYou', timeString)
           : t('conversationUpdatedTimer', timeString);

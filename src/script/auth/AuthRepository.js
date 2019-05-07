@@ -17,18 +17,21 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
 
-import * as StorageUtil from 'utils/StorageUtil';
-import {Environment} from 'utils/Environment';
+import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
+import {Environment} from 'Util/Environment';
+
 import {WebAppEvents} from '../event/WebApp';
+import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from './SignOutReason';
 import {QUEUE_STATE} from '../service/QueueState';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class AuthRepository {
   static get CONFIG() {
     return {
-      REFRESH_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
     };
   }
 
@@ -71,8 +74,8 @@ export class AuthRepository {
   login(login, persist) {
     return this.authService.postLogin(login, persist).then(accessTokenResponse => {
       this.saveAccessToken(accessTokenResponse);
-      StorageUtil.setValue(z.storage.StorageKey.AUTH.PERSIST, persist);
-      StorageUtil.setValue(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      storeValue(StorageKey.AUTH.PERSIST, persist);
+      storeValue(StorageKey.AUTH.SHOW_LOGIN, true);
       return accessTokenResponse;
     });
   }
@@ -126,7 +129,7 @@ export class AuthRepository {
 
           this.queueState(QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
-          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         });
     }
   }
@@ -136,10 +139,10 @@ export class AuthRepository {
    * @returns {undefined} No return value
    */
   deleteAccessToken() {
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
-    StorageUtil.resetValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
+    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TTL);
+    resetStoreValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
 
   /**
@@ -148,13 +151,13 @@ export class AuthRepository {
    */
   getCachedAccessToken() {
     return new Promise((resolve, reject) => {
-      const accessToken = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const accessTokenType = StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const accessToken = loadValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const accessTokenType = loadValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (accessToken) {
         this.logger.info('Cached access token found in Local Storage', {accessToken});
         this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
-        this._scheduleTokenRefresh(StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+        this._scheduleTokenRefresh(loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
       }
 
@@ -181,13 +184,13 @@ export class AuthRepository {
    */
   saveAccessToken(accessTokenResponse) {
     const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
-    const expiresInMillis = expiresIn * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const expiresInMillis = expiresIn * TIME_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
-    StorageUtil.setValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
+    storeValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
+    storeValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expirationTimestamp, expiresIn);
+    storeValue(StorageKey.AUTH.ACCESS_TOKEN.TTL, expiresInMillis, expiresIn);
+    storeValue(StorageKey.AUTH.ACCESS_TOKEN.TYPE, accessTokenType, expiresIn);
 
     this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
 
@@ -205,7 +208,7 @@ export class AuthRepository {
    * @returns {undefined}
    */
   _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
-    const expirationDate = TimeUtil.formatTimestamp(expirationTimestamp, false);
+    const expirationDate = formatTimestamp(expirationTimestamp, false);
     this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenResponse);
   }
 
@@ -226,7 +229,7 @@ export class AuthRepository {
     if (callbackTimestamp < Date.now()) {
       return this.renewAccessToken(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
     }
-    const refreshDate = TimeUtil.formatTimestamp(callbackTimestamp, false);
+    const refreshDate = formatTimestamp(callbackTimestamp, false);
     this.logger.info(`Scheduling next access token refresh for '${refreshDate}'`);
 
     this.accessTokenRefresh = window.setTimeout(() => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {t, setStrings} from 'utils/LocalizerUtil';
+import {t, setStrings, joinNames} from 'Util/LocalizerUtil';
 
 describe('LocalizerUtil', () => {
   describe('t', () => {
@@ -161,6 +161,32 @@ describe('LocalizerUtil', () => {
       setStrings({en: {test: '[bold]Felix[/bold] is [bold]a[/bold] [italic]pickle[/italic]'}});
 
       expect(t('test')).toBe('<strong>Felix</strong> is <strong>a</strong> <i>pickle</i>');
+    });
+  });
+
+  describe('joinNames', () => {
+    it('can join first names of a list of users', () => {
+      setStrings({en: {enumerationAnd: ', and '}});
+      const beatles = [
+        {first_name: () => 'John'},
+        {first_name: () => 'Paul'},
+        {first_name: () => 'George'},
+        {first_name: () => 'Ringo'},
+      ];
+
+      expect(joinNames(beatles)).toBe('George, John, Paul, and Ringo');
+    });
+
+    it('can join first names of a list of users with me last', () => {
+      setStrings({en: {conversationYouAccusative: 'you', enumerationAnd: ', and '}});
+      const beatles = [
+        {first_name: () => 'John'},
+        {first_name: () => 'Paul'},
+        {first_name: () => 'George', is_me: true},
+        {first_name: () => 'Ringo'},
+      ];
+
+      expect(joinNames(beatles)).toBe('John, Paul, Ringo, and you');
     });
   });
 });

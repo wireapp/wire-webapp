@@ -18,18 +18,22 @@
  */
 
 import 'src/script/localization/Localizer';
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
+
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {BackendEvent} from 'src/script/event/Backend';
+
 import {StatusType} from 'src/script/message/StatusType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+
+import {BackendEvent} from 'src/script/event/Backend';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -1036,7 +1040,7 @@ describe('Conversation', () => {
       const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       const connectionEntity = connectionMapper.mapConnectionFromJson(payload_connection);
 
       const conversation_mapper = new ConversationMapper();

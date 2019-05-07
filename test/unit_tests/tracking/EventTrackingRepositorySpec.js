@@ -19,8 +19,9 @@
 
 import {WebappProperties} from 'src/script/properties/WebappProperties';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 
-describe('z.tracking.EventTrackingRepository', () => {
+describe('EventTrackingRepository', () => {
   const test_factory = new TestFactory();
 
   beforeEach(() => {
@@ -127,7 +128,7 @@ describe('z.tracking.EventTrackingRepository', () => {
 
       expect(error_payload).toBe(false);
       jasmine.clock().mockDate(Date.now());
-      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD * 2);
+      jasmine.clock().tick(EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD * 2);
       error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload);
 
       expect(error_payload).toBe(raygun_payload);

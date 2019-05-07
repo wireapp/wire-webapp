@@ -17,17 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import * as StorageUtil from 'utils/StorageUtil';
+import {getLogger} from 'Util/Logger';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {loadValue} from 'Util/StorageUtil';
+import {appendParameter} from 'Util/UrlUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
+import {StorageKey} from '../storage/StorageKey';
 import {WebAppEvents} from './WebApp';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
-window.z = window.z || {};
-window.z.event = z.event || {};
-
-z.event.WebSocketService = class WebSocketService {
+export class WebSocketService {
   static get CHANGE_TRIGGER() {
     return {
       CLEANUP: 'WebSocketService.CHANGE_TRIGGER.CLEANUP',
@@ -45,20 +45,20 @@ z.event.WebSocketService = class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
+      PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
+      RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
   }
 
   /**
    * Construct a new WebSocket Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.sendPing = this.sendPing.bind(this);
 
     this.backendClient = backendClient;
-    this.logger = getLogger('z.event.WebSocketService');
+    this.logger = getLogger('WebSocketService');
 
     this.clientId = undefined;
     this.connectionUrl = '';
@@ -88,7 +88,7 @@ z.event.WebSocketService = class WebSocketService {
     return new Promise(resolve => {
       this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
       if (this.clientId) {
-        this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
+        this.connectionUrl = appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
 
       const wrongSocketType = typeof this.socket === 'object';
@@ -152,7 +152,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!StorageUtil.getValue(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
@@ -183,7 +183,7 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
     amplify.publish(WebAppEvents.CONNECTION.ONLINE);
   }
@@ -207,7 +207,7 @@ z.event.WebSocketService = class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }
@@ -231,4 +231,4 @@ z.event.WebSocketService = class WebSocketService {
     this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
     this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
   }
-};
+}

@@ -15,9 +15,9 @@
     "noUnusedLocals": true,
     "outDir": "src/script/auth",
     "paths": {
-      "components/*": ["./src/script/components/*"],
-      "resource/*": ["./resource/*"],
-      "utils/*": ["./src/script/util/*"]
+      "Components/*": ["./src/script/components/*"],
+      "Resource/*": ["./resource/*"],
+      "Util/*": ["./src/script/util/*"]
     },
     "rootDirs": ["src/script"],
     "sourceMap": true,

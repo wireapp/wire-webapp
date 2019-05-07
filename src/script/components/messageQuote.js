@@ -18,7 +18,8 @@
  */
 
 import moment from 'moment';
-import {includesOnlyEmojis} from 'utils/EmojiUtil';
+
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';
@@ -181,8 +182,8 @@ ko.components.register('message-quote', {
         <!-- /ko -->
         <div class="message-quote__timestamp"
           data-bind="text: quotedMessageIsBeforeToday()
-            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('DD.MM.YYYY'))
-            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('HH:mm')),
+            ? t('replyQuoteTimeStampDate', moment(quotedMessage().timestamp()).format('L'))
+            : t('replyQuoteTimeStampTime', moment(quotedMessage().timestamp()).format('LT')),
             click: focusMessage"
           data-uie-name="label-timestamp-quote">
         </div>

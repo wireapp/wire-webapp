@@ -19,10 +19,12 @@
 
 import adapter from 'webrtc-adapter';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {createRandomUuid} from 'utils/util';
+import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createRandomUuid} from 'Util/util';
+import {Environment} from 'Util/Environment';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../telemetry/calling/CallSetupSteps';
@@ -38,14 +40,18 @@ import {CALL_STATE} from './enum/CallState';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CallMessageMapper} from './CallMessageMapper';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {MediaType} from '../media/MediaType';
-import {Environment} from 'utils/Environment';
 
 import {ClientEvent} from '../event/Client';
 import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
+import {EventName} from '../tracking/EventName';
+
+import {ConversationRepository} from '../conversation/ConversationRepository';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -173,7 +179,7 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    *
    * @param {Object} event - Event payload
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   onCallEvent(event, source) {
@@ -194,7 +200,7 @@ export class CallingRepository {
 
       this._validateMessageType(callMessageEntity)
         .then(conversationEntity => {
-          const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+          const isBackendTimestamp = source !== EventRepository.SOURCE.INJECTED;
           conversationEntity.update_timestamp_server(callMessageEntity.time, isBackendTimestamp);
         })
         .then(() => {
@@ -210,7 +216,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onCallEventInSupportedBrowsers(callMessageEntity, source) {
@@ -268,7 +274,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Mapped incoming call message entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onCallEventInUnsupportedBrowsers(callMessageEntity, source) {
@@ -280,7 +286,7 @@ export class CallingRepository {
           this.injectActivateEvent(callMessageEntity, source);
           this.userRepository.get_user_by_id(userId).then(userEntity => {
             const warningOptions = {name: userEntity.name()};
-            const warningType = z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
+            const warningType = WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL;
 
             amplify.publish(WebAppEvents.WARNING.SHOW, warningType, warningOptions);
           });
@@ -288,7 +294,7 @@ export class CallingRepository {
         }
 
         case CALL_MESSAGE_TYPE.CANCEL: {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.UNSUPPORTED_INCOMING_CALL);
           break;
         }
 
@@ -336,7 +342,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_CHECK
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onGroupCheck(callMessageEntity, source) {
@@ -400,7 +406,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.GROUP_START
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onGroupStart(callMessageEntity, source) {
@@ -494,7 +500,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _onSetup(callMessageEntity, source) {
@@ -596,7 +602,7 @@ export class CallingRepository {
    * Verify validity of incoming call.
    *
    * @param {CallMessageEntity} callMessageEntity - Call message to validate
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {z.error.CallError|Error} error - Error thrown during call message handling
    * @returns {undefined} No return value
    */
@@ -610,14 +616,14 @@ export class CallingRepository {
     const validMessage = response === isTypeGroupCheck;
 
     if (!isSelfUser && validMessage) {
-      const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+      const eventFromStream = source === EventRepository.SOURCE.STREAM;
       const silentCall = isTypeGroupCheck || eventFromStream;
       const promises = [this._createIncomingCall(callMessageEntity, source, silentCall)];
 
       if (!eventFromStream) {
         const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
-        eventInfoEntity.setType(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING);
-        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+        eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+        const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
         promises.push(grantPromise);
@@ -748,7 +754,7 @@ export class CallingRepository {
 
           const protoCalling = new Calling({content: callMessageEntity.toContentString()});
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+            [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
             messageId: createRandomUuid(),
           });
 
@@ -1000,7 +1006,7 @@ export class CallingRepository {
 
       const isOutgoingCall = callState === CALL_STATE.OUTGOING;
       if (isOutgoingCall && !this.supportsCalling) {
-        amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
+        amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.UNSUPPORTED_OUTGOING_CALL);
         return reject(new z.error.CallError(z.error.CallError.TYPE.NOT_SUPPORTED));
       }
 
@@ -1065,7 +1071,7 @@ export class CallingRepository {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
+            window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
@@ -1370,7 +1376,7 @@ export class CallingRepository {
    *
    * @private
    * @param {CallMessageEntity} callMessageEntity - Call message entity of type CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
    */
@@ -1405,10 +1411,10 @@ export class CallingRepository {
         callEntity.state(callState);
 
         return callEntity.addOrUpdateParticipant(userId, false, callMessageEntity).then(() => {
-          this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, callEntity);
+          this.telemetry.track_event(EventName.CALLING.RECEIVED_CALL, callEntity);
           this.injectActivateEvent(callMessageEntity, source);
 
-          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          const eventFromWebSocket = source === EventRepository.SOURCE.WEB_SOCKET;
           const hasOtherCalls = this.calls().some(call => call.id !== callEntity.id);
           const hasCallWithoutVideo = hasOtherCalls && !this.mediaStreamHandler.selfStreamState.videoSend();
 
@@ -1457,7 +1463,7 @@ export class CallingRepository {
 
       callEntity.state(CALL_STATE.OUTGOING);
 
-      this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, callEntity);
+      this.telemetry.track_event(EventName.CALLING.INITIATED_CALL, callEntity);
       return callEntity;
     });
   }
@@ -1469,7 +1475,7 @@ export class CallingRepository {
   /**
    * Inject a call activate event.
    * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   injectActivateEvent(callMessageEntity, source) {
@@ -1480,7 +1486,7 @@ export class CallingRepository {
   /**
    * Inject a call deactivate event.
    * @param {CallMessageEntity} callMessageEntity - Call message to create event from
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
@@ -1622,7 +1628,7 @@ export class CallingRepository {
 
         const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 

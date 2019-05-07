@@ -17,35 +17,32 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {koArrayPushAll} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {koArrayPushAll} from 'Util/util';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {EventRepository} from '../event/EventRepository';
 import {SystemMessageType} from '../message/SystemMessageType';
 
-window.z = window.z || {};
-window.z.connection = z.connection || {};
+import {ConnectionStatus} from './ConnectionStatus';
+import {ConnectionMapper} from './ConnectionMapper';
+import {ConnectionService} from './ConnectionService';
 
-z.connection.ConnectionRepository = class ConnectionRepository {
+export class ConnectionRepository {
   static get CONFIG() {
     return {
       SUPPORTED_EVENTS: [BackendEvent.USER.CONNECTION],
     };
   }
-  /**
-   * Construct a new Connection repository.
-   * @class z.connection.ConnectionRepository
-   * @param {z.connection.ConnectionService} connectionService - Backend REST API connection service implementation
-   * @param {z.repository.UserRepository} userRepository - Repository for all user interactions
-   */
-  constructor(connectionService, userRepository) {
-    this.connectionService = connectionService;
+
+  constructor(backendClient, userRepository) {
+    this.connectionService = new ConnectionService(backendClient);
     this.userRepository = userRepository;
 
-    this.logger = getLogger('z.connection.ConnectionRepository');
+    this.logger = getLogger('ConnectionRepository');
 
-    this.connectionMapper = new z.connection.ConnectionMapper();
+    this.connectionMapper = new ConnectionMapper();
     this.connectionEntities = ko.observableArray([]);
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
@@ -55,7 +52,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Listener for incoming user events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   onUserEvent(eventJson, source) {
@@ -77,7 +74,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * Convert a JSON event into an entity and get the matching conversation.
    *
    * @param {Object} eventJson - JSON data of 'user.connection' event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @param {boolean} [showConversation] - Should the new conversation be opened?
    * @returns {undefined} No return value
    */
@@ -99,7 +96,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
     }
 
     return this.updateConnection(connectionEntity).then(() => {
-      const shouldUpdateUser = previousStatus === z.connection.ConnectionStatus.SENT && connectionEntity.isConnected();
+      const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
       if (shouldUpdateUser) {
         this.userRepository.updateUserById(connectionEntity.userId);
       }
@@ -115,7 +112,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
   acceptRequest(userEntity, showConversation = false) {
-    return this._updateStatus(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
+    return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
@@ -127,7 +124,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   blockUser(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._updateStatus(userEntity, z.connection.ConnectionStatus.BLOCKED).then(() => {
+    return this._updateStatus(userEntity, ConnectionStatus.BLOCKED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -143,7 +140,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancelRequest(userEntity, hideConversation = false, nextConversationEntity) {
-    return this._updateStatus(userEntity, z.connection.ConnectionStatus.CANCELLED).then(() => {
+    return this._updateStatus(userEntity, ConnectionStatus.CANCELLED).then(() => {
       if (hideConversation) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
       }
@@ -162,7 +159,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .postConnections(userEntity.id, userEntity.name())
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
@@ -172,7 +169,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Get a connection for a user ID.
    * @param {string} userId - User ID
-   * @returns {z.connection.ConnectionEntity} User connection entity
+   * @returns {ConnectionEntity} User connection entity
    */
   getConnectionByUserId(userId) {
     return this.connectionEntities().find(connectionEntity => connectionEntity.userId === userId);
@@ -181,7 +178,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Get a connection for a conversation ID.
    * @param {string} conversationId - Conversation ID
-   * @returns {z.connection.ConnectionEntity} User connection entity
+   * @returns {ConnectionEntity} User connection entity
    */
   getConnectionByConversationId(conversationId) {
     return this.connectionEntities().find(connectionEntity => connectionEntity.conversationId === conversationId);
@@ -194,7 +191,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    *
    * @param {number} [limit=500] - Query limit for user connections
    * @param {string} [userId] - User ID of the latest connection
-   * @param {Array<z.connection.ConnectionEntity>} [connectionEntities=[]] - Unordered array of user connections
+   * @param {Array<ConnectionEntity>} [connectionEntities=[]] - Unordered array of user connections
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   getConnections(limit = 500, userId, connectionEntities = []) {
@@ -227,7 +224,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * @returns {Promise} Promise that resolves when an incoming connection request was ignored
    */
   ignoreRequest(userEntity) {
-    return this._updateStatus(userEntity, z.connection.ConnectionStatus.IGNORED);
+    return this._updateStatus(userEntity, ConnectionStatus.IGNORED);
   }
 
   /**
@@ -238,12 +235,12 @@ z.connection.ConnectionRepository = class ConnectionRepository {
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
   unblockUser(userEntity, showConversation = true) {
-    return this._updateStatus(userEntity, z.connection.ConnectionStatus.ACCEPTED, showConversation);
+    return this._updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
   }
 
   /**
    * Update user matching a given connection.
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
+   * @param {ConnectionEntity} connectionEntity - Connection entity
    * @returns {Promise} Promise that resolves when the connection have been updated
    */
   updateConnection(connectionEntity) {
@@ -261,8 +258,8 @@ z.connection.ConnectionRepository = class ConnectionRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all connections have been updated
+   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
+   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
   updateConnections(connectionEntities) {
     return Promise.resolve()
@@ -302,7 +299,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       .putConnections(userEntity.id, connectionStatus)
       .then(response => {
         const connectionEvent = {connection: response};
-        return this.onUserConnection(connectionEvent, z.event.EventRepository.SOURCE.INJECTED, showConversation);
+        return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
       })
       .catch(error => {
         const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
@@ -321,17 +318,17 @@ z.connection.ConnectionRepository = class ConnectionRepository {
   /**
    * Send the user connection notification.
    *
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.connection.ConnectionStatus} previousStatus - Previous connection status
+   * @param {ConnectionEntity} connectionEntity - Connection entity
+   * @param {EventRepository.SOURCE} source - Source of event
+   * @param {ConnectionStatus} previousStatus - Previous connection status
    * @returns {undefined} No return value
    */
   _sendNotification(connectionEntity, source, previousStatus) {
     // We accepted the connection request or unblocked the user
-    const expectedPreviousStatus = [z.connection.ConnectionStatus.BLOCKED, z.connection.ConnectionStatus.PENDING];
+    const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
-    const isWebSocketEvent = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const isWebSocketEvent = source === EventRepository.SOURCE.WEB_SOCKET;
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
@@ -340,7 +337,7 @@ z.connection.ConnectionRepository = class ConnectionRepository {
         messageEntity.user(userEntity);
 
         if (connectionEntity.isConnected()) {
-          const statusWasSent = previousStatus === z.connection.ConnectionStatus.SENT;
+          const statusWasSent = previousStatus === ConnectionStatus.SENT;
           messageEntity.memberMessageType = statusWasSent
             ? SystemMessageType.CONNECTION_ACCEPTED
             : SystemMessageType.CONNECTION_CONNECTED;
@@ -352,4 +349,4 @@ z.connection.ConnectionRepository = class ConnectionRepository {
       });
     }
   }
-};
+}

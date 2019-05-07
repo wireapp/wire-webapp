@@ -17,18 +17,23 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {alias} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {alias} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
-import {t} from 'utils/LocalizerUtil';
 import {User} from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {Environment} from 'utils/Environment';
 import {WebAppEvents} from '../../event/WebApp';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
+import {SearchRepository} from '../../search/SearchRepository';
 
 class StartUIViewModel {
   static get STATE() {
@@ -191,7 +196,7 @@ class StartUIViewModel {
 
     // Selected user bubble
     this.userProfile = ko.observable(null);
-    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof z.integration.ServiceEntity);
+    this.userProfileIsService = ko.pureComputed(() => this.userProfile() instanceof ServiceEntity);
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
       return this.userProfileIsService() ? 'start-ui-service-bubble' : '';
@@ -250,21 +255,21 @@ class StartUIViewModel {
   clickOnCreateGuestRoom() {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.GUEST_ROOM_CREATION);
     });
   }
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      safeWindowOpen(this.manageServicesUrl);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -309,7 +314,7 @@ class StartUIViewModel {
     });
 
     // Dismiss old bubble and wait with creating the new one when another bubble is open
-    const timeout = this.userBubble ? z.motion.MotionDuration.LONG : 0;
+    const timeout = this.userBubble ? MotionDuration.LONG : 0;
     if (this.userBubble) {
       this.userBubble.hide();
     }
@@ -560,7 +565,7 @@ class StartUIViewModel {
   }
 
   _searchPeople(query) {
-    const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
+    const normalizedQuery = SearchRepository.normalizeQuery(query);
     if (normalizedQuery) {
       this.showMatches(false);
 
@@ -571,7 +576,7 @@ class StartUIViewModel {
         this.searchRepository
           .search_by_name(normalizedQuery, isHandle)
           .then(userEntities => {
-            const isCurrentQuery = normalizedQuery === z.search.SearchRepository.normalizeQuery(this.searchInput());
+            const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
             if (isCurrentQuery) {
               this.searchResults.others(userEntities);
             }
@@ -585,7 +590,7 @@ class StartUIViewModel {
         ? this.conversationRepository.connectedUsers()
         : allLocalUsers;
 
-      const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+      const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
       const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);

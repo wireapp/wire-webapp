@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
 
 import {CallSetupTimings} from './CallSetupTimings';
 import {SIGNALING_STATE} from '../../calling/rtc/SignalingState';

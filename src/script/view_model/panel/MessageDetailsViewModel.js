@@ -19,8 +19,9 @@
 
 import moment from 'moment';
 
+import {t} from 'Util/LocalizerUtil';
+
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {t} from 'utils/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {SuperType} from '../../message/SuperType';
 
@@ -51,7 +52,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       RECEIPTS_OFF: 'receipts-off',
     };
 
-    const formatTime = time => moment(time).format('DD.MM.YY, HH:mm');
+    const formatTime = time => moment(time).format('L, LT');
 
     this.message = ko.pureComputed(() => {
       if (!this.isVisible()) {

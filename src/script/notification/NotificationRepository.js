@@ -17,12 +17,14 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t, Declension} from 'Util/LocalizerUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
+import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
-import {t, Declension} from 'utils/LocalizerUtil';
-import {SanitizationUtil} from 'utils/SanitizationUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {Environment} from 'utils/Environment';
 import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';
@@ -34,6 +36,9 @@ import {AudioType} from '../audio/AudioType';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ContentViewModel} from '../view_model/ContentViewModel';
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -41,12 +46,12 @@ import {SuperType} from '../message/SuperType';
  * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
-class NotificationRepository {
+export class NotificationRepository {
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
       TITLE_LENGTH: 38,
     };
   }
@@ -58,7 +63,7 @@ class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param {CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users
    */
@@ -146,7 +151,7 @@ class NotificationRepository {
   /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification has been handled
    */
@@ -251,7 +256,7 @@ class NotificationRepository {
             notificationText = assetEntity.text;
           }
 
-          return z.util.StringUtil.truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
+          return truncate(notificationText, NotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     }
@@ -294,7 +299,7 @@ class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = SanitizationUtil.getFirstName(otherUserEntity, declension);
+      const nameOfJoinedUser = getFirstName(otherUserEntity, declension);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
@@ -329,7 +334,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.MemberMessage} messageEntity - Member message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message body
    */
@@ -411,10 +416,10 @@ class NotificationRepository {
    */
   _createBodySystem(messageEntity) {
     const createBodyMessageTimerUpdate = () => {
-      const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
+      const messageTimer = ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
 
       if (messageTimer) {
-        const timeString = TimeUtil.formatDuration(messageTimer).text;
+        const timeString = formatDuration(messageTimer).text;
         const substitutions = {time: timeString, user: messageEntity.user().first_name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
@@ -442,7 +447,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves with the notification content
    */
@@ -476,7 +481,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connection entity
+   * @param {ConnectionEntity} connectionEntity - Connection entity
    * @param {Conversation} conversationEntity - Conversation entity
    * @returns {string|undefined} The notification message body
    */
@@ -502,7 +507,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Object} Notification message data
    */
@@ -531,7 +536,7 @@ class NotificationRepository {
         .previewPictureResource()
         .generateUrl()
         .catch(error => {
-          if (error instanceof z.util.ValidationUtilError) {
+          if (error instanceof ValidationUtilError) {
             this.logger.error(`Failed to validate an asset URL: ${error.message}`);
           }
           return '';
@@ -546,7 +551,7 @@ class NotificationRepository {
    * Creates the notification tag.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} Notification message tag
    */
@@ -573,7 +578,7 @@ class NotificationRepository {
         : conversationName;
     }
 
-    return z.util.StringUtil.truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -583,7 +588,7 @@ class NotificationRepository {
    */
   _createTitleObfuscated() {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return z.util.StringUtil.truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -591,7 +596,7 @@ class NotificationRepository {
    *
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Function} Function to be called when notification is clicked
    */
@@ -607,7 +612,7 @@ class NotificationRepository {
     const isConnectionRequest = messageEntity.is_member() && messageEntity.isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       };
     }
 
@@ -618,7 +623,7 @@ class NotificationRepository {
    * Retrieve conversation ID from either conversation or connection.
    *
    * @private
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {string} ID of conversation
    */
@@ -655,7 +660,7 @@ class NotificationRepository {
    * @private
    * @see https://developer.mozilla.org/en/docs/Web/API/notification#Parameters
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.connection.ConnectionEntity} [connectionEntity] - Connection entity
+   * @param {ConnectionEntity} [connectionEntity] - Connection entity
    * @param {Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves when notification was handled
    */
@@ -703,12 +708,12 @@ class NotificationRepository {
   // Request browser permission for notifications.
   _requestPermission() {
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permissionState => {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
           this.updatePermissionState(permissionState).then(resolve);
         });
       }
@@ -749,7 +754,7 @@ class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationRepository.is_active_conversation(conversationEntity)
       : false;
-    const inConversationView = this.contentViewModelState.state() === z.viewModel.ContentViewModel.STATE.CONVERSATION;
+    const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =
       this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
@@ -859,5 +864,3 @@ class NotificationRepository {
     return isEventToNotify && isSelfMentionOrReply;
   }
 }
-
-export {NotificationRepository};

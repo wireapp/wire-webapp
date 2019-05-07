@@ -18,11 +18,10 @@
  */
 
 import moment from 'moment';
-/* eslint-disable no-unused-vars */
-import {isSameDay, isSameMonth, isCurrentYear, isToday} from '../../../src/script/util/moment';
-/* eslint-enable no-unused-vars */
 
-describe('z.util.moment', () => {
+import {isSameDay, isSameMonth, isCurrentYear, isToday} from 'Util/moment';
+
+describe('moment', () => {
   describe('isToday', () => {
     it('should return true if date is today', () => {
       expect(isToday(moment())).toBeTruthy();

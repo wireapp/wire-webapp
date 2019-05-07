@@ -17,15 +17,16 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+
 import {EventMapper} from 'src/script/conversation/EventMapper';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
-
-import {createRandomUuid} from 'utils/util';
 
 describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;

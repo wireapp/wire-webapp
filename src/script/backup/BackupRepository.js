@@ -19,13 +19,13 @@
 
 import JSZip from 'jszip';
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {chunk} from 'Util/ArrayUtil';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {ClientEvent} from '../event/Client';
 
 import {BackupService} from './BackupService';
-import {chunk} from 'utils/ArrayUtil';
 
 class BackupRepository {
   static get CONFIG() {
@@ -42,9 +42,9 @@ class BackupRepository {
   /**
    * Construct a new Backup repository.
    * @param {BackupService} backupService - Backup service implementation
-   * @param {z.client.ClientRepository} clientRepository - Repository for all client interactions
-   * @param {z.connection.ConnectionRepository} connectionRepository - Repository for all connection interactions
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {ClientRepository} clientRepository - Repository for all client interactions
+   * @param {ConnectionRepository} connectionRepository - Repository for all connection interactions
+   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {
@@ -58,8 +58,8 @@ class BackupRepository {
 
     this.canceled = false;
 
-    this.CONVERSATIONS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENTS_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.CONVERSATIONS_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENTS_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   cancelAction() {

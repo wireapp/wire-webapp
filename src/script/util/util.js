@@ -21,17 +21,15 @@ import {Decoder, Encoder} from 'bazinga64';
 import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
-import {SanitizationUtil} from 'utils/SanitizationUtil';
+import MarkdownIt from 'markdown-it';
+
+import {escapeString} from 'Util/SanitizationUtil';
 
 /* eslint-disable no-unused-vars */
 import PhoneFormatGlobal from 'phoneformat.js';
-import MarkdownIt from 'markdown-it';
-import {StringUtilGlobal} from './StringUtil';
+import {replaceInRange} from './StringUtil';
 import {Environment} from './Environment';
 /* eslint-enable no-unused-vars */
-
-window.z = window.z || {};
-window.z.util = z.util || {};
 
 export const checkIndexedDb = () => {
   if (!Environment.browser.supports.indexedDb) {
@@ -79,10 +77,6 @@ export const checkIndexedDb = () => {
   }
 
   return Promise.resolve();
-};
-
-export const isSameLocation = (pastLocation, currentLocation) => {
-  return pastLocation !== '' && currentLocation.startsWith(pastLocation);
 };
 
 export const loadDataUrl = file => {
@@ -331,7 +325,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
 
     const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${z.util.SanitizationUtil.escapeString(mentionText)}`;
+    const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
   const mentionTexts = {};
@@ -348,12 +342,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
         text: mentionText,
         userId: mention.userId,
       };
-      return z.util.StringUtil.replaceInRange(
-        strippedText,
-        mentionKey,
-        mention.startIndex,
-        mention.startIndex + mention.length
-      );
+      return replaceInRange(strippedText, mentionKey, mention.startIndex, mention.startIndex + mention.length);
     }, message);
 
   markdownit.set({
@@ -373,7 +362,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const cleanString = hashedString =>
-      SanitizationUtil.escapeString(
+      escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
           hashedString
@@ -394,8 +383,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       return `[${cleanString(text)}](${cleanString(href)})`;
     }
     if (isEmail) {
-      const email = href.replace(/^mailto:/, '');
-      link.attrPush(['onclick', `z.util.SanitizationUtil.safeMailtoOpen(event, '${email}')`]);
+      link.attrPush(['data-email-link', 'true']);
     } else {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
@@ -407,13 +395,16 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       }
       link.attrSet('href', cleanString(href));
       if (nextToken && nextToken.type === 'text') {
-        nextToken.content = cleanString(text);
+        nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
     }
     if (isWireDeepLink) {
       link.attrPush(['data-uie-name', 'wire-deep-link']);
+    }
+    if (link.markup === 'linkify') {
+      nextToken.content = encodeURI(nextToken.content);
     }
     return self.renderToken(tokens, idx, options);
   };
@@ -501,31 +492,6 @@ export const validateProfileImageResolution = (file, minWidth, minHeight) => {
     image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
-};
-
-export const isValidEmail = email => {
-  const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return regExp.test(email);
-};
-
-/**
- * Checks if input has the format of an international phone number
- * @note Begins with + and contains only numbers
- * @param {string} phoneNumber - Input
- * @returns {boolean} True, if the input a phone number
- */
-export const isValidPhoneNumber = phoneNumber => {
-  const allowDebugPhoneNumbers = z.config.FEATURE.ENABLE_DEBUG;
-  const regularExpression = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-  return regularExpression.test(phoneNumber);
-};
-
-export const isValidUsername = username => {
-  if (username.startsWith('@')) {
-    username = username.substring(1);
-  }
-  return /^[a-z_0-9]{2,21}$/.test(username);
 };
 
 export const murmurhash3 = (key, seed) => {

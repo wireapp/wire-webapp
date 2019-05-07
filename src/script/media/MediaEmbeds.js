@@ -18,7 +18,9 @@
  */
 
 import 'url-search-params-polyfill';
-import {Environment} from 'utils/Environment';
+
+import {Environment} from 'Util/Environment';
+import {formatString} from 'Util/StringUtil';
 
 /**
  * Create and iframe.
@@ -51,7 +53,7 @@ const _createIframeContainer = options => {
     options.allowfullscreen = '';
   }
 
-  return z.util.StringUtil.format(
+  return formatString(
     iframeContainer,
     options.class,
     options.width,
@@ -62,7 +64,6 @@ const _createIframeContainer = options => {
   );
 };
 
-// Enum of different regex for the supported services.
 const _regex = {
   // example: http://regexr.com/3ase5
   soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
@@ -205,7 +206,7 @@ export const MediaEmbeds = {
         video: false,
       });
 
-      const embed = z.util.StringUtil.format(iframe, height, linkSrc);
+      const embed = formatString(iframe, height, linkSrc);
       message = _appendIframe(link, message, embed);
     }
 

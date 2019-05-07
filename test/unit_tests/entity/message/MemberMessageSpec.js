@@ -17,13 +17,14 @@
  *
  */
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 import 'src/script/localization/Localizer';
 
 import {User} from 'src/script/entity/User';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 import {StatusType} from 'src/script/message/StatusType';
+import {File} from 'src/script/entity/message/File';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
@@ -101,7 +102,7 @@ describe('Member Message', () => {
     });
 
     it('should be deletable when message is a file and uploading or downloading', () => {
-      const file_et = new z.entity.File();
+      const file_et = new File();
       file_et.status(AssetTransferState.UPLOADING);
       message_et.assets.push(file_et);
 
@@ -127,7 +128,7 @@ describe('Member Message', () => {
     });
 
     it('should return true for File asset', () => {
-      message_et.assets.push(new z.entity.File());
+      message_et.assets.push(new File());
 
       expect(message_et.has_asset_file()).toBeTruthy();
     });

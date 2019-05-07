@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
-import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 

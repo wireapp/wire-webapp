@@ -17,7 +17,7 @@
  *
  */
 
-import {getDifference} from 'utils/ArrayUtil';
+import {getDifference} from 'Util/ArrayUtil';
 
 class VideoGridRepository {
   /**

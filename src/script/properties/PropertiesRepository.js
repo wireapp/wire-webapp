@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
 
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';

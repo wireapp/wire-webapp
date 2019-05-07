@@ -19,9 +19,10 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {koArrayPushAll, koArrayUnshiftAll} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {koArrayPushAll, koArrayUnshiftAll} from 'Util/util';
+import {truncate} from 'Util/StringUtil';
 
 import {Config} from '../auth/config';
 
@@ -30,10 +31,13 @@ import {ACCESS_STATE} from '../conversation/AccessState';
 import {NotificationSetting} from '../conversation/NotificationSetting';
 import {ConversationType} from '../conversation/ConversationType';
 import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 
 import {WebAppEvents} from '../event/WebApp';
+import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -107,7 +111,7 @@ export class Conversation {
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity && connectionEntity.userId;
       if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
@@ -298,8 +302,8 @@ export class Conversation {
             .map(userEntity => userEntity.first_name())
             .join(', ');
 
-          const maxLength = z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-          return z.util.StringUtil.truncate(joinedNames, maxLength, false);
+          const maxLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+          return truncate(joinedNames, maxLength, false);
         }
 
         const hasUserIds = !!this.participating_user_ids().length;
@@ -479,11 +483,11 @@ export class Conversation {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
-          : accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+          : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.selfUser().devices().length);
     }
 
-    return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**

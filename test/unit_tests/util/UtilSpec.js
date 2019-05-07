@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {Conversation} from 'src/script/entity/Conversation';
+
 import {
   renderMessage,
   createRandomUuid,
@@ -39,8 +39,9 @@ import {
   stripUrlWrapper,
   printDevicesId,
   zeroPadding,
-  isSameLocation,
-} from 'utils/util';
+} from 'Util/util';
+
+import {Conversation} from 'src/script/entity/Conversation';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 
@@ -139,29 +140,27 @@ describe('renderMessage', () => {
   });
 
   it('renders an email address', () => {
-    const expected =
-      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello@wire.com\')">hello@wire.com</a>';
+    const expected = 'send it over to <a href="mailto:hello@wire.com" data-email-link="true">hello@wire.com</a>';
 
     expect(renderMessage('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" data-email-link="true">hello+world@wire.com</a>';
 
     expect(renderMessage('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" data-email-link="true">janedoe@school.university.edu</a>';
 
     expect(renderMessage('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
-    const expected =
-      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+    const expected = 'send it over to <a href="mailto:bla@foo.co.uk" data-email-link="true">bla@foo.co.uk</a>';
 
     expect(renderMessage('send it over to bla@foo.co.uk')).toBe(expected);
   });
@@ -213,11 +212,11 @@ describe('renderMessage', () => {
 
   it('renders special escaped email links from markdown notation', () => {
     expect(renderMessage('[email](mailto:test@email.com)')).toBe(
-      '<a href="mailto:test@email.com" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'test@email.com\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
+      '<a href="mailto:test@email.com" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
 
     expect(renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
-      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" onclick="z.util.SanitizationUtil.safeMailtoOpen(event, \'&amp;#x27;);alert(&amp;#x27;pwned&amp;#x27;)//\')" data-md-link="true" data-uie-name="markdown-link">email</a>'
+      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>'
     );
   });
 
@@ -779,63 +778,5 @@ describe('zeroPadding', () => {
 
   it('can transform 666 to a string', () => {
     expect(zeroPadding(666)).toEqual('666');
-  });
-});
-
-describe('is_same_location', () => {
-  it('returns false if page was accessed directly', () => {
-    expect(isSameLocation('', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if page was accessed from https://wire.com', () => {
-    expect(isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if page was accessed from https://wire.com/download', () => {
-    expect(isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if page was accessed from https://get.wire.com', () => {
-    expect(isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if page was accessed from an external link', () => {
-    expect(isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if redirected from auth', () => {
-    expect(isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
-  });
-
-  it('returns false if redirected from auth with parameter', () => {
-    expect(isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')).toBeFalsy();
-  });
-
-  it('returns false if redirected from auth with history hashtag', () => {
-    expect(isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')).toBeFalsy();
-  });
-
-  it('returns false if redirected from auth with login hashtag', () => {
-    expect(
-      isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
-    ).toBeFalsy();
-  });
-
-  it('returns false if redirected from auth with registration hashtag', () => {
-    expect(
-      isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
-    ).toBeFalsy();
-  });
-
-  it('returns true if auth with login hashtag was reloaded', () => {
-    expect(isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
-  });
-
-  it('returns true if page was reloaded', () => {
-    expect(isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
-  });
-
-  it('returns true if page was reloaded with parameters', () => {
-    expect(isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
   });
 });

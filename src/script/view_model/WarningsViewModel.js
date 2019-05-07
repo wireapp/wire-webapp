@@ -17,18 +17,18 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {Environment} from 'Util/Environment';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {buildSupportUrl} from 'Util/UrlUtil';
+import {afterRender} from 'Util/util';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
-import {Environment} from 'utils/Environment';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.WarningsViewModel = class WarningsViewModel {
+export class WarningsViewModel {
   static get CONFIG() {
     return {
       DIMMED_MODES: [
@@ -67,12 +67,13 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
 
   constructor() {
     this.elementId = 'warnings';
-    this.logger = getLogger('z.viewModel.WarningsViewModel');
+    this.logger = getLogger('WarningsViewModel');
 
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
     this.Environment = Environment;
+    this.TYPE = WarningsViewModel.TYPE;
 
     this.warnings.subscribe(warnings => {
       let topMargin;
@@ -87,8 +88,8 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
         topMargin = isMiniMode ? '32px' : '64px';
       }
 
-      $('#app').css({top: topMargin});
-      window.requestAnimationFrame(() => $(window).trigger('resize'));
+      document.querySelector('#app').style.top = topMargin;
+      afterRender(() => window.dispatchEvent(new Event('resize')));
     });
 
     this.name = ko.observable();
@@ -126,8 +127,8 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           action: () => {
-            const url = z.util.URLUtil.buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
-            z.util.SanitizationUtil.safeWindowOpen(url);
+            const url = buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+            safeWindowOpen(url);
           },
           text: {
             action: t('modalCallNoMicrophoneAction'),
@@ -170,4 +171,4 @@ z.viewModel.WarningsViewModel = class WarningsViewModel {
     }
     this.warnings.push(type);
   }
-};
+}

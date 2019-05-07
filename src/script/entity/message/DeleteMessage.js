@@ -19,11 +19,9 @@
 
 import moment from 'moment';
 
-import {t} from 'utils/LocalizerUtil';
-import {SuperType} from '../../message/SuperType';
+import {t} from 'Util/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
+import {SuperType} from '../../message/SuperType';
 
 z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
   constructor() {
@@ -33,7 +31,7 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
     this.deleted_timestamp = null;
 
     this.display_deleted_timestamp = () => {
-      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('HH:mm'));
+      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
     };
   }
 };

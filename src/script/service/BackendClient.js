@@ -17,8 +17,9 @@
  *
  */
 
-import {PromiseQueue} from 'utils/PromiseQueue';
-import {TimeUtil} from 'utils/TimeUtil';
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isValidApiPath} from 'Util/ValidationUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';
@@ -29,10 +30,10 @@ export class BackendClient {
     return {
       CONNECTIVITY_CHECK: {
         INITIAL_TIMEOUT: 0,
-        RECHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
-        REQUEST_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        RECHECK_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+        REQUEST_TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
       },
-      QUEUE_CHECK_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      QUEUE_CHECK_TIMEOUT: TIME_IN_MILLIS.MINUTE,
     };
   }
 
@@ -126,7 +127,7 @@ export class BackendClient {
    * @returns {string} REST API endpoint URL
    */
   createUrl(path) {
-    z.util.ValidationUtil.isValidApiPath(path);
+    isValidApiPath(path);
     return `${this.restUrl}${path}`;
   }
 

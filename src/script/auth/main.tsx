@@ -24,7 +24,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
-import {enableLogging} from '../util/LoggerUtil';
+
+import {enableLogging} from 'Util/LoggerUtil';
+import {exposeWrapperGlobals} from 'Util/wrapper';
+
 import {Config} from './config';
 import {configureClient} from './configureClient';
 import {configureCore} from './configureCore';
@@ -34,6 +37,8 @@ import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
 configureEnvironment();
+exposeWrapperGlobals();
+
 const apiClient = configureClient();
 const core = configureCore(apiClient);
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
@@ -93,7 +93,7 @@ import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
-class ConversationMapper {
+export class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
     this.logger = getLogger('ConversationMapper');
@@ -457,5 +457,3 @@ class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 }
-
-export {ConversationMapper};

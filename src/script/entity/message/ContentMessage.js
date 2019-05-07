@@ -20,9 +20,10 @@
 import moment from 'moment';
 import ko from 'knockout';
 
-import {copyText} from 'utils/ClipboardUtil';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
 import {Message} from './Message';
-import {t} from 'utils/LocalizerUtil';
 import {SuperType} from '../../message/SuperType';
 
 window.z = window.z || {};
@@ -51,7 +52,7 @@ class ContentMessage extends Message {
     this.readReceipts = ko.observableArray([]);
 
     this.display_edited_timestamp = () => {
-      return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('HH:mm'));
+      return t('conversationEditTimestamp', moment(this.edited_timestamp()).format('LT'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -169,7 +170,7 @@ class ContentMessage extends Message {
 
     if (!file_name) {
       const date = moment(this.timestamp());
-      file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format('H.mm.ss')}`;
+      file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format('LT')}`;
     }
 
     if (asset_et.file_type) {

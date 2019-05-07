@@ -17,6 +17,8 @@
  *
  */
 
+import {bytesToHex} from 'Util/StringUtil';
+
 import {ClientEvent} from 'src/script/event/Client';
 
 describe('z.message.MessageHasher', () => {
@@ -54,7 +56,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -80,7 +82,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -116,7 +118,7 @@ describe('z.message.MessageHasher', () => {
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
           return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });

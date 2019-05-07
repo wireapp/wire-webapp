@@ -18,9 +18,11 @@
  */
 
 import keyboardJS from 'keyboardjs';
-import {Environment} from 'utils/Environment';
-import {ShortcutType} from './ShortcutType';
 
+import {Environment} from 'Util/Environment';
+import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
+
+import {ShortcutType} from './ShortcutType';
 import {WebAppEvents} from '../event/WebApp';
 
 const SHORTCUT_MAP = {
@@ -140,7 +142,7 @@ const SHORTCUT_MAP = {
 
 const _registerEvent = (platformSpecificShortcut, event) => {
   // bind also 'command + alt + n' for start shortcut
-  if (z.util.StringUtil.includes(platformSpecificShortcut, 'graveaccent')) {
+  if (includesString(platformSpecificShortcut, 'graveaccent')) {
     const replacedShortcut = platformSpecificShortcut.replace('graveaccent', 'n');
     _registerEvent(replacedShortcut, event);
   }
@@ -149,7 +151,7 @@ const _registerEvent = (platformSpecificShortcut, event) => {
     keyboardJS.releaseKey(inputEvent.keyCode);
 
     // Hotfix WEBAPP-1916
-    const ignoreEvent = z.util.StringUtil.includes(platformSpecificShortcut, 'command') && !inputEvent.metaKey;
+    const ignoreEvent = includesString(platformSpecificShortcut, 'command') && !inputEvent.metaKey;
     if (!ignoreEvent) {
       inputEvent.preventDefault();
       amplify.publish(event);
@@ -177,7 +179,7 @@ export const Shortcut = {
       .replace('up', '↑')
       .replace('down', '↓')
       .replace('graveaccent', 'n')
-      .replace(/\w+/g, string => z.util.StringUtil.capitalizeFirstChar(string));
+      .replace(/\w+/g, string => capitalizeFirstChar(string));
   },
 
   getShortcut: shortcutName => {

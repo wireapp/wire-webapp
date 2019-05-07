@@ -19,16 +19,20 @@
 
 import moment from 'moment';
 
-import {getLogger} from 'utils/Logger';
-import * as StorageUtil from 'utils/StorageUtil';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {formatBytes, afterRender, renderMessage} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {loadValue, storeValue} from 'Util/StorageUtil';
+import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatBytes, afterRender, renderMessage} from 'Util/util';
+import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
+import {escapeString} from 'Util/SanitizationUtil';
+import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {AvailabilityType} from '../../user/AvailabilityType';
 
+import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
 import {QuoteEntity} from '../../message/QuoteEntity';
 
@@ -39,7 +43,7 @@ window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.viewModel.ContentViewModel
+// Parent: ContentViewModel
 z.viewModel.content.InputBarViewModel = class InputBarViewModel {
   static get CONFIG() {
     return {
@@ -50,7 +54,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -189,7 +193,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
       return pieces
         .map((piece, index) => {
-          const textPiece = z.util.SanitizationUtil.escapeString(piece).replace(/[\r\n]/g, '<br>');
+          const textPiece = escapeString(piece).replace(/[\r\n]/g, '<br>');
           return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
         })
         .join('')
@@ -259,7 +263,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.pastedFilePreviewUrl(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
+        const date = moment(blob.lastModifiedDate).format('LL, LTS');
         return this.pastedFileName(t('conversationSendPastedFile', date));
       }
 
@@ -328,17 +332,17 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      StorageUtil.setValue(storageKey, {mentions, reply, text});
+      storeValue(storageKey, {mentions, reply, text});
     }
   }
 
   _generateStorageKey(conversationEntity) {
-    return `${z.storage.StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+    return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   }
 
   _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = StorageUtil.getValue(storageKey);
+    const storageValue = loadValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};
@@ -514,13 +518,13 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     const beforeLength = this.input().length;
-    const messageTrimmedStart = z.util.StringUtil.trimStart(this.input());
+    const messageTrimmedStart = trimStart(this.input());
     const afterLength = messageTrimmedStart.length;
 
     const updatedMentions = this.updateMentionRanges(this.currentMentions(), 0, 0, afterLength - beforeLength);
     this.currentMentions(updatedMentions);
 
-    const messageText = z.util.StringUtil.trimEnd(messageTrimmedStart);
+    const messageText = trimEnd(messageTrimmedStart);
 
     const isMessageTextTooLong = messageText.length > z.config.MAXIMUM_MESSAGE_LENGTH;
     if (isMessageTextTooLong) {
@@ -562,15 +566,15 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
-        case z.util.KeyboardUtil.KEY.ARROW_UP: {
-          if (!z.util.KeyboardUtil.isFunctionKey(keyboardEvent) && !this.input().length) {
+        case KEY.ARROW_UP: {
+          if (!isFunctionKey(keyboardEvent) && !this.input().length) {
             this.editMessage(this.conversationEntity().get_last_editable_message());
             this.updateMentions(data, keyboardEvent);
           }
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ESC: {
+        case KEY.ESC: {
           if (this.mentionSuggestions().length) {
             this.endMentionFlow();
           } else if (this.pastedFile()) {
@@ -583,9 +587,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           break;
         }
 
-        case z.util.KeyboardUtil.KEY.ENTER: {
+        case KEY.ENTER: {
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
-            z.util.KeyboardUtil.insertAtCaret(keyboardEvent.target, '\n');
+            insertAtCaret(keyboardEvent.target, '\n');
             ko.utils.triggerEvent(keyboardEvent.target, 'change');
             keyboardEvent.preventDefault();
           }
@@ -709,7 +713,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     if (!this.editedMention()) {
       this.emojiInput.onInputKeyUp(data, keyboardEvent);
     }
-    if (keyboardEvent.key !== z.util.KeyboardUtil.KEY.ESC) {
+    if (keyboardEvent.key !== KEY.ESC) {
       this.handleMentionFlow();
     }
   }

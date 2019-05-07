@@ -17,6 +17,8 @@
  *
  */
 
+import {isRemovalAction} from 'Util/KeyboardUtil';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -66,7 +68,7 @@ z.components.UserInput = class UserInput {
 
   onKeyDown(data, keyboardEvent) {
     if (typeof this.selectedUsers === 'function') {
-      if (z.util.KeyboardUtil.isRemovalAction(keyboardEvent) && !this.input().length) {
+      if (isRemovalAction(keyboardEvent) && !this.input().length) {
         this.selectedUsers.pop();
       }
     }

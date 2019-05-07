@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'utils/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {BackendEvent} from '../event/Backend';
@@ -26,14 +26,12 @@ import {WebAppEvents} from '../event/WebApp';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
+import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+import {EventName} from '../tracking/EventName';
 
-z.conversation.ConversationStateHandler = class ConversationStateHandler extends z.conversation
-  .AbstractConversationEventHandler {
+export class ConversationStateHandler extends AbstractConversationEventHandler {
   /**
-   * Construct a new conversation state handler.
    * @param {ConversationService} conversationService - Service for conversation related backend interactions
    * @param {ConversationRepository} conversationMapper - Repository for conversation interactions
    */
@@ -79,7 +77,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
               }
 
               const attribute = {is_allow_guests: changeToGuestRoom};
-              amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
+              amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
             .catch(() => {
               const messageString = changeToGuestRoom
@@ -115,7 +113,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
         const accessCode = response && response.data;
         if (accessCode) {
           this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_CREATED);
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_CREATED);
         }
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
@@ -126,7 +124,7 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
       .deleteConversationCode(conversationEntity.id)
       .then(() => {
         conversationEntity.accessCode(undefined);
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_REVOKED);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
@@ -148,4 +146,4 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
     const modalOptions = {text: {message}};
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
-};
+}

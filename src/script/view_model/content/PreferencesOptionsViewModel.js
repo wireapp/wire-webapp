@@ -17,18 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
+import {Environment} from 'Util/Environment';
+import {downloadBlob} from 'Util/util';
 
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {Environment} from 'utils/Environment';
-
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
-import {downloadBlob} from 'utils/util';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {AudioPreference} from '../../audio/AudioPreference';
@@ -104,7 +103,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       const selfUserId = this.userRepository.self().id;
       const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
+      const filename = `Wire-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       return downloadBlob(blob, filename);
     }

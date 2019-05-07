@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {CALL_STATE} from '../calling/enum/CallState';
 import {MediaType} from '../media/MediaType';

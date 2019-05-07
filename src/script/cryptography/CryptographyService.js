@@ -17,12 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.CryptographyService = class CryptographyService {
+export class CryptographyService {
   static get CONFIG() {
     return {
       URL_CLIENTS: '/clients',
@@ -32,11 +29,11 @@ z.cryptography.CryptographyService = class CryptographyService {
 
   /**
    * Construct a new Cryptography Service.
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('z.cryptography.CryptographyService');
+    this.logger = getLogger('CryptographyService');
   }
 
   /**
@@ -85,4 +82,4 @@ z.cryptography.CryptographyService = class CryptographyService {
       url: `${CryptographyService.CONFIG.URL_CLIENTS}/${clientId}`,
     });
   }
-};
+}

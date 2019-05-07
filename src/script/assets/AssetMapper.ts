@@ -20,12 +20,9 @@
 import {Asset} from '../entity/message/Asset';
 import {AssetRemoteData} from './AssetRemoteData';
 
-export interface MappedAsset {
-  medium?: AssetRemoteData;
-  preview?: AssetRemoteData;
-}
+export type MappedAsset = {[index: string]: AssetRemoteData};
 
-export const mapProfileAssets = (userId: string, assets: Asset[]) => {
+export const mapProfileAssets = (userId: string, assets: Asset[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
     complete: 'medium',
     preview: 'preview',
@@ -35,7 +32,6 @@ export const mapProfileAssets = (userId: string, assets: Asset[]) => {
     .filter(asset => asset.type === 'image')
     .reduce((mappedAssets, asset) => {
       const assetRemoteData = AssetRemoteData.v3(asset.key, new Uint8Array());
-
       return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
     }, {});
 };
@@ -49,13 +45,7 @@ export const mapProfileAssetsV1 = (userId: string, pictures: Asset[]): MappedAss
 };
 
 // TODO: Fake user entity signature until "User" has been converted to TypeScript
-export const updateUserEntityAssets = (
-  userEntity: {
-    previewPictureResource: ko.Observable<AssetRemoteData>;
-    mediumPictureResource: ko.Observable<AssetRemoteData>;
-  },
-  mappedAssets: MappedAsset = {}
-) => {
+export const updateUserEntityAssets = (userEntity: any, mappedAssets: MappedAsset = {}) => {
   const {preview, medium} = mappedAssets;
   if (preview) {
     userEntity.previewPictureResource(preview);

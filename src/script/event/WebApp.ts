@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum of different webapp events. */
 export const WebAppEvents = {
   ANALYTICS: {
     EVENT: 'wire.webapp.analytics.event',
@@ -239,5 +238,5 @@ export const WebAppEvents = {
 // Needed for the wrapper
 
 window.z = window.z || {};
-window.z.event = z.event || {};
+window.z.event = window.z.event || {};
 window.z.event.WebApp = WebAppEvents;

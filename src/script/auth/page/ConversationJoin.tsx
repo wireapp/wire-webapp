@@ -38,6 +38,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+
+import {noop} from 'Util/util';
+
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
@@ -145,7 +148,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
   componentDidMount = () => {
     this.props
       .doInit({shouldValidateLocalClient: true})
-      .catch(() => {})
+      .catch(noop)
       .then(() => this.readAndUpdateParamsFromUrl(this.props));
   };
 

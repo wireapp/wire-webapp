@@ -17,6 +17,8 @@
  *
  */
 
+import {ClientType} from 'src/script/client/ClientType';
+
 describe('z.client.ClientMapper', () => {
   const mapper = new z.client.ClientMapper();
 
@@ -36,7 +38,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);
+      expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBeTruthy();
       expect(clientEntity.isRemote()).toBeFalsy();
       expect(clientEntity.isTemporary()).toBeFalsy();
@@ -57,7 +59,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(z.client.ClientType.TEMPORARY);
+      expect(clientEntity.type).toBe(ClientType.TEMPORARY);
       expect(clientEntity.isPermanent()).toBeFalsy();
       expect(clientEntity.isRemote()).toBeFalsy();
       expect(clientEntity.isTemporary()).toBeTruthy();
@@ -141,7 +143,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);
+      expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBeTruthy();
       expect(clientEntity.isRemote()).toBeFalsy();
       expect(clientEntity.isTemporary()).toBeFalsy();
@@ -164,7 +166,7 @@ describe('z.client.ClientMapper', () => {
       expect(clientEntity.meta.isVerified()).toBeFalsy();
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(z.client.ClientType.PERMANENT);
+      expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBeTruthy();
       expect(clientEntity.isRemote()).toBeFalsy();
       expect(clientEntity.isTemporary()).toBeFalsy();

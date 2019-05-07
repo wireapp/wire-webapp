@@ -17,28 +17,34 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
+
 import 'src/script/localization/Localizer';
-import {t} from 'utils/LocalizerUtil';
-import {createRandomUuid} from 'utils/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {User} from 'src/script/entity/User';
-import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {Environment} from 'src/script/util/Environment';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -59,7 +65,7 @@ describe('NotificationRepository', () => {
 
   beforeEach(() => {
     return test_factory.exposeNotificationActors().then(() => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
@@ -84,7 +90,7 @@ describe('NotificationRepository', () => {
           tag: conversation_et.id,
         },
         timeout: NotificationRepository.CONFIG.TIMEOUT,
-        title: z.util.StringUtil.truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
+        title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
       };
 
       // Mocks
@@ -95,7 +101,7 @@ describe('NotificationRepository', () => {
       window.wire.app = {
         service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
-      contentViewModelState.state = ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };
@@ -120,7 +126,7 @@ describe('NotificationRepository', () => {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.title = '…';
           }
@@ -160,7 +166,7 @@ describe('NotificationRepository', () => {
             const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = z.string.notificationObfuscatedTitle;
@@ -519,7 +525,7 @@ describe('NotificationRepository', () => {
       const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
       const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-      notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+      notification_content.title = truncate(titleText, titleLength, false);
     });
 
     it('if a group is created', () => {
@@ -576,7 +582,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
@@ -610,7 +616,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {
@@ -655,7 +661,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(ConversationType.ONE2ONE);
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);

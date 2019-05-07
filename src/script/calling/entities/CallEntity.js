@@ -17,8 +17,8 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
-import {getRandomNumber} from 'utils/NumberUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getRandomNumber} from 'Util/NumberUtil';
 
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 import {CALL_STATE} from '../enum/CallState';
@@ -32,11 +32,14 @@ import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {MediaType} from '../../media/MediaType';
-import {WebAppEvents} from '../../event/WebApp';
 import {ParticipantEntity} from './ParticipantEntity';
 import {AudioType} from '../../audio/AudioType';
 
-class CallEntity {
+import {WebAppEvents} from '../../event/WebApp';
+import {EventRepository} from '../../event/EventRepository';
+import {EventName} from '../../tracking/EventName';
+
+export class CallEntity {
   static get CONFIG() {
     return {
       GROUP_CHECK: {
@@ -44,10 +47,10 @@ class CallEntity {
         MAXIMUM_TIMEOUT: 90,
         MINIMUM_TIMEOUT: 60,
       },
-      STATE_TIMEOUT: 60 * TimeUtil.UNITS_IN_MILLIS.SECOND,
+      STATE_TIMEOUT: 60 * TIME_IN_MILLIS.SECOND,
       TIMER: {
         INIT_THRESHOLD: 100,
-        UPDATE_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
+        UPDATE_INTERVAL: TIME_IN_MILLIS.SECOND,
       },
     };
   }
@@ -155,11 +158,11 @@ class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
-          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
+          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / TIME_IN_MILLIS.SECOND);
           this.durationTime(durationInSeconds);
         }, CallEntity.CONFIG.TIMER.UPDATE_INTERVAL);
       }
@@ -224,7 +227,7 @@ class CallEntity {
 
       const isConnectingCall = state === CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;
@@ -278,9 +281,7 @@ class CallEntity {
       this.callLogger.warn(`Deactivation on group check with remaining users '${userIds.join(', ')}' on group check`);
     }
 
-    const eventSource = onGroupCheck
-      ? z.event.EventRepository.SOURCE.INJECTED
-      : z.event.EventRepository.SOURCE.WEB_SOCKET;
+    const eventSource = onGroupCheck ? EventRepository.SOURCE.INJECTED : EventRepository.SOURCE.WEB_SOCKET;
 
     callMessageEntity.userId = this.creatingUser.id;
     this.callingRepository.injectDeactivateEvent(callMessageEntity, eventSource, reason);
@@ -525,7 +526,7 @@ class CallEntity {
     const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
     const timeoutInSeconds = getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
-    const timeout = timeoutInSeconds * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = timeoutInSeconds * TIME_IN_MILLIS.SECOND;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
 
     const timeoutId = this.groupCheckTimeoutId;
@@ -539,7 +540,7 @@ class CallEntity {
    */
   _setVerifyGroupCheckTimeout() {
     const ACTIVITY_TIMEOUT = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
-    const timeout = ACTIVITY_TIMEOUT * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = ACTIVITY_TIMEOUT * TIME_IN_MILLIS.SECOND;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeout);
     this.callLogger.debug(`Set verifying group check after '${ACTIVITY_TIMEOUT}s' (ID: ${this.groupCheckTimeoutId})`);
@@ -1084,5 +1085,3 @@ class CallEntity {
     this.getFlows().forEach(flowEntity => flowEntity.logTimings());
   }
 }
-
-export {CallEntity};

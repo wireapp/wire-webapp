@@ -17,34 +17,33 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
-import {t} from 'utils/LocalizerUtil';
-import {loadDataUrl} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {loadDataUrl} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
+import {TeamService} from './TeamService';
+import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
 
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {SuperProperty} from '../tracking/SuperProperty';
 
-window.z = window.z || {};
-window.z.team = z.team || {};
-
-z.team.TeamRepository = class TeamRepository {
+export class TeamRepository {
   /**
-   * Construct a new Team Repository.
-   * @class z.team.TeamRepository
-   *
-   * @param {z.team.TeamService} teamService - Backend REST API team service implementation
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
-  constructor(teamService, userRepository) {
-    this.logger = getLogger('z.team.TeamRepository');
+  constructor(backendClient, userRepository) {
+    this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
-    this.teamService = teamService;
+    this.teamService = new TeamService(backendClient);
     this.userRepository = userRepository;
 
     this.selfUser = this.userRepository.self;
@@ -75,12 +74,12 @@ z.team.TeamRepository = class TeamRepository {
       return this.teamMembers()
         .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
     });
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
     });
 
     this.userRepository.isTeam = this.isTeam;
@@ -101,7 +100,7 @@ z.team.TeamRepository = class TeamRepository {
           return this.updateTeamMembers(teamEntity);
         }
 
-        this.team(new z.team.TeamEntity());
+        this.team(new TeamEntity());
       })
       .then(() => this.sendAccountInfo())
       .then(() => this.team());
@@ -123,7 +122,7 @@ z.team.TeamRepository = class TeamRepository {
 
   getWhitelistedServices(teamId, size, prefix) {
     return this.teamService.getWhitelistedServices(teamId, size, prefix).then(({services: servicesData}) => {
-      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+      return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
@@ -131,7 +130,7 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} eventJson - JSON data for team event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
   onTeamEvent(eventJson, source) {
@@ -336,4 +335,4 @@ z.team.TeamRepository = class TeamRepository {
       this.sendAccountInfo();
     }
   }
-};
+}

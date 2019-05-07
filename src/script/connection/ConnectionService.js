@@ -17,12 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.connection = z.connection || {};
-
-z.connection.ConnectionService = class ConnectionService {
+export class ConnectionService {
   static get URL() {
     return {
       CONNECTIONS: '/connections',
@@ -31,12 +28,11 @@ z.connection.ConnectionService = class ConnectionService {
 
   /**
    * Construct a new Connection Service.
-   * @class z.connection.ConnectionService
-   * @param {z.service.BackendClient} backendClient - Client for the API calls
+   * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('z.connection.ConnectionService');
+    this.logger = getLogger('ConnectionService');
   }
 
   /**
@@ -90,7 +86,7 @@ z.connection.ConnectionService = class ConnectionService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//updateConnection
    *
    * @param {string} userId - User ID of the other user
-   * @param {z.connection.ConnectionStatus} connectionStatus - New relation status
+   * @param {ConnectionStatus} connectionStatus - New relation status
    * @returns {Promise} Promise that resolves when the status was updated
    */
   putConnections(userId, connectionStatus) {
@@ -102,4 +98,4 @@ z.connection.ConnectionService = class ConnectionService {
       url: `${ConnectionService.URL.CONNECTIONS}/${userId}`,
     });
   }
-};
+}

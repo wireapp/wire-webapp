@@ -17,14 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {ReceiptMode} from '../../conversation/ReceiptMode';
-import {onEscKey, offEscKey} from 'utils/KeyboardUtil';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {WebAppEvents} from '../../event/WebApp';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 export class GroupCreationViewModel {
   static get STATE() {
@@ -43,6 +46,8 @@ export class GroupCreationViewModel {
     this.teamRepository = teamRepository;
     this.userRepository = userRepository;
     this.isTeam = this.teamRepository.isTeam;
+
+    this.ConversationRepository = ConversationRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -78,7 +83,7 @@ export class GroupCreationViewModel {
 
         return this.teamRepository
           .teamMembers()
-          .sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+          .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
       }
       return [];
     });
@@ -126,7 +131,7 @@ export class GroupCreationViewModel {
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_GROUP_CREATION, {
       method: this.method,
     });
   };
@@ -173,10 +178,10 @@ export class GroupCreationViewModel {
   clickOnNext() {
     if (this.nameInput().length) {
       const trimmedNameInput = this.nameInput().trim();
-      const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      const nameTooLong = trimmedNameInput.length > ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       const nameTooShort = !trimmedNameInput.length;
 
-      this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      this.nameInput(trimmedNameInput.slice(0, ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(t('groupCreationPreferencesErrorNameLong'));
       }
@@ -185,7 +190,7 @@ export class GroupCreationViewModel {
         return this.nameError(t('groupCreationPreferencesErrorNameShort'));
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
         method: this.method,
       });
 
@@ -220,7 +225,7 @@ export class GroupCreationViewModel {
       attributes.is_allow_guests = !conversationEntity.isTeamOnly();
     }
 
-    const eventName = z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
+    const eventName = EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, attributes);
   }
 
@@ -242,6 +247,6 @@ export class GroupCreationViewModel {
       });
     }
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
   }
 }

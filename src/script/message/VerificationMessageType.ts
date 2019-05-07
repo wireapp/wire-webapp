@@ -17,7 +17,6 @@
  *
  */
 
-/** Enum for different verification message types */
 export enum VerificationMessageType {
   NEW_DEVICE = 'new-device',
   NEW_MEMBER = 'new-member',

@@ -17,9 +17,10 @@
  *
  */
 
+import {Environment} from 'Util/Environment';
+
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {MediaRepository} from '../../media/MediaRepository';
-import {Environment} from 'utils/Environment';
 import {WebAppEvents} from '../../event/WebApp';
 
 class FlowAudioEntity {

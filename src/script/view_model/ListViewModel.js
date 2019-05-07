@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
-import {t} from 'utils/LocalizerUtil';
-import {iterateItem} from 'utils/ArrayUtil';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {iterateItem} from 'Util/ArrayUtil';
+import {Environment} from 'Util/Environment';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -34,6 +34,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {Context} from '../ui/ContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
+import {ContentViewModel} from './ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -97,21 +98,21 @@ z.viewModel.ListViewModel = class ListViewModel {
       const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
       if (isStatePreferences) {
         const preferenceItems = [
-          z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT,
-          z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES,
-          z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS,
-          z.viewModel.ContentViewModel.STATE.PREFERENCES_AV,
+          ContentViewModel.STATE.PREFERENCES_ACCOUNT,
+          ContentViewModel.STATE.PREFERENCES_DEVICES,
+          ContentViewModel.STATE.PREFERENCES_OPTIONS,
+          ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
         if (!Environment.desktop) {
-          preferenceItems.push(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
+          preferenceItems.push(ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
         return preferenceItems;
       }
 
       const hasConnectRequests = !!this.userRepository.connect_requests().length;
-      const states = hasConnectRequests ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS : [];
+      const states = hasConnectRequests ? ContentViewModel.STATE.CONNECTION_REQUESTS : [];
       return this.conversationRepository
         .conversations_calls()
         .concat(states, this.conversationRepository.conversations_unarchived());
@@ -175,16 +176,16 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   _iterateActiveConversation(reverse) {
-    const isStateRequests = this.contentViewModel.state() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
+    const isStateRequests = this.contentViewModel.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     const activeConversationItem = isStateRequests
-      ? z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS
+      ? ContentViewModel.STATE.CONNECTION_REQUESTS
       : this.conversationRepository.active_conversation();
 
     const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
-    const isConnectionRequestItem = nextItem === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
+    const isConnectionRequestItem = nextItem === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isConnectionRequestItem) {
-      return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      return this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     if (nextItem) {
@@ -195,9 +196,9 @@ z.viewModel.ListViewModel = class ListViewModel {
   _iterateActivePreference(reverse) {
     let activePreference = this.contentViewModel.state();
 
-    const isDeviceDetails = activePreference === z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
+    const isDeviceDetails = activePreference === ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
     if (isDeviceDetails) {
-      activePreference = z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES;
+      activePreference = ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse);
@@ -212,7 +213,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
 
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   openPreferencesDevices(deviceEntity) {
@@ -220,10 +221,10 @@ z.viewModel.ListViewModel = class ListViewModel {
 
     if (deviceEntity) {
       this.contentViewModel.preferencesDeviceDetails.device(deviceEntity);
-      return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+      return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
     }
 
-    return this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   }
 
   openStartUI() {
@@ -265,7 +266,7 @@ z.viewModel.ListViewModel = class ListViewModel {
     this.lastUpdate(Date.now());
 
     $(document).on('keydown.listView', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey(keyboardEvent)) {
         const newState = this.isActivatedAccount()
           ? ListViewModel.STATE.CONVERSATIONS
           : ListViewModel.STATE.TEMPORARY_GUEST;
@@ -283,7 +284,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         this.start.updateList();
         break;
       case ListViewModel.STATE.PREFERENCES:
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respectLastState) {

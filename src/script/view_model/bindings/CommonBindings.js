@@ -26,12 +26,15 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {stripUrlWrapper} from 'Util/util';
+import {Environment} from 'Util/Environment';
+import {isEnterKey} from 'Util/KeyboardUtil';
+import {LLDM} from 'Util/moment';
+
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
-import {t} from 'utils/LocalizerUtil';
-import {stripUrlWrapper} from 'utils/util';
-import {Environment} from 'utils/Environment';
 
 /**
  * Use it on the drop area.
@@ -227,7 +230,7 @@ ko.bindingHandlers.enter = {
     const wrapper = function(_data, jquery_event) {
       const keyboard_event = jquery_event.originalEvent || jquery_event;
 
-      if (z.util.KeyboardUtil.isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+      if (isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, keyboard_event);
@@ -262,7 +265,7 @@ ko.bindingHandlers.file_select = {
         // wait before clearing to fix autotests
         window.setTimeout(() => {
           $(event.target).val(null);
-        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
+        }, TIME_IN_MILLIS.SECOND);
       }
     };
 
@@ -522,11 +525,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
 
     const now = moment().local();
     const today = now.format('YYMMDD');
@@ -542,18 +545,18 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return $(element).text(date.local().format('HH:mm'));
+      return $(element).text(date.local().format('LT'));
     }
 
     if (current_day === yesterday) {
-      return $(element).text(`${t('conversationYesterday')} ${date.local().format('HH:mm')}`);
+      return $(element).text(`${t('conversationYesterday')} ${date.local().format('LT')}`);
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return $(element).text(date.local().format('dddd HH:mm'));
+      return $(element).text(date.local().format('dddd LT'));
     }
 
-    return $(element).text(date.local().format('dddd, MMMM D, HH:mm'));
+    return $(element).text(date.local().format(`dddd, ${LLDM}, LT`));
   };
 
   return {

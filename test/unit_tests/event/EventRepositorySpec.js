@@ -20,14 +20,18 @@
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import * as Proteus from '@wireapp/proteus';
 
-import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {createRandomUuid, arrayToBase64} from 'Util/util';
 
 import {AssetUploadFailedReason} from 'src/script/assets/AssetUploadFailedReason';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 async function createEncodedCiphertext(
@@ -42,7 +46,7 @@ async function createEncodedCiphertext(
   await sender.create();
 
   const genericMessage = new GenericMessage({
-    [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
+    [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
     messageId: createRandomUuid(),
   });
 
@@ -116,7 +120,7 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
-        Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION)
+        Promise.resolve(NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION)
       );
     });
 
@@ -141,7 +145,7 @@ describe('Event Repository', () => {
 
       expect(TestFactory.event_repository._bufferWebSocketNotification).toHaveBeenCalled();
       expect(TestFactory.event_repository._handleNotification).not.toHaveBeenCalled();
-      expect(TestFactory.event_repository.notificationHandlingState()).toBe(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
+      expect(TestFactory.event_repository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
       expect(TestFactory.event_repository.webSocketBuffer.length).toBe(1);
     });
 
@@ -157,9 +161,7 @@ describe('Event Repository', () => {
         expect(TestFactory.event_repository._handleBufferedNotifications).toHaveBeenCalled();
         expect(TestFactory.event_repository.webSocketBuffer.length).toBe(0);
         expect(TestFactory.event_repository.lastNotificationId()).toBe(last_published_notification_id);
-        expect(TestFactory.event_repository.notificationHandlingState()).toBe(
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-        );
+        expect(TestFactory.event_repository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       });
     });
   });
@@ -199,7 +201,7 @@ describe('Event Repository', () => {
 
   describe('_handleEvent', () => {
     beforeEach(() => {
-      TestFactory.event_repository.notificationHandlingState(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      TestFactory.event_repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       spyOn(TestFactory.event_service, 'saveEvent').and.returnValue(Promise.resolve({data: 'dummy content'}));
       spyOn(TestFactory.event_repository, '_distributeEvent');
     });
@@ -341,7 +343,7 @@ describe('Event Repository', () => {
             time: '2018-07-10T14:54:21.621Z',
             type: 'conversation.otr-message-add',
           };
-          const source = z.event.EventRepository.SOURCE.STREAM;
+          const source = EventRepository.SOURCE.STREAM;
           return TestFactory.event_repository.processEvent(event, source);
         })
         .then(messagePayload => {
@@ -720,7 +722,7 @@ describe('Event Repository', () => {
       TestFactory.event_repository.lastEventDate('2017-08-05T16:18:41.820Z');
 
       TestFactory.event_repository
-        ._handleEventValidation(event, z.event.EventRepository.SOURCE.STREAM)
+        ._handleEventValidation(event, EventRepository.SOURCE.STREAM)
         .then(() => fail('Method should have thrown an error'))
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.error.EventError));

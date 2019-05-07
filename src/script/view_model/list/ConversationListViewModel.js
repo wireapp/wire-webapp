@@ -17,13 +17,16 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {ContentViewModel} from '../ContentViewModel';
 
 export class ConversationListViewModel {
   /**
@@ -75,7 +78,7 @@ export class ConversationListViewModel {
         : t('conversationsConnectionRequestOne');
     });
     this.stateIsRequests = ko.pureComputed(() => {
-      return this.contentState() === z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS;
+      return this.contentState() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     });
 
     this.callConversations = this.conversationRepository.conversations_calls;
@@ -128,7 +131,7 @@ export class ConversationListViewModel {
   }
 
   clickOnConnectRequests() {
-    this.contentViewModel.switchContent(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+    this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   }
 
   getConversationUrl(conversationEntity) {
@@ -136,7 +139,7 @@ export class ConversationListViewModel {
   }
 
   setShowCallsState(handlingNotifications) {
-    const shouldShowCalls = handlingNotifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;
     if (isStateChange) {
@@ -147,9 +150,9 @@ export class ConversationListViewModel {
 
   isSelectedConversation(conversationEntity) {
     const expectedStates = [
-      z.viewModel.ContentViewModel.STATE.COLLECTION,
-      z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS,
-      z.viewModel.ContentViewModel.STATE.CONVERSATION,
+      ContentViewModel.STATE.COLLECTION,
+      ContentViewModel.STATE.COLLECTION_DETAILS,
+      ContentViewModel.STATE.CONVERSATION,
     ];
 
     const isSelectedConversation = this.conversationRepository.is_active_conversation(conversationEntity);

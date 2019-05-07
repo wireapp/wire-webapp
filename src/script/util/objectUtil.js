@@ -17,6 +17,8 @@
  *
  */
 
+import {escape} from 'underscore';
+
 /**
  * Creates an object copy and applies a mapping functions to all properties of that object.
  *
@@ -43,4 +45,4 @@ const mapRecursive = (object, mappingFunction) => {
  * @param {Object} object - Base object
  * @returns {Object} Object copy with escaped properties
  */
-export const escapeProperties = object => mapRecursive(object, _.escape);
+export const escapeProperties = object => mapRecursive(object, escape);

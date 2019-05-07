@@ -17,7 +17,7 @@
  *
  */
 
-import {chunk, getNextItem, interpolate, isLastItem, iterateIndex} from 'utils/ArrayUtil';
+import {chunk, getNextItem, interpolate, isLastItem, iterateIndex} from 'Util/ArrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {

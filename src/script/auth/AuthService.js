@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'utils/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
@@ -27,7 +27,7 @@ export class AuthService {
     return {
       POST_ACCESS_RETRY: {
         LIMIT: 10,
-        TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.5,
+        TIMEOUT: TIME_IN_MILLIS.SECOND * 0.5,
       },
       URL_ACCESS: '/access',
       URL_COOKIES: '/cookies',

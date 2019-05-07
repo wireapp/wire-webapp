@@ -17,11 +17,12 @@
  *
  */
 
+import {getLogger} from 'Util/Logger';
+import {joaatHash} from 'Util/Crypto';
+
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
-import {getLogger} from 'utils/Logger';
 import {User} from '../entity/User';
 import '../view_model/bindings/CommonBindings';
-import {joaatHash} from 'utils/Crypto';
 
 export class UserMapper {
   /**

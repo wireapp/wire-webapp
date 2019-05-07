@@ -17,13 +17,13 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
+import {getLogger} from 'Util/Logger';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      UNBLOCK_INTERVAL: TIME_IN_MILLIS.MINUTE,
     };
   }
 

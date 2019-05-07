@@ -17,20 +17,19 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.storage = z.storage || {};
+import {StorageSchemata} from '../storage/StorageSchemata';
 
-z.storage.StorageRepository = class StorageRepository {
+export class StorageRepository {
   static get CONFIG() {
     return {
       CRYPTOGRAPHY_TABLES: [
-        z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY,
-        z.storage.StorageSchemata.OBJECT_STORE.CLIENTS,
-        z.storage.StorageSchemata.OBJECT_STORE.KEYS,
-        z.storage.StorageSchemata.OBJECT_STORE.SESSIONS,
-        z.storage.StorageSchemata.OBJECT_STORE.PRE_KEYS,
+        StorageSchemata.OBJECT_STORE.AMPLIFY,
+        StorageSchemata.OBJECT_STORE.CLIENTS,
+        StorageSchemata.OBJECT_STORE.KEYS,
+        StorageSchemata.OBJECT_STORE.SESSIONS,
+        StorageSchemata.OBJECT_STORE.PRE_KEYS,
       ],
     };
   }
@@ -41,9 +40,9 @@ z.storage.StorageRepository = class StorageRepository {
    */
   constructor(storageService) {
     this.storageService = storageService;
-    this.logger = getLogger('z.storage.StorageRepository');
+    this.logger = getLogger('StorageRepository');
 
-    this.AMPLIFY_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**
@@ -109,4 +108,4 @@ z.storage.StorageRepository = class StorageRepository {
   terminate(reason) {
     this.storageService.terminate(reason);
   }
-};
+}

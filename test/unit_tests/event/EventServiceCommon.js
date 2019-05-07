@@ -17,10 +17,11 @@
  *
  */
 
-import {createRandomUuid} from 'utils/util';
+import {createRandomUuid} from 'Util/util';
 
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 
 window.testEventServiceClass = (testedServiceName, className) => {
   describe(className, () => {
@@ -28,7 +29,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
 
     const test_factory = new TestFactory();
-    const eventStoreName = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
     beforeEach(() => test_factory.exposeEventActors());
 

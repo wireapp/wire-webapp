@@ -17,7 +17,8 @@
  *
  */
 
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'utils/scroll-helpers';
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
+
 import {WebAppEvents} from '../../event/WebApp';
 
 // show scroll borders

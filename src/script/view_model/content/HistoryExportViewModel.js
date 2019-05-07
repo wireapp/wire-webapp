@@ -17,12 +17,14 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
-import {downloadBlob} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
+import {downloadBlob} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -118,11 +120,11 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   downloadArchiveFile() {
     const userName = this.userRepository.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    const filename = `Wire-${userName}-Backup_${TimeUtil.getCurrentDate()}.${fileExtension}`;
+    const filename = `Wire-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_SUCCEEDED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_SUCCEEDED);
   }
 
   onCancel() {
@@ -141,7 +143,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
     }
     this.hasError(true);
     this.logger.error(`Failed to export history: ${error.message}`, error);
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.HISTORY.BACKUP_FAILED);
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_FAILED);
   }
 
   onSuccess(archiveBlob) {
@@ -155,6 +157,6 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   }
 
   dismissExport() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 };

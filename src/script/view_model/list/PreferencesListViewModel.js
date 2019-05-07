@@ -17,13 +17,15 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {Environment} from 'utils/Environment';
+import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/Environment';
+
+import {ContentViewModel} from '../ContentViewModel';
 
 class PreferencesListViewModel {
   /**
    * View model for the preferences list.
-   * @param {z.viewModel.ContentViewModel} contentViewModel - content view model
+   * @param {ContentViewModel} contentViewModel - content view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {UserRepository} userRepository - Repository managing users
    * @param {CallingRepository} callingRepository - Repository managing calls
@@ -40,32 +42,21 @@ class PreferencesListViewModel {
 
     this.supportsCalling = callingRepository.supportsCalling;
 
-    this.selectedAbout = ko.pureComputed(() => {
-      return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT;
-    });
-    this.selectedAccount = ko.pureComputed(() => {
-      return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT;
-    });
-    this.selectedAV = ko.pureComputed(() => {
-      return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_AV;
-    });
+    this.selectedAbout = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_ABOUT);
+    this.selectedAccount = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    this.selectedAV = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_AV);
     this.selectedDevices = ko.pureComputed(() => {
       const devicesState = [
-        z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS,
-        z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES,
+        ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS,
+        ContentViewModel.STATE.PREFERENCES_DEVICES,
       ];
       return devicesState.includes(this.contentState());
     });
-    this.selectedOptions = ko.pureComputed(() => {
-      return this.contentState() === z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS;
-    });
+    this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 
   clickOnClosePreferences() {
-    const preventingContentViewStates = [
-      z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT,
-      z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT,
-    ];
+    const preventingContentViewStates = [ContentViewModel.STATE.HISTORY_EXPORT, ContentViewModel.STATE.HISTORY_IMPORT];
 
     if (!preventingContentViewStates.includes(this.contentState())) {
       if (!this.isActivatedAccount()) {
@@ -76,23 +67,23 @@ class PreferencesListViewModel {
   }
 
   clickOnAbout() {
-    this._switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
+    this._switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
   }
 
   clickOnAccount() {
-    this._switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    this._switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   }
 
   clickOnAV() {
-    this._switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
+    this._switchContent(ContentViewModel.STATE.PREFERENCES_AV);
   }
 
   clickOnDevices() {
-    this._switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+    this._switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   }
 
   clickOnOptions() {
-    this._switchContent(z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS);
+    this._switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 
   _switchContent(newContentState) {

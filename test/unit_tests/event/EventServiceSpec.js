@@ -17,4 +17,4 @@
  *
  */
 
-window.testEventServiceClass('event_service', 'z.event.EventService');
+window.testEventServiceClass('event_service', 'EventService');

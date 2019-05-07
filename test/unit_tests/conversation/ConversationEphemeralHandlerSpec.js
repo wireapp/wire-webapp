@@ -19,14 +19,16 @@
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationEphemeralHandler} from 'src/script/conversation/ConversationEphemeralHandler';
+import {EventService} from 'src/script/event/EventService';
 
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new ConversationMapper();
-  const eventService = new z.event.EventService(null, null);
-  return new z.conversation.ConversationEphemeralHandler(conversationMapper, eventService, () => {});
+  const eventService = new EventService(null, null);
+  return new ConversationEphemeralHandler(conversationMapper, eventService, () => {});
 };
 
-describe('z.conversation.ConversationEphemeralHandler', () => {
+describe('ConversationEphemeralHandler', () => {
   describe('_updateEphemeralTimer', () => {
     it("should update timer according to the event's data", () => {
       const conversationEphemeralHandler = buildConversationEphemeralHandler();

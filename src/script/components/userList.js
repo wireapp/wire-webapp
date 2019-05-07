@@ -18,6 +18,7 @@
  */
 
 import {validateHandle} from '../user/UserHandleGenerator';
+import {SearchRepository} from '../search/SearchRepository';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -80,9 +81,9 @@ z.components.UserList = class UserList {
     this.filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = this.conversationRepository.connectedUsers();
       if (typeof this.filter === 'function') {
-        const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
+        const normalizedQuery = SearchRepository.normalizeQuery(this.filter());
         if (normalizedQuery) {
-          const SEARCHABLE_FIELDS = z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
           const trimmedQuery = this.filter().trim();
           const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
           const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
@@ -115,8 +116,8 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
-      <participant-item 
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id)" 
+      <participant-item
+        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id)"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
       </participant-item>
     </div>

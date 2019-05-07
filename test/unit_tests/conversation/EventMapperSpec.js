@@ -19,7 +19,8 @@
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {createRandomUuid, arrayToBase64} from 'utils/util';
+import {createRandomUuid, arrayToBase64} from 'Util/util';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventMapper} from 'src/script/conversation/EventMapper';
@@ -257,7 +258,7 @@ describe('Event Mapper', () => {
       try {
         asset_et.resource().generateUrl();
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
       }
     });
   });

@@ -21,6 +21,9 @@ const jQuery = require('jquery');
 import {amplify} from 'amplify';
 import * as bazinga64 from 'bazinga64';
 import * as platform from 'platform';
+
+import {noop} from 'Util/util';
+
 import '../config';
 import '../event/Client';
 import '../event/WebApp';
@@ -28,9 +31,6 @@ import '../message/MessageCategorization';
 import '../message/MessageCategory';
 import '../service/BackendEnvironment';
 import '../storage/StorageSchemata';
-// Adding "window.z.util.Environment" which is required by "wire-desktop"
-import '../util/Environment';
-import '../util/URLUtil';
 
 declare global {
   interface Window {
@@ -49,6 +49,6 @@ window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-const configureEnvironment = () => {};
+const configureEnvironment = noop;
 
 export {configureEnvironment};

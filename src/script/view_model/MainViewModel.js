@@ -17,11 +17,13 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {afterRender} from 'Util/util';
 
-import {afterRender} from 'utils/util';
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
+import {WarningsViewModel} from './WarningsViewModel';
+import {ContentViewModel} from './ContentViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -68,7 +70,7 @@ export class MainViewModel {
     this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
-    this.content = new z.viewModel.ContentViewModel(this, repositories);
+    this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = modals;
@@ -77,7 +79,7 @@ export class MainViewModel {
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
-    this.warnings = new z.viewModel.WarningsViewModel();
+    this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {

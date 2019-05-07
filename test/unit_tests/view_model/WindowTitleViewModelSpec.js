@@ -19,9 +19,10 @@
 
 import ko from 'knockout';
 
+import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+
 import 'src/script/localization/Localizer';
-import {t} from 'utils/LocalizerUtil';
-import {createRandomUuid} from 'utils/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -29,6 +30,7 @@ import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {WebAppEvents} from 'src/script/event/WebApp';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 describe('WindowTitleViewModel', () => {
   const suffix = t('wire');
@@ -42,7 +44,7 @@ describe('WindowTitleViewModel', () => {
       title_view_model = new WindowTitleViewModel(
         {
           content: {
-            state: ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION),
+            state: ko.observable(ContentViewModel.STATE.CONVERSATION),
           },
         },
         {
@@ -156,7 +158,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences about page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ABOUT);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_ABOUT);
 
       const expected_title = `${z.string.preferencesAbout} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -165,7 +167,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences account page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
 
       const expected_title = `${z.string.preferencesAccount} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -174,7 +176,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences av page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_AV);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_AV);
 
       const expected_title = `${z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -183,7 +185,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences device details page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
 
       const expected_title = `${z.string.preferencesDeviceDetails} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -192,7 +194,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences devices page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_DEVICES);
 
       const expected_title = `${z.string.preferencesDevices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -201,7 +203,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences options page', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.PREFERENCES_OPTIONS);
+      title_view_model.contentState(ContentViewModel.STATE.PREFERENCES_OPTIONS);
 
       const expected_title = `${z.string.preferencesOptions} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -210,7 +212,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('shows the number of connection requests when viewing the inbox', () => {
-      title_view_model.contentState(z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
       title_view_model.userRepository.connect_requests = ko.observableArray([]);
 
       const firstConnectedUser = new User(createRandomUuid());

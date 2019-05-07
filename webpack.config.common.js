@@ -22,15 +22,15 @@ const webpack = require('webpack');
 const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
-const srcScript = path.resolve(SRC_PATH, 'script', 'auth');
-const src = path.resolve(SRC_PATH, 'script');
+const auth = path.resolve(SRC_PATH, 'script', 'auth');
+const srcScript = path.resolve(SRC_PATH, 'script');
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    app: path.resolve(src, 'main/app.js'),
-    auth: path.resolve(srcScript, 'main.tsx'),
-    login: path.resolve(src, 'main/login.js'),
+    app: path.resolve(srcScript, 'main/app.js'),
+    auth: path.resolve(auth, 'main.tsx'),
+    login: path.resolve(srcScript, 'main/login.js'),
   },
   externals: {
     'fs-extra': '{}',
@@ -40,7 +40,7 @@ module.exports = {
     rules: [
       {
         exclude: /node_modules/,
-        include: src,
+        include: srcScript,
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
       },
@@ -91,13 +91,13 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      components: path.resolve(src, 'components'),
+      Components: path.resolve(srcScript, 'components'),
+      Resource: path.resolve(ROOT_PATH, 'resource'),
+      Util: path.resolve(srcScript, 'util'),
       // override phoneformat export, because the 'main' file is not exporting anything
       'phoneformat.js': path.resolve(ROOT_PATH, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
-      resource: path.resolve(ROOT_PATH, 'resource'),
-      utils: path.resolve(src, 'util'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
-    modules: [srcScript, 'node_modules'],
+    modules: [auth, 'node_modules'],
   },
 };

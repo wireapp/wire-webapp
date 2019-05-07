@@ -21,9 +21,14 @@ import ko from 'knockout';
 import moment from 'moment';
 
 import 'jquery-mousewheel';
+
+import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isArrowKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
+import {noop} from 'Util/util';
+import {LLDM} from 'Util/moment';
+
 import {viewportObserver} from '../../ui/viewportObserver';
-import {t} from 'utils/LocalizerUtil';
-import {TimeUtil} from 'utils/TimeUtil';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.
@@ -43,13 +48,10 @@ ko.bindingHandlers.focus_on_keydown = {
             // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-            const is_arrow_key = z.util.KeyboardUtil.isArrowKey(keyboard_event);
+            const is_arrow_key = isArrowKey(keyboard_event);
 
             if (!active_element_is_input && !is_arrow_key) {
-              const is_meta_key_pressed = z.util.KeyboardUtil.isMetaKey(keyboard_event);
-              const is_paste_action = z.util.KeyboardUtil.isPasteAction(keyboard_event);
-
-              if (!is_meta_key_pressed || is_paste_action) {
+              if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
             }
@@ -143,7 +145,7 @@ ko.bindingHandlers.background_image = {
           objectUrl = window.URL.createObjectURL(blob);
           imageElement[0].src = objectUrl;
         })
-        .catch(() => {});
+        .catch(noop);
     };
 
     viewportObserver.onElementInViewport(element, loadImage);
@@ -179,18 +181,18 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return date.local().format('HH:mm');
+      return date.local().format('LT');
     }
 
     if (current_day === yesterday) {
-      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('LT')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return date.local().format('dddd HH:mm');
+      return date.local().format('dddd LT');
     }
 
-    return date.local().format('MMMM D, HH:mm');
+    return date.local().format(`${LLDM}, LT`);
   };
 
   const calculate_timestamp_day = function(date) {
@@ -208,26 +210,26 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return `${t('conversationToday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationToday')} ${date.local().format('LT')}`;
     }
 
     if (current_day === yesterday) {
-      return `${t('conversationYesterday')} ${date.local().format('HH:mm')}`;
+      return `${t('conversationYesterday')} ${date.local().format('LT')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
-      return date.local().format('dddd HH:mm');
+      return date.local().format('dddd LT');
     }
 
-    return date.local().format('dddd, MMMM D, HH:mm');
+    return date.local().format(`dddd, ${LLDM}, LT`);
   };
 
   // should be fine to update every minute
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp, is_day) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
 
     if (is_day) {
       return $(element).text(calculate_timestamp_day(date));

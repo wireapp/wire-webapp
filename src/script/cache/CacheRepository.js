@@ -17,7 +17,9 @@
  *
  */
 
-import * as StorageUtil from 'utils/StorageUtil';
+import {resetStoreValue} from 'Util/StorageUtil';
+
+import {StorageKey} from '../storage/StorageKey';
 
 /**
  * Cache repository for local storage interactions using amplify.
@@ -35,21 +37,21 @@ export class CacheRepository {
    * Deletes cached data.
    *
    * @param {boolean} [keepConversationInput=false] - Should conversation input be kept
-   * @param {Array<string>} [protectedKeyPatterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
+   * @param {Array<string>} [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
    * @returns {Array<string>} Keys which have been deleted from the cache
    */
-  clearCache(keepConversationInput = false, protectedKeyPatterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
+  clearCache(keepConversationInput = false, protectedKeyPatterns = [StorageKey.AUTH.SHOW_LOGIN]) {
     const deletedKeys = [];
 
     if (keepConversationInput) {
-      protectedKeyPatterns.push(z.storage.StorageKey.CONVERSATION.INPUT);
+      protectedKeyPatterns.push(StorageKey.CONVERSATION.INPUT);
     }
 
     for (const storedKey in amplify.store()) {
       const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
 
       if (shouldBeDeleted) {
-        StorageUtil.resetValue(storedKey);
+        resetStoreValue(storedKey);
         deletedKeys.push(storedKey);
       }
     }

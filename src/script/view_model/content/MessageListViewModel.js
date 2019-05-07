@@ -17,18 +17,20 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-
-import {scrollEnd, scrollToBottom, scrollBy} from 'utils/scroll-helpers';
 import moment from 'moment';
 import $ from 'jquery';
 import {groupBy} from 'underscore';
-import {t} from 'utils/LocalizerUtil';
+
+import {getLogger} from 'Util/Logger';
+import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
+import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 /*
  * Message list rendering view model.
@@ -409,7 +411,7 @@ class MessageListViewModel {
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
-      }, z.motion.MotionDuration.LONG);
+      }, MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
     this.conversation_repository
@@ -589,12 +591,17 @@ class MessageListViewModel {
   }
 
   handleClickOnMessage(messageEntity, event) {
+    const emailTarget = event.target.closest('[data-email-link]');
+    if (emailTarget) {
+      safeMailOpen(emailTarget.href);
+      return false;
+    }
     const linkTarget = event.target.closest('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         action: () => {
-          z.util.SanitizationUtil.safeWindowOpen(href);
+          safeWindowOpen(href);
         },
         text: {
           action: t('modalOpenLinkAction'),

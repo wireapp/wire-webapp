@@ -17,14 +17,14 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {MessageCategory} from '../message/MessageCategory';
+import {getLogger} from 'Util/Logger';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {MessageCategory} from '../message/MessageCategory';
+import {search as fullTextSearch} from '../search/FullTextSearch';
 
 // Conversation service for all conversation calls to the backend REST API.
-z.conversation.ConversationService = class ConversationService {
+export class ConversationService {
   static get CONFIG() {
     return {
       URL_CONVERSATIONS: '/conversations',
@@ -41,10 +41,10 @@ z.conversation.ConversationService = class ConversationService {
     this.backendClient = backendClient;
     this.eventService = eventService;
     this.storageService = storageService;
-    this.logger = getLogger('z.conversation.ConversationService');
+    this.logger = getLogger('ConversationService');
 
-    this.CONVERSATION_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.CONVERSATIONS;
-    this.EVENT_STORE_NAME = z.storage.StorageSchemata.OBJECT_STORE.EVENTS;
+    this.CONVERSATION_STORE_NAME = StorageSchemata.OBJECT_STORE.CONVERSATIONS;
+    this.EVENT_STORE_NAME = StorageSchemata.OBJECT_STORE.EVENTS;
   }
 
   //##############################################################################
@@ -485,7 +485,7 @@ z.conversation.ConversationService = class ConversationService {
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
     return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
-      return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));
+      return events.filter(({data: event_data}) => fullTextSearch(event_data.content, query));
     });
   }
-};
+}

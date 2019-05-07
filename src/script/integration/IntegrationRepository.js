@@ -17,17 +17,19 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
-import {t} from 'utils/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {WebAppEvents} from '../event/WebApp';
+import {IntegrationMapper} from './IntegrationMapper';
+import {ServiceEntity} from './ServiceEntity';
+import {ServiceTag} from './ServiceTag';
+import {EventName} from '../tracking/EventName';
 
-window.z = window.z || {};
-window.z.integration = z.integration || {};
-
-z.integration.IntegrationRepository = class IntegrationRepository {
+export class IntegrationRepository {
   /**
    * Trim query string for search.
    * @param {string} query - Service search string
@@ -41,7 +43,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   constructor(integrationService, conversationRepository, teamRepository) {
-    this.logger = getLogger('z.integration.IntegrationRepository');
+    this.logger = getLogger('IntegrationRepository');
 
     this.integrationService = integrationService;
 
@@ -69,11 +71,11 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
   /**
    * Get ServiceEntity for entity.
-   * @param {z.integration.ServiceEntity|User} entity - Service or user to resolve to ServiceEntity
+   * @param {ServiceEntity|User} entity - Service or user to resolve to ServiceEntity
    * @returns {Promise} - Resolves with the ServiceEntity
    */
   getServiceFromUser(entity) {
-    if (entity instanceof z.integration.ServiceEntity) {
+    if (entity instanceof ServiceEntity) {
       return Promise.resolve(entity);
     }
     const {providerId, serviceId} = entity;
@@ -84,7 +86,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * Add a service to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add service to
-   * @param {z.integration.ServiceEntity} serviceEntity - Service to be added to conversation
+   * @param {ServiceEntity} serviceEntity - Service to be added to conversation
    * @param {string} method - Method used to add service
    * @returns {Promise} Resolves when service was added
    */
@@ -101,7 +103,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
           services_size: conversationEntity.getNumberOfServices(),
         };
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 
       return event;
@@ -111,7 +113,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   /**
    * Add service to conversation.
    *
-   * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
+   * @param {ServiceEntity} serviceEntity - Information about service to be added
    * @returns {Promise} Resolves when conversation with the integration was was created
    */
   create1to1ConversationWithService(serviceEntity) {
@@ -178,7 +180,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   getProviderById(providerId) {
     return this.integrationService.getProvider(providerId).then(providerData => {
       if (providerData) {
-        return z.integration.IntegrationMapper.mapProviderFromObject(providerData);
+        return IntegrationMapper.mapProviderFromObject(providerData);
       }
     });
   }
@@ -186,22 +188,22 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   getServiceById(providerId, serviceId) {
     return this.integrationService.getService(providerId, serviceId).then(serviceData => {
       if (serviceData) {
-        return z.integration.IntegrationMapper.mapServiceFromObject(serviceData);
+        return IntegrationMapper.mapServiceFromObject(serviceData);
       }
     });
   }
 
   getServices(tags, start) {
-    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.INTEGRATION];
+    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services: servicesData}) => {
-      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+      return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
   getServicesByProvider(providerId) {
     return this.integrationService.getProviderServices(providerId).then(servicesData => {
-      return z.integration.IntegrationMapper.mapServicesFromArray(servicesData);
+      return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
@@ -218,7 +220,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
         const attributes = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, attributes);
         return event;
       }
     });
@@ -233,13 +235,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
-            .filter(serviceEntity => z.util.StringUtil.compareTransliteration(serviceEntity.name, normalizedQuery))
+            .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
             .sort((serviceA, serviceB) => {
-              return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+              return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
             });
           this.services(serviceEntities);
         }
       })
       .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
   }
-};
+}

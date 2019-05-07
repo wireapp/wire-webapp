@@ -17,13 +17,17 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import * as trackingHelpers from '../../tracking/Helpers';
+import {EventName} from '../../tracking/EventName';
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   static get STATE() {
@@ -42,6 +46,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.searchRepository = search;
     this.teamRepository = team;
     this.userRepository = user;
+    this.MotionDuration = MotionDuration;
 
     this.logger = getLogger('z.viewModel.panel.AddParticipantsViewModel');
 
@@ -82,9 +87,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
       if (this.isTeam()) {
         userEntities = this.isTeamOnly()
-          ? this.teamMembers().sort((userA, userB) => {
-              return z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name());
-            })
+          ? this.teamMembers().sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()))
           : this.teamUsers();
       } else {
         userEntities = this.userRepository.connected_users();
@@ -136,8 +139,8 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
   clickOpenManageServices() {
     if (this.manageServicesUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageServicesUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      safeWindowOpen(this.manageServicesUrl);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
@@ -179,7 +182,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
         });
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, attributes);
     });
   }
 }

@@ -18,9 +18,12 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
+
+import {createRandomUuid} from 'Util/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {createRandomUuid} from 'utils/util';
 
 describe('ClientMismatchHandler', () => {
   const testFactory = new TestFactory();
@@ -46,7 +49,7 @@ describe('ClientMismatchHandler', () => {
 
     beforeAll(() => {
       genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
 

@@ -17,8 +17,10 @@
  *
  */
 
+import {formatDuration} from 'Util/TimeUtil';
+
 import {BasePanelViewModel} from './BasePanelViewModel';
-import {TimeUtil} from 'utils/TimeUtil';
+import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 
 export class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params) {
@@ -38,23 +40,23 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
     });
 
     const hasCustomTime = ko.pureComputed(() => {
-      return !!this.currentMessageTimer() && !z.ephemeral.timings.VALUES.includes(this.currentMessageTimer());
+      return !!this.currentMessageTimer() && !EphemeralTimings.VALUES.includes(this.currentMessageTimer());
     });
 
     this.messageTimes = ko.pureComputed(() => {
-      const times = z.ephemeral.timings.VALUES;
+      const times = EphemeralTimings.VALUES;
 
       times.sort((timeA, timeB) => timeA - timeB);
 
       const mappedTimes = times.map(time => ({
-        text: TimeUtil.formatDuration(time).text,
+        text: formatDuration(time).text,
         value: time,
       }));
 
       if (hasCustomTime()) {
         mappedTimes.push({
           isCustom: true,
-          text: TimeUtil.formatDuration(this.currentMessageTimer()).text,
+          text: formatDuration(this.currentMessageTimer()).text,
           value: this.currentMessageTimer(),
         });
       }

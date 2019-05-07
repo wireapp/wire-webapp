@@ -19,26 +19,24 @@
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'utils/Logger';
-import {TimeUtil} from 'utils/TimeUtil';
-import {clamp} from 'utils/NumberUtil';
-import {arrayToBase64, noop} from 'utils/util';
+import {getLogger} from 'Util/Logger';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {clamp} from 'Util/NumberUtil';
+import {arrayToBase64, noop} from 'Util/util';
+import {obfuscate} from 'Util/StringUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
 import {BackendEvent} from '../event/Backend';
+import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler extends z.conversation
-  .AbstractConversationEventHandler {
+export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   static get CONFIG() {
     return {
-      INTERVAL_TIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 0.25,
+      INTERVAL_TIME: TIME_IN_MILLIS.SECOND * 0.25,
       TIMER_RANGE: {
-        MAX: TimeUtil.UNITS_IN_MILLIS.YEAR,
-        MIN: TimeUtil.UNITS_IN_MILLIS.SECOND,
+        MAX: TIME_IN_MILLIS.YEAR,
+        MIN: TIME_IN_MILLIS.SECOND,
       },
     };
   }
@@ -64,7 +62,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
     this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
-    this.logger = getLogger('z.conversation.ConversationEphemeralHandler');
+    this.logger = getLogger('ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
 
@@ -219,7 +217,7 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       return arrayToBase64(LinkPreview.encode(linkPreviewProto).finish());
     });
 
-    obfuscatedAsset.text = z.util.StringUtil.obfuscate(assetEntity.text);
+    obfuscatedAsset.text = obfuscate(assetEntity.text);
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
@@ -291,4 +289,4 @@ z.conversation.ConversationEphemeralHandler = class ConversationEphemeralHandler
       });
     }
   }
-};
+}

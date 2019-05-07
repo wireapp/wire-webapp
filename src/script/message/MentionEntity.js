@@ -19,6 +19,9 @@
 
 import {Mention} from '@wireapp/protocol-messaging';
 
+import {isUUID} from 'Util/ValidationUtil';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+
 window.z = window.z || {};
 window.z.message = z.message || {};
 
@@ -40,13 +43,13 @@ z.message.MentionEntity = class MentionEntity {
   constructor(startIndex, length, userId) {
     this.startIndex = startIndex;
     this.length = length;
-    this.type = z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    this.type = PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
 
     this.userId = userId;
   }
 
   targetsUser(userId) {
-    const isTypeUserId = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    const isTypeUserId = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     return isTypeUserId && this.userId === userId;
   }
 
@@ -97,7 +100,7 @@ z.message.MentionEntity = class MentionEntity {
       throw new Error(MentionEntity.ERROR.OUT_OF_BOUNDS);
     }
 
-    const isValidUserId = z.util.ValidationUtil.isUUID(this.userId);
+    const isValidUserId = isUUID(this.userId);
     if (!isValidUserId) {
       throw new Error(MentionEntity.ERROR.INVALID_USER_ID);
     }
@@ -120,9 +123,9 @@ z.message.MentionEntity = class MentionEntity {
 
   toProto() {
     const protoMention = new Mention({length: this.length, start: this.startIndex});
-    const isUserIdMention = this.type === z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
+    const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
-      protoMention[z.cryptography.PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID] = this.userId;
+      protoMention[PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID] = this.userId;
     }
     return protoMention;
   }

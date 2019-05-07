@@ -17,14 +17,15 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {copyText} from 'utils/ClipboardUtil';
-import {t} from 'utils/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {WebAppEvents} from '../../event/WebApp';
+import {EventName} from '../../tracking/EventName';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   static get CONFIG() {
@@ -68,7 +69,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     if (!this.isLinkCopied() && this.activeConversation()) {
       copyText(this.activeConversation().accessCode()).then(() => {
         this.isLinkCopied(true);
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.GUEST_ROOMS.LINK_COPIED);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_COPIED);
         window.setTimeout(() => this.isLinkCopied(false), GuestsAndServicesViewModel.CONFIG.CONFIRM_DURATION);
       });
     }

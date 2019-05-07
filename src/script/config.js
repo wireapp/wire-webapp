@@ -31,7 +31,7 @@ export const ACCENT_ID = {
   YELLOW: 3,
 };
 
-window.z.config = {
+export const config = {
   FEATURE: {
     CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
     ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
@@ -90,3 +90,5 @@ window.z.config = {
     },
   },
 };
+
+window.z.config = config;

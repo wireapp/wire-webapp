@@ -17,14 +17,16 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'utils/util';
 import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
+import {generateCellState} from 'src/script/conversation/ConversationCellState';
 
-describe('z.conversation.ConversationCellState', () => {
-  const conversationCellState = z.conversation.ConversationCellState;
+describe('ConversationCellState', () => {
   const NOTIFICATION_STATES = NotificationSetting.STATE;
 
   describe('Notification state icon', () => {
@@ -38,19 +40,19 @@ describe('z.conversation.ConversationCellState', () => {
     it('returns empty state if notifications are set to everything', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.EVERYTHING);
 
-      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'none'});
+      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if state is set to mentions and replies', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
 
-      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
 
-      expect(conversationCellState.generate(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
     });
   });
 
@@ -84,7 +86,10 @@ describe('z.conversation.ConversationCellState', () => {
     const tests = [
       {
         description: 'returns the number of missed calls',
-        expected: {description: '2 missed calls', icon: ConversationStatusIcon.MISSED_CALL},
+        expected: {
+          description: t('conversationsSecondaryLineSummaryMissedCalls'),
+          icon: ConversationStatusIcon.MISSED_CALL,
+        },
         unreadState: Object.assign({}, defaultUnreadState, {
           calls: [{}, {}],
         }),
@@ -101,14 +106,17 @@ describe('z.conversation.ConversationCellState', () => {
       },
       {
         description: 'returns the number of pings',
-        expected: {description: '2 pings', icon: ConversationStatusIcon.UNREAD_PING},
+        expected: {description: t('conversationsSecondaryLineSummaryPings'), icon: ConversationStatusIcon.UNREAD_PING},
         unreadState: Object.assign({}, defaultUnreadState, {
           pings: [pingMessage, pingMessage],
         }),
       },
       {
         description: 'returns the number of mentions',
-        expected: {description: '2 mentions', icon: ConversationStatusIcon.UNREAD_MENTION},
+        expected: {
+          description: t('conversationsSecondaryLineSummaryMentions'),
+          icon: ConversationStatusIcon.UNREAD_MENTION,
+        },
         unreadState: Object.assign({}, defaultUnreadState, {
           selfMentions: [1, 2],
         }),
@@ -116,7 +124,9 @@ describe('z.conversation.ConversationCellState', () => {
       {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
-          description: '2 mentions, 2 missed calls, 2 pings, 2 messages',
+          description: `${t('conversationsSecondaryLineSummaryMentions')}, ${t(
+            'conversationsSecondaryLineSummaryMissedCalls'
+          )}, ${t('conversationsSecondaryLineSummaryPings')}, ${t('conversationsSecondaryLineSummaryMessages')}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         unreadState: Object.assign({}, defaultUnreadState, {
@@ -132,7 +142,7 @@ describe('z.conversation.ConversationCellState', () => {
     tests.forEach(({description, expected, unreadState}) => {
       const expectedOne2One = expected.one2one || expected;
       conversationEntity.unreadState = () => unreadState;
-      const state = conversationCellState.generate(conversationEntity);
+      const state = generateCellState(conversationEntity);
 
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
@@ -143,7 +153,7 @@ describe('z.conversation.ConversationCellState', () => {
     tests.forEach(({description, expected, unreadState}) => {
       const expectedGroup = expected.group || expected;
       conversationEntity.unreadState = () => unreadState;
-      const state = conversationCellState.generate(conversationEntity);
+      const state = generateCellState(conversationEntity);
 
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);

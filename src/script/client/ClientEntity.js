@@ -18,7 +18,9 @@
  */
 
 import ko from 'knockout';
-import {zeroPadding} from 'utils/util';
+
+import {zeroPadding} from 'Util/util';
+import {ClientType} from './ClientType';
 
 window.z = window.z || {};
 window.z.client = z.client || {};
@@ -43,7 +45,7 @@ class ClientEntity {
       this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
-      this.type = z.client.ClientType.TEMPORARY;
+      this.type = ClientType.TEMPORARY;
     }
 
     // Metadata maintained by us
@@ -77,7 +79,7 @@ class ClientEntity {
    * @returns {boolean} True, if the client is the self user's permanent client.
    */
   isPermanent() {
-    return this.type === z.client.ClientType.PERMANENT;
+    return this.type === ClientType.PERMANENT;
   }
 
   /**
@@ -91,7 +93,7 @@ class ClientEntity {
    * @returns {boolean} - True, if the client is the self user's temporary client.
    */
   isTemporary() {
-    return this.type === z.client.ClientType.TEMPORARY;
+    return this.type === ClientType.TEMPORARY;
   }
 
   /**

@@ -17,8 +17,8 @@
  *
  */
 
-import {interpolate} from 'utils/ArrayUtil';
-import {clamp} from 'utils/NumberUtil';
+import {interpolate} from 'Util/ArrayUtil';
+import {clamp} from 'Util/NumberUtil';
 
 class AudioSeekBarComponent {
   /**
@@ -26,7 +26,7 @@ class AudioSeekBarComponent {
    *
    * @param {Object} params - Component parameters
    * @param {HTMLElement} params.media_src - Media source
-   * @param {z.entity.File} params.asset - Asset file
+   * @param {File} params.asset - Asset file
    * @param {boolean} params.disabled - Disabled seek bar
    * @param {Object} componentInfo - Component information
    */

@@ -17,9 +17,11 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
+import {getLogger} from 'Util/Logger';
 
 import {roleFromTeamPermissions} from './../user/UserPermission';
+import {TeamEntity} from './TeamEntity';
+import {TeamMemberEntity} from './TeamMemberEntity';
 
 export class TeamMapper {
   constructor() {
@@ -30,7 +32,7 @@ export class TeamMapper {
     return this.updateTeamFromObject(data);
   }
 
-  updateTeamFromObject(teamData, teamEntity = new z.team.TeamEntity()) {
+  updateTeamFromObject(teamData, teamEntity = new TeamEntity()) {
     if (teamData) {
       const {creator, icon, icon_key: iconKey, id, name} = teamData;
 
@@ -74,7 +76,7 @@ export class TeamMapper {
     }
   }
 
-  updateMemberFromObject(memberData, memberEntity = new z.team.TeamMemberEntity()) {
+  updateMemberFromObject(memberData, memberEntity = new TeamMemberEntity()) {
     if (memberData) {
       const {created_by, permissions, user} = memberData;
       if (created_by) {

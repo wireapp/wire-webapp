@@ -17,9 +17,9 @@
  *
  */
 
-import {getLogger} from 'utils/Logger';
-import {scrollToBottom} from 'utils/scroll-helpers';
-import {isLastItem} from 'utils/ArrayUtil';
+import {getLogger} from 'Util/Logger';
+import {scrollToBottom} from 'Util/scroll-helpers';
+import {isLastItem} from 'Util/ArrayUtil';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -30,7 +30,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    * View model for connection requests.
    *
    * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ContentViewModel} contentViewModel - Content view model
+   * @param {ContentViewModel} contentViewModel - Content view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, contentViewModel, repositories) {
