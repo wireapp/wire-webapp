@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
 import {noop} from 'Util/util';
 
@@ -56,10 +56,10 @@ class FlowEntity {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
       MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 10,
-      NEGOTIATION_THRESHOLD: 0.5 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      RECONNECTION_TIMEOUT: 2.5 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      RENEGOTIATION_TIMEOUT: 30 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND,
+      NEGOTIATION_THRESHOLD: 0.5 * TIME_IN_MILLIS.SECOND,
+      RECONNECTION_TIMEOUT: 2.5 * TIME_IN_MILLIS.SECOND,
+      RENEGOTIATION_TIMEOUT: 30 * TIME_IN_MILLIS.SECOND,
+      SDP_SEND_TIMEOUT: TIME_IN_MILLIS.SECOND,
     };
   }
 

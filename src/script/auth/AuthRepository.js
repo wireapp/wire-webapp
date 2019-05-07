@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatTimestamp} from 'Util/TimeUtil';
 
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {Environment} from 'Util/Environment';
@@ -31,7 +31,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 export class AuthRepository {
   static get CONFIG() {
     return {
-      REFRESH_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      REFRESH_THRESHOLD: TIME_IN_MILLIS.MINUTE,
     };
   }
 
@@ -184,7 +184,7 @@ export class AuthRepository {
    */
   saveAccessToken(accessTokenResponse) {
     const {access_token: accessToken, expires_in: expiresIn, token_type: accessTokenType} = accessTokenResponse;
-    const expiresInMillis = expiresIn * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const expiresInMillis = expiresIn * TIME_IN_MILLIS.SECOND;
     const expirationTimestamp = Date.now() + expiresInMillis;
 
     storeValue(StorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken, expiresIn);
@@ -208,7 +208,7 @@ export class AuthRepository {
    * @returns {undefined}
    */
   _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
-    const expirationDate = TimeUtil.formatTimestamp(expirationTimestamp, false);
+    const expirationDate = formatTimestamp(expirationTimestamp, false);
     this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenResponse);
   }
 
@@ -229,7 +229,7 @@ export class AuthRepository {
     if (callbackTimestamp < Date.now()) {
       return this.renewAccessToken(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
     }
-    const refreshDate = TimeUtil.formatTimestamp(callbackTimestamp, false);
+    const refreshDate = formatTimestamp(callbackTimestamp, false);
     this.logger.info(`Scheduling next access token refresh for '${refreshDate}'`);
 
     this.accessTokenRefresh = window.setTimeout(() => {

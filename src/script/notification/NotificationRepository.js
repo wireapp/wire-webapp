@@ -20,7 +20,7 @@
 import {getLogger} from 'Util/Logger';
 import {t, Declension} from 'Util/LocalizerUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {truncate} from 'Util/StringUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -36,6 +36,7 @@ import {AudioType} from '../audio/AudioType';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 
@@ -45,12 +46,12 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
  * @see https://developer.mozilla.org/en-US/docs/Web/API/notification
  * @see http://www.w3.org/TR/notifications
  */
-class NotificationRepository {
+export class NotificationRepository {
   static get CONFIG() {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
+      TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
       TITLE_LENGTH: 38,
     };
   }
@@ -62,7 +63,7 @@ class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param {CallingRepository} callingRepository - Repository for all call interactions
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    * @param {UserRepository} userRepository - Repository for users
    */
@@ -415,10 +416,10 @@ class NotificationRepository {
    */
   _createBodySystem(messageEntity) {
     const createBodyMessageTimerUpdate = () => {
-      const messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
+      const messageTimer = ConversationEphemeralHandler.validateTimer(messageEntity.message_timer);
 
       if (messageTimer) {
-        const timeString = TimeUtil.formatDuration(messageTimer).text;
+        const timeString = formatDuration(messageTimer).text;
         const substitutions = {time: timeString, user: messageEntity.user().first_name()};
         return t('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }
@@ -859,9 +860,7 @@ class NotificationRepository {
     }
 
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
-
-    return isEventToNotify && isSelfMentionOrReply;
+    const isCallMessage = messageEntity.super_type === SuperType.CALL;
+    return isEventToNotify && (isCallMessage || isSelfMentionOrReply);
   }
 }
-
-export {NotificationRepository};

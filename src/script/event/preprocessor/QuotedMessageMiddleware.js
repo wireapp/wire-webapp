@@ -24,6 +24,7 @@ import {base64ToArray} from 'Util/util';
 
 import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
+import {MessageHasher} from '../../message/MessageHasher';
 
 export class QuotedMessageMiddleware {
   /**
@@ -32,11 +33,9 @@ export class QuotedMessageMiddleware {
    * It will handle validating the quote and adding metadata to the event.
    *
    * @param {EventService} eventService - Repository that handles events
-   * @param {z.message.MessageHasher} messageHasher - Handles hashing messages
    */
-  constructor(eventService, messageHasher) {
+  constructor(eventService) {
     this.eventService = eventService;
-    this.messageHasher = messageHasher;
     this.logger = getLogger('QuotedMessageMiddleware');
   }
 
@@ -122,7 +121,7 @@ export class QuotedMessageMiddleware {
 
       const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
 
-      return this.messageHasher.validateHash(quotedMessage, quotedMessageHash).then(isValid => {
+      return MessageHasher.validateHash(quotedMessage, quotedMessageHash).then(isValid => {
         let quoteData;
 
         if (!isValid) {

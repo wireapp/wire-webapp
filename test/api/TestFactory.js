@@ -48,6 +48,8 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
+import {ConversationService} from 'src/script/conversation/ConversationService';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 
 window.testConfig = {
   connection: backendConfig,
@@ -194,7 +196,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         resolveDependency(graph.BackendClient),
         TestFactory.storage_service
       );
-      TestFactory.conversation_service = new z.conversation.ConversationService(
+      TestFactory.conversation_service = new ConversationService(
         resolveDependency(graph.BackendClient),
         TestFactory.event_service,
         TestFactory.storage_service
@@ -298,20 +300,20 @@ window.TestFactory.prototype.exposeTeamActors = function() {
 
 /**
  *
- * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
+ * @returns {Promise<ConversationRepository>} The conversation repository.
  */
 window.TestFactory.prototype.exposeConversationActors = function() {
   return this.exposeConnectionActors()
     .then(() => this.exposeTeamActors())
     .then(() => this.exposeEventActors())
     .then(() => {
-      TestFactory.conversation_service = new z.conversation.ConversationService(
+      TestFactory.conversation_service = new ConversationService(
         resolveDependency(graph.BackendClient),
         TestFactory.event_service,
         TestFactory.storage_service
       );
 
-      TestFactory.conversation_repository = new z.conversation.ConversationRepository(
+      TestFactory.conversation_repository = new ConversationRepository(
         TestFactory.conversation_service,
         TestFactory.asset_service,
         TestFactory.client_repository,

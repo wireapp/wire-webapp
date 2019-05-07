@@ -18,12 +18,12 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
+      UNBLOCK_INTERVAL: TIME_IN_MILLIS.MINUTE,
     };
   }
 
@@ -131,7 +131,7 @@ export class PromiseQueue {
   push(fn) {
     return new Promise((resolve, reject) => {
       const queueEntry = {
-        fn: fn,
+        fn,
         rejectFn: reject,
         resolveFn: resolve,
       };

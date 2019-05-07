@@ -44,7 +44,7 @@ class BackupRepository {
    * @param {BackupService} backupService - Backup service implementation
    * @param {ClientRepository} clientRepository - Repository for all client interactions
    * @param {ConnectionRepository} connectionRepository - Repository for all connection interactions
-   * @param {z.conversation.ConversationRepository} conversationRepository - Repository for all conversation interactions
+   * @param {ConversationRepository} conversationRepository - Repository for all conversation interactions
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
   constructor(backupService, clientRepository, connectionRepository, conversationRepository, userRepository) {

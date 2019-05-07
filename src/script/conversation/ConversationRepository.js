@@ -39,7 +39,7 @@ import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
@@ -63,6 +63,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
 import {ConversationType} from './ConversationType';
+import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
@@ -71,7 +72,9 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {NotificationSetting} from './NotificationSetting';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ClientMismatchHandler} from './ClientMismatchHandler';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
@@ -93,14 +96,11 @@ import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation repository for all conversation interactions with the conversation service
-z.conversation.ConversationRepository = class ConversationRepository {
+export class ConversationRepository {
   static get CONFIG() {
     return {
-      CONFIRMATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.WEEK,
+      CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -165,16 +165,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = getLogger('z.conversation.ConversationRepository');
+    this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
-    this.verification_state_handler = new ConversationVerificationStateHandler(
+    this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
     );
-    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+    this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
@@ -243,12 +243,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this.conversationMapper);
-    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
-      this.conversationMapper,
-      this.eventService,
-      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
-    );
+    this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
+    this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
+      onMessageTimeout: this.handleMessageExpiration.bind(this),
+    });
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
@@ -1450,7 +1448,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
-    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return this.conversation_service
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
@@ -1549,13 +1547,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    const validNotificationStates = Object.values(NotificationSetting.STATE);
+    const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== NotificationSetting.STATE.EVERYTHING;
+    const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(currentTimestamp)).toISOString(),
@@ -2033,7 +2031,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of message
    * @param {QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2116,7 +2114,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
@@ -2229,7 +2227,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2261,7 +2259,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions part of the message
    * @param {QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2328,7 +2326,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
-    const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
@@ -2771,7 +2769,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id, asImage))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const upload_duration = (Date.now() - upload_started) / TIME_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
       })
       .catch(error => {
@@ -3248,7 +3246,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
           }
 
-          this.verification_state_handler.onConversationCreate(conversationEntity);
+          this.verificationStateHandler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       })
@@ -3322,7 +3320,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this._addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -3375,7 +3373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.onMemberLeft(conversationEntity);
+          this.verificationStateHandler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archiveConversation(conversationEntity);
@@ -3917,7 +3915,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
-      messageTimer = genericMessage[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TimeUtil.UNITS_IN_MILLIS.SECOND;
+      messageTimer = genericMessage[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -3982,4 +3980,4 @@ z.conversation.ConversationRepository = class ConversationRepository {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
     }
   }
-};
+}

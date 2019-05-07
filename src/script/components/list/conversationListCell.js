@@ -21,6 +21,7 @@ import {noop} from 'Util/util';
 
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import {MediaType} from '../../media/MediaType';
+import {generateCellState} from '../../conversation/ConversationCellState';
 
 class ConversationListCell {
   constructor({conversation, onJoinCall, is_selected = noop, click = noop}) {
@@ -32,7 +33,7 @@ class ConversationListCell {
 
     this.cell_state = ko.observable('');
     this.cell_state_observable = ko
-      .computed(() => this.cell_state(z.conversation.ConversationCellState.generate(this.conversation)))
+      .computed(() => this.cell_state(generateCellState(this.conversation)))
       .extend({rateLimit: 500});
 
     this.showJoinButton = this.conversation.hasJoinableCall;

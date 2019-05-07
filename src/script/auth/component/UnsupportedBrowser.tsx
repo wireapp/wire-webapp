@@ -22,6 +22,7 @@ import * as React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
+import {Config} from '../config';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';
@@ -36,10 +37,10 @@ const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) =>
   <ContainerXS verticalCenter centerText>
     <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
-      <FormattedHTMLMessage {...headline} />
+      <FormattedMessage {...headline} values={{brandName: Config.BRAND_NAME}} />
     </H1>
     <Text center>
-      <FormattedHTMLMessage {...subhead} />
+      <FormattedMessage {...subhead} values={{brandName: Config.BRAND_NAME}} />
     </Text>
   </ContainerXS>
 );
@@ -76,6 +77,7 @@ export const _UnsupportedBrowser = ({
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
+              values={{brandName: Config.BRAND_NAME}}
             />
           </H2>
           {isTemporaryGuest && isMobileOs() ? (

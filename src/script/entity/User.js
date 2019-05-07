@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
 
@@ -51,9 +51,9 @@ class User {
         WIRE: 'wire',
       },
       TEMPORARY_GUEST: {
-        EXPIRATION_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
-        EXPIRATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-        LIFETIME: TimeUtil.UNITS_IN_MILLIS.DAY,
+        EXPIRATION_INTERVAL: TIME_IN_MILLIS.MINUTE,
+        EXPIRATION_THRESHOLD: TIME_IN_MILLIS.SECOND * 10,
+        LIFETIME: TIME_IN_MILLIS.DAY,
       },
     };
   }
@@ -234,19 +234,19 @@ class User {
 
   _setRemainingExpirationTime(expirationTime) {
     const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
-    const remainingMinutes = Math.ceil(remainingTime / TimeUtil.UNITS_IN_MILLIS.MINUTE);
+    const remainingMinutes = Math.ceil(remainingTime / TIME_IN_MILLIS.MINUTE);
 
     if (remainingMinutes <= 45) {
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       const timeValue = remainingQuarters * 15;
       this.expirationText(t('userRemainingTimeMinutes', timeValue));
-      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.MINUTE);
+      this.expirationRemaining(timeValue * TIME_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
       this.expirationText(t('userRemainingTimeHours', timeValue));
-      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.HOUR);
+      this.expirationRemaining(timeValue * TIME_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 

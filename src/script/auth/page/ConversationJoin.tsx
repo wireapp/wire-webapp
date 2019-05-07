@@ -240,17 +240,17 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
           {selfName ? (
             <FormattedHTMLMessage
               {...conversationJoinStrings.existentAccountHeadline}
-              values={{name: StringUtil.capitalize(selfName)}}
+              values={{brandName: Config.BRAND_NAME, name: StringUtil.capitalize(selfName)}}
             />
           ) : (
-            <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+            <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
           )}
         </H2>
         <Text block style={{fontSize: '16px', marginTop: '10px'}}>
           {_(conversationJoinStrings.existentAccountSubhead)}
         </Text>
         <Button style={{marginTop: 16}} onClick={this.onOpenWireClick} data-uie-name="do-open">
-          {_(conversationJoinStrings.existentAccountOpenButton)}
+          {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
         </Button>
         <ErrorMessage data-uie-name="error-message">
           {error ? parseValidationErrors(error) : parseError(this.props.error)}
@@ -278,7 +278,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+          <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
         </H2>
         <Text style={{fontSize: '16px', marginTop: '10px'}}>
           <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
@@ -342,7 +342,10 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
           color={COLOR.GRAY}
           data-uie-name="status-full-headline"
         >
-          <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
+          <FormattedHTMLMessage
+            {...conversationJoinStrings.fullConversationHeadline}
+            values={{brandName: Config.BRAND_NAME}}
+          />
         </H2>
         <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
           {_(conversationJoinStrings.fullConversationSubhead)}

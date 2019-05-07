@@ -17,15 +17,12 @@
  *
  */
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 /**
  * @typedef {Object} EventHandlingConfig - Object representing conversation event handlers
  * @property {() => void} [eventId: string] - an event handler function
  */
 
-z.conversation.AbstractConversationEventHandler = class AbstractConversationEventHandler {
+export class AbstractConversationEventHandler {
   /**
    * Abstract class that represents an entity that can react to a conversation event.
    */
@@ -54,4 +51,4 @@ z.conversation.AbstractConversationEventHandler = class AbstractConversationEven
     const handler = this.eventHandlingConfig[eventJson.type] || (() => Promise.resolve());
     return handler.bind(this)(conversationEntity, eventJson);
   }
-};
+}

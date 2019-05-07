@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {conversationJoinStrings} from '../../strings';
 import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
+import {Config} from '../config';
 import {RootState, ThunkDispatch} from '../module/reducer';
 
 interface Props extends React.HTMLAttributes<_ConversationJoinInvalid> {}
@@ -52,7 +53,10 @@ class _ConversationJoinInvalid extends React.PureComponent<
               color={COLOR.GRAY}
               data-uie-name="status-invalid-headline"
             >
-              <FormattedHTMLMessage {...conversationJoinStrings.invalidHeadline} />
+              <FormattedHTMLMessage
+                {...conversationJoinStrings.invalidHeadline}
+                values={{brandName: Config.BRAND_NAME}}
+              />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">
               {_(conversationJoinStrings.invalidSubhead)}

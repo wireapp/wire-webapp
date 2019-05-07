@@ -22,7 +22,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
 
@@ -50,6 +50,8 @@ import {ClientEvent} from '../event/Client';
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
 import {EventName} from '../tracking/EventName';
+
+import {ConversationRepository} from '../conversation/ConversationRepository';
 
 export class CallingRepository {
   static get CONFIG() {
@@ -621,7 +623,7 @@ export class CallingRepository {
       if (!eventFromStream) {
         const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
         eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-        const consentType = z.conversation.ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+        const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
         const grantPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
 
         promises.push(grantPromise);
@@ -1069,7 +1071,7 @@ export class CallingRepository {
           action: () => {
             const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
             amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
+            window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
           },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
@@ -1388,7 +1390,8 @@ export class CallingRepository {
       })
       .then(callEntity => {
         const mediaType = this._getMediaTypeFromProperties(properties);
-        const conversationName = callEntity.conversationEntity.display_name();
+        const conversation = callEntity.conversationEntity;
+        const conversationName = conversation.display_name();
 
         const logMessage = {
           data: {
@@ -1401,7 +1404,7 @@ export class CallingRepository {
 
         callEntity.setRemoteVersion(callMessageEntity);
 
-        if (!callEntity.conversationEntity.showNotificationsEverything()) {
+        if (conversation.showNotificationsNothing()) {
           silent = true;
         }
 
@@ -1626,7 +1629,7 @@ export class CallingRepository {
 
         const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 

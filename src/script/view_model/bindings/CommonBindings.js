@@ -26,7 +26,7 @@ import {debounce} from 'underscore';
 import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
 /* eslint-enable no-unused-vars */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {stripUrlWrapper} from 'Util/util';
 import {Environment} from 'Util/Environment';
@@ -265,7 +265,7 @@ ko.bindingHandlers.file_select = {
         // wait before clearing to fix autotests
         window.setTimeout(() => {
           $(event.target).val(null);
-        }, TimeUtil.UNITS_IN_MILLIS.SECOND);
+        }, TIME_IN_MILLIS.SECOND);
       }
     };
 
@@ -525,11 +525,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TimeUtil.UNITS_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
-    const date = moment.unix(timestamp / TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const date = moment.unix(timestamp / TIME_IN_MILLIS.SECOND);
 
     const now = moment().local();
     const today = now.format('YYMMDD');

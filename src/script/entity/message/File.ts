@@ -21,7 +21,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Asset} from './Asset';
@@ -120,7 +120,7 @@ export class File extends Asset {
         return downloadBlob(blob, this.file_name);
       })
       .then(blob => {
-        const download_duration = (Date.now() - download_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const download_duration = (Date.now() - download_started) / TIME_IN_MILLIS.SECOND;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);
         return blob;
       })

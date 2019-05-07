@@ -34,6 +34,7 @@ declare global {
         APP_NAME: string;
         BACKEND_REST: string;
         BACKEND_WS: string;
+        BRAND_NAME: string;
         ENVIRONMENT: string;
         FEATURE: {
           CHECK_CONSENT: boolean;
@@ -65,6 +66,7 @@ class Configuration {
   readonly APP_INSTANCE_ID = UUID();
   readonly BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
+  readonly BRAND_NAME = window.wire.env.BRAND_NAME || 'Wire';
   readonly CALLING_PROTOCOL_VERSION = '3.0';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
   readonly FEATURE = window.wire.env.FEATURE || {

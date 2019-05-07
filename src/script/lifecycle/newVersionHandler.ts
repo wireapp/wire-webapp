@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 type OnNewVersionAvailableFn = (serverVersion: string) => void;
 
@@ -29,7 +29,7 @@ interface VersionListener {
 
 const logger = getLogger('LifecycleRepository');
 const VERSION_URL = '/version/';
-const CHECK_INTERVAL = TimeUtil.UNITS_IN_MILLIS.HOUR * 3;
+const CHECK_INTERVAL = TIME_IN_MILLIS.HOUR * 3;
 
 let newVersionListeners: VersionListener[] = [];
 let pollInterval: number;

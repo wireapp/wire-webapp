@@ -23,9 +23,6 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {WebAppEvents} from '../event/WebApp';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 export class ConversationVerificationStateHandler {
   constructor(conversationRepository, eventRepository, serverTimeHandler) {
     this.conversationRepository = conversationRepository;

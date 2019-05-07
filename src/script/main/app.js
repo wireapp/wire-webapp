@@ -24,7 +24,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid} from 'Util/util';
 import {DebugUtil} from 'Util/DebugUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -56,6 +56,7 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
 
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
@@ -64,6 +65,7 @@ import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
+import {ConversationService} from '../conversation/ConversationService';
 
 import {BackendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
@@ -102,7 +104,7 @@ class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [SIGN_OUT_REASON.ACCOUNT_DELETED, SIGN_OUT_REASON.CLIENT_REMOVED, SIGN_OUT_REASON.SESSION_EXPIRED],
         TEMPORARY_GUEST: [
@@ -187,7 +189,7 @@ class App {
     repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
     repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
-    repositories.conversation = new z.conversation.ConversationRepository(
+    repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
       repositories.client,
@@ -205,7 +207,7 @@ class App {
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event, z.message.MessageHasher);
+    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
 
     const readReceiptMiddleware = new ReceiptsMiddleware(
       this.service.event,
@@ -273,7 +275,7 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       connect: new ConnectService(this.backendClient),
-      conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
+      conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
       notification: new NotificationService(this.backendClient, storageService),

@@ -17,6 +17,7 @@
  *
  */
 import {base64ToArray} from 'Util/util';
+import {categoryFromEvent} from '../message/MessageCategorization';
 
 export class StorageSchemata {
   static get OBJECT_STORE() {
@@ -192,7 +193,7 @@ export class StorageSchemata {
         },
         upgrade: transaction => {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            event.category = z.message.MessageCategorization.categoryFromEvent(event);
+            event.category = categoryFromEvent(event);
           });
         },
         version: 10,

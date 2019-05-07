@@ -22,7 +22,7 @@ import moment from 'moment';
 import {getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, afterRender, renderMessage} from 'Util/util';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
@@ -34,7 +34,10 @@ import {AvailabilityType} from '../../user/AvailabilityType';
 
 import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
+
 import {QuoteEntity} from '../../message/QuoteEntity';
+import {MessageHasher} from '../../message/MessageHasher';
+import {MentionEntity} from '../../message/MentionEntity';
 
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -54,11 +57,11 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      PING_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories, messageHasher) {
+  constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
     this.addMention = this.addMention.bind(this);
     this.clickToPing = this.clickToPing.bind(this);
@@ -69,8 +72,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.setElements = this.setElements.bind(this);
     this.updateSelectionState = this.updateSelectionState.bind(this);
     this.assetUploader = resolve(graph.AssetUploader);
-
-    this.messageHasher = messageHasher;
 
     this.shadowInput = null;
     this.textarea = null;
@@ -353,7 +354,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
 
     storageValue.mentions = storageValue.mentions.map(mention => {
-      return new z.message.MentionEntity(mention.startIndex, mention.length, mention.userId);
+      return new MentionEntity(mention.startIndex, mention.length, mention.userId);
     });
 
     const replyMessageId = storageValue.reply ? storageValue.reply.messageId : undefined;
@@ -377,7 +378,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   _createMentionEntity(userEntity) {
     const mentionLength = userEntity.name().length + 1;
-    return new z.message.MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
   }
 
   addMention(userEntity, inputElement) {
@@ -740,7 +741,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       ? Promise.resolve()
       : this.eventRepository
           .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
-          .then(this.messageHasher.hashEvent)
+          .then(MessageHasher.hashEvent)
           .then(messageHash => {
             return new QuoteEntity({
               hash: messageHash,

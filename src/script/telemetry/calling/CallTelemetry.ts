@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import {RaygunStatic} from 'raygun4js';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationType} from '../../tracking/attribute';
 import {EventName} from '../../tracking/EventName';
@@ -127,7 +127,7 @@ export class CallTelemetry {
   track_duration(callEntity: CallEntity): void {
     const {terminationReason, timerStart, durationTime} = callEntity;
 
-    const duration = Math.floor((Date.now() - timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
+    const duration = Math.floor((Date.now() - timerStart) / TIME_IN_MILLIS.SECOND);
 
     if (!isNaN(duration)) {
       this.logger.info(`Call duration: ${duration} seconds.`, durationTime());

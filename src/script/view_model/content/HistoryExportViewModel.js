@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {WebAppEvents} from '../../event/WebApp';
@@ -120,7 +120,7 @@ z.viewModel.content.HistoryExportViewModel = class HistoryExportViewModel {
   downloadArchiveFile() {
     const userName = this.userRepository.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
-    const filename = `Wire-${userName}-Backup_${TimeUtil.getCurrentDate()}.${fileExtension}`;
+    const filename = `Wire-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
 
     this.dismissExport();
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');

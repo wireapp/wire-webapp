@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,20 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {PromiseQueue} from 'Util/PromiseQueue';
 
-export const NotificationSetting = {
-  /* eslint-disable sort-keys */
+export class MessageSender {
+  private readonly sendingQueue: PromiseQueue;
 
-  STATE: {
-    EVERYTHING: 0b00,
-    MENTIONS_AND_REPLIES: 0b01,
-    NOTHING: 0b11,
-  },
+  constructor() {
+    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
+  }
 
-  /* eslint-enable sort-keys */
+  queueMessage<T extends Function>(sendingFunction: T): Promise<void> {
+    return this.sendingQueue.push(sendingFunction);
+  }
 
-  getText(status) {
-    const statusTexts = {
-      [NotificationSetting.STATE.EVERYTHING]: t('notificationSettingsEverything'),
-      [NotificationSetting.STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-      [NotificationSetting.STATE.NOTHING]: t('notificationSettingsNothing'),
-    };
-    return statusTexts[status];
-  },
-};
+  pauseQueue(pauseState = true): void {
+    this.sendingQueue.pause(pauseState);
+  }
+}

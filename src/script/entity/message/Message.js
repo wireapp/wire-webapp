@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import moment from 'moment';
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatDurationCaption} from 'Util/TimeUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
@@ -51,7 +51,7 @@ class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? TimeUtil.formatDurationCaption(remainingTime) : '';
+      return remainingTime ? formatDurationCaption(remainingTime) : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
@@ -101,7 +101,7 @@ class Message {
     this.category = undefined;
 
     this.display_timestamp_short = () => {
-      const date = moment.unix(this.timestamp() / TimeUtil.UNITS_IN_MILLIS.SECOND);
+      const date = moment.unix(this.timestamp() / TIME_IN_MILLIS.SECOND);
       return date.local().format('LT');
     };
 

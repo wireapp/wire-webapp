@@ -26,7 +26,7 @@ import 'src/script/localization/Localizer';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {WebAppEvents} from 'src/script/event/WebApp';
@@ -110,7 +110,7 @@ describe('WindowTitleViewModel', () => {
       title_view_model.conversationRepository.active_conversation(selected_conversation);
 
       const muted_conversation = new Conversation(createRandomUuid());
-      muted_conversation.mutedState(NotificationSetting.STATE.NOTHING);
+      muted_conversation.mutedState(NOTIFICATION_STATE.NOTHING);
       muted_conversation.name('Muted Conversation');
       muted_conversation.type(ConversationType.GROUP);
       muted_conversation.selfUser(selfUserEntity);

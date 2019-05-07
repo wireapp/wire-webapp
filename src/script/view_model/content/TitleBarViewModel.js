@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {MediaType} from '../../media/MediaType';
@@ -48,7 +48,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.panelIsVisible = this.panelViewModel.isVisible;
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => $('.titlebar').remove(), TimeUtil.UNITS_IN_MILLIS.SECOND);
+    window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
     this.ConversationVerificationState = ConversationVerificationState;

@@ -243,8 +243,8 @@
   min-width: @conversation-message-timestamp-width;
   height: 1px;
   flex: 1;
-  margin-left: 16px;
   border: none;
+  margin-left: 16px;
   background: @separator-color;
 }
 
@@ -252,8 +252,8 @@
 .message-timestamp {
   height: 48px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
-  margin-bottom: 16px;
   border-bottom: 1px solid @separator-color;
+  margin-bottom: 16px;
   line-height: 40px;
   user-select: none;
 
@@ -277,8 +277,8 @@
   }
 
   &:not(.message-timestamp-day) {
-    margin-right: @conversation-message-timestamp-width;
     border: 0;
+    margin-right: @conversation-message-timestamp-width;
 
     .message-header-label {
       border-bottom: 1px dotted @separator-color;
@@ -536,7 +536,7 @@ image-asset {
 }
 .message-status,
 .message-status-read {
-  left: 60px;
+  left: 83px;
   &::before {
     display: flex;
     width: 16px;

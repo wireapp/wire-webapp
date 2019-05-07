@@ -26,15 +26,12 @@ import {WebAppEvents} from '../event/WebApp';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
+import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
+
 import {EventName} from '../tracking/EventName';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
-z.conversation.ConversationStateHandler = class ConversationStateHandler extends z.conversation
-  .AbstractConversationEventHandler {
+export class ConversationStateHandler extends AbstractConversationEventHandler {
   /**
-   * Construct a new conversation state handler.
    * @param {ConversationService} conversationService - Service for conversation related backend interactions
    * @param {ConversationRepository} conversationMapper - Repository for conversation interactions
    */
@@ -149,4 +146,4 @@ z.conversation.ConversationStateHandler = class ConversationStateHandler extends
     const modalOptions = {text: {message}};
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
-};
+}

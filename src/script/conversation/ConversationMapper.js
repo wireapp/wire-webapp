@@ -22,7 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
-import {NotificationSetting} from './NotificationSetting';
+import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
 
@@ -93,7 +93,7 @@ import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
-class ConversationMapper {
+export class ConversationMapper {
   // Construct a new Conversation Mapper.
   constructor() {
     this.logger = getLogger('ConversationMapper');
@@ -305,17 +305,17 @@ class ConversationMapper {
    * Get the valid muted state.
    *
    * @param {boolean} mutedState - Outdated muted state
-   * @param {NotificationSetting.STATE} [notificationState] - Bit mask based notification setting
-   * @returns {NotificationSetting.STATE} validated notification setting
+   * @param {NOTIFICATION_STATE} [notificationState] - Bit mask based notification setting
+   * @returns {NOTIFICATION_STATE} validated notification setting
    */
   getMutedState(mutedState, notificationState) {
-    const validNotifcationStates = Object.values(NotificationSetting.STATE);
+    const validNotifcationStates = Object.values(NOTIFICATION_STATE);
     if (validNotifcationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
-      return mutedState ? notificationState | 0b1 : NotificationSetting.STATE.EVERYTHING;
+      return mutedState ? notificationState | 0b1 : NOTIFICATION_STATE.EVERYTHING;
     }
 
-    return typeof mutedState === 'boolean' ? mutedState : NotificationSetting.STATE.EVERYTHING;
+    return typeof mutedState === 'boolean' ? mutedState : NOTIFICATION_STATE.EVERYTHING;
   }
 
   /**
@@ -457,5 +457,3 @@ class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 }
-
-export {ConversationMapper};

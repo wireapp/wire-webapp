@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
@@ -45,8 +45,8 @@ export class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
+      PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
+      RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
   }
 

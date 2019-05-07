@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatTimestamp} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -56,7 +56,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       if (clientEntity) {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this._updateFingerprint();
-        const date = TimeUtil.formatTimestamp(clientEntity.time);
+        const date = formatTimestamp(clientEntity.time);
         this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       }
     });

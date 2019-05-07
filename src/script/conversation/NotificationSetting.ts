@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,19 @@
  *
  */
 
-import {PromiseQueue} from 'Util/PromiseQueue';
+import {t} from 'Util/LocalizerUtil';
 
-export class MessageSender {
-  constructor() {
-    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
-  }
-  queueMessage(sendingFunction) {
-    return this.sendingQueue.push(sendingFunction);
-  }
+export const NOTIFICATION_STATE = {
+  EVERYTHING: 0b00,
+  MENTIONS_AND_REPLIES: 0b01,
+  NOTHING: 0b11,
+};
 
-  pauseQueue(pauseState = true) {
-    this.sendingQueue.pause(pauseState);
-  }
-}
+export const getNotificationText = (status: number) => {
+  const statusTexts: Record<number, string> = {
+    [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
+    [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+    [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
+  };
+  return statusTexts[status];
+};

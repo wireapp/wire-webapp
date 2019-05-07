@@ -20,13 +20,13 @@
 import Cookies from 'js-cookie';
 
 import {Environment} from 'Util/Environment';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 let checkIntervalId = 0;
 
 const CONFIG = {
   COOKIE_NAME: 'app_opened',
-  INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
+  INTERVAL: TIME_IN_MILLIS.SECOND,
 };
 
 /**

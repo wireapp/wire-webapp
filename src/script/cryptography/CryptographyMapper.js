@@ -20,7 +20,7 @@
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {AvailabilityType} from '../user/AvailabilityType';
@@ -32,6 +32,7 @@ import {BackendEvent} from '../event/Backend';
 import {StatusType} from '../message/StatusType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 
 export class CryptographyMapper {
   static get CONFIG() {
@@ -221,9 +222,7 @@ export class CryptographyMapper {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : [];
-      const durationInSeconds = audioData.durationInMillis
-        ? audioData.durationInMillis / TimeUtil.UNITS_IN_MILLIS.SECOND
-        : 0;
+      const durationInSeconds = audioData.durationInMillis ? audioData.durationInMillis / TIME_IN_MILLIS.SECOND : 0;
 
       return {
         duration: durationInSeconds,
@@ -314,7 +313,7 @@ export class CryptographyMapper {
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
   }
