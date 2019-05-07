@@ -855,8 +855,8 @@ class NotificationRepository {
     }
 
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
-
-    return isEventToNotify && isSelfMentionOrReply;
+    const isCallMessage = messageEntity.super_type === SuperType.CALL;
+    return isEventToNotify && (isCallMessage || isSelfMentionOrReply);
   }
 }
 
