@@ -16,7 +16,7 @@
     "browser-sync": "2.26.5",
     "cpx": "1.5.0",
     "cross-env": "5.2.0",
-    "gulp": "4.0.1",
+    "gulp": "4.0.2",
     "gulp-babel": "8.0.0",
     "gulp-bower-assets": "0.0.3",
     "gulp-clean": "0.4.0",
