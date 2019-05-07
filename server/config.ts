@@ -124,6 +124,7 @@ const config: ServerConfig = {
     APP_NAME: process.env.APP_NAME,
     BACKEND_REST: process.env.BACKEND_REST,
     BACKEND_WS: process.env.BACKEND_WS,
+    BRAND_NAME: process.env.BRAND_NAME,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,

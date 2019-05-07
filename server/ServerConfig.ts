@@ -6,6 +6,7 @@ export interface ServerConfig {
     APP_NAME: string;
     BACKEND_REST: string;
     BACKEND_WS: string;
+    BRAND_NAME: string;
     ENVIRONMENT: string;
     FEATURE: {
       CHECK_CONSENT: boolean;

@@ -22,6 +22,7 @@ import * as React from 'react';
 import {FormattedHTMLMessage, FormattedMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
+import {Config} from '../config';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
 import {isMobileOs} from '../Runtime';
@@ -76,6 +77,7 @@ export const _UnsupportedBrowser = ({
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
+              values={{brandName: Config.BRAND_NAME}}
             />
           </H2>
           {isTemporaryGuest && isMobileOs() ? (
