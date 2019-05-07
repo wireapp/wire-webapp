@@ -43,21 +43,38 @@ import {
   RoundIconButton,
   Select,
   ShakeBox,
+  TabBar,
+  TabBarItem,
   Text,
   TextArea,
   TextLink,
   Tooltip,
 } from '@wireapp/react-ui-kit';
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 
 const DemoInputs = () => {
   const shakeBox = useRef();
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <Container>
       <Line />
       <H1>Inputs</H1>
       <Line />
+
+      <H2>TabBar</H2>
+      <Line />
+      <TabBar>
+        <TabBarItem active={activeTab === 0} onClick={() => setActiveTab(0)}>
+          Info
+        </TabBarItem>
+        <TabBarItem active={activeTab === 1} onClick={() => setActiveTab(1)}>
+          Download
+        </TabBarItem>
+        <TabBarItem active={activeTab === 2} onClick={() => setActiveTab(2)}>
+          Open
+        </TabBarItem>
+      </TabBar>
 
       <H2>Button</H2>
       <Line />

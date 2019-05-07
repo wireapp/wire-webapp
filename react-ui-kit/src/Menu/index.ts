@@ -18,3 +18,4 @@
  */
 
 export * from './MenuModal';
+export * from './TabBar';
