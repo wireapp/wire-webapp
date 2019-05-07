@@ -21,6 +21,7 @@ import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '
 import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {acceptNewsModalStrings} from '../../strings';
+import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,7 +33,7 @@ const _AcceptNewsModal: React.SFC<Props & InjectedIntlProps> = ({onConfirm, onDe
   <Modal>
     <Container style={{maxWidth: '400px'}} data-uie-name="modal-marketing-consent">
       <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="modal-marketing-consent-title">
-        {_(acceptNewsModalStrings.headline)}
+        {_(acceptNewsModalStrings.headline, {brandName: Config.BRAND_NAME})}
       </H3>
       <div data-uie-name="modal-marketing-consent-description">
         <Text block>{_(acceptNewsModalStrings.unsubscribeDescription)}</Text>

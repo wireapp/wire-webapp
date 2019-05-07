@@ -22,6 +22,7 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {appAlreadyOpenStrings} from '../../strings';
+import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
@@ -54,7 +55,7 @@ class _AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchP
         <Modal fullscreen={fullscreen}>
           <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
             <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
-              {_(appAlreadyOpenStrings.headline)}
+              {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
             </H3>
             <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
             <Columns style={{marginTop: '20px'}}>
