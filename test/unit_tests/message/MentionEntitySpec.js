@@ -20,6 +20,7 @@
 import {Mention} from '@wireapp/protocol-messaging';
 
 import {base64ToArray} from 'Util/util';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 
 describe('MentionEntity', () => {
   const userId = '7bec1483-5b11-429d-9759-ec71369654b5';
@@ -28,60 +29,60 @@ describe('MentionEntity', () => {
     const textMessage = 'Hello, World! @test_user Please read!';
 
     it('should throw with missing properties or wrong types', () => {
-      const mentionEntity = new z.message.MentionEntity();
+      const mentionEntity = new MentionEntity();
       const functionCall = () => mentionEntity.validate(textMessage);
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_START_INDEX);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_START_INDEX);
       mentionEntity.startIndex = 'fourteen';
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_START_INDEX);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_START_INDEX);
       mentionEntity.startIndex = 14;
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_LENGTH);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_LENGTH);
       mentionEntity.length = 'ten';
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_LENGTH);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_LENGTH);
       mentionEntity.length = 10;
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_USER_ID);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_USER_ID);
       mentionEntity.userId = 1337;
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.MISSING_USER_ID);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_USER_ID);
     });
 
     it('should throw with inconsistent properties', () => {
-      const mentionEntity = new z.message.MentionEntity(-1, 10, userId);
+      const mentionEntity = new MentionEntity(-1, 10, userId);
       const functionCall = () => mentionEntity.validate(textMessage);
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_START_INDEX);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_START_INDEX);
       mentionEntity.startIndex = 14;
       mentionEntity.length = -1;
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_LENGTH);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_LENGTH);
       mentionEntity.length = 40;
 
-      expect(() => mentionEntity.validate('')).toThrowError(z.message.MentionEntity.ERROR.OUT_OF_BOUNDS);
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.OUT_OF_BOUNDS);
+      expect(() => mentionEntity.validate('')).toThrowError(MentionEntity.ERROR.OUT_OF_BOUNDS);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.OUT_OF_BOUNDS);
       mentionEntity.length = 10;
       mentionEntity.userId = '1337';
 
-      expect(functionCall).toThrowError(z.message.MentionEntity.ERROR.INVALID_USER_ID);
+      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_USER_ID);
       mentionEntity.userId = userId;
       const functionToThrow = () => mentionEntity.validate('Hello, World! Please read!');
 
-      expect(functionToThrow).toThrowError(z.message.MentionEntity.ERROR.INVALID_START_CHAR);
+      expect(functionToThrow).toThrowError(MentionEntity.ERROR.INVALID_START_CHAR);
     });
 
     it('should return true on validation', () => {
-      const mentionEntity = new z.message.MentionEntity(14, 10, userId);
+      const mentionEntity = new MentionEntity(14, 10, userId);
 
       expect(mentionEntity.validate(textMessage)).toBe(true);
       const beginningTextMessage = '@Gregor Can you please take a look?';
-      const beginningMentionEntity = new z.message.MentionEntity(0, 7, userId);
+      const beginningMentionEntity = new MentionEntity(0, 7, userId);
 
       expect(beginningMentionEntity.validate(beginningTextMessage)).toBe(true);
       const endTextMessage = 'Can you please take a look? @Gregor';
-      const endMentionEntity = new z.message.MentionEntity(28, 7, userId);
+      const endMentionEntity = new MentionEntity(28, 7, userId);
 
       expect(endMentionEntity.validate(endTextMessage)).toBe(true);
     });
@@ -89,7 +90,7 @@ describe('MentionEntity', () => {
     it('supports line breaks in texts with mentions', () => {
       const encodedMention = 'CAEQCBokNDRiZDc3NmUtODcxOS00MzIwLWIxYTAtMzU0Y2NkOGU5ODNh';
       const protoMention = Mention.decode(base64ToArray(encodedMention));
-      const mentionEntity = new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
+      const mentionEntity = new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       const messageText = '\n@Firefox';
 
       expect(mentionEntity.validate(messageText)).toBe(true);
@@ -98,7 +99,7 @@ describe('MentionEntity', () => {
 
   describe('toJSON', () => {
     it('should return a well-formed JSON object', () => {
-      const mentionEntity = new z.message.MentionEntity(14, 10, userId);
+      const mentionEntity = new MentionEntity(14, 10, userId);
       const expectedResult = {length: 10, startIndex: 14, userId};
 
       expect(mentionEntity.toJSON()).toEqual(expectedResult);

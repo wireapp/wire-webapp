@@ -22,25 +22,26 @@ import {Mention} from '@wireapp/protocol-messaging';
 import {isUUID} from 'Util/ValidationUtil';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
-window.z = window.z || {};
-window.z.message = z.message || {};
+export enum ERROR {
+  INVALID_LENGTH = 'Invalid mention: Invalid length',
+  INVALID_START_CHAR = 'Invalid mention: Mention does not start with @',
+  INVALID_START_INDEX = 'Invalid mention: Invalid startIndex',
+  INVALID_USER_ID = 'Invalid mention: User ID is not a valid UUID',
+  MISSING_LENGTH = 'Invalid mention: Missing length',
+  MISSING_START_INDEX = 'Invalid mention: Missing startIndex',
+  MISSING_USER_ID = 'Invalid mention: Missing user ID',
+  OUT_OF_BOUNDS = 'Invalid mention: Length out of string boundary',
+  OVERLAPPING = 'Invalid mention: Overlap with another mention',
+}
 
-z.message.MentionEntity = class MentionEntity {
-  static get ERROR() {
-    return {
-      INVALID_LENGTH: 'Invalid mention: Invalid length',
-      INVALID_START_CHAR: 'Invalid mention: Mention does not start with @',
-      INVALID_START_INDEX: 'Invalid mention: Invalid startIndex',
-      INVALID_USER_ID: 'Invalid mention: User ID is not a valid UUID',
-      MISSING_LENGTH: 'Invalid mention: Missing length',
-      MISSING_START_INDEX: 'Invalid mention: Missing startIndex',
-      MISSING_USER_ID: 'Invalid mention: Missing user ID',
-      OUT_OF_BOUNDS: 'Invalid mention: Length out of string boundary',
-      OVERLAPPING: 'Invalid mention: Overlap with another mention',
-    };
-  }
+export class MentionEntity {
+  static ERROR = ERROR;
+  startIndex: number;
+  length: number;
+  type: PROTO_MESSAGE_TYPE;
+  userId: string;
 
-  constructor(startIndex, length, userId) {
+  constructor(startIndex: number, length: number, userId: string) {
     this.startIndex = startIndex;
     this.length = length;
     this.type = PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
@@ -48,17 +49,17 @@ z.message.MentionEntity = class MentionEntity {
     this.userId = userId;
   }
 
-  targetsUser(userId) {
+  targetsUser(userId: string): boolean {
     const isTypeUserId = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     return isTypeUserId && this.userId === userId;
   }
 
   // Index of first char outside of mention
-  get endIndex() {
+  get endIndex(): number {
     return this.startIndex + this.length;
   }
 
-  validate(messageText = '', allMentions = []) {
+  validate(messageText = '', allMentions: MentionEntity[] = []): boolean {
     if (allMentions.includes(this)) {
       const mentionIndex = allMentions.indexOf(this);
       const otherMentions = allMentions.slice(0, mentionIndex);
@@ -113,7 +114,7 @@ z.message.MentionEntity = class MentionEntity {
     return true;
   }
 
-  toJSON() {
+  toJSON(): {length: number; startIndex: number; userId: string} {
     return {
       length: this.length,
       startIndex: this.startIndex,
@@ -121,7 +122,7 @@ z.message.MentionEntity = class MentionEntity {
     };
   }
 
-  toProto() {
+  toProto(): Mention {
     const protoMention = new Mention({length: this.length, start: this.startIndex});
     const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
@@ -129,4 +130,4 @@ z.message.MentionEntity = class MentionEntity {
     }
     return protoMention;
   }
-};
+}

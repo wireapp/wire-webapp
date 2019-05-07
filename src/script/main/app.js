@@ -207,7 +207,7 @@ class App {
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event, z.message.MessageHasher);
+    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
 
     const readReceiptMiddleware = new ReceiptsMiddleware(
       this.service.event,

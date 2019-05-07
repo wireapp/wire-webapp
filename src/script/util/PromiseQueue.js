@@ -131,7 +131,7 @@ export class PromiseQueue {
   push(fn) {
     return new Promise((resolve, reject) => {
       const queueEntry = {
-        fn: fn,
+        fn,
         rejectFn: reject,
         resolveFn: resolve,
       };

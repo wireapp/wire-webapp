@@ -21,6 +21,8 @@ import {getLogger} from 'Util/Logger';
 
 import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';
+import {categoryFromEvent} from '../message/MessageCategorization';
+
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
@@ -185,7 +187,7 @@ export class EventService {
    * @returns {Promise<Event>} Resolves with the stored record
    */
   saveEvent(event) {
-    event.category = z.message.MessageCategorization.categoryFromEvent(event);
+    event.category = categoryFromEvent(event);
     return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
   }
 

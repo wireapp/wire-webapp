@@ -43,6 +43,8 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
@@ -728,7 +730,7 @@ describe('NotificationRepository', () => {
       const mentionId = selfMentioned ? userId : createRandomUuid();
 
       const textEntity = new z.entity.Text(createRandomUuid(), '@Gregor can you take a look?');
-      const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
+      const mentionEntity = new MentionEntity(0, 7, mentionId);
       textEntity.mentions([mentionEntity]);
 
       return textEntity;
