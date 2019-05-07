@@ -27,11 +27,10 @@ export const NOTIFICATION_STATE = {
 };
 
 /* tslint:enable:object-literal-sort-keys */
-export const getNotificationText = (status: number) => {
-  const statusTexts: Record<number, string> = {
-    [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
-    [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-    [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
-  };
-  return statusTexts[status];
+const statusTexts: Record<number, string> = {
+  [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
+  [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
+  [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
 };
+
+export const getNotificationText = (status: number) => statusTexts[status];
