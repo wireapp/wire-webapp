@@ -33,6 +33,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
+import {Config} from '../../auth/config';
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
@@ -80,6 +81,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.Environment = Environment;
+    this.brandName = Config.BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;

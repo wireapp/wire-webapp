@@ -120,7 +120,7 @@
             <label class="preferences-options-checkbox-label" for="privacy-checkbox" data-bind="text: t('preferencesAccountDataCheckbox')"></label>
           </div>
         </div>
-        <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail')"></div>
+        <div class="preferences-detail" data-bind="text: t('preferencesAccountDataDetail', brandName)"></div>
 
         <!-- ko if: isActivatedAccount() -->
           <div class="preferences-option">
@@ -129,7 +129,7 @@
               <label class="preferences-options-checkbox-label" for="marketing-checkbox" data-bind="text: t('preferencesAccountMarketingConsentCheckbox')"></label>
             </div>
           </div>
-          <div class="preferences-detail" data-bind="text: t('preferencesAccountMarketingConsentDetail')"></div>
+          <div class="preferences-detail" data-bind="text: t('preferencesAccountMarketingConsentDetail', brandName)"></div>
         <!-- /ko -->
       </section>
     <!-- /ko -->
