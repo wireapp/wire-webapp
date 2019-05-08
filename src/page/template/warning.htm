@@ -90,7 +90,7 @@
           <!-- ko if: Environment.browser.chrome -->
             <!-- ko if: Environment.desktop -->
               <div class="warning-bar-message">
-                <span data-bind="text: t('warningCallIssues')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web')"></a>
+                <span data-bind="text: t('warningCallIssues', brandName)"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web', brandName)"></a>
               </div>
             <!-- /ko -->
             <!-- ko ifnot: Environment.desktop -->
@@ -113,7 +113,7 @@
           <!-- ko if: Environment.browser.chrome -->
             <!-- ko if: Environment.desktop -->
               <div class="warning-bar-message">
-                <span data-bind="text: t('warningCallIssues')"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web')"></a>
+                <span data-bind="text: t('warningCallIssues', brandName)"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: window.wire.env.APP_BASE}, text: t('wire_for_web', brandName)"></a>
               </div>
             <!-- /ko -->
             <!-- ko ifnot: Environment.desktop -->
@@ -129,7 +129,7 @@
       <!-- ko if: visibleWarning() === TYPE.CONNECTIVITY_RECONNECT -->
         <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message">
-            <span data-bind="text: t('warningConnectivityConnectionLost')"></span>
+            <span data-bind="text: t('warningConnectivityConnectionLost', brandName)"></span>
             <loading-icon class="warning-bar-spinner" data-uie-name="status-loading"></loading-icon>
           </div>
         </div>
@@ -148,7 +148,7 @@
       <!-- ko if: visibleWarning() === TYPE.LIFECYCLE_UPDATE -->
         <div class="warning-bar warning-bar-connection">
           <div class="warning-bar-message">
-            <span data-bind="text: t('warningLifecycleUpdate')"></span>&nbsp;<a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="text: t('warningLifecycleUpdateNotes')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;<a class="warning-bar-link" data-bind="click: function(){amplify.publish(WebAppEvents.LIFECYCLE.REFRESH)}, text: t('warningLifecycleUpdateLink')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
+            <span data-bind="text: t('warningLifecycleUpdate', brandName)"></span>&nbsp;<a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="text: t('warningLifecycleUpdateNotes')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-whats-new"></a>&nbsp;·&nbsp;<a class="warning-bar-link" data-bind="click: function(){amplify.publish(WebAppEvents.LIFECYCLE.REFRESH)}, text: t('warningLifecycleUpdateLink')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-update"></a>
           </div>
         </div>
       <!-- /ko -->

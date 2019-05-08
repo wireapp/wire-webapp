@@ -33,7 +33,7 @@ import {WebAppEvents} from 'src/script/event/WebApp';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 describe('WindowTitleViewModel', () => {
-  const suffix = t('wire');
+  const suffix = 'Wire';
   let test_factory = undefined;
   let title_view_model = undefined;
 

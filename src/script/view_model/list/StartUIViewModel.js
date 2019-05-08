@@ -24,6 +24,7 @@ import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
+import {Config} from '../../auth/config';
 import {User} from '../../entity/User';
 import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -75,6 +76,7 @@ class StartUIViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.list.StartUIViewModel');
+    this.brandName = Config.BRAND_NAME;
 
     this.actionsViewModel = this.mainViewModel.actions;
 
@@ -188,7 +190,9 @@ class StartUIViewModel {
     this.inviteMessage = ko.pureComputed(() => {
       if (this.selfUser()) {
         const username = this.selfUser().username();
-        return username ? t('inviteMessage', `@${username}`) : t('inviteMessageNoEmail');
+        return username
+          ? t('inviteMessage', {brandName: Config.BRAND_NAME, username: `@${username}`})
+          : t('inviteMessageNoEmail', Config.BRAND_NAME);
       }
       return '';
     });

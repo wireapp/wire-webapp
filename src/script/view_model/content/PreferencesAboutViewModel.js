@@ -18,6 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
+import {Config} from '../../auth/config';
 
 import {
   getPrivacyPolicyUrl,
@@ -38,6 +39,7 @@ z.viewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
 
     this.userRepository = repositories.user;
     this.selfUser = this.userRepository.self;
+    this.brandName = Config.BRAND_NAME;
 
     this.supportUrl = getSupportUrl();
     this.supportContactUrl = getSupportContactUrl();

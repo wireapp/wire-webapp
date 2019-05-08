@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
 
+import {Config} from '../auth/config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
@@ -242,7 +243,7 @@ export class ContentViewModel {
         this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('conversationNotFoundMessage'),
-            title: t('conversationNotFoundTitle'),
+            title: t('conversationNotFoundTitle', Config.BRAND_NAME),
           },
         });
       });

@@ -5,7 +5,7 @@
   >
     <div class="modal__header">
       <!-- ko if: userNotFound() -->
-        <div class="modal__header__title" data-bind="text: t('userNotFoundTitle')" data-uie-name="status-modal-title"></div>
+        <div class="modal__header__title" data-bind="text: t('userNotFoundTitle', brandName)" data-uie-name="status-modal-title"></div>
       <!-- /ko -->
       <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
     </div>
@@ -23,7 +23,7 @@
         </div>
       <!-- /ko -->
       <!-- ko if: userNotFound() -->
-        <div class="modal__message" data-bind="text: t('userNotFoundMessage')" data-uie-name="status-modal-text"></div>
+        <div class="modal__message" data-bind="text: t('userNotFoundMessage', brandName)" data-uie-name="status-modal-text"></div>
         <div class="modal__buttons">
           <div class="modal__button modal__button--confirm" data-bind="text: t('modalAcknowledgeAction'), click: hide" data-uie-name="do-ok"></div>
         </div>

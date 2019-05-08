@@ -20,6 +20,7 @@
 import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 
+import {Config} from '../auth/config';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaElementHandler} from './MediaElementHandler';
@@ -99,16 +100,12 @@ export class MediaRepository {
   showNoCameraModal() {
     const modalOptions = {
       text: {
-        htmlMessage: t(
-          'modalNoCameraMessage',
-          {},
-          {
-            '/faqLink': '</a>',
-            br: '<br>',
-            faqLink:
-              '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
-          }
-        ),
+        htmlMessage: t('modalNoCameraMessage', Config.BRAND_NAME, {
+          '/faqLink': '</a>',
+          br: '<br>',
+          faqLink:
+            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+        }),
         title: t('modalNoCameraTitle'),
       },
     };
