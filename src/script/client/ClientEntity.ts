@@ -33,7 +33,6 @@ export class ClientEntity {
   class: string;
   cookie?: string;
   id: string;
-  isSelfClient: boolean;
   label?: string;
   location?: object;
   meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
@@ -41,9 +40,7 @@ export class ClientEntity {
   time?: string;
   type?: ClientType;
 
-  constructor(isSelfClient = false) {
-    this.isSelfClient = isSelfClient;
-
+  constructor(public isSelfClient = false) {
     this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
     this.id = '';
 
@@ -84,21 +81,21 @@ export class ClientEntity {
    * @returns `true`, if the client is the self user's permanent client.
    */
   isPermanent(): boolean {
-    return this.type === ClientType.PERMANENT;
+    return this.isSelfClient && this.type === ClientType.PERMANENT;
   }
 
   /**
    * @returns `true`, if it is **not** the client of the self user.
    */
   isRemote(): boolean {
-    return !this.isPermanent() && !this.isTemporary();
+    return !this.isSelfClient && !this.isPermanent() && !this.isTemporary();
   }
 
   /**
    * @returns `true`, if the client is the self user's temporary client.
    */
   isTemporary(): boolean {
-    return this.type === ClientType.TEMPORARY;
+    return this.isSelfClient && this.type === ClientType.TEMPORARY;
   }
 
   /**
