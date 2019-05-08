@@ -31,7 +31,7 @@
               <people-icon class="start-ui-no-contacts__icon"></people-icon>
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
-              <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire')"></div>
+              <div class="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire', brandName)"></div>
             <!-- /ko -->
           <!-- /ko -->
 
@@ -44,7 +44,7 @@
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
               <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
-            <!-- /ko -->         
+            <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
@@ -168,7 +168,7 @@
   <!-- ko if: showInvitePeople() -->
     <div class="start-ui-import" id="invite-button" data-bind="click: clickToShowInviteBubble" data-bubble="#invite-bubble" data-placement="top">
       <span class="icon-invite start-ui-import-icon"></span>
-      <span data-bind="text: t('searchInvite')"></span>
+      <span data-bind="text: t('searchInvite', brandName)"></span>
     </div>
   <!-- /ko -->
 
@@ -211,7 +211,7 @@
       <!-- ko if: showInviteForm() -->
         <div class="invite-bubble-link">
           <div class="invite-content">
-            <div class="invite-header" data-bind="text: t('inviteHeadline')"></div>
+            <div class="invite-header" data-bind="text: t('inviteHeadline', brandName)"></div>
             <div class="invite-link-box">
               <div class="fade-wrapper">
                 <textarea data-bind="value: inviteMessage" class="message" dir="auto"></textarea>

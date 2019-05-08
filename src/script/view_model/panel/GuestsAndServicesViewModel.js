@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../../auth/config';
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
@@ -59,6 +60,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
     this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
+    this.brandName = Config.BRAND_NAME;
   }
 
   getElementId() {

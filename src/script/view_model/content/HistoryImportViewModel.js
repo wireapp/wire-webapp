@@ -22,6 +22,7 @@ import JSZip from 'jszip';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../../auth/config';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
@@ -87,7 +88,7 @@ z.viewModel.content.HistoryImportViewModel = class HistoryImportViewModel {
         this.errorSecondary(t('backupImportAccountErrorSecondary'));
       } else if (error instanceof z.backup.IncompatibleBackupError) {
         this.errorHeadline(t('backupImportVersionErrorHeadline'));
-        this.errorSecondary(t('backupImportVersionErrorSecondary'));
+        this.errorSecondary(t('backupImportVersionErrorSecondary', Config.BRAND_NAME));
       } else {
         this.errorHeadline(t('backupImportGenericErrorHeadline'));
         this.errorSecondary(t('backupImportGenericErrorSecondary'));

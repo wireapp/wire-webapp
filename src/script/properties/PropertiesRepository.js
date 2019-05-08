@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../auth/config';
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
 import {ReceiptMode} from '../conversation/ReceiptMode';
@@ -77,9 +78,9 @@ class PropertiesRepository {
             },
             text: {
               action: t('modalImproveWireAction'),
-              message: t('modalImproveWireMessage'),
+              message: t('modalImproveWireMessage', Config.BRAND_NAME),
               secondary: t('modalImproveWireSecondary'),
-              title: t('modalImproveWireHeadline'),
+              title: t('modalImproveWireHeadline', Config.BRAND_NAME),
             },
           });
         });

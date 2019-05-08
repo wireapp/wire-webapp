@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../auth/config';
 import {WebAppEvents} from '../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
@@ -133,7 +134,7 @@ export class WindowTitleViewModel {
         }
 
         const isTitleSet = specificTitle !== '' && !specificTitle.endsWith(' ');
-        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${t('wire')}`;
+        window.document.title = `${specificTitle}${isTitleSet ? ' · ' : ''}${Config.BRAND_NAME}`;
       }
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   }

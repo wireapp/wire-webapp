@@ -25,6 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {murmurhash3} from 'Util/util';
 import {Environment} from 'Util/Environment';
 
+import {Config} from '../auth/config';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
@@ -354,11 +355,11 @@ export class ClientRepository {
     if (Environment.desktop) {
       let modelString;
       if (Environment.os.mac) {
-        modelString = t('wireMacos');
+        modelString = t('wireMacos', Config.BRAND_NAME);
       } else if (Environment.os.win) {
-        modelString = t('wireWindows');
+        modelString = t('wireWindows', Config.BRAND_NAME);
       } else {
-        modelString = t('wireLinux');
+        modelString = t('wireLinux', Config.BRAND_NAME);
       }
       deviceModel = modelString;
       if (!Environment.frontend.isProduction()) {
