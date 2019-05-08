@@ -28,6 +28,7 @@ async function addGeoIP(req: Request) {
 
   try {
     const ip = req.header('X-Forwarded-For') || req.ip;
+    // https://github.com/runk/node-maxmind/releases/tag/v3.0.0
     const lookup = await maxmind.open(geolite2.paths.country);
     const result = lookup.get(ip);
     if (result) {
