@@ -23,6 +23,11 @@ import {Participant, UserId} from '../calling/Participant';
 
 let baseGrid: string[] = ['', '', '', ''];
 
+export interface Grid {
+  grid: (Participant | null)[];
+  thumbnail: Participant | null;
+}
+
 /**
  * Will compute the next grid layout according to the previous state and the new array of streams
  * The grid will fill according to this pattern
@@ -54,12 +59,28 @@ function computeGrid(previousGrid: string[], participants: Participant[]): strin
     : [newStreamsIds[0] || '', newStreamsIds[3] || '', newStreamsIds[1] || '', newStreamsIds[2] || ''];
 }
 
-export function getGrid(participants: ko.Observable<Participant[]>): ko.PureComputed<(Participant | null)[]> {
+export function getGrid(
+  participants: ko.Observable<Participant[]>,
+  selfParticipant: Participant
+): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
-    baseGrid = computeGrid(baseGrid, participants());
-    return baseGrid.map((userId: UserId) => {
-      return participants().find(participant => participant.userId === userId) || null;
-    });
+    let inGridParticipants: Participant[];
+    let thumbnailParticipant: Participant | null;
+    if (participants().length === 1) {
+      inGridParticipants = participants();
+      thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
+    } else {
+      inGridParticipants = participants().concat(selfParticipant);
+      thumbnailParticipant = null;
+    }
+    baseGrid = computeGrid(baseGrid, inGridParticipants);
+
+    return {
+      grid: baseGrid.map((userId: UserId) => {
+        return inGridParticipants.find(participant => participant.userId === userId) || null;
+      }),
+      thumbnail: thumbnailParticipant,
+    };
   });
 }
 

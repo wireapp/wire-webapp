@@ -28,15 +28,15 @@ export class Participant {
   public deviceId: DeviceId;
   public videoState: ko.Observable<number>;
   public videoStream: MediaStream | undefined;
+  public hasActiveVideo: ko.PureComputed<boolean>;
 
   constructor(userId: UserId, deviceId: DeviceId) {
     this.userId = userId;
     this.deviceId = deviceId;
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
-  }
-
-  hasActiveVideo() {
-    const activeVideoStates = [VIDEO_STATE.STARTED, VIDEO_STATE.SCREENSHARING];
-    return activeVideoStates.includes(this.videoState());
+    this.hasActiveVideo = ko.pureComputed(() => {
+      const activeVideoStates = [VIDEO_STATE.STARTED, VIDEO_STATE.SCREENSHARING];
+      return activeVideoStates.includes(this.videoState());
+    });
   }
 }

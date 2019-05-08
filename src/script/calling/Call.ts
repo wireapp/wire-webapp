@@ -17,6 +17,7 @@
  *
  */
 
+import {STATE as CALL_STATE} from 'avs-web';
 import ko from 'knockout';
 import {Participant} from './Participant';
 
@@ -28,14 +29,14 @@ export class Call {
   public readonly startedAt: ko.Observable<number | undefined>;
   public readonly state: ko.Observable<number>;
   public readonly participants: ko.ObservableArray<Participant>;
-  public readonly initialType: number;
+  public readonly selfParticipant: Participant;
 
-  constructor(conversationId: ConversationId, state: number, initialType: number) {
+  constructor(conversationId: ConversationId, selfParticipant: Participant) {
     this.conversationId = conversationId;
-    this.state = ko.observable(state);
+    this.state = ko.observable(CALL_STATE.NONE);
+    this.selfParticipant = selfParticipant;
     this.participants = ko.observableArray();
     this.reason = ko.observable();
     this.startedAt = ko.observable();
-    this.initialType = initialType;
   }
 }

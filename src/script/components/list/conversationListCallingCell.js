@@ -99,9 +99,12 @@ class ConversationListCallingCell {
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.call.participants().length);
     });
-    this.showVideoPreview = () => {
-      const hasActiveVideo = this.call.participants().find(participant => participant.hasActiveVideo());
-      return hasActiveVideo || call.initialType === CALL_TYPE.VIDEO;
+    this.showVideoGrid = () => {
+      const hasActiveVideo = this.call
+        .participants()
+        .concat(this.call.selfParticipant)
+        .find(participant => participant.hasActiveVideo());
+      return hasActiveVideo;
     };
     this.showMaximize = ko.pureComputed(() => false /*TODOthis.multitasking.isMinimized() && this.isConnected()*/);
 
@@ -275,9 +278,9 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
 
-    <!-- ko if: showVideoPreview() -->
+    <!-- ko if: showVideoGrid() -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="minimized: true, participants: call.participants"></group-video-grid>
+        <group-video-grid params="minimized: true, participants: call.participants, selfParticipant: call.selfParticipant"></group-video-grid>
         <!-- ko if: showMaximize() -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>

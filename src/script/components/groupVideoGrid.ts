@@ -20,12 +20,11 @@
 import ko from 'knockout';
 import {afterRender} from 'Util/util';
 
-import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {Participant} from '../calling/Participant';
-import {getGrid} from '../calling/videoGridHandler';
+import {Grid, getGrid} from '../calling/videoGridHandler';
 
 class GroupVideoGrid {
-  private readonly grid: ko.PureComputed<(Participant | null)[]>;
+  private readonly grid: ko.PureComputed<Grid>;
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
 
@@ -44,32 +43,24 @@ class GroupVideoGrid {
   }
 
   constructor(
-    {minimized, participants}: {minimized: boolean; participants: ko.Observable<Participant[]>},
+    {
+      minimized,
+      participants,
+      selfParticipant,
+    }: {minimized: boolean; participants: ko.Observable<Participant[]>; selfParticipant: Participant},
     rootElement: HTMLElement
   ) {
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
-    this.grid = getGrid(participants);
-    this.videoParticipants = ko.pureComputed(() => this.grid().filter(participant => !!participant));
+    this.grid = getGrid(participants, selfParticipant);
+    this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
-    /*
-    this.grid = videoGridRepository.grid;
-    this.thumbnailStream = videoGridRepository.thumbnailStream;
-    this.streams = videoGridRepository.streams;
-
-    this.getStreamInfo = id => this.streams().find(stream => stream.id === id);
-    this.gridInfo = ko.pureComputed(() => this.grid().map(this.getStreamInfo));
-
-
     // scale videos when the grid is updated (on the next rendering cycle)
     this.grid.subscribe(() => afterRender(this.scaleVideos));
-
-    this.PROPERTY_STATE = PROPERTY_STATE;
-    */
   }
 
   hasBlackBackground() {
-    const gridElementsCount = this.grid().filter(participant => !!participant).length;
+    const gridElementsCount = this.grid().grid.filter(participant => !!participant).length;
     return this.minimized && gridElementsCount > 1;
   }
 
@@ -124,7 +115,7 @@ class GroupVideoGrid {
 
   getSizeForVideo(index: number, participant: Participant) {
     const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-    const grid = this.grid();
+    const grid = this.grid().grid;
 
     const isAlone = grid.filter(member => !!member).length === 1;
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== null : grid[index - 1] !== null;
@@ -170,7 +161,7 @@ ko.components.register('group-video-grid', {
   template: `
     <div class="group-video">
       <div class="group-video-grid" data-bind="
-        foreach: {data: grid, as: 'participant', noChildContext: true, afterRender: scaleVideos},
+        foreach: {data: grid().grid, as: 'participant', noChildContext: true, afterRender: scaleVideos},
         css: {'group-video-grid--black-background': hasBlackBackground()}"
       >
         <!-- ko if: participant -->
@@ -184,6 +175,17 @@ ko.components.register('group-video-grid', {
           </div>
         <!-- /ko -->
       </div>
+      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream -->
+        <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
+          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream">
+          </video>
+          <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
+            <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
+              <micoff-icon></micoff-icon>
+            </div>
+          <!-- /ko -->
+        </div>
+      <!-- /ko -->
     </div>
   `,
   templateold: `
@@ -211,11 +213,11 @@ ko.components.register('group-video-grid', {
             </div>
           <!-- /ko -->
         </div>
-        <!-- ko if: thumbnailStream() && thumbnailStream().stream -->
+        <!-- ko if: thumbnailParticipant && thumbnailParticipant.videoStream -->
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailStream().videoSend()}, sourceStream: thumbnailStream().stream, muteMediaElement: thumbnailStream().stream">
+            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailParticipant().hasActiveVideo()}, sourceStream: thumbnailParticipant().videoStream">
             </video>
-            <!-- ko if: !thumbnailStream().audioSend() && !minimized -->
+            <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
               <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
                 <micoff-icon></micoff-icon>
               </div>

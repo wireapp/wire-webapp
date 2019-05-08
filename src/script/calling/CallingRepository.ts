@@ -51,6 +51,8 @@ export class CallingRepository {
   private readonly mediaConstraintsHandler: any;
   private readonly serverTimeHandler: any;
 
+  private selfUserId: UserId;
+  private selfClientId: DeviceId;
   private wUser: number | undefined;
   private callingApi: any | undefined;
   private readonly activeCalls: ko.ObservableArray<Call>;
@@ -109,7 +111,9 @@ export class CallingRepository {
     this._enableDebugging();
   }
 
-  initAvs(selfUserId: string, clientId: string) {
+  initAvs(selfUserId: UserId, clientId: DeviceId) {
+    this.selfUserId = selfUserId;
+    this.selfClientId = clientId;
     getAvsInstance().then((callingInstance: any) => {
       const {callingApi, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
       this.callingApi = callingApi;
@@ -133,10 +137,17 @@ export class CallingRepository {
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     callingApi.init(avsEnv);
 
-    callingApi.setUserMediaHandler((audio: boolean, video: boolean, screen: boolean) => {
-      const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
-      return navigator.mediaDevices.getUserMedia(constraints);
-    });
+    callingApi.setUserMediaHandler(
+      (converationId: ConversationId, audio: boolean, video: boolean, screen: boolean): Promise<MediaStream> => {
+        const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
+        return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
+          const selfParticipant = this.activeCalls()[0].selfParticipant;
+          selfParticipant.videoStream = new MediaStream(mediaStream.getVideoTracks());
+          selfParticipant.videoState(VIDEO_STATE.STARTED);
+          return mediaStream;
+        });
+      }
+    );
 
     callingApi.setVideoTrackHandler(
       (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
@@ -205,7 +216,13 @@ export class CallingRepository {
       hasVideo: boolean,
       shouldRing: boolean
     ) => {
-      const call = new Call(conversationId, CALL_STATE.INCOMING, hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.AUDIO);
+      const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
+      const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.AUDIO;
+      const call = new Call(conversationId, selfParticipant);
+      if (isVideoCall) {
+        this.loadVideoPreview(call);
+      }
+
       this.storeCall(call);
     };
 
@@ -225,7 +242,7 @@ export class CallingRepository {
       videoStateChanged //vstateh,
     );
 
-    callingApi.set_group_chgjson_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
+    callingApi.set_participant_changed_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
       const call = this.findCall(conversationId);
       if (call) {
         const {members} = JSON.parse(membersJson);
@@ -287,9 +304,21 @@ export class CallingRepository {
 
   removeCall(call: Call) {
     const index = this.activeCalls().indexOf(call);
+    if (call.selfParticipant.videoStream) {
+      call.selfParticipant.videoStream.getTracks().forEach(track => track.stop());
+    }
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
+  }
+
+  loadVideoPreview(call: Call) {
+    // if it's a video call we query the video user media in order to display the video preview
+    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, false);
+    navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
+      call.selfParticipant.videoStream = mediaStream;
+      call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+    });
   }
 
   /**
@@ -398,7 +427,8 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   startCall(conversationId: ConversationId, conversationType: number, callType: number) {
-    const call = new Call(conversationId, CALL_STATE.NONE, callType);
+    const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
+    const call = new Call(conversationId, selfParticipant);
     this.storeCall(call);
     this.callingApi.start(this.wUser, conversationId, callType, conversationType, false);
   }
