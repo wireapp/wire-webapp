@@ -386,7 +386,7 @@ class FlowEntity {
     const hadMediaStream = !!mediaStream;
     this._createPeerConnection().then(() => {
       if (!mediaStream) {
-        // @todo Remove report after debugging purpose achieved
+        // TODO: Remove report after debugging purpose achieved
         const customData = {
           hadMediaStream,
           hasMediaStream: !!mediaStream,

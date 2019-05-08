@@ -33,6 +33,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 
 async function createEncodedCiphertext(
   preKey,
@@ -323,8 +324,10 @@ describe('Event Repository', () => {
     it('processes OTR events', () => {
       const text = 'Hello, this is a test!';
       const ownClientId = 'f180a823bf0d1204';
+      const client = new ClientEntity();
+      client.id = ownClientId;
 
-      TestFactory.client_repository.currentClient(new z.client.ClientEntity({id: ownClientId}));
+      TestFactory.client_repository.currentClient(client);
       TestFactory.cryptography_repository.createCryptobox.and.callThrough();
 
       return Promise.resolve()
