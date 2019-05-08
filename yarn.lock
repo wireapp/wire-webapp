@@ -1562,10 +1562,10 @@
     fs-extra "7.0.1"
     logdown "3.2.7"
 
-"@wireapp/eslint-config@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.0.0.tgz#13ad48b6fa4ed3303e6d3e914691c11003fdf421"
-  integrity sha512-Z847IrRpQuhjLt4UVPpJFsL8DAfQRBj2w7EHHBTdLaaoFKKcNvl9Sh86EPL8DdTJmjfdR+3GEYHFo8DXTDCW1A==
+"@wireapp/eslint-config@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.0.1.tgz#f23cc0d20c43ef9ece425a5be8d33132fc67e6a9"
+  integrity sha512-Q4tNKQegWDEqnBBOwIDit6X/91XyJ1nO9NXVf9HfdI+8IBYp7ny/nPzYcsUA2sdvTjMuQZ7uUFgob0s6HIaHjQ==
 
 "@wireapp/lru-cache@3.1.0":
   version "3.1.0"
