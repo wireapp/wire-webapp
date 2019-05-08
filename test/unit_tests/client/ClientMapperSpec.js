@@ -41,7 +41,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBe(true);
-      expect(clientEntity.isRemote()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
@@ -62,7 +61,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.TEMPORARY);
       expect(clientEntity.isPermanent()).toBe(false);
-      expect(clientEntity.isRemote()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(true);
     });
 
@@ -75,7 +73,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.meta.isVerified()).toBe(false);
       expect(clientEntity.isPermanent()).toBe(false);
-      expect(clientEntity.isRemote()).toBe(true);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
@@ -94,7 +91,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.class).toBe(clientPayload.class);
       expect(clientEntity.meta.isVerified()).toBe(true);
       expect(clientEntity.isPermanent()).toBe(false);
-      expect(clientEntity.isRemote()).toBe(true);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
@@ -146,7 +142,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBe(true);
-      expect(clientEntity.isRemote()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
@@ -169,7 +164,6 @@ describe('ClientMapper', () => {
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
       expect(clientEntity.isPermanent()).toBe(true);
-      expect(clientEntity.isRemote()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
   });

@@ -80,23 +80,10 @@ export class ClientEntity {
     return zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
-  /**
-   * @returns `true`, if the client is the self user's permanent client.
-   */
   isPermanent(): boolean {
     return this.type === ClientType.PERMANENT;
   }
 
-  /**
-   * @returns `true`, if it is **not** the client of the self user.
-   */
-  isRemote(): boolean {
-    return !this.isPermanent() && !this.isTemporary();
-  }
-
-  /**
-   * @returns `true`, if the client is the self user's temporary client.
-   */
   isTemporary(): boolean {
     return this.type === ClientType.TEMPORARY;
   }
