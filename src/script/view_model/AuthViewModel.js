@@ -196,6 +196,7 @@ class AuthViewModel {
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
     this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
+    this.brandName = Config.BRAND_NAME;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;

@@ -75,7 +75,7 @@
           <div id="section-verify" class="section">
             <form id="form-verify-account" class="form" data-bind="submit: verify_account">
               <div class="auth-headline" data-bind="text: t('authVerifyAccountHeadline')"></div>
-              <div class="auth-headline-sub" data-bind="text: t('authVerifyAccountDetail')"></div>
+              <div class="auth-headline-sub" data-bind="text: t('authVerifyAccountDetail', brandName)"></div>
               <div id="wire-verify-account-email-container" class="form-control">
                 <input class="input email" id="wire-verify-account-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
                        data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, attr: {title: t('authPlaceholderEmail'), placeholder: t('authPlaceholderEmail')}, textInput: username"
@@ -182,7 +182,7 @@
           </div>
 
           <div id="section-limit" class="section">
-            <div class="auth-headline" data-bind="text: t('authLimitDescription')"></div>
+            <div class="auth-headline" data-bind="text: t('authLimitDescription', brandName)"></div>
             <div class="footer">
               <div class="column">
                 <span class="button button-white button-fluid"
@@ -200,11 +200,11 @@
 
           <div id="section-history" class="section">
             <!-- ko if: deviceReused -->
-              <div class="auth-headline" data-bind="text: t('authHistoryReuseHeadline')"></div>
+              <div class="auth-headline" data-bind="text: t('authHistoryReuseHeadline', brandName)"></div>
               <div class="auth-headline-sub" data-bind="text: t('authHistoryReuseDescription')"></div>
             <!-- /ko -->
             <!-- ko ifnot: deviceReused -->
-              <div class="auth-headline" data-bind="text: t('authHistoryHeadline')"></div>
+              <div class="auth-headline" data-bind="text: t('authHistoryHeadline', brandName)"></div>
               <div class="auth-headline-sub" data-bind="text: t('authHistoryDescription')"></div>
             <!-- /ko -->
             <div class="footer">
@@ -241,13 +241,13 @@
           <div id="section-blocked" class="section">
             <div class="form-blocked">
               <div id="form-blocked-cookies" class="blocked-content" data-bind="visible: blocked_mode_cookies">
-                <div class="auth-headline" data-bind="text: t('authBlockedCookies')"></div>
+                <div class="auth-headline" data-bind="text: t('authBlockedCookies', brandName)"></div>
               </div>
               <div id="form-blocked-database" class="blocked-content" data-bind="visible: blocked_mode_database">
-                <div class="auth-headline" data-bind="text: t('authBlockedDatabase')"></div>
+                <div class="auth-headline" data-bind="text: t('authBlockedDatabase', brandName)"></div>
               </div>
               <div id="form-blocked-tabs" class="blocked-content" data-bind="visible: blocked_mode_tabs">
-                <div class="auth-headline blocked-headline" data-bind="text: t('authBlockedTabs')"></div>
+                <div class="auth-headline blocked-headline" data-bind="text: t('authBlockedTabs', brandName)"></div>
                 <span class="auth-text-link" data-bind="click: clickOnHandover, text: t('authBlockedTabsAction')"></span>
               </div>
             </div>
