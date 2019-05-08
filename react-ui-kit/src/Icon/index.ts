@@ -40,6 +40,8 @@ export * from './OptionsIcon';
 export * from './PingIcon';
 export * from './PlaneIcon';
 export * from './ProfileIcon';
+export * from './RecordIcon';
+export * from './RecordPendingIcon';
 export * from './ServicesIcon';
 export * from './SettingsIcon';
 export * from './SpeakerIcon';
