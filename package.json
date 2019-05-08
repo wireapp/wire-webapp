@@ -79,7 +79,7 @@
     "@types/uuid": "3.4.4",
     "@types/webpack-env": "1.13.9",
     "@wireapp/copy-config": "0.5.5",
-    "@wireapp/eslint-config": "1.0.0",
+    "@wireapp/eslint-config": "1.0.1",
     "@wireapp/prettier-config": "0.2.0",
     "@wireapp/tslint-config": "1.0.0",
     "autoprefixer": "9.5.1",
