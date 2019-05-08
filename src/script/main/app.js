@@ -364,7 +364,7 @@ class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications'));
+        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();

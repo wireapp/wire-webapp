@@ -44,7 +44,7 @@
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
               <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
-            <!-- /ko -->         
+            <!-- /ko -->
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
@@ -211,7 +211,7 @@
       <!-- ko if: showInviteForm() -->
         <div class="invite-bubble-link">
           <div class="invite-content">
-            <div class="invite-header" data-bind="text: t('inviteHeadline')"></div>
+            <div class="invite-header" data-bind="text: t('inviteHeadline', brandName)"></div>
             <div class="invite-link-box">
               <div class="fade-wrapper">
                 <textarea data-bind="value: inviteMessage" class="message" dir="auto"></textarea>
