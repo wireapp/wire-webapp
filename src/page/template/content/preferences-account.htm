@@ -151,7 +151,7 @@
         <hr class="preferences-separator">
         <header class="preferences-header" data-bind="text: t('preferencesOptionsBackupHeader')"></header>
         <div class="preferences-link accent-text" data-bind="click: clickOnBackupExport, text: t('preferencesOptionsBackupExportHeadline')" data-uie-name="do-backup-export"></div>
-        <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupExportSecondary')"></div>
+        <div class="preferences-detail" data-bind="text: t('preferencesOptionsBackupExportSecondary', brandName)"></div>
         <label class="preferences-link accent-text preferences-history-backup-import-field" data-uie-name="do-backup-import">
           <span data-bind="text: t('preferencesOptionsBackupImportHeadline')"></span>
           <input type="file" data-bind="event: {change: onImportFileChange}, attr: {accept: `.${z.viewModel.content.HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}" data-uie-name="input-import-file"/>

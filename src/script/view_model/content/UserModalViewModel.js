@@ -19,6 +19,7 @@
 
 import {noop} from 'Util/util';
 
+import {Config} from '../../auth/config';
 import {Actions} from 'Components/panel/userActions';
 
 export class UserModalViewModel {
@@ -36,6 +37,7 @@ export class UserModalViewModel {
       this.onClosedCallback();
     };
     this.hide = () => this.isVisible(false);
+    this.brandName = Config.BRAND_NAME;
   }
 
   onUserAction = userAction => {

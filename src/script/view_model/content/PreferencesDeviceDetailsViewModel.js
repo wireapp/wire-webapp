@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
 
+import {Config} from '../../auth/config';
 import {WebAppEvents} from '../../event/WebApp';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
@@ -51,6 +52,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
     this.sessionResetState = ko.observable(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+    this.brandName = Config.BRAND_NAME;
 
     this.device.subscribe(clientEntity => {
       if (clientEntity) {
