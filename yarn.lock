@@ -1624,10 +1624,10 @@
     dexie "2.0.4"
     fs-extra "7.0.1"
 
-"@wireapp/tslint-config@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.0.0.tgz#c79a558294bb4a3253261caeb97ecfcee2144e79"
-  integrity sha512-dHqflGGtACc4Ej19DycEmU7xENKjokAFCSxqBzr5msjLCmnhYZHA4ytCVvXyUBMaGknN+qmiIR/rPIVHIWEsUw==
+"@wireapp/tslint-config@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.0.2.tgz#89b4c369c2659c83fe15404e99297f86056fef03"
+  integrity sha512-pOCfDE6vclBTuILiX+Qvl6bYS1Y69PBfkfjOJhTm8XIdsZkT+WP+3eG981fOF2Xjf+SLYmnEtxZK8Rs8UgGhBQ==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
