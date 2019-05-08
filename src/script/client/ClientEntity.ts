@@ -33,6 +33,7 @@ export class ClientEntity {
   class: string;
   cookie?: string;
   id: string;
+  isSelfClient: boolean;
   label?: string;
   location?: object;
   meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
@@ -40,7 +41,9 @@ export class ClientEntity {
   time?: string;
   type?: ClientType;
 
-  constructor(public isSelfClient = false) {
+  constructor(isSelfClient = false) {
+    this.isSelfClient = isSelfClient;
+
     this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
     this.id = '';
 
