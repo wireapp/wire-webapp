@@ -51,6 +51,8 @@ import {
   PingIcon,
   PlaneIcon,
   ProfileIcon,
+  RecordIcon,
+  RecordPendingIcon,
   ServicesIcon,
   SettingsIcon,
   SpeakerIcon,
@@ -93,6 +95,8 @@ class DemoIcons extends React.PureComponent {
           <PingIcon height={32} />
           <PlaneIcon height={32} />
           <ProfileIcon height={32} />
+          <RecordPendingIcon width={32} />
+          <RecordIcon width={32} />
           <ServicesIcon height={32} />
           <SettingsIcon height={32} />
           <SpeakerIcon height={32} />
