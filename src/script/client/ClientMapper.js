@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.client = z.client || {};
+import {ClientEntity} from './ClientEntity';
 
-z.client.ClientMapper = class ClientMapper {
+export class ClientMapper {
   static get CONFIG() {
     return {
       CLIENT_PAYLOAD: ['class', 'id'],
@@ -35,10 +34,10 @@ z.client.ClientMapper = class ClientMapper {
    *
    * @param {Object} clientPayload - Client data
    * @param {boolean} isSelfClient - Creating self client
-   * @returns {z.client.ClientEntity} Mapped client entity
+   * @returns {ClientEntity} Mapped client entity
    */
   mapClient(clientPayload, isSelfClient) {
-    const clientEntity = new z.client.ClientEntity(isSelfClient);
+    const clientEntity = new ClientEntity(isSelfClient);
 
     ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._mapMember(clientEntity, clientPayload, name));
 
@@ -47,7 +46,7 @@ z.client.ClientMapper = class ClientMapper {
     }
 
     if (clientPayload.meta) {
-      const {userId} = z.client.ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
+      const {userId} = ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
 
       clientEntity.meta.isVerified(clientPayload.meta.is_verified);
       clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
@@ -62,7 +61,7 @@ z.client.ClientMapper = class ClientMapper {
    *
    * @param {Array<Object>} clientsPayload - Clients data
    * @param {boolean} isSelfClient - Creating self client
-   * @returns {Array<z.client.ClientEntity>} - Mapped client entities
+   * @returns {Array<ClientEntity>} - Mapped client entities
    */
   mapClients(clientsPayload, isSelfClient) {
     return clientsPayload.map(clientPayload => this.mapClient(clientPayload, isSelfClient));
@@ -71,7 +70,7 @@ z.client.ClientMapper = class ClientMapper {
   /**
    * Update a client entity or object from JSON.
    *
-   * @param {z.client.ClientEntity|Object} clientData - Client data
+   * @param {ClientEntity|Object} clientData - Client data
    * @param {Object} updatePayload - JSON possibly containing updates
    * @returns {Object} Contains the client and whether there was a change
    */
@@ -97,4 +96,4 @@ z.client.ClientMapper = class ClientMapper {
       clientEntity[memberName] = payloadValue;
     }
   }
-};
+}

@@ -19,6 +19,7 @@
 
 import {User} from 'src/script/entity/User';
 import {ACCENT_ID} from 'src/script/config';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 
 describe('User', () => {
   describe('First Name', () => {
@@ -92,10 +93,10 @@ describe('User', () => {
 
   describe('add_client', () =>
     it('accepts clients which are no duplicates', () => {
-      const first_client = new z.client.ClientEntity();
+      const first_client = new ClientEntity();
       first_client.id = '5021d77752286cac';
 
-      const second_client = new z.client.ClientEntity();
+      const second_client = new ClientEntity();
       second_client.id = '575b7a890cdb7635';
 
       const user_et = new User();

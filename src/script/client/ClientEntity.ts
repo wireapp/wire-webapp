@@ -18,19 +18,28 @@
  */
 
 import ko from 'knockout';
+import {isString} from 'underscore';
 
 import {zeroPadding} from 'Util/util';
+import {ClientMapper} from './ClientMapper';
 import {ClientType} from './ClientType';
 
-window.z = window.z || {};
-window.z.client = z.client || {};
+export class ClientEntity {
+  static CONFIG = {
+    DEFAULT_VALUE: '?',
+  };
 
-class ClientEntity {
-  static get CONFIG() {
-    return {
-      DEFAULT_VALUE: '?',
-    };
-  }
+  address?: string;
+  class: string;
+  cookie?: string;
+  id: string;
+  isSelfClient: boolean;
+  label?: string;
+  location?: object;
+  meta: {isVerified: ko.Observable<boolean>; primaryKey?: string};
+  model?: string;
+  time?: string;
+  type?: ClientType;
 
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;
@@ -53,62 +62,43 @@ class ClientEntity {
       isVerified: ko.observable(false),
       primaryKey: undefined,
     };
-
-    this.session = {};
   }
 
   /**
    * Splits an ID into user ID & client ID.
-   * @param {string} id - Client ID to be dismantled
-   * @returns {Object} Object containing the user ID & client ID
    */
-  static dismantleUserClientId(id) {
-    const [userId, clientId] = _.isString(id) ? id.split('@') : [];
+  static dismantleUserClientId(id: string): {clientId: string; userId: string} {
+    const [userId, clientId] = isString(id) ? id.split('@') : ([] as string[]);
     return {clientId, userId};
   }
 
   /**
    * Returns the ID of a client in a format suitable for UI display in user preferences.
-   * @returns {Array<string>} Client ID in pairs of two as an array
+   * @returns Client ID in pairs of two as an array
    */
-  formatId() {
+  formatId(): string[] {
     return zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
-  /**
-   * @returns {boolean} True, if the client is the self user's permanent client.
-   */
-  isPermanent() {
+  isPermanent(): boolean {
     return this.type === ClientType.PERMANENT;
   }
 
-  /**
-   * @returns {boolean} - True, if it is NOT the client of the self user.
-   */
-  isRemote() {
-    return !this.isPermanent() && !this.isTemporary();
-  }
-
-  /**
-   * @returns {boolean} - True, if the client is the self user's temporary client.
-   */
-  isTemporary() {
+  isTemporary(): boolean {
     return this.type === ClientType.TEMPORARY;
   }
 
   /**
-   * This method returns a JSON object which can be stored in our local database.
-   * @returns {Object} Client data as JSON object
+   * This method returns an object which can be stored in our local database.
    */
-  toJson() {
+  toJson(): Record<string, any> {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
-    delete jsonObject.session;
 
-    z.client.ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
 
     if (this.isSelfClient) {
-      z.client.ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
     }
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
@@ -122,7 +112,7 @@ class ClientEntity {
     return jsonObject;
   }
 
-  _removeDefaultValues(jsonObject, memberName) {
+  _removeDefaultValues(jsonObject: Record<string, any>, memberName: string) {
     if (jsonObject.hasOwnProperty(memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {
@@ -131,6 +121,3 @@ class ClientEntity {
     }
   }
 }
-
-export {ClientEntity};
-z.client.ClientEntity = ClientEntity;
