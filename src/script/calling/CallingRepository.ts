@@ -42,7 +42,7 @@ import {DeviceId, Participant, UserId} from './Participant';
 
 import {WebAppEvents} from '../event/WebApp';
 
-import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, VIDEO_STATE, getAvsInstance} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, VIDEO_STATE, Wcall, getAvsInstance} from 'avs-web';
 
 export class CallingRepository {
   private readonly backendClient: any;
@@ -54,7 +54,7 @@ export class CallingRepository {
   private selfUserId: UserId;
   private selfClientId: DeviceId;
   private wUser: number | undefined;
-  private wCall: any | undefined;
+  private wCall: Wcall | undefined;
   private readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
 
@@ -114,14 +114,14 @@ export class CallingRepository {
   initAvs(selfUserId: UserId, clientId: DeviceId) {
     this.selfUserId = selfUserId;
     this.selfClientId = clientId;
-    getAvsInstance().then((callingInstance: any) => {
+    getAvsInstance().then(callingInstance => {
       const {wCall, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
       this.wCall = wCall;
       this.wUser = wUser;
     });
   }
 
-  configureCallingApi(wCall: any, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
+  configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
     const log = (name: string) => {
       return function() {
         // eslint-disable-next-line no-console
@@ -129,7 +129,7 @@ export class CallingRepository {
       };
     };
     const avsLogger = getLogger('avs');
-    wCall.set_log_handler((level: number, message: string) => {
+    wCall.setLogHandler((level: number, message: string, arg: any) => {
       // TODO handle levels
       avsLogger.debug(message);
     });
@@ -167,7 +167,7 @@ export class CallingRepository {
     );
 
     const requestConfig = () => {
-      this.getConfig().then((config: any) => wCall.config_update(this.wUser, 0, JSON.stringify(config)));
+      this.getConfig().then((config: any) => wCall.configUpdate(this.wUser, 0, JSON.stringify(config)));
       return 0;
     };
 
@@ -240,10 +240,11 @@ export class CallingRepository {
       log('metricsh'), //metricsh,
       requestConfig, //cfg_reqh,
       log('acbrh'), //acbrh,
-      videoStateChanged //vstateh,
+      videoStateChanged, //vstateh,
+      0
     );
 
-    wCall.set_participant_changed_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
+    wCall.setParticipantChangedHandler(wUser, (conversationId: ConversationId, membersJson: string) => {
       const call = this.findCall(conversationId);
       if (call) {
         const {members} = JSON.parse(membersJson);
@@ -259,8 +260,8 @@ export class CallingRepository {
       }
     });
 
-    wCall.set_mute_handler(wUser, this.isMuted);
-    wCall.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
+    wCall.setMuteHandler(wUser, this.isMuted);
+    wCall.setStateHandler(wUser, (conversationId: ConversationId, state: number) => {
       const call = this.findCall(conversationId);
       if (!call) {
         this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
@@ -282,7 +283,7 @@ export class CallingRepository {
           break;
       }
     });
-    setInterval(wCall.poll, 500);
+    setInterval(wCall.poll.bind(wCall), 500);
 
     return {wCall, wUser};
   }
@@ -360,9 +361,9 @@ export class CallingRepository {
   onCallEvent(event: any, source: string) {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const toSecond = timestamp => Math.floor(timestamp / 1000);
+    const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
-    const res = this.wCall.recv_msg(
+    const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
       contentStr.length,
@@ -426,7 +427,7 @@ export class CallingRepository {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const call = new Call(conversationId, conversationType, selfParticipant);
     this.storeCall(call);
-    this.wCall.start(this.wUser, conversationId, callType, conversationType, false);
+    this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
   }
 
   upgradeToScreenshare(conversationId: ConversationId) {
@@ -442,7 +443,7 @@ export class CallingRepository {
   }
 
   answerCall(conversationId: ConversationId, callType: number) {
-    this.wCall.answer(this.wUser, conversationId, callType, false);
+    this.wCall.answer(this.wUser, conversationId, callType, 0);
   }
 
   rejectCall(conversationId: ConversationId) {
@@ -455,14 +456,16 @@ export class CallingRepository {
   }
 
   muteCall(conversationId: ConversationId, isMuted: boolean) {
-    this.wCall.set_mute(this.wUser, isMuted);
+    this.wCall.setMute(this.wUser, isMuted ? 1 : 0);
   }
 
-  callTypeFromMediaType(mediaType: MediaType): number {
-    const types = {
+  callTypeFromMediaType(mediaType: MediaType): CALL_TYPE {
+    const types: Record<MediaType, CALL_TYPE> = {
       [MediaType.AUDIO]: CALL_TYPE.NORMAL,
       [MediaType.AUDIO_VIDEO]: CALL_TYPE.VIDEO,
       [MediaType.SCREEN]: CALL_TYPE.VIDEO,
+      [MediaType.VIDEO]: CALL_TYPE.VIDEO,
+      [MediaType.NONE]: CALL_TYPE.NORMAL,
     };
 
     return types[mediaType] || CALL_TYPE.NORMAL;
@@ -640,7 +643,9 @@ export class CallingRepository {
         const expirationDate = new Date(Date.now() + timeout);
         callingConfig.expiration = expirationDate;
 
-        const turnServersConfig = (callingConfig.ice_servers || []).map(server => server.urls.join('\n')).join('\n');
+        const turnServersConfig = (callingConfig.ice_servers || [])
+          .map((server: any) => server.urls.join('\n'))
+          .join('\n');
         const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
 ${turnServersConfig}`;
         this.callLogger.info(logMessage);
