@@ -170,14 +170,14 @@ ko.components.register('group-video-grid', {
             attr: {'data-uie-name': 'item-grid', 'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
             event: {dblclick: doubleClickedOnVideo}"
           >
-            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream">
+            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream()">
             </video>
           </div>
         <!-- /ko -->
       </div>
-      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream -->
+      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream() -->
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream">
+          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
           </video>
           <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
@@ -213,9 +213,9 @@ ko.components.register('group-video-grid', {
             </div>
           <!-- /ko -->
         </div>
-        <!-- ko if: thumbnailParticipant && thumbnailParticipant.videoStream -->
+        <!-- ko if: thumbnailParticipant && thumbnailParticipant.videoStream() -->
           <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailParticipant().hasActiveVideo()}, sourceStream: thumbnailParticipant().videoStream">
+            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailParticipant().hasActiveVideo()}, sourceStream: thumbnailParticipant().videoStream()">
             </video>
             <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
               <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">

@@ -23,7 +23,6 @@ import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
 import {CALL_TYPE} from 'avs-web';
-import {WebAppEvents} from '../../event/WebApp';
 import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
 import {AudioType} from '../../audio/AudioType';
 
@@ -108,7 +107,7 @@ class ConversationListCallingCell {
     };
     this.showMaximize = ko.pureComputed(() => false /*TODOthis.multitasking.isMinimized() && this.isConnected()*/);
 
-    this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
+    this.disableScreenButton = false; // !this.callingRepository.supportsScreenSharing;
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -218,7 +217,7 @@ class ConversationListCallingCell {
 
   onToggleScreen(data, event) {
     event.stopPropagation();
-    amplify.publish(WebAppEvents.CALL.MEDIA.CHOOSE_SCREEN, this.conversation.id);
+    this.callingRepository.upgradeToScreenshare(this.conversation.id);
   }
 
   onToggleVideo(data, event) {

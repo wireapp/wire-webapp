@@ -143,8 +143,7 @@ export class CallingRepository {
         return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
           if (video) {
             const selfParticipant = this.activeCalls()[0].selfParticipant;
-            selfParticipant.videoStream = new MediaStream(mediaStream.getVideoTracks());
-            selfParticipant.videoState(VIDEO_STATE.STARTED);
+            selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
           }
           return mediaStream;
         });
@@ -163,7 +162,7 @@ export class CallingRepository {
           return;
         }
 
-        participant.videoStream = new MediaStream(tracks);
+        participant.videoStream(new MediaStream(tracks));
       }
     );
 
@@ -303,9 +302,7 @@ export class CallingRepository {
 
   removeCall(call: Call) {
     const index = this.activeCalls().indexOf(call);
-    if (call.selfParticipant.videoStream) {
-      call.selfParticipant.videoStream.getTracks().forEach(track => track.stop());
-    }
+    call.selfParticipant.releaseVideoStream();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
@@ -316,8 +313,7 @@ export class CallingRepository {
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
     navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-      call.selfParticipant.videoStream = mediaStream;
-      call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
     });
   }
 
@@ -426,11 +422,23 @@ export class CallingRepository {
    * @param {CALL_TYPE} callType - Type of call (audio or video)
    * @returns {undefined} No return value
    */
-  startCall(conversationId: ConversationId, conversationType: number, callType: number) {
+  startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE) {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const call = new Call(conversationId, conversationType, selfParticipant);
     this.storeCall(call);
     this.wCall.start(this.wUser, conversationId, callType, conversationType, false);
+  }
+
+  upgradeToScreenshare(conversationId: ConversationId) {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+    // TODO restore retro-compatibility with getUserMedia
+    navigator.mediaDevices.getDisplayMedia().then(mediaStream => {
+      this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
+      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.SCREENSHARE);
+    });
   }
 
   answerCall(conversationId: ConversationId, callType: number) {
