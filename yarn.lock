@@ -1211,10 +1211,10 @@
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
   integrity sha512-FGd6J1GQ7zvl1GZ3BBev83B7nfak8dqoR2PZ+l5MoisKMpd4xOLhZJC1ugpmk3Rz5F85t6HbOg9mYqXW97BsNA==
 
-"@types/react-redux@7.0.7":
-  version "7.0.7"
-  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.0.7.tgz#55492cb022559f1e1e8685b66b2fee1383ff123a"
-  integrity sha512-IrGTb1UZEP2EdOudTsfLEihL/C/U7nHxvSsMwJmPF9zRGJuCMo28ELVnlhtRtkxYmZT+4IE2Nm1IhTN4z64T4Q==
+"@types/react-redux@7.0.8":
+  version "7.0.8"
+  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.0.8.tgz#c928863058e334d41031c6bedd0f113bc514e234"
+  integrity sha512-vIBC15E84ehN6RzdGwRVa41whp9e4CkfPm+WfD0r6y6vqBf4tQPKZeKEBfLLM8k79uSwQC7rh3rH/MFaN1IESQ==
   dependencies:
     "@types/hoist-non-react-statics" "^3.3.0"
     "@types/react" "*"
