@@ -54,7 +54,7 @@ export class CallingRepository {
   private selfUserId: UserId;
   private selfClientId: DeviceId;
   private wUser: number | undefined;
-  private callingApi: any | undefined;
+  private wCall: any | undefined;
   private readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
 
@@ -115,13 +115,13 @@ export class CallingRepository {
     this.selfUserId = selfUserId;
     this.selfClientId = clientId;
     getAvsInstance().then((callingInstance: any) => {
-      const {callingApi, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
-      this.callingApi = callingApi;
+      const {wCall, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
+      this.wCall = wCall;
       this.wUser = wUser;
     });
   }
 
-  configureCallingApi(callingApi: any, selfUserId: string, selfClientId: string): {wUser: number; callingApi: any} {
+  configureCallingApi(wCall: any, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
     const log = (name: string) => {
       return function() {
         // eslint-disable-next-line no-console
@@ -129,15 +129,15 @@ export class CallingRepository {
       };
     };
     const avsLogger = getLogger('avs');
-    callingApi.set_log_handler((level: number, message: string) => {
+    wCall.set_log_handler((level: number, message: string) => {
       // TODO handle levels
       avsLogger.debug(message);
     });
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
-    callingApi.init(avsEnv);
+    wCall.init(avsEnv);
 
-    callingApi.setUserMediaHandler(
+    wCall.setUserMediaHandler(
       (converationId: ConversationId, audio: boolean, video: boolean, screen: boolean): Promise<MediaStream> => {
         const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
         return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
@@ -151,7 +151,7 @@ export class CallingRepository {
       }
     );
 
-    callingApi.setVideoTrackHandler(
+    wCall.setVideoTrackHandler(
       (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
         let participant = this.findParticipant(conversationId, userId);
         if (!participant) {
@@ -168,7 +168,7 @@ export class CallingRepository {
     );
 
     const requestConfig = () => {
-      this.getConfig().then((config: any) => callingApi.config_update(this.wUser, 0, JSON.stringify(config)));
+      this.getConfig().then((config: any) => wCall.config_update(this.wUser, 0, JSON.stringify(config)));
       return 0;
     };
 
@@ -219,8 +219,8 @@ export class CallingRepository {
       shouldRing: boolean
     ) => {
       const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-      const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.AUDIO;
-      const call = new Call(conversationId, selfParticipant);
+      const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+      const call = new Call(conversationId, CONV_TYPE.ONEONONE, selfParticipant);
       if (isVideoCall) {
         this.loadVideoPreview(call);
       }
@@ -228,7 +228,7 @@ export class CallingRepository {
       this.storeCall(call);
     };
 
-    const wUser = callingApi.create(
+    const wUser = wCall.create(
       selfUserId,
       selfClientId,
       log('readyh'), //readyh,
@@ -244,7 +244,7 @@ export class CallingRepository {
       videoStateChanged //vstateh,
     );
 
-    callingApi.set_participant_changed_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
+    wCall.set_participant_changed_handler(wUser, (conversationId: ConversationId, membersJson: string) => {
       const call = this.findCall(conversationId);
       if (call) {
         const {members} = JSON.parse(membersJson);
@@ -260,8 +260,8 @@ export class CallingRepository {
       }
     });
 
-    callingApi.set_mute_handler(wUser, this.isMuted);
-    callingApi.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
+    wCall.set_mute_handler(wUser, this.isMuted);
+    wCall.set_state_handler(wUser, (conversationId: ConversationId, state: number) => {
       const call = this.findCall(conversationId);
       if (!call) {
         this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
@@ -283,9 +283,9 @@ export class CallingRepository {
           break;
       }
     });
-    setInterval(callingApi.poll, 500);
+    setInterval(wCall.poll, 500);
 
-    return {callingApi, wUser};
+    return {wCall, wUser};
   }
 
   findCall(conversationId: ConversationId): Call | undefined {
@@ -294,10 +294,7 @@ export class CallingRepository {
 
   findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
     const call = this.findCall(conversationId);
-    if (!call) {
-      return;
-    }
-    return call.participants().find(participant => participant.userId === userId);
+    return call && call.participants().find(participant => participant.userId === userId);
   }
 
   storeCall(call: Call) {
@@ -316,7 +313,8 @@ export class CallingRepository {
 
   loadVideoPreview(call: Call) {
     // if it's a video call we query the video user media in order to display the video preview
-    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, false);
+    const isGroup = call.conversationType === CONV_TYPE.GROUP;
+    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
     navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
       call.selfParticipant.videoStream = mediaStream;
       call.selfParticipant.videoState(VIDEO_STATE.STARTED);
@@ -368,7 +366,7 @@ export class CallingRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = timestamp => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
-    const res = this.callingApi.recv_msg(
+    const res = this.wCall.recv_msg(
       this.wUser,
       contentStr,
       contentStr.length,
@@ -430,18 +428,18 @@ export class CallingRepository {
    */
   startCall(conversationId: ConversationId, conversationType: number, callType: number) {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-    const call = new Call(conversationId, selfParticipant);
+    const call = new Call(conversationId, conversationType, selfParticipant);
     this.storeCall(call);
-    this.callingApi.start(this.wUser, conversationId, callType, conversationType, false);
+    this.wCall.start(this.wUser, conversationId, callType, conversationType, false);
   }
 
   answerCall(conversationId: ConversationId, callType: number) {
-    this.callingApi.answer(this.wUser, conversationId, callType, false);
+    this.wCall.answer(this.wUser, conversationId, callType, false);
   }
 
   rejectCall(conversationId: ConversationId) {
     // TODO sort out if rejection should be shared accross devices (does avs handle it?)
-    this.callingApi.reject(this.wUser, conversationId);
+    this.wCall.reject(this.wUser, conversationId);
   }
 
   removeParticipant(conversationId: ConversationId, userId: UserId) {
@@ -449,7 +447,7 @@ export class CallingRepository {
   }
 
   muteCall(conversationId: ConversationId, isMuted: boolean) {
-    this.callingApi.set_mute(this.wUser, isMuted);
+    this.wCall.set_mute(this.wUser, isMuted);
   }
 
   callTypeFromMediaType(mediaType: MediaType): number {
@@ -469,7 +467,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   leaveCall(conversationId: ConversationId) {
-    this.callingApi.end(this.wUser, conversationId);
+    this.wCall.end(this.wUser, conversationId);
   }
 
   /**
@@ -554,7 +552,7 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   leaveCallOnUnload() {
-    this.activeCalls().forEach((call: Call) => this.callingApi.end(this.wUser, call.conversationId));
+    this.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));
   }
 
   //##############################################################################
