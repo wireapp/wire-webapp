@@ -57,7 +57,7 @@ const tabBarItemStyle: <T>(props: TabBarItemProps<T>) => ObjectInterpolation<und
 }) => {
   return {
     ...textStyle({bold, block, color, center, fontSize, textTransform, ...props}),
-    borderBottom: active ? `1px solid ${COLOR.GRAY_DARKEN_48}` : 'none',
+    borderBottom: active ? `1px solid ${COLOR.GRAY_DARKEN_48}` : `1px solid ${COLOR.GRAY_LIGHTEN_40}`,
     cursor: 'pointer',
     display: 'flex',
     flexGrow: 1,
