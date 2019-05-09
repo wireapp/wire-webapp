@@ -11648,10 +11648,10 @@ stylelint-config-idiomatic-order@7.0.0:
     stylelint "^10.0.1"
     stylelint-order "^3.0.0"
 
-stylelint-config-prettier@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-5.0.0.tgz#e7339da065dac8129ca821e234abddcef950b7f8"
-  integrity sha512-ksd78d8Kfq5CCDaT7C+/5O8RyDnRMkLNsqcpqXtdDkHIkIN9lNTdFeYo6clMFw0MmtibO8Mb7/AbEcZysAKRpw==
+stylelint-config-prettier@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-5.1.0.tgz#bbc21d4b0dc01c8d19c181c2cca68fb8dadb515b"
+  integrity sha512-xRWnMTVxVcBJ2lHi0Y1B0Gr8RoXC6SsnXNYb5sjmDYupf2fxx67uxrms8jni1pviR/4QkwlqKuuH6Z4nXWnPWw==
 
 stylelint-order@^3.0.0:
   version "3.0.0"
