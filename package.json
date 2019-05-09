@@ -143,7 +143,7 @@
     "sinon": "7.3.2",
     "stylelint": "9.10.1",
     "stylelint-config-idiomatic-order": "7.0.0",
-    "stylelint-config-prettier": "5.0.0",
+    "stylelint-config-prettier": "5.1.0",
     "svg-inline-loader": "0.8.0",
     "terser-webpack-plugin": "1.2.3",
     "tslint": "5.16.0",
