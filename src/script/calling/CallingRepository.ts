@@ -141,9 +141,11 @@ export class CallingRepository {
       (converationId: ConversationId, audio: boolean, video: boolean, screen: boolean): Promise<MediaStream> => {
         const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
         return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-          const selfParticipant = this.activeCalls()[0].selfParticipant;
-          selfParticipant.videoStream = new MediaStream(mediaStream.getVideoTracks());
-          selfParticipant.videoState(VIDEO_STATE.STARTED);
+          if (video) {
+            const selfParticipant = this.activeCalls()[0].selfParticipant;
+            selfParticipant.videoStream = new MediaStream(mediaStream.getVideoTracks());
+            selfParticipant.videoState(VIDEO_STATE.STARTED);
+          }
           return mediaStream;
         });
       }
