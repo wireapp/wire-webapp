@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.1.1...@wireapp/react-ui-kit@6.1.2) (2019-05-09)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** TabBarItem gray inactive line ([#1813](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1813)) ([e18ecd4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e18ecd4))
+
+
+
+
+
 ## [6.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.1.0...@wireapp/react-ui-kit@6.1.1) (2019-05-08)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
