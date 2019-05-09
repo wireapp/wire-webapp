@@ -28,6 +28,8 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 
+import 'Components/legalHoldDot';
+
 export class ConversationListViewModel {
   /**
    * View model for conversation list.

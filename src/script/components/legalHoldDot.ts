@@ -34,12 +34,14 @@ ko.components.register('legal-hold-dot', {
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({isPending, large, conversation}: LegalHoldParams) {
+  viewModel: function({isPending = false, large = false, conversation}: LegalHoldParams) {
     this.large = large;
     this.isPending = isPending;
     this.conversation = conversation;
 
-    this.onClick = () => console.log('click');
-    this.dispose = () => {};
+    this.onClick = () => {
+      // TODO: Implement opening the legal hold modal once built
+      // if a conversation is passed, open the conversation specific modal, otherwise the one for the selfuser
+    };
   },
 });
