@@ -46,7 +46,7 @@
     "switch-path": "1.2.0",
     "uint32": "0.2.1",
     "underscore": "1.9.1",
-    "url-search-params-polyfill": "5.1.0",
+    "url-search-params-polyfill": "6.0.0",
     "uuidjs": "4.2.1",
     "webrtc-adapter": "6.4.8"
   },
