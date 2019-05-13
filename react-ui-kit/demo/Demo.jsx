@@ -18,6 +18,7 @@
  */
 
 import {
+  Avatar,
   COLOR,
   Container,
   ContainerXS,
@@ -26,6 +27,7 @@ import {
   H1,
   HeaderMenu,
   HeaderSubMenu,
+  Line,
   Loading,
   Logo,
   MenuLink,
@@ -46,6 +48,7 @@ import {DemoModals} from './DemoModals';
 import {DemoTypography} from './DemoTypography';
 import Helmet from 'react-helmet';
 import React from 'react';
+import {avatarBase64} from './avatarImage';
 
 class Demo extends React.PureComponent {
   state = {
@@ -152,6 +155,49 @@ class Demo extends React.PureComponent {
             <Pill type={PILL_TYPE.error}>Error Pill</Pill>
             <Pill type={PILL_TYPE.success}>Success Pill</Pill>
             <Pill type={PILL_TYPE.warning}>Warning Pill</Pill>
+          </Container>
+          <Container>
+            <Line />
+            <H1>Avatars</H1>
+            <div
+              style={{
+                alignItems: 'center',
+                display: 'grid',
+                gridGap: 16,
+                gridTemplateColumns: 'repeat(6, 1fr)',
+                justifyItems: 'center',
+              }}
+            >
+              <Avatar
+                size={120}
+                fontSize={20}
+                name={'Joe Do'}
+                forceInitials={false}
+                base64Image={avatarBase64}
+                borderColor={'#fb0807'}
+                backgroundColor={'#2085C2'}
+              />
+              <Avatar
+                size={120}
+                fontSize={20}
+                name={'Joe Do'}
+                forceInitials={true}
+                borderColor={'#fb0807'}
+                backgroundColor={'#2085C2'}
+              />
+              <Avatar
+                size={64}
+                fontSize={20}
+                name={'Joe Do'}
+                forceInitials={false}
+                base64Image={avatarBase64}
+                borderColor={'#fb0807'}
+                backgroundColor={'#2085C2'}
+              />
+              <Avatar size={64} fontSize={20} name={'Joe Do'} backgroundColor={'#2085C2'} />
+              <Avatar size={32} fontSize={20} name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
+              <Avatar size={24} fontSize={20} name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
+            </div>
           </Container>
           <DemoIcons />
           <DemoLayouts />
