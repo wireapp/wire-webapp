@@ -40,7 +40,7 @@
     "sinon": "7.3.2",
     "sinon-har-server": "0.3.0",
     "typescript": "3.4.5",
-    "webpack": "4.30.0",
+    "webpack": "4.31.0",
     "webpack-cli": "3.3.2",
     "webpack-dev-server": "3.3.1"
   },
