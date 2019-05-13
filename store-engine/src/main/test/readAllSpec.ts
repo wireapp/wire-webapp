@@ -52,8 +52,6 @@ export const readAllSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    const allEntities = [homer, lisa, marge];
-
     Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
@@ -61,10 +59,7 @@ export const readAllSpec = {
     ])
       .then(() => engine.readAll<DomainEntity>(TABLE_NAME))
       .then(records => {
-        expect(records.length).toBe(allEntities.length);
-        for (const counter in records) {
-          expect(records[counter].firstName).toBe(allEntities[counter].entity.firstName);
-        }
+        expect(records.length).toBe(3);
         done();
       })
       .catch(error => done.fail(error));

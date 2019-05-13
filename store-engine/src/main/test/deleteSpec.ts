@@ -58,8 +58,8 @@ export const deleteSpec = {
       .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
       .then(primaryKeys => {
         expect(primaryKeys.length).toBe(expectedRemainingEntities);
-        expect(primaryKeys[0]).toBe(homer.primaryKey);
-        expect(primaryKeys[1]).toBe(marge.primaryKey);
+        expect(primaryKeys.includes(homer.primaryKey));
+        expect(primaryKeys.includes(marge.primaryKey));
         done();
       })
       .catch(error => done.fail(error));

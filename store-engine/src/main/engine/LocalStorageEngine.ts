@@ -42,7 +42,11 @@ export class LocalStorageEngine implements CRUDEngine {
   }
 
   private createKey(tableName: string, primaryKey: string): string {
-    return `${this.storeName}@${tableName}@${primaryKey}`;
+    return `${this.createPrefix(tableName)}${primaryKey}`;
+  }
+
+  private createPrefix(tableName: string): string {
+    return `${this.storeName}@${tableName}@`;
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
@@ -84,7 +88,7 @@ export class LocalStorageEngine implements CRUDEngine {
   public deleteAll(tableName: string): Promise<boolean> {
     return Promise.resolve().then(() => {
       Object.keys(localStorage).forEach((key: string) => {
-        const prefix = `${this.storeName}@${tableName}@`;
+        const prefix = this.createPrefix(tableName);
         if (key.startsWith(prefix)) {
           localStorage.removeItem(key);
         }
@@ -113,7 +117,7 @@ export class LocalStorageEngine implements CRUDEngine {
     const promises: Promise<T>[] = [];
 
     Object.keys(localStorage).forEach((key: string) => {
-      const prefix = `${this.storeName}@${tableName}@`;
+      const prefix = this.createPrefix(tableName);
       if (key.startsWith(prefix)) {
         const primaryKey = key.replace(prefix, '');
         promises.push(this.read(tableName, primaryKey));
@@ -127,7 +131,7 @@ export class LocalStorageEngine implements CRUDEngine {
     const primaryKeys: string[] = [];
 
     Object.keys(localStorage).forEach((primaryKey: string) => {
-      const prefix = `${this.storeName}@${tableName}@`;
+      const prefix = this.createPrefix(tableName);
       if (primaryKey.startsWith(prefix)) {
         primaryKeys.push(primaryKey.replace(prefix, ''));
       }

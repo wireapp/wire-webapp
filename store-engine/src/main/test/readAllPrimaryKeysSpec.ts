@@ -47,8 +47,6 @@ export const readAllPrimaryKeysSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    const allEntities = [homer, lisa, marge];
-
     Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
@@ -56,10 +54,10 @@ export const readAllPrimaryKeysSpec = {
     ])
       .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
       .then(primaryKeys => {
-        expect(primaryKeys.length).toBe(allEntities.length);
-        for (const counter in allEntities) {
-          expect(primaryKeys[counter]).toBe(allEntities[counter].primaryKey);
-        }
+        expect(primaryKeys.length).toBe(3);
+        expect(primaryKeys.includes(homer.primaryKey));
+        expect(primaryKeys.includes(lisa.primaryKey));
+        expect(primaryKeys.includes(marge.primaryKey));
         done();
       })
       .catch(error => done.fail(error));

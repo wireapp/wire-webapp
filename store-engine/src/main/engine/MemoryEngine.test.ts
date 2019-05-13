@@ -40,75 +40,77 @@ async function initEngine(shouldCreateNewEngine = true) {
   return storeEngine;
 }
 
-beforeEach(async done => {
-  engine = await initEngine();
-  done();
-});
-
-describe('init', () => {
-  it('resolves with direct access to the complete in-memory store.', async () => {
-    engine = new MemoryEngine();
-    const inMemory = await engine.init(STORE_NAME);
-    expect(inMemory[STORE_NAME]).toBeDefined();
+describe('MemoryEngine', () => {
+  beforeEach(async done => {
+    engine = await initEngine();
+    done();
   });
-});
 
-describe('append', () => {
-  Object.entries(appendSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('init', () => {
+    it('resolves with direct access to the complete in-memory store.', async () => {
+      engine = new MemoryEngine();
+      const inMemory = await engine.init(STORE_NAME);
+      expect(inMemory[STORE_NAME]).toBeDefined();
+    });
   });
-});
 
-describe('create', () => {
-  Object.entries(createSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('append', () => {
+    Object.entries(appendSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('delete', () => {
-  Object.entries(deleteSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('create', () => {
+    Object.entries(createSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('deleteAll', () => {
-  Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('delete', () => {
+    Object.entries(deleteSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('purge', () => {
-  Object.entries(purgeSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine, initEngine));
+  describe('deleteAll', () => {
+    Object.entries(deleteAllSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('readAllPrimaryKeys', () => {
-  Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('purge', () => {
+    Object.entries(purgeSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine, initEngine));
+    });
   });
-});
 
-describe('readAll', () => {
-  Object.entries(readAllSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('readAllPrimaryKeys', () => {
+    Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('read', () => {
-  Object.entries(readSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('readAll', () => {
+    Object.entries(readAllSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('updateOrCreate', () => {
-  Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('read', () => {
+    Object.entries(readSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
-});
 
-describe('update', () => {
-  Object.entries(updateSpec).map(([description, testFunction]) => {
-    it(description, done => testFunction(done, engine));
+  describe('updateOrCreate', () => {
+    Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
+  });
+
+  describe('update', () => {
+    Object.entries(updateSpec).map(([description, testFunction]) => {
+      it(description, done => testFunction(done, engine));
+    });
   });
 });
