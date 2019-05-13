@@ -214,8 +214,8 @@ export class CallingRepository {
       conversationId: ConversationId,
       timestamp: number,
       userId: UserId,
-      hasVideo: boolean,
-      shouldRing: boolean
+      hasVideo: number,
+      shouldRing: number
     ) => {
       const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
       const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
@@ -427,6 +427,9 @@ export class CallingRepository {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const call = new Call(conversationId, conversationType, selfParticipant);
     this.storeCall(call);
+    if (conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO) {
+      this.loadVideoPreview(call);
+    }
     this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
   }
 
@@ -451,6 +454,16 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
+  /**
+   * User action to leave a call.
+   *
+   * @param {string} conversationId - ID of conversation to leave call in
+   * @returns {undefined} No return value
+   */
+  leaveCall(conversationId: ConversationId) {
+    this.wCall.end(this.wUser, conversationId);
+  }
+
   removeParticipant(conversationId: ConversationId, userId: UserId) {
     throw new Error('TODO: implement removeParticipant');
   }
@@ -469,16 +482,6 @@ export class CallingRepository {
     };
 
     return types[mediaType] || CALL_TYPE.NORMAL;
-  }
-
-  /**
-   * User action to leave a call.
-   *
-   * @param {string} conversationId - ID of conversation to leave call in
-   * @returns {undefined} No return value
-   */
-  leaveCall(conversationId: ConversationId) {
-    this.wCall.end(this.wUser, conversationId);
   }
 
   /**
@@ -718,24 +721,6 @@ ${turnServersConfig}`;
   _sendReport(customData) {
     Raygun.send(new Error('Call failure report'), customData);
     this.callLogger.debug(`Reported status of flow id '${customData.meta.flowId}' for call analysis`, customData);
-  }
-  */
-
-  /**
-   * Throw error is not expected types.
-   *
-   * @private
-   * @param {z.error.CallError|Error} error - Error thrown during call message handling
-   * @returns {undefined} No return value
-   */
-  /*
-  _throwMessageError(error) {
-    const expectedErrorTypes = [z.error.CallError.TYPE.MISTARGETED_MESSAGE, z.error.CallError.TYPE.NOT_FOUND];
-    const isExpectedError = expectedErrorTypes.includes(error.type);
-
-    if (!isExpectedError) {
-      throw error;
-    }
   }
   */
 
