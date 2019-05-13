@@ -54,7 +54,7 @@ const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
-  console.log('sdf', Config.BRAND_NAME);
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
