@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/copy": "0.3.1",
     "@types/cosmiconfig": "5.0.3",
-    "@types/fs-extra": "5.0.5",
+    "@types/fs-extra": "5.1.0",
     "@types/jszip": "3.1.5",
     "@types/rimraf": "2.0.2",
     "jasmine": "3.4.0"
