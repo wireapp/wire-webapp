@@ -31,7 +31,7 @@
     "nock": "10.0.6",
     "rimraf": "2.6.3",
     "terser-webpack-plugin": "1.2.3",
-    "typescript": "3.4.4",
+    "typescript": "3.4.5",
     "webpack": "4.30.0",
     "webpack-cli": "3.3.2"
   },
