@@ -115,7 +115,8 @@ const _supportsNotifications = () => {
   return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
 };
 const _supportsScreenSharing = () => {
-  return window.desktopCapturer || _isFirefox();
+  const hasScreenCaptureAPI = window.desktopCapturer || navigator.mediaDevices.getDisplayMedia;
+  return hasScreenCaptureAPI || _isFirefox();
 };
 
 // add body information
