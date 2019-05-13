@@ -18,12 +18,12 @@
  */
 import {createRandomUuid} from 'Util/util';
 
-import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {encryptAesAsset} from './AssetCrypto';
+import {AssetRemoteData} from './AssetRemoteData';
 
 describe('AssetRemoteData', () => {
   describe('load unencrypted v1 asset', () => {
-    let remote_data = null;
+    let remote_data: AssetRemoteData;
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
 
@@ -37,14 +37,14 @@ describe('AssetRemoteData', () => {
     });
 
     it('should load and decrypt v1 asset', () => {
-      return remote_data.load().then(blob => {
+      return remote_data.load().then((blob: Blob) => {
         expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
       });
     });
   });
 
   describe('load encrypted v2 asset', () => {
-    let remote_data = null;
+    let remote_data: AssetRemoteData;
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
 
@@ -58,7 +58,7 @@ describe('AssetRemoteData', () => {
     });
 
     it('should load and decrypt v2 asset', () => {
-      return remote_data.load().then(blob => {
+      return remote_data.load().then((blob: Blob) => {
         expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
       });
     });
