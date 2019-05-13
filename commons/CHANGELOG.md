@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.6.7...@wireapp/commons@1.7.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/be7c254))
+
+
+
+
+
 ## [1.6.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.6.6...@wireapp/commons@1.6.7) (2019-05-07)
 
 **Note:** Version bump only for package @wireapp/commons

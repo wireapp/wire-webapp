@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.1.2...@wireapp/react-ui-kit@6.2.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/be7c254))
+
+
+
+
+
 ## [6.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.1.1...@wireapp/react-ui-kit@6.1.2) (2019-05-09)
 
 

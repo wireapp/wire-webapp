@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.3.60...bazinga64@5.4.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/be7c254))
+
+
+
+
+
 ## [5.3.60](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.3.59...bazinga64@5.3.60) (2019-04-23)
 
 **Note:** Version bump only for package bazinga64

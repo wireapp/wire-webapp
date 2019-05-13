@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@10.0.2...@wireapp/cryptobox@10.1.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/be7c254))
+
+
+
+
+
 ## [10.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@10.0.1...@wireapp/cryptobox@10.0.2) (2019-05-07)
 
 **Note:** Version bump only for package @wireapp/cryptobox

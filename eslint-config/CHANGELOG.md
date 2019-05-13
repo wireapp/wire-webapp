@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.0.1...@wireapp/eslint-config@1.1.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/be7c254))
+
+
+
+
+
 ## [1.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.0.0...@wireapp/eslint-config@1.0.1) (2019-04-24)
 
 **Note:** Version bump only for package @wireapp/eslint-config

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.0.0...@wireapp/proteus@9.1.0) (2019-05-13)
+
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/be7c254))
+
+
+
+
+
 # [9.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@8.0.52...@wireapp/proteus@9.0.0) (2019-04-23)
 
 
