@@ -17,6 +17,7 @@
  *
  */
 
-export * from './Logo';
-export * from './colors';
 export * from './Animation';
+export * from './Avatar';
+export * from './colors';
+export * from './Logo';
