@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.2.0...@wireapp/react-ui-kit@6.3.0) (2019-05-13)
+
+
+### Features
+
+* **react-ui-kit:** New invite icon (clock) ([#1822](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1822)) ([79c8bc2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/79c8bc2))
+
+
+
+
+
 # [6.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.1.2...@wireapp/react-ui-kit@6.2.0) (2019-05-13)
 
 
