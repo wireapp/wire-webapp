@@ -3,7 +3,7 @@
     "collect-licenses": "dist/cli.js"
   },
   "dependencies": {
-    "fs-extra": "7.0.1",
+    "fs-extra": "8.0.0",
     "logdown": "3.2.8",
     "npm-license-crawler": "0.2.1",
     "npm-registry-package-info": "1.0.5"
