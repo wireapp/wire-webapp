@@ -21,7 +21,7 @@
     "ts-node": "8.1.0",
     "typescript": "3.4.4",
     "webpack": "4.30.0",
-    "webpack-cli": "3.3.1"
+    "webpack-cli": "3.3.2"
   },
   "description": "Provides a generic storage layer for File, FileSystem, IndexedDB, Memory & LocalStorage.",
   "files": [
