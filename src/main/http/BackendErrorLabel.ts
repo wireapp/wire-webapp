@@ -17,10 +17,11 @@
  *
  */
 
-// @note: Backend error labels are defined by the backend team and their source code.
-// @see: https://github.com/wireapp/wire-server/blob/master/services/galley/src/Galley/API/Error.hs
-
-enum BackendErrorLabel {
+/**
+ * @note Backend error labels are defined by the backend team and their source code.
+ * @see https://github.com/wireapp/wire-server/blob/master/services/galley/src/Galley/API/Error.hs
+ */
+export enum BackendErrorLabel {
   ACCESS_DENIED = 'access-denied',
   BAD_REQUEST = 'bad-request',
   CLIENT_ERROR = 'client-error',
@@ -76,5 +77,3 @@ enum BackendErrorLabel {
   // Service errors
   SERVICE_NOT_FOUND = 'service-not-found', // defined by web team
 }
-
-export {BackendErrorLabel};

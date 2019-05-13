@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,19 @@
  *
  */
 
-import {BackendErrorLabel, StatusCode} from '../http/';
-
-class BackendError extends Error {
-  code: StatusCode;
-  label: BackendErrorLabel;
-  message: string;
-
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.UNKNOWN,
-    code: StatusCode = StatusCode.UNKNOWN
-  ) {
-    super(message);
-    this.code = code;
-    this.label = label;
-    this.message = message;
-    // see https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, BackendError.prototype);
-  }
+export interface BackendCookie {
+  /**  The cookie's creation time */
+  created: string;
+  /**  The cookie's expiration time */
+  expires: string;
+  /**  The primary cookie identifier */
+  id: number;
+  /**  The cookie's type = ['session', 'persistent'] */
+  type: 'session' | 'persistent';
+  /**  The cookie's label */
+  label: string;
 }
 
-export {BackendError};
+export interface CookieList {
+  cookies: BackendCookie[];
+}

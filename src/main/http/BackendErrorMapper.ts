@@ -32,63 +32,57 @@ import {UnconnectedUserError, UserIsUnknownError} from '../user/';
 import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 class BackendErrorMapper {
-  public static get ERRORS(): {
-    [code: number]: {
-      [label: string]: {
-        [message: string]: BackendError;
-      };
-    };
-  } {
+  public static get ERRORS(): Record<number, Record<string, Record<string, BackendError>>> {
     return {
       [StatusCode.BAD_REQUEST]: {
         [BackendErrorLabel.CLIENT_ERROR]: {
-          ["[path] 'cnv' invalid: Failed reading: Invalid UUID"]: new ConversationIsUnknownError(
+          'Error in $: Failed reading: satisfy': new BackendError('Wrong set of parameters.'),
+          "[path] 'cnv' invalid: Failed reading: Invalid UUID": new ConversationIsUnknownError(
             'Conversation ID is unknown.'
           ),
-          ["[path] 'usr' invalid: Failed reading: Invalid UUID"]: new UserIsUnknownError('User ID is unknown.'),
-          ['Error in $: Failed reading: satisfy']: new BackendError('Wrong set of parameters.'),
+          "[path] 'usr' invalid: Failed reading: Invalid UUID": new UserIsUnknownError('User ID is unknown.'),
         },
         [BackendErrorLabel.INVALID_INVITATION_CODE]: {
-          ['Invalid invitation code.']: new InvalidInvitationCodeError('Invalid invitation code.'),
+          'Invalid invitation code.': new InvalidInvitationCodeError('Invalid invitation code.'),
         },
       },
       [StatusCode.FORBIDDEN]: {
         [BackendErrorLabel.INVALID_CREDENTIALS]: {
-          ['Authentication failed.']: new InvalidCredentialsError(
+          'Authentication failed.': new InvalidCredentialsError(
             'Authentication failed because of invalid credentials.'
           ),
-          ['Token expired']: new TokenExpiredError('Authentication failed because the token is expired.'),
-          ['Missing cookie']: new MissingCookieError('Authentication failed because the cookie is missing.'),
-          ['Invalid token']: new InvalidTokenError('Authentication failed because the token is invalid.'),
+          'Invalid token': new InvalidTokenError('Authentication failed because the token is invalid.'),
+          'Missing cookie': new MissingCookieError('Authentication failed because the cookie is missing.'),
+          'Token expired': new TokenExpiredError('Authentication failed because the token is expired.'),
         },
         [BackendErrorLabel.NOT_CONNECTED]: {
-          ['Users are not connected']: new UnconnectedUserError('Users are not connected.'),
+          'Users are not connected': new UnconnectedUserError('Users are not connected.'),
         },
         [BackendErrorLabel.INVALID_OPERATION]: {
-          ['invalid operation for 1:1 conversations']: new ConversationOperationError('Cannot leave 1:1 conversation.'),
+          'invalid operation for 1:1 conversations': new ConversationOperationError('Cannot leave 1:1 conversation.'),
         },
         [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
-          ['Account suspended.']: new SuspendedAccountError('Account suspended.'),
+          'Account suspended.': new SuspendedAccountError('Account suspended.'),
         },
       },
       [StatusCode.TOO_MANY_REQUESTS]: {
         [BackendErrorLabel.CLIENT_ERROR]: {
-          ['Logins too frequent']: new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
+          'Logins too frequent': new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
         },
       },
       [StatusCode.CONFLICT]: {
         [BackendErrorLabel.INVITE_EMAIL_EXISTS]: {
-          ['The given e-mail address is in use.']: new InviteEmailInUseError('The given e-mail address is in use.'),
+          'The given e-mail address is in use.': new InviteEmailInUseError('The given e-mail address is in use.'),
         },
         [BackendErrorLabel.KEY_EXISTS]: {
-          ['The given e-mail address or phone number is in use.']: new IdentifierExistsError(
+          'The given e-mail address or phone number is in use.': new IdentifierExistsError(
             'The given e-mail address or phone number is in use.'
           ),
         },
       },
       [StatusCode.NOT_FOUND]: {
         [BackendErrorLabel.NOT_FOUND]: {
-          ['Service not found']: new ServiceNotFoundError('Service not found'),
+          'Service not found': new ServiceNotFoundError('Service not found'),
         },
       },
     };

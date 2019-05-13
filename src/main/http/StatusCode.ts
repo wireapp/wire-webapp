@@ -17,7 +17,7 @@
  *
  */
 
-enum StatusCode {
+export enum StatusCode {
   ACCEPTED = 202,
   BAD_GATEWAY = 502,
   BAD_REQUEST = 400,
@@ -36,5 +36,3 @@ enum StatusCode {
   UNAUTHORIZED = 401,
   UNKNOWN = -1,
 }
-
-export {StatusCode};

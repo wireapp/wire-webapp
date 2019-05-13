@@ -27,12 +27,10 @@ class TeamInvitationAPI {
   static readonly MAX_CHUNK_SIZE = 100;
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      INFO: 'info',
-      INVITATIONS: 'invitations',
-    };
-  }
+  static URL = {
+    INFO: 'info',
+    INVITATIONS: 'invitations',
+  };
 
   public getInvitation(teamId: string, invitationId: string): Promise<TeamInvitation> {
     const config: AxiosRequestConfig = {

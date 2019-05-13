@@ -27,19 +27,17 @@ import {Consent} from './Consent';
 class SelfAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      CONSENT: 'consent',
-      EMAIL: 'email',
-      HANDLE: 'handle',
-      LOCALE: 'locale',
-      NAME: 'name',
-      PASSWORD: 'password',
-      PHONE: 'phone',
-      SEARCHABLE: 'searchable',
-      SELF: '/self',
-    };
-  }
+  static URL = {
+    CONSENT: 'consent',
+    EMAIL: 'email',
+    HANDLE: 'handle',
+    LOCALE: 'locale',
+    NAME: 'name',
+    PASSWORD: 'password',
+    PHONE: 'phone',
+    SEARCHABLE: 'searchable',
+    SELF: '/self',
+  };
 
   /**
    * Remove your email address.
