@@ -12540,11 +12540,6 @@ url-join@^2.0.2:
   resolved "https://registry.yarnpkg.com/url-join/-/url-join-2.0.5.tgz#5af22f18c052a000a48d7b82c5e9c2e2feeda728"
   integrity sha1-WvIvGMBSoACkjXuCxenC4v7tpyg=
 
-url-search-params-polyfill@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-5.1.0.tgz#f0405dcc2e921bf7f5fdf8c4e616f1e8088ef31b"
-  integrity sha512-yjFY7uw2xRf9e8Mg4ZVkZwtp8dMCC4cbBkEIZiTDpuSY2WJ9+Quw0wRhxncv32qaMQwmBQT+P847rO8PrFhhDA==
-
 url-search-params-polyfill@6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-6.0.0.tgz#f5e5fc230d56125f5b0ba67d9cbcd6555fa347e3"
