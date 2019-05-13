@@ -175,7 +175,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
           }
         }
       } else {
-        //tslint:disable:no-console
+        // tslint:disable-next-line:no-console
         console.error('Account registration error', error);
       }
     }
