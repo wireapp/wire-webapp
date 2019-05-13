@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/generate-changelog": "1.7.0",
     "@types/node": "~10",
-    "@wireapp/core": "10.1.1",
+    "@wireapp/core": "10.1.2",
     "commander": "2.20.0",
     "generate-changelog": "1.7.1"
   },
@@ -31,5 +31,5 @@
     "test:project": "yarn dist && yarn test"
   },
   "types": "dist/ChangelogBot.d.ts",
-  "version": "3.0.30"
+  "version": "3.0.31"
 }

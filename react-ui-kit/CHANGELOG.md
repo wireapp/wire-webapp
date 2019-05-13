@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.3.0...@wireapp/react-ui-kit@6.4.0) (2019-05-13)
+
+
+### Features
+
+* **react-ui-kit:** Add Avatar component ([#1823](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1823)) ([db25656](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/db25656))
+
+
+
+
+
 # [6.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.2.0...@wireapp/react-ui-kit@6.3.0) (2019-05-13)
 
 
