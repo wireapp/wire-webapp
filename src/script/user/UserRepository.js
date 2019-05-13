@@ -182,6 +182,16 @@ export class UserRepository {
   }
 
   /**
+   * Retrieves meta information about all the clients of a given user.
+   * @param {string} userId - User ID to retrieve client information for
+   * @param {boolean} updateClients - Automatically update the clients
+   * @returns {Promise<ClientEntity[]>} Resolves with an array of client entities
+   */
+  getClientsByUserId(userId, updateClients = true) {
+    return this.client_repository.getClientsByUserId(userId, updateClients);
+  }
+
+  /**
    * Persists a conversation state in the database.
    * @param {User} userEntity - User which should be persisted
    * @returns {Promise} Resolves when user was saved
@@ -295,7 +305,9 @@ export class UserRepository {
 
       if (wasClientAdded) {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
-          if (publishClient) {
+          if (clientEntity.class === 'legalhold') {
+            amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
+          } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
         });

@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmpty} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
@@ -60,7 +62,7 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchDeleted(recipients, payload) {
-    if (_.isEmpty(recipients)) {
+    if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
@@ -96,6 +98,7 @@ export class ClientMismatchHandler {
    */
   _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
+
     if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
@@ -120,11 +123,16 @@ export class ClientMismatchHandler {
       .then(updatedPayload => {
         payload = updatedPayload;
 
-        const _addMissingClient = (userId, clientId) => this.userRepository.addClientToUser(userId, {id: clientId});
-        return Promise.all(this._mapRecipients(recipients, _addMissingClient));
+        return Promise.all(
+          missingUserIds.map(userId => {
+            return this.userRepository.getClientsByUserId(userId, false).then(clients => {
+              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+            });
+          })
+        );
       })
       .then(() => {
-        this.conversationRepository.verificationStateHandler.onClientsAdded(Object.keys(recipients));
+        this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
         return payload;
       });
   }
@@ -143,7 +151,7 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
-    if (_.isEmpty(recipients)) {
+    if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
@@ -201,11 +209,11 @@ export class ClientMismatchHandler {
     const result = [];
 
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
-      if (_.isFunction(clientFn)) {
+      if (typeof clientFn === 'function') {
         clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
       }
 
-      if (_.isFunction(userFn)) {
+      if (typeof userFn === 'function') {
         result.push(userFn(userId));
       }
     });
