@@ -28,19 +28,19 @@ for (let index = 8; index < percent; index += 8) {
   steps.push(index);
 }
 
-function shade(color: ColorParam, amount = 0.08) {
+function shade(color: ColorParam, amount = 0.08): string {
   return Color(color)
     .mix(Color(BLACK), amount)
     .toString();
 }
 
-function tint(color: ColorParam, amount: number) {
+function tint(color: ColorParam, amount: number): string {
   return Color(color)
     .mix(Color(WHITE), amount)
     .toString();
 }
 
-function opaque(color: ColorParam, amount: number) {
+function opaque(color: ColorParam, amount: number): string {
   return Color(color)
     .fade(1 - amount)
     .toString();
