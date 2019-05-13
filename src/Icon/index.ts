@@ -32,6 +32,7 @@ export * from './FileIcon';
 export * from './GifIcon';
 export * from './HangupIcon';
 export * from './ImageIcon';
+export * from './InviteIcon';
 export * from './LeaveIcon';
 export * from './MessageIcon';
 export * from './MoreIcon';
