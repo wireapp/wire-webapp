@@ -22,7 +22,7 @@
     "react-helmet": "5.2.1",
     "react-hot-loader": "4.8.4",
     "rimraf": "2.6.3",
-    "typescript": "3.4.4",
+    "typescript": "3.4.5",
     "webpack": "4.30.0",
     "webpack-cli": "3.3.2",
     "webpack-dev-server": "3.3.1"
