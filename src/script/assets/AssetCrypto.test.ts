@@ -19,7 +19,7 @@
 
 import {decryptAesAsset, encryptAesAsset} from './AssetCrypto';
 
-describe('AssetsCrypto', () => {
+ describe('AssetCrypto', () => {
   it('should encrypt and decrypt arraybuffer', () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
