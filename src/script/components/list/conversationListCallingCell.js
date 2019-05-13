@@ -30,20 +30,13 @@ import 'Components/list/participantItem';
 import 'Components/groupVideoGrid';
 
 class ConversationListCallingCell {
-  constructor({
-    call,
-    conversation,
-    temporaryUserStyle = false,
-    callingRepository,
-    audioRepository,
-    videoGridRepository,
-  }) {
+  constructor({call, conversation, temporaryUserStyle = false, multitasking, callingRepository, audioRepository}) {
     this.call = call;
     this.conversation = conversation;
     this.temporaryUserStyle = temporaryUserStyle;
+    this.multitasking = multitasking;
     this.callingRepository = callingRepository;
     this.audioRepository = audioRepository;
-    this.videoGridRepository = videoGridRepository;
 
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
@@ -105,7 +98,7 @@ class ConversationListCallingCell {
         .find(participant => participant.hasActiveVideo());
       return hasActiveVideo;
     };
-    this.showMaximize = ko.pureComputed(() => false /*TODOthis.multitasking.isMinimized() && this.isConnected()*/);
+    this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
     this.disableScreenButton = false; // !this.callingRepository.supportsScreenSharing;
 
@@ -118,8 +111,6 @@ class ConversationListCallingCell {
     this.conversation = params.conversation;
 
     const permissionRepository = params.permissionRepository;
-
-    this.multitasking = params.multitasking;
 
     this.calls = this.callingRepository.calls;
     this.call = this.conversation.call;

@@ -21,7 +21,7 @@
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
       <conversation-list-calling-cell
         data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
-        params="call: activeCall, conversation: getConversationById(activeCall.conversationId), callingRepository: callingRepository, audioRepository: audioRepository, videoGridRepository: videoGridRepository"
+        params="call: activeCall, conversation: getConversationById(activeCall.conversationId), multitasking: multitasking, callingRepository: callingRepository, audioRepository: audioRepository"
         data-uie-name="item-call">
       </conversation-list-calling-cell>
     <!-- /ko -->

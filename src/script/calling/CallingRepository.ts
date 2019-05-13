@@ -142,7 +142,8 @@ export class CallingRepository {
         const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
         return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
           if (video) {
-            const selfParticipant = this.activeCalls()[0].selfParticipant;
+            const call = this.findCall(converationId);
+            const selfParticipant = call.selfParticipant;
             selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
           }
           return mediaStream;

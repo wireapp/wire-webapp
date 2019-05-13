@@ -24,6 +24,7 @@ import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
+import {VideoCallingViewModel} from './VideoCallingViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -78,7 +79,7 @@ export class MainViewModel {
     this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
-    this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
+    this.videoCalling = new VideoCallingViewModel(this, repositories);
     this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {

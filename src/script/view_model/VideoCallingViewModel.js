@@ -28,10 +28,7 @@ import {MediaType} from '../media/MediaType';
 import {MediaDeviceType} from '../media/MediaDeviceType';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
+export class VideoCallingViewModel {
   static get CONFIG() {
     return {
       AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
@@ -50,11 +47,10 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.conversationRepository = repositories.conversation;
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
-    this.videoGridRepository = repositories.videoGrid;
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = getLogger('z.viewModel.VideoCallingViewModel');
+    this.logger = getLogger('VideoCallingViewModel');
 
     this.devicesHandler = this.mediaRepository.devicesHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
@@ -70,6 +66,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.isChoosingScreen = ko.observable(false);
 
+    this.HIDE_CONTROLS_TIMEOUT = VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT;
     this.minimizeTimeout = undefined;
 
     this.calls = this.callingRepository.calls;
@@ -304,4 +301,4 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.multitasking.isMinimized(true);
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
-};
+}

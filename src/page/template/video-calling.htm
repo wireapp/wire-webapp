@@ -1,4 +1,4 @@
-<div id="video-calling" data-bind="hide_controls: {timeout: z.viewModel.VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}, css:{'video-calling--active': showFullscreen(), 'video-calling--minimized': multitasking.isMinimized()}" class="video-calling">
+<div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}, css:{'video-calling--active': showFullscreen(), 'video-calling--minimized': multitasking.isMinimized()}" class="video-calling">
   <!-- ko if: showFullscreen() -->
     <div id="video-element-remote" class="video-element-remote">
       <group-video-grid params="videoGridRepository: videoGridRepository"></group-video-grid>
