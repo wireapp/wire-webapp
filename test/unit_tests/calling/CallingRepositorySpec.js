@@ -17,6 +17,7 @@
  *
  */
 
+/*
 import {MediaType} from 'src/script/media/MediaType';
 
 describe('CallingRepository', () => {
@@ -74,3 +75,4 @@ describe('CallingRepository', () => {
     });
   });
 });
+*/

@@ -100,8 +100,9 @@ class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo = (viewModel, {currentTarget}) => {
+  doubleClickedOnVideo = (viewModel: any, {currentTarget}: any) => {
     return; // TODO
+    /*
     const childVideo = currentTarget.querySelector('video');
     const userId = currentTarget.dataset.userId;
     const participant = this.videoParticipants().find(participant => participant.userId === userId);
@@ -111,6 +112,7 @@ class GroupVideoGrid {
     participant.fitContain = hasFitProperty ? !participant.fitContain : !hasFitClass;
 
     childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, participant.fitContain);
+    */
   };
 
   getSizeForVideo(index: number, participant: Participant) {
@@ -227,6 +229,6 @@ ko.components.register('group-video-grid', {
       </div>
     `,
   viewModel: {
-    createViewModel: (params, componentInfo) => new GroupVideoGrid(params, componentInfo.element),
+    createViewModel: (params: any, componentInfo: any) => new GroupVideoGrid(params, componentInfo.element),
   },
 });

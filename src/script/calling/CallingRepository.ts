@@ -21,6 +21,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {getLogger} from 'Util/Logger';
+// @ts-ignore
 import adapter from 'webrtc-adapter';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
@@ -143,8 +144,10 @@ export class CallingRepository {
         return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
           if (video) {
             const call = this.findCall(converationId);
-            const selfParticipant = call.selfParticipant;
-            selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
+            if (call) {
+              const selfParticipant = call.selfParticipant;
+              selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
+            }
           }
           return mediaStream;
         });
@@ -440,7 +443,7 @@ export class CallingRepository {
       return;
     }
     // TODO restore retro-compatibility with getUserMedia
-    navigator.mediaDevices.getDisplayMedia().then(mediaStream => {
+    (navigator.mediaDevices as any).getDisplayMedia().then((mediaStream: MediaStream) => {
       this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
       call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.SCREENSHARE);
     });
