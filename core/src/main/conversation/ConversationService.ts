@@ -869,6 +869,7 @@ class ConversationService {
     return userId;
   }
 
+  // tslint:disable-next-line:typedef
   public async send(payloadBundle: Message, userIds?: string[]) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:

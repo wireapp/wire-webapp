@@ -25,14 +25,12 @@ import {HttpClient} from '../http/';
 class GiphyAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      GIPHY: 'giphy/v1/gifs',
-      PROXY: '/proxy',
-      RANDOM: 'random',
-      SEARCH: 'search',
-    };
-  }
+  static URL = {
+    GIPHY: 'giphy/v1/gifs',
+    PROXY: '/proxy',
+    RANDOM: 'random',
+    SEARCH: 'search',
+  };
 
   /**
    * Get a random GIF from Giphy.

@@ -24,7 +24,7 @@ export function pathWithParams(
   additionalParams?: Record<string, any>,
   whitelistParams?: string[],
   search = window.location.search
-) {
+): string {
   const params: Record<string, any> = paramsToRecord(search);
 
   if (additionalParams) {
@@ -42,7 +42,7 @@ export function pathWithParams(
   return `${path}${queryString ? `?${queryString}` : ''}`;
 }
 
-export function paramsToRecord(params: string) {
+export function paramsToRecord(params: string): Record<string, any> {
   const records: Record<string, any> = {};
   new URLSearchParams(params).forEach((value, key) => {
     records[key] = value;
@@ -50,10 +50,10 @@ export function paramsToRecord(params: string) {
   return records;
 }
 
-export function getURLParameter(parameterName: string, search = window.location.search) {
+export function getURLParameter(parameterName: string, search = window.location.search): string {
   return new URLSearchParams(search).get(parameterName) || '';
 }
 
-export function hasURLParameter(parameterName: string, search = window.location.search) {
+export function hasURLParameter(parameterName: string, search = window.location.search): boolean {
   return !!new URLSearchParams(search).has(parameterName);
 }

@@ -19,29 +19,29 @@
 
 import {CRUDEngine} from '@wireapp/store-engine';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
+
 import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
 import {HttpClient} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user/';
+import {CookieList} from './CookieList';
 import {RegisterData} from './RegisterData';
 
 class AuthAPI {
   constructor(private readonly client: HttpClient, private readonly engine: CRUDEngine) {}
 
-  static get URL() {
-    return {
-      ACCESS: '/access',
-      COOKIES: '/cookies',
-      INITIATE_LOGIN: 'initiate-login',
-      LOGIN: '/login',
-      LOGOUT: 'logout',
-      REGISTER: '/register',
-      SSO: '/sso',
-    };
-  }
+  static URL = {
+    ACCESS: '/access',
+    COOKIES: '/cookies',
+    INITIATE_LOGIN: 'initiate-login',
+    LOGIN: '/login',
+    LOGOUT: 'logout',
+    REGISTER: '/register',
+    SSO: '/sso',
+  };
 
-  public getCookies(labels?: string[]) {
+  public getCookies(labels?: string[]): Promise<AxiosResponse<CookieList>> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {},

@@ -36,7 +36,7 @@ const STORE_NAME = 'store-name';
 
 let engine: CRUDEngine;
 
-async function initEngine(shouldCreateNewEngine = true) {
+async function initEngine(shouldCreateNewEngine = true): Promise<IndexedDBEngine | CRUDEngine> {
   const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
   const db = await storeEngine.init(STORE_NAME);
   db.version(1).stores({

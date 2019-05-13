@@ -34,7 +34,7 @@ const STORE_NAME = 'store-name';
 
 let engine: CRUDEngine;
 
-async function initEngine(shouldCreateNewEngine = true) {
+async function initEngine(shouldCreateNewEngine = true): Promise<MemoryEngine | CRUDEngine> {
   const storeEngine = shouldCreateNewEngine ? new MemoryEngine() : engine;
   await storeEngine.init(STORE_NAME);
   return storeEngine;

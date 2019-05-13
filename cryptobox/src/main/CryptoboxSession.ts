@@ -41,9 +41,7 @@ class CryptoboxSession {
   }
 
   public encrypt(plaintext: string | Uint8Array): Promise<ArrayBuffer> {
-    return this.session.encrypt(plaintext).then(function(ciphertext: ProteusMessage.Envelope) {
-      return ciphertext.serialise();
-    });
+    return this.session.encrypt(plaintext).then((ciphertext: ProteusMessage.Envelope) => ciphertext.serialise());
   }
 
   public fingerprint_local(): string {

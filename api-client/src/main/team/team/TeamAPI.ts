@@ -25,11 +25,9 @@ import {HttpClient} from '../../http/';
 class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      TEAMS: '/teams',
-    };
-  }
+  static URL = {
+    TEAMS: '/teams',
+  };
 
   public postTeam(team: NewTeamData): Promise<void> {
     const config: AxiosRequestConfig = {

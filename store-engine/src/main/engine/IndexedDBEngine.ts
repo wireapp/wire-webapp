@@ -23,7 +23,7 @@ import {LowDiskSpaceError, RecordTypeError, UnsupportedError} from './error/';
 import {RecordAlreadyExistsError} from './error/RecordAlreadyExistsError';
 import {RecordNotFoundError} from './error/RecordNotFoundError';
 
-// @see https://dexie.org/docs/Typescript#create-a-subclass
+/** @see https://dexie.org/docs/Typescript#create-a-subclass */
 export interface DexieInstance extends Dexie {
   [index: string]: any;
 }
@@ -54,7 +54,7 @@ export class IndexedDBEngine implements CRUDEngine {
     }
   }
 
-  // @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space
+  /** @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space */
   private async hasEnoughQuota(): Promise<void> {
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       const {quota, usage} = await navigator.storage.estimate();

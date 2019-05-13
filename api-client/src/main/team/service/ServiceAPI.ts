@@ -25,15 +25,13 @@ import {Provider, Service, ServiceWhitelistData, Services} from './';
 class ServiceAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      PROVIDERS: '/providers',
-      SERVICES: 'services',
-      TEAMS: '/teams',
-      WHITELIST: 'whitelist',
-      WHITELISTED: 'whitelisted',
-    };
-  }
+  static URL = {
+    PROVIDERS: '/providers',
+    SERVICES: 'services',
+    TEAMS: '/teams',
+    WHITELIST: 'whitelist',
+    WHITELISTED: 'whitelisted',
+  };
 
   public getServices(limit: number = 100): Promise<Services> {
     const config: AxiosRequestConfig = {

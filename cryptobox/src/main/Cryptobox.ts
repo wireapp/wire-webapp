@@ -481,7 +481,7 @@ class Cryptobox extends EventEmitter {
     }
   }
 
-  public async deserialize(payload: SerializedCryptobox) {
+  public async deserialize(payload: SerializedCryptobox): Promise<void> {
     await this.deleteData();
     await this.importIdentity(payload.identity);
     await this.importPreKeys(payload.prekeys);

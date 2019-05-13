@@ -26,12 +26,10 @@ const NOTIFICATION_SIZE_MAXIMUM = 10000;
 class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      LAST: 'last',
-      NOTIFICATION: '/notifications',
-    };
-  }
+  static URL = {
+    LAST: 'last',
+    NOTIFICATION: '/notifications',
+  };
 
   /**
    * Fetch the last notification.

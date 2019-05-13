@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,19 @@
  *
  */
 
-/* tslint:disable:object-literal-sort-keys */
-export const WIDTH = {
-  TINY: 320,
-  MOBILE: 480,
-  TABLET_MIN: 640,
-  TABLET_MAX: 919,
-  DESKTOP_MIN: 920,
-  DESKTOP_MAX: 1199,
-  DESKTOP_XL_MIN: 1200,
-  DESKTOP_XL_MAX: 1600,
-};
+export interface BackendCookie {
+  /**  The cookie's creation time */
+  created: string;
+  /**  The cookie's expiration time */
+  expires: string;
+  /**  The primary cookie identifier */
+  id: number;
+  /**  The cookie's type = ['session', 'persistent'] */
+  type: 'session' | 'persistent';
+  /**  The cookie's label */
+  label: string;
+}
 
-export const STEP = 8;
-export const GUTTER = STEP + STEP;
+export interface CookieList {
+  cookies: BackendCookie[];
+}

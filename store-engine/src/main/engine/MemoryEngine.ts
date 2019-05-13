@@ -42,7 +42,7 @@ export class MemoryEngine implements CRUDEngine {
     delete this.stores[this.storeName];
   }
 
-  private prepareTable(tableName: string) {
+  private prepareTable(tableName: string): void {
     if (!this.stores[this.storeName][tableName]) {
       this.stores[this.storeName][tableName] = {};
     }

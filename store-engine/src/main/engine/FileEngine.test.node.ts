@@ -40,7 +40,7 @@ const TEST_DIRECTORY = path.join(BASE_DIRECTORY, STORE_NAME);
 
 let engine: FileEngine;
 
-async function initEngine(shouldCreateNewEngine = true) {
+async function initEngine(shouldCreateNewEngine = true): Promise<FileEngine> {
   const storeEngine = shouldCreateNewEngine ? new FileEngine(BASE_DIRECTORY) : engine;
   await storeEngine.init(STORE_NAME);
   return storeEngine;

@@ -17,7 +17,7 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
+import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import EventEmitter from 'events';
 import logdown from 'logdown';
 
@@ -242,7 +242,7 @@ class APIClient extends EventEmitter {
     this.transport.ws.disconnect(reason);
   }
 
-  private async initEngine(context: Context) {
+  private async initEngine(context: Context): Promise<CRUDEngine> {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     const dbName = `${this.STORE_NAME_PREFIX}@${this.config.urls.name}@${context.userId}${clientType}`;
     this.logger.log(`Initialising store with name "${dbName}"`);

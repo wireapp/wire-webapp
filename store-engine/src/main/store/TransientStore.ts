@@ -79,7 +79,7 @@ export class TransientStore extends EventEmitter {
     return cacheKey.replace(`${this.engine.storeName}@${this.tableName}@`, '');
   }
 
-  private createTransientBundle<T>(record: T, ttl: number) {
+  private createTransientBundle<T>(record: T, ttl: number): {expires: number; payload: T} {
     return {
       expires: Date.now() + ttl,
       payload: record,

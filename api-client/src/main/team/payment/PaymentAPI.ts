@@ -34,18 +34,16 @@ class PaymentAPI {
   static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
   constructor(private readonly client: HttpClient) {}
 
-  static get URL() {
-    return {
-      BILLING: 'billing',
-      CHARGES: 'charges',
-      CURRENCIES: 'currencies',
-      INFO: 'info',
-      INVOICES: 'invoices',
-      PLAN: 'plan',
-      PLANS: 'plans',
-      TEAMS: '/teams',
-    };
-  }
+  static URL = {
+    BILLING: 'billing',
+    CHARGES: 'charges',
+    CURRENCIES: 'currencies',
+    INFO: 'info',
+    INVOICES: 'invoices',
+    PLAN: 'plan',
+    PLANS: 'plans',
+    TEAMS: '/teams',
+  };
 
   public putPaymentData(teamId: string, paymentData: PaymentDataUpdate): Promise<PaymentData> {
     const config: AxiosRequestConfig = {

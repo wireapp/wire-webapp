@@ -17,11 +17,11 @@
  *
  */
 
-import {Config, ConfigOptions} from 'karma';
+import {Config} from 'karma';
 const jasmineConfig = require('./jasmine.json');
 
-module.exports = function(config: Config) {
-  const options: ConfigOptions = {
+module.exports = (config: Config): void => {
+  config.set({
     autoWatch: false,
     basePath: jasmineConfig.spec_dir,
     browserNoActivityTimeout: 90000,
@@ -46,7 +46,5 @@ module.exports = function(config: Config) {
     },
     reporters: ['progress', 'karma-typescript'],
     singleRun: true,
-  };
-
-  config.set({...options});
+  });
 };

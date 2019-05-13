@@ -33,8 +33,7 @@ class BackendError extends Error {
     this.code = code;
     this.label = label;
     this.message = message;
-    // @see
-    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    // see https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     Object.setPrototypeOf(this, BackendError.prototype);
   }
 }

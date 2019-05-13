@@ -19,7 +19,7 @@
 
 import {Config} from 'karma';
 
-module.exports = function(config: Config) {
+module.exports = (config: Config): void => {
   config.set({
     autoWatch: false,
     basePath: 'src/main',
