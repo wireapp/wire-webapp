@@ -17,7 +17,7 @@
  *
  */
 
-import {encryptAesAsset, decryptAesAsset} from 'src/script/assets/AssetCrypto';
+import {decryptAesAsset, encryptAesAsset} from './AssetCrypto';
 
 describe('AssetsCrypto', () => {
   it('should encrypt and decrypt arraybuffer', () => {
@@ -37,7 +37,7 @@ describe('AssetsCrypto', () => {
 
     encryptAesAsset(bytes.buffer)
       .then(({cipherText, keyBytes}) => decryptAesAsset(cipherText, keyBytes, null))
-      .then(done.fail)
+      .then(() => done.fail())
       .catch(() => done());
   });
 
@@ -47,7 +47,7 @@ describe('AssetsCrypto', () => {
 
     encryptAesAsset(bytes.buffer)
       .then(({cipherText, keyBytes}) => decryptAesAsset(cipherText, keyBytes, new Uint8Array([])))
-      .then(done.fail)
+      .then(() => done.fail())
       .catch(() => done());
   });
 });
