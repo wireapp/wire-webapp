@@ -5,7 +5,7 @@
     "@wireapp/lru-cache": "3.1.12",
     "@wireapp/priority-queue": "1.0.2",
     "@wireapp/proteus": "9.1.1",
-    "@wireapp/store-engine": "2.1.1",
+    "@wireapp/store-engine": "2.1.2",
     "bazinga64": "5.4.1",
     "dexie": "2.0.4",
     "fs-extra": "8.0.1",
@@ -58,5 +58,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
-  "version": "10.1.1"
+  "version": "10.1.2"
 }
