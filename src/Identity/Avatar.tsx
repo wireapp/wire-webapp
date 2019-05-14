@@ -26,7 +26,7 @@ interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor: string;
   base64Image?: string;
   borderColor?: string;
-  fetchImage?: () => {};
+  fetchImage?: () => void;
   forceInitials?: boolean;
   name: string;
   size: number;
@@ -42,7 +42,7 @@ const avatarStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = prop
   return {
     alignItems: 'center',
     backgroundColor: backgroundColor,
-    backgroundImage: !forceInitials && `url(data:image/png;base64,${base64Image})`,
+    backgroundImage: forceInitials ? undefined : base64Image && `url(data:image/png;base64,${base64Image})`,
     backgroundPosition: 'center',
     backgroundSize: 'cover',
     borderRadius: '50%',
@@ -73,7 +73,7 @@ const Avatar = (props: Props) => {
 
   useEffect(() => {
     let observer = undefined;
-    if (!fetchImage) {
+    if (fetchImage) {
       observer = new IntersectionObserver(([{isIntersecting}]) => {
         if (isIntersecting) {
           observer.disconnect();
