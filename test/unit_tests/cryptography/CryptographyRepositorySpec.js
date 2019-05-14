@@ -17,7 +17,7 @@
  *
  */
 
-import StoreEngine from '@wireapp/store-engine';
+import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
@@ -114,7 +114,7 @@ describe('CryptographyRepository', () => {
 
       const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
 
-      const bobEngine = new StoreEngine.MemoryEngine();
+      const bobEngine = new MemoryEngine();
       await bobEngine.init('bob');
 
       const bob = new Cryptobox(bobEngine, 1);

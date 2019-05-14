@@ -87,7 +87,9 @@ git tag 2019-04-23-staging.0
 git push origin --tags
 ```
 
-If everything is done right, a deployment job ([Example](https://travis-ci.org/wireapp/wire-webapp/builds/523396493)) should be picked up on Travis CI based on the new tag.
+If everything is done right, you will see a Travis CI job in the [build pipeline](https://travis-ci.org/wireapp/wire-webapp/builds) based on the new tag:
+
+![Staging Release](./docs/release/staging-release.png)
 
 #### Production Release
 
