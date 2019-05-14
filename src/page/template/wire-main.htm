@@ -91,7 +91,7 @@
     <!-- ko foreach: {data: activeCalls, as: 'call', noChildContext: true} -->
       <div data-bind="text: call.state()"></div>
       <!-- ko if: isOngoing(call) && !multitasking.isMinimized() && hasVideos(call) -->
-        <fullscreen-video-call params="videoGrid: getVideoGrid(call), call: call, conversation: getConversationById(call.conversationId), multitasking: multitasking, callActions: callActions"></fullscreen-video-call>
+        <fullscreen-video-call params="videoGrid: getVideoGrid(call), call: call, conversation: getConversationById(call.conversationId), multitasking: multitasking, callActions: callActions, isMuted: callingRepository.isMuted"></fullscreen-video-call>
       <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->

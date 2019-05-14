@@ -35,11 +35,12 @@ export class FullscreenVideoCalling {
     };
   }
 
-  constructor({videoGrid, call, conversation, multitasking, callActions}) {
+  constructor({videoGrid, call, conversation, multitasking, callActions, isMuted}) {
     this.call = call;
     this.conversation = conversation;
     this.videoGrid = videoGrid;
     this.multitasking = multitasking;
+    this.isMuted = isMuted;
     this.callActions = callActions;
 
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
@@ -237,12 +238,6 @@ export class FullscreenVideoCalling {
     this.isChoosingScreen(false);
   }
 
-  clickedOnMuteAudio() {
-    if (this.joinedCall()) {
-      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
-    }
-  }
-
   clickedOnShareScreen() {
     if (!this.disableToggleScreen() && this.joinedCall()) {
       this.chooseSharedScreen(this.joinedCall().id);
@@ -313,6 +308,14 @@ ko.components.register('fullscreen-video-call', {
     <div id="video-controls" class="video-controls hide-controls-hidden">
       <div class="video-controls__fit-info" data-bind="text: t('videoCallOverlayFitVideoLabel')" data-uie-name="label-fit-fill-info"></div>
       <div class="video-controls__wrapper">
+
+        <div class="video-controls__button"
+            data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'video-controls__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}"
+            data-uie-name="do-call-controls-video-call-mute">
+          <micoff-icon></micoff-icon>
+          <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayMute')"></div>
+        </div>
+
         <div class="video-controls__button"
             data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableToggleScreen()}, click: clickedOnShareScreen, css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
             data-uie-name="do-toggle-screen">
