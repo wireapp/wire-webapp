@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.1.3...@wireapp/api-client@4.2.0) (2019-05-14)
+
+
+### Features
+
+* **api-client:** Add legal hold classification ([#1829](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1829)) ([3874936](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3874936))
+
+
+
+
+
 ## [4.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.1.2...@wireapp/api-client@4.1.3) (2019-05-14)
 
 **Note:** Version bump only for package @wireapp/api-client
