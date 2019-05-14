@@ -65,7 +65,7 @@ class _Index extends React.Component<Props & ConnectedProps & DispatchProps & In
     this.props.history.push(ROUTE.LOGIN);
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;
