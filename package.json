@@ -46,7 +46,8 @@
   },
   "description": "Wire API Client to send and receive data.",
   "files": [
-    "dist/commonjs"
+    "dist/commonjs",
+    "src/main"
   ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/APIClient.js",
