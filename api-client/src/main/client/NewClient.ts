@@ -20,7 +20,7 @@
 import {PreKey} from '../auth/';
 import {ClientClassification, ClientType, Location} from '../client/';
 
-interface NewClient {
+export interface NewClient {
   class: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
   cookie: string;
   label?: string;
@@ -31,5 +31,3 @@ interface NewClient {
   prekeys: PreKey[];
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
-
-export {NewClient};
