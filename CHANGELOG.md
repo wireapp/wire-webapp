@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.1...@wireapp/react-ui-kit@6.4.2) (2019-05-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Use max 2 chars for initials ([#1831](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1831)) ([fed5f4d](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fed5f4d))
+
+
+
+
+
 ## [6.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.0...@wireapp/react-ui-kit@6.4.1) (2019-05-14)
 
 
