@@ -184,6 +184,9 @@ class Demo extends React.PureComponent {
                 forceInitials={true}
                 borderColor={'#fb0807'}
                 backgroundColor={'#2085C2'}
+                fetchImage={() => {
+                  console.info('Trying to fetch asset');
+                }}
               />
               <Avatar
                 size={64}
