@@ -17,7 +17,7 @@
  *
  */
 
-import StoreEngine from '@wireapp/store-engine';
+import {IndexedDBEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -100,7 +100,7 @@ export class CryptographyRepository {
   _init(database) {
     return Promise.resolve().then(() => {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      const storeEngine = new StoreEngine.IndexedDBEngine();
+      const storeEngine = new IndexedDBEngine();
       storeEngine.initWithDb(database);
       this.cryptobox = new Cryptobox(storeEngine, 10);
 
@@ -453,7 +453,7 @@ export class CryptographyRepository {
       .encrypt(sessionId, GenericMessage.encode(genericMessage).finish(), preKeyBundle)
       .then(cipherText => ({cipherText: arrayToBase64(cipherText), sessionId}))
       .catch(error => {
-        if (error instanceof StoreEngine.error.RecordNotFoundError) {
+        if (error instanceof StoreEngineError.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }
