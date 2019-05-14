@@ -82,7 +82,7 @@ export class ClientEntity {
   }
 
   isLegalHold(): boolean {
-    return this.class === 'legalhold';
+    return this.class === ClientClassification.DESKTOP;
   }
 
   isPermanent(): boolean {
