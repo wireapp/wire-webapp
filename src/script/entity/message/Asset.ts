@@ -19,6 +19,13 @@
 
 import {AssetType} from '../../assets/AssetType';
 
+export interface AssetPayload {
+  id: string;
+  key: string;
+  size: string;
+  type: string;
+}
+
 export class Asset {
   public file_type: string;
   public id: string;

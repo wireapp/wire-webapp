@@ -132,6 +132,9 @@ class User {
       }
       return this.devices().every(client_et => client_et.meta.isVerified());
     });
+    this.isOnLegalHold = ko.pureComputed(() => {
+      return this.devices().some(client_et => client_et.isLegalHold());
+    });
 
     this.availability = ko.observable(AvailabilityType.NONE);
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {MemberRole, NewTeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
 import {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as languageSelector from '../selector/LanguageSelector';
@@ -25,7 +26,7 @@ import {BackendError} from './BackendError';
 import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {
-  invite = (invitation: {email: string; locale: string; inviter_name: string}): ThunkAction => {
+  invite = (invitation: {email: string}): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
@@ -42,11 +43,16 @@ export class InvitationAction {
         throw error;
       }
 
-      invitation.locale = languageSelector.getLanguage(state);
-      invitation.inviter_name = selfSelector.getSelfName(state);
+      const newInvite: NewTeamInvitation = {
+        email: invitationEmail,
+        inviter_name: selfSelector.getSelfName(state),
+        locale: languageSelector.getLanguage(state),
+        role: MemberRole.MEMBER,
+      };
+
       const teamId = selfSelector.getSelfTeamId(state);
       return Promise.resolve()
-        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
+        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, newInvite))
         .then(createdInvite => {
           dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
         })
