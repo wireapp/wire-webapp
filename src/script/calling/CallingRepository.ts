@@ -224,6 +224,7 @@ export class CallingRepository {
       const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
       const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       const call = new Call(conversationId, CONV_TYPE.ONEONONE, selfParticipant);
+      call.state(CALL_STATE.INCOMING);
       if (isVideoCall) {
         this.loadVideoPreview(call);
       }
