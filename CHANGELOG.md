@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.0...@wireapp/react-ui-kit@6.4.1) (2019-05-14)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Fetch Image bug ([#1828](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1828)) ([c5de3ab](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/c5de3ab))
+
+
+
+
+
 # [6.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.3.0...@wireapp/react-ui-kit@6.4.0) (2019-05-13)
 
 
