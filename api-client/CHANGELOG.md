@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.2.0...@wireapp/api-client@4.3.0) (2019-05-14)
+
+
+### Features
+
+* **api-client:** Ship source code for source maps ([#1830](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1830)) ([69ca7e5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/69ca7e5))
+
+
+
+
+
 # [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.1.3...@wireapp/api-client@4.2.0) (2019-05-14)
 
 
