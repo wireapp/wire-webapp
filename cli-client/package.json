@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "@types/dotenv": "6.1.1",
-    "@wireapp/core": "10.2.1",
+    "@wireapp/core": "10.2.2",
     "commander": "2.20.0",
     "dotenv": "8.0.0",
     "fs-extra": "8.0.1"
@@ -30,5 +30,5 @@
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
-  "version": "5.0.34"
+  "version": "5.0.35"
 }
