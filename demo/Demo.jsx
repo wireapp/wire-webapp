@@ -180,7 +180,7 @@ class Demo extends React.PureComponent {
               <Avatar
                 size={120}
                 fontSize={20}
-                name={'Joe Do'}
+                name={'Jon Bon Jovi'}
                 forceInitials={true}
                 borderColor={'#fb0807'}
                 backgroundColor={'#2085C2'}

@@ -69,7 +69,8 @@ const Avatar = (props: Props) => {
     name
       .split(' ')
       .map(([initial]) => initial && initial.toUpperCase())
-      .join('');
+      .join('')
+      .substring(0, 2);
 
   useEffect(() => {
     let observer = undefined;
