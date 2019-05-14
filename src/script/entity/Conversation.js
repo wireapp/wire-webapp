@@ -158,14 +158,18 @@ export class Conversation {
     this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
-      const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-      const isInitialized = this.selfUser() && hasMappedUsers;
-      if (!isInitialized) {
+      if (!this._isInitialized()) {
         return undefined;
       }
 
-      const allUserEntities = [this.selfUser()].concat(this.participating_user_ets());
-      return allUserEntities.every(userEntity => userEntity.is_verified());
+      return this.allUserEntities.every(userEntity => userEntity.is_verified());
+    });
+    this.isOnLegalHold = ko.pureComputed(() => {
+      if (!this._isInitialized()) {
+        return undefined;
+      }
+
+      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
@@ -320,6 +324,11 @@ export class Conversation {
     this._initSubscriptions();
   }
 
+  _isInitialized() {
+    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+    return this.selfUser() && hasMappedUsers;
+  }
+
   _initSubscriptions() {
     [
       this.archivedState,
@@ -339,6 +348,10 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  get allUserEntities() {
+    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   persistState() {

@@ -80,6 +80,10 @@ export class ClientEntity {
     return zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
+  isLegalHold(): boolean {
+    return this.model === 'legalhold';
+  }
+
   isPermanent(): boolean {
     return this.type === ClientType.PERMANENT;
   }
@@ -95,10 +99,10 @@ export class ClientEntity {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
 
     if (this.isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
     }
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
@@ -112,7 +116,7 @@ export class ClientEntity {
     return jsonObject;
   }
 
-  _removeDefaultValues(jsonObject: Record<string, any>, memberName: string) {
+  private removeDefaultValues(jsonObject: Record<string, any>, memberName: string) {
     if (jsonObject.hasOwnProperty(memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {
