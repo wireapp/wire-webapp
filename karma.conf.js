@@ -17,27 +17,23 @@
  *
  */
 
-/* eslint-disable sort-keys */
-
-const webpack = require('webpack');
 const path = require('path');
+const rootWebpackConfig = require('./webpack.config.common.js');
+const webpack = require('webpack');
 const {SRC_PATH} = require('./locations');
 
-const rootWebpackConfig = require('./webpack.config.common.js');
+const testCode = 'src/script/**/*.test.ts';
 
 function getSpecs(specList) {
   if (specList) {
     return specList.split(',').map(specPath => `test/unit_tests/${specPath}Spec.js`);
   }
-  return ['test/unit_tests/**/*.js'];
+  return ['test/unit_tests/**/*.js'].concat(testCode);
 }
 
 /**
- * Returns the files to load in Karma before running the tests.
- * If the 'nolegacy' param is given, it will skip all the globals import
- *
- * @param {boolean} noLegacy - Prevents loading globals dependencies which slows down the load time
- * @returns {Array} - The files to load in Karma
+ * @param {boolean} noLegacy - Prevents loading global dependencies which slow down the load time
+ * @returns {Array} - The files to load in Karma before running the tests
  */
 function getIncludedFiles(noLegacy) {
   const commonFiles = [
@@ -52,124 +48,17 @@ function getIncludedFiles(noLegacy) {
 
 module.exports = function(config) {
   config.set({
+    autoWatch: false,
     basePath: './',
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
-
+    browserNoActivityTimeout: 60000,
+    browsers: ['ChromeNoSandbox'],
     client: {
       jasmine: {
         random: false,
       },
     },
-
-    // list of files / patterns to load in the browser
-    files: getIncludedFiles(config.nolegacy).concat(getSpecs(config.specs)),
-
-    proxies: {
-      '/audio/': '/base/audio/',
-      '/ext/js': '/base/node_modules/',
-      '/worker/': '/base/worker/',
-    },
-
-    // pre-process matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'test/unit_tests/**/*.js': ['webpack'],
-      'test/api/TestFactory.js': ['webpack'],
-    },
-
-    webpack: {
-      mode: 'development',
-      node: {
-        fs: 'empty',
-        path: 'empty',
-      },
-      externals: {
-        'fs-extra': '{}',
-      },
-      module: {
-        rules: [
-          {
-            exclude: /node_modules/,
-            include: path.resolve('src/script/'),
-            loader: 'babel-loader',
-            test: /\.[tj]sx?$/,
-          },
-          {
-            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
-            test: /\.svg$/,
-          },
-          {
-            enforce: 'post',
-            exclude: [path.resolve('node_modules/'), path.resolve('src/script/view_model/')],
-            include: [path.resolve('src/script/')],
-            test: /\.[tj]s$/,
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: {esModules: true},
-            },
-          },
-        ],
-      },
-      plugins: [
-        new webpack.ProvidePlugin({
-          $: 'jquery',
-          jQuery: 'jquery',
-          _: 'underscore',
-          ko: 'knockout',
-        }),
-      ],
-      resolve: {
-        alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
-          src: path.resolve(__dirname, 'src'),
-        }),
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
-      },
-    },
-
-    webpackMiddleware: {
-      logLevel: 'error',
-      stats: 'errors-only',
-    },
-
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage-istanbul'],
-
-    // web server port
-    port: 9876,
-
-    // enable / disable colors in the output (reporters and logs)
     colors: true,
-
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR,
-
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
-
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['ChromeNoSandbox'],
-    browserNoActivityTimeout: 60000,
-
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true,
-
-    // Concurrency level
-    // how many browser should be started simultaneous
     concurrency: Infinity,
-
-    customLaunchers: {
-      ChromeNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: ['--no-sandbox'],
-      },
-    },
     coverageIstanbulReporter: {
       dir: path.resolve('docs/coverage/'),
       fixWebpackSourcePaths: true,
@@ -186,6 +75,81 @@ module.exports = function(config) {
           statements: 45,
         },
       },
+    },
+    customLaunchers: {
+      ChromeNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
+    exclude: [],
+    files: getIncludedFiles(config.nolegacy).concat(getSpecs(config.specs)),
+    frameworks: ['jasmine'],
+    logLevel: config.LOG_ERROR,
+    port: 9876,
+    preprocessors: {
+      'test/api/TestFactory.js': ['webpack'],
+      'test/unit_tests/**/*.js': ['webpack'],
+      [testCode]: ['webpack'],
+    },
+    proxies: {
+      '/audio/': '/base/audio/',
+      '/ext/js': '/base/node_modules/',
+      '/worker/': '/base/worker/',
+    },
+    reporters: ['progress', 'coverage-istanbul'],
+    singleRun: true,
+    webpack: {
+      externals: {
+        'fs-extra': '{}',
+      },
+      mode: 'development',
+      module: {
+        rules: [
+          {
+            exclude: /node_modules/,
+            include: path.resolve('src/script/'),
+            loader: 'babel-loader',
+            test: /\.[tj]sx?$/,
+          },
+          {
+            loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+            test: /\.svg$/,
+          },
+          {
+            enforce: 'post',
+            exclude: [/node_modules|\.test\.[tj]sx?$/, path.resolve('src/script/view_model/')],
+            include: [path.resolve('src/script/')],
+            test: /\.[tj]s$/,
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: {esModules: true},
+            },
+          },
+        ],
+      },
+      node: {
+        fs: 'empty',
+        path: 'empty',
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          _: 'underscore',
+          jQuery: 'jquery',
+          ko: 'knockout',
+        }),
+      ],
+      resolve: {
+        alias: Object.assign({}, rootWebpackConfig.resolve.alias, {
+          src: path.resolve(__dirname, 'src'),
+        }),
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
+      },
+    },
+    webpackMiddleware: {
+      logLevel: 'error',
+      stats: 'errors-only',
     },
   });
 

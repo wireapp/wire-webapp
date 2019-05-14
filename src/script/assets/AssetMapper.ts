@@ -17,12 +17,12 @@
  *
  */
 
-import {Asset} from '../entity/message/Asset';
+import {AssetPayload} from '../entity/message/Asset';
 import {AssetRemoteData} from './AssetRemoteData';
 
 export type MappedAsset = {[index: string]: AssetRemoteData};
 
-export const mapProfileAssets = (userId: string, assets: Asset[]): MappedAsset => {
+export const mapProfileAssets = (userId: string, assets: AssetPayload[]): MappedAsset => {
   const sizeMap: {[index: string]: string} = {
     complete: 'medium',
     preview: 'preview',
@@ -36,7 +36,7 @@ export const mapProfileAssets = (userId: string, assets: Asset[]): MappedAsset =
     }, {});
 };
 
-export const mapProfileAssetsV1 = (userId: string, pictures: Asset[]): MappedAsset => {
+export const mapProfileAssetsV1 = (userId: string, pictures: AssetPayload[]): MappedAsset => {
   const [previewPicture, mediumPicture] = pictures;
   const previewAsset = previewPicture ? AssetRemoteData.v1(userId, previewPicture.id, true) : undefined;
   const mediumAsset = mediumPicture ? AssetRemoteData.v1(userId, mediumPicture.id, true) : undefined;
