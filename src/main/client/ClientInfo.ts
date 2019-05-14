@@ -20,7 +20,7 @@
 import {ClientClassification, Location} from '@wireapp/api-client/dist/commonjs/client/';
 
 interface ClientInfo {
-  classification: ClientClassification;
+  classification: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
   cookieLabel: string;
   model: string;
   label?: string;
