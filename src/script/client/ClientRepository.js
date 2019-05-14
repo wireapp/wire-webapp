@@ -19,6 +19,7 @@
 
 import platform from 'platform';
 
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -370,7 +371,7 @@ export class ClientRepository {
     }
 
     return {
-      class: 'desktop',
+      class: ClientClassification.DESKTOP,
       cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
       label: deviceLabel,
       lastkey: lastResortKey,
