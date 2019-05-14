@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import ko from 'knockout';
 import {isString} from 'underscore';
 
@@ -30,7 +31,7 @@ export class ClientEntity {
   };
 
   address?: string;
-  class: string;
+  class: ClientClassification;
   cookie?: string;
   id: string;
   isSelfClient: boolean;
