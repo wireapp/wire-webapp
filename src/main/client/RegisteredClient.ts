@@ -17,16 +17,20 @@
  *
  */
 
-interface RegisteredClient {
-  address?: string; // IP address
-  class: 'desktop' | 'phone' | 'tablet';
-  cookie: string; // Cookie label
-  id: string; // Client ID
+import {ClientClassification} from './ClientClassification';
+
+export interface RegisteredClient {
+  /** The IP address from which the client was registered */
+  address?: string;
+  class: ClientClassification;
+  /** The cookie label */
+  cookie: string;
+  /** The client ID */
+  id: string;
   label?: string;
   location?: Location;
   model?: string;
-  time: string; // ISO 8601 Date string
+  /** An ISO 8601 Date string */
+  time: string;
   type: 'permanent' | 'temporary';
 }
-
-export {RegisteredClient};

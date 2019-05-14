@@ -17,9 +17,9 @@
  *
  */
 
-interface PublicClient {
-  class: 'desktop' | 'phone' | 'tablet';
+import {ClientClassification} from './ClientClassification';
+
+export interface PublicClient {
+  class: ClientClassification;
   id: string;
 }
-
-export {PublicClient};

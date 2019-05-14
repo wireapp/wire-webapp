@@ -19,11 +19,9 @@
 
 import {PermissionsData} from './PermissionsData';
 
-interface MemberData {
+export interface MemberData {
   created_at?: Date;
   created_by?: string;
   permissions: PermissionsData;
   user: string;
 }
-
-export {MemberData};
