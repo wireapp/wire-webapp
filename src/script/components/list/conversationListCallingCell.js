@@ -22,22 +22,34 @@ import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {CALL_TYPE} from 'avs-web';
 import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
-import {AudioType} from '../../audio/AudioType';
 
 import 'Components/list/participantItem';
+import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
 
 class ConversationListCallingCell {
-  constructor({call, conversation, temporaryUserStyle = false, multitasking, callingRepository, audioRepository}) {
+  constructor({
+    call,
+    conversation,
+    videoGrid,
+    callingRepository,
+    temporaryUserStyle = false,
+    multitasking,
+    callActions,
+  }) {
     this.call = call;
     this.conversation = conversation;
+    this.callingRepository = callingRepository;
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
-    this.callingRepository = callingRepository;
-    this.audioRepository = audioRepository;
+    this.callActions = callActions;
 
+    this.videoGrid = videoGrid;
+    this.hasVideoGrid = () => {
+      const grid = this.videoGrid();
+      return grid.grid.filter(participant => !!participant).length > 0 || grid.thumbnail;
+    };
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
     );
@@ -52,13 +64,12 @@ class ConversationListCallingCell {
     this.isIdle = ko.pureComputed(isState(CALL_STATE.NONE));
     this.isOutgoing = ko.pureComputed(isState(CALL_STATE.OUTGOING));
     this.isConnecting = ko.pureComputed(isState(CALL_STATE.ANSWERED));
-    this.isDisconnecting = ko.pureComputed(isState(CALL_STATE.DISCONNECTING));
     this.isIncoming = ko.pureComputed(isState(CALL_STATE.INCOMING));
     this.isOngoing = ko.pureComputed(isState(CALL_STATE.MEDIA_ESTAB));
 
     this.isDeclined = ko.pureComputed(() => call.reason() === CALL_REASON.STILL_ONGOING);
 
-    this.isMuted = this.callingRepository.isMuted;
+    this.isMuted = callingRepository.isMuted;
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval;
@@ -73,31 +84,11 @@ class ConversationListCallingCell {
       }
     });
 
-    const ringingSubscription = ko.computed(() => {
-      const isOutgoing = this.isOutgoing();
-      const isIncoming = this.isIncoming();
-      const isDeclined = this.isDeclined();
-      if (!isDeclined && (isOutgoing || isIncoming)) {
-        const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
-        this.audioRepository.loop(audioId);
-      } else {
-        this.audioRepository.stop(AudioType.INCOMING_CALL);
-        this.audioRepository.stop(AudioType.OUTGOING_CALL);
-      }
-    });
-
     this.showParticipants = ko.observable(false);
     this.showParticipantsButton = ko.pureComputed(() => this.isOngoing() && this.conversation().isGroup());
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.call.participants().length);
     });
-    this.showVideoGrid = () => {
-      const hasActiveVideo = this.call
-        .participants()
-        .concat(this.call.selfParticipant)
-        .find(participant => participant.hasActiveVideo());
-      return hasActiveVideo;
-    };
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
     this.disableScreenButton = false; // !this.callingRepository.supportsScreenSharing;
@@ -105,7 +96,6 @@ class ConversationListCallingCell {
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
-      ringingSubscription.dispose();
     };
     /*
     this.conversation = params.conversation;
@@ -166,22 +156,8 @@ class ConversationListCallingCell {
     */
   }
 
-  endCall(data, event) {
-    event.stopPropagation();
-    return this.isIncoming() ? this.onRejectCall() : this.onLeaveCall();
-  }
-
-  onJoinCall(data, event) {
-    event.stopPropagation();
-    this.callingRepository.answerCall(this.conversation().id, CALL_TYPE.NORMAL);
-  }
-
-  onJoinDeclinedCall() {
-    this.callingRepository.startCall(this.conversation().id, CALL_TYPE.NORMAL);
-  }
-
-  onLeaveCall() {
-    this.callingRepository.leaveCall(this.conversation().id);
+  endCall(call) {
+    return this.isIncoming() ? this.callActions.reject(call) : this.callActions.leave(call);
   }
 
   onMaximizeVideoGrid() {
@@ -195,15 +171,6 @@ class ConversationListCallingCell {
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
-  }
-
-  onRejectCall() {
-    this.callingRepository.rejectCall(this.conversation().id);
-  }
-
-  toggleMute(data, event) {
-    event.stopPropagation();
-    this.callingRepository.muteCall(this.conversation.id, !this.isMuted());
   }
 
   onToggleScreen(data, event) {
@@ -260,7 +227,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="conversation-list-cell-right">
         <!-- ko if: isConnecting() || isOngoing() -->
-          <div class="call-ui__button call-ui__button--red" data-bind="click: onLeaveCall" data-uie-name="do-call-controls-call-leave">
+          <div class="call-ui__button call-ui__button--red" data-bind="click: () => callActions.leave(call)" data-uie-name="do-call-controls-call-leave">
             <hangup-icon class="small-icon"></hangup-icon>
           </div>
         <!-- /ko -->
@@ -268,9 +235,9 @@ ko.components.register('conversation-list-calling-cell', {
 
     </div>
 
-    <!-- ko if: showVideoGrid() -->
+    <!-- ko if: hasVideoGrid() -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
-        <group-video-grid params="minimized: true, participants: call.participants, selfParticipant: call.selfParticipant"></group-video-grid>
+        <group-video-grid params="minimized: true, grid: videoGrid"></group-video-grid>
         <!-- ko if: showMaximize() -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
@@ -282,7 +249,7 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">
         <div class="conversation-list-calling-cell-controls-left">
-          <div class="call-ui__button" data-bind="click: toggleMute, css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
+          <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
             <micoff-icon class="small-icon"></micoff-icon>
           </div>
           <!-- ko if: false && showVideoButton() -->
@@ -304,12 +271,12 @@ ko.components.register('conversation-list-calling-cell', {
             </div>
           <!-- /ko -->
           <!-- ko if: isIncoming() || isOutgoing() -->
-            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: endCall" data-uie-name="do-call-controls-call-decline">
+            <div class="call-ui__button call-ui__button--red call-ui__button--large" data-bind="click: () => endCall(call)" data-uie-name="do-call-controls-call-decline">
               <hangup-icon class="small-icon"></hangup-icon>
             </div>
           <!-- /ko -->
           <!-- ko if: isIncoming() && !isDeclined() -->
-            <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: onJoinCall" data-uie-name="do-call-controls-call-accept">
+            <div class="call-ui__button call-ui__button--green call-ui__button--large" data-bind="click: () => callActions.answer(call)" data-uie-name="do-call-controls-call-accept">
               <pickup-icon class="small-icon"></pickup-icon>
             </div>
           <!-- /ko -->
@@ -321,6 +288,7 @@ ko.components.register('conversation-list-calling-cell', {
             <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo()" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
+
     <!-- /ko -->
   <!-- /ko -->
   `,

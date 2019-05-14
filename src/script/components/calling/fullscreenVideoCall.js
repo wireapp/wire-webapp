@@ -17,18 +17,17 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+//import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
-import * as trackingHelpers from '../tracking/Helpers';
-import {EventName} from '../tracking/EventName';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {MediaType} from '../media/MediaType';
-import {MediaDeviceType} from '../media/MediaDeviceType';
-import {WebAppEvents} from '../event/WebApp';
+import * as trackingHelpers from '../../tracking/Helpers';
+import {EventName} from '../../tracking/EventName';
+import {MediaType} from '../../media/MediaType';
+//import {MediaDeviceType} from '../../media/MediaDeviceType';
+import {WebAppEvents} from '../../event/WebApp';
 
-export class VideoCallingViewModel {
+export class FullscreenVideoCalling {
   static get CONFIG() {
     return {
       AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
@@ -36,12 +35,44 @@ export class VideoCallingViewModel {
     };
   }
 
-  constructor(mainViewModel, repositories) {
+  constructor({videoGrid, call, conversation, multitasking, callActions}) {
+    this.call = call;
+    this.conversation = conversation;
+    this.videoGrid = videoGrid;
+    this.multitasking = multitasking;
+    this.callActions = callActions;
+
+    this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
+
+    this.showRemoteParticipant = ko.pureComputed(() => false); // TODO
+    this.disableToggleScreen = ko.pureComputed(() => false); // TODO pass on the screensharing capability
+    this.selfSharesScreen = ko.pureComputed(() => false); // TODO
+    this.showSwitchScreen = ko.pureComputed(() => false); // TODO
+    this.isChoosingScreen = ko.observable(false); // TODO
+
+    this.callDuration = ko.observable();
+    let callDurationUpdateInterval;
+    const startedAtSubscription = ko.computed(() => {
+      const startedAt = call.startedAt;
+      if (startedAt) {
+        const updateTimer = () => {
+          const time = Math.floor((Date.now() - startedAt) / 1000);
+          this.callDuration(formatSeconds(time));
+        };
+        updateTimer();
+        callDurationUpdateInterval = window.setInterval(updateTimer, 1000);
+      }
+    });
+
+    this.dispose = () => {
+      window.clearInterval(callDurationUpdateInterval);
+      startedAtSubscription.dispose();
+    };
+
+    /*
     this.clickedOnCancelScreen = this.clickedOnCancelScreen.bind(this);
     this.clickedOnChooseScreen = this.clickedOnChooseScreen.bind(this);
     this.chooseSharedScreen = this.chooseSharedScreen.bind(this);
-
-    this.elementId = 'video-calling';
 
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
@@ -52,51 +83,15 @@ export class VideoCallingViewModel {
     this.multitasking = this.contentViewModel.multitasking;
     this.logger = getLogger('VideoCallingViewModel');
 
-    this.devicesHandler = this.mediaRepository.devicesHandler;
-    this.streamHandler = this.mediaRepository.streamHandler;
-
-    this.availableDevices = this.devicesHandler.availableDevices;
-    this.currentDeviceId = this.devicesHandler.currentDeviceId;
-    this.currentDeviceIndex = this.devicesHandler.currentDeviceIndex;
-
     this.hasSelfVideo = this.streamHandler.hasActiveVideo;
     this.selfStreamState = this.streamHandler.selfStreamState;
     this.localVideoStream = this.streamHandler.localMediaStream;
     this.remoteVideoStreamsInfo = this.streamHandler.remoteMediaStreamInfoIndex.video;
 
-    this.isChoosingScreen = ko.observable(false);
-
-    this.HIDE_CONTROLS_TIMEOUT = VideoCallingViewModel.CONFIG.HIDE_CONTROLS_TIMEOUT;
     this.minimizeTimeout = undefined;
 
     this.calls = this.callingRepository.calls;
     this.joinedCall = this.callingRepository.joinedCall;
-
-    this.videodCall = ko.pureComputed(() => {
-      for (const callEntity of this.calls()) {
-        const selfScreenSend = callEntity.selfClientJoined() && this.selfStreamState.screenSend();
-        const selfVideoSend = selfScreenSend || this.selfStreamState.videoSend();
-        const remoteVideoSend = callEntity.isRemoteVideoCall() && !callEntity.isOngoingOnAnotherClient();
-        const isVideoCall = selfVideoSend || remoteVideoSend || this.isChoosingScreen();
-
-        if (callEntity.isActiveState() && isVideoCall) {
-          return callEntity;
-        }
-      }
-    });
-
-    this.isCallOngoing = ko.pureComputed(() => {
-      if (this.joinedCall()) {
-        const isSendingVideo = this.localVideoStream() && this.hasSelfVideo();
-        const isVideoCall = isSendingVideo || this.joinedCall().isRemoteVideoCall();
-        return this.joinedCall().isOngoing() && isVideoCall;
-      }
-    });
-
-    this.showFullscreen = ko.pureComputed(() => {
-      const isFullScreenState = this.isCallOngoing() || this.isChoosingScreen();
-      return isFullScreenState && !this.multitasking.isMinimized() && !!this.videodCall();
-    });
 
     this.remoteUser = ko.pureComputed(() => {
       const [participantEntity] = this.joinedCall() ? this.joinedCall().participants() : [];
@@ -129,11 +124,6 @@ export class VideoCallingViewModel {
       return this.isCallOngoing() && isVisible;
     });
 
-    this.showControls = ko.pureComputed(() => {
-      const isFullscreenEnabled = this.showRemoteParticipant() && !this.multitasking.isMinimized();
-      const isVisible = this.showRemoteVideo() || isFullscreenEnabled;
-      return this.isCallOngoing() && isVisible;
-    });
     this.showToggleVideo = ko.pureComputed(() => {
       return this.joinedCall() ? this.joinedCall().conversationEntity.supportsVideoCall(false) : false;
     });
@@ -193,10 +183,8 @@ export class VideoCallingViewModel {
     amplify.subscribe(WebAppEvents.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
-    ko.applyBindings(this, document.getElementById(this.elementId));
-
-    this.formatSeconds = formatSeconds;
     this.MediaDeviceType = MediaDeviceType;
+    */
   }
 
   chooseSharedScreen(conversationId) {
@@ -249,13 +237,6 @@ export class VideoCallingViewModel {
     this.isChoosingScreen(false);
   }
 
-  clickedOnLeaveCall() {
-    if (this.joinedCall()) {
-      const reason = TERMINATION_REASON.SELF_USER;
-      amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.joinedCall().id, reason);
-    }
-  }
-
   clickedOnMuteAudio() {
     if (this.joinedCall()) {
       amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.AUDIO);
@@ -302,3 +283,61 @@ export class VideoCallingViewModel {
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
 }
+
+ko.components.register('fullscreen-video-call', {
+  template: `
+<div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}" class="video-calling">
+  <div id="video-element-remote" class="video-element-remote">
+    <group-video-grid params="grid: videoGrid"></group-video-grid>
+  </div>
+
+  <!-- ko if: showRemoteParticipant() -->
+    <div class="video-element-remote-participant">
+      <!-- ko ifnot: videodCall().isGroup -->
+        <participant-avatar class="video-element-remote-participant avatar-no-badge" params="participant: remoteUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+
+  <!-- ko if: !isChoosingScreen() -->
+    <div class="video-element-overlay hide-controls-hidden"></div>
+  <!-- /ko -->
+
+  <div id="video-title" class="video-title hide-controls-hidden">
+    <div class="video-remote-name" data-bind="text: conversation().display_name()"></div>
+    <div class="video-timer label-xs" data-bind="text: callDuration()"></div>
+  </div>
+
+
+  <!-- ko ifnot: isChoosingScreen() -->
+    <div id="video-controls" class="video-controls hide-controls-hidden">
+      <div class="video-controls__fit-info" data-bind="text: t('videoCallOverlayFitVideoLabel')" data-uie-name="label-fit-fill-info"></div>
+      <div class="video-controls__wrapper">
+        <div class="video-controls__button"
+            data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableToggleScreen()}, click: clickedOnShareScreen, css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
+            data-uie-name="do-toggle-screen">
+          <screenshare-icon></screenshare-icon>
+          <!-- ko if: showSwitchScreen() -->
+            <device-toggle-button
+              data-bind="click: clickedOnToggleScreen, clickBubble: false"
+              params="index: currentDeviceIndex.screenInput, devices: availableDevices.screenInput, type: MediaDeviceType.SCREEN_INPUT"
+          >
+            </device-toggle-button>
+          <!-- /ko -->
+          <!-- ko ifnot: showSwitchScreen() -->
+            <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayShareScreen')"></div>
+          <!-- /ko -->
+        </div>
+
+        <div class="video-controls__button video-controls__button--red" data-bind="click: () => callActions.leave(call)" data-uie-name="do-call-controls-video-call-cancel">
+          <hangup-icon></hangup-icon>
+          <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayHangUp')"></div>
+        </div>
+     </div>
+   </div>
+ <!-- /ko -->
+
+</div>
+  `,
+  viewModel: FullscreenVideoCalling,
+});

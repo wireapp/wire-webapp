@@ -17,11 +17,17 @@
       <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>
     <!-- /ko -->
   </div>
-  <!-- ko if: showCalls() -->
+  <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
       <conversation-list-calling-cell
-        data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
-        params="call: activeCall, conversation: getConversationById(activeCall.conversationId), multitasking: multitasking, callingRepository: callingRepository, audioRepository: audioRepository"
+        data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': $parent.getConversationById(activeCall.conversationId).display_name}"
+        params="
+          call: activeCall,
+          videoGrid: getVideoGrid(activeCall),
+          conversation: $parent.getConversationById(activeCall.conversationId),
+          multitasking: multitasking,
+          callingRepository: callingRepository,
+          callActions: callActions"
         data-uie-name="item-call">
       </conversation-list-calling-cell>
     <!-- /ko -->

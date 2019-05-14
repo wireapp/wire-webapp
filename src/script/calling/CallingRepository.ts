@@ -56,10 +56,9 @@ export class CallingRepository {
   private selfClientId: DeviceId;
   private wUser: number | undefined;
   private wCall: Wcall | undefined;
-  private readonly activeCalls: ko.ObservableArray<Call>;
+  public readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
 
-  public readonly calls: ko.ObservableArray<any>;
   public readonly joinedCall: ko.Observable<any>;
 
   private callingConfig: any;
@@ -93,7 +92,6 @@ export class CallingRepository {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
 
-    this.calls = ko.observableArray();
     this.joinedCall = ko.observable();
 
     this.backendClient = backendClient;

@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {afterRender} from 'Util/util';
 
 import {Participant} from '../calling/Participant';
-import {Grid, getGrid} from '../calling/videoGridHandler';
+import {Grid} from '../calling/videoGridHandler';
 
 class GroupVideoGrid {
   private readonly grid: ko.PureComputed<Grid>;
@@ -42,20 +42,14 @@ class GroupVideoGrid {
     };
   }
 
-  constructor(
-    {
-      minimized,
-      participants,
-      selfParticipant,
-    }: {minimized: boolean; participants: ko.Observable<Participant[]>; selfParticipant: Participant},
-    rootElement: HTMLElement
-  ) {
+  constructor({minimized, grid}: {minimized: boolean; grid: ko.PureComputed<Grid>}, rootElement: HTMLElement) {
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
-    this.grid = getGrid(participants, selfParticipant);
+    this.grid = grid;
     this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
     // scale videos when the grid is updated (on the next rendering cycle)
+    //TODO unsubscribe grid
     this.grid.subscribe(() => afterRender(this.scaleVideos));
   }
 

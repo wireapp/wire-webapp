@@ -54,17 +54,15 @@ export class ConversationListViewModel {
     this.videoGridRepository = repositories.videoGrid;
 
     this.contentViewModel = mainViewModel.content;
+    this.callingViewModel = mainViewModel.calling;
     this.listViewModel = listViewModel;
     this.onJoinCall = onJoinCall;
 
     this.logger = getLogger('z.viewModel.list.ConversationListViewModel');
-    this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable();
     this.setShowCallsState(repositories.event.notificationHandlingState());
     repositories.event.notificationHandlingState.subscribe(this.setShowCallsState.bind(this));
-
-    this.activeCalls = this.callingRepository.activeCalls;
 
     this.contentState = this.contentViewModel.state;
     this.selectedConversation = ko.observable();
