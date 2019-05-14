@@ -45,12 +45,24 @@ export class CallingViewModel {
     this.multitasking = multitasking;
 
     this.callActions = {
-      answer: (call: Call) => this.callingRepository.answerCall(call.conversationId, CALL_TYPE.NORMAL),
-      leave: (call: Call) => this.callingRepository.leaveCall(call.conversationId),
-      reject: (call: Call) => this.callingRepository.rejectCall(call.conversationId),
-      start: (call: Call) =>
-        this.callingRepository.startCall(call.conversationId, call.conversationType, CALL_TYPE.NORMAL),
-      toggleMute: (call: Call, muteState: boolean) => this.callingRepository.muteCall(call.conversationId, muteState),
+      answer: (call: Call) => {
+        this.callingRepository.answerCall(call.conversationId, CALL_TYPE.NORMAL);
+      },
+      leave: (call: Call) => {
+        this.callingRepository.leaveCall(call.conversationId);
+      },
+      reject: (call: Call) => {
+        this.callingRepository.rejectCall(call.conversationId);
+      },
+      start: (call: Call) => {
+        this.callingRepository.startCall(call.conversationId, call.conversationType, CALL_TYPE.NORMAL);
+      },
+      toggleMute: (call: Call, muteState: boolean) => {
+        this.callingRepository.muteCall(call.conversationId, muteState);
+      },
+      toggleScreenshare: (call: Call) => {
+        this.callingRepository.toggleScreenshare(call.conversationId);
+      },
     };
 
     ko.computed(() => {

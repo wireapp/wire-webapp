@@ -29,14 +29,21 @@ export class Participant {
   public videoState: ko.Observable<number>;
   public videoStream: ko.Observable<MediaStream | undefined>;
   public hasActiveVideo: ko.PureComputed<boolean>;
+  public sharesScreen: ko.PureComputed<boolean>;
+  public sharesCamera: ko.PureComputed<boolean>;
 
   constructor(userId: UserId, deviceId: DeviceId) {
     this.userId = userId;
     this.deviceId = deviceId;
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
-      const activeVideoStates = [VIDEO_STATE.STARTED, VIDEO_STATE.SCREENSHARE];
-      return activeVideoStates.includes(this.videoState());
+      return this.sharesCamera() || this.sharesScreen();
+    });
+    this.sharesScreen = ko.pureComputed(() => {
+      return this.videoState() === VIDEO_STATE.SCREENSHARE;
+    });
+    this.sharesCamera = ko.pureComputed(() => {
+      return this.videoState() === VIDEO_STATE.STARTED;
     });
     this.videoStream = ko.observable();
   }

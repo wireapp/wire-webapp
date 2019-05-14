@@ -47,9 +47,28 @@ export class FullscreenVideoCalling {
 
     this.showRemoteParticipant = ko.pureComputed(() => false); // TODO
     this.disableToggleScreen = ko.pureComputed(() => false); // TODO pass on the screensharing capability
-    this.selfSharesScreen = ko.pureComputed(() => false); // TODO
-    this.showSwitchScreen = ko.pureComputed(() => false); // TODO
+    this.selfSharesScreen = ko.pureComputed(() => call.selfParticipant.sharesScreen()); // TODO
+    this.showSwitchCamera = ko.pureComputed(() => {
+      return false; //TODO handle multiple cameras
+      /*
+      const hasMultipleCameras = this.availableDevices.videoInput().length > 1;
+      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
+      return this.isCallOngoing() && isVisible;
+      */
+    });
+    this.showSwitchScreen = ko.pureComputed(() => {
+      return false; // TODO handle multi input devices
+      /*
+      const hasMultipleScreens = this.availableDevices.screenInput().length > 1;
+      const isVisible = hasMultipleScreens && this.localVideoStream() && this.selfStreamState.screenSend();
+      return this.isCallOngoing() && isVisible;
+      */
+    });
+
     this.isChoosingScreen = ko.observable(false); // TODO
+    this.showToggleVideo = ko.pureComputed(() => {
+      return conversation().supportsVideoCall(false);
+    });
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval;
@@ -260,9 +279,7 @@ export class FullscreenVideoCalling {
   }
 
   clickedOnStopVideo() {
-    if (this.joinedCall()) {
-      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.VIDEO);
-    }
+    throw new Error('not implemented (toggeling video)');
   }
 
   clickedOnToggleCamera() {
@@ -316,8 +333,24 @@ ko.components.register('fullscreen-video-call', {
           <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayMute')"></div>
         </div>
 
+        <!-- ko if: showToggleVideo() -->
+          <div class="video-controls__button"
+              data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': call.selfParticipant.sharesCamera()}, attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}"
+              data-uie-name="do-call-controls-toggle-video">
+            <camera-icon></camera-icon>
+            <!-- ko if: showSwitchCamera() -->
+              <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
+                                    params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: MediaDeviceType.VIDEO_INPUT">
+              </device-toggle-button>
+            <!-- /ko -->
+            <!-- ko ifnot: showSwitchCamera() -->
+              <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayVideo')"></div>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+
         <div class="video-controls__button"
-            data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableToggleScreen()}, click: clickedOnShareScreen, css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
+            data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableToggleScreen()}, click: () => callActions.toggleScreenshare(call), css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
             data-uie-name="do-toggle-screen">
           <screenshare-icon></screenshare-icon>
           <!-- ko if: showSwitchScreen() -->

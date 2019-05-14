@@ -136,21 +136,7 @@ export class CallingRepository {
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
 
-    wCall.setUserMediaHandler(
-      (converationId: ConversationId, audio: boolean, video: boolean, screen: boolean): Promise<MediaStream> => {
-        const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
-        return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-          if (video) {
-            const call = this.findCall(converationId);
-            if (call) {
-              const selfParticipant = call.selfParticipant;
-              selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
-            }
-          }
-          return mediaStream;
-        });
-      }
-    );
+    wCall.setUserMediaHandler(this.getMediaStream);
 
     wCall.setVideoTrackHandler(
       (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
@@ -221,7 +207,12 @@ export class CallingRepository {
     ) => {
       const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
       const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      const call = new Call(conversationId, CONV_TYPE.ONEONONE, selfParticipant);
+      const call = new Call(
+        conversationId,
+        CONV_TYPE.ONEONONE,
+        selfParticipant,
+        hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
+      );
       call.state(CALL_STATE.INCOMING);
       if (isVideoCall) {
         this.loadVideoPreview(call);
@@ -428,7 +419,7 @@ export class CallingRepository {
    */
   startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE) {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-    const call = new Call(conversationId, conversationType, selfParticipant);
+    const call = new Call(conversationId, conversationType, selfParticipant, callType);
     this.storeCall(call);
     if (conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO) {
       this.loadVideoPreview(call);
@@ -436,16 +427,31 @@ export class CallingRepository {
     this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
   }
 
-  upgradeToScreenshare(conversationId: ConversationId) {
+  toggleCamera(conversationId: ConversationId) {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
     }
-    // TODO restore retro-compatibility with getUserMedia
-    (navigator.mediaDevices as any).getDisplayMedia().then((mediaStream: MediaStream) => {
-      this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
-      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.SCREENSHARE);
-    });
+    const selfParticipant = call.selfParticipant;
+    if (selfParticipant.sharesCamera()) {
+      selfParticipant.releaseVideoStream();
+      selfParticipant.videoState(VIDEO_STATE.STOPPED);
+      return;
+    }
+  }
+
+  toggleScreenshare(conversationId: ConversationId) {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+    const selfParticipant = call.selfParticipant;
+    if (selfParticipant.sharesScreen()) {
+      selfParticipant.releaseVideoStream();
+      selfParticipant.videoState(VIDEO_STATE.STOPPED);
+      return;
+    }
+    this.getMediaStream(conversationId, false, false, true);
   }
 
   answerCall(conversationId: ConversationId, callType: number) {
@@ -486,6 +492,38 @@ export class CallingRepository {
 
     return types[mediaType] || CALL_TYPE.NORMAL;
   }
+
+  getMediaStream = (
+    conversationId: ConversationId,
+    audio: boolean,
+    video: boolean,
+    screen: boolean
+  ): Promise<MediaStream> => {
+    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
+
+    if (screen) {
+      // TODO restore retro-compatibility with getUserMedia
+      return (navigator.mediaDevices as any).getDisplayMedia().then((mediaStream: MediaStream) => {
+        this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
+        const call = this.findCall(conversationId);
+        if (call) {
+          call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.SCREENSHARE);
+        }
+        return mediaStream;
+      });
+    }
+
+    return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
+      if (video) {
+        const call = this.findCall(conversationId);
+        if (call) {
+          const selfParticipant = call.selfParticipant;
+          selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
+        }
+      }
+      return mediaStream;
+    });
+  };
 
   /**
    * Check whether conversation supports calling.

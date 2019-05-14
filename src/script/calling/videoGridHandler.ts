@@ -69,7 +69,9 @@ export function getGrid(
       inGridParticipants = videoParticipants;
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
     } else {
-      inGridParticipants = videoParticipants.concat(selfParticipant);
+      inGridParticipants = selfParticipant.hasActiveVideo()
+        ? videoParticipants.concat(selfParticipant)
+        : videoParticipants;
       thumbnailParticipant = null;
     }
     baseGrid = computeGrid(baseGrid, inGridParticipants);

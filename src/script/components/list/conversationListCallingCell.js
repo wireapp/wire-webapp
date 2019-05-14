@@ -22,7 +22,7 @@ import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
+import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from 'avs-web';
 
 import 'Components/list/participantItem';
 import 'Components/calling/fullscreenVideoCall';
@@ -91,7 +91,13 @@ class ConversationListCallingCell {
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
+    this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
     this.disableScreenButton = false; // !this.callingRepository.supportsScreenSharing;
+    this.disableVideoButton = ko.pureComputed(() => {
+      const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
+      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
+      return isOutgoingVideoCall || isVideoUnsupported;
+    });
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -125,7 +131,6 @@ class ConversationListCallingCell {
       }
       return false;
     });
-    this.showVideoButton = ko.pureComputed(() => this.isVideoCall() || this.isConnected());
 
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && this.selfStreamState.videoSend();
@@ -171,11 +176,6 @@ class ConversationListCallingCell {
     // TODO: this is a very hacky way to get antiscroll to recalculate the height of the conversationlist.
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
-  }
-
-  onToggleScreen(data, event) {
-    event.stopPropagation();
-    this.callingRepository.upgradeToScreenshare(this.conversation.id);
   }
 
   onToggleVideo(data, event) {
@@ -232,7 +232,6 @@ ko.components.register('conversation-list-calling-cell', {
           </div>
         <!-- /ko -->
       </div>
-
     </div>
 
     <!-- ko if: hasVideoGrid() -->
@@ -252,13 +251,13 @@ ko.components.register('conversation-list-calling-cell', {
           <div class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}" data-uie-name="do-toggle-mute">
             <micoff-icon class="small-icon"></micoff-icon>
           </div>
-          <!-- ko if: false && showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': selfStreamState.videoSend()}, disable: disableVideoButton(), attr: {'data-uie-value': selfStreamState.videoSend() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+          <!-- ko if: showVideoButton() -->
+            <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
             </button>
           <!-- /ko -->
           <!-- ko if: isOngoing() -->
-            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton, position: 'bottom'}, click: onToggleScreen, css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton, position: 'bottom'}, click: () => callActions.toggleScreenshare(call), css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
           <!-- /ko -->
