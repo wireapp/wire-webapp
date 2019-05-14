@@ -75,7 +75,7 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
     handle: '',
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     const suggestions = createSuggestions(this.props.name);
     this.props.doGetConsents();
     this.props
@@ -84,9 +84,10 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
       .catch(error => this.setState({error}));
   }
 
-  updateConsent = (consentType: ConsentType, value: number) => this.props.doSetConsent(consentType, value);
+  updateConsent = (consentType: ConsentType, value: number): Promise<void> =>
+    this.props.doSetConsent(consentType, value);
 
-  onSetHandle = (event: React.FormEvent) => {
+  onSetHandle = (event: React.FormEvent): void => {
     event.preventDefault();
     this.props
       .setHandle(this.state.handle)
@@ -105,7 +106,7 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
       });
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       isFetching,
       intl: {formatMessage: _},

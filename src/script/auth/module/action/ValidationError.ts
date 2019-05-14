@@ -40,7 +40,7 @@ export class ValidationError extends Error {
     return this.label === label;
   };
 
-  static getAllPropertyNames(obj: {}) {
+  static getAllPropertyNames(obj: {}): string[] {
     let props: string[] = [];
     do {
       props = props.concat(Object.getOwnPropertyNames(obj));
@@ -73,7 +73,7 @@ export class ValidationError extends Error {
     return Object.entries(ValidationError.ERROR).find(([key, value]) => value === errorValue)[0];
   };
 
-  static mapErrorsToField = (fieldName: string) => {
+  static mapErrorsToField = (fieldName: string): ErrorTypes => {
     return Object.entries(ValidationError.ERROR).reduce(
       (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
       ValidationError.ERROR

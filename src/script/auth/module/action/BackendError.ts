@@ -105,17 +105,15 @@ export class BackendError extends Error {
     SSO_USER_CANCELLED_ERROR: 'user-cancelled-sso-error', // Synthetic error label
   };
 
-  static get LABEL() {
-    return {
-      ...BackendError.AUTH_ERRORS,
-      ...BackendError.CONVERSATION_ERRORS,
-      ...BackendError.GENERAL_ERRORS,
-      ...BackendError.CLIENT_ERRORS,
-      ...BackendError.HANDLE_ERRORS,
-      ...BackendError.TEAM_ERRORS,
-      ...BackendError.TEAM_INVITE_ERRORS,
-      ...BackendError.PAYMENT_ERRORS,
-      ...BackendError.SSO_ERRORS,
-    };
-  }
+  static LABEL = {
+    ...BackendError.AUTH_ERRORS,
+    ...BackendError.CONVERSATION_ERRORS,
+    ...BackendError.GENERAL_ERRORS,
+    ...BackendError.CLIENT_ERRORS,
+    ...BackendError.HANDLE_ERRORS,
+    ...BackendError.TEAM_ERRORS,
+    ...BackendError.TEAM_INVITE_ERRORS,
+    ...BackendError.PAYMENT_ERRORS,
+    ...BackendError.SSO_ERRORS,
+  };
 }

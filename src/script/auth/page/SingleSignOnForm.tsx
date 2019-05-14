@@ -245,7 +245,7 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
       .toLowerCase()
       .replace(_SingleSignOnForm.SSO_CODE_PREFIX, '');
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
       loginError,

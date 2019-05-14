@@ -38,28 +38,28 @@ export class IntegrationService {
     this.logger = getLogger('IntegrationService');
   }
 
-  getProvider(providerId: string) {
+  getProvider(providerId: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}`,
     });
   }
 
-  getProviderServices(providerId: string) {
+  getProviderServices(providerId: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}`,
     });
   }
 
-  getService(providerId: string, serviceId: string) {
+  getService(providerId: string, serviceId: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}/${serviceId}`,
     });
   }
 
-  getServices(tags: string[], start: string) {
+  getServices(tags: string[], start: string): Promise<any> {
     const params: Record<string, string[] | string> = {tags};
     if (start) {
       params.start = start;

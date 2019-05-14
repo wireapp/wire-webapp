@@ -98,7 +98,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
     validationErrors: [],
   };
 
-  componentWillReceiveProps({account}: CombinedProps) {
+  componentWillReceiveProps({account}: CombinedProps): void {
     if (account) {
       if (account.email !== this.state.registrationData.email) {
         this.setState({
@@ -181,7 +181,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
     }
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       isFetching,
       isPersonalFlow,

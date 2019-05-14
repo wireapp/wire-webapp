@@ -112,7 +112,7 @@ export class ClientEntity {
     return jsonObject;
   }
 
-  _removeDefaultValues(jsonObject: Record<string, any>, memberName: string) {
+  _removeDefaultValues(jsonObject: Record<string, any>, memberName: string): void {
     if (jsonObject.hasOwnProperty(memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {
