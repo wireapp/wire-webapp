@@ -24,7 +24,6 @@ import {getLogger} from 'Util/Logger';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {WebAppEvents} from '../event/WebApp';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export class ConversationVerificationStateHandler {
   constructor(conversationRepository, eventRepository, serverTimeHandler) {
@@ -124,15 +123,7 @@ export class ConversationVerificationStateHandler {
    */
   onLegalHoldsActivated(userIds) {
     userIds.forEach(() => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {},
-        close: () => {},
-        text: {
-          action: 'ok',
-          message: 'User activated legal hold',
-          title: 'User activated legal hold',
-        },
-      });
+      // TODO: show modal
     });
   }
 
