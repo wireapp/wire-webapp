@@ -43,9 +43,7 @@ export interface Grid {
  */
 function computeGrid(previousGrid: string[], participants: Participant[]): string[] {
   const previousStreamIds = previousGrid.filter(streamId => streamId !== '');
-  const currentStreamIds = participants
-    .filter(participant => participant.hasActiveVideo())
-    .map(participant => participant.userId);
+  const currentStreamIds = participants.map(participant => participant.userId);
 
   const addedStreamIds = getDifference(previousStreamIds, currentStreamIds);
 
@@ -66,11 +64,12 @@ export function getGrid(
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
-    if (participants().length === 1) {
-      inGridParticipants = participants();
+    const videoParticipants = participants().filter(participant => participant.hasActiveVideo());
+    if (videoParticipants.length === 1) {
+      inGridParticipants = videoParticipants;
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
     } else {
-      inGridParticipants = participants().concat(selfParticipant);
+      inGridParticipants = videoParticipants.concat(selfParticipant);
       thumbnailParticipant = null;
     }
     baseGrid = computeGrid(baseGrid, inGridParticipants);
