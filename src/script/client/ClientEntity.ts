@@ -31,7 +31,7 @@ export class ClientEntity {
   };
 
   address?: string;
-  class: ClientClassification;
+  class: ClientClassification | '?';
   cookie?: string;
   id: string;
   isSelfClient: boolean;
@@ -45,7 +45,7 @@ export class ClientEntity {
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;
 
-    this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
+    this.class = '?';
     this.id = '';
 
     if (this.isSelfClient) {
