@@ -81,7 +81,7 @@ export class ClientEntity {
   }
 
   isLegalHold(): boolean {
-    return this.model === 'legalhold';
+    return this.class === 'legalhold';
   }
 
   isPermanent(): boolean {
