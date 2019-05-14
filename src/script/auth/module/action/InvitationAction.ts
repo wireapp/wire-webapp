@@ -26,7 +26,7 @@ import {BackendError} from './BackendError';
 import {InvitationActionCreator} from './creator/';
 
 export class InvitationAction {
-  invite = (invitation: NewTeamInvitation): ThunkAction => {
+  invite = (invitation: {email: string}): ThunkAction => {
     return (dispatch, getState, {apiClient}) => {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
@@ -43,12 +43,16 @@ export class InvitationAction {
         throw error;
       }
 
-      invitation.inviter_name = selfSelector.getSelfName(state);
-      invitation.locale = languageSelector.getLanguage(state);
-      invitation.role = MemberRole.MEMBER;
+      const newInvite: NewTeamInvitation = {
+        email: invitationEmail,
+        inviter_name: selfSelector.getSelfName(state),
+        locale: languageSelector.getLanguage(state),
+        role: MemberRole.MEMBER,
+      };
+
       const teamId = selfSelector.getSelfTeamId(state);
       return Promise.resolve()
-        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
+        .then(() => apiClient.teams.invitation.api.postInvitation(teamId, newInvite))
         .then(createdInvite => {
           dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
         })

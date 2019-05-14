@@ -216,8 +216,7 @@ export const InitialInvite = injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {
         fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-        invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
-          dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
+        invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       };
     }
