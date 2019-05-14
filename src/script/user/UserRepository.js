@@ -305,7 +305,7 @@ export class UserRepository {
 
       if (wasClientAdded) {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
-          if (clientEntity.class === 'legalhold') {
+          if (clientEntity.isLegalHold()) {
             amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
           } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
