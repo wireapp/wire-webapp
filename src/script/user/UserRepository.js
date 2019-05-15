@@ -439,7 +439,7 @@ export class UserRepository {
   /**
    * Find a local user.
    * @param {string} userId - User ID
-   * @returns {Promise<User>} Resolves with the matching user entity
+   * @returns {User | undefined} matching user entity if found. Undefined else
    */
   findUserById(userId) {
     return this.users().find(userEntity => userEntity.id === userId);
