@@ -22,7 +22,7 @@ import * as React from 'react';
 import {FormattedHTMLMessage} from 'react-intl';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 
-export function parseError(error: any) {
+export function parseError(error: any): JSX.Element | null {
   if (error) {
     if (errorHandlerStrings.hasOwnProperty(error.label)) {
       return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
@@ -32,7 +32,7 @@ export function parseError(error: any) {
   return null;
 }
 
-export function parseValidationErrors(errors: any | any[]) {
+export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
   const errorMessages = [].concat(errors || []);
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" key={error.label}>

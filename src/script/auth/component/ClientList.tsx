@@ -70,7 +70,7 @@ class _ClientList extends React.Component<CombinedProps, State> {
     showLoading: false,
   };
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.resetLoadingSpinner();
   }
 
@@ -115,7 +115,7 @@ class _ClientList extends React.Component<CombinedProps, State> {
 
   isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
 
-  render() {
+  render(): JSX.Element {
     const {clientError, isFetching, permanentClients, isSSOUser} = this.props;
     const {showLoading} = this.state;
 

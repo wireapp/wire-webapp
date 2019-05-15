@@ -72,7 +72,7 @@ class CallSetupTimings {
     this.ice_connection_completed = 0;
   }
 
-  get() {
+  get(): Record<string, number> {
     const timings: Record<string, number> = {};
 
     this._steps_order().forEach(step => {
@@ -82,13 +82,13 @@ class CallSetupTimings {
     return timings;
   }
 
-  time_step(step: CallSetupSteps) {
+  time_step(step: CallSetupSteps): void {
     if (this[step] === 0) {
       this[step] = Math.trunc(window.performance.now() - this.started);
     }
   }
 
-  log() {
+  log(): void {
     this.logger.info(`Call setup duration for flow ID '${this.flowId}' of call ID '${this.call_id}'`);
 
     this._steps_order().forEach(step => {
@@ -101,7 +101,7 @@ class CallSetupTimings {
     });
   }
 
-  _steps_order() {
+  _steps_order(): CallSetupSteps[] {
     return this.is_answer ? CallSetupStepsOrder.ANSWER : CallSetupStepsOrder.OFFER;
   }
 }

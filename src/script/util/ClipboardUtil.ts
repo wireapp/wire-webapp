@@ -19,7 +19,7 @@
 
 import {Environment} from './Environment';
 
-export function copyText(text: string) {
+export function copyText(text: string): Promise<void> {
   if (Environment.browser.supports.clipboard) {
     return navigator.clipboard.writeText(text);
   }

@@ -44,18 +44,18 @@ export class QuoteEntity {
     this.error = options.error;
   }
 
-  isQuoteFromUser(userId: string) {
+  isQuoteFromUser(userId: string): boolean {
     return this.userId === userId;
   }
 
-  toJSON() {
+  toJSON(): {messageId: string; userId: string} {
     return {
       messageId: this.messageId,
       userId: this.userId,
     };
   }
 
-  toProto() {
+  toProto(): Quote {
     return new Quote({
       quotedMessageId: this.messageId,
       quotedMessageSha256: new Uint8Array(this.hash),

@@ -87,7 +87,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     };
   }
 
-  componentWillReceiveProps(newProps: CombinedProps) {
+  componentWillReceiveProps(newProps: CombinedProps): void {
     if (!this.props.selected && newProps.selected) {
       this.setState({isAnimating: true});
       this.executeAnimateIn();
@@ -99,7 +99,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     }
   }
 
-  executeAnimateIn() {
+  executeAnimateIn(): void {
     if (this.state.animationStep < _ClientItem.CONFIG.animationSteps) {
       window.requestAnimationFrame(this.executeAnimateIn.bind(this));
       this.setState(state => ({animationStep: state.animationStep + 1}));
@@ -108,7 +108,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     }
   }
 
-  executeAnimateOut() {
+  executeAnimateOut(): void {
     if (this.state.animationStep > 0) {
       window.requestAnimationFrame(this.executeAnimateOut.bind(this));
       this.setState(state => ({animationStep: state.animationStep - 1}));
@@ -117,7 +117,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     }
   }
 
-  formatDate = (dateString: string) =>
+  formatDate = (dateString: string): string =>
     dateString
       ? new Date(dateString).toLocaleString('en-US', {
           day: 'numeric',
@@ -130,7 +130,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
         })
       : '?';
 
-  formatName = (model: string, clazz: string) =>
+  formatName = (model: string, clazz: string): string | JSX.Element =>
     model || (
       <Text bold textTransform={'capitalize'}>
         {clazz}
@@ -140,12 +140,12 @@ class _ClientItem extends React.Component<CombinedProps, State> {
 
   resetState = () => this.setState(_ClientItem.initialState);
 
-  wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>): void => {
     this.resetState();
     this.props.onClick(event);
   };
 
-  handlePasswordlessClientDeletion = (event: React.FormEvent) => {
+  handlePasswordlessClientDeletion = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
     return Promise.resolve()
@@ -157,7 +157,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
       });
   };
 
-  handleSubmit = (event: React.FormEvent) => {
+  handleSubmit = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     let validationError = null;
     if (!this.passwordInput.current.checkValidity()) {
@@ -192,7 +192,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
       });
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       client,
       selected,

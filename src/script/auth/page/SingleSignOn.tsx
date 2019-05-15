@@ -179,7 +179,7 @@ class _SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State
 
   focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;

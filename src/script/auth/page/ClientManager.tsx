@@ -54,7 +54,7 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
       .catch(noop)
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;

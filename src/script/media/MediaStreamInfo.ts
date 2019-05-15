@@ -20,6 +20,7 @@
 import {CallEntity} from '../calling/entities/CallEntity';
 import {MediaStreamHandler} from './MediaStreamHandler';
 import {MediaStreamSource} from './MediaStreamSource';
+import {MediaType} from './MediaType';
 
 export class MediaStreamInfo {
   callEntity: CallEntity;
@@ -37,7 +38,7 @@ export class MediaStreamInfo {
     this.conversationId = callEntity ? callEntity.id : undefined;
   }
 
-  getType() {
+  getType(): MediaType {
     return MediaStreamHandler.detectMediaStreamType(this.stream);
   }
 }

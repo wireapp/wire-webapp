@@ -56,7 +56,7 @@ const store = configureStore({
   localStorage,
 });
 
-const Wrapper = (Component: React.ComponentClass) => (
+const Wrapper = (Component: React.ComponentClass): JSX.Element => (
   <AppContainer>
     <Provider store={store}>
       <Component />
@@ -64,11 +64,11 @@ const Wrapper = (Component: React.ComponentClass) => (
   </AppContainer>
 );
 
-const render = (Component: React.ComponentClass) => {
+const render = (Component: React.ComponentClass): void => {
   ReactDOM.render(Wrapper(Component), document.getElementById('main'));
 };
 
-function runApp() {
+function runApp(): void {
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
