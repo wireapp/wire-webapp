@@ -23,22 +23,22 @@ import {afterRender} from 'Util/util';
 import {Participant} from '../calling/Participant';
 import {Grid} from '../calling/videoGridHandler';
 
+enum VIDEO_SIZE {
+  EMPTY = 'empty',
+  FULL_SCREEN = 'full_screen',
+  HALF_SCREEN = 'half_screen',
+  QUARTER_SCREEN = 'quarter_screen',
+}
+
 class GroupVideoGrid {
   private readonly grid: ko.PureComputed<Grid>;
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
 
-  static get CONFIG() {
+  static get CONFIG(): any {
     return {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',
       RATIO_THRESHOLD: 0.4,
-      VIDEO_ELEMENT_SIZE: {
-        EMPTY: 'empty',
-        FULL_SCREEN: 'full_screen',
-        HALF_SCREEN: 'half_screen',
-        HIDDEN: 'hidden',
-        QUARTER_SCREEN: 'quarter_screen',
-      },
     };
   }
 
@@ -53,12 +53,12 @@ class GroupVideoGrid {
     this.grid.subscribe(() => afterRender(this.scaleVideos));
   }
 
-  hasBlackBackground() {
+  hasBlackBackground(): boolean {
     const gridElementsCount = this.grid().grid.filter(participant => !!participant).length;
     return this.minimized && gridElementsCount > 1;
   }
 
-  scaleVideos(rootElement: HTMLElement) {
+  scaleVideos(rootElement: HTMLElement): void {
     const elements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
     const setScale = (videoElement: HTMLVideoElement, wrapper: HTMLElement) => {
       const userId = wrapper.dataset.userId;
@@ -74,7 +74,7 @@ class GroupVideoGrid {
       wrapper: HTMLElement,
       isScreenSend: boolean,
       participant: Participant
-    ) => {
+    ): void => {
       const hasFitSet = false; // TODO streamInfo.hasOwnProperty('fitContain');
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
@@ -94,7 +94,7 @@ class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo = (viewModel: any, {currentTarget}: any) => {
+  doubleClickedOnVideo = (viewModel: any, {currentTarget}: any): void => {
     return; // TODO
     /*
     const childVideo = currentTarget.querySelector('video');
@@ -109,29 +109,27 @@ class GroupVideoGrid {
     */
   };
 
-  getSizeForVideo(index: number, participant: Participant) {
-    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
+  getSizeForVideo(index: number, participant: Participant): VIDEO_SIZE {
     const grid = this.grid().grid;
 
     const isAlone = grid.filter(member => !!member).length === 1;
     const hasVerticalNeighbor = index % 2 === 0 ? grid[index + 1] !== null : grid[index - 1] !== null;
 
     if (isAlone) {
-      return SIZES.FULL_SCREEN;
+      return VIDEO_SIZE.FULL_SCREEN;
     } else if (!hasVerticalNeighbor) {
-      return SIZES.HALF_SCREEN;
+      return VIDEO_SIZE.HALF_SCREEN;
     }
-    return SIZES.QUARTER_SCREEN;
+    return VIDEO_SIZE.QUARTER_SCREEN;
   }
 
-  getClassNameForVideo(index: number, participant: Participant) {
+  getClassNameForVideo(index: number, participant: Participant): string {
     const size = this.getSizeForVideo(index, participant);
-    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
-    const extraClasses = {
-      [SIZES.EMPTY]: 'group-video-grid__element--empty',
-      [SIZES.FULL_SCREEN]: 'group-video-grid__element--full-size',
-      [SIZES.HALF_SCREEN]: 'group-video-grid__element--full-height',
-      [SIZES.QUARTER_SCREEN]: '',
+    const extraClasses: Record<VIDEO_SIZE, string> = {
+      [VIDEO_SIZE.EMPTY]: 'group-video-grid__element--empty',
+      [VIDEO_SIZE.FULL_SCREEN]: 'group-video-grid__element--full-size',
+      [VIDEO_SIZE.HALF_SCREEN]: 'group-video-grid__element--full-height',
+      [VIDEO_SIZE.QUARTER_SCREEN]: '',
     };
 
     const roundedClass =
@@ -140,14 +138,13 @@ class GroupVideoGrid {
     return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
   }
 
-  getUIEValueForVideo(index: number, participant: Participant) {
+  getUIEValueForVideo(index: number, participant: Participant): string {
     const size = this.getSizeForVideo(index, participant);
-    const SIZES = GroupVideoGrid.CONFIG.VIDEO_ELEMENT_SIZE;
     const extraClasses = {
-      [SIZES.EMPTY]: '',
-      [SIZES.FULL_SCREEN]: 'full',
-      [SIZES.HALF_SCREEN]: 'half',
-      [SIZES.QUARTER_SCREEN]: 'quarter',
+      [VIDEO_SIZE.EMPTY]: '',
+      [VIDEO_SIZE.FULL_SCREEN]: 'full',
+      [VIDEO_SIZE.HALF_SCREEN]: 'half',
+      [VIDEO_SIZE.QUARTER_SCREEN]: 'quarter',
     };
     return extraClasses[size];
   }

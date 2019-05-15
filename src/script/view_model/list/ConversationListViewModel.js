@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 
-import {REASON as CALL_REASON} from 'avs-web';
+import {STATE as CALL_STATE} from 'avs-web';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -155,7 +155,7 @@ export class ConversationListViewModel {
 
   hasJoinableCall(conversationId) {
     const call = this.callingRepository.findCall(conversationId);
-    return call && call.reason() === CALL_REASON.STILL_ONGOING;
+    return call && call.state() === CALL_STATE.INCOMING;
   }
 
   setShowCallsState(handlingNotifications) {

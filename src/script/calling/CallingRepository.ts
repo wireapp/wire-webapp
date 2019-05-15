@@ -590,7 +590,7 @@ export class CallingRepository {
     destinationUserId: UserId,
     destinationClientId: DeviceId,
     payload: string
-  ): void => {
+  ): number => {
     const protoCalling = new Calling({content: payload});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,

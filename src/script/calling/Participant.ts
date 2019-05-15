@@ -48,13 +48,13 @@ export class Participant {
     this.videoStream = ko.observable();
   }
 
-  setVideoStream(videoStream: MediaStream, state: VIDEO_STATE) {
+  setVideoStream(videoStream: MediaStream, state: VIDEO_STATE): void {
     this.releaseVideoStream();
     this.videoStream(videoStream);
     this.videoState(state);
   }
 
-  releaseVideoStream() {
+  releaseVideoStream(): void {
     if (this.videoStream()) {
       this.videoStream()
         .getTracks()
