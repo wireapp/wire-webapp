@@ -171,19 +171,15 @@ describe('UserRepository', () => {
       });
 
       it('should find an existing user', () => {
-        return TestFactory.user_repository.findUserById(user.id).then(user_et => {
-          expect(user_et).toEqual(user);
-        });
+        const userEntity = TestFactory.user_repository.findUserById(user.id);
+
+        expect(userEntity).toEqual(user);
       });
 
-      it('should not find an unknown user', done => {
-        TestFactory.user_repository
-          .findUserById('1')
-          .then(done.fail)
-          .catch(error => {
-            expect(error.type).toBe(z.error.UserError.TYPE.USER_NOT_FOUND);
-            done();
-          });
+      it('should not find an unknown user', () => {
+        const userEntity = TestFactory.user_repository.findUserById('1');
+
+        expect(userEntity).toBe(undefined);
       });
     });
 
@@ -194,21 +190,21 @@ describe('UserRepository', () => {
         const user = new User();
         user.id = entities.user.jane_roe.id;
 
-        return TestFactory.user_repository.save_user(user).then(() => {
-          expect(TestFactory.user_repository.users().length).toBe(1);
-          expect(TestFactory.user_repository.users()[0]).toBe(user);
-        });
+        TestFactory.user_repository.save_user(user);
+
+        expect(TestFactory.user_repository.users().length).toBe(1);
+        expect(TestFactory.user_repository.users()[0]).toBe(user);
       });
 
       it('saves self user', () => {
         const user = new User();
         user.id = entities.user.jane_roe.id;
 
-        return TestFactory.user_repository.save_user(user, true).then(() => {
-          expect(TestFactory.user_repository.users().length).toBe(1);
-          expect(TestFactory.user_repository.users()[0]).toBe(user);
-          expect(TestFactory.user_repository.self()).toBe(user);
-        });
+        TestFactory.user_repository.save_user(user, true);
+
+        expect(TestFactory.user_repository.users().length).toBe(1);
+        expect(TestFactory.user_repository.users()[0]).toBe(user);
+        expect(TestFactory.user_repository.self()).toBe(user);
       });
     });
 
@@ -221,21 +217,20 @@ describe('UserRepository', () => {
         user_jane_roe = new User(entities.user.jane_roe.id);
         user_john_doe = new User(entities.user.john_doe.id);
 
-        return TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]).then(() => {
-          const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
-            entities.clients.john_doe.permanent
-          );
-          const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
-          const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
-            entities.clients.john_doe.temporary
-          );
-          const recipients = {
-            [entities.user.john_doe.id]: [permanent_client, temporary_client],
-            [entities.user.jane_roe.id]: [plain_client],
-          };
+        TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]);
+        const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
+          entities.clients.john_doe.permanent
+        );
+        const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
+        const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
+          entities.clients.john_doe.temporary
+        );
+        const recipients = {
+          [entities.user.john_doe.id]: [permanent_client, temporary_client],
+          [entities.user.jane_roe.id]: [plain_client],
+        };
 
-          spyOn(TestFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
-        });
+        spyOn(TestFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
       });
 
       afterEach(() => TestFactory.user_repository.users.removeAll());
