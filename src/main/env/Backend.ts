@@ -17,18 +17,25 @@
  *
  */
 
-class Backend {
-  public static PRODUCTION: {rest: string; ws: string; name: string} = {
-    name: 'production',
-    rest: 'https://prod-nginz-https.wire.com',
-    ws: 'wss://prod-nginz-ssl.wire.com',
-  };
-
-  public static STAGING: {rest: string; ws: string; name: string} = {
-    name: 'staging',
-    rest: 'https://staging-nginz-https.zinfra.io',
-    ws: 'wss://staging-nginz-ssl.zinfra.io',
-  };
+export interface BackendData {
+  name: string;
+  rest: string;
+  ws: string;
 }
 
-export {Backend};
+const PRODUCTION: BackendData = {
+  name: 'production',
+  rest: 'https://prod-nginz-https.wire.com',
+  ws: 'wss://prod-nginz-ssl.wire.com',
+};
+
+const STAGING: BackendData = {
+  name: 'staging',
+  rest: 'https://staging-nginz-https.zinfra.io',
+  ws: 'wss://staging-nginz-ssl.zinfra.io',
+};
+
+export const Backend = {
+  PRODUCTION,
+  STAGING,
+};
