@@ -62,7 +62,6 @@ export const WebAppEvents = {
       JOIN: 'wire.webapp.call.state.join',
       LEAVE: 'wire.webapp.call.state.leave',
       REJECT: 'wire.webapp.call.state.reject',
-      REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove_participant',
       TOGGLE: 'wire.webapp.call.state.toggle',
     },
   },

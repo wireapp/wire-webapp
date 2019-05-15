@@ -60,6 +60,7 @@ export class CallingRepository {
   private readonly eventRepository: any;
   private readonly mediaConstraintsHandler: any;
   private readonly serverTimeHandler: any;
+  private readonly userRepository: any;
 
   private selfUserId: UserId;
   private selfClientId: DeviceId;
@@ -74,7 +75,7 @@ export class CallingRepository {
   private callingConfigTimeout: number | undefined;
   private readonly callLogger: CallLogger;
 
-  static get CONFIG() {
+  static get CONFIG(): any {
     return {
       DATA_CHANNEL_MESSAGE_TYPES: [CALL_MESSAGE_TYPE.HANGUP, CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
@@ -96,7 +97,8 @@ export class CallingRepository {
     conversationRepository: any,
     eventRepository: any,
     mediaRepository: any,
-    serverTimeHandler: any
+    serverTimeHandler: any,
+    userRepository: any
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -107,6 +109,7 @@ export class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
+    this.userRepository = userRepository;
     // Media Handler
     this.mediaConstraintsHandler = mediaRepository.constraintsHandler;
 
@@ -116,10 +119,10 @@ export class CallingRepository {
     this.callingConfigTimeout = undefined;
 
     this.subscribeToEvents();
-    this._enableDebugging();
+    this.enableDebugging();
   }
 
-  initAvs(selfUserId: UserId, clientId: DeviceId) {
+  initAvs(selfUserId: UserId, clientId: DeviceId): void {
     this.selfUserId = selfUserId;
     this.selfClientId = clientId;
     getAvsInstance().then(callingInstance => {
@@ -130,12 +133,6 @@ export class CallingRepository {
   }
 
   configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
-    const log = (name: string) => {
-      return function() {
-        // eslint-disable-next-line no-console
-        //console.log('avs_cb', name, arguments);
-      };
-    };
     const avsLogger = getLogger('avs');
     wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
       const logFunctions = {
@@ -170,27 +167,6 @@ export class CallingRepository {
 
     const requestConfig = () => {
       this.getConfig().then((config: any) => wCall.configUpdate(this.wUser, 0, JSON.stringify(config)));
-      return 0;
-    };
-
-    const sendMessage = (
-      context: any,
-      conversationId: ConversationId,
-      userId: UserId,
-      clientId: string,
-      destinationUserId: string,
-      destinationClientId: string,
-      payload: string
-    ) => {
-      const protoCalling = new Calling({content: payload});
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-        messageId: createRandomUuid(),
-      });
-
-      const options = {}; // TODO {precondition, recipients};
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-      this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
       return 0;
     };
 
@@ -238,16 +214,16 @@ export class CallingRepository {
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
-      log('readyh'), //readyh,
-      sendMessage, //sendh,
+      () => {}, //readyh,
+      this.sendMessage, //sendh,
       incomingCall, //incomingh,
-      log('missedh'), //missedh,
-      log('answerh'), //answerh,
-      log('estabh'), //estabh,
+      () => {}, //missedh,
+      () => {}, //answerh,
+      () => {}, //estabh,
       callClosed, //closeh,
-      log('metricsh'), //metricsh,
+      () => {}, //metricsh,
       requestConfig, //cfg_reqh,
-      log('acbrh'), //acbrh,
+      () => {}, //acbrh,
       videoStateChanged, //vstateh,
       0
     );
@@ -305,11 +281,11 @@ export class CallingRepository {
     return call && call.participants().find(participant => participant.userId === userId);
   }
 
-  storeCall(call: Call) {
+  storeCall(call: Call): void {
     this.activeCalls.push(call);
   }
 
-  removeCall(call: Call) {
+  removeCall(call: Call): void {
     const index = this.activeCalls().indexOf(call);
     call.selfParticipant.releaseVideoStream();
     if (index !== -1) {
@@ -317,7 +293,7 @@ export class CallingRepository {
     }
   }
 
-  loadVideoPreview(call: Call) {
+  loadVideoPreview(call: Call): void {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
@@ -346,11 +322,10 @@ export class CallingRepository {
    * Subscribe to amplify topics.
    * @returns {undefined} No return value
    */
-  subscribeToEvents() {
+  subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.LEAVE, this.leaveCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, this.removeParticipant.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.getConfig);
   }
@@ -366,7 +341,7 @@ export class CallingRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  onCallEvent(event: any, source: string) {
+  onCallEvent(event: any, source: string): void {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
@@ -411,7 +386,7 @@ export class CallingRepository {
    * @param [conversationEntity] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggleState(mediaType: MediaType, conversationEntity: any = this.conversationRepository.active_conversation()) {
+  toggleState(mediaType: MediaType, conversationEntity: any = this.conversationRepository.active_conversation()): void {
     if (conversationEntity) {
       // TODO deduce active call from avs api
       const isActiveCall = false;
@@ -431,7 +406,7 @@ export class CallingRepository {
    * @param {CALL_TYPE} callType - Type of call (audio or video)
    * @returns {undefined} No return value
    */
-  startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE) {
+  startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE): void {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const call = new Call(conversationId, conversationType, selfParticipant, callType);
     this.storeCall(call);
@@ -441,7 +416,7 @@ export class CallingRepository {
     this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
   }
 
-  toggleCamera(conversationId: ConversationId) {
+  toggleCamera(conversationId: ConversationId): void {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -454,7 +429,7 @@ export class CallingRepository {
     }
   }
 
-  toggleScreenshare(conversationId: ConversationId) {
+  toggleScreenshare(conversationId: ConversationId): void {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -468,11 +443,11 @@ export class CallingRepository {
     this.getMediaStream(conversationId, false, false, true);
   }
 
-  answerCall(conversationId: ConversationId, callType: number) {
+  answerCall(conversationId: ConversationId, callType: number): void {
     this.wCall.answer(this.wUser, conversationId, callType, 0);
   }
 
-  rejectCall(conversationId: ConversationId) {
+  rejectCall(conversationId: ConversationId): void {
     // TODO sort out if rejection should be shared accross devices (does avs handle it?)
     this.wCall.reject(this.wUser, conversationId);
   }
@@ -483,19 +458,15 @@ export class CallingRepository {
    * @param {string} conversationId - ID of conversation to leave call in
    * @returns {undefined} No return value
    */
-  leaveCall(conversationId: ConversationId) {
+  leaveCall(conversationId: ConversationId): void {
     this.wCall.end(this.wUser, conversationId);
   }
 
-  removeParticipant(conversationId: ConversationId, userId: UserId) {
-    throw new Error('TODO: implement removeParticipant');
-  }
-
-  muteCall(conversationId: ConversationId, isMuted: boolean) {
+  muteCall(conversationId: ConversationId, isMuted: boolean): void {
     this.wCall.setMute(this.wUser, isMuted ? 1 : 0);
   }
 
-  callTypeFromMediaType(mediaType: MediaType): CALL_TYPE {
+  private callTypeFromMediaType(mediaType: MediaType): CALL_TYPE {
     const types: Record<MediaType, CALL_TYPE> = {
       [MediaType.AUDIO]: CALL_TYPE.NORMAL,
       [MediaType.AUDIO_VIDEO]: CALL_TYPE.VIDEO,
@@ -507,7 +478,7 @@ export class CallingRepository {
     return types[mediaType] || CALL_TYPE.NORMAL;
   }
 
-  getMediaStream = (
+  private readonly getMediaStream = (
     conversationId: ConversationId,
     audio: boolean,
     video: boolean,
@@ -585,7 +556,7 @@ export class CallingRepository {
    * @param {EventRepository.SOURCE} source - Source of the event
    * @returns {void} - nothing
    */
-  injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string) {
+  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time);
     this.eventRepository.injectEvent(event, source);
   }
@@ -600,15 +571,97 @@ export class CallingRepository {
    * @param {EventRepository.SOURCE} source - Source of the event
    * @returns {void} - nothing
    */
-  injectDeactivateEvent(
+  private injectDeactivateEvent(
     conversationId: ConversationId,
     userId: UserId,
     reason: TERMINATION_REASON,
     time: number,
     source: string
-  ) {
+  ): void {
     const event = EventBuilder.buildVoiceChannelDeactivate(conversationId, userId, reason, time);
     this.eventRepository.injectEvent(event, source);
+  }
+
+  private readonly sendMessage = (
+    context: any,
+    conversationId: ConversationId,
+    userId: UserId,
+    clientId: DeviceId,
+    destinationUserId: UserId,
+    destinationClientId: DeviceId,
+    payload: string
+  ): void => {
+    const protoCalling = new Calling({content: payload});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+      messageId: createRandomUuid(),
+    });
+
+    const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+    this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+    return 0;
+  };
+
+  private targetMessageRecipients(
+    payload: string,
+    remoteUserId: UserId | null,
+    remoteClientId: DeviceId | null
+  ): {precondition: any; recipients: any} {
+    const {type, resp} = JSON.parse(payload);
+    const selfUserEntity = this.userRepository.self();
+    let precondition;
+    let recipients;
+
+    switch (type) {
+      case CALL_MESSAGE_TYPE.CANCEL: {
+        if (resp && remoteUserId) {
+          // Send to remote client that initiated call
+          precondition = true;
+          recipients = {
+            [remoteUserId]: [`${remoteClientId}`],
+          };
+        }
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.GROUP_SETUP:
+      case CALL_MESSAGE_TYPE.HANGUP:
+      case CALL_MESSAGE_TYPE.PROP_SYNC:
+      case CALL_MESSAGE_TYPE.UPDATE: {
+        // Send to remote client that call is connected with
+        if (remoteClientId) {
+          precondition = true;
+          recipients = {
+            [remoteUserId]: [`${remoteClientId}`],
+          };
+        }
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.REJECT: {
+        // Send to all clients of self user
+        precondition = [selfUserEntity.id];
+        recipients = {
+          [selfUserEntity.id]: selfUserEntity.devices().map((device: any) => device.id),
+        };
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.SETUP: {
+        if (resp && remoteUserId) {
+          // Send to remote client that initiated call and all clients of self user
+          precondition = [selfUserEntity.id];
+          recipients = {
+            [remoteUserId]: [`${remoteClientId}`],
+            [selfUserEntity.id]: selfUserEntity.devices().map((device: any) => device.id),
+          };
+        }
+        break;
+      }
+    }
+
+    return {precondition, recipients};
   }
 
   //##############################################################################
@@ -620,7 +673,7 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    * @returns {undefined} No return value
    */
-  leaveCallOnUnload() {
+  leaveCallOnUnload(): void {
     this.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));
   }
 
@@ -641,7 +694,7 @@ export class CallingRepository {
         return Promise.resolve(this.callingConfig);
       }
 
-      this._clearConfig();
+      this.clearConfig();
     }
 
     return this._getConfigFromBackend();
@@ -667,7 +720,7 @@ export class CallingRepository {
     });
   }
 
-  _clearConfig() {
+  private clearConfig(): void {
     if (this.callingConfig) {
       const expirationDate = this.callingConfig.expiration.toISOString();
       this.callLogger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
@@ -675,7 +728,7 @@ export class CallingRepository {
     }
   }
 
-  _clearConfigTimeout() {
+  private clearConfigTimeout(): void {
     if (this.callingConfigTimeout) {
       window.clearTimeout(this.callingConfigTimeout);
       this.callingConfigTimeout = undefined;
@@ -693,7 +746,7 @@ export class CallingRepository {
 
     return this.fetchConfig(limit).then(callingConfig => {
       if (callingConfig) {
-        this._clearConfigTimeout();
+        this.clearConfigTimeout();
 
         const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
         const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
@@ -710,7 +763,7 @@ ${turnServersConfig}`;
         this.callingConfig = callingConfig;
 
         this.callingConfigTimeout = window.setTimeout(() => {
-          this._clearConfig();
+          this.clearConfig();
           this.getConfig();
         }, timeout);
 
@@ -727,7 +780,7 @@ ${turnServersConfig}`;
    * Set logging on adapter.js.
    * @returns {undefined} No return value
    */
-  _enableDebugging() {
+  private enableDebugging(): void {
     adapter.disableLog = false;
   }
 

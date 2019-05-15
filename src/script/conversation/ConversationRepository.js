@@ -3573,10 +3573,6 @@ export class ConversationRepository {
               if (userEntity.isTemporaryGuest()) {
                 userEntity.clearExpirationTimeout();
               }
-
-              if (conversationEntity.call()) {
-                amplify.publish(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
-              }
             });
 
           return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
