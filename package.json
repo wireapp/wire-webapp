@@ -75,7 +75,7 @@
     "@types/sdp-transform": "2.4.0",
     "@types/speakingurl": "13.0.2",
     "@types/uint32": "0.2.0",
-    "@types/underscore": "1.8.14",
+    "@types/underscore": "1.8.16",
     "@types/uuid": "3.4.4",
     "@types/webpack-env": "1.13.9",
     "@wireapp/copy-config": "0.5.5",
