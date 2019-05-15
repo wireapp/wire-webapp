@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.2...@wireapp/react-ui-kit@6.4.3) (2019-05-15)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Export buttonLinkStyles ([#1838](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1838)) ([2c84c48](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/2c84c48))
+
+
+
+
+
 ## [6.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.1...@wireapp/react-ui-kit@6.4.2) (2019-05-14)
 
 
