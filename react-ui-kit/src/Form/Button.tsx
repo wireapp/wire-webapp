@@ -95,4 +95,4 @@ const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
   <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)} />
 );
 
-export {Button, ButtonLink, buttonStyle, filterButtonProps};
+export {Button, ButtonLink, buttonStyle, filterButtonProps, buttonLinkStyle};
