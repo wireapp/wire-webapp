@@ -5,11 +5,11 @@ RUN apk add --no-cache dumb-init git bash
 
 COPY /server .
 COPY /run.sh .
-COPY /env.defaults .
+COPY /.env.defaults .
 ENV NODE_PATH=/node_modules
 ENV PATH=$PATH:/node_modules/.bin
 
-RUN yarn
+RUN yarn --production --ignore-scripts
 
 EXPOSE 8080
 
