@@ -43,7 +43,16 @@ import {DeviceId, Participant, UserId} from './Participant';
 
 import {WebAppEvents} from '../event/WebApp';
 
-import {CALL_TYPE, CONV_TYPE, ENV as AVS_ENV, STATE as CALL_STATE, VIDEO_STATE, Wcall, getAvsInstance} from 'avs-web';
+import {
+  CALL_TYPE,
+  CONV_TYPE,
+  ENV as AVS_ENV,
+  LOG_LEVEL,
+  STATE as CALL_STATE,
+  VIDEO_STATE,
+  Wcall,
+  getAvsInstance,
+} from 'avs-web';
 
 export class CallingRepository {
   private readonly backendClient: any;
@@ -124,13 +133,18 @@ export class CallingRepository {
     const log = (name: string) => {
       return function() {
         // eslint-disable-next-line no-console
-        console.log('avs_cb', name, arguments);
+        //console.log('avs_cb', name, arguments);
       };
     };
     const avsLogger = getLogger('avs');
-    wCall.setLogHandler((level: number, message: string, arg: any) => {
-      // TODO handle levels
-      avsLogger.debug(message);
+    wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
+      const logFunctions = {
+        [LOG_LEVEL.DEBUG]: avsLogger.debug,
+        [LOG_LEVEL.INFO]: avsLogger.log,
+        [LOG_LEVEL.WARN]: avsLogger.warn,
+        [LOG_LEVEL.ERROR]: avsLogger.error,
+      };
+      logFunctions[level].call(avsLogger, message);
     });
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
