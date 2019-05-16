@@ -27,14 +27,14 @@ interface LegalHoldParams {
 
 ko.components.register('legal-hold-dot', {
   template: `
-    <div class="legal-hold-dot" 
+    <div class="legal-hold-dot"
          data-bind="click: onClick, css: {'legal-hold-dot--large': large, 'legal-hold-dot--active': !isPending}">
       <!-- ko if: isPending -->
         <pending-icon></pending-icon>
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({isPending = false, large = false, conversation}: LegalHoldParams) {
+  viewModel: function({isPending = false, large = false, conversation}: LegalHoldParams): void {
     this.large = large;
     this.isPending = isPending;
     this.conversation = conversation;
