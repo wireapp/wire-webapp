@@ -106,7 +106,7 @@ ko.components.register('user-devices', {
       <!-- ko if: showDevicesNotFound() -->
         <div class="participant-devices__header">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
-          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: window.wire.env.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
+          <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->
 
@@ -158,6 +158,7 @@ ko.components.register('user-devices', {
   }: UserDevicesParams) {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.pureComputed(() => userEntity() && userEntity().devices());
+    this.Config = Config;
 
     const logger = getLogger('UserDevices');
 
@@ -171,8 +172,9 @@ ko.components.register('user-devices', {
 
     this.showDeviceDetails = () => current() === UserDevicesState.DEVICE_DETAILS;
     this.showSelfFingerprint = () => current() === UserDevicesState.SELF_FINGERPRINT;
-    this.showDevicesFound = () => current() === UserDevicesState.DEVICE_LIST;
-    this.showDevicesNotFound = () => current() === UserDevicesState.DEVICE_LIST;
+    const showDeviceList = () => current() === UserDevicesState.DEVICE_LIST;
+    this.showDevicesFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.FOUND;
+    this.showDevicesNotFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.NOT_FOUND;
 
     clientRepository
       .getClientsByUserId(userEntity().id)
