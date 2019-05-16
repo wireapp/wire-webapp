@@ -38,7 +38,7 @@ interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
   goTo: (to: UserDevicesState, head: string) => void;
   goBack: () => void;
-  headline: ko.PureComputed<strings>;
+  headline: ko.PureComputed<string>;
 }
 
 interface UserDevicesParams {
