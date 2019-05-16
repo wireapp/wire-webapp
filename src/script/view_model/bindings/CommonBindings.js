@@ -323,23 +323,6 @@ ko.bindingHandlers.load_image_on_hover = {
 };
 
 /**
- * This execution trims the underlying value.
- * @returns {ko.computed} Computed
- */
-ko.subscribable.fn.trimmed = function() {
-  return ko.computed({
-    owner: this,
-    read() {
-      return this().trim();
-    },
-    write(value) {
-      this(value.trim());
-      this.valueHasMutated();
-    },
-  });
-};
-
-/**
  * Will only fire once when the value has changed.
  * @param {*} handler - Handler
  * @param {ko.observable} owner - Subscription owner

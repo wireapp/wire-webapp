@@ -6,6 +6,7 @@
                           data-uie-name="status-availability"
                           params="availability: selfAvailability, label: selfUserName">
       </availability-state>
+      <legal-hold-dot style="margin: 0 16px 0 auto" params="userRepository: userRepository, conversationRepository: conversationRepository, legalHoldModal: contentViewModel.legalHoldModal"></legal-hold-dot>
     <!-- /ko -->
     <!-- ko ifnot: isTeam() -->
       <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>

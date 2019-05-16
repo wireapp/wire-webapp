@@ -1,0 +1,20 @@
+<div class="legal-hold-modal" data-bind="with: $root.legalHoldModal">
+  <modal params="isShown: isVisible, onBgClick: hide, onClosed: onClosed" data-uie-name="legal-hold-modal">
+    <div class="modal__header">
+      <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+    </div>
+    <div class="modal__body">
+      <legal-hold-dot class="legal-hold-modal__logo" params="large: true"></legal-hold-dot>
+      <div class="legal-hold-modal__headline">Legal Hold</div>
+      <p class="legal-hold-modal__info">
+        Legal Hold has been activated for your account.<br />All messages will be preserved for future access, including
+        deleted, edited, and timed messages.<br />Your conversation partners will be aware of the recording.
+      </p>
+      <div class="legal-hold-modal__subjects">Legal Hold Subjects</div>
+
+      <user-list
+        params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
+      ></user-list>
+    </div>
+  </modal>
+</div>

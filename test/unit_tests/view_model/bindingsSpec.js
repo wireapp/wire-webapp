@@ -82,27 +82,4 @@ describe('ko.bindingHandlers', () => {
       expect(handler.callback).toHaveBeenCalledWith(true);
     });
   });
-
-  describe('ko.subscribable.fn.trimmed', () => {
-    let observable = null;
-
-    beforeEach(() => {
-      observable = ko.observable('').trimmed();
-    });
-
-    it('trims spaces', () => {
-      observable(' foo');
-
-      expect(observable()).toBe('foo');
-      observable('foo ');
-
-      expect(observable()).toBe('foo');
-      observable(' foo ');
-
-      expect(observable()).toBe('foo');
-      observable(' foo bar ');
-
-      expect(observable()).toBe('foo bar');
-    });
-  });
 });
