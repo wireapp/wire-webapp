@@ -2258,10 +2258,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-3.0.3.tgz#f771af8cc10a6a3481a42c3f374af9448a0689c8"
-  integrity sha512-E/AvmqI1bfYU1c8p+Q7xCc9TGoTOp/yV8WsUHuJ+eGYEHmakEazbl3OrJCYkacBdLEqq19p/G3OyjBSDUJTUqA==
+maxmind@3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-3.0.4.tgz#f8257ec6d352c8a7e486dffdb636bb8704f502fc"
+  integrity sha512-q6mB5COkgAM+KQgromGXyTn0CBwVgcfja2B42aMoFAJah87rN2Joq0WNB981QnNlwVtiDsLZgMRCPP8PvpOt4w==
   dependencies:
     tiny-lru "6.0.1"
 
