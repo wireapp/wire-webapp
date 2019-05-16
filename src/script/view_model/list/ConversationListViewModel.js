@@ -146,11 +146,7 @@ export class ConversationListViewModel {
   }
 
   getConversationById(conversationId) {
-    const conversationObs = ko.observable();
-    this.conversationRepository
-      .get_conversation_by_id(conversationId)
-      .then(conversationEntity => conversationObs(conversationEntity));
-    return conversationObs;
+    return this.conversationRepository.find_conversation_by_id(conversationId);
   }
 
   hasJoinableCall(conversationId) {
