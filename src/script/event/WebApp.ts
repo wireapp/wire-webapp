@@ -223,6 +223,8 @@ export const WebAppEvents = {
     CLIENT_ADDED: 'wire.webapp.user.client_added',
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
     EVENT_FROM_BACKEND: 'wire.webapp.user.event_from_backend',
+    LEGAL_HOLD_ACTIVATED: 'wire.webapp.user.legal_hold_activated',
+    LEGAL_HOLD_REMOVED: 'wire.webapp.user.legal_hold_removed',
     PERSIST: 'wire.webapp.user.persist',
     SET_AVAILABILITY: 'wire.webapp.user.set_availability',
     UNBLOCKED: 'wire.webapp.user.unblocked',
