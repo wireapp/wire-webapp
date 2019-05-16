@@ -103,7 +103,10 @@ export class CallingRepository {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
 
-    this.joinedCall = ko.observable();
+    this.joinedCall = ko.observable({
+      //@ts-ignore
+      getFlows: () => this.wCall.getPeerConnections(),
+    });
 
     this.backendClient = backendClient;
     this.conversationRepository = conversationRepository;
@@ -233,12 +236,7 @@ export class CallingRepository {
       if (call) {
         const {members} = JSON.parse(membersJson);
         const newMemberList: Participant[] = members.map(({userid, clientid}: any) => {
-          const existingParticipant = this.findParticipant(conversationId, userid);
-          if (existingParticipant) {
-            // TODO update participant with new state if needed
-            return existingParticipant;
-          }
-          return new Participant(userid, clientid);
+          return this.findParticipant(conversationId, userid) || new Participant(userid, clientid);
         });
         call.participants(newMemberList);
       }
@@ -388,8 +386,7 @@ export class CallingRepository {
    */
   toggleState(mediaType: MediaType, conversationEntity: any = this.conversationRepository.active_conversation()): void {
     if (conversationEntity) {
-      // TODO deduce active call from avs api
-      const isActiveCall = false;
+      const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       const callType = this.callTypeFromMediaType(mediaType);
       return isActiveCall
@@ -599,7 +596,9 @@ export class CallingRepository {
 
     const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+    this.conversationRepository
+      .sendCallingMessage(eventInfoEntity, conversationId)
+      .catch(() => this.leaveCall(conversationId));
     return 0;
   };
 

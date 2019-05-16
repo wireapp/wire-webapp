@@ -46,10 +46,6 @@ class ConversationListCallingCell {
     this.callActions = callActions;
 
     this.videoGrid = videoGrid;
-    this.hasVideoGrid = () => {
-      const grid = this.videoGrid();
-      return grid.grid.filter(participant => !!participant).length > 0 || grid.thumbnail;
-    };
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
     );
@@ -91,8 +87,16 @@ class ConversationListCallingCell {
     });
     this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
 
+    const hasVideoGrid = () => {
+      const grid = this.videoGrid();
+      return grid.grid.filter(participant => !!participant).length > 0 || grid.thumbnail;
+    };
+    this.showVideoGrid = ko.pureComputed(() => {
+      return hasVideoGrid() && (this.multitasking.isMinimized() || !this.isOngoing());
+    });
+
     this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
-    this.disableScreenButton = false; // !this.callingRepository.supportsScreenSharing;
+    this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
       const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
@@ -137,8 +141,6 @@ class ConversationListCallingCell {
       const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
       return isOutgoingVideoCall || isVideoUnsupported;
     });
-    this.disableScreenButton = ko.pureComputed(() => !this.callingRepository.supportsScreenSharing);
-
     this.showVideoPreview = ko.pureComputed(() => {
       const hasOtherOngoingCalls = this.calls().some(callEntity => {
         return callEntity.id !== this.call().id && callEntity.isOngoing();
@@ -234,7 +236,7 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
     </div>
 
-    <!-- ko if: hasVideoGrid() -->
+    <!-- ko if: showVideoGrid() -->
       <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
         <group-video-grid params="minimized: true, grid: videoGrid"></group-video-grid>
         <!-- ko if: showMaximize() -->

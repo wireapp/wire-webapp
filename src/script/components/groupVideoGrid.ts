@@ -34,6 +34,7 @@ class GroupVideoGrid {
   private readonly grid: ko.PureComputed<Grid>;
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
+  public readonly muted: ko.Observable<boolean>;
 
   static get CONFIG(): any {
     return {
@@ -42,9 +43,17 @@ class GroupVideoGrid {
     };
   }
 
-  constructor({minimized, grid}: {minimized: boolean; grid: ko.PureComputed<Grid>}, rootElement: HTMLElement) {
+  constructor(
+    {
+      minimized,
+      grid,
+      muted,
+    }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined},
+    rootElement: HTMLElement
+  ) {
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
+    this.muted = muted || ko.observable(false);
     this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
@@ -159,9 +168,10 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-            css: getClassNameForVideo($index()),
-            attr: {'data-uie-name': 'item-grid', 'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
-            event: {dblclick: doubleClickedOnVideo}"
+              css: getClassNameForVideo($index()),
+              attr: {'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
+              event: {dblclick: doubleClickedOnVideo}"
+            data-uie-name="item-grid"
           >
             <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream()">
             </video>
@@ -172,7 +182,7 @@ ko.components.register('group-video-grid', {
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
           <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
           </video>
-          <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
+          <!-- ko if: muted() -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
               <micoff-icon></micoff-icon>
             </div>

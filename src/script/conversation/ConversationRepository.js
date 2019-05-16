@@ -2021,8 +2021,6 @@ export class ConversationRepository {
         if (!this._isUserCancellationError(error)) {
           throw error;
         }
-
-        amplify.publish(WebAppEvents.CALL.STATE.DELETE, callMessageEntity.conversationId);
       });
   }
 

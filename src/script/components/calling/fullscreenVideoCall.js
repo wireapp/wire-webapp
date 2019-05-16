@@ -17,7 +17,7 @@
  *
  */
 
-//import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
@@ -35,18 +35,19 @@ export class FullscreenVideoCalling {
     };
   }
 
-  constructor({videoGrid, call, conversation, multitasking, callActions, isMuted}) {
+  constructor({videoGrid, call, conversation, multitasking, canShareScreen, callActions, isMuted}) {
     this.call = call;
     this.conversation = conversation;
     this.videoGrid = videoGrid;
     this.multitasking = multitasking;
     this.isMuted = isMuted;
     this.callActions = callActions;
+    this.logger = getLogger('VideoCallingViewModel');
 
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
 
     this.showRemoteParticipant = ko.pureComputed(() => false); // TODO
-    this.disableToggleScreen = ko.pureComputed(() => false); // TODO pass on the screensharing capability
+    this.canShareScreen = canShareScreen;
     this.selfSharesScreen = ko.pureComputed(() => call.selfParticipant.sharesScreen()); // TODO
     this.showSwitchCamera = ko.pureComputed(() => {
       return false; //TODO handle multiple cameras
@@ -84,6 +85,9 @@ export class FullscreenVideoCalling {
       }
     });
 
+    this.hasUnreadMessages = ko.observable(false);
+    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
+
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
@@ -101,7 +105,6 @@ export class FullscreenVideoCalling {
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;
-    this.logger = getLogger('VideoCallingViewModel');
 
     this.hasSelfVideo = this.streamHandler.hasActiveVideo;
     this.selfStreamState = this.streamHandler.selfStreamState;
@@ -198,58 +201,54 @@ export class FullscreenVideoCalling {
       }
     });
 
-    this.hasUnreadMessages = ko.observable(false);
 
     amplify.subscribe(WebAppEvents.CALL.MEDIA.CHOOSE_SCREEN, this.chooseSharedScreen);
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     this.MediaDeviceType = MediaDeviceType;
     */
   }
 
   chooseSharedScreen(conversationId) {
-    if (!this.disableToggleScreen()) {
-      const skipScreenSelection =
-        this.selfStreamState.screenSend() || Environment.browser.firefox || navigator.mediaDevices.getDisplayMedia;
-      if (skipScreenSelection) {
-        amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
-        return;
-      }
+    const skipScreenSelection =
+      this.selfStreamState.screenSend() || Environment.browser.firefox || navigator.mediaDevices.getDisplayMedia;
+    if (skipScreenSelection) {
+      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
+      return;
+    }
 
-      if (window.desktopCapturer) {
-        this.mediaRepository.devicesHandler
-          .getScreenSources()
-          .then(screenSources => {
-            const conversationEntity = this.joinedCall().conversationEntity;
+    if (window.desktopCapturer) {
+      this.mediaRepository.devicesHandler
+        .getScreenSources()
+        .then(screenSources => {
+          const conversationEntity = this.joinedCall().conversationEntity;
 
-            const attributes = {
-              conversation_type: trackingHelpers.getConversationType(conversationEntity),
-              kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
-              num_screens: screenSources.length,
-            };
+          const attributes = {
+            conversation_type: trackingHelpers.getConversationType(conversationEntity),
+            kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
+            num_screens: screenSources.length,
+          };
 
-            const isTeamConversation = !!conversationEntity.team_id;
-            if (isTeamConversation) {
-              Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
+          const isTeamConversation = !!conversationEntity.team_id;
+          if (isTeamConversation) {
+            Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
+          }
+
+          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SHARED_SCREEN, attributes);
+
+          const hasMultipleScreens = screenSources.length > 1;
+          if (hasMultipleScreens) {
+            this.isChoosingScreen(true);
+            if (this.multitasking.isMinimized()) {
+              this.multitasking.resetMinimize(true);
+              this.multitasking.isMinimized(false);
             }
-
-            amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SHARED_SCREEN, attributes);
-
-            const hasMultipleScreens = screenSources.length > 1;
-            if (hasMultipleScreens) {
-              this.isChoosingScreen(true);
-              if (this.multitasking.isMinimized()) {
-                this.multitasking.resetMinimize(true);
-                this.multitasking.isMinimized(false);
-              }
-            } else {
-              amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
-            }
-          })
-          .catch(error => {
-            this.logger.error('Unable to get screens sources for sharing', error);
-          });
-      }
+          } else {
+            amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
+          }
+        })
+        .catch(error => {
+          this.logger.error('Unable to get screens sources for sharing', error);
+        });
     }
   }
 
@@ -258,9 +257,7 @@ export class FullscreenVideoCalling {
   }
 
   clickedOnShareScreen() {
-    if (!this.disableToggleScreen() && this.joinedCall()) {
-      this.chooseSharedScreen(this.joinedCall().id);
-    }
+    this.chooseSharedScreen(this.joinedCall().id);
   }
 
   clickedOnChooseScreen(screenSource) {
@@ -290,7 +287,7 @@ export class FullscreenVideoCalling {
     this.mediaRepository.devicesHandler.toggleNextScreen();
   }
 
-  clickedOnMinimize() {
+  minimize() {
     this.multitasking.isMinimized(true);
     this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
@@ -300,7 +297,7 @@ ko.components.register('fullscreen-video-call', {
   template: `
 <div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}" class="video-calling">
   <div id="video-element-remote" class="video-element-remote">
-    <group-video-grid params="grid: videoGrid"></group-video-grid>
+    <group-video-grid params="grid: videoGrid, muted: isMuted"></group-video-grid>
   </div>
 
   <!-- ko if: showRemoteParticipant() -->
@@ -326,6 +323,16 @@ ko.components.register('fullscreen-video-call', {
       <div class="video-controls__fit-info" data-bind="text: t('videoCallOverlayFitVideoLabel')" data-uie-name="label-fit-fill-info"></div>
       <div class="video-controls__wrapper">
 
+        <div class="video-controls__button" data-bind="click: minimize" data-uie-name="do-call-controls-video-minimize">
+          <!-- ko if: hasUnreadMessages() -->
+            <message-unread-icon></message-unread-icon>
+          <!-- /ko -->
+          <!-- ko ifnot: hasUnreadMessages() -->
+            <message-icon></message-icon>
+          <!-- /ko -->
+          <div class="video-controls__button__label" data-bind="text: t('videoCallOverlayConversations')"></div>
+        </div>
+
         <div class="video-controls__button"
             data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'video-controls__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active'}"
             data-uie-name="do-call-controls-video-call-mute">
@@ -350,7 +357,11 @@ ko.components.register('fullscreen-video-call', {
         <!-- /ko -->
 
         <div class="video-controls__button"
-            data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableToggleScreen()}, click: () => callActions.toggleScreenshare(call), css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': disableToggleScreen()}, attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableToggleScreen() ? 'false' : 'true'}"
+            data-bind="
+              tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: canShareScreen},
+              click: () => callActions.toggleScreenshare(call),
+              css: {'video-controls__button--active': selfSharesScreen(), 'video-controls__button--disabled': !canShareScreen},
+              attr: {'data-uie-value': selfSharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': canShareScreen ? 'true' : 'false'}"
             data-uie-name="do-toggle-screen">
           <screenshare-icon></screenshare-icon>
           <!-- ko if: showSwitchScreen() -->
