@@ -21,6 +21,7 @@ import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import EventEmitter from 'events';
 import logdown from 'logdown';
 
+import {AccountAPI} from './account/AccountAPI';
 import {AssetAPI} from './asset/';
 import {AccessTokenStore, AuthAPI, Context, InvalidTokenError, LoginData, RegisterData} from './auth/';
 import {BroadcastAPI} from './broadcast/';
@@ -51,6 +52,7 @@ class APIClient extends EventEmitter {
 
   private readonly STORE_NAME_PREFIX = 'wire';
   // APIs
+  public account: {api: AccountAPI};
   public asset: {api: AssetAPI};
   public auth: {api: AuthAPI};
   public broadcast: {api: BroadcastAPI};
@@ -105,6 +107,9 @@ class APIClient extends EventEmitter {
       ws: webSocket,
     };
 
+    this.account = {
+      api: new AccountAPI(this.transport.http),
+    };
     this.asset = {
       api: new AssetAPI(this.transport.http),
     };
