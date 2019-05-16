@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.4.0...@wireapp/api-client@4.5.0) (2019-05-16)
+
+
+### Features
+
+* **api-client:** Account API ([#1843](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1843)) ([092f779](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/092f779))
+
+
+
+
+
 # [4.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.3.2...@wireapp/api-client@4.4.0) (2019-05-15)
 
 
