@@ -287,7 +287,7 @@ class _Login extends React.Component<CombinedProps, State> {
       });
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
       loginError,

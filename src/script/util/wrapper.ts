@@ -21,7 +21,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {ROLE} from '../user/UserPermission';
 import {Environment} from './Environment';
 
-export function exposeWrapperGlobals() {
+export function exposeWrapperGlobals(): void {
   if (Environment.desktop && Environment.electron) {
     window.z = window.z || {};
 

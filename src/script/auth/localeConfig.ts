@@ -25,28 +25,28 @@ import {getURLParameter} from './util/urlUtil';
 export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_LANGUAGE = 'en-US';
 
-function getLocale() {
+function getLocale(): string {
   return mapLanguage(navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language);
 }
 
-export function currentLanguage() {
+export function currentLanguage(): string {
   return mapLanguage(getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
 }
 
-export function currentCurrency() {
+export function currentCurrency(): string {
   return getURLParameter(QUERY_KEY.CURRENCY).toUpperCase() || DEFAULT_CURRENCY;
 }
 
-export function normalizeLanguage(language: string = DEFAULT_LANGUAGE) {
+export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {
   const LANGUAGE_SHORTHAND_LENGTH = 2;
   return language.substring(0, LANGUAGE_SHORTHAND_LENGTH);
 }
 
-export function findLanguage(language: string = DEFAULT_LANGUAGE) {
+export function findLanguage(language: string = DEFAULT_LANGUAGE): string {
   language = normalizeLanguage(language);
   return Locales.find(locale => locale.startsWith(language));
 }
 
-export function mapLanguage(language: string = DEFAULT_LANGUAGE) {
+export function mapLanguage(language: string = DEFAULT_LANGUAGE): string {
   return findLanguage(language) || DEFAULT_LANGUAGE;
 }

@@ -78,11 +78,11 @@ class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps &
     isValidTeamName: !!this.props.teamName,
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.props.enterTeamCreationFlow();
   }
 
-  handleSubmit = (event: React.FormEvent) => {
+  handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
     this.teamNameInput.current.value = this.teamNameInput.current.value.trim();
     if (!this.teamNameInput.current.checkValidity()) {
@@ -114,7 +114,7 @@ class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps &
     this.props.resetInviteErrors();
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;

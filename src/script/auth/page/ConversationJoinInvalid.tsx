@@ -40,7 +40,7 @@ class _ConversationJoinInvalid extends React.PureComponent<
 > {
   state = {};
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;

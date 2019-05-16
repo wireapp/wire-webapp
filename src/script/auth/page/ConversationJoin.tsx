@@ -368,7 +368,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
-  render() {
+  render(): JSX.Element {
     return (
       <UnsupportedBrowser isTemporaryGuest>
         <WirelessContainer

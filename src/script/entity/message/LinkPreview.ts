@@ -39,7 +39,7 @@ export class LinkPreview {
     this.meta_data_type = undefined;
   }
 
-  obfuscate() {
+  obfuscate(): void {
     this.title = obfuscate(this.title);
     this.url = obfuscate(this.url);
 
