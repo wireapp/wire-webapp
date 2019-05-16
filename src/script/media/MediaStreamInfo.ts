@@ -17,25 +17,20 @@
  *
  */
 
-import {CallEntity} from '../calling/entities/CallEntity';
 import {MediaStreamHandler} from './MediaStreamHandler';
 import {MediaStreamSource} from './MediaStreamSource';
 import {MediaType} from './MediaType';
 
 export class MediaStreamInfo {
-  callEntity: CallEntity;
   conversationId?: string;
   flowId: string;
   source: MediaStreamSource;
   stream: MediaStream;
 
-  constructor(source: MediaStreamSource, flowId: string, stream: MediaStream, callEntity: CallEntity) {
+  constructor(source: MediaStreamSource, flowId: string, stream: MediaStream) {
     this.source = source;
     this.flowId = flowId;
     this.stream = stream;
-    this.callEntity = callEntity;
-
-    this.conversationId = callEntity ? callEntity.id : undefined;
   }
 
   getType(): MediaType {

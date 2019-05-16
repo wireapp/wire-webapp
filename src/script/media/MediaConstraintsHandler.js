@@ -119,7 +119,7 @@ export class MediaConstraintsHandler {
 
   /**
    * Get the MediaStreamConstraints to be used for screen sharing.
-   * @returns {Promise} Resolves with MediaStreamConstraints and their type
+   * @returns {MediaStreamConstraints} the constraints to apply to screen media
    */
   getScreenStreamConstraints() {
     if (window.desktopCapturer) {
@@ -133,7 +133,7 @@ export class MediaConstraintsHandler {
       const chromeMediaSourceId = this.devicesHandler.currentDeviceId.screenInput();
       streamConstraints.video.mandatory = Object.assign(streamConstraints.video.mandatory, {chromeMediaSourceId});
 
-      return Promise.resolve(streamConstraints);
+      return streamConstraints;
     }
 
     if (navigator.mediaDevices.getDisplayMedia) {
@@ -144,7 +144,7 @@ export class MediaConstraintsHandler {
         video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.DISPLAY_MEDIA,
       };
 
-      return Promise.resolve(streamConstraints);
+      return streamConstraints;
     }
 
     if (Environment.browser.firefox) {
@@ -155,10 +155,10 @@ export class MediaConstraintsHandler {
         video: MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.USER_MEDIA,
       };
 
-      return Promise.resolve(streamConstraints);
+      return streamConstraints;
     }
 
-    return Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
+    return undefined;
   }
 
   /**
