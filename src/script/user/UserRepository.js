@@ -19,12 +19,14 @@
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {ConsentValue} from './ConsentValue';
@@ -33,11 +35,15 @@ import {ConsentType} from './ConsentType';
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
+
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
+
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {EventName} from '../tracking/EventName';
+import {SuperProperty} from '../tracking/SuperProperty';
 
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
@@ -90,9 +96,9 @@ export class UserRepository {
       .pureComputed(() => {
         return this.users()
           .filter(user_et => user_et.isConnected())
-          .sort((user_a, user_b) => z.util.StringUtil.sortByPriority(user_a.first_name(), user_b.first_name()));
+          .sort((user_a, user_b) => sortByPriority(user_a.first_name(), user_b.first_name()));
       })
-      .extend({rateLimit: TimeUtil.UNITS_IN_MILLIS.SECOND});
+      .extend({rateLimit: TIME_IN_MILLIS.SECOND});
 
     this.isActivatedAccount = ko.pureComputed(() => this.self() && !this.self().isTemporaryGuest());
     this.isTemporaryGuest = ko.pureComputed(() => this.self() && this.self().isTemporaryGuest());
@@ -106,7 +112,7 @@ export class UserRepository {
       return contacts.filter(user_et => !user_et.isService).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
-      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+      amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.CONTACTS, number_of_contacts);
     });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
@@ -235,8 +241,8 @@ export class UserRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<z.connection.ConnectionEntity>>} Promise that resolves when all connections have been updated
+   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
+   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
   updateUsersFromConnections(connectionEntities) {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
@@ -316,7 +322,7 @@ export class UserRepository {
   /**
    * Update clients for given user.
    * @param {string} user_id - ID of user
-   * @param {Array<z.client.ClientEntity>} client_ets - Clients which should get updated
+   * @param {Array<ClientEntity>} client_ets - Clients which should get updated
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
@@ -341,7 +347,7 @@ export class UserRepository {
 
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 
@@ -357,7 +363,7 @@ export class UserRepository {
    * @returns {undefined} No return value
    */
   _trackAvailability(availability, method) {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
       status: valueFromType(availability),
     });

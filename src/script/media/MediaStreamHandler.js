@@ -27,6 +27,8 @@ import {MediaStreamSource} from './MediaStreamSource';
 import {MediaStreamInfo} from './MediaStreamInfo';
 import {MediaType} from './MediaType';
 import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class MediaStreamHandler {
   /**
@@ -173,7 +175,7 @@ export class MediaStreamHandler {
       .catch(error => {
         this._initiateMediaStreamFailure(error, conversationId);
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.FAILED_REQUESTING_MEDIA, {
           cause: error.name || error.message,
           video: videoSend,
         });
@@ -609,16 +611,16 @@ export class MediaStreamHandler {
   _selectPermissionDeniedWarningType(mediaType) {
     switch (mediaType) {
       case MediaType.AUDIO: {
-        return z.viewModel.WarningsViewModel.TYPE.DENIED_MICROPHONE;
+        return WarningsViewModel.TYPE.DENIED_MICROPHONE;
       }
 
       case MediaType.SCREEN: {
-        return z.viewModel.WarningsViewModel.TYPE.DENIED_SCREEN;
+        return WarningsViewModel.TYPE.DENIED_SCREEN;
       }
 
       case MediaType.AUDIO_VIDEO:
       case MediaType.VIDEO: {
-        return z.viewModel.WarningsViewModel.TYPE.DENIED_CAMERA;
+        return WarningsViewModel.TYPE.DENIED_CAMERA;
       }
 
       default: {
@@ -630,16 +632,16 @@ export class MediaStreamHandler {
   _selectPermissionRequestWarningType(mediaType) {
     switch (mediaType) {
       case MediaType.AUDIO: {
-        return z.viewModel.WarningsViewModel.TYPE.REQUEST_MICROPHONE;
+        return WarningsViewModel.TYPE.REQUEST_MICROPHONE;
       }
 
       case MediaType.SCREEN: {
-        return z.viewModel.WarningsViewModel.TYPE.REQUEST_SCREEN;
+        return WarningsViewModel.TYPE.REQUEST_SCREEN;
       }
 
       case MediaType.AUDIO_VIDEO:
       case MediaType.VIDEO: {
-        return z.viewModel.WarningsViewModel.TYPE.REQUEST_CAMERA;
+        return WarningsViewModel.TYPE.REQUEST_CAMERA;
       }
 
       default: {
@@ -658,9 +660,9 @@ export class MediaStreamHandler {
    */
   _showDeviceNotFoundHint(mediaType, conversationId) {
     if (mediaType === MediaType.AUDIO) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NOT_FOUND_MICROPHONE);
     } else if (mediaType === MediaType.VIDEO) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NOT_FOUND_CAMERA);
     }
 
     if (conversationId) {

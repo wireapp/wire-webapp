@@ -98,7 +98,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
     validationErrors: [],
   };
 
-  componentWillReceiveProps({account}: CombinedProps) {
+  componentWillReceiveProps({account}: CombinedProps): void {
     if (account) {
       if (account.email !== this.state.registrationData.email) {
         this.setState({
@@ -175,13 +175,13 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
           }
         }
       } else {
-        //tslint:disable:no-console
+        // tslint:disable-next-line:no-console
         console.error('Account registration error', error);
       }
     }
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       isFetching,
       isPersonalFlow,

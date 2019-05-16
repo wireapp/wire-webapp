@@ -17,54 +17,54 @@
  *
  */
 
-describe('z.search.FullTextSearch', () => {
+import {search} from 'src/script/search/FullTextSearch';
+
+describe('FullTextSearch', () => {
   describe('search', () => {
     it('should return false if text is not found', () => {
-      expect(z.search.FullTextSearch.search('aa', '')).toBeFalsy();
-      expect(z.search.FullTextSearch.search('aa', undefined)).toBeFalsy();
-      expect(z.search.FullTextSearch.search('aa', 'bb')).toBeFalsy();
-      expect(z.search.FullTextSearch.search('aa bb', '     ')).toBeFalsy();
+      expect(search('aa', '')).toBe(false);
+      expect(search('aa', undefined)).toBe(false);
+      expect(search('aa', 'bb')).toBe(false);
+      expect(search('aa bb', '     ')).toBe(false);
     });
 
     it('should handle special chars', () => {
-      expect(z.search.FullTextSearch.search('youtube.com/watch?v=pQHX-Sj', 'youtube.com/watch?v=pQHX-Sj')).toBeTruthy();
+      expect(search('youtube.com/watch?v=pQHX-Sj', 'youtube.com/watch?v=pQHX-Sj')).toBe(true);
     });
 
     it('general', () => {
-      expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa cc', 'aa bb')).toBeFalsy();
+      expect(search('aa bb', 'aa')).toBe(true);
+      expect(search('aa cc', 'aa bb')).toBe(false);
     });
 
     it('special signs', () => {
-      expect(z.search.FullTextSearch.search('aa aa aa', 'aa aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa.bb', 'bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa....bb', 'bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa.bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa....bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa-bb', 'aa-bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa-bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa-bb', 'bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa/bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa/bb', 'bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa:bb', 'aa')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('aa:bb', 'bb')).toBeTruthy();
+      expect(search('aa aa aa', 'aa aa')).toBe(true);
+      expect(search('aa.bb', 'bb')).toBe(true);
+      expect(search('aa....bb', 'bb')).toBe(true);
+      expect(search('aa.bb', 'aa')).toBe(true);
+      expect(search('aa....bb', 'aa')).toBe(true);
+      expect(search('aa-bb', 'aa-bb')).toBe(true);
+      expect(search('aa-bb', 'aa')).toBe(true);
+      expect(search('aa-bb', 'bb')).toBe(true);
+      expect(search('aa/bb', 'aa')).toBe(true);
+      expect(search('aa/bb', 'bb')).toBe(true);
+      expect(search('aa:bb', 'aa')).toBe(true);
+      expect(search('aa:bb', 'bb')).toBe(true);
     });
 
     it('special cases', () => {
-      expect(z.search.FullTextSearch.search('aa 11:45 am bb', '11:45')).toBeTruthy();
-      expect(
-        z.search.FullTextSearch.search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')
-      ).toBeTruthy();
+      expect(search('aa 11:45 am bb', '11:45')).toBe(true);
+      expect(search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')).toBe(true);
 
-      expect(z.search.FullTextSearch.search('@peter', 'peter')).toBeTruthy();
-      // expect(z.search.FullTextSearch.search('René', 'rene')).toBeTruthy()
-      // expect(z.search.FullTextSearch.search('Håkon Bø', 'Ha')).toBeTruthy()
+      expect(search('@peter', 'peter')).toBe(true);
+      // expect(search('René', 'rene')).toBe(true)
+      // expect(search('Håkon Bø', 'Ha')).toBe(true)
     });
 
     it('transliteration', () => {
-      expect(z.search.FullTextSearch.search('bb бб bb', 'бб')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('bb бб bb', 'bb')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy();
+      expect(search('bb бб bb', 'бб')).toBe(true);
+      expect(search('bb бб bb', 'bb')).toBe(true);
+      expect(search('苹果', '苹果')).toBe(true);
     });
   });
 });

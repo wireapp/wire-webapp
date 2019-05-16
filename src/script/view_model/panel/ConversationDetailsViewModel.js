@@ -19,16 +19,18 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/TimeUtil';
+import {removeLineBreaks} from 'Util/StringUtil';
 
 import 'Components/receiptModeToggle';
 import {BasePanelViewModel} from './BasePanelViewModel';
 
-import {NotificationSetting} from '../../conversation/NotificationSetting';
+import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 import 'Components/panel/panelActions';
 
@@ -54,6 +56,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.searchRepository = search;
     this.teamRepository = team;
     this.userRepository = user;
+
+    this.ConversationRepository = ConversationRepository;
 
     this.actionsViewModel = mainViewModel.actions;
 
@@ -183,16 +187,14 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
-      return this.activeConversation()
-        ? NotificationSetting.getText(this.activeConversation().notificationState())
-        : '';
+      return this.activeConversation() ? getNotificationText(this.activeConversation().notificationState()) : '';
     });
 
     this.timedMessagesText = ko.pureComputed(() => {
       if (this.activeConversation()) {
         const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return TimeUtil.formatDuration(this.activeConversation().messageTimer()).text;
+          return formatDuration(this.activeConversation().messageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');
@@ -371,7 +373,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         .display_name()
         .trim();
 
-      const newConversationName = z.util.StringUtil.removeLineBreaks(event.target.value.trim());
+      const newConversationName = removeLineBreaks(event.target.value.trim());
 
       this.isEditingName(false);
       const hasNameChanged = newConversationName.length && newConversationName !== currentConversationName;

@@ -18,6 +18,8 @@
  */
 
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import {getFirstName} from 'Util/SanitizationUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {User} from '../User';
 import {ClientEvent} from '../../event/Client';
@@ -89,9 +91,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave
-        ? this.name()
-        : z.util.SanitizationUtil.getFirstName(this.user(), Declension.NOMINATIVE, true);
+      return isTeamMemberLeave ? this.name() : getFirstName(this.user(), Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
@@ -109,7 +109,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       };
 
       const count = this.hiddenUserCount();
-      const users = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
+      const dativeUsers = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.DATIVE);
+      const accusativeUsers = this._generateNameString(this.exceedsMaxVisibleUsers(), Declension.ACCUSATIVE);
       const name = this.senderName();
 
       switch (this.memberMessageType) {
@@ -144,19 +145,19 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             }
 
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreateWithMore', {count, users}, replaceShowMore)
-              : t('conversationCreateWith', users);
+              ? t('conversationCreateWithMore', {count, users: dativeUsers}, replaceShowMore)
+              : t('conversationCreateWith', dativeUsers);
           }
 
           if (this.user().is_me) {
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationCreatedYouMore', {count, users}, replaceShowMore)
-              : t('conversationCreatedYou', users);
+              ? t('conversationCreatedYouMore', {count, users: dativeUsers}, replaceShowMore)
+              : t('conversationCreatedYou', dativeUsers);
           }
 
           return this.exceedsMaxVisibleUsers()
-            ? t('conversationCreatedMore', {count, name, users}, replaceShowMore)
-            : t('conversationCreated', {name, users});
+            ? t('conversationCreatedMore', {count, name, users: dativeUsers}, replaceShowMore)
+            : t('conversationCreated', {name, users: dativeUsers});
         }
 
         case SystemMessageType.CONVERSATION_RESUME: {
@@ -178,12 +179,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
           if (this.user().is_me) {
             return this.exceedsMaxVisibleUsers()
-              ? t('conversationMemberJoinedYouMore', {count, users}, replaceShowMore)
-              : t('conversationMemberJoinedYou', users, replaceShowMore);
+              ? t('conversationMemberJoinedYouMore', {count, users: accusativeUsers}, replaceShowMore)
+              : t('conversationMemberJoinedYou', accusativeUsers, replaceShowMore);
           }
           return this.exceedsMaxVisibleUsers()
-            ? t('conversationMemberJoinedMore', {count, name, users}, replaceShowMore)
-            : t('conversationMemberJoined', {name, users}, replaceShowMore);
+            ? t('conversationMemberJoinedMore', {count, name, users: accusativeUsers}, replaceShowMore)
+            : t('conversationMemberJoined', {name, users: accusativeUsers}, replaceShowMore);
         }
 
         case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
@@ -222,7 +223,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         const groupCreationString = this.user().is_me
           ? t('conversationCreatedNameYou')
           : t('conversationCreatedName', this.senderName());
-        return z.util.StringUtil.capitalizeFirstChar(groupCreationString);
+        return capitalizeFirstChar(groupCreationString);
       }
       return '';
     });

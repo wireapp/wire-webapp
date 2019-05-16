@@ -17,7 +17,7 @@
  *
  */
 
-import StoreEngine from '@wireapp/store-engine';
+import {IndexedDBEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -26,12 +26,12 @@ import {getLogger} from 'Util/Logger';
 import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
+import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
+import {EventName} from '../tracking/EventName';
+import {ClientEntity} from '../client/ClientEntity';
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
-
-z.cryptography.CryptographyRepository = class CryptographyRepository {
+export class CryptographyRepository {
   static get CONFIG() {
     return {
       UNKNOWN_DECRYPTION_ERROR_CODE: 999,
@@ -43,14 +43,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
-   * Construct a new Cryptography repository.
-   * @param {z.cryptography.CryptographyService} cryptographyService - Backend REST API cryptography service implementation
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {StorageRepository} storageRepository - Repository for all storage interactions
    */
-  constructor(cryptographyService, storageRepository) {
-    this.cryptographyService = cryptographyService;
+  constructor(backendClient, storageRepository) {
+    this.cryptographyService = new CryptographyService(backendClient);
     this.storageRepository = storageRepository;
-    this.logger = getLogger('z.cryptography.CryptographyRepository');
+    this.logger = getLogger('CryptographyRepository');
 
     this.cryptographyMapper = new CryptographyMapper();
 
@@ -101,7 +100,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _init(database) {
     return Promise.resolve().then(() => {
       this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      const storeEngine = new StoreEngine.IndexedDBEngine();
+      const storeEngine = new IndexedDBEngine();
       storeEngine.initWithDb(database);
       this.cryptobox = new Cryptobox(storeEngine, 10);
 
@@ -115,7 +114,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       });
 
       this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
-        const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+        const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
         amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
       });
     });
@@ -396,7 +395,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const missingRecipients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
-      const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+      const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
 
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;
@@ -454,7 +453,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .encrypt(sessionId, GenericMessage.encode(genericMessage).finish(), preKeyBundle)
       .then(cipherText => ({cipherText: arrayToBase64(cipherText), sessionId}))
       .catch(error => {
-        if (error instanceof StoreEngine.error.RecordNotFoundError) {
+        if (error instanceof StoreEngineError.RecordNotFoundError) {
           this.logger.log(`Session '${sessionId}' needs to get initialized...`);
           return {sessionId};
         }
@@ -518,7 +517,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {undefined} No return value
    */
   _reportDecryptionFailure(error, {type: eventType}) {
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: error.code || error.message,
     });
 
@@ -534,4 +533,4 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     raygunError.stack = error.stack;
     Raygun.send(raygunError, customData);
   }
-};
+}

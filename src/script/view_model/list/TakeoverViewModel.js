@@ -19,8 +19,10 @@
 
 import {getLogger} from 'Util/Logger';
 
+import {Config} from '../../auth/config';
 import {getSupportUsernameUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';
+import {ContentViewModel} from '../ContentViewModel';
 
 class TakeoverViewModel {
   /**
@@ -41,6 +43,7 @@ class TakeoverViewModel {
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
     this.supportUsernameUrl = getSupportUsernameUrl();
+    this.brandName = Config.BRAND_NAME;
   }
 
   chooseUsername() {
@@ -58,7 +61,7 @@ class TakeoverViewModel {
         }
 
         if (this.userRepository.connect_requests().length) {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
         }
       })
       .catch(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT))

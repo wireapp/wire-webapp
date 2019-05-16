@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
-
+import {Config} from '../../auth/config';
 import {MediaType} from '../../media/MediaType';
 
 window.z = window.z || {};
@@ -79,6 +79,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.audioSource = undefined;
 
     this.permissionDenied = ko.observable(false);
+    this.brandName = Config.BRAND_NAME;
 
     this.supportsAudioOutput = ko.pureComputed(() => {
       return this.deviceSupport.audioOutput() && Environment.browser.supports.audioOutputSelection;

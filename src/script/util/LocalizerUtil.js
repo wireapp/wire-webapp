@@ -17,8 +17,8 @@
  *
  */
 
-import {SanitizationUtil} from './SanitizationUtil';
-import {StringUtil} from './StringUtil';
+import {escapeString, getSelfName} from './SanitizationUtil';
+import {sortByPriority} from './StringUtil';
 import {isString, isNumber} from 'underscore';
 
 export const DEFAULT_LOCALE = 'en';
@@ -30,9 +30,8 @@ const isStringOrNumber = toTest => isString(toTest) || isNumber(toTest);
 
 const replaceSubstituteEscaped = (string, regex, substitute) => {
   const replacement = isStringOrNumber(substitute)
-    ? SanitizationUtil.escapeString(substitute)
-    : (found, content) =>
-        substitute.hasOwnProperty(content) ? SanitizationUtil.escapeString(substitute[content]) : found;
+    ? escapeString(substitute)
+    : (found, content) => (substitute.hasOwnProperty(content) ? escapeString(substitute[content]) : found);
   return string.replace(regex, replacement);
 };
 
@@ -55,10 +54,10 @@ export const LocalizerUtil = {
         const firstName = userEntity.first_name();
         return boldNames ? `[bold]${firstName}[/bold]` : firstName;
       })
-      .sort((userNameA, userNameB) => StringUtil.sortByPriority(userNameA, userNameB));
+      .sort((userNameA, userNameB) => sortByPriority(userNameA, userNameB));
 
     if (containsSelfUser) {
-      firstNames.push(SanitizationUtil.getSelfName(declension));
+      firstNames.push(getSelfName(declension));
     }
 
     const numberOfNames = firstNames.length;

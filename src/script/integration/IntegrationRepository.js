@@ -19,6 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ACCESS_STATE} from '../conversation/AccessState';
@@ -26,6 +27,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {IntegrationMapper} from './IntegrationMapper';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
+import {EventName} from '../tracking/EventName';
 
 export class IntegrationRepository {
   /**
@@ -101,7 +103,7 @@ export class IntegrationRepository {
           services_size: conversationEntity.getNumberOfServices(),
         };
 
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 
       return event;
@@ -218,7 +220,7 @@ export class IntegrationRepository {
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
         const attributes = {service_id: serviceId};
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INTEGRATION.REMOVED_SERVICE, attributes);
         return event;
       }
     });
@@ -233,9 +235,9 @@ export class IntegrationRepository {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
-            .filter(serviceEntity => z.util.StringUtil.compareTransliteration(serviceEntity.name, normalizedQuery))
+            .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
             .sort((serviceA, serviceB) => {
-              return z.util.StringUtil.sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+              return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
             });
           this.services(serviceEntities);
         }

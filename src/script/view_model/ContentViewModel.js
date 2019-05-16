@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
 
+import {Config} from '../auth/config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
@@ -28,10 +29,7 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ContentViewModel = class ContentViewModel {
+export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
@@ -58,7 +56,8 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
-    this.logger = getLogger('z.viewModel.ContentViewModel');
+    this.logger = getLogger('ContentViewModel');
+    this.STATE = ContentViewModel.STATE;
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
@@ -74,12 +73,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.connectRequests = new z.viewModel.content.ConnectRequestsViewModel(mainViewModel, this, repositories);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new z.viewModel.content.GiphyViewModel(mainViewModel, this, repositories);
-    this.inputBar = new z.viewModel.content.InputBarViewModel(
-      mainViewModel,
-      this,
-      repositories,
-      z.message.MessageHasher
-    );
+    this.inputBar = new z.viewModel.content.InputBarViewModel(mainViewModel, this, repositories);
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
       repositories.search,
@@ -249,7 +243,7 @@ z.viewModel.ContentViewModel = class ContentViewModel {
         this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('conversationNotFoundMessage'),
-            title: t('conversationNotFoundTitle'),
+            title: t('conversationNotFoundTitle', Config.BRAND_NAME),
           },
         });
       });
@@ -341,4 +335,4 @@ z.viewModel.ContentViewModel = class ContentViewModel {
     this.state(newContentState);
     return this._shiftContent(this._getElementOfContent(newContentState));
   }
-};
+}

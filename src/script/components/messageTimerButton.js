@@ -18,7 +18,7 @@
  */
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
@@ -34,7 +34,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
     });
     this.isTimerDisabled = ko.pureComputed(() => this.conversationEntity().hasGlobalMessageTimer());
     this.duration = ko.pureComputed(() => {
-      return this.hasMessageTimer() ? TimeUtil.formatDuration(this.conversationEntity().messageTimer()) : {};
+      return this.hasMessageTimer() ? formatDuration(this.conversationEntity().messageTimer()) : {};
     });
   }
 
@@ -56,7 +56,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
       },
     ].concat(
       EphemeralTimings.VALUES.map(milliseconds => {
-        const {text} = TimeUtil.formatDuration(milliseconds);
+        const {text} = formatDuration(milliseconds);
 
         return {
           click: () => this.conversationEntity().localMessageTimer(milliseconds),

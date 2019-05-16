@@ -18,24 +18,31 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
 
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
+import {WebAppEvents} from 'src/script/event/WebApp';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 
-import {WebAppEvents} from 'src/script/event/WebApp';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {EventRepository} from 'src/script/event/EventRepository';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {File} from 'src/script/entity/message/File';
+
+import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
+import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -51,12 +58,12 @@ describe('ConversationRepository', () => {
 
   const _generate_conversation = (
     conversation_type = ConversationType.GROUP,
-    connection_status = z.connection.ConnectionStatus.ACCEPTED
+    connection_status = ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new Conversation(createRandomUuid());
     conversation.type(conversation_type);
 
-    const connectionEntity = new z.connection.ConnectionEntity();
+    const connectionEntity = new ConnectionEntity();
     connectionEntity.conversationId = conversation.id;
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
@@ -105,7 +112,7 @@ describe('ConversationRepository', () => {
       conversation_et = _generate_conversation(ConversationType.GROUP);
 
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-        const file_et = new z.entity.File();
+        const file_et = new File();
         file_et.status(AssetTransferState.UPLOADING);
         message_et = new z.entity.ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
@@ -206,10 +213,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain a blocked conversations', () => {
-      const blocked_conversation_et = _generate_conversation(
-        ConversationType.ONE2ONE,
-        z.connection.ConnectionStatus.BLOCKED
-      );
+      const blocked_conversation_et = _generate_conversation(ConversationType.ONE2ONE, ConnectionStatus.BLOCKED);
 
       return TestFactory.conversation_repository.save_conversation(blocked_conversation_et).then(() => {
         expect(
@@ -223,10 +227,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a cancelled connection request', () => {
-      const cancelled_conversation_et = _generate_conversation(
-        ConversationType.ONE2ONE,
-        z.connection.ConnectionStatus.CANCELLED
-      );
+      const cancelled_conversation_et = _generate_conversation(ConversationType.ONE2ONE, ConnectionStatus.CANCELLED);
 
       return TestFactory.conversation_repository.save_conversation(cancelled_conversation_et).then(() => {
         expect(
@@ -240,10 +241,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should not contain the conversation for a pending connection request', () => {
-      const pending_conversation_et = _generate_conversation(
-        ConversationType.ONE2ONE,
-        z.connection.ConnectionStatus.PENDING
-      );
+      const pending_conversation_et = _generate_conversation(ConversationType.ONE2ONE, ConnectionStatus.PENDING);
 
       return TestFactory.conversation_repository.save_conversation(pending_conversation_et).then(() => {
         expect(
@@ -378,7 +376,7 @@ describe('ConversationRepository', () => {
     let connectionEntity = undefined;
 
     beforeEach(() => {
-      connectionEntity = new z.connection.ConnectionEntity();
+      connectionEntity = new ConnectionEntity();
       connectionEntity.conversationId = conversation_et.id;
 
       // prettier-ignore
@@ -401,7 +399,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to a new conversation', () => {
-      connectionEntity.status(z.connection.ConnectionStatus.ACCEPTED);
+      connectionEntity.status(ConnectionStatus.ACCEPTED);
       TestFactory.conversation_repository.conversations.removeAll();
 
       return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
@@ -412,7 +410,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
-      connectionEntity.status(z.connection.ConnectionStatus.CANCELLED);
+      connectionEntity.status(ConnectionStatus.CANCELLED);
 
       return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
         expect(_conversation.connection()).toBe(connectionEntity);
@@ -700,9 +698,9 @@ describe('ConversationRepository', () => {
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         // conversation has a corresponding pending connection
-        const connectionEntity = new z.connection.ConnectionEntity();
+        const connectionEntity = new ConnectionEntity();
         connectionEntity.conversationId = conversation_et.id;
-        connectionEntity.status(z.connection.ConnectionStatus.PENDING);
+        connectionEntity.status(ConnectionStatus.PENDING);
         TestFactory.connection_repository.connectionEntities.push(connectionEntity);
 
         return TestFactory.conversation_repository._handleConversationEvent(memberJoinEvent).then(() => {
@@ -945,7 +943,7 @@ describe('ConversationRepository', () => {
               'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
           });
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: text,
+            [GENERIC_MESSAGE_TYPE.TEXT]: text,
             messageId: createRandomUuid(),
           });
 
@@ -965,7 +963,7 @@ describe('ConversationRepository', () => {
         .save_conversation(smallConversationEntity)
         .then(() => {
           const genericMessage = new GenericMessage({
-            [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+            [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
             messageId: createRandomUuid(),
           });
 
@@ -1000,8 +998,8 @@ describe('ConversationRepository', () => {
         (conversationId, genericMessage) => {
           const {content, ephemeral} = genericMessage;
 
-          expect(content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL);
-          expect(ephemeral.content).toBe(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT);
+          expect(content).toBe(GENERIC_MESSAGE_TYPE.EPHEMERAL);
+          expect(ephemeral.content).toBe(GENERIC_MESSAGE_TYPE.TEXT);
           expect(ephemeral.expireAfterMillis.toString()).toBe(expectedValues.shift());
           return Promise.resolve({
             recipients: {},
@@ -1043,14 +1041,21 @@ describe('ConversationRepository', () => {
       john = new User(entities.user.john_doe.id);
       john.name('John');
 
-      const johns_computer = new z.client.ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
+      const johns_computer = new ClientEntity();
+      johns_computer.id = '83ad5d3c31d3c76b';
+      johns_computer.class = 'tabconst';
       john.devices.push(johns_computer);
 
       lara = new User();
       lara.name('Lara');
 
-      const bobs_computer = new z.client.ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
-      const bobs_phone = new z.client.ClientEntity({id: '8f63631e129ed19d', class: 'phone'});
+      const bobs_computer = new ClientEntity();
+      bobs_computer.id = '74606e4c02b2c7f9';
+      bobs_computer.class = 'desktop';
+
+      const bobs_phone = new ClientEntity();
+      bobs_phone.id = '8f63631e129ed19d';
+      bobs_phone.class = 'phone';
 
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);

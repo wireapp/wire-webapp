@@ -4,7 +4,7 @@
     <span class="takeover-names-username label-username" data-bind="text: username" data-uie-name="takeover-username"></span>
   </div>
   <div class="takeover-actions">
-    <span class="takeover-actions-sub" data-bind="text: t('takeoverSub')"></span>
+    <span class="takeover-actions-sub" data-bind="text: t('takeoverSub', brandName)"></span>
     <a class="takeover-actions-link text-white" data-bind="attr: {href: supportUsernameUrl}, text: t('takeoverLink')" rel="nofollow noopener noreferrer" target="_blank"></a>
     <button class="button button-fluid" data-bind="click: chooseUsername, text: t('takeoverButtonChoose')" data-uie-name="do-takeover-choose"></button>
     <button class="button button-fluid button-inverted text-white" data-bind="click: keepUsername, text: t('takeoverButtonKeep')" data-uie-name="do-takeover-keep"></button>

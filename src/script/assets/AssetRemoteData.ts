@@ -18,7 +18,8 @@
  */
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadUrlBuffer} from 'Util/util';
+import {loadUrlBuffer, noop} from 'Util/util';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
@@ -46,10 +47,10 @@ export interface AssetUrlDataVersion1 {
   version: 1;
 }
 
-class AssetRemoteData {
-  public cancelDownload: Function;
+export class AssetRemoteData {
+  public cancelDownload: () => void;
 
-  private readonly downloadProgress: ko.Observable<number>;
+  public readonly downloadProgress: ko.Observable<number>;
   private readonly identifier?: string;
   private loadPromise: Promise<void | Blob> | undefined;
   private readonly logger: Logger;
@@ -58,7 +59,7 @@ class AssetRemoteData {
   private readonly urlData?: AssetUrlData;
 
   constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
-    this.cancelDownload = () => {};
+    this.cancelDownload = noop;
     this.downloadProgress = ko.observable();
     this.identifier = identifier;
     this.loadPromise = undefined;
@@ -194,7 +195,7 @@ class AssetRemoteData {
         });
       })
       .catch(error => {
-        const isValidationUtilError = error instanceof z.util.ValidationUtilError;
+        const isValidationUtilError = error instanceof ValidationUtilError;
         const message = isValidationUtilError
           ? `Failed to validate an asset URL (_loadBuffer): ${error.message}`
           : `Failed to load asset: ${error.message || error}`;
@@ -205,5 +206,3 @@ class AssetRemoteData {
       });
   }
 }
-
-export {AssetRemoteData};

@@ -46,6 +46,10 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+
+import {noop} from 'Util/util';
+import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
@@ -186,7 +190,7 @@ class _Login extends React.Component<CombinedProps, State> {
       .then(() => this.props.doInit({isImmediateLogin: true}))
       .then(() => this.props.doInitializeClient(ClientType.PERMANENT, undefined))
       .then(this.navigateChooseHandleOrWebapp)
-      .catch(() => {});
+      .catch(noop);
   };
 
   navigateChooseHandleOrWebapp = () => {
@@ -227,11 +231,11 @@ class _Login extends React.Component<CombinedProps, State> {
         const email = this.state.email.trim();
         const login: LoginData = {clientType: persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password};
 
-        if (this.isValidEmail(email)) {
+        if (isValidEmail(email)) {
           login.email = email;
-        } else if (this.isValidUsername(email)) {
+        } else if (isValidUsername(email)) {
           login.handle = email.replace('@', '');
-        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && this.isValidPhoneNumber(email)) {
+        } else if (Config.FEATURE.ENABLE_PHONE_LOGIN && isValidPhoneNumber(email)) {
           login.phone = email;
         }
 
@@ -283,28 +287,7 @@ class _Login extends React.Component<CombinedProps, State> {
       });
   };
 
-  isValidEmail = (email: string) => {
-    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailRegex.test(email);
-  };
-
-  isValidPhoneNumber = (phoneNumber: string) => {
-    const allowDebugPhoneNumbers = Config.FEATURE.ENABLE_DEBUG;
-    const e164regex = allowDebugPhoneNumbers ? /^\+[0-9]\d{1,14}$/ : /^\+[1-9]\d{1,14}$/;
-
-    return e164regex.test(phoneNumber);
-  };
-
-  isValidUsername = (username: string) => {
-    if (username.startsWith('@')) {
-      username = username.substring(1);
-    }
-
-    const usernameRegex = /^[a-z_0-9]{2,21}$/;
-    return usernameRegex.test(username);
-  };
-
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
       loginError,

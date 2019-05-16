@@ -18,6 +18,7 @@
  */
 
 import platform from 'platform';
+import {BackendEnvironment} from '../service/BackendEnvironment';
 
 const APP_ENV = {
   LOCALHOST: 'localhost',
@@ -74,7 +75,7 @@ const _isWindows = () => platform.os.family && platform.os.family.includes(PLATF
 
 const isLocalhost = () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
 const isProduction = () => {
-  const isProductionHost = window.wire.env.ENVIRONMENT === z.service.BackendEnvironment.PRODUCTION;
+  const isProductionHost = window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
   return isProductionHost;
 };
 
@@ -114,7 +115,8 @@ const _supportsNotifications = () => {
   return requestPermissionNotSupported ? false : document.visibilityState !== undefined;
 };
 const _supportsScreenSharing = () => {
-  return window.desktopCapturer || _isFirefox();
+  const hasScreenCaptureAPI = window.desktopCapturer || navigator.mediaDevices.getDisplayMedia;
+  return hasScreenCaptureAPI || _isFirefox();
 };
 
 // add body information
@@ -174,7 +176,3 @@ export const Environment = {
     return showElectronVersion ? electronVersion : _getFormattedAppVersion();
   },
 };
-
-window.z = window.z || {};
-z.util = z.util || {};
-window.z.util.Environment = Environment;

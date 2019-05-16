@@ -61,22 +61,22 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 const logger = getLogger('CreatePersonalAccount');
 
 class _CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
-  componentDidMount() {
+  componentDidMount(): Promise<void> {
     return this.props.enterPersonalCreationFlow();
   }
 
-  createAccount = () => {
+  createAccount = (): void => {
     const {account, history, doRegisterPersonal, match} = this.props;
     doRegisterPersonal({...account, invitation_code: match.params.invitationCode})
       .then(() => history.push(ROUTE.CHOOSE_HANDLE))
       .catch(error => logger.error('Failed to create personal account from invite', error));
   };
 
-  handleSubmit = () => {
+  handleSubmit = (): void => {
     this.props.history.push(ROUTE.VERIFY);
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       isPersonalFlow,
       intl: {formatMessage: _},

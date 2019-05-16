@@ -28,6 +28,8 @@ import {NotificationsViewModel} from './panel/NotificationsViewModel';
 import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {TimedMessagesViewModel} from './panel/TimedMessagesViewModel';
 import {WebAppEvents} from '../event/WebApp';
+import {MotionDuration} from '../motion/MotionDuration';
+import {ContentViewModel} from './ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -186,7 +188,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
   }
 
   _switchContent(newContentState) {
-    const stateIsCollection = newContentState === z.viewModel.ContentViewModel.STATE.COLLECTION;
+    const stateIsCollection = newContentState === ContentViewModel.STATE.COLLECTION;
     if (stateIsCollection) {
       this._forceClosePanel();
     }
@@ -225,7 +227,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     window.setTimeout(() => {
       toPanel.removeClass('panel__page--move-in--left panel__page--move-in--right');
       this._hidePanel(fromState);
-    }, z.motion.MotionDuration.MEDIUM);
+    }, MotionDuration.MEDIUM);
   }
 
   _hidePanel(state) {

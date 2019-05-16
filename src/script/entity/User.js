@@ -20,13 +20,15 @@
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
+import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil';
 
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 
 // Please note: The own user has a "locale"
 class User {
@@ -49,9 +51,9 @@ class User {
         WIRE: 'wire',
       },
       TEMPORARY_GUEST: {
-        EXPIRATION_INTERVAL: TimeUtil.UNITS_IN_MILLIS.MINUTE,
-        EXPIRATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
-        LIFETIME: TimeUtil.UNITS_IN_MILLIS.DAY,
+        EXPIRATION_INTERVAL: TIME_IN_MILLIS.MINUTE,
+        EXPIRATION_THRESHOLD: TIME_IN_MILLIS.SECOND * 10,
+        LIFETIME: TIME_IN_MILLIS.DAY,
       },
     };
   }
@@ -90,8 +92,8 @@ class User {
     this.initials = ko.pureComputed(() => {
       let initials = '';
       if (this.first_name() && this.last_name()) {
-        const first = z.util.StringUtil.getFirstChar(this.first_name());
-        const last = z.util.StringUtil.getFirstChar(this.last_name());
+        const first = getFirstChar(this.first_name());
+        const last = getFirstChar(this.last_name());
         initials = `${first}${last}`;
       } else {
         initials = this.first_name().slice(0, 2);
@@ -104,7 +106,7 @@ class User {
     this.previewPictureResource = ko.observable();
     this.mediumPictureResource = ko.observable();
 
-    this.connection = ko.observable(new z.connection.ConnectionEntity());
+    this.connection = ko.observable(new ConnectionEntity());
 
     this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
     this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
@@ -179,9 +181,9 @@ class User {
    */
   matches(query, is_handle, excludedChars = []) {
     if (is_handle) {
-      return z.util.StringUtil.startsWith(this.username(), query);
+      return startsWith(this.username(), query);
     }
-    return z.util.StringUtil.compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
+    return compareTransliteration(this.name(), query, excludedChars) || this.username() === query;
   }
 
   serialize() {
@@ -232,19 +234,19 @@ class User {
 
   _setRemainingExpirationTime(expirationTime) {
     const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
-    const remainingMinutes = Math.ceil(remainingTime / TimeUtil.UNITS_IN_MILLIS.MINUTE);
+    const remainingMinutes = Math.ceil(remainingTime / TIME_IN_MILLIS.MINUTE);
 
     if (remainingMinutes <= 45) {
       const remainingQuarters = Math.max(1, Math.ceil(remainingMinutes / 15));
       const timeValue = remainingQuarters * 15;
       this.expirationText(t('userRemainingTimeMinutes', timeValue));
-      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.MINUTE);
+      this.expirationRemaining(timeValue * TIME_IN_MILLIS.MINUTE);
       this.expirationRemainingText(`${timeValue}m`);
     } else {
       const showOneAndAHalf = remainingMinutes > 60 && remainingMinutes <= 90;
       const timeValue = showOneAndAHalf ? 1.5 : Math.ceil(remainingMinutes / 60);
       this.expirationText(t('userRemainingTimeHours', timeValue));
-      this.expirationRemaining(timeValue * TimeUtil.UNITS_IN_MILLIS.HOUR);
+      this.expirationRemaining(timeValue * TIME_IN_MILLIS.HOUR);
       this.expirationRemainingText(`${timeValue}h`);
     }
 

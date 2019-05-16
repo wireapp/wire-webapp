@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {getCurrentDate} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
@@ -27,6 +27,7 @@ import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 
+import {Config} from '../../auth/config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {ConnectSource} from '../../connect/ConnectSource';
@@ -87,6 +88,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
+    this.brandName = Config.BRAND_NAME;
   }
 
   connectMacOSContacts() {
@@ -103,7 +105,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       const selfUserId = this.userRepository.self().id;
       const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
-      const filename = `Wire-${truncatedId}-Calling_${TimeUtil.getCurrentDate()}.log`;
+      const filename = `Wire-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       return downloadBlob(blob, filename);
     }

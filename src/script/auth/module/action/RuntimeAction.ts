@@ -114,7 +114,7 @@ export class RuntimeAction {
         const interval = 10;
         const maxRetry = 50;
 
-        function checkDbRequest(currentAttempt = 0) {
+        function checkDbRequest(currentAttempt = 0): void {
           const tooManyAttempts = currentAttempt >= maxRetry;
           const isRequestDone = dbOpenRequest.readyState === 'done';
 

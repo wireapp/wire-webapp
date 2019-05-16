@@ -20,7 +20,7 @@
         <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.isVerified">
         <label class="button-label" for="preferences_device_verification" data-bind="click: toggleDeviceVerification, text: t('preferencesDevicesVerification')" data-uie-name="do-verify"></label>
       </div>
-      <div class="preferences-detail" data-bind="text: t('preferencesDevicesFingerprintDetail')"></div>
+      <div class="preferences-detail" data-bind="text: t('preferencesDevicesFingerprintDetail', brandName)"></div>
     </section>
 
     <section class="preferences-section">

@@ -25,11 +25,11 @@
       <!-- ko if: stateIsPreferences() -->
         <input class="modal__input"
                autocomplete="off" autofocus required spellcheck="false" type="text"
-               data-bind="attr: {maxlength: z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
+               data-bind="attr: {maxlength: ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
                data-uie-name="enter-group-name">
         <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->
-          <div class="modal__info" data-bind="text: t('groupSizeInfo', z.conversation.ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info"></div>
+          <div class="modal__info" data-bind="text: t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)" data-uie-name="status-group-size-info"></div>
           <guest-mode-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
           <info-toggle class="modal-style" params="
             dataUieName: 'read-receipts',

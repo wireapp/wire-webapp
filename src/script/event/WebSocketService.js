@@ -18,12 +18,14 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
-import * as StorageUtil from 'Util/StorageUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {loadValue} from 'Util/StorageUtil';
+import {appendParameter} from 'Util/UrlUtil';
 
 import {AuthRepository} from '../auth/AuthRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {WebAppEvents} from './WebApp';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export class WebSocketService {
   static get CHANGE_TRIGGER() {
@@ -43,8 +45,8 @@ export class WebSocketService {
 
   static get CONFIG() {
     return {
-      PING_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND * 15,
+      PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
+      RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
     };
   }
 
@@ -86,7 +88,7 @@ export class WebSocketService {
     return new Promise(resolve => {
       this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.backendClient.accessToken}`;
       if (this.clientId) {
-        this.connectionUrl = z.util.URLUtil.appendParameter(this.connectionUrl, `client=${this.clientId}`);
+        this.connectionUrl = appendParameter(this.connectionUrl, `client=${this.clientId}`);
       }
 
       const wrongSocketType = typeof this.socket === 'object';
@@ -150,7 +152,7 @@ export class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (!StorageUtil.getValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+    if (!loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
@@ -181,7 +183,7 @@ export class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
     this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
     amplify.publish(WebAppEvents.CONNECTION.ONLINE);
   }
@@ -205,7 +207,7 @@ export class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }

@@ -24,10 +24,14 @@ import 'phoneformat.js';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
-import {checkIndexedDb, alias, isValidEmail, isValidPhoneNumber} from 'Util/util';
+import {TIME_IN_MILLIS, getUnixTimestamp} from 'Util/TimeUtil';
+import {checkIndexedDb, alias} from 'Util/util';
 import {getCountryCode, getCountryByCode, COUNTRY_CODES} from 'Util/CountryCodes';
 import {Environment} from 'Util/Environment';
+import {KEY, isEnterKey, isEscapeKey, isFunctionKey, isPasteAction} from 'Util/KeyboardUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {isValidPhoneNumber, isValidEmail} from 'Util/ValidationUtil';
+import {forwardParameter, getParameter} from 'Util/UrlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../auth/config';
@@ -45,23 +49,27 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import '../auth/AuthView';
 import '../auth/ValidationError';
 import {AuthView} from '../auth/AuthView';
+import {SingleInstanceHandler} from '../main/SingleInstanceHandler';
 
 import {BackendEvent} from '../event/Backend';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {NotificationService} from '../event/NotificationService';
 import {WebSocketService} from '../event/WebSocketService';
+import {MotionDuration} from '../motion/MotionDuration';
 
 import {resolve as resolveDependency, graph} from '../config/appResolver';
 
 import {Modal} from '../ui/Modal';
 import {ClientRepository} from '../client/ClientRepository';
+import {ClientType} from '../client/ClientType';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 class AuthViewModel {
   static get CONFIG() {
     return {
       FORWARDED_URL_PARAMETERS: [URLParameter.ENVIRONMENT, URLParameter.LOCALE, URLParameter.TRACKING],
-      RESET_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND * 2,
+      RESET_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
 
@@ -83,9 +91,8 @@ class AuthViewModel {
     this.storageService = new StorageService();
     this.storage_repository = new StorageRepository(this.storageService);
 
-    this.cryptography_service = new z.cryptography.CryptographyRepository(backendClient);
-    this.cryptography_repository = new z.cryptography.CryptographyRepository(
-      this.cryptography_service,
+    this.cryptography_repository = new CryptographyRepository(
+      resolveDependency(graph.BackendClient),
       this.storage_repository
     );
     this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
@@ -99,7 +106,7 @@ class AuthViewModel {
       serverTimeHandler
     );
 
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler();
+    this.singleInstanceHandler = new SingleInstanceHandler();
 
     const eventService = new EventService(this.storageService);
     this.notification_service = new NotificationService(backendClient, this.storageService);
@@ -131,7 +138,7 @@ class AuthViewModel {
     this.is_public_computer.subscribe(is_public_computer => this.persist(!is_public_computer));
 
     this.client_type = ko.pureComputed(() => {
-      return this.persist() ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
+      return this.persist() ? ClientType.PERMANENT : ClientType.TEMPORARY;
     });
 
     this.self_user = ko.observable();
@@ -140,7 +147,7 @@ class AuthViewModel {
     this.remove_form_error = ko.observable(false);
     this.device_modal = undefined;
     this.permanent_devices = ko.pureComputed(() => {
-      return this.client_repository.clients().filter(client_et => client_et.type === z.client.ClientType.PERMANENT);
+      return this.client_repository.clients().filter(client_et => client_et.type === ClientType.PERMANENT);
     });
 
     this.code_digits = ko.observableArray([
@@ -175,7 +182,7 @@ class AuthViewModel {
     this.code_expiration_timestamp.subscribe(timestamp => {
       this.code_expiration_in(moment.unix(timestamp).fromNow());
       this.code_interval_id = window.setInterval(() => {
-        if (timestamp <= TimeUtil.getUnixTimestamp()) {
+        if (timestamp <= getUnixTimestamp()) {
           window.clearInterval(this.code_interval_id);
           return this.code_expiration_timestamp(0);
         }
@@ -189,12 +196,13 @@ class AuthViewModel {
     this.failed_validation_code = ko.observable(false);
     this.failed_validation_phone = ko.observable(false);
     this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
+    this.brandName = Config.BRAND_NAME;
 
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.country_code().length > 1 && this.phone_number().length;
     });
     this.can_resend_code = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.code_expiration_timestamp() < TimeUtil.getUnixTimestamp();
+      return !this.disabled_by_animation() && this.code_expiration_timestamp() < getUnixTimestamp();
     });
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_account = ko.pureComputed(() => !this.disabled_by_animation());
@@ -293,7 +301,7 @@ class AuthViewModel {
   }
 
   _init_url_parameter() {
-    const mode = z.util.URLUtil.getParameter(URLParameter.MODE);
+    const mode = getParameter(URLParameter.MODE);
     if (mode) {
       const isExpectedMode = mode === AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
@@ -443,9 +451,9 @@ class AuthViewModel {
       const _on_code_request_success = response => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
-          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + response.expires_in);
+          this.code_expiration_timestamp(getUnixTimestamp() + response.expires_in);
         } else if (!response.label) {
-          this.code_expiration_timestamp(TimeUtil.getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
+          this.code_expiration_timestamp(getUnixTimestamp() + z.config.LOGIN_CODE_EXPIRATION);
         }
         this._set_hash(AuthView.MODE.VERIFY_CODE);
         this.pending_server_request(false);
@@ -700,8 +708,7 @@ class AuthViewModel {
   }
 
   clicked_on_password() {
-    const url = getAccountPagesUrl(URL_PATH.PASSWORD_RESET);
-    z.util.SanitizationUtil.safeWindowOpen(url);
+    safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   clicked_on_resend_code() {
@@ -730,7 +737,7 @@ class AuthViewModel {
             window.setTimeout(() => {
               $('.icon-error').fadeIn();
               this.disabled_by_animation(false);
-            }, z.motion.MotionDuration.LONG);
+            }, MotionDuration.LONG);
           });
       }
     }
@@ -738,11 +745,11 @@ class AuthViewModel {
 
   clicked_on_wire_link() {
     const path = t('urlWebsiteRoot');
-    z.util.SanitizationUtil.safeWindowOpen(getWebsiteUrl(path));
+    safeWindowOpen(getWebsiteUrl(path));
   }
 
   keydown_auth(keyboard_event) {
-    if (z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
+    if (isEnterKey(keyboard_event)) {
       switch (this.visible_mode()) {
         case AuthView.MODE.ACCOUNT_LOGIN:
           this.login_phone();
@@ -773,11 +780,11 @@ class AuthViewModel {
   }
 
   keydown_phone_code(view_model, keyboard_event) {
-    if (z.util.KeyboardUtil.isPasteAction(keyboard_event)) {
+    if (isPasteAction(keyboard_event)) {
       return true;
     }
 
-    if (z.util.KeyboardUtil.isFunctionKey(keyboard_event)) {
+    if (isFunctionKey(keyboard_event)) {
       return false;
     }
 
@@ -786,20 +793,20 @@ class AuthViewModel {
 
     let focus_digit;
     switch (keyboard_event.key) {
-      case z.util.KeyboardUtil.KEY.ARROW_LEFT:
-      case z.util.KeyboardUtil.KEY.ARROW_UP:
+      case KEY.ARROW_LEFT:
+      case KEY.ARROW_UP:
         focus_digit = target_digit - 1;
         $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
         break;
 
-      case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-      case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
+      case KEY.ARROW_DOWN:
+      case KEY.ARROW_RIGHT:
         focus_digit = target_digit + 1;
         $(`#wire-verify-code-digit-${Math.min(6, focus_digit)}`).focus();
         break;
 
-      case z.util.KeyboardUtil.KEY.BACKSPACE:
-      case z.util.KeyboardUtil.KEY.DELETE:
+      case KEY.BACKSPACE:
+      case KEY.DELETE:
         if (keyboard_event.currentTarget.value === '') {
           focus_digit = target_digit - 1;
           $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
@@ -847,7 +854,7 @@ class AuthViewModel {
     if (this.device_modal.isHidden()) {
       this.client_repository.getClientsForSelf();
       $(document).on('keydown.deviceModal', keyboard_event => {
-        if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+        if (isEscapeKey(keyboard_event)) {
           this.device_modal.hide();
         }
       });
@@ -890,7 +897,7 @@ class AuthViewModel {
 
     window.setTimeout(() => {
       $('.icon-check').fadeIn();
-    }, z.motion.MotionDuration.LONG);
+    }, MotionDuration.LONG);
 
     window.setTimeout(() => {
       $('.icon-check').fadeOut();
@@ -1486,7 +1493,7 @@ class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
-      url = z.util.URLUtil.forwardParameter(url, parameter_name);
+      url = forwardParameter(url, parameter_name);
     });
 
     return url;

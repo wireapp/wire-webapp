@@ -20,17 +20,22 @@
 import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
-import * as StorageUtil from 'Util/StorageUtil';
+import {loadValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {murmurhash3} from 'Util/util';
 import {Environment} from 'Util/Environment';
 
+import {Config} from '../auth/config';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {StorageKey} from '../storage/StorageKey';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+
 import {ClientService} from './ClientService';
+import {ClientType} from './ClientType';
+import {ClientEntity} from './ClientEntity';
+import {ClientMapper} from './ClientMapper';
 
 export class ClientRepository {
   static get CONFIG() {
@@ -49,7 +54,7 @@ export class ClientRepository {
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
 
-    this.clientMapper = new z.client.ClientMapper();
+    this.clientMapper = new ClientMapper();
     this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
     this.currentClient = ko.observable();
 
@@ -94,7 +99,7 @@ export class ClientRepository {
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
-        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] = recipients[userId] || [];
           recipients[userId].push(this.clientMapper.mapClient(client, false));
@@ -123,7 +128,7 @@ export class ClientRepository {
 
   /**
    * Loads a client from the database (if it exists).
-   * @returns {Promise<z.client.ClientEntity>} Resolves with the local client
+   * @returns {Promise<ClientEntity>} Resolves with the local client
    */
   getCurrentClientFromDb() {
     return this.clientService
@@ -195,7 +200,7 @@ export class ClientRepository {
    * Change verification state of client.
    *
    * @param {string} userId - User ID of the client owner
-   * @param {z.client.ClientEntity} clientEntity - Client which needs to get updated
+   * @param {ClientEntity} clientEntity - Client which needs to get updated
    * @param {boolean} isVerified - New state to apply
    * @returns {Promise} Resolves when the verification state has been updated
    */
@@ -241,7 +246,7 @@ export class ClientRepository {
   /**
    * Constructs the value for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label
    */
   constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
@@ -252,7 +257,7 @@ export class ClientRepository {
   /**
    * Constructs the key for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label key
    */
   constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
@@ -287,7 +292,7 @@ export class ClientRepository {
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
    * @param {string|undefined} password - User password for verification
-   * @returns {Promise<z.client.ClientEntity>} Resolve with the newly registered client
+   * @returns {Promise<ClientEntity>} Resolve with the newly registered client
    */
   registerClient(password) {
     const clientType = this._loadCurrentClientType();
@@ -331,7 +336,7 @@ export class ClientRepository {
    * Create payload for client registration.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Type of client to be registered
+   * @param {ClientType} clientType - Type of client to be registered
    * @param {string} password - User password
    * @param {string} lastResortKey - Last resort key
    * @param {Array<string>} preKeys - Pre-keys
@@ -350,17 +355,17 @@ export class ClientRepository {
     if (Environment.desktop) {
       let modelString;
       if (Environment.os.mac) {
-        modelString = t('wireMacos');
+        modelString = t('wireMacos', Config.BRAND_NAME);
       } else if (Environment.os.win) {
-        modelString = t('wireWindows');
+        modelString = t('wireWindows', Config.BRAND_NAME);
       } else {
-        modelString = t('wireLinux');
+        modelString = t('wireLinux', Config.BRAND_NAME);
       }
       deviceModel = modelString;
       if (!Environment.frontend.isProduction()) {
         deviceModel = `${deviceModel} (Internal)`;
       }
-    } else if (clientType === z.client.ClientType.TEMPORARY) {
+    } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
 
@@ -384,14 +389,14 @@ export class ClientRepository {
    * @returns {string} Cookie label
    */
   _getCookieLabelValue(login) {
-    return StorageUtil.getValue(this.constructCookieLabelKey(login));
+    return loadValue(this.constructCookieLabelKey(login));
   }
 
   /**
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
    * @private
-   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {ClientType} clientType - Temporary or permanent client type
    * @param {string} cookieLabel - Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
@@ -403,7 +408,7 @@ export class ClientRepository {
     if (cookieLabel === undefined) {
       cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
-      StorageUtil.setValue(localStorageKey, cookieLabel);
+      loadValue(localStorageKey, cookieLabel);
     }
 
     this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
@@ -417,15 +422,15 @@ export class ClientRepository {
   /**
    * Load current client type from amplify store.
    * @private
-   * @returns {z.client.ClientType} Type of current client
+   * @returns {ClientType} Type of current client
    */
   _loadCurrentClientType() {
     if (this.currentClient()) {
       return this.currentClient().type;
     }
-    const isPermanent = StorageUtil.getValue(StorageKey.AUTH.PERSIST);
-    const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
-    return Environment.electron ? z.client.ClientType.PERMANENT : type;
+    const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
+    const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+    return Environment.electron ? ClientType.PERMANENT : type;
   }
 
   //##############################################################################
@@ -517,7 +522,7 @@ export class ClientRepository {
   getClientByUserIdFromDb(requestedUserId) {
     return this.clientService.loadAllClientsFromDb().then(clients => {
       return clients.filter(client => {
-        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
         return userId === requestedUserId;
       });
     });
@@ -567,7 +572,7 @@ export class ClientRepository {
    * @param {string} userId - ID of user whose clients are updated
    * @param {Object} clientsData - Clients data from backend
    * @param {booelan} [publish=true] - Publish changes clients using amplify
-   * @returns {Promise<Array<z.client.Client>>} Resolves with the entities once clients have been updated
+   * @returns {Promise<Client[]>} Resolves with the entities once clients have been updated
    */
   _updateClientsOfUserById(userId, clientsData, publish = true) {
     const clientsFromBackend = {};

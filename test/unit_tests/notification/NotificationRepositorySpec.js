@@ -20,6 +20,7 @@
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {truncate} from 'Util/StringUtil';
 
 import 'src/script/localization/Localizer';
 
@@ -33,7 +34,7 @@ import {NotificationRepository} from 'src/script/notification/NotificationReposi
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {AvailabilityType} from 'src/script/user/AvailabilityType';
-import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
@@ -42,6 +43,10 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -87,7 +92,7 @@ describe('NotificationRepository', () => {
           tag: conversation_et.id,
         },
         timeout: NotificationRepository.CONFIG.TIMEOUT,
-        title: z.util.StringUtil.truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
+        title: truncate(title, NotificationRepository.CONFIG.TITLE_LENGTH, false),
       };
 
       // Mocks
@@ -98,7 +103,7 @@ describe('NotificationRepository', () => {
       window.wire.app = {
         service: {asset: {generateAssetUrl: () => Promise.resolve('/image/logo/notification.png')}},
       };
-      contentViewModelState.state = ko.observable(z.viewModel.ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };
@@ -123,7 +128,7 @@ describe('NotificationRepository', () => {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${_message.user().first_name()} in ${_conversation.display_name()}`;
 
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.title = '…';
           }
@@ -163,7 +168,7 @@ describe('NotificationRepository', () => {
             const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
             notification_content.options.body = z.string.notificationObfuscated;
-            notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+            notification_content.title = truncate(titleText, titleLength, false);
           } else {
             notification_content.options.body = z.string.notificationObfuscated;
             notification_content.title = z.string.notificationObfuscatedTitle;
@@ -242,7 +247,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the conversation is muted', () => {
-      conversation_et.mutedState(NotificationSetting.STATE.NOTHING);
+      conversation_et.mutedState(NOTIFICATION_STATE.NOTHING);
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -522,7 +527,7 @@ describe('NotificationRepository', () => {
       const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
       const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-      notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+      notification_content.title = truncate(titleText, titleLength, false);
     });
 
     it('if a group is created', () => {
@@ -579,7 +584,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
@@ -613,7 +618,7 @@ describe('NotificationRepository', () => {
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
         const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
-        notification_content.title = z.util.StringUtil.truncate(titleText, titleLength, false);
+        notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {
@@ -658,7 +663,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(ConversationType.ONE2ONE);
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
@@ -725,7 +730,7 @@ describe('NotificationRepository', () => {
       const mentionId = selfMentioned ? userId : createRandomUuid();
 
       const textEntity = new z.entity.Text(createRandomUuid(), '@Gregor can you take a look?');
-      const mentionEntity = new z.message.MentionEntity(0, 7, mentionId);
+      const mentionEntity = new MentionEntity(0, 7, mentionId);
       textEntity.mentions([mentionEntity]);
 
       return textEntity;
@@ -745,7 +750,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for all notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -753,7 +758,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for no notifications', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -761,7 +766,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset(true));
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -769,7 +774,7 @@ describe('NotificationRepository', () => {
 
     it('returns the correct value for non-self mentioned messages', () => {
       messageEntity.add_asset(generateTextAsset());
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);
@@ -781,7 +786,7 @@ describe('NotificationRepository', () => {
       const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(true);
@@ -796,7 +801,7 @@ describe('NotificationRepository', () => {
       });
       messageEntity.quote(quoteEntity);
 
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
       expect(notifyInConversation).toBe(false);

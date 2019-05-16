@@ -17,86 +17,81 @@
  *
  */
 
+import {isObject} from 'underscore';
+
 import {ClientEvent} from '../event/Client';
-import {MessageCategory} from '../message/MessageCategory';
+import {MessageCategory} from './MessageCategory';
 
-window.z = window.z || {};
-window.z.message = z.message || {};
+const _checkAsset = event => {
+  const {data: eventData, type: eventType} = event;
 
-z.message.MessageCategorization = (() => {
-  const _checkAsset = event => {
-    const {data: eventData, type: eventType} = event;
-
-    const isAssetAdd = eventType === ClientEvent.CONVERSATION.ASSET_ADD;
-    if (isAssetAdd) {
-      const isTagUndefined = eventData.info.tag === undefined;
-      if (isTagUndefined) {
-        return MessageCategory.FILE;
-      }
-
-      let category = MessageCategory.IMAGE;
-      if (eventData.content_type === 'image/gif') {
-        category = category | MessageCategory.GIF;
-      }
-
-      return category;
+  const isAssetAdd = eventType === ClientEvent.CONVERSATION.ASSET_ADD;
+  if (isAssetAdd) {
+    const isTagUndefined = eventData.info.tag === undefined;
+    if (isTagUndefined) {
+      return MessageCategory.FILE;
     }
-  };
 
-  const _checkLocation = event => {
-    const isLocation = event.type === ClientEvent.CONVERSATION.LOCATION;
-    if (isLocation) {
-      return MessageCategory.LOCATION;
+    let category = MessageCategory.IMAGE;
+    if (eventData.content_type === 'image/gif') {
+      category = category | MessageCategory.GIF;
     }
-  };
 
-  const _checkPing = event => {
-    const isPing = event.type === ClientEvent.CONVERSATION.KNOCK;
-    if (isPing) {
-      return MessageCategory.KNOCK;
+    return category;
+  }
+};
+
+const _checkLocation = event => {
+  const isLocation = event.type === ClientEvent.CONVERSATION.LOCATION;
+  if (isLocation) {
+    return MessageCategory.LOCATION;
+  }
+};
+
+const _checkPing = event => {
+  const isPing = event.type === ClientEvent.CONVERSATION.KNOCK;
+  if (isPing) {
+    return MessageCategory.KNOCK;
+  }
+};
+
+const _checkText = event => {
+  const {data: eventData, type: eventType} = event;
+
+  const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
+  if (isMessageAdd) {
+    let category = MessageCategory.TEXT;
+
+    const isLinkPreview = eventData.previews && !!eventData.previews.length;
+    if (isLinkPreview) {
+      category = category | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
     }
-  };
 
-  const _checkText = event => {
-    const {data: eventData, type: eventType} = event;
+    return category;
+  }
+};
 
-    const isMessageAdd = eventType === ClientEvent.CONVERSATION.MESSAGE_ADD;
-    if (isMessageAdd) {
-      let category = MessageCategory.TEXT;
+export const categoryFromEvent = event => {
+  try {
+    const eventReactions = event.reactions;
+    let category = MessageCategory.NONE;
 
-      const isLinkPreview = eventData.previews && !!eventData.previews.length;
-      if (isLinkPreview) {
-        category = category | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
+    const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
+    for (const check of categoryChecks) {
+      const matchedCategory = check(event);
+      if (matchedCategory) {
+        category = matchedCategory;
+        break;
       }
-
-      return category;
     }
-  };
 
-  return {
-    categoryFromEvent: event => {
-      try {
-        const eventReactions = event.reactions;
-        let category = MessageCategory.NONE;
+    const isReaction = isObject(eventReactions) && !!Object.keys(eventReactions).length;
+    if (isReaction) {
+      category = category | MessageCategory.LIKED;
+    }
 
-        const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation];
-        for (const check of categoryChecks) {
-          const matchedCategory = check(event);
-          if (matchedCategory) {
-            category = matchedCategory;
-            break;
-          }
-        }
-
-        const isReaction = _.isObject(eventReactions) && !!Object.keys(eventReactions).length;
-        if (isReaction) {
-          category = category | MessageCategory.LIKED;
-        }
-
-        return category;
-      } catch (error) {
-        return MessageCategory.UNDEFINED;
-      }
-    },
-  };
-})();
+    return category;
+  } catch (error) {
+    return MessageCategory.UNDEFINED;
+  }
+};

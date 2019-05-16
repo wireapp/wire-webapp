@@ -24,6 +24,7 @@ import {arrayToBase64} from 'Util/util';
 import {ClientEvent} from 'src/script/event/Client';
 import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MessageHasher} from 'src/script/message/MessageHasher';
 
 describe('QuotedMessageMiddleware', () => {
   const testFactory = new TestFactory();
@@ -31,7 +32,7 @@ describe('QuotedMessageMiddleware', () => {
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(() => {
-      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service, z.message.MessageHasher);
+      quotedMessageMiddleware = new QuotedMessageMiddleware(TestFactory.event_service);
     });
   });
 
@@ -122,7 +123,7 @@ describe('QuotedMessageMiddleware', () => {
         time: 100,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
-      spyOn(z.message.MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
+      spyOn(MessageHasher, 'validateHash').and.returnValue(Promise.resolve(true));
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(quotedMessage));
 
       const quote = new Quote({

@@ -204,7 +204,7 @@ export const appAlreadyOpenStrings = defineMessages({
     id: 'appAlreadyOpen.continueButton',
   },
   headline: {
-    defaultMessage: 'Wire is already open in this browser',
+    defaultMessage: '{brandName} is already open in this browser',
     id: 'appAlreadyOpen.headline',
   },
   text: {
@@ -223,7 +223,7 @@ export const acceptNewsModalStrings = defineMessages({
     id: 'acceptNewsModal.declineButton',
   },
   headline: {
-    defaultMessage: 'Do you want to receive news and product updates from Wire via email?',
+    defaultMessage: 'Do you want to receive news and product updates from {brandName} via email?',
     id: 'acceptNewsModal.headline',
   },
   privacyDescription: {
@@ -255,19 +255,19 @@ export const unsupportedStrings = defineMessages({
     id: 'unsupported.subheadBrowser',
   },
   subheadCookies: {
-    defaultMessage: 'Enable cookies to log in to Wire.',
+    defaultMessage: 'Enable cookies to log in to {brandName}.',
     id: 'unsupported.subheadCookies',
   },
   subheadIndexedDb: {
     defaultMessage:
-      'Wire needs access to local storage to display your messages. Local storage is not available in private mode.',
+      '{brandName} needs access to local storage to display your messages. Local storage is not available in private mode.',
     id: 'unsupported.subheadIndexedDb',
   },
 });
 
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">{brandName} guest room.</b>',
     id: 'conversationJoin.unsupportedJoinHeadline',
   },
   unsupportedJoinMobileSubhead: {
@@ -278,7 +278,8 @@ export const unsupportedJoinStrings = defineMessages({
 
 export const conversationJoinStrings = defineMessages({
   existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage:
+      '{name}, you have been invited <br />to join a <b style="color: black;">{brandName} guest room.</b>',
     id: 'conversationJoin.existentAccountHeadline',
   },
   existentAccountJoinWithoutLink: {
@@ -290,7 +291,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.existentAccountJoinWithoutText',
   },
   existentAccountOpenButton: {
-    defaultMessage: 'Open in Wire',
+    defaultMessage: 'Open in {brandName}',
     id: 'conversationJoin.buttonExistentAccountOpen',
   },
   existentAccountSubhead: {
@@ -298,7 +299,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.subheadExistentAccount',
   },
   fullConversationHeadline: {
-    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is full.',
+    defaultMessage: 'This <b style="color: black;">{brandName} guest room</b><br />is full.',
     id: 'conversationJoin.fullConversationHeadline',
   },
   fullConversationSubhead: {
@@ -310,7 +311,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">Wire guest room.</b>',
+    defaultMessage: 'You have been invited <br />to join a <b style="color: black;">{brandName} guest room.</b>',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
@@ -322,7 +323,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.invalidCreateAccountText',
   },
   invalidHeadline: {
-    defaultMessage: 'This <b style="color: black;">Wire guest room</b><br />is now closed.',
+    defaultMessage: 'This <b style="color: black;">{brandName} guest room</b><br />is now closed.',
     id: 'conversationJoin.invalidHeadline',
   },
   invalidSubhead: {
@@ -651,7 +652,7 @@ export const clientManagerStrings = defineMessages({
     id: 'clientManager.logout',
   },
   subhead: {
-    defaultMessage: 'Remove one of your other devices to start using Wire on this one.',
+    defaultMessage: 'Remove one of your other devices to start using {brandName} on this one.',
     id: 'clientManager.subhead',
   },
 });
@@ -665,7 +666,7 @@ export const clientItemStrings = defineMessages({
 
 export const historyInfoStrings = defineMessages({
   hasHistoryHeadline: {
-    defaultMessage: 'You’ve used Wire on this device before.',
+    defaultMessage: 'You’ve used {brandName} on this device before.',
     id: 'historyInfo.hasHistoryHeadline',
   },
   hasHistoryInfo: {
@@ -677,7 +678,7 @@ export const historyInfoStrings = defineMessages({
     id: 'historyInfo.learnMore',
   },
   noHistoryHeadline: {
-    defaultMessage: 'It’s the first time you’re using Wire on this device.',
+    defaultMessage: 'It’s the first time you’re using {brandName} on this device.',
     id: 'historyInfo.noHistoryHeadline',
   },
   noHistoryInfo: {

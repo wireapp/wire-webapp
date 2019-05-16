@@ -20,8 +20,11 @@
 import {Asset} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
+import {assetV3, legacyAsset} from 'Util/ValidationUtil';
+import {WebWorker} from 'Util/worker';
 
 import {AssetRetentionPolicy} from '../assets/AssetRetentionPolicy';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {BackendClientInterface} from '../service/BackendClientInterface';
 import {encryptAesAsset} from './AssetCrypto';
 
@@ -82,8 +85,8 @@ export class AssetService {
         });
 
         const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+          [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
         });
 
         return protoAsset;
@@ -109,7 +112,7 @@ export class AssetService {
           size: compressedBytes.length,
         });
 
-        (protoAsset as any)[z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
+        protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = assetOriginal;
         return protoAsset;
       });
     });
@@ -117,7 +120,7 @@ export class AssetService {
 
   generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      legacyAsset(assetId, conversationId);
       const url = this.backendClient.createUrl(`/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
       const conversationIdParam = `&conv_id=${encodeURIComponent(conversationId)}`;
@@ -128,7 +131,7 @@ export class AssetService {
 
   generateAssetUrlV2(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      legacyAsset(assetId, conversationId);
       const url = this.backendClient.createUrl(`/conversations/${conversationId}/otr/assets/${assetId}`);
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
@@ -138,7 +141,7 @@ export class AssetService {
 
   generateAssetUrlV3(assetKey: string, assetToken: string, forceCaching: boolean): Promise<string> {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+      assetV3(assetKey, assetToken);
       const url = `${this.backendClient.createUrl(`/assets/v3/${assetKey}`)}`;
       const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
       const cachingParam = forceCaching ? '&forceCaching=true' : '';
@@ -198,7 +201,7 @@ export class AssetService {
     xhr.send(new Blob([body, assetData, footer]));
 
     return new Promise((resolve, reject) => {
-      xhr.onload = function(event) {
+      xhr.onload = function(event): void {
         return this.status === 201 ? resolve(JSON.parse(this.response)) : reject(event);
       };
       xhr.onerror = reject;
@@ -219,7 +222,7 @@ export class AssetService {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
         }
-        return new z.util.Worker(pathToWorkerFile).post(buffer);
+        return new WebWorker(pathToWorkerFile).post(buffer);
       })
       .then(compressedBytes => {
         return loadImage(new Blob([compressedBytes], {type: image.type})).then(compressedImage => ({

@@ -23,6 +23,7 @@ import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {historyInfoStrings} from '../../strings';
+import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
@@ -53,10 +54,11 @@ const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
   };
   const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
   const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
-        <H1 center>{_(headline)}</H1>
+        <H1 center>{_(headline, {brandName: Config.BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>
           <FormattedHTMLMessage {...infoText} />
         </Paragraph>

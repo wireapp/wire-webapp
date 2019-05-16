@@ -191,6 +191,7 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
               errorType => error.label && error.label.endsWith(errorType)
             );
             if (!isValidationError) {
+              // tslint:disable-next-line:no-console
               console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
             }
           }
@@ -244,7 +245,7 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
       .toLowerCase()
       .replace(_SingleSignOnForm.SSO_CODE_PREFIX, '');
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
       loginError,

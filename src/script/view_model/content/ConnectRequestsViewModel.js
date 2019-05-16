@@ -30,7 +30,7 @@ z.viewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    * View model for connection requests.
    *
    * @param {MainViewModel} mainViewModel - Main view model
-   * @param {z.viewModel.ContentViewModel} contentViewModel - Content view model
+   * @param {ContentViewModel} contentViewModel - Content view model
    * @param {Object} repositories - Object containing all repositories
    */
   constructor(mainViewModel, contentViewModel, repositories) {

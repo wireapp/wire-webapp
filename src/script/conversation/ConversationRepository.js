@@ -35,14 +35,17 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
+import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -60,6 +63,7 @@ import * as trackingHelpers from '../tracking/Helpers';
 
 import {ConversationMapper} from './ConversationMapper';
 import {ConversationType} from './ConversationType';
+import {ConversationStateHandler} from './ConversationStateHandler';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ACCESS_MODE} from './AccessMode';
@@ -68,19 +72,23 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {NotificationSetting} from './NotificationSetting';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ClientMismatchHandler} from './ClientMismatchHandler';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
+import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {QUEUE_STATE} from '../service/QueueState';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {EventName} from '../tracking/EventName';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
@@ -88,14 +96,11 @@ import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
 
-window.z = window.z || {};
-window.z.conversation = z.conversation || {};
-
 // Conversation repository for all conversation interactions with the conversation service
-z.conversation.ConversationRepository = class ConversationRepository {
+export class ConversationRepository {
   static get CONFIG() {
     return {
-      CONFIRMATION_THRESHOLD: TimeUtil.UNITS_IN_MILLIS.WEEK,
+      CONFIRMATION_THRESHOLD: TIME_IN_MILLIS.WEEK,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
@@ -160,16 +165,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.user_repository = user_repository;
     this.propertyRepository = propertyRepository;
     this.assetUploader = assetUploader;
-    this.logger = getLogger('z.conversation.ConversationRepository');
+    this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
-    this.verification_state_handler = new ConversationVerificationStateHandler(
+    this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
     );
-    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+    this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
@@ -204,11 +209,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversation_et => {
-        const states_to_filter = [
-          z.connection.ConnectionStatus.BLOCKED,
-          z.connection.ConnectionStatus.CANCELLED,
-          z.connection.ConnectionStatus.PENDING,
-        ];
+        const states_to_filter = [ConnectionStatus.BLOCKED, ConnectionStatus.CANCELLED, ConnectionStatus.PENDING];
 
         if (conversation_et.isSelf() || states_to_filter.includes(conversation_et.connection().status())) {
           return false;
@@ -242,12 +243,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this._init_subscriptions();
 
-    this.stateHandler = new z.conversation.ConversationStateHandler(this.conversation_service, this.conversationMapper);
-    this.ephemeralHandler = new z.conversation.ConversationEphemeralHandler(
-      this.conversationMapper,
-      this.eventService,
-      {onMessageTimeout: this.handleMessageExpiration.bind(this)}
-    );
+    this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
+    this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
+      onMessageTimeout: this.handleMessageExpiration.bind(this),
+    });
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.team_repository.memberInviters()[this.selfUser().id];
@@ -865,13 +864,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const queryString = isHandle ? `@${query}` : query;
-        if (z.util.StringUtil.compareTransliteration(conversationEntity.display_name(), queryString)) {
+        if (compareTransliteration(conversationEntity.display_name(), queryString)) {
           return true;
         }
 
         for (const userEntity of conversationEntity.participating_user_ets()) {
           const nameString = isHandle ? userEntity.username() : userEntity.name();
-          if (z.util.StringUtil.startsWith(nameString, query)) {
+          if (startsWith(nameString, query)) {
             return true;
           }
         }
@@ -879,7 +878,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return false;
       })
       .sort((conversationA, conversationB) => {
-        return z.util.StringUtil.sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
+        return sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
       })
       .map(conversationEntity => {
         this.updateParticipatingUserEntities(conversationEntity);
@@ -1045,7 +1044,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
-   * @param {z.connection.ConnectionEntity} connectionEntity - Connections
+   * @param {ConnectionEntity} connectionEntity - Connections
    * @param {boolean} [show_conversation=false] - Open the new conversation
    * @returns {Promise} Resolves when connection was mapped return value
    */
@@ -1089,7 +1088,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Maps user connections to the corresponding conversations.
-   * @param {Array<z.connection.ConnectionEntity>} connectionEntities - Connections entities
+   * @param {Array<ConnectionEntity>} connectionEntities - Connections entities
    * @returns {undefined} No return value
    */
   map_connections(connectionEntities) {
@@ -1148,7 +1147,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       lastReadTimestamp: timestamp,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
+      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
       messageId: createRandomUuid(),
     });
 
@@ -1226,7 +1225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.user_repository
       .get_users_by_id(conversationEntity.participating_user_ids(), offline)
       .then(userEntities => {
-        userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+        userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
         conversationEntity.participating_user_ets(userEntities);
 
         if (updateGuests) {
@@ -1368,7 +1367,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversationId: conversationEntity.id,
       });
       const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
+        [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
         messageId: createRandomUuid(),
       });
 
@@ -1449,7 +1448,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was updated on server side
    */
   updateConversationMessageTimer(conversationEntity, messageTimer) {
-    messageTimer = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return this.conversation_service
       .updateConversationMessageTimer(conversationEntity.id, messageTimer)
@@ -1548,13 +1547,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
     }
 
-    const validNotificationStates = Object.values(NotificationSetting.STATE);
+    const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
       return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== NotificationSetting.STATE.EVERYTHING;
+    const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(currentTimestamp)).toISOString(),
@@ -1756,7 +1755,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(asset => {
         genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          [GENERIC_MESSAGE_TYPE.ASSET]: asset,
           messageId,
         });
 
@@ -1816,15 +1815,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const protoAsset = new Asset({
-          [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-          [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+          [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
         });
 
         return protoAsset;
       })
       .then(asset => {
         let genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: asset,
+          [GENERIC_MESSAGE_TYPE.ASSET]: asset,
           messageId: createRandomUuid(),
         });
 
@@ -1870,12 +1869,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.assetUploader.uploadAsset(messageEntity.id, imageBlob, options).then(uploadedImageAsset => {
             const assetPreview = new Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
             const protoAsset = new Asset({
-              [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
-              [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+              [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
+              [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
             });
 
             const genericMessage = new GenericMessage({
-              [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+              [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
               messageId,
             });
 
@@ -1901,12 +1900,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
-      [z.cryptography.PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
     });
 
     const generic_message = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
+      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
       messageId,
     });
 
@@ -1946,7 +1945,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       type,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
+      [GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
       messageId: createRandomUuid(),
     });
 
@@ -2005,12 +2004,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendKnock(conversationEntity) {
     const protoKnock = new Knock({
-      [z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
       hotKnock: false,
     });
 
     let genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
       messageId: createRandomUuid(),
     });
 
@@ -2032,7 +2031,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message that possibly contains link
    * @param {GenericMessage} genericMessage - GenericMessage of containing text or edited message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of message
    * @param {QuoteEntity} quoteEntity - Link to a quoted message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2052,7 +2051,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             [linkPreview],
             this.expectReadReceipt(conversationEntity)
           );
-          genericMessage[z.cryptography.GENERIC_MESSAGE_TYPE.TEXT] = protoText;
+          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
           return this.get_message_in_conversation_by_id(conversationEntity, messageId);
         }
@@ -2101,7 +2100,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       zoom,
     });
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
+      [GENERIC_MESSAGE_TYPE.LOCATION]: protoLocation,
       messageId: createRandomUuid(),
     });
 
@@ -2115,7 +2114,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
    * @param {z.entity.Message} originalMessageEntity - Original message entity
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
   sendMessageEdit(conversationEntity, textMessage, originalMessageEntity, mentionEntities) {
@@ -2139,7 +2138,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
+      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
       messageId,
     });
 
@@ -2181,7 +2180,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   sendReaction(conversationEntity, messageEntity, reaction) {
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
+      [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
     });
 
@@ -2202,7 +2201,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   sendSessionReset(userId, clientId, conversationId) {
     const genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+      [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
     });
 
@@ -2228,7 +2227,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions as part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @param {QuoteEntity} [quoteEntity] - Quote as part of the message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2244,7 +2243,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.expectReadReceipt(conversationEntity)
     );
     let genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: protoText,
+      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
       messageId,
     });
 
@@ -2260,7 +2259,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation that should receive the message
    * @param {string} textMessage - Plain text message
-   * @param {Array<z.message.MentionEntity>} [mentionEntities] - Mentions part of the message
+   * @param {Array<MentionEntity>} [mentionEntities] - Mentions part of the message
    * @param {QuoteEntity} [quoteEntity] - Quoted message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2298,22 +2297,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .map(mentionEntity => mentionEntity.toProto());
 
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
+      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
     }
 
     if (quoteEntity) {
       const protoQuote = quoteEntity.toProto();
       this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
+      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
     }
 
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
+      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
     }
 
     if (expectsReadConfirmation) {
-      protoText[z.cryptography.PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
+      protoText[PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
     }
 
     return protoText;
@@ -2327,15 +2326,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Message} New proto message
    */
   _wrap_in_ephemeral_message(genericMessage, millis) {
-    const ephemeralExpiration = z.conversation.ConversationEphemeralHandler.validateTimer(millis);
+    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
 
     const protoEphemeral = new Ephemeral({
       [genericMessage.content]: genericMessage[genericMessage.content],
-      [z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
+      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
     });
 
     genericMessage = new GenericMessage({
-      [z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
+      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
       messageId: genericMessage.messageId,
     });
 
@@ -2393,7 +2392,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.cryptography_repository.cryptographyMapper.mapGenericMessage(genericMessage, optimisticEvent);
       })
       .then(mappedEvent => {
-        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = z.cryptography.GENERIC_MESSAGE_TYPE;
+        const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
         const isPing = message => message.content === TYPE_KNOCK;
         const isEphemeralPing = message => message.content === TYPE_EPHEMERAL && isPing(message.ephemeral);
         const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
@@ -2475,7 +2474,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const externalMessage = new External({otrKey: keyBytes, sha256});
 
         const genericMessageExternal = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
+          [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
           messageId: createRandomUuid(),
         });
 
@@ -2540,7 +2539,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
-    if (messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+    if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
       messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
     }
 
@@ -2600,7 +2599,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
 
-    const isCallingMessage = messageType === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
+    const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
@@ -2631,7 +2630,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
             const hasMultipleUsers = userEntities.length > 1;
             const userNames = joinNames(userEntities, Declension.NOMINATIVE);
-            const titleSubstitutions = z.util.StringUtil.capitalizeFirstChar(userNames);
+            const titleSubstitutions = capitalizeFirstChar(userNames);
 
             if (hasMultipleUsers) {
               titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
@@ -2770,7 +2769,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id, asImage))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / TimeUtil.UNITS_IN_MILLIS.SECOND;
+        const upload_duration = (Date.now() - upload_started) / TIME_IN_MILLIS.SECOND;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
       })
       .catch(error => {
@@ -2806,7 +2805,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const protoMessageDelete = new MessageDelete({messageId});
         const genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
           messageId: createRandomUuid(),
         });
 
@@ -2849,7 +2848,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           messageId: messageEntity.id,
         });
         const genericMessage = new GenericMessage({
-          [z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
+          [GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
           messageId: createRandomUuid(),
         });
 
@@ -3247,7 +3246,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
           }
 
-          this.verification_state_handler.onConversationCreate(conversationEntity);
+          this.verificationStateHandler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       })
@@ -3321,7 +3320,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this._addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -3374,7 +3373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.updateParticipatingUserEntities(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.onMemberLeft(conversationEntity);
+          this.verificationStateHandler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archiveConversation(conversationEntity);
@@ -3746,7 +3745,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
         return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
-          userEntities.sort((userA, userB) => z.util.StringUtil.sortByPriority(userA.first_name(), userB.first_name()));
+          userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
           messageEntity.userEntities(userEntities);
           return messageEntity;
         });
@@ -3912,12 +3911,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _trackContributed(conversationEntity, genericMessage, callMessageEntity) {
     let messageTimer;
-    const isEphemeral = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral;
-      messageTimer =
-        genericMessage[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TimeUtil.UNITS_IN_MILLIS.SECOND;
+      messageTimer = genericMessage[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION] / TIME_IN_MILLIS.SECOND;
     }
 
     const messageContentType = genericMessage.content;
@@ -3951,7 +3949,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
         if (!length) {
           actionType = 'text';
           numberOfMentions = protoText.mentions.length;
@@ -3979,7 +3977,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
       }
 
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, attributes);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONTRIBUTED, attributes);
     }
   }
-};
+}

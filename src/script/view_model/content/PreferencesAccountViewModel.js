@@ -21,6 +21,8 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
+import {KEY, isKey} from 'Util/KeyboardUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
@@ -31,6 +33,7 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
+import {Config} from '../../auth/config';
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
@@ -38,6 +41,9 @@ import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {EventName} from '../../tracking/EventName';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -49,7 +55,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       PROFILE_IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      SAVE_ANIMATION_TIMEOUT: z.motion.MotionDuration.X_LONG * 2,
+      SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
     };
   }
 
@@ -75,6 +81,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.Environment = Environment;
+    this.brandName = Config.BRAND_NAME;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
     this.selfUser = this.userRepository.self;
@@ -193,7 +200,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   checkUsernameInput(username, keyboardEvent) {
-    if (z.util.KeyboardUtil.isKey(keyboardEvent, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+    if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
 
@@ -215,7 +222,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
           secondary: () => {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
           },
         });
         break;
@@ -247,14 +254,14 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnBackupExport() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_EXPORT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   }
 
   onImportFileChange(viewModel, event) {
     const file = event.target.files[0];
     if (file) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.HISTORY_IMPORT);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
       amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
     }
   }
@@ -288,13 +295,13 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOpenManageTeam() {
     if (this.manageTeamUrl) {
-      z.util.SanitizationUtil.safeWindowOpen(this.manageTeamUrl);
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
+      safeWindowOpen(this.manageTeamUrl);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.OPENED_MANAGE_TEAM);
     }
   }
 
   clickOnResetPassword() {
-    z.util.SanitizationUtil.safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
+    safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   }
 
   removedFromView() {

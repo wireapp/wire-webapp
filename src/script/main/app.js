@@ -22,11 +22,15 @@ import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, isSameLocation, createRandomUuid} from 'Util/util';
+import {checkIndexedDb, createRandomUuid} from 'Util/util';
 import {DebugUtil} from 'Util/DebugUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
+import {exposeWrapperGlobals} from 'Util/wrapper';
+import {includesString} from 'Util/StringUtil';
+import {isSameLocation} from 'Util/ValidationUtil';
+import {appendParameter} from 'Util/UrlUtil';
 
 import {Config} from '../auth/config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -47,6 +51,12 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {TeamRepository} from '../team/TeamRepository';
+import {SearchRepository} from '../search/SearchRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
 
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
@@ -55,8 +65,10 @@ import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
+import {ConversationService} from '../conversation/ConversationService';
 
 import {BackendClient} from '../service/BackendClient';
+import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -83,6 +95,8 @@ import {WebAppEvents} from '../event/WebApp';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {ContentViewModel} from '../view_model/ContentViewModel';
 
 class App {
   static get CONFIG() {
@@ -90,7 +104,7 @@ class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: TimeUtil.UNITS_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
         IMMEDIATE: [SIGN_OUT_REASON.ACCOUNT_DELETED, SIGN_OUT_REASON.CLIENT_REMOVED, SIGN_OUT_REASON.SESSION_EXPIRED],
         TEMPORARY_GUEST: [
@@ -123,7 +137,7 @@ class App {
     this._publishGlobals();
 
     const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    this.singleInstanceHandler = new z.main.SingleInstanceHandler(onExtraInstanceStarted);
+    this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
     this.initApp();
@@ -148,10 +162,7 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new z.cryptography.CryptographyRepository(
-      this.service.cryptography,
-      repositories.storage
-    );
+    repositories.cryptography = new CryptographyRepository(resolve(graph.BackendClient), repositories.storage);
     const storageService = resolve(graph.StorageService);
     repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
@@ -163,7 +174,7 @@ class App {
       serverTimeHandler,
       repositories.properties
     );
-    repositories.connection = new z.connection.ConnectionRepository(this.service.connection, repositories.user);
+    repositories.connection = new ConnectionRepository(this.backendClient, repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -174,11 +185,11 @@ class App {
       repositories.user
     );
     repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
-    repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
-    repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
-    repositories.eventTracker = new z.tracking.EventTrackingRepository(repositories.team, repositories.user);
+    repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
+    repositories.team = new TeamRepository(resolve(graph.BackendClient), repositories.user);
+    repositories.eventTracker = new EventTrackingRepository(repositories.team, repositories.user);
 
-    repositories.conversation = new z.conversation.ConversationRepository(
+    repositories.conversation = new ConversationRepository(
       this.service.conversation,
       this.service.asset,
       repositories.client,
@@ -196,7 +207,7 @@ class App {
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event, z.message.MessageHasher);
+    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
 
     const readReceiptMiddleware = new ReceiptsMiddleware(
       this.service.event,
@@ -264,15 +275,11 @@ class App {
     return {
       asset: resolve(graph.AssetService),
       connect: new ConnectService(this.backendClient),
-      connection: new z.connection.ConnectionService(this.backendClient),
-      conversation: new z.conversation.ConversationService(this.backendClient, eventService, storageService),
-      cryptography: new z.cryptography.CryptographyService(this.backendClient),
+      conversation: new ConversationService(this.backendClient, eventService, storageService),
       event: eventService,
       integration: new IntegrationService(this.backendClient),
       notification: new NotificationService(this.backendClient, storageService),
-      search: new z.search.SearchService(this.backendClient),
       storage: storageService,
-      team: new z.team.TeamService(this.backendClient),
       webSocket: new WebSocketService(this.backendClient),
     };
   }
@@ -304,6 +311,7 @@ class App {
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
+    exposeWrapperGlobals();
 
     checkIndexedDb()
       .then(() => this._registerSingleInstance())
@@ -356,7 +364,7 @@ class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications'));
+        loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.BRAND_NAME));
 
         this._watchOnlineStatus();
         return this.repository.client.updateClientsForSelf();
@@ -413,8 +421,8 @@ class App {
   onInternetConnectionGained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
     this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
+      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
       this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
     });
   }
@@ -426,7 +434,7 @@ class App {
   onInternetConnectionLost() {
     this.logger.warn('Internet connection lost');
     this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.NO_INTERNET);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
   }
 
   _appInitFailure(error, isReload) {
@@ -543,7 +551,7 @@ class App {
 
   /**
    * Initiate the current client of the self user.
-   * @returns {Promise<z.client.Client>} Resolves with the local client entity
+   * @returns {Promise<Client>} Resolves with the local client entity
    */
   _initiateSelfUserClients() {
     return this.repository.client
@@ -633,7 +641,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
     } else if (this.repository.user.connect_requests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
@@ -719,7 +727,7 @@ class App {
         Object.keys(amplify.store()).forEach(keyInAmplifyStore => {
           const isCookieLabelKey = keyInAmplifyStore === cookieLabelKey;
           const deleteLabelKey = isCookieLabelKey && clearData;
-          const isCookieLabel = z.util.StringUtil.includes(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
+          const isCookieLabel = includesString(keyInAmplifyStore, StorageKey.AUTH.COOKIE_LABEL);
 
           if (!deleteLabelKey && isCookieLabel) {
             keysToKeep.push(keyInAmplifyStore);
@@ -785,7 +793,7 @@ class App {
    * @returns {undefined} No return value
    */
   update() {
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**
@@ -807,7 +815,7 @@ class App {
       let url = `/auth/${location.search}`;
       const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
       if (isImmediateSignOutReason) {
-        url = z.util.URLUtil.appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
+        url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
       }
 
       const redirectToLogin = signOutReason !== SIGN_OUT_REASON.NOT_SIGNED_IN;

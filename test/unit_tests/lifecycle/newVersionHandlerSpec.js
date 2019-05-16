@@ -17,6 +17,8 @@
  *
  */
 
+//@ts-check
+
 import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
 
 describe('newVersionHandler', () => {
@@ -33,7 +35,7 @@ describe('newVersionHandler', () => {
 
     it('polls the server every 3 hours', () => {
       jasmine.clock().install();
-      spyOn(window, 'fetch').and.returnValue(Promise.resolve({}));
+      spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response()));
 
       startNewVersionPolling('', () => {});
 
@@ -51,7 +53,7 @@ describe('newVersionHandler', () => {
         response: {version: '2019-03-19'},
       };
 
-      spyOn(window, 'fetch').and.returnValue(Promise.resolve({json: () => testData.response, ok: true}));
+      spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response(JSON.stringify(testData.response))));
       spyOn(testData, 'callback');
 
       startNewVersionPolling(testData.currentVersion, testData.callback);

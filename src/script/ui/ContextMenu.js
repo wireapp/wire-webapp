@@ -17,6 +17,8 @@
  *
  */
 
+import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
+
 const _addListeners = () => {
   window.addEventListener('wheel', _onWheel);
   window.addEventListener('keydown', _onKeyDown);
@@ -27,17 +29,17 @@ const _addListeners = () => {
 const _onKeyDown = keyboardEvent => {
   keyboardEvent.preventDefault();
 
-  if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+  if (isEscapeKey(keyboardEvent)) {
     return _cleanup();
   }
 
-  const expectedKeys = [z.util.KeyboardUtil.KEY.ARROW_UP, z.util.KeyboardUtil.KEY.ARROW_DOWN];
+  const expectedKeys = [KEY.ARROW_UP, KEY.ARROW_DOWN];
 
-  if (z.util.KeyboardUtil.isOneOfKeys(keyboardEvent, expectedKeys)) {
+  if (isOneOfKeys(keyboardEvent, expectedKeys)) {
     return _rotateItem(keyboardEvent.key);
   }
 
-  if (z.util.KeyboardUtil.isEnterKey(keyboardEvent)) {
+  if (isEnterKey(keyboardEvent)) {
     _triggerItem();
   }
 };
@@ -58,11 +60,11 @@ const _rotateItem = key => {
 
   if (entries.length) {
     if (!entry) {
-      const index = key === z.util.KeyboardUtil.KEY.ARROW_UP ? entries.length - 1 : 0;
+      const index = key === KEY.ARROW_UP ? entries.length - 1 : 0;
       return entries[index].classList.add('selected');
     }
 
-    const direction = key === z.util.KeyboardUtil.KEY.ARROW_UP ? -1 : 1;
+    const direction = key === KEY.ARROW_UP ? -1 : 1;
     const nextIndext = (entries.indexOf(entry) + direction + entries.length) % entries.length;
     const nextEntry = entries[nextIndext];
 

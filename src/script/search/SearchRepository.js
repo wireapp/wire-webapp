@@ -19,13 +19,12 @@
 
 import {getLogger} from 'Util/Logger';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
+import {compareTransliteration, startsWith, computeTransliteration, sortByPriority} from 'Util/StringUtil';
 
+import {SearchService} from './SearchService';
 import {validateHandle} from '../user/UserHandleGenerator';
 
-window.z = window.z || {};
-window.z.search = z.search || {};
-
-class SearchRepository {
+export class SearchRepository {
   static get CONFIG() {
     return {
       MAX_DIRECTORY_RESULTS: 30,
@@ -53,14 +52,13 @@ class SearchRepository {
   }
 
   /**
-   * Construct a new Conversation Repository.
-   * @param {z.search.SearchService} searchService - Backend REST API search service implementation
+   * @param {BackendClient} backendClient - Client for the API calls
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
-  constructor(searchService, userRepository) {
-    this.searchService = searchService;
+  constructor(backendClient, userRepository) {
+    this.searchService = new SearchService(backendClient);
     this.userRepository = userRepository;
-    this.logger = getLogger('z.search.SearchRepository');
+    this.logger = getLogger('SearchRepository');
   }
 
   /**
@@ -69,7 +67,7 @@ class SearchRepository {
    *
    * @param {string} term - the search term
    * @param {Array<User>} userEntities - entities to match the search term against
-   * @param {Array<z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, z.search.SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
+   * @param {Array<SearchRepository.CONFIG.SEARCHABLE_FIELDS>} properties=[SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME] - list of properties that will be matched against the search term
    *    the order of the properties in the array indicates the priorities by which results will be sorted
    * @returns {Array<User>} the filtered list of users
    */
@@ -116,26 +114,26 @@ class SearchRepository {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
     }
-    const isStrictTransliteratedMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, true);
+    const isStrictTransliteratedMatch = compareTransliteration(value, term, excludedEmojis, true);
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string
       return 50;
     }
-    const isLoosyMatch = z.util.StringUtil.compareTransliteration(value, term, excludedEmojis, false);
+    const isLoosyMatch = compareTransliteration(value, term, excludedEmojis, false);
     if (!isLoosyMatch) {
       // if the pattern doesn't match loosely, then it's not a match at all
       return 0;
     }
 
-    const tokens = z.util.StringUtil.computeTransliteration(value).split(/-/g);
+    const tokens = computeTransliteration(value).split(/-/g);
     // computing the match value by testing all components of the property
     return tokens.reverse().reduce((weight, token, index) => {
       const indexWeight = index + 1;
       let tokenWeight = 0;
 
-      if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, true)) {
+      if (compareTransliteration(token, term, excludedEmojis, true)) {
         tokenWeight = indexWeight * 10;
-      } else if (z.util.StringUtil.compareTransliteration(token, term, excludedEmojis, false)) {
+      } else if (compareTransliteration(token, term, excludedEmojis, false)) {
         tokenWeight = indexWeight;
       }
 
@@ -179,19 +177,16 @@ class SearchRepository {
       })
       .then(userEntities => {
         if (isHandle) {
-          userEntities = userEntities.filter(userEntity => z.util.StringUtil.startsWith(userEntity.username(), name));
+          userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), name));
         }
 
         return userEntities
           .sort((userA, userB) => {
             return isHandle
-              ? z.util.StringUtil.sortByPriority(userA.username(), userB.username(), name)
-              : z.util.StringUtil.sortByPriority(userA.name(), userB.name(), name);
+              ? sortByPriority(userA.username(), userB.username(), name)
+              : sortByPriority(userA.name(), userB.name(), name);
           })
           .slice(0, maxResults);
       });
   }
 }
-
-z.search.SearchRepository = SearchRepository;
-export {SearchRepository};

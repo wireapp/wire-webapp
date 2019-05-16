@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
@@ -49,14 +49,14 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
       times.sort((timeA, timeB) => timeA - timeB);
 
       const mappedTimes = times.map(time => ({
-        text: TimeUtil.formatDuration(time).text,
+        text: formatDuration(time).text,
         value: time,
       }));
 
       if (hasCustomTime()) {
         mappedTimes.push({
           isCustom: true,
-          text: TimeUtil.formatDuration(this.currentMessageTimer()).text,
+          text: formatDuration(this.currentMessageTimer()).text,
           value: this.currentMessageTimer(),
         });
       }

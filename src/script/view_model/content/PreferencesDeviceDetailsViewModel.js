@@ -19,9 +19,12 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatTimestamp} from 'Util/TimeUtil';
 
+import {Config} from '../../auth/config';
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -49,12 +52,13 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.device = ko.observable();
     this.fingerprint = ko.observableArray([]);
     this.sessionResetState = ko.observable(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+    this.brandName = Config.BRAND_NAME;
 
     this.device.subscribe(clientEntity => {
       if (clientEntity) {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this._updateFingerprint();
-        const date = TimeUtil.formatTimestamp(clientEntity.time);
+        const date = formatTimestamp(clientEntity.time);
         this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       }
     });
@@ -69,7 +73,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   clickOnDetailsClose() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICES);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   }
 
@@ -82,7 +86,7 @@ z.viewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       .then(() => {
         window.setTimeout(() => {
           this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
-        }, z.motion.MotionDuration.LONG);
+        }, MotionDuration.LONG);
 
         window.setTimeout(() => {
           this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);

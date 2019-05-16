@@ -31,7 +31,7 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
     this.deleted_timestamp = null;
 
     this.display_deleted_timestamp = () => {
-      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('HH:mm'));
+      return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
     };
   }
 };

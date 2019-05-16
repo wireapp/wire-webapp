@@ -17,16 +17,18 @@
  *
  */
 
-import StoreEngine from '@wireapp/store-engine';
+import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {isString} from 'underscore';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 
-describe('z.cryptography.CryptographyRepository', () => {
+describe('CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
   beforeAll(() => test_factory.exposeCryptographyActors(false));
@@ -44,54 +46,56 @@ describe('z.cryptography.CryptographyRepository', () => {
         id: entities.user.john_doe.id,
       };
 
-      return (jane_roe = {
+      jane_roe = {
         clients: {
           phone_id: '55cdd1dbe3c2ed74',
         },
         id: entities.user.jane_roe.id,
-      });
+      };
     });
 
     it('encrypts a generic message', () => {
-      spyOn(TestFactory.cryptography_service, 'getUsersPreKeys').and.callFake(recipients =>
-        Promise.resolve().then(() => {
-          const prekey_map = {};
+      spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(
+        recipients =>
+          new Promise(resolve => {
+            const prekey_map = {};
 
-          for (const user_id in recipients) {
-            if (recipients.hasOwnProperty(user_id)) {
-              const client_ids = recipients[user_id];
+            for (const user_id in recipients) {
+              if (recipients.hasOwnProperty(user_id)) {
+                const client_ids = recipients[user_id];
 
-              prekey_map[user_id] = prekey_map[user_id] || {};
+                prekey_map[user_id] = prekey_map[user_id] || {};
 
-              client_ids.forEach(client_id => {
-                prekey_map[user_id][client_id] = {
-                  id: 65535,
-                  key:
-                    'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
-                };
-              });
+                client_ids.forEach(client_id => {
+                  prekey_map[user_id][client_id] = {
+                    id: 65535,
+                    key:
+                      'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
+                  };
+                });
+              }
             }
-          }
 
-          return prekey_map;
-        })
+            resolve(prekey_map);
+          })
       );
 
       const generic_message = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
         messageId: createRandomUuid(),
       });
 
-      const recipients = {};
-      recipients[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];
-      recipients[jane_roe.id] = [jane_roe.clients.phone_id];
+      const recipients = {
+        [john_doe.id]: [john_doe.clients.phone_id, john_doe.clients.desktop_id],
+        [jane_roe.id]: [jane_roe.clients.phone_id],
+      };
 
       return TestFactory.cryptography_repository.encryptGenericMessage(recipients, generic_message).then(payload => {
         expect(payload.recipients).toBeTruthy();
         expect(Object.keys(payload.recipients).length).toBe(2);
         expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
         expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
-        expect(_.isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBeTruthy();
+        expect(isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBe(true);
       });
     });
   });
@@ -110,7 +114,7 @@ describe('z.cryptography.CryptographyRepository', () => {
 
       const aliceBundle = Proteus.keys.PreKeyBundle.new(alice.public_key, preKeys[0]);
 
-      const bobEngine = new StoreEngine.MemoryEngine();
+      const bobEngine = new MemoryEngine();
       await bobEngine.init('bob');
 
       const bob = new Cryptobox(bobEngine, 1);
@@ -119,7 +123,7 @@ describe('z.cryptography.CryptographyRepository', () => {
       const plainText = 'Hello, Alice!';
 
       const genericMessage = new GenericMessage({
-        [z.cryptography.GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: plainText}),
         messageId: createRandomUuid(),
       });
 

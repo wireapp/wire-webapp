@@ -18,6 +18,7 @@
  */
 
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
@@ -56,7 +57,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
 
     this.captionUser = ko.pureComputed(() => {
       const namesString = joinNames(this.userEntities(), Declension.NOMINATIVE);
-      return z.util.StringUtil.capitalizeFirstChar(namesString);
+      return capitalizeFirstChar(namesString);
     });
 
     this.captionStartedUsing = ko.pureComputed(() => {

@@ -20,11 +20,13 @@
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
+import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {AssetType} from 'src/script/assets/AssetType';
 import {ClientEvent} from 'src/script/event/Client';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 
 describe('Event Mapper', () => {
   const test_factory = new TestFactory();
@@ -172,8 +174,8 @@ describe('Event Mapper', () => {
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
 
-      const validMention = new z.message.MentionEntity(text.indexOf('@'), mandy.length, createRandomUuid());
-      const outOfRangeMention = new z.message.MentionEntity(text.length, randy.length, createRandomUuid());
+      const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createRandomUuid());
+      const outOfRangeMention = new MentionEntity(text.length, randy.length, createRandomUuid());
 
       const conversationEntity = new Conversation(createRandomUuid());
 
@@ -210,11 +212,11 @@ describe('Event Mapper', () => {
 
       const mandyStart = text.indexOf(mandy);
       const sandyStart = text.indexOf(sandy);
-      const validMention1 = new z.message.MentionEntity(mandyStart, mandy.length, createRandomUuid());
-      const validMention2 = new z.message.MentionEntity(sandyStart, sandy.length, createRandomUuid());
+      const validMention1 = new MentionEntity(mandyStart, mandy.length, createRandomUuid());
+      const validMention2 = new MentionEntity(sandyStart, sandy.length, createRandomUuid());
 
       const overlappingStart = mandyStart + mandy.length - 1;
-      const overlappingMention = new z.message.MentionEntity(overlappingStart, randy.length, createRandomUuid());
+      const overlappingMention = new MentionEntity(overlappingStart, randy.length, createRandomUuid());
 
       const conversationEntity = new Conversation(createRandomUuid());
 
@@ -257,7 +259,7 @@ describe('Event Mapper', () => {
       try {
         asset_et.resource().generateUrl();
       } catch (error) {
-        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        expect(error).toEqual(jasmine.any(ValidationUtilError));
       }
     });
   });

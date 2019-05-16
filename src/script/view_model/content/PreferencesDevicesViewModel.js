@@ -19,9 +19,10 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatTimestamp} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -55,7 +56,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   clickOnShowDevice(clientEntity) {
     this.preferencesDeviceDetails.device(clientEntity);
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   }
 
   clickOnRemoveDevice(clientEntity, event) {
@@ -65,7 +66,7 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   updateDeviceInfo() {
     if (this.currentClient() && !this.localFingerprint().length) {
-      const date = TimeUtil.formatTimestamp(this.currentClient().time);
+      const date = formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));
       this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
     }

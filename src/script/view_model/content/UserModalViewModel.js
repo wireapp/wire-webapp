@@ -17,6 +17,9 @@
  *
  */
 
+import {noop} from 'Util/util';
+
+import {Config} from '../../auth/config';
 import {Actions} from 'Components/panel/userActions';
 
 export class UserModalViewModel {
@@ -27,13 +30,14 @@ export class UserModalViewModel {
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
     this.userNotFound = ko.observable(false);
-    this.onClosedCallback = () => {};
+    this.onClosedCallback = noop;
     this.onClosed = () => {
       this.user(null);
       this.userNotFound(false);
       this.onClosedCallback();
     };
     this.hide = () => this.isVisible(false);
+    this.brandName = Config.BRAND_NAME;
   }
 
   onUserAction = userAction => {
@@ -46,7 +50,7 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId, onModalClosed = () => {}) {
+  showUser(userId, onModalClosed = noop) {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);

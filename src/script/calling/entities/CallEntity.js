@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getRandomNumber} from 'Util/NumberUtil';
 
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
@@ -37,6 +37,7 @@ import {AudioType} from '../../audio/AudioType';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {EventRepository} from '../../event/EventRepository';
+import {EventName} from '../../tracking/EventName';
 
 export class CallEntity {
   static get CONFIG() {
@@ -46,10 +47,10 @@ export class CallEntity {
         MAXIMUM_TIMEOUT: 90,
         MINIMUM_TIMEOUT: 60,
       },
-      STATE_TIMEOUT: 60 * TimeUtil.UNITS_IN_MILLIS.SECOND,
+      STATE_TIMEOUT: 60 * TIME_IN_MILLIS.SECOND,
       TIMER: {
         INIT_THRESHOLD: 100,
-        UPDATE_INTERVAL: TimeUtil.UNITS_IN_MILLIS.SECOND,
+        UPDATE_INTERVAL: TIME_IN_MILLIS.SECOND,
       },
     };
   }
@@ -157,11 +158,11 @@ export class CallEntity {
           this.scheduleGroupCheck();
         }
 
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.ESTABLISHED_CALL, this);
         this.timerStart = Date.now() - CallEntity.CONFIG.TIMER.INIT_THRESHOLD;
 
         this.callTimerInterval = window.setInterval(() => {
-          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / TimeUtil.UNITS_IN_MILLIS.SECOND);
+          const durationInSeconds = Math.floor((Date.now() - this.timerStart) / TIME_IN_MILLIS.SECOND);
           this.durationTime(durationInSeconds);
         }, CallEntity.CONFIG.TIMER.UPDATE_INTERVAL);
       }
@@ -226,7 +227,7 @@ export class CallEntity {
 
       const isConnectingCall = state === CALL_STATE.CONNECTING;
       if (isConnectingCall) {
-        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this);
+        this.telemetry.track_event(EventName.CALLING.JOINED_CALL, this);
       }
 
       this.previousState = state;
@@ -525,7 +526,7 @@ export class CallEntity {
     const {MAXIMUM_TIMEOUT, MINIMUM_TIMEOUT} = CallEntity.CONFIG.GROUP_CHECK;
     const timeoutInSeconds = getRandomNumber(MINIMUM_TIMEOUT, MAXIMUM_TIMEOUT);
 
-    const timeout = timeoutInSeconds * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = timeoutInSeconds * TIME_IN_MILLIS.SECOND;
     this.groupCheckTimeoutId = window.setTimeout(() => this._onSendGroupCheckTimeout(timeoutInSeconds), timeout);
 
     const timeoutId = this.groupCheckTimeoutId;
@@ -539,7 +540,7 @@ export class CallEntity {
    */
   _setVerifyGroupCheckTimeout() {
     const ACTIVITY_TIMEOUT = CallEntity.CONFIG.GROUP_CHECK.ACTIVITY_TIMEOUT;
-    const timeout = ACTIVITY_TIMEOUT * TimeUtil.UNITS_IN_MILLIS.SECOND;
+    const timeout = ACTIVITY_TIMEOUT * TIME_IN_MILLIS.SECOND;
 
     this.groupCheckTimeoutId = window.setTimeout(() => this._onVerifyGroupCheckTimeout(), timeout);
     this.callLogger.debug(`Set verifying group check after '${ACTIVITY_TIMEOUT}s' (ID: ${this.groupCheckTimeoutId})`);

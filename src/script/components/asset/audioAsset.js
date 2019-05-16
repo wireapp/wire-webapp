@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {formatSeconds} from 'Util/TimeUtil';
 
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import {AssetTransferState} from '../../assets/AssetTransferState';
@@ -63,7 +63,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
     this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
 
-    this.TimeUtil = TimeUtil;
+    this.formatSeconds = formatSeconds;
     this.AssetTransferState = AssetTransferState;
   }
 
@@ -118,7 +118,7 @@ ko.components.register('audio-asset', {
           <!-- ko if: transferState() !== AssetTransferState.UPLOADING -->
             <span class="audio-controls-time label-xs"
                   data-uie-name="status-audio-time"
-                  data-bind="text: TimeUtil.formatSeconds(audio_time())">
+                  data-bind="text: formatSeconds(audio_time())">
             </span>
             <!-- ko if: show_loudness_preview -->
               <audio-seek-bar data-uie-name="status-audio-seekbar"

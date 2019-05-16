@@ -71,6 +71,7 @@ module.exports = {
           minChunks: 2,
           name: 'vendor',
           priority: 1,
+          test: /node_modules/,
         },
       },
     },

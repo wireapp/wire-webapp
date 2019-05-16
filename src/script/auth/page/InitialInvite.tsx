@@ -77,13 +77,13 @@ class _InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispat
     error: null,
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.props.fetchSelf();
   }
 
-  onInviteDone = () => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+  onInviteDone = (): void => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
 
-  renderEmail = (email: string) => (
+  renderEmail = (email: string): JSX.Element => (
     <div
       style={{
         alignItems: 'center',
@@ -101,7 +101,7 @@ class _InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispat
     </div>
   );
 
-  handleSubmit = (event: React.FormEvent) => {
+  handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
     this.emailInput.current.value = this.emailInput.current.value.trim();
     if (!this.emailInput.current.checkValidity()) {
@@ -133,12 +133,12 @@ class _InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispat
     this.emailInput.current.focus();
   };
 
-  resetErrors = () => {
+  resetErrors = (): void => {
     this.setState({error: null});
     this.props.resetInviteErrors();
   };
 
-  render() {
+  render(): JSX.Element {
     const {
       invites,
       isFetching,
@@ -216,8 +216,7 @@ export const InitialInvite = injectIntl(
     (dispatch: ThunkDispatch): DispatchProps => {
       return {
         fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-        invite: (invitation: {email: string; locale: string; inviter_name: string}) =>
-          dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
+        invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       };
     }

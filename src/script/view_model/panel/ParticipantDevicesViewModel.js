@@ -19,10 +19,13 @@
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {BasePanelViewModel} from './BasePanelViewModel';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../../externalRoute';
 import {WebAppEvents} from '../../event/WebApp';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {Config} from '../../auth/config';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   static get MODE() {
@@ -41,6 +44,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.clientRepository = client;
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
+    this.capitalizeFirstChar = capitalizeFirstChar;
 
     this.logger = getLogger('z.viewModel.panel.ParticipantDevicesViewModel');
 
@@ -72,11 +76,18 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     });
 
     this.devicesHeadlineText = ko.pureComputed(() => {
-      return this.userEntity() ? t('participantDevicesHeadline', this.userEntity().first_name()) : '';
+      return this.userEntity()
+        ? t('participantDevicesHeadline', {brandName: Config.BRAND_NAME, user: this.userEntity().first_name()})
+        : '';
     });
 
     this.noDevicesHeadlineText = ko.pureComputed(() => {
-      return this.userEntity() ? t('participantDevicesOutdatedClientMessage', this.userEntity().first_name()) : '';
+      return this.userEntity()
+        ? t('participantDevicesOutdatedClientMessage', {
+            brandName: Config.BRAND_NAME,
+            user: this.userEntity().first_name(),
+          })
+        : '';
     });
 
     this.isVisible.subscribe(isVisible => {
@@ -133,7 +144,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
   }
 
   clickToResetSession() {
-    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), z.motion.MotionDuration.LONG);
+    const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
 
     this.isResettingSession(true);
     this.conversationRepository

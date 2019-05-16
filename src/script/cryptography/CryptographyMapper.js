@@ -20,7 +20,7 @@
 import {Availability, Confirmation, GenericMessage, LinkPreview, Mention, Quote} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {AvailabilityType} from '../user/AvailabilityType';
@@ -30,6 +30,9 @@ import {AssetTransferState} from '../assets/AssetTransferState';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 import {StatusType} from '../message/StatusType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 
 export class CryptographyMapper {
   static get CONFIG() {
@@ -40,7 +43,7 @@ export class CryptographyMapper {
 
   // Construct a new CryptographyMapper.
   constructor() {
-    this.logger = getLogger('z.cryptography.CryptographyMapper');
+    this.logger = getLogger('CryptographyMapper');
   }
 
   /**
@@ -64,52 +67,52 @@ export class CryptographyMapper {
     let specificContent;
 
     switch (genericMessage.content) {
-      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET: {
+      case GENERIC_MESSAGE_TYPE.ASSET: {
         specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING: {
+      case GENERIC_MESSAGE_TYPE.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling, event.data);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED: {
+      case GENERIC_MESSAGE_TYPE.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED: {
+      case GENERIC_MESSAGE_TYPE.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED: {
+      case GENERIC_MESSAGE_TYPE.EDITED: {
         specificContent = this._mapEdited(genericMessage.edited, genericMessage.messageId);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL: {
+      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
         specificContent = this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case GENERIC_MESSAGE_TYPE.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE: {
+      case GENERIC_MESSAGE_TYPE.IMAGE: {
         specificContent = addExpectReadReceiptData(
           this._mapImage(genericMessage.image, event.data.id),
           genericMessage.image
@@ -117,27 +120,27 @@ export class CryptographyMapper {
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK: {
+      case GENERIC_MESSAGE_TYPE.KNOCK: {
         specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case GENERIC_MESSAGE_TYPE.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION: {
+      case GENERIC_MESSAGE_TYPE.LOCATION: {
         specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION: {
+      case GENERIC_MESSAGE_TYPE.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction);
         break;
       }
 
-      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT: {
+      case GENERIC_MESSAGE_TYPE.TEXT: {
         specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
@@ -219,9 +222,7 @@ export class CryptographyMapper {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : [];
-      const durationInSeconds = audioData.durationInMillis
-        ? audioData.durationInMillis / TimeUtil.UNITS_IN_MILLIS.SECOND
-        : 0;
+      const durationInSeconds = audioData.durationInMillis ? audioData.durationInMillis / TIME_IN_MILLIS.SECOND : 0;
 
       return {
         duration: durationInSeconds,
@@ -308,11 +309,11 @@ export class CryptographyMapper {
   }
 
   _mapEphemeral(genericMessage, event) {
-    const messageTimer = genericMessage.ephemeral[z.cryptography.PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
+    const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     genericMessage.ephemeral.messageId = genericMessage.messageId;
 
     const embeddedMessage = this._mapGenericMessage(genericMessage.ephemeral, event);
-    embeddedMessage.ephemeral_expires = z.conversation.ConversationEphemeralHandler.validateTimer(messageTimer);
+    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer);
 
     return embeddedMessage;
   }
@@ -432,7 +433,7 @@ export class CryptographyMapper {
   _mapText(text) {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
-    const protoLinkPreviews = text[z.cryptography.PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
+    const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
       this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);

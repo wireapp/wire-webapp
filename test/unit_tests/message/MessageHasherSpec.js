@@ -17,9 +17,12 @@
  *
  */
 
-import {ClientEvent} from 'src/script/event/Client';
+import {bytesToHex} from 'Util/StringUtil';
 
-describe('z.message.MessageHasher', () => {
+import {ClientEvent} from 'src/script/event/Client';
+import {MessageHasher} from 'src/script/message/MessageHasher';
+
+describe('MessageHasher', () => {
   describe('hashEvent', () => {
     describe('unhandled event type', () => {
       it('throws if the event type is not handled', () => {
@@ -27,7 +30,7 @@ describe('z.message.MessageHasher', () => {
           type: ClientEvent.CONVERSATION.KNOCK,
         };
 
-        expect(() => z.message.MessageHasher.hashEvent(event)).toThrow();
+        expect(() => MessageHasher.hashEvent(event)).toThrow();
       });
     });
 
@@ -53,8 +56,8 @@ describe('z.message.MessageHasher', () => {
         ];
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
-          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+          return MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -79,8 +82,8 @@ describe('z.message.MessageHasher', () => {
         ];
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
-          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+          return MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });
@@ -115,8 +118,8 @@ describe('z.message.MessageHasher', () => {
         ];
 
         const testPromises = tests.map(({event, expectedHashValue}) => {
-          return z.message.MessageHasher.hashEvent(event).then(hashBytes => {
-            const hashValue = z.util.StringUtil.bytesToHex(new Uint8Array(hashBytes));
+          return MessageHasher.hashEvent(event).then(hashBytes => {
+            const hashValue = bytesToHex(new Uint8Array(hashBytes));
 
             expect(hashValue).toBe(expectedHashValue);
           });

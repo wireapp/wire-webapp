@@ -18,15 +18,17 @@
  */
 
 import {getLogger} from 'Util/Logger';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {MessageCategory} from '../../message/MessageCategory';
+import {ContentViewModel} from '../ContentViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
 
-// Parent: z.viewModel.ContentViewModel
+// Parent: ContentViewModel
 z.viewModel.content.CollectionViewModel = class CollectionViewModel {
   constructor(mainViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
@@ -58,7 +60,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     $(document).on('keydown.collection', keyboardEvent => {
-      if (z.util.KeyboardUtil.isEscapeKey(keyboardEvent)) {
+      if (isEscapeKey(keyboardEvent)) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
       }
     });
@@ -145,7 +147,7 @@ z.viewModel.content.CollectionViewModel = class CollectionViewModel {
 
   clickOnSection(category, items) {
     this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, z.viewModel.ContentViewModel.STATE.COLLECTION_DETAILS);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
   clickOnImage(messageEntity) {

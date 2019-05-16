@@ -17,8 +17,9 @@
  *
  */
 
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isValidIceCandidatesGathering, getIceCandidatesTypes} from 'Util/PeerConnectionUtil';
+import {noop} from 'Util/util';
 
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaStreamSource} from '../../media/MediaStreamSource';
@@ -31,6 +32,7 @@ import {EventRepository} from '../../event/EventRepository';
 import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {CallSetupSteps} from '../../telemetry/calling/CallSetupSteps';
 import {FlowTelemetry} from '../../telemetry/calling/FlowTelemetry';
+import {EventName} from '../../tracking/EventName';
 
 import {CALL_MESSAGE_TYPE} from '../enum/CallMessageType';
 import {CALL_STATE} from '../enum/CallState';
@@ -54,10 +56,10 @@ class FlowEntity {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
       MAX_ICE_CANDIDATE_GATHERING_ATTEMPTS: 10,
-      NEGOTIATION_THRESHOLD: 0.5 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      RECONNECTION_TIMEOUT: 2.5 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      RENEGOTIATION_TIMEOUT: 30 * TimeUtil.UNITS_IN_MILLIS.SECOND,
-      SDP_SEND_TIMEOUT: TimeUtil.UNITS_IN_MILLIS.SECOND,
+      NEGOTIATION_THRESHOLD: 0.5 * TIME_IN_MILLIS.SECOND,
+      RECONNECTION_TIMEOUT: 2.5 * TIME_IN_MILLIS.SECOND,
+      RENEGOTIATION_TIMEOUT: 30 * TIME_IN_MILLIS.SECOND,
+      SDP_SEND_TIMEOUT: TIME_IN_MILLIS.SECOND,
     };
   }
 
@@ -336,12 +338,8 @@ class FlowEntity {
   restartNegotiation(negotiationMode, isAnswer, mediaStream) {
     this.callLogger.info(`Negotiation restart triggered by '${negotiationMode}'`);
 
-    this.clearTimeouts();
-    this._closePeerConnection();
-    this._closeDataChannel();
-    this._resetSignalingStates();
+    this._teardownPeerConnection();
     this.isAnswer(isAnswer);
-    this._resetSdp();
 
     const isModeStateCollision = negotiationMode === SDP_NEGOTIATION_MODE.STATE_COLLISION;
     if (!isModeStateCollision) {
@@ -388,7 +386,7 @@ class FlowEntity {
     const hadMediaStream = !!mediaStream;
     this._createPeerConnection().then(() => {
       if (!mediaStream) {
-        // @todo Remove report after debugging purpose achieved
+        // TODO: Remove report after debugging purpose achieved
         const customData = {
           hadMediaStream,
           hasMediaStream: !!mediaStream,
@@ -476,8 +474,8 @@ class FlowEntity {
     }
 
     // disabling connection state and signaling state handlers
-    this.peerConnection.oniceconnectionstatechange = () => {};
-    this.peerConnection.onsignalingstatechange = () => {};
+    this.peerConnection.oniceconnectionstatechange = noop;
+    this.peerConnection.onsignalingstatechange = noop;
 
     const connectionMediaStreamTracks = this.peerConnection.getReceivers
       ? this.peerConnection.getReceivers().map(receiver => receiver.track)
@@ -1029,7 +1027,7 @@ class FlowEntity {
     this.callLogger.error(`Creating '${sdpType}' failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, step: 'create_sdp', type: sdpType};
-    this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.track_event(EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     amplify.publish(WebAppEvents.CALL.STATE.LEAVE, this.callEntity.id, TERMINATION_REASON.SDP_FAILED);
   }
@@ -1162,7 +1160,7 @@ class FlowEntity {
     this.callLogger.error(`Setting ${sdpSource} '${sdpType}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdpSource, step: 'set_sdp', type: sdpType};
-    this.callEntity.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
+    this.callEntity.telemetry.track_event(EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     this._removeDroppedParticipant(TERMINATION_REASON.SDP_FAILED);
   }
@@ -1483,28 +1481,11 @@ class FlowEntity {
     this._clearSendSdpTimeout();
   }
 
-  /**
-   * Reset the flow.
-   * @returns {undefined} No return value
-   */
-  resetFlow() {
+  _teardownPeerConnection() {
     if (this.mediaStream()) {
       this._removeMediaStream(this.mediaStream());
     }
-
     if (this.pcInitialized()) {
-      const logMessage = {
-        data: {
-          default: [this.remoteUser.id],
-          obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
-        },
-        message: `Resetting flow with user '{0}'`,
-      };
-      this.callLogger.debug(logMessage);
-
-      this.remoteClientId = undefined;
-      this.telemetry.disconnected();
-
       this.clearTimeouts();
       this.iceCandidatesGatheringAttempts = 1;
       this._closeDataChannel();
@@ -1513,6 +1494,26 @@ class FlowEntity {
       this._resetSdp();
       this.pcInitialized(false);
     }
+  }
+
+  /**
+   * Reset the flow.
+   * @returns {undefined} No return value
+   */
+  resetFlow() {
+    const logMessage = {
+      data: {
+        default: [this.remoteUser.id],
+        obfuscated: [this.callLogger.obfuscate(this.remoteUser.id)],
+      },
+      message: `Resetting flow with user '{0}'`,
+    };
+    this.callLogger.debug(logMessage);
+
+    this._teardownPeerConnection();
+
+    this.remoteClientId = undefined;
+    this.telemetry.disconnected();
   }
 
   /**

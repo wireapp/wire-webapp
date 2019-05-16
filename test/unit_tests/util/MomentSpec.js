@@ -21,7 +21,7 @@ import moment from 'moment';
 
 import {isSameDay, isSameMonth, isCurrentYear, isToday} from 'Util/moment';
 
-describe('z.util.moment', () => {
+describe('moment', () => {
   describe('isToday', () => {
     it('should return true if date is today', () => {
       expect(isToday(moment())).toBeTruthy();

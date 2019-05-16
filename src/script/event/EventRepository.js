@@ -18,7 +18,7 @@
  */
 
 import {getLogger} from 'Util/Logger';
-import {TimeUtil} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 import {koArrayPushAll} from 'Util/util';
 
@@ -32,11 +32,13 @@ import {EventTypeHandling} from './EventTypeHandling';
 import {BackendEvent} from './Backend';
 import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {categoryFromEvent} from '../message/MessageCategorization';
 
 export class EventRepository {
   static get CONFIG() {
     return {
-      E_CALL_EVENT_LIFETIME: TimeUtil.UNITS_IN_MILLIS.SECOND * 30,
+      E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         z.error.CryptographyError.TYPE.IGNORED_ASSET,
         z.error.CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -68,8 +70,8 @@ export class EventRepository {
    * @param {EventService} eventService - Service that handles interactions with events
    * @param {NotificationService} notificationService - Service handling the notification stream
    * @param {WebSocketService} webSocketService - Service that connects to WebSocket
-   * @param {z.conversation.ConversationService} conversationService - Service to handle conversation related tasks
-   * @param {z.cryptography.CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
+   * @param {ConversationService} conversationService - Service to handle conversation related tasks
+   * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions
    */
@@ -102,7 +104,7 @@ export class EventRepository {
         this._handleBufferedNotifications();
         const previouslyHandlingRecovery = this.previousHandlingState === NOTIFICATION_HANDLING_STATE.RECOVERY;
         if (previouslyHandlingRecovery) {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
       }
       this.previousHandlingState = handling_state;
@@ -365,7 +367,7 @@ export class EventRepository {
    */
   recoverFromStream() {
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
-    amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
     return this._updateFromStream(this._getLastKnownNotificationId())
       .then(numberOfNotifications => {
@@ -377,7 +379,7 @@ export class EventRepository {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(WebAppEvents.WARNING.SHOW, z.viewModel.WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
         }
       });
   }
@@ -836,7 +838,7 @@ export class EventRepository {
     }
 
     return Object.assign({}, newEvent, {
-      category: z.message.MessageCategorization.categoryFromEvent(newEvent),
+      category: categoryFromEvent(newEvent),
       ephemeral_expires: originalEvent.ephemeral_expires,
       ephemeral_started: originalEvent.ephemeral_started,
       ephemeral_time: originalEvent.ephemeral_time,

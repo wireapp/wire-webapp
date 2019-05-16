@@ -24,12 +24,18 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
+
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {NotificationSetting} from 'src/script/conversation/NotificationSetting';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
-import {BackendEvent} from 'src/script/event/Backend';
+
 import {StatusType} from 'src/script/message/StatusType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+
+import {BackendEvent} from 'src/script/event/Backend';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ClientEntity} from 'src/script/client/ClientEntity';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 
 describe('Conversation', () => {
   let conversation_et = null;
@@ -516,13 +522,13 @@ describe('Conversation', () => {
 
   describe('getNumberOfClients', () => {
     it('should return the number of all known clients  (including own clients)', () => {
-      const first_client = new z.client.ClientEntity();
+      const first_client = new ClientEntity();
       first_client.id = '5021d77752286cac';
 
-      const second_client = new z.client.ClientEntity();
+      const second_client = new ClientEntity();
       second_client.id = '575b7a890cdb7635';
 
-      const third_client = new z.client.ClientEntity();
+      const third_client = new ClientEntity();
       third_client.id = '6c0daa855d6b8b6e';
 
       const user_et = new User();
@@ -545,7 +551,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when self user has no remote clients', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User(createRandomUuid());
@@ -560,8 +566,8 @@ describe('Conversation', () => {
     });
 
     it('is not verified when participant has unverified device', () => {
-      const unverified_client_et = new z.client.ClientEntity();
-      const verified_client_et = new z.client.ClientEntity();
+      const unverified_client_et = new ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();
@@ -582,7 +588,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when all users are verified', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();
@@ -885,7 +891,7 @@ describe('Conversation', () => {
       pingMessage.timestamp(timestamp + 200);
 
       selfMentionMessage = new ContentMessage();
-      const mentionEntity = new z.message.MentionEntity(0, 7, selfUserEntity.id);
+      const mentionEntity = new MentionEntity(0, 7, selfUserEntity.id);
       const textAsset = new z.entity.Text('id', '@Gregor, Hello there');
       textAsset.mentions.push(mentionEntity);
       selfMentionMessage.assets([textAsset]);
@@ -916,7 +922,7 @@ describe('Conversation', () => {
     });
 
     it('returns false if conversation is in no notification state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.NOTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -937,7 +943,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in only mentions notifications state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.MENTIONS_AND_REPLIES);
+      conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -958,7 +964,7 @@ describe('Conversation', () => {
     });
 
     it('returns expected value if conversation is in everything notifications state', () => {
-      conversationEntity.mutedState(NotificationSetting.STATE.EVERYTHING);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       conversationEntity.messages_unordered.push(outdatedMessage);
@@ -1019,7 +1025,7 @@ describe('Conversation', () => {
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.mutedState(NotificationSetting.STATE.EVERYTHING);
+      conversation_et.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
@@ -1036,7 +1042,7 @@ describe('Conversation', () => {
       const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const connectionMapper = new z.connection.ConnectionMapper();
+      const connectionMapper = new ConnectionMapper();
       const connectionEntity = connectionMapper.mapConnectionFromJson(payload_connection);
 
       const conversation_mapper = new ConversationMapper();
@@ -1050,7 +1056,7 @@ describe('Conversation', () => {
 
   describe('notificationState', () => {
     it('returns expected values', () => {
-      const NOTIFICATION_STATES = NotificationSetting.STATE;
+      const NOTIFICATION_STATES = NOTIFICATION_STATE;
       const conversationEntity = new Conversation(createRandomUuid());
       const selfUserEntity = new User(createRandomUuid());
 

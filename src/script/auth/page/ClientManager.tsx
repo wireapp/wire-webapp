@@ -23,8 +23,12 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps} from 'react-router';
+
+import {noop} from 'Util/util';
+
 import {clientManagerStrings} from '../../strings';
 import {ClientList} from '../component/ClientList';
+import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {ROUTE} from '../route';
@@ -47,10 +51,10 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
   logout = () =>
     this.props
       .doLogout()
-      .catch(() => {})
+      .catch(noop)
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
-  render() {
+  render(): JSX.Element {
     const {
       intl: {formatMessage: _},
     } = this.props;
@@ -65,7 +69,7 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
             {_(clientManagerStrings.headline)}
           </H1>
           <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
-            {_(clientManagerStrings.subhead)}
+            {_(clientManagerStrings.subhead, {brandName: Config.BRAND_NAME})}
           </Muted>
           <ClientList />
           <Link

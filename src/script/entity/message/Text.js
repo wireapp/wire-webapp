@@ -34,7 +34,7 @@ export class Text extends Asset {
     // Raw message text
     this.text = text;
 
-    // Array of z.message.MentionEntity instances
+    // Array of MentionEntity instances
     this.mentions = ko.observableArray();
 
     // Array of z.entity.LinkPreview instances

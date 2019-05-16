@@ -26,7 +26,10 @@ import {base64ToArray} from 'Util/util';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {MediumImage} from '../entity/message/MediumImage';
+import {File} from '../entity/message/File';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
@@ -36,6 +39,7 @@ import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
+import {MentionEntity} from '../message/MentionEntity';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -618,7 +622,7 @@ export class EventMapper {
     const {conversation: conversationId, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
-    const assetEntity = new z.entity.File(id);
+    const assetEntity = new File(id);
 
     assetEntity.conversationId = conversationId;
 
@@ -704,7 +708,7 @@ export class EventMapper {
 
       const meta_data = linkPreview.metaData || linkPreview.meta_data;
 
-      const linkPreviewEntity = new z.entity.LinkPreview(title || article_title, url);
+      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
       linkPreviewEntity.meta_data_type = meta_data;
       linkPreviewEntity.meta_data = linkPreview[meta_data];
 
@@ -746,13 +750,13 @@ export class EventMapper {
    * @private
    * @param {Array} mentions - Mentions as base64 encoded proto messages
    * @param {string} messageText - Text of message
-   * @returns {Array<z.message.MentionEntity>} Array of mapped mentions
+   * @returns {Array<MentionEntity>} Array of mapped mentions
    */
   _mapAssetMentions(mentions, messageText) {
     return mentions
       .map(encodedMention => {
         const protoMention = Mention.decode(base64ToArray(encodedMention));
-        return new z.message.MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
+        return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
       })
       .filter((mentionEntity, _, allMentions) => {
         if (mentionEntity) {

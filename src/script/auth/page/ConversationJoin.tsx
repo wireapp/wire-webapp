@@ -38,6 +38,9 @@ import * as React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps, withRouter} from 'react-router';
+
+import {noop} from 'Util/util';
+
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
@@ -145,7 +148,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
   componentDidMount = () => {
     this.props
       .doInit({shouldValidateLocalClient: true})
-      .catch(() => {})
+      .catch(noop)
       .then(() => this.readAndUpdateParamsFromUrl(this.props));
   };
 
@@ -237,17 +240,17 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
           {selfName ? (
             <FormattedHTMLMessage
               {...conversationJoinStrings.existentAccountHeadline}
-              values={{name: StringUtil.capitalize(selfName)}}
+              values={{brandName: Config.BRAND_NAME, name: StringUtil.capitalize(selfName)}}
             />
           ) : (
-            <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+            <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
           )}
         </H2>
         <Text block style={{fontSize: '16px', marginTop: '10px'}}>
           {_(conversationJoinStrings.existentAccountSubhead)}
         </Text>
         <Button style={{marginTop: 16}} onClick={this.onOpenWireClick} data-uie-name="do-open">
-          {_(conversationJoinStrings.existentAccountOpenButton)}
+          {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.BRAND_NAME})}
         </Button>
         <ErrorMessage data-uie-name="error-message">
           {error ? parseValidationErrors(error) : parseError(this.props.error)}
@@ -275,7 +278,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
       <ContainerXS style={{margin: 'auto 0'}}>
         <AppAlreadyOpen fullscreen={this.isPwaEnabled()} />
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
-          <FormattedHTMLMessage {...conversationJoinStrings.headline} />
+          <FormattedHTMLMessage {...conversationJoinStrings.headline} values={{brandName: Config.BRAND_NAME}} />
         </H2>
         <Text style={{fontSize: '16px', marginTop: '10px'}}>
           <FormattedHTMLMessage {...conversationJoinStrings.subhead} />
@@ -339,7 +342,10 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
           color={COLOR.GRAY}
           data-uie-name="status-full-headline"
         >
-          <FormattedHTMLMessage {...conversationJoinStrings.fullConversationHeadline} />
+          <FormattedHTMLMessage
+            {...conversationJoinStrings.fullConversationHeadline}
+            values={{brandName: Config.BRAND_NAME}}
+          />
         </H2>
         <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
           {_(conversationJoinStrings.fullConversationSubhead)}
@@ -362,7 +368,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
-  render() {
+  render(): JSX.Element {
     return (
       <UnsupportedBrowser isTemporaryGuest>
         <WirelessContainer
