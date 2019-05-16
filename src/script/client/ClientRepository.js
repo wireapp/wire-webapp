@@ -512,12 +512,13 @@ export class ClientRepository {
    * @note If you want to get very detailed information about the devices from the own user, then use "@getClients"
    *
    * @param {string} userId - User ID to retrieve client information for
+   * @param {boolean} updateClients - Automatically update the clients
    * @returns {Promise} Resolves with an array of client entities
    */
-  getClientsByUserId(userId) {
+  getClientsByUserId(userId, updateClients = true) {
     return this.clientService
       .getClientsByUserId(userId)
-      .then(clientsData => this._updateClientsOfUserById(userId, clientsData));
+      .then(clientsData => (updateClients ? this._updateClientsOfUserById(userId, clientsData) : clientsData));
   }
 
   getClientByUserIdFromDb(requestedUserId) {

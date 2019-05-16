@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmpty} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
 
@@ -60,7 +62,7 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchDeleted(recipients, payload) {
-    if (_.isEmpty(recipients)) {
+    if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
     this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
@@ -96,6 +98,7 @@ export class ClientMismatchHandler {
    */
   _handleClientMismatchMissing(recipients, payload, eventInfoEntity) {
     const missingUserIds = Object.keys(recipients);
+
     if (!missingUserIds.length) {
       return Promise.resolve(payload);
     }
@@ -103,10 +106,12 @@ export class ClientMismatchHandler {
     this.logger.debug(`Message is missing clients of '${missingUserIds.length}' users`, recipients);
     const {conversationId, genericMessage, timestamp} = eventInfoEntity;
 
-    const skipParticipantsCheck = !conversationId;
-    const participantsCheckPromise = skipParticipantsCheck
-      ? Promise.resolve()
-      : this.conversationRepository.get_conversation_by_id(conversationId).then(conversationEntity => {
+    let participantsCheckPromise = Promise.resolve();
+
+    if (conversationId) {
+      participantsCheckPromise = this.conversationRepository
+        .get_conversation_by_id(conversationId)
+        .then(conversationEntity => {
           const knownUserIds = conversationEntity.participating_user_ids();
           const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
@@ -114,17 +119,22 @@ export class ClientMismatchHandler {
             return this.conversationRepository.addMissingMember(conversationId, unknownUserIds, timestamp - 1);
           }
         });
+    }
 
     return participantsCheckPromise
       .then(() => this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload))
       .then(updatedPayload => {
         payload = updatedPayload;
-
-        const _addMissingClient = (userId, clientId) => this.userRepository.addClientToUser(userId, {id: clientId});
-        return Promise.all(this._mapRecipients(recipients, _addMissingClient));
+        return Promise.all(
+          missingUserIds.map(userId => {
+            return this.userRepository.getClientsByUserId(userId, false).then(clients => {
+              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+            });
+          })
+        );
       })
       .then(() => {
-        this.conversationRepository.verificationStateHandler.onClientsAdded(Object.keys(recipients));
+        this.conversationRepository.verificationStateHandler.onClientsAdded(missingUserIds);
         return payload;
       });
   }
@@ -143,20 +153,23 @@ export class ClientMismatchHandler {
    * @returns {Promise} Resolves with the updated payload
    */
   _handleClientMismatchRedundant(recipients, payload, eventInfoEntity) {
-    if (_.isEmpty(recipients)) {
+    if (isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
+
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
     const conversationId = eventInfoEntity.conversationId;
 
-    const conversationPromise = conversationId
-      ? this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
-          const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-          if (!isConversationNotFound) {
-            throw error;
-          }
-        })
-      : Promise.resolve();
+    let conversationPromise = Promise.resolve();
+
+    if (conversationId) {
+      conversationPromise = this.conversationRepository.get_conversation_by_id(conversationId).catch(error => {
+        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
+          throw error;
+        }
+      });
+    }
 
     return conversationPromise.then(conversationEntity => {
       const _removeRedundantClient = (userId, clientId) => delete payload.recipients[userId][clientId];
@@ -201,11 +214,11 @@ export class ClientMismatchHandler {
     const result = [];
 
     Object.entries(recipients).forEach(([userId, clientIds = []]) => {
-      if (_.isFunction(clientFn)) {
+      if (typeof clientFn === 'function') {
         clientIds.forEach(clientId => result.push(clientFn(userId, clientId)));
       }
 
-      if (_.isFunction(userFn)) {
+      if (typeof userFn === 'function') {
         result.push(userFn(userId));
       }
     });

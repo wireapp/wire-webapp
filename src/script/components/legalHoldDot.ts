@@ -32,7 +32,7 @@ interface LegalHoldParams {
 
 ko.components.register('legal-hold-dot', {
   template: `
-    <div class="legal-hold-dot" 
+    <div class="legal-hold-dot"
          data-bind="click: onClick, css: {'legal-hold-dot--interactive': isInteractive, 'legal-hold-dot--large': large, 'legal-hold-dot--active': !isPending}">
       <!-- ko if: isPending -->
         <pending-icon></pending-icon>
@@ -45,7 +45,7 @@ ko.components.register('legal-hold-dot', {
     conversation,
     userRepository,
     legalHoldModal,
-  }: LegalHoldParams) {
+  }: LegalHoldParams): void {
     this.large = large;
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
