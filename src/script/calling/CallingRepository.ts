@@ -20,6 +20,7 @@
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 // @ts-ignore
 import adapter from 'webrtc-adapter';
@@ -29,6 +30,7 @@ import {Environment} from 'Util/Environment';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {CallLogger} from '../telemetry/calling/CallLogger';
@@ -368,7 +370,7 @@ export class CallingRepository {
       this.callLogger.warn(`recv_msg failed with code: ${res}`);
       return;
     }
-    this.handleCallEventSaving(type, conversationId, userId, time, source);
+    this.handleCallEventSaving(content.type, conversationId, userId, time, source);
   }
 
   handleCallEventSaving(
@@ -422,13 +424,17 @@ export class CallingRepository {
    * @returns {undefined} No return value
    */
   startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE): void {
-    const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-    const call = new Call(conversationId, conversationType, selfParticipant, callType);
-    this.storeCall(call);
-    if (conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO) {
-      this.loadVideoPreview(call);
-    }
-    this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+    this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING)
+      .then(() => {
+        const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
+        const call = new Call(conversationId, conversationType, selfParticipant, callType);
+        this.storeCall(call);
+        if (conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO) {
+          this.loadVideoPreview(call);
+        }
+        this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+      })
+      .catch(() => {});
   }
 
   toggleCamera(conversationId: ConversationId): void {
@@ -459,7 +465,13 @@ export class CallingRepository {
   }
 
   answerCall(conversationId: ConversationId, callType: number): void {
-    this.wCall.answer(this.wUser, conversationId, callType, 0);
+    this.checkConcurrentJoinedCall(conversationId, CALL_STATE.INCOMING)
+      .then(() => {
+        this.wCall.answer(this.wUser, conversationId, callType, 0);
+      })
+      .catch(() => {
+        this.rejectCall(conversationId);
+      });
   }
 
   rejectCall(conversationId: ConversationId): void {
@@ -881,68 +893,54 @@ ${turnServersConfig}`;
    * @param {CALL_STATE} callState - Call state of new call
    * @returns {Promise} Resolves when the new call was joined
    */
-  /* TODO use AVS
-  _checkConcurrentJoinedCall(newCallId, callState) {
-    // FIXME use info from avs lib
-    const ongoingCallId = false;
-    return new Promise(resolve => {
-      if (!ongoingCallId) {
-        resolve();
-      } else {
-        let actionString;
-        let messageString;
-        let titleString;
+  private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
+    const activeCall = this.activeCalls().find((call: Call) => call.conversationId !== conversationId);
+    if (!activeCall) {
+      return Promise.resolve();
+    }
 
-        switch (callState) {
-          case CALL_STATE.INCOMING:
-          case CALL_STATE.REJECTED: {
-            actionString = t('modalCallSecondIncomingAction');
-            messageString = t('modalCallSecondIncomingMessage');
-            titleString = t('modalCallSecondIncomingHeadline');
-            break;
-          }
+    let actionString: string;
+    let messageString: string;
+    let titleString: string;
 
-          case CALL_STATE.ONGOING: {
-            actionString = t('modalCallSecondOngoingAction');
-            messageString = t('modalCallSecondOngoingMessage');
-            titleString = t('modalCallSecondOngoingHeadline');
-            break;
-          }
-
-          case CALL_STATE.ANSWER: {
-            actionString = t('modalCallSecondOutgoingAction');
-            messageString = t('modalCallSecondOutgoingMessage');
-            titleString = t('modalCallSecondOutgoingHeadline');
-            break;
-          }
-
-          default: {
-            this.callLogger.error(`Tried to join second call in unexpected state '${callState}'`);
-            throw new z.error.CallError(z.error.CallError.TYPE.WRONG_STATE);
-          }
-        }
-
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            const terminationReason = 0;
-            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, TimeUtil.UNITS_IN_MILLIS.SECOND);
-          },
-          close: () => {
-            const isIncomingCall = callState === CALL_STATE.INCOMING;
-            if (isIncomingCall) {
-              amplify.publish(WebAppEvents.CALL.STATE.REJECT, newCallId);
-            }
-          },
-          text: {
-            action: actionString,
-            message: messageString,
-            title: titleString,
-          },
-        });
-        this.callLogger.warn(`You cannot join a second call while calling in conversation '${ongoingCallId}'.`);
+    switch (newCallState) {
+      case CALL_STATE.INCOMING: {
+        actionString = t('modalCallSecondIncomingAction');
+        messageString = t('modalCallSecondIncomingMessage');
+        titleString = t('modalCallSecondIncomingHeadline');
+        break;
       }
+
+      case CALL_STATE.OUTGOING: {
+        actionString = t('modalCallSecondOutgoingAction');
+        messageString = t('modalCallSecondOutgoingMessage');
+        titleString = t('modalCallSecondOutgoingHeadline');
+        break;
+      }
+
+      default: {
+        return Promise.reject(`Tried to join second call in unexpected state '${newCallState}'`);
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        action: () => {
+          if (activeCall.state() === CALL_STATE.INCOMING) {
+            this.rejectCall(activeCall.conversationId);
+          } else {
+            this.leaveCall(activeCall.conversationId);
+          }
+          window.setTimeout(resolve, 1000);
+        },
+        secondary: reject,
+        text: {
+          action: actionString,
+          message: messageString,
+          title: titleString,
+        },
+      });
+      this.callLogger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
     });
   }
-  */
 }
