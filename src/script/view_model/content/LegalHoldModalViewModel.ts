@@ -17,8 +17,11 @@
  *
  */
 
+import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import ko from 'knockout';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -27,30 +30,42 @@ export class LegalHoldModalViewModel {
   userRepository: UserRepository;
   conversationRepository: ConversationRepository;
   teamRepository: TeamRepository;
+  clientRepository: ClientRepository;
+  cryptographyRepository: CryptographyRepository;
+
   isVisible: ko.Observable<boolean>;
   isOnlyMe: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
-  devicesUserId: ko.Observable<string>;
+  devicesUser: ko.Observable<User>;
   hide: () => void;
   onClosed: () => void;
+  userDevicesHistory: UserDevicesHistory;
+  showDeviceList: () => boolean;
 
   constructor(
     userRepository: UserRepository,
     conversationRepository: ConversationRepository,
-    teamRepository: TeamRepository
+    teamRepository: TeamRepository,
+    clientRepository: ClientRepository,
+    cryptographyRepository: CryptographyRepository
   ) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
     this.teamRepository = teamRepository;
+    this.clientRepository = clientRepository;
+    this.cryptographyRepository = cryptographyRepository;
 
     this.isVisible = ko.observable(false);
     this.isOnlyMe = ko.observable(false);
     this.users = ko.observable([]);
-    this.devicesUserId = ko.observable('');
+    this.devicesUser = ko.observable();
+    this.userDevicesHistory = makeUserDevicesHistory();
+    this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
 
     this.hide = () => this.isVisible(false);
     this.onClosed = () => {
       this.users([]);
+      this.devicesUser(undefined);
     };
   }
 
@@ -62,6 +77,13 @@ export class LegalHoldModalViewModel {
   };
 
   showUserDevices = (user: User) => {
-    // TODO: show the devices of the user
+    this.devicesUser(user);
   };
+
+  clickOnBack() {
+    if (!this.showDeviceList()) {
+      return this.userDevicesHistory.goBack();
+    }
+    this.devicesUser(undefined);
+  }
 }

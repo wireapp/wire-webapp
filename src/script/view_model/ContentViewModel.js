@@ -82,7 +82,13 @@ export class ContentViewModel {
       repositories.user
     );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
-    this.legalHoldModal = new LegalHoldModalViewModel(repositories.user, repositories.conversation, repositories.team);
+    this.legalHoldModal = new LegalHoldModalViewModel(
+      repositories.user,
+      repositories.conversation,
+      repositories.team,
+      repositories.client,
+      repositories.cryptography
+    );
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
 

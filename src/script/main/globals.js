@@ -67,7 +67,6 @@ import ListViewModelGlobal from '../view_model/ListViewModel.js';
 import accentColorPickerGlobal from 'Components/accentColorPicker.js';
 import availabilityStateGlobal from 'Components/availabilityState.js';
 import copyToClipboardGlobal from 'Components/copyToClipboard.js';
-import deviceCardGlobal from 'Components/deviceCard.js';
 import deviceRemoveGlobal from 'Components/deviceRemove.js';
 import ephemeralTimerGlobal from 'Components/ephemeralTimer.js';
 import fullSearchGlobal from 'Components/fullSearch.js';

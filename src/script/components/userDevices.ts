@@ -34,7 +34,9 @@ import {WebAppEvents} from '../event/WebApp';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
-interface UserDevicesHistory {
+import 'Components/deviceCard';
+
+export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
   goTo: (to: UserDevicesState, head: string) => void;
   goBack: () => void;
@@ -92,13 +94,8 @@ ko.components.register('user-devices', {
 
         <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
           <div class="participant-devices__device-item" data-bind="click: $parent.clickOnDevice" data-uie-name="item-device">
-            <!-- ko if: meta.isVerified()-->
-              <verified-icon data-uie-name="user-device-verified"></verified-icon>
-            <!-- /ko -->
-            <!-- ko ifnot: meta.isVerified()-->
-              <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
-            <!-- /ko -->
-            <device-card params="device: $data, click: $parent.clickOnDevice"></device-card>
+            <devices-icon></devices-icon>
+            <device-card params="device: $data, click: $parent.clickOnDevice, showVerified: true"></device-card>
           </div>
         </div>
       <!-- /ko -->
@@ -170,9 +167,9 @@ ko.components.register('user-devices', {
     this.privacyHowUrl = getPrivacyHowUrl();
     this.privacyWhyUrl = getPrivacyWhyUrl();
 
+    const showDeviceList = () => current() === UserDevicesState.DEVICE_LIST;
     this.showDeviceDetails = () => current() === UserDevicesState.DEVICE_DETAILS;
     this.showSelfFingerprint = () => current() === UserDevicesState.SELF_FINGERPRINT;
-    const showDeviceList = () => current() === UserDevicesState.DEVICE_LIST;
     this.showDevicesFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.FOUND;
     this.showDevicesNotFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.NOT_FOUND;
 
