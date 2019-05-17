@@ -36,6 +36,7 @@ import {CallLogger} from '../telemetry/calling/CallLogger';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
+import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 
 import {Call, ConversationId} from './Call';
@@ -367,9 +368,18 @@ export class CallingRepository {
       this.callLogger.warn(`recv_msg failed with code: ${res}`);
       return;
     }
+    this.handleCallEventSaving(type, conversationId, userId, time, source);
+  }
 
+  handleCallEventSaving(
+    type: string,
+    conversationId: ConversationId,
+    userId: UserId,
+    time: number,
+    source: string
+  ): void {
     // save event if needed
-    switch (content.type) {
+    switch (type) {
       case 'SETUP':
         this.injectActivateEvent(conversationId, userId, time, source);
         break;
@@ -601,6 +611,11 @@ export class CallingRepository {
       [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
       messageId: createRandomUuid(),
     });
+
+    const type = JSON.parse(payload).type;
+    if (type) {
+      this.handleCallEventSaving(type, conversationId, userId, Date.now(), EventRepository.SOURCE.INJECTED);
+    }
 
     const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
