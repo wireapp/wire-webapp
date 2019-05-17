@@ -38,6 +38,7 @@ class TemporaryGuestViewModel {
     this.multitasking = mainViewModel.content.multitasking;
     this.permissionRepository = repositories.permission;
     this.videoGridRepository = repositories.videoGrid;
+    this.callingViewModel = mainViewModel.calling;
 
     this.logger = getLogger('TemporaryGuestViewModel');
 

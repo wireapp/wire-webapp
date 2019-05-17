@@ -145,10 +145,6 @@ export class ConversationListViewModel {
     return `/conversation/${conversationEntity.id}`;
   }
 
-  getConversationById(conversationId) {
-    return this.conversationRepository.find_conversation_by_id(conversationId);
-  }
-
   hasJoinableCall(conversationId) {
     const call = this.callingRepository.findCall(conversationId);
     return call && call.state() === CALL_STATE.INCOMING;

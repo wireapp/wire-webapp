@@ -20,11 +20,11 @@
   <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
       <conversation-list-calling-cell
-        data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': $parent.getConversationById(activeCall.conversationId).display_name}"
+        data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
         params="
           call: activeCall,
           videoGrid: getVideoGrid(activeCall),
-          conversation: $parent.getConversationById(activeCall.conversationId),
+          conversation: getConversationById(activeCall.conversationId),
           multitasking: multitasking,
           callingRepository: callingRepository,
           callActions: callActions"

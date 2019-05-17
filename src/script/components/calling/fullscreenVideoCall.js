@@ -289,7 +289,6 @@ export class FullscreenVideoCalling {
 
   minimize() {
     this.multitasking.isMinimized(true);
-    this.logger.info(`Minimizing call '${this.videodCall().id}' on user click`);
   }
 }
 
