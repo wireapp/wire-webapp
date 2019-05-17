@@ -48,6 +48,7 @@ import {
   CONV_TYPE,
   ENV as AVS_ENV,
   LOG_LEVEL,
+  REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
@@ -173,12 +174,17 @@ export class CallingRepository {
       return 0;
     };
 
-    const callClosed = (reason: number, conversationId: ConversationId) => {
-      const storedCall = this.findCall(conversationId);
-      if (!storedCall) {
+    const callClosed = (reason: REASON, conversationId: ConversationId) => {
+      const call = this.findCall(conversationId);
+      if (!call) {
         return;
       }
-      storedCall.reason(reason);
+      if (reason !== REASON.STILL_ONGOING) {
+        this.removeCall(call);
+        return;
+      }
+      call.selfParticipant.releaseVideoStream();
+      call.reason(reason);
     };
 
     const videoStateChanged = (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, state: number) => {
@@ -254,12 +260,6 @@ export class CallingRepository {
       call.reason(undefined);
 
       switch (state) {
-        case CALL_STATE.TERM_REMOTE:
-        case CALL_STATE.TERM_LOCAL:
-        case CALL_STATE.NONE:
-          this.removeCall(call);
-          return;
-
         case CALL_STATE.MEDIA_ESTAB:
           call.startedAt(Date.now());
           break;
