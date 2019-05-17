@@ -213,6 +213,10 @@ export class CallingRepository {
         hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
       );
       call.state(CALL_STATE.INCOMING);
+      if (!shouldRing) {
+        // an incoming call that should not ring is an ongoing group call
+        call.reason(REASON.STILL_ONGOING);
+      }
       if (isVideoCall) {
         this.loadVideoPreview(call);
       }
