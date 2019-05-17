@@ -151,7 +151,7 @@ export class CallingRepository {
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
 
-    wCall.setUserMediaHandler(this.getMediaStream);
+    wCall.setUserMediaHandler(this.updateMediaStream);
 
     wCall.setVideoTrackHandler(
       (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
@@ -240,11 +240,14 @@ export class CallingRepository {
     wCall.setParticipantChangedHandler(wUser, (conversationId: ConversationId, membersJson: string) => {
       const call = this.findCall(conversationId);
       if (call) {
-        const {members} = JSON.parse(membersJson);
-        const newMemberList: Participant[] = members.map(({userid, clientid}: any) => {
-          return this.findParticipant(conversationId, userid) || new Participant(userid, clientid);
-        });
-        call.participants(newMemberList);
+        const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
+        const newMembers = members
+          .filter(({userid}) => !this.findParticipant(conversationId, userid))
+          .map(({userid, clientid}) => new Participant(userid, clientid));
+        const removedMembers = call.participants().filter(({userId}) => !members.find(({userid}) => userid === userId));
+
+        newMembers.forEach(participant => call.participants.push(participant));
+        removedMembers.forEach(participant => call.participants.remove(participant));
       }
     });
 
@@ -286,6 +289,7 @@ export class CallingRepository {
   removeCall(call: Call): void {
     const index = this.activeCalls().indexOf(call);
     call.selfParticipant.releaseVideoStream();
+    call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
@@ -437,7 +441,7 @@ export class CallingRepository {
       selfParticipant.videoState(VIDEO_STATE.STOPPED);
       return;
     }
-    this.getMediaStream(conversationId, false, false, true);
+    this.updateMediaStream(conversationId, false, false, true);
   }
 
   answerCall(conversationId: ConversationId, callType: number): void {
@@ -475,7 +479,7 @@ export class CallingRepository {
     return types[mediaType] || CALL_TYPE.NORMAL;
   }
 
-  private readonly getMediaStream = (
+  private readonly updateMediaStream = (
     conversationId: ConversationId,
     audio: boolean,
     video: boolean,

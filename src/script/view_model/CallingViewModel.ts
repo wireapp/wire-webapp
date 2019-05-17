@@ -65,6 +65,36 @@ export class CallingViewModel {
       },
     };
 
+    const currentCall = ko.pureComputed(() => {
+      return this.activeCalls()[0];
+    });
+    let currentCallSubscription: ko.Subscription | undefined;
+
+    ko.computed(() => {
+      const call = currentCall();
+      if (currentCallSubscription) {
+        currentCallSubscription.dispose();
+      }
+      if (!call) {
+        return;
+      }
+      currentCallSubscription = call.participants.subscribe(
+        participantChanges => {
+          const memberJoined = participantChanges.find(({status}) => status === 'added');
+          const memberLeft = participantChanges.find(({status}) => status === 'deleted');
+
+          if (memberJoined) {
+            audioRepository.play(AudioType.READY_TO_TALK);
+          }
+          if (memberLeft) {
+            audioRepository.play(AudioType.TALK_LATER);
+          }
+        },
+        null,
+        'arrayChange'
+      );
+    });
+
     ko.computed(() => {
       this.activeCalls().forEach(call => {
         const isOutgoing = this.isOutgoing(call);
