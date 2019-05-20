@@ -28,7 +28,7 @@ export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
   public readonly conversationRepository: any;
-  public readonly activeCalls: ko.ObservableArray<Call>;
+  public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
   public readonly callActions: any;
 
@@ -41,7 +41,9 @@ export class CallingViewModel {
     this.audioRepository = audioRepository;
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
-    this.activeCalls = callingRepository.activeCalls;
+    this.activeCalls = ko.pureComputed(() =>
+      callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
+    );
     this.multitasking = multitasking;
 
     this.callActions = {
@@ -96,11 +98,12 @@ export class CallingViewModel {
     });
 
     ko.computed(() => {
-      this.activeCalls().forEach(call => {
+      this.callingRepository.activeCalls().forEach(call => {
         const isOutgoing = this.isOutgoing(call);
         const isIncoming = this.isIncoming(call);
-        const isDeclined = call.reason() === CALL_REASON.STILL_ONGOING;
-        if (!isDeclined && (isOutgoing || isIncoming)) {
+        const callIdleReasons = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE];
+        const isIdleCall = callIdleReasons.includes(call.reason());
+        if (!isIdleCall && (isOutgoing || isIncoming)) {
           const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
           audioRepository.loop(audioId);
         } else {

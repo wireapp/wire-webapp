@@ -63,7 +63,9 @@ class ConversationListCallingCell {
     this.isIncoming = ko.pureComputed(isState(CALL_STATE.INCOMING));
     this.isOngoing = ko.pureComputed(isState(CALL_STATE.MEDIA_ESTAB));
 
-    this.isDeclined = ko.pureComputed(() => call.reason() === CALL_REASON.STILL_ONGOING);
+    this.isDeclined = ko.pureComputed(() =>
+      [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(call.reason())
+    );
 
     this.isMuted = callingRepository.isMuted;
 

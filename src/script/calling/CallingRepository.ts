@@ -182,7 +182,8 @@ export class CallingRepository {
       if (!call) {
         return;
       }
-      if (reason !== REASON.STILL_ONGOING) {
+      const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+      if (!stillActiveState.includes(reason)) {
         this.removeCall(call);
         return;
       }
@@ -355,6 +356,17 @@ export class CallingRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
+    switch (content.type) {
+      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
+        if (userId === this.selfUserId && clientId !== this.selfClientId) {
+          const call = this.findCall(conversationId);
+          if (call) {
+            // If the group leave was sent from the self user from another device, we reset the reason so that the call would show in the UI again
+            call.reason(REASON.STILL_ONGOING);
+          }
+        }
+      }
+    }
     const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
