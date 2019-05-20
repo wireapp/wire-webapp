@@ -34,6 +34,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {getPrivacyHowUrl, getPrivacyWhyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
 import 'Components/deviceCard';
 
 export interface UserDevicesHistory {
@@ -153,9 +154,17 @@ ko.components.register('user-devices', {
     userEntity,
     history: {current, goTo},
     noPadding = false,
-  }: UserDevicesParams) {
+  }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
-    this.clientEntities = ko.pureComputed(() => userEntity() && userEntity().devices());
+    this.clientEntities = ko.pureComputed(() => {
+      if (userEntity()) {
+        const devices = userEntity().devices();
+        const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);
+        const otherDevices = devices.filter(device => device.class !== ClientClassification.LEGAL_HOLD);
+        return legalholdDevices.concat(otherDevices);
+      }
+      return undefined;
+    });
     this.Config = Config;
     this.noPadding = noPadding;
 
