@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client';
 import {formatTimestamp} from 'Util/TimeUtil';
 import {ClientEntity} from '../client/ClientEntity';
 
@@ -32,7 +33,13 @@ interface DeviceCardParams {
 ko.components.register('device-card', {
   template: `
     <div class="device-card" data-uie-name="device-card" data-bind="attr: {'data-uie-uid': id, 'data-uie-name': dataUieName}">
-      <!-- ko if: showIcon -->
+      <!-- ko if: showLegalHoldIcon -->
+        <legal-hold-dot class="device-card__icon"></legal-hold-dot>
+      <!-- /ko -->
+      <!-- ko if: showDesktopIcon -->
+        <desktop-icon class="device-card__icon"></desktop-icon>
+      <!-- /ko -->
+      <!-- ko if: showOtherIcon -->
         <devices-icon class="device-card__icon"></devices-icon>
       <!-- /ko -->
       <div class="device-card__info" data-uie-name="device-card-info" data-bind="click: clickOnDevice,
@@ -77,7 +84,7 @@ ko.components.register('device-card', {
     current = false,
     showVerified = false,
     showIcon = false,
-  }: DeviceCardParams) {
+  }: DeviceCardParams): void {
     const device = ko.unwrap(wrappedDevice);
     const {class: deviceClass = '?', id = '', label = '?', model, meta} = device;
     this.formattedId = id ? device.formatId() : [];
@@ -94,7 +101,9 @@ ko.components.register('device-card', {
     this.timestamp = formatTimestamp(device.time);
     this.isVerified = meta.isVerified;
     this.showVerified = showVerified;
-    this.showIcon = showIcon;
+    this.showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
+    this.showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
+    this.showOtherIcon = showIcon && !this.showLegalHoldIcon && !this.showDesktopIcon;
 
     this.clickOnDevice = () => {
       if (typeof click === 'function') {
