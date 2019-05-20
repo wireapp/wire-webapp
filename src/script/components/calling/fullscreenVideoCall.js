@@ -27,6 +27,8 @@ import {MediaType} from '../../media/MediaType';
 //import {MediaDeviceType} from '../../media/MediaDeviceType';
 import {WebAppEvents} from '../../event/WebApp';
 
+import 'Components/calling/deviceToggleButton';
+
 export class FullscreenVideoCalling {
   static get CONFIG() {
     return {
@@ -35,13 +37,23 @@ export class FullscreenVideoCalling {
     };
   }
 
-  constructor({videoGrid, call, conversation, multitasking, canShareScreen, callActions, isMuted}) {
+  constructor({
+    videoGrid,
+    call,
+    conversation,
+    mediaDevicesHandler,
+    multitasking,
+    canShareScreen,
+    callActions,
+    isMuted,
+  }) {
     this.call = call;
     this.conversation = conversation;
     this.videoGrid = videoGrid;
     this.multitasking = multitasking;
     this.isMuted = isMuted;
     this.callActions = callActions;
+    this.mediaDevicesHandler = mediaDevicesHandler;
     this.logger = getLogger('VideoCallingViewModel');
 
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
@@ -49,13 +61,12 @@ export class FullscreenVideoCalling {
     this.showRemoteParticipant = ko.pureComputed(() => false); // TODO
     this.canShareScreen = canShareScreen;
     this.selfSharesScreen = ko.pureComputed(() => call.selfParticipant.sharesScreen()); // TODO
+    this.currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput;
+    this.availableCameraDevices = ko.pureComputed(() =>
+      mediaDevicesHandler.availableDevices.videoInput().map(device => device.deviceId)
+    );
     this.showSwitchCamera = ko.pureComputed(() => {
-      return false; //TODO handle multiple cameras
-      /*
-      const hasMultipleCameras = this.availableDevices.videoInput().length > 1;
-      const isVisible = hasMultipleCameras && this.localVideoStream() && this.selfStreamState.videoSend();
-      return this.isCallOngoing() && isVisible;
-      */
+      return this.call.selfParticipant.sharesCamera() && this.availableCameraDevices().length > 1;
     });
     this.showSwitchScreen = ko.pureComputed(() => {
       return false; // TODO handle multi input devices
@@ -275,13 +286,9 @@ export class FullscreenVideoCalling {
     }
   }
 
-  clickedOnStopVideo() {
-    throw new Error('not implemented (toggeling video)');
-  }
-
-  clickedOnToggleCamera() {
-    this.mediaRepository.devicesHandler.toggleNextCamera();
-  }
+  switchCameraSource = (call, deviceId) => {
+    this.callActions.switchCameraInput(call, deviceId);
+  };
 
   clickedOnToggleScreen() {
     this.mediaRepository.devicesHandler.toggleNextScreen();
@@ -341,12 +348,11 @@ ko.components.register('fullscreen-video-call', {
 
         <!-- ko if: showToggleVideo() -->
           <div class="video-controls__button"
-              data-bind="click: clickedOnStopVideo, css: {'video-controls__button--active': call.selfParticipant.sharesCamera()}, attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}"
+              data-bind="click: () => callActions.toggleCamera(call), css: {'video-controls__button--active': call.selfParticipant.sharesCamera()}, attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}"
               data-uie-name="do-call-controls-toggle-video">
             <camera-icon></camera-icon>
             <!-- ko if: showSwitchCamera() -->
-              <device-toggle-button data-bind="click: clickedOnToggleCamera, clickBubble: false"
-                                    params="index: currentDeviceIndex.videoInput, devices: availableDevices.videoInput, type: MediaDeviceType.VIDEO_INPUT">
+              <device-toggle-button params="currentDevice: currentCameraDevice, devices: availableCameraDevices, onChooseDevice: deviceId => switchCameraSource(call, deviceId)">
               </device-toggle-button>
             <!-- /ko -->
             <!-- ko ifnot: showSwitchCamera() -->

@@ -17,24 +17,26 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.DeviceToggleButton = class DeviceToggleButton {
-  constructor(params) {
-    this.availableDevices = params.devices;
-    this.currentDeviceIndex = params.index;
-    this.numberOfDevices = ko.pureComputed(() => {
-      return _.isArray(this.availableDevices()) ? this.availableDevices().length : 0;
-    });
+class DeviceToggleButton {
+  constructor({currentDevice, devices, onChooseDevice}) {
+    this.availableDevices = devices || ko.observable([]);
+    this.currentDevice = currentDevice;
+    this.onChooseDevice = (data, event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const currentDeviceIndex = this.availableDevices().indexOf(this.currentDevice());
+      const newDeviceIndex = (currentDeviceIndex + 1) % this.availableDevices().length;
+      const newDeviceId = this.availableDevices()[newDeviceIndex];
+      onChooseDevice(newDeviceId);
+    };
   }
-};
+}
 
 ko.components.register('device-toggle-button', {
   template: `
-    <div class="device-toggle-button-indicator" data-bind="foreach: ko.utils.range(0, numberOfDevices() - 1)">
-      <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.currentDeviceIndex()}"></span>
+    <div class="device-toggle-button-indicator" data-bind="foreach: {data: availableDevices, as: 'device', noChildContext: true}, click: onChooseDevice">
+      <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': device === currentDevice() }"></span>
     </div>
   `,
-  viewModel: z.components.DeviceToggleButton,
+  viewModel: DeviceToggleButton,
 });

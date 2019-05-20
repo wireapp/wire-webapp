@@ -182,12 +182,6 @@ class ConversationListCallingCell {
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }
 
-  onToggleVideo(data, event) {
-    event.stopPropagation();
-    // TODO
-    //amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.conversation.id, MediaType.VIDEO);
-  }
-
   findUser(userId) {
     return this.conversationParticipants().find(user => user.id === userId);
   }
@@ -256,7 +250,7 @@ ko.components.register('conversation-list-calling-cell', {
             <micoff-icon class="small-icon"></micoff-icon>
           </div>
           <!-- ko if: showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: onToggleVideo, css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': call.selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': call.selfParticipant.sharesCamera() ? 'active' : 'inactive'}" data-uie-name="do-toggle-video">
               <camera-icon class="small-icon"></camera-icon>
             </button>
           <!-- /ko -->

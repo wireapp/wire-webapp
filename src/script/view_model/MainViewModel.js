@@ -76,6 +76,7 @@ export class MainViewModel {
       repositories.calling,
       repositories.conversation,
       repositories.audio,
+      repositories.media.devicesHandler,
       this.content.multitasking
     );
     this.list = new z.viewModel.ListViewModel(this, repositories);

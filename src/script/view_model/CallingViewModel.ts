@@ -28,6 +28,7 @@ export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
   public readonly conversationRepository: any;
+  public readonly mediaDevicesHandler: any;
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
   public readonly callActions: any;
@@ -36,11 +37,13 @@ export class CallingViewModel {
     callingRepository: CallingRepository,
     conversationRepository: any,
     audioRepository: any,
+    mediaDevicesHandler: any,
     multitasking: any
   ) {
     this.audioRepository = audioRepository;
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
+    this.mediaDevicesHandler = mediaDevicesHandler;
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
     );
@@ -58,6 +61,12 @@ export class CallingViewModel {
       },
       start: (call: Call) => {
         this.callingRepository.startCall(call.conversationId, call.conversationType, CALL_TYPE.NORMAL);
+      },
+      switchCameraInput: (call: Call, deviceId: string) => {
+        this.callingRepository.switchCameraInput(call.conversationId, deviceId);
+      },
+      toggleCamera: (call: Call) => {
+        this.callingRepository.toggleCamera(call.conversationId);
       },
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call.conversationId, muteState);

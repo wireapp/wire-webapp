@@ -62,6 +62,7 @@ export class CallingRepository {
   private readonly backendClient: any;
   private readonly conversationRepository: any;
   private readonly eventRepository: any;
+  private readonly mediaDevicesHandler: any;
   private readonly mediaConstraintsHandler: any;
   private readonly serverTimeHandler: any;
   private readonly userRepository: any;
@@ -100,7 +101,8 @@ export class CallingRepository {
     backendClient: any,
     conversationRepository: any,
     eventRepository: any,
-    mediaRepository: any,
+    mediaDevicesHandler: any,
+    mediaConstraintsHandler: any,
     serverTimeHandler: any,
     userRepository: any
   ) {
@@ -118,7 +120,8 @@ export class CallingRepository {
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     // Media Handler
-    this.mediaConstraintsHandler = mediaRepository.constraintsHandler;
+    this.mediaConstraintsHandler = mediaConstraintsHandler;
+    this.mediaDevicesHandler = mediaDevicesHandler;
 
     this.callLogger = new CallLogger('CallingRepository', null, []);
 
@@ -458,8 +461,15 @@ export class CallingRepository {
     if (selfParticipant.sharesCamera()) {
       selfParticipant.releaseVideoStream();
       selfParticipant.videoState(VIDEO_STATE.STOPPED);
+      this.wCall.setVideoSendState(this.wUser, conversationId, VIDEO_STATE.STOPPED);
       return;
     }
+    this.updateMediaStream(conversationId, false, true, false);
+  }
+
+  switchCameraInput(conversationId: ConversationId, deviceId: string): void {
+    this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+    this.updateMediaStream(conversationId, false, true, false);
   }
 
   toggleScreenshare(conversationId: ConversationId): void {
@@ -471,6 +481,7 @@ export class CallingRepository {
     if (selfParticipant.sharesScreen()) {
       selfParticipant.releaseVideoStream();
       selfParticipant.videoState(VIDEO_STATE.STOPPED);
+      this.wCall.setVideoSendState(this.wUser, conversationId, VIDEO_STATE.STOPPED);
       return;
     }
     this.updateMediaStream(conversationId, false, false, true);
@@ -525,25 +536,19 @@ export class CallingRepository {
   ): Promise<MediaStream> => {
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
 
-    if (screen) {
-      // TODO restore retro-compatibility with getUserMedia
-      return (navigator.mediaDevices as any).getDisplayMedia().then((mediaStream: MediaStream) => {
-        this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
-        const call = this.findCall(conversationId);
-        if (call) {
-          call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.SCREENSHARE);
-        }
-        return mediaStream;
-      });
-    }
+    const mediaStreamPromise = screen
+      ? (navigator.mediaDevices as any).getDisplayMedia()
+      : navigator.mediaDevices.getUserMedia(constraints);
 
-    return navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-      if (video) {
-        const call = this.findCall(conversationId);
-        if (call) {
-          const selfParticipant = call.selfParticipant;
-          selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), VIDEO_STATE.STARTED);
+    return mediaStreamPromise.then((mediaStream: MediaStream) => {
+      const call = this.findCall(conversationId);
+      if (call) {
+        const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
+        this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
+        if (call.selfParticipant.videoState() !== videoState) {
+          this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
         }
+        call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
       }
       return mediaStream;
     });

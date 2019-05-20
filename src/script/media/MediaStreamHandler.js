@@ -258,20 +258,20 @@ export class MediaStreamHandler {
   replaceInputSource(mediaType) {
     const isPreferenceChange = this.currentCalls.size === 0;
 
-    let constraintsPromise;
+    let streamConstraints;
     switch (mediaType) {
       case MediaType.AUDIO: {
-        constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(true, isPreferenceChange);
+        streamConstraints = this.constraintsHandler.getMediaStreamConstraints(true, isPreferenceChange);
         break;
       }
 
       case MediaType.SCREEN: {
-        constraintsPromise = this.constraintsHandler.getScreenStreamConstraints();
+        streamConstraints = this.constraintsHandler.getScreenStreamConstraints();
         break;
       }
 
       case MediaType.VIDEO: {
-        constraintsPromise = this.constraintsHandler.getMediaStreamConstraints(isPreferenceChange, true);
+        streamConstraints = this.constraintsHandler.getMediaStreamConstraints(isPreferenceChange, true);
         break;
       }
 
@@ -280,8 +280,7 @@ export class MediaStreamHandler {
       }
     }
 
-    return constraintsPromise
-      .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
+    return this.requestMediaStream(mediaType, streamConstraints)
       .then(({stream}) => {
         this._setSelfStreamState(mediaType);
         this.changeMediaStream(stream, mediaType).then(() => stream.getTracks().forEach(track => track.stop()));
