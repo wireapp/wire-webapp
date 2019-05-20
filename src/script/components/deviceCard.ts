@@ -26,13 +26,17 @@ interface DeviceCardParams {
   detailed?: boolean;
   current?: boolean;
   showVerified?: boolean;
+  showIcon?: boolean;
 }
 
 ko.components.register('device-card', {
   template: `
-    <div class="device-card">
-      <div class="device-card__info" data-bind="click: clickOnDevice,
-          attr: {'data-uie-uid': id, 'data-uie-value': label, 'data-uie-name': dataUieName},
+    <div class="device-card" data-uie-name="device-card" data-bind="attr: {'data-uie-uid': id, 'data-uie-name': dataUieName}">
+      <!-- ko if: showIcon -->
+        <devices-icon class="device-card__icon"></devices-icon>
+      <!-- /ko -->
+      <div class="device-card__info" data-uie-name="device-card-info" data-bind="click: clickOnDevice,
+          attr: {'data-uie-value': label},
           css: {'device-card__no-hover': !clickable}">
         <!-- ko if: detailed -->
           <div class="label-xs device-card__label" data-bind="text: label"></div>
@@ -72,6 +76,7 @@ ko.components.register('device-card', {
     detailed = false,
     current = false,
     showVerified = false,
+    showIcon = false,
   }: DeviceCardParams) {
     const device = ko.unwrap(wrappedDevice);
     const {class: deviceClass = '?', id = '', label = '?', model, meta} = device;
@@ -84,11 +89,13 @@ ko.components.register('device-card', {
     this.detailed = detailed;
     this.clickable = !detailed && click;
 
-    this.dataUieName = `device-card-info${current ? '-current' : ''}`;
+    this.dataUieName = `device-card${current ? '-current' : ''}`;
 
     this.timestamp = formatTimestamp(device.time);
     this.isVerified = meta.isVerified;
     this.showVerified = showVerified;
+    this.showIcon = showIcon;
+
     this.clickOnDevice = () => {
       if (typeof click === 'function') {
         click(device);

@@ -49,6 +49,7 @@ interface UserDevicesParams {
   cryptographyRepository: CryptographyRepository;
   userEntity: ko.Observable<User>;
   history: UserDevicesHistory;
+  noPadding?: boolean;
 }
 
 enum FIND_MODE {
@@ -87,28 +88,27 @@ ko.components.register('user-devices', {
   template: `
     <div>
       <!-- ko if: showDevicesFound() -->
-        <div class="participant-devices__header">
+        <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: devicesHeadlineText"></div>
           <a class="participant-devices__link" data-bind="attr: {href: privacyWhyUrl}, text: t('participantDevicesWhyVerify')" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
 
         <div class="participant-devices__device-list" data-bind="foreach: clientEntities()">
-          <div class="participant-devices__device-item" data-bind="click: $parent.clickOnDevice" data-uie-name="item-device">
-            <devices-icon></devices-icon>
-            <device-card params="device: $data, click: $parent.clickOnDevice, showVerified: true"></device-card>
+          <div class="participant-devices__device-item" data-bind="css: {'participant-devices__device-item--padding': !$parent.noPadding}" data-uie-name="item-device">
+            <device-card params="device: $data, click: $parent.clickOnDevice, showVerified: true, showIcon: true"></device-card>
           </div>
         </div>
       <!-- /ko -->
 
       <!-- ko if: showDevicesNotFound() -->
-        <div class="participant-devices__header">
+        <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <div class="participant-devices__text-block panel__info-text" data-bind="text: noDevicesHeadlineText"></div>
           <a class="participant-devices__link" data-bind="text: t('participantDevicesLearnMore'), attr: {href: Config.URL.PRIVACY_POLICY}" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
         </div>
       <!-- /ko -->
 
       <!-- ko if: showDeviceDetails() -->
-        <div class="participant-devices__header">
+        <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <div class="participant-devices__link participant-devices__show-self-fingerprint accent-text" data-bind="click: clickToShowSelfFingerprint, text: t('participantDevicesDetailShowMyDevice')"></div>
           <div class="panel__info-text" data-bind="html: detailMessage()"></div>
           <a class="participant-devices__link" data-bind="attr: {href: privacyHowUrl}, text: t('participantDevicesDetailHowTo')" rel="nofollow noopener noreferrer" target="_blank" class="accent-text"></a>
@@ -134,7 +134,7 @@ ko.components.register('user-devices', {
       <!-- /ko -->
 
       <!-- ko if: showSelfFingerprint()-->
-        <div class="participant-devices__header">
+        <div class="participant-devices__header" data-bind="css: {'participant-devices__header--padding': !noPadding}">
           <device-card params="device: selfClient()"></device-card>
           <div class="participant-devices__fingerprint" data-bind="foreach: fingerprintLocal()">
             <span class="participant-devices__fingerprint__part" data-bind="text: $data"></span>
@@ -152,10 +152,12 @@ ko.components.register('user-devices', {
     cryptographyRepository,
     userEntity,
     history: {current, goTo},
+    noPadding = false,
   }: UserDevicesParams) {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.pureComputed(() => userEntity() && userEntity().devices());
     this.Config = Config;
+    this.noPadding = noPadding;
 
     const logger = getLogger('UserDevices');
 
