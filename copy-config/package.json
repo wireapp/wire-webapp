@@ -16,7 +16,7 @@
     "@types/copy": "0.3.1",
     "@types/cosmiconfig": "5.0.3",
     "@types/fs-extra": "7.0.0",
-    "@types/jszip": "3.1.5",
+    "@types/jszip": "3.1.6",
     "@types/rimraf": "2.0.2",
     "jasmine": "3.4.0"
   },
