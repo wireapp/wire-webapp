@@ -153,7 +153,7 @@
     "tslint-react": "4.0.0",
     "tslint-react-hooks": "2.1.0",
     "typescript": "3.4.5",
-    "webpack": "4.30.0",
+    "webpack": "4.32.0",
     "webpack-cli": "3.3.2",
     "webpack-dev-middleware": "3.6.2",
     "webpack-hot-middleware": "2.24.4"
