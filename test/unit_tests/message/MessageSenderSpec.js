@@ -32,22 +32,23 @@ describe('MessageSender', () => {
     });
   });
 
-  it('execute the sending queue when set to an active state', done => {
+  it('execute the sending queue when set to an active state', () => {
     const messageSender = resolve(graph.MessageSender);
     const testData = {sendMessageFunction: () => Promise.resolve()};
     spyOn(testData, 'sendMessageFunction').and.callThrough();
 
-    messageSender.queueMessage(testData.sendMessageFunction);
-    messageSender.queueMessage(testData.sendMessageFunction);
-    messageSender.queueMessage(testData.sendMessageFunction);
+    const promises = [
+      messageSender.queueMessage(testData.sendMessageFunction),
+      messageSender.queueMessage(testData.sendMessageFunction),
+      messageSender.queueMessage(testData.sendMessageFunction),
+    ];
 
     expect(testData.sendMessageFunction).not.toHaveBeenCalled();
 
     messageSender.pauseQueue(false);
 
-    setTimeout(() => {
+    return Promise.all(promises).then(() => {
       expect(testData.sendMessageFunction).toHaveBeenCalledTimes(3);
-      done();
-    }, 50);
+    });
   });
 });
