@@ -39,8 +39,9 @@
   }
 
   &__header {
-    padding: 16px;
-
+    &--padding {
+      padding: 16px;
+    }
     & > * + * {
       margin-top: 8px;
     }
@@ -64,12 +65,14 @@
     height: 64px;
     align-items: center;
     border-bottom: 1px solid var(--background-fade-8);
-    margin: 0 16px;
     cursor: pointer;
+
+    &--padding {
+      margin: 0 16px;
+    }
 
     device-card {
       flex-grow: 1;
-      margin-left: 16px;
     }
   }
 

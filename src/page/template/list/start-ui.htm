@@ -115,7 +115,7 @@
               </div>
               <div class="others" data-bind="visible: searchResults.others().length > 0">
                 <span class="start-ui-list-header" data-bind="text: t('searchOthers')"></span>
-                <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
+                <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: UserlistMode.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             </div>
           <!-- /ko -->
