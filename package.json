@@ -20,7 +20,7 @@
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-helmet": "5.2.1",
-    "react-hot-loader": "4.8.5",
+    "react-hot-loader": "4.8.7",
     "rimraf": "2.6.3",
     "typescript": "3.4.5",
     "webpack": "4.31.0",
