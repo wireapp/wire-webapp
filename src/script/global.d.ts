@@ -62,6 +62,7 @@ declare global {
         VERSION: string;
       };
     };
+    wSSOCapable: boolean;
     z: any;
   }
 }
