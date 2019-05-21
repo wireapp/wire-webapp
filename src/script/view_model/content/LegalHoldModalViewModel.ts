@@ -80,10 +80,10 @@ export class LegalHoldModalViewModel {
     this.devicesUser(user);
   };
 
-  clickOnBack() {
+  clickOnBack = () => {
     if (!this.showDeviceList()) {
       return this.userDevicesHistory.goBack();
     }
     this.devicesUser(undefined);
-  }
+  };
 }

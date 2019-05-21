@@ -19,6 +19,7 @@
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {UserlistMode} from 'Components/userList';
 
 window.z = window.z || {};
 window.z.components = z.components || {};
@@ -32,9 +33,9 @@ z.components.ParticipantItem = class ParticipantItem {
     this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
     this.badge = params.badge;
 
-    this.mode = params.mode || z.components.UserList.MODE.DEFAULT;
-    this.isDefaultMode = this.mode === z.components.UserList.MODE.DEFAULT;
-    this.isOthersMode = this.mode === z.components.UserList.MODE.OTHERS;
+    this.mode = params.mode || UserlistMode.DEFAULT;
+    this.isDefaultMode = this.mode === UserlistMode.DEFAULT;
+    this.isOthersMode = this.mode === UserlistMode.OTHERS;
 
     this.canSelect = params.canSelect;
     this.isSelected = params.isSelected;

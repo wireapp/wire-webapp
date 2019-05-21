@@ -23,6 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
+import {UserlistMode} from 'Components/userList';
+
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {Config} from '../../auth/config';
 import {User} from '../../entity/User';
@@ -77,6 +79,7 @@ class StartUIViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.list.StartUIViewModel');
     this.brandName = Config.BRAND_NAME;
+    this.UserlistMode = UserlistMode;
 
     this.actionsViewModel = this.mainViewModel.actions;
 
