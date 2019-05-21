@@ -131,7 +131,7 @@ ko.components.register('user-list', {
         return connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id);
       });
 
-      // make sure the selfuser is the first one in the list
+      // make sure the self user is the first one in the list
       const selfUser = resultUsers.filter(user => user.is_me);
       const otherUsers = resultUsers.filter(user => !user.is_me);
       return selfUser.concat(otherUsers);
