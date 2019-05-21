@@ -32,7 +32,7 @@ interface DeviceCardParams {
 
 ko.components.register('device-card', {
   template: `
-    <div class="device-card" data-uie-name="device-card" data-bind="attr: {'data-uie-uid': id, 'data-uie-name': dataUieName}">
+    <div class="device-card" data-uie-name="device-card" data-bind="click: clickOnDevice, attr: {'data-uie-uid': id, 'data-uie-name': dataUieName}, css: {'device-card__no-hover': !clickable}"">
       <!-- ko if: showLegalHoldIcon -->
         <legal-hold-dot class="device-card__icon"></legal-hold-dot>
       <!-- /ko -->
@@ -42,9 +42,7 @@ ko.components.register('device-card', {
       <!-- ko if: showOtherIcon -->
         <devices-icon class="device-card__icon"></devices-icon>
       <!-- /ko -->
-      <div class="device-card__info" data-uie-name="device-card-info" data-bind="click: clickOnDevice,
-          attr: {'data-uie-value': label},
-          css: {'device-card__no-hover': !clickable}">
+      <div class="device-card__info" data-uie-name="device-card-info" data-bind="attr: {'data-uie-value': label}">    
         <!-- ko if: detailed -->
           <div class="label-xs device-card__label" data-bind="text: label"></div>
           <div class="label-xs">
