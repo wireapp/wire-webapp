@@ -27,7 +27,7 @@ export class Participant {
   public userId: UserId;
   public deviceId: DeviceId;
   public videoState: ko.Observable<number>;
-  public videoStream: ko.Observable<MediaStream | undefined>;
+  public mediaStream: ko.Observable<MediaStream | undefined>;
   public hasActiveVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
@@ -45,18 +45,18 @@ export class Participant {
     this.sharesCamera = ko.pureComputed(() => {
       return this.videoState() === VIDEO_STATE.STARTED;
     });
-    this.videoStream = ko.observable();
+    this.mediaStream = ko.observable();
   }
 
-  setVideoStream(videoStream: MediaStream, state: VIDEO_STATE): void {
+  setMediaStream(mediaStream: MediaStream, state: VIDEO_STATE): void {
     this.releaseVideoStream();
-    this.videoStream(videoStream);
+    this.mediaStream(mediaStream);
     this.videoState(state);
   }
 
   releaseVideoStream(): void {
-    if (this.videoStream()) {
-      this.videoStream()
+    if (this.mediaStream()) {
+      this.mediaStream()
         .getTracks()
         .forEach(track => track.stop());
     }

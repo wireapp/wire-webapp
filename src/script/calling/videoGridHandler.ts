@@ -26,15 +26,16 @@ let baseGrid: string[] = ['', '', '', ''];
 export interface Grid {
   grid: (Participant | null)[];
   thumbnail: Participant | null;
+  hasRemoteVideo: boolean;
 }
 
 /**
  * Will compute the next grid layout according to the previous state and the new array of streams
  * The grid will fill according to this pattern
- * - 1 stream : [id, 0, 0, 0]
- * - 2 streams: [id, 0, id, 0]
- * - 3 streams: [id, 0, id, id]
- * - 3 streams: [id, id, 0, id]
+ * - 1 stream : [id, '', '', '']
+ * - 2 streams: [id, '', id, '']
+ * - 3 streams: [id, '', id, id]
+ * - 3 streams: [id, id, '', id]
  * - 4 streams: [id, id, id, id]
  * @param {Array<string|0>} previousGrid - the previous state of the grid
  * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
@@ -64,14 +65,14 @@ export function getGrid(
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
-    const videoParticipants = participants().filter(participant => participant.hasActiveVideo());
-    if (videoParticipants.length === 1) {
-      inGridParticipants = videoParticipants;
+    const remoteVideoParticipants = participants().filter(participant => participant.hasActiveVideo());
+    if (remoteVideoParticipants.length === 1) {
+      inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant.hasActiveVideo() ? selfParticipant : null;
     } else {
       inGridParticipants = selfParticipant.hasActiveVideo()
-        ? videoParticipants.concat(selfParticipant)
-        : videoParticipants;
+        ? remoteVideoParticipants.concat(selfParticipant)
+        : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
     baseGrid = computeGrid(baseGrid, inGridParticipants);
@@ -80,72 +81,8 @@ export function getGrid(
       grid: baseGrid.map((userId: UserId) => {
         return inGridParticipants.find(participant => participant.userId === userId) || null;
       }),
+      hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };
   });
 }
-
-// class VideoGridRepository {
-//   /**
-//    * Construct an new VideoGridRepository.
-//    * @param {CallingRepository} callingRepository - Repository for the calls
-//    * @param {MediaRepository} mediaRepository - Repository for the media streams
-//    */
-//   constructor(callingRepository, mediaRepository) {
-//     const streamHandler = mediaRepository.streamHandler;
-//     const streamsInfo = streamHandler.remoteMediaStreamInfoIndex.video;
-//     const {hasActiveVideo, localMediaStream, selfStreamState} = streamHandler;
-
-//     const calls = callingRepository.calls;
-//     this.grid = ko.observable([0, 0, 0, 0]);
-//     this.thumbnailStream = ko.observable();
-
-//     const selfStream = ko.pureComputed(() => {
-//       const stream = hasActiveVideo() ? localMediaStream() : undefined;
-//       return {
-//         audioSend: selfStreamState.audioSend,
-//         id: stream && stream.id,
-//         isSelf: true,
-//         screenSend: selfStreamState.screenSend,
-//         stream: stream,
-//         videoSend: selfStreamState.videoSend,
-//       };
-//     });
-
-//     this.streams = ko.pureComputed(() => {
-//       const videoParticipants = calls()
-//         .reduce((participantEntities, callEntity) => participantEntities.concat(callEntity.participants()), [])
-//         .filter(participantEntity => participantEntity.hasActiveVideo());
-
-//       const videoParticipantIds = videoParticipants.map(participant => participant.id);
-
-//       const remoteStreams = streamsInfo()
-//         .filter(mediaStreamInfo => videoParticipantIds.includes(mediaStreamInfo.flowId))
-//         .map(mediaStreamInfo => {
-//           const stream = mediaStreamInfo.stream;
-//           const participant = videoParticipants.find(videoParticipant => {
-//             return videoParticipant.id === mediaStreamInfo.flowId;
-//           });
-
-//           return {
-//             id: stream.id,
-//             picture: participant.user.mediumPictureResource,
-//             screenSend: participant.state.screenSend,
-//             stream: stream,
-//             videoSend: participant.state.videoSend,
-//           };
-//         });
-
-//       if (remoteStreams.length === 1) {
-//         this.thumbnailStream(selfStream());
-//         return remoteStreams;
-//       }
-//       this.thumbnailStream(undefined);
-//       return selfStream().stream ? remoteStreams.concat(selfStream()) : remoteStreams;
-//     });
-
-//     this.streams.subscribe(this.updateGrid.bind(this));
-//     this.updateGrid(this.streams());
-//   }
-
-// }

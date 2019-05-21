@@ -173,14 +173,14 @@ ko.components.register('group-video-grid', {
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
-            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream()">
+            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.mediaStream()">
             </video>
           </div>
         <!-- /ko -->
       </div>
-      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream() -->
+      <!-- ko if: grid().thumbnail && grid().thumbnail.mediaStream() -->
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
+          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.mediaStream()">
           </video>
           <!-- ko if: muted() -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
@@ -191,44 +191,6 @@ ko.components.register('group-video-grid', {
       <!-- /ko -->
     </div>
   `,
-  templateold: `
-    <div class="group-video">
-
-        <div class="group-video-grid" data-bind="foreach: {data: gridInfo, as: 'streamInfo', afterRender: scaleVideos}, css: {'group-video-grid--black-background': hasBlackBackground()}">
-          <!-- ko if: streamInfo -->
-            <div class="group-video-grid__element" data-bind="css: $parent.getClassNameForVideo($index(), streamInfo.isSelf && streamInfo.videoSend()), attr: {'data-uie-name': 'item-grid', 'data-uie-value': $parent.getUIEValueForVideo($index()), 'data-stream-id': streamInfo.id}, event: {dblclick: $parent.doubleClickedOnVideo}">
-              <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: streamInfo.stream, muteMediaElement: streamInfo.stream">
-              </video>
-              <!-- ko if: streamInfo.isSelf && !streamInfo.audioSend() && !$parent.minimized -->
-                <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-                  <micoff-icon></micoff-icon>
-                </div>
-              <!-- /ko -->
-              <!-- ko if: streamInfo.videoSend() === $parent.PROPERTY_STATE.PAUSED -->
-                <div class="group-video-grid__pause-overlay" data-bind="switchBackground: streamInfo.picture()">
-                  <div class="background">
-                    <div class="background-image"></div>
-                    <div class="background-darken"></div>
-                  </div>
-                  <div class="group-video-grid__pause-overlay__label" data-bind="text: t('videoCallPaused'), css: {'group-video-grid__pause-overlay__label--minimized': $parent.minimized}" data-uie-name="status-video-paused"></div>
-                </div>
-              <!-- /ko -->
-            </div>
-          <!-- /ko -->
-        </div>
-        <!-- ko if: thumbnailParticipant && thumbnailParticipant.videoStream() -->
-          <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-            <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': thumbnailParticipant().hasActiveVideo()}, sourceStream: thumbnailParticipant().videoStream()">
-            </video>
-            <!-- ko if: false && !thumbnailStream().audioSend() && !minimized -->
-              <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-                <micoff-icon></micoff-icon>
-              </div>
-            <!-- /ko -->
-          </div>
-        <!-- /ko -->
-      </div>
-    `,
   viewModel: {
     createViewModel: (params: any, componentInfo: any) => new GroupVideoGrid(params, componentInfo.element),
   },

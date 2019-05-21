@@ -171,7 +171,7 @@ export class CallingRepository {
           return;
         }
 
-        participant.videoStream(new MediaStream(tracks));
+        participant.mediaStream(new MediaStream(tracks));
       }
     );
 
@@ -311,7 +311,7 @@ export class CallingRepository {
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
     navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
+      call.selfParticipant.setMediaStream(mediaStream, VIDEO_STATE.STARTED);
     });
   }
 
@@ -441,6 +441,11 @@ export class CallingRepository {
   startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE): void {
     this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING)
       .then(() => {
+        const rejectedCallInConversation = this.findCall(conversationId);
+        if (rejectedCallInConversation) {
+          // if there is a rejected call, we can remove it from the store
+          this.removeCall(rejectedCallInConversation);
+        }
         const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
         const call = new Call(conversationId, conversationType, selfParticipant, callType);
         this.storeCall(call);
@@ -542,13 +547,14 @@ export class CallingRepository {
 
     return mediaStreamPromise.then((mediaStream: MediaStream) => {
       const call = this.findCall(conversationId);
-      if (call) {
+      const hasVideoStream = video || screen;
+      if (call && hasVideoStream) {
         const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
         this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
         if (call.selfParticipant.videoState() !== videoState) {
           this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
         }
-        call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
+        call.selfParticipant.setMediaStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
       }
       return mediaStream;
     });

@@ -45,6 +45,8 @@ class ConversationListCallingCell {
     this.multitasking = multitasking;
     this.callActions = callActions;
 
+    this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
+
     this.videoGrid = videoGrid;
     this.conversationParticipants = ko.pureComputed(
       () => this.conversation() && this.conversation().participating_user_ets()
@@ -169,7 +171,7 @@ class ConversationListCallingCell {
     return this.isIncoming() ? this.callActions.reject(call) : this.callActions.leave(call);
   }
 
-  onMaximizeVideoGrid() {
+  showFullscreenVideoGrid() {
     this.multitasking.autoMinimize(false);
     this.multitasking.isMinimized(false);
   }
@@ -233,7 +235,7 @@ ko.components.register('conversation-list-calling-cell', {
     </div>
 
     <!-- ko if: showVideoGrid() -->
-      <div class="group-video__minimized-wrapper" data-bind="click: onMaximizeVideoGrid">
+      <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
         <group-video-grid params="minimized: true, grid: videoGrid"></group-video-grid>
         <!-- ko if: showMaximize() -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">

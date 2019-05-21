@@ -58,7 +58,6 @@ export class FullscreenVideoCalling {
 
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
 
-    this.showRemoteParticipant = ko.pureComputed(() => false); // TODO
     this.canShareScreen = canShareScreen;
     this.selfSharesScreen = ko.pureComputed(() => call.selfParticipant.sharesScreen()); // TODO
     this.currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput;
@@ -85,7 +84,7 @@ export class FullscreenVideoCalling {
     this.callDuration = ko.observable();
     let callDurationUpdateInterval;
     const startedAtSubscription = ko.computed(() => {
-      const startedAt = call.startedAt;
+      const startedAt = call.startedAt();
       if (startedAt) {
         const updateTimer = () => {
           const time = Math.floor((Date.now() - startedAt) / 1000);
@@ -96,12 +95,33 @@ export class FullscreenVideoCalling {
       }
     });
 
+    let minimizeTimeout;
+    const gridSubscription = ko.computed(() => {
+      const grid = this.videoGrid();
+      if (!grid.hasRemoteVideo) {
+        if (minimizeTimeout) {
+          window.clearTimeout(minimizeTimeout);
+          minimizeTimeout = undefined;
+        }
+
+        const shouldAutoMinimize = this.multitasking.autoMinimize();
+        if (shouldAutoMinimize) {
+          minimizeTimeout = window.setTimeout(() => {
+            //if (!this.isChoosingScreen()) {
+            this.multitasking.isMinimized(true);
+            //}
+          }, FullscreenVideoCalling.CONFIG.AUTO_MINIMIZE_TIMEOUT);
+        }
+      }
+    });
+
     this.hasUnreadMessages = ko.observable(false);
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
+      gridSubscription.dispose();
     };
 
     /*
@@ -305,14 +325,6 @@ ko.components.register('fullscreen-video-call', {
   <div id="video-element-remote" class="video-element-remote">
     <group-video-grid params="grid: videoGrid, muted: isMuted"></group-video-grid>
   </div>
-
-  <!-- ko if: showRemoteParticipant() -->
-    <div class="video-element-remote-participant">
-      <!-- ko ifnot: videodCall().isGroup -->
-        <participant-avatar class="video-element-remote-participant avatar-no-badge" params="participant: remoteUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
-      <!-- /ko -->
-    </div>
-  <!-- /ko -->
 
   <!-- ko if: !isChoosingScreen() -->
     <div class="video-element-overlay hide-controls-hidden"></div>
