@@ -35,16 +35,17 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(callingViewModel, panelViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
+    this.callingViewModel = callingViewModel;
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
     this.logger = getLogger('z.viewModel.content.TitleBarViewModel');
 
-    this.panelViewModel = mainViewModel.panel;
+    this.panelViewModel = panelViewModel;
     this.contentViewModel = contentViewModel;
 
     this.panelIsVisible = this.panelViewModel.isVisible;

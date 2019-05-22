@@ -62,11 +62,6 @@ export class ContentViewModel {
 
     // State
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
-    this.multitasking = {
-      autoMinimize: ko.observable(true),
-      isMinimized: ko.observable(false),
-      resetMinimize: ko.observable(false),
-    };
 
     // Nested view models
     this.collectionDetails = new z.viewModel.content.CollectionDetailsViewModel();
@@ -90,7 +85,12 @@ export class ContentViewModel {
       repositories.cryptography,
     );
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
-    this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
+    this.titleBar = new z.viewModel.content.TitleBarViewModel(
+      mainViewModel.calling,
+      mainViewModel.panel,
+      this,
+      repositories
+    );
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
     this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);

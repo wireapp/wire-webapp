@@ -38,7 +38,6 @@ import FaviconViewModelGlobal from '../view_model/FaviconViewModel.js';
 import ImageDetailViewViewModelGlobal from '../view_model/ImageDetailViewViewModel.js';
 import LoadingViewModelGlobal from '../view_model/LoadingViewModel.js';
 import MainViewModelGlobal from '../view_model/MainViewModel.js';
-import ShortcutsViewModelGlobal from '../view_model/ShortcutsViewModel.js';
 import CommonBindingsGlobal from '../view_model/bindings/CommonBindings.js';
 import ConversationListBindingsGlobal from '../view_model/bindings/ConversationListBindings.js';
 import ListBackgroundBindingsGlobal from '../view_model/bindings/ListBackgroundBindings.js';

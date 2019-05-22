@@ -336,4 +336,12 @@ export class DebugUtil {
         events.forEach(event => this.eventRepository.processEvent(event, EventRepository.SOURCE.STREAM));
       });
   }
+
+  getActiveCallStats() {
+    const activeCall = this.callingRepository.joinedCall();
+    if (!activeCall) {
+      throw new Error('no active call found');
+    }
+    return this.callingRepository.getStats(activeCall.conversationId);
+  }
 }

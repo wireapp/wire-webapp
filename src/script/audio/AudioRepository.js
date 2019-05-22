@@ -182,7 +182,7 @@ export class AudioRepository {
    * @returns {undefined}
    */
   loop(audioId) {
-    this.play(audioId, true);
+    return this.play(audioId, true);
   }
 
   /**

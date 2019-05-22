@@ -32,6 +32,7 @@ export class Call {
   public readonly selfParticipant: Participant;
   public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
+  public blockMessages: boolean = false;
 
   constructor(
     conversationId: ConversationId,

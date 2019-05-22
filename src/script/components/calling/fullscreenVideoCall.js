@@ -98,14 +98,10 @@ export class FullscreenVideoCalling {
     let minimizeTimeout;
     const gridSubscription = ko.computed(() => {
       const grid = this.videoGrid();
+      window.clearTimeout(minimizeTimeout);
+      minimizeTimeout = undefined;
       if (!grid.hasRemoteVideo) {
-        if (minimizeTimeout) {
-          window.clearTimeout(minimizeTimeout);
-          minimizeTimeout = undefined;
-        }
-
-        const shouldAutoMinimize = this.multitasking.autoMinimize();
-        if (shouldAutoMinimize) {
+        if (this.multitasking.autoMinimize()) {
           minimizeTimeout = window.setTimeout(() => {
             //if (!this.isChoosingScreen()) {
             this.multitasking.isMinimized(true);

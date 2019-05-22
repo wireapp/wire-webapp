@@ -642,7 +642,7 @@ class App {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
 
-    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
+    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 

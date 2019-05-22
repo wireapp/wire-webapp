@@ -25,6 +25,7 @@ import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
+import {ShortcutsViewModel} from './ShortcutsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -64,6 +65,12 @@ export class MainViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
+    this.multitasking = {
+      autoMinimize: ko.observable(true),
+      isMinimized: ko.observable(false),
+      resetMinimize: ko.observable(false),
+    };
+
     this.selfUser = this.userRepository.self;
 
     this.isPanelOpen = ko.observable(false);
@@ -71,19 +78,19 @@ export class MainViewModel {
     this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
-    this.content = new ContentViewModel(this, repositories);
     this.calling = new CallingViewModel(
       repositories.calling,
       repositories.conversation,
       repositories.audio,
       repositories.media.devicesHandler,
-      this.content.multitasking
+      this.multitasking
     );
+    this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
+    this.shortcuts = new ShortcutsViewModel(repositories.calling);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.warnings = new WarningsViewModel();

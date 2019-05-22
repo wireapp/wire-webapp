@@ -73,24 +73,20 @@ class GroupVideoGrid {
       const userId = wrapper.dataset.userId;
       const participant = this.videoParticipants().find(participant => participant.userId === userId);
       if (participant) {
-        const isScreenSend = false; //TODO participant.screenSend();
-        updateContainClass(videoElement, wrapper, isScreenSend, participant);
+        updateContainClass(videoElement, wrapper, participant);
       }
     };
 
     const updateContainClass = (
       videoElement: HTMLVideoElement,
       wrapper: HTMLElement,
-      isScreenSend: boolean,
       participant: Participant
     ): void => {
-      const hasFitSet = false; // TODO streamInfo.hasOwnProperty('fitContain');
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
       const isVeryDifferent = Math.abs(wrapperRatio - videoRatio) > GroupVideoGrid.CONFIG.RATIO_THRESHOLD;
-      const shouldBeContain = isVeryDifferent || false; // TODO isScreenSend === PROPERTY_STATE.TRUE;
-      const forceClass = hasFitSet ? false /*TODOstreamInfo.fitContain*/ : shouldBeContain;
-      videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, forceClass);
+      const shouldBeContain = isVeryDifferent || participant.sharesScreen();
+      videoElement.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, shouldBeContain);
     };
 
     elements.forEach((element: HTMLElement) => {
@@ -104,18 +100,8 @@ class GroupVideoGrid {
   }
 
   doubleClickedOnVideo = (viewModel: any, {currentTarget}: any): void => {
-    return; // TODO
-    /*
     const childVideo = currentTarget.querySelector('video');
-    const userId = currentTarget.dataset.userId;
-    const participant = this.videoParticipants().find(participant => participant.userId === userId);
-
-    const hasFitProperty = participant.hasOwnProperty('fitContain');
-    const hasFitClass = childVideo.classList.contains(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
-    participant.fitContain = hasFitProperty ? !participant.fitContain : !hasFitClass;
-
-    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS, participant.fitContain);
-    */
+    childVideo.classList.toggle(GroupVideoGrid.CONFIG.CONTAIN_CLASS);
   };
 
   getSizeForVideo(index: number): VIDEO_SIZE {
@@ -173,14 +159,14 @@ ko.components.register('group-video-grid', {
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
           >
-            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.mediaStream()">
+            <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
             </video>
           </div>
         <!-- /ko -->
       </div>
-      <!-- ko if: grid().thumbnail && grid().thumbnail.mediaStream() -->
+      <!-- ko if: grid().thumbnail && grid().thumbnail.videoStream() -->
         <div class="group-video__thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized}">
-          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.mediaStream()">
+          <video class="mirror group-video__thumbnail-video" autoplay playsinline data-uie-name="self-video-thumbnail" data-bind="css: {'group-video__thumbnail--minimized': minimized, 'mirror': grid().thumbnail.hasActiveVideo()}, sourceStream: grid().thumbnail.videoStream()">
           </video>
           <!-- ko if: muted() -->
             <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">

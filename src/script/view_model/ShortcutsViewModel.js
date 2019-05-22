@@ -17,43 +17,16 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-
-import {CALL_STATE} from '../calling/enum/CallState';
 import {MediaType} from '../media/MediaType';
 import {WebAppEvents} from '../event/WebApp';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-
-z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
-  constructor(mainViewModel, repositories) {
+export class ShortcutsViewModel {
+  constructor(callingRepository) {
+    // TODO restore shortcuts
     this.onMuteCall = this.onMuteCall.bind(this);
     this.onRejectCall = this.onRejectCall.bind(this);
 
-    this.callingRepository = repositories.calling;
-    this.logger = getLogger('z.viewModel.ShortcutsViewModel');
-
-    this.joinedCall = this.callingRepository.joinedCall;
-    this.joinedCall.subscribe(callEntity => this._updateShortcutSubscription(callEntity));
-  }
-
-  _updateShortcutSubscription(callEntity) {
-    this._unsubscribeShortcuts();
-
-    if (callEntity) {
-      switch (callEntity.state()) {
-        case CALL_STATE.ONGOING:
-        case CALL_STATE.OUTGOING:
-          this._subscribeOutgoingOrOngoingCall();
-          break;
-        case CALL_STATE.INCOMING:
-          this._subscribeIncomingCall();
-          break;
-        default:
-          break;
-      }
-    }
+    this.callingRepository = callingRepository;
   }
 
   _subscribeIncomingCall() {
@@ -80,4 +53,4 @@ z.viewModel.ShortcutsViewModel = class ShortcutsViewModel {
       amplify.publish(WebAppEvents.CALL.STATE.REJECT, this.joinedCall().id);
     }
   }
-};
+}

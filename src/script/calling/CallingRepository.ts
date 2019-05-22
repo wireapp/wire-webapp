@@ -73,8 +73,9 @@ export class CallingRepository {
   private wCall: Wcall | undefined;
   public readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
+  private incomingCallCallback: Function;
 
-  public readonly joinedCall: ko.Observable<any>;
+  public readonly joinedCall: ko.PureComputed<Call | undefined>;
 
   private callingConfig: any;
   private callingConfigTimeout: number | undefined;
@@ -108,10 +109,8 @@ export class CallingRepository {
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
-
-    this.joinedCall = ko.observable({
-      //@ts-ignore
-      getFlows: () => this.wCall.getPeerConnections(),
+    this.joinedCall = ko.pureComputed(() => {
+      return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
 
     this.backendClient = backendClient;
@@ -122,6 +121,7 @@ export class CallingRepository {
     // Media Handler
     this.mediaConstraintsHandler = mediaConstraintsHandler;
     this.mediaDevicesHandler = mediaDevicesHandler;
+    this.incomingCallCallback = () => {};
 
     this.callLogger = new CallLogger('CallingRepository', null, []);
 
@@ -130,6 +130,11 @@ export class CallingRepository {
 
     this.subscribeToEvents();
     this.enableDebugging();
+  }
+
+  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}> {
+    // @ts-ignore
+    return this.wCall.getStats(conversationId);
   }
 
   initAvs(selfUserId: UserId, clientId: DeviceId): void {
@@ -159,19 +164,25 @@ export class CallingRepository {
 
     wCall.setUserMediaHandler(this.updateMediaStream);
 
-    wCall.setVideoTrackHandler(
-      (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, tracks: MediaStreamTrack[]) => {
+    wCall.setMediaStreamHandler(
+      (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, streams: MediaStream[]) => {
         let participant = this.findParticipant(conversationId, userId);
         if (!participant) {
           participant = new Participant(userId, deviceId);
           this.findCall(conversationId).participants.push(participant);
         }
 
-        if (tracks.length === 0) {
+        if (streams.length === 0) {
           return;
         }
 
-        participant.mediaStream(new MediaStream(tracks));
+        const [stream] = streams;
+        if (stream.getAudioTracks().length > 0) {
+          participant.audioStream(stream);
+        }
+        if (stream.getVideoTracks().length > 0) {
+          participant.videoStream(stream);
+        }
       }
     );
 
@@ -224,11 +235,12 @@ export class CallingRepository {
         // an incoming call that should not ring is an ongoing group call
         call.reason(REASON.STILL_ONGOING);
       }
-      if (isVideoCall) {
+      if (shouldRing && isVideoCall) {
         this.loadVideoPreview(call);
       }
 
       this.storeCall(call);
+      this.incomingCallCallback(call);
     };
 
     const wUser = wCall.create(
@@ -270,8 +282,9 @@ export class CallingRepository {
         return;
       }
 
+      // If a call goes from a state to INCOMING, it means it's a group call that just ended
+      call.reason(state === CALL_STATE.INCOMING ? REASON.STILL_ONGOING : undefined);
       call.state(state);
-      call.reason(undefined);
 
       switch (state) {
         case CALL_STATE.MEDIA_ESTAB:
@@ -284,20 +297,24 @@ export class CallingRepository {
     return {wCall, wUser};
   }
 
+  onIncomingCall(callback: Function): void {
+    this.incomingCallCallback = callback;
+  }
+
   findCall(conversationId: ConversationId): Call | undefined {
     return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
-  findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
+  private findParticipant(conversationId: ConversationId, userId: UserId): Participant | undefined {
     const call = this.findCall(conversationId);
     return call && call.participants().find(participant => participant.userId === userId);
   }
 
-  storeCall(call: Call): void {
+  private storeCall(call: Call): void {
     this.activeCalls.push(call);
   }
 
-  removeCall(call: Call): void {
+  private removeCall(call: Call): void {
     const index = this.activeCalls().indexOf(call);
     call.selfParticipant.releaseVideoStream();
     call.participants.removeAll();
@@ -306,12 +323,12 @@ export class CallingRepository {
     }
   }
 
-  loadVideoPreview(call: Call): void {
+  private loadVideoPreview(call: Call): void {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
     navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-      call.selfParticipant.setMediaStream(mediaStream, VIDEO_STATE.STARTED);
+      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
     });
   }
 
@@ -426,7 +443,7 @@ export class CallingRepository {
       const callType = this.callTypeFromMediaType(mediaType);
       return isActiveCall
         ? this.leaveCall(conversationEntity.id)
-        : this.startCall(conversationEntity.id, isGroupCall, callType);
+        : this.startCall(conversationEntity.id, isGroupCall, callType) && undefined;
     }
   }
 
@@ -438,8 +455,8 @@ export class CallingRepository {
    * @param {CALL_TYPE} callType - Type of call (audio or video)
    * @returns {undefined} No return value
    */
-  startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE): void {
-    this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING)
+  startCall(conversationId: ConversationId, conversationType: CONV_TYPE, callType: CALL_TYPE): Promise<void | Call> {
+    return this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING)
       .then(() => {
         const rejectedCallInConversation = this.findCall(conversationId);
         if (rejectedCallInConversation) {
@@ -453,6 +470,7 @@ export class CallingRepository {
           this.loadVideoPreview(call);
         }
         this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+        return call;
       })
       .catch(() => {});
   }
@@ -554,7 +572,7 @@ export class CallingRepository {
         if (call.selfParticipant.videoState() !== videoState) {
           this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
         }
-        call.selfParticipant.setMediaStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
+        call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
       }
       return mediaStream;
     });
@@ -646,6 +664,10 @@ export class CallingRepository {
       [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
       messageId: createRandomUuid(),
     });
+    const call = this.findCall(conversationId);
+    if (call && call.blockMessages) {
+      return 0;
+    }
 
     const type = JSON.parse(payload).type;
     if (type) {
@@ -654,9 +676,13 @@ export class CallingRepository {
 
     const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    this.conversationRepository
-      .sendCallingMessage(eventInfoEntity, conversationId)
-      .catch(() => this.leaveCall(conversationId));
+    this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId).catch(() => {
+      if (call) {
+        // we flag the call in order to prevent sending further messages
+        call.blockMessages = true;
+      }
+      this.leaveCall(conversationId);
+    });
     return 0;
   };
 
@@ -917,8 +943,8 @@ ${turnServersConfig}`;
    * @returns {Promise} Resolves when the new call was joined
    */
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
-    const activeCall = this.activeCalls().find((call: Call) => call.conversationId !== conversationId);
-    if (!activeCall) {
+    const activeCall = this.joinedCall();
+    if (!activeCall || activeCall.conversationId === conversationId) {
       return Promise.resolve();
     }
 

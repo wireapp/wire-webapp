@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from 'avs-web';
 import ko from 'knockout';
 import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
@@ -40,7 +40,6 @@ export class CallingViewModel {
     mediaDevicesHandler: any,
     multitasking: any
   ) {
-    this.audioRepository = audioRepository;
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.mediaDevicesHandler = mediaDevicesHandler;
@@ -48,6 +47,39 @@ export class CallingViewModel {
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
     );
     this.multitasking = multitasking;
+
+    const ring = (call: Call): void => {
+      const sounds: any = {
+        [CALL_STATE.INCOMING]: AudioType.INCOMING_CALL,
+        [CALL_STATE.OUTGOING]: AudioType.OUTGOING_CALL,
+      };
+      const initialCallState = call.state();
+      const soundId = sounds[initialCallState];
+      if (!soundId) {
+        return;
+      }
+
+      audioRepository.loop(soundId).then(() => {
+        const stateSubscription = ko.computed(() => {
+          if (call.state() !== initialCallState || call.reason() !== undefined) {
+            audioRepository.stop(soundId);
+            stateSubscription.dispose();
+          }
+        });
+      });
+    };
+
+    const startCall = (conversationEntity: any, callType: CALL_TYPE): void => {
+      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
+        if (!call) {
+          return;
+        }
+        ring(call);
+      });
+    };
+
+    this.callingRepository.onIncomingCall(ring);
 
     this.callActions = {
       answer: (call: Call) => {
@@ -59,8 +91,11 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      start: (call: Call) => {
-        this.callingRepository.startCall(call.conversationId, call.conversationType, CALL_TYPE.NORMAL);
+      startAudio: (conversationEntity: any): void => {
+        startCall(conversationEntity, CALL_TYPE.NORMAL);
+      },
+      startVideo(conversationEntity: any): void {
+        startCall(conversationEntity, CALL_TYPE.VIDEO);
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.callingRepository.switchCameraInput(call.conversationId, deviceId);
@@ -80,6 +115,25 @@ export class CallingViewModel {
       return this.activeCalls()[0];
     });
     let currentCallSubscription: ko.Subscription | undefined;
+
+    const participantsAudioElement: Record<string, HTMLAudioElement> = {};
+    ko.computed(() => {
+      const call = this.callingRepository.joinedCall();
+      if (call) {
+        call.participants().forEach(participant => {
+          if (!participantsAudioElement[participant.userId]) {
+            const audioElement = new Audio();
+            audioElement.srcObject = participant.audioStream();
+            audioElement.play();
+            participantsAudioElement[participant.userId] = audioElement;
+          }
+        });
+      } else {
+        Object.keys(participantsAudioElement).forEach(userId => {
+          delete participantsAudioElement[userId];
+        });
+      }
+    });
 
     ko.computed(() => {
       const call = currentCall();
@@ -104,22 +158,6 @@ export class CallingViewModel {
         null,
         'arrayChange'
       );
-    });
-
-    ko.computed(() => {
-      this.callingRepository.activeCalls().forEach(call => {
-        const isOutgoing = this.isOutgoing(call);
-        const isIncoming = this.isIncoming(call);
-        const callIdleReasons = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE];
-        const isIdleCall = callIdleReasons.includes(call.reason());
-        if (!isIdleCall && (isOutgoing || isIncoming)) {
-          const audioId = isIncoming ? AudioType.INCOMING_CALL : AudioType.OUTGOING_CALL;
-          audioRepository.loop(audioId);
-        } else {
-          audioRepository.stop(AudioType.INCOMING_CALL);
-          audioRepository.stop(AudioType.OUTGOING_CALL);
-        }
-      });
     });
   }
 
