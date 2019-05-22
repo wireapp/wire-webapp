@@ -51,7 +51,7 @@ ko.components.register('participant-item', {
         <!-- ko if: isUser && selfInTeam -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
             data-uie-name="status-name"
-            params="availability: participant.availability, label: participantName(), indicateSelf: participant.is_me"></availability-state>
+            params="availability: participant.availability, label: participantName()"></availability-state>
         <!-- /ko -->
 
         <!-- ko if: isService || !selfInTeam -->
