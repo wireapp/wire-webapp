@@ -69,12 +69,6 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
 import {Page} from './Page';
 
-declare global {
-  interface Window {
-    wSSOCapable: boolean;
-  }
-}
-
 interface Props extends React.HTMLAttributes<_Login>, RouteComponentProps {}
 
 interface ConnectedProps {
