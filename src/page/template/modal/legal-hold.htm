@@ -12,11 +12,12 @@
     </div>
     <div class="modal__body legal-hold-modal__wrapper">
       <!-- ko ifnot: devicesUser() -->
-        <legal-hold-dot class="legal-hold-modal__logo" params="large: true"></legal-hold-dot>
-        <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')"></div>
+        <legal-hold-dot class="legal-hold-modal__logo" params="large: true" data-uie-name="status-modal-legal-hold-icon"></legal-hold-dot>
+        <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')" data-uie-name="status-modal-title"></div>
         <p
           class="legal-hold-modal__info"
-          data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers') "
+          data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
+          data-uie-name="status-modal-text"
         ></p>
         <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 

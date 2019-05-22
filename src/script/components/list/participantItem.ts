@@ -16,63 +16,41 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import ko from 'knockout';
+
+import {ParticipantAvatar} from 'Components/participantAvatar';
+import {UserlistMode} from 'Components/userList';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import {UserlistMode} from 'Components/userList';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ParticipantItem = class ParticipantItem {
-  constructor(params) {
-    this.participant = ko.unwrap(params.participant);
-    this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
-    this.isUser = this.participant instanceof User && !this.participant.isService;
-    this.selfUser = window.wire.app.repository.user.self;
-    this.isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
-    this.badge = params.badge;
-
-    this.mode = params.mode || UserlistMode.DEFAULT;
-    this.isDefaultMode = this.mode === UserlistMode.DEFAULT;
-    this.isOthersMode = this.mode === UserlistMode.OTHERS;
-
-    this.canSelect = params.canSelect;
-    this.isSelected = params.isSelected;
-    this.showCamera = params.showCamera;
-    const hasCustomInfo = !!params.customInfo;
-
-    this.hasUsernameInfo = this.isUser && !params.hideInfo && !hasCustomInfo && !this.isTemporaryGuest;
-
-    if (hasCustomInfo) {
-      this.contentInfo = params.customInfo;
-    } else if (params.hideInfo) {
-      this.contentInfo = null;
-    } else if (this.isService) {
-      this.contentInfo = this.participant.summary;
-    } else if (this.isTemporaryGuest) {
-      this.contentInfo = this.participant.expirationText;
-    } else {
-      this.contentInfo = this.participant.username();
-    }
-  }
-};
+interface ParticipantItemParams {
+  participant: User | ServiceEntity;
+  badge: boolean;
+  mode: UserlistMode;
+  canSelect: boolean;
+  isSelected: boolean;
+  showCamera: boolean;
+  customInfo: string;
+  hideInfo: boolean;
+  selfInTeam: boolean;
+}
 
 ko.components.register('participant-item', {
   template: `
     <div class="participant-item" data-bind="attr: {'data-uie-name': isUser ? 'item-user' : 'item-service', 'data-uie-value': participant.name}">
       <div class="participant-item-image">
-        <participant-avatar params="participant: participant, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+        <participant-avatar params="participant: participant, size: avatarSize"></participant-avatar>
       </div>
 
       <div class="participant-item-content">
-        <!-- ko if: isUser && selfUser().inTeam() -->
+        <!-- ko if: isUser && selfInTeam -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
             data-uie-name="status-name"
             params="availability: participant.availability, label: participant.name"></availability-state>
         <!-- /ko -->
 
-        <!-- ko if: isService || !selfUser().inTeam() -->
+        <!-- ko if: isService || !selfInTeam -->
           <div class="participant-item-content-name" data-bind="text: participant.name" data-uie-name="status-name"></div>
         <!-- /ko -->
         <div class="participant-item-content-info">
@@ -104,5 +82,45 @@ ko.components.register('participant-item', {
       <disclose-icon></disclose-icon>
     </div>
   `,
-  viewModel: z.components.ParticipantItem,
+  viewModel: function({
+    participant,
+    badge,
+    mode = UserlistMode.DEFAULT,
+    canSelect,
+    isSelected,
+    showCamera,
+    customInfo,
+    hideInfo,
+    selfInTeam,
+  }: ParticipantItemParams): void {
+    this.avatarSize = ParticipantAvatar.SIZE.SMALL;
+    this.participant = ko.unwrap(participant);
+    this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
+    this.isUser = this.participant instanceof User && !this.participant.isService;
+    this.selfInTeam = selfInTeam;
+    const isTemporaryGuest = this.isUser && this.participant.isTemporaryGuest();
+    this.badge = badge;
+
+    this.isDefaultMode = mode === UserlistMode.DEFAULT;
+    this.isOthersMode = mode === UserlistMode.OTHERS;
+
+    this.canSelect = canSelect;
+    this.isSelected = isSelected;
+    this.showCamera = showCamera;
+    const hasCustomInfo = !!customInfo;
+
+    this.hasUsernameInfo = this.isUser && !hideInfo && !hasCustomInfo && !this.isTemporaryGuest;
+
+    if (hasCustomInfo) {
+      this.contentInfo = customInfo;
+    } else if (hideInfo) {
+      this.contentInfo = null;
+    } else if (this.isService) {
+      this.contentInfo = this.participant.summary;
+    } else if (isTemporaryGuest) {
+      this.contentInfo = this.participant.expirationText;
+    } else {
+      this.contentInfo = this.participant.username();
+    }
+  },
 });

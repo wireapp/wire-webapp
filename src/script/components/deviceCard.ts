@@ -34,13 +34,13 @@ ko.components.register('device-card', {
   template: `
     <div class="device-card" data-uie-name="device-card" data-bind="click: clickOnDevice, attr: {'data-uie-uid': id, 'data-uie-name': dataUieName}, css: {'device-card__no-hover': !clickable}"">
       <!-- ko if: showLegalHoldIcon -->
-        <legal-hold-dot class="device-card__icon"></legal-hold-dot>
+        <legal-hold-dot class="device-card__icon" data-uie-name="status-legal-hold-device"></legal-hold-dot>
       <!-- /ko -->
       <!-- ko if: showDesktopIcon -->
-        <desktop-icon class="device-card__icon"></desktop-icon>
+        <desktop-icon class="device-card__icon" data-uie-name="status-desktop-device"></desktop-icon>
       <!-- /ko -->
       <!-- ko if: showOtherIcon -->
-        <devices-icon class="device-card__icon"></devices-icon>
+        <devices-icon class="device-card__icon" data-uie-name="status-mobile-device"></devices-icon>
       <!-- /ko -->
       <div class="device-card__info" data-uie-name="device-card-info" data-bind="attr: {'data-uie-value': label}">    
         <!-- ko if: detailed -->

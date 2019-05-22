@@ -80,7 +80,6 @@ import messageTimerButtonGlobal from 'Components/messageTimerButton.js';
 import serviceListGlobal from 'Components/serviceList.js';
 import topPeopleGlobal from 'Components/topPeople.js';
 import participantAvatarGlobal from 'Components/participantAvatar.js';
-import participantItemGlobal from 'Components/list/participantItem.js';
 import userProfileGlobal from 'Components/userProfile.js';
 import userInputGlobal from 'Components/userInput.js';
 import guestModeToggleGlobal from 'Components/guestModeToggle.js';

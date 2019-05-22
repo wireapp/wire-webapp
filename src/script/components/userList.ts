@@ -25,6 +25,8 @@ import {SearchRepository} from '../search/SearchRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {validateHandle} from '../user/UserHandleGenerator';
 
+import 'Components/list/participantItem';
+
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
   DEFAULT = 'UserlistMode.DEFAULT',
@@ -50,7 +52,7 @@ ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities(), as: 'user', noChildContext: true }">
       <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id)"
+        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, badge: teamRepository.getRoleBadge(user.id), selfInTeam: selfInTeam"
         data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
       </participant-item>
     </div>
@@ -88,6 +90,7 @@ ko.components.register('user-list', {
     this.isSelectEnabled = typeof selectedUsers === 'function';
     this.noUnderline = noUnderline;
     this.arrow = arrow;
+    this.selfInTeam = teamRepository.selfUser().inTeam();
 
     const isCompactMode = mode === UserlistMode.COMPACT;
 
