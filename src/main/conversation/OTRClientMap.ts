@@ -17,8 +17,7 @@
  *
  */
 
-interface OTRClientMap {
-  [clientId: string]: string; // User ID → Encrypted Payload (Base64)
+export interface OTRClientMap {
+  /** User ID → Encrypted Payload (Base64) */
+  [clientId: string]: string;
 }
-
-export {OTRClientMap};

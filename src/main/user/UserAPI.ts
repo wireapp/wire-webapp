@@ -190,13 +190,13 @@ class UserAPI {
    * @param propertyKey The property key to get
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getProperty
    */
-  public getProperty<T extends string>(propertyKey: string): Promise<{[key in T]: any}> {
+  public getProperty<T extends string>(propertyKey: string): Promise<Record<T, any>> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
     };
 
-    return this.client.sendJSON<{[key in T]: any}>(config).then(response => response.data);
+    return this.client.sendJSON<Record<T, any>>(config).then(response => response.data);
   }
 
   /**
