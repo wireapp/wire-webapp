@@ -19,7 +19,7 @@
 
 import * as sodium from 'libsodium-wrappers-sumo';
 
-function zeroize(object: Uint8Array | ArrayBuffer | {[index: string]: any} | undefined): void {
+function zeroize(object: Uint8Array | ArrayBuffer | Record<string, any> | undefined): void {
   if (object instanceof Uint8Array) {
     sodium.memzero(object);
   } else if (object instanceof ArrayBuffer) {

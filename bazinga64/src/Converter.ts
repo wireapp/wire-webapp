@@ -41,7 +41,7 @@ class Converter {
     ).join('');
   }
 
-  public static jsonToArrayBufferView(objectSource: {[key: number]: number}): Uint8Array {
+  public static jsonToArrayBufferView(objectSource: Record<number, number>): Uint8Array {
     const length = Object.keys(objectSource).length;
     const arrayBufferView = new Uint8Array(length);
 

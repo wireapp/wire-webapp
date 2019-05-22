@@ -20,9 +20,7 @@
 import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error/';
 
-export interface MemoryStore {
-  [index: string]: {[index: string]: any};
-}
+export type MemoryStore = Record<string, Record<string, any>>;
 
 export class MemoryEngine implements CRUDEngine {
   public storeName = '';

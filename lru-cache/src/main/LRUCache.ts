@@ -17,9 +17,7 @@
  *
  */
 
-export interface NodeMap<T> {
-  [index: string]: T;
-}
+export type NodeMap<T> = Record<string, T>;
 
 export interface Node<T> {
   key: string;

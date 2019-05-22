@@ -29,7 +29,7 @@ export enum QueryKeys {
   TABLET_UP = 'tabletUp',
 }
 
-export type QueryMap = {[index in QueryKeys]: string};
+export type QueryMap = Record<QueryKeys, string>;
 
 export const QUERY: QueryMap = {
   [QueryKeys.DESKTOP]: `min-width: ${WIDTH.DESKTOP_MIN}px`,

@@ -24,7 +24,7 @@ import {ExpiredBundle} from './ExpiredBundle';
 import {TransientBundle} from './TransientBundle';
 
 export class TransientStore extends EventEmitter {
-  private readonly bundles: {[index: string]: TransientBundle} = {};
+  private readonly bundles: Record<string, TransientBundle> = {};
   private tableName = '';
 
   public static TOPIC = {

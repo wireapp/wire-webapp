@@ -72,8 +72,8 @@ export class CopyConfig {
     }
   }
 
-  private getFilesFromString(files: string): {[source: string]: string | string[]} {
-    const resolvedPaths: {[source: string]: string | string[]} = {};
+  private getFilesFromString(files: string): Record<string, string | string[]> {
+    const resolvedPaths: Record<string, string | string[]> = {};
     const fileArrayRegex = /^\[(.*)\]$/;
 
     files

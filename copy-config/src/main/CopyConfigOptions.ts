@@ -43,9 +43,7 @@ export interface CopyConfigOptions {
    *   ']
    * }
    */
-  files?: {
-    [source: string]: string | string[];
-  };
+  files?: Record<string, string | string[]>;
   /** Force using HTTPS download over `git clone` */
   forceDownload?: boolean;
   /**
