@@ -19,7 +19,7 @@
 
 import Color from 'color';
 
-export type ColorParam = Color | string | ArrayLike<number> | number | {[key: string]: any};
+export type ColorParam = Color | string | ArrayLike<number> | number | Record<string, any>;
 
 const steps = [];
 const percent = 100;
@@ -49,7 +49,7 @@ function opaque(color: ColorParam, amount: number): string {
 const BLACK = '#000';
 const WHITE = '#fff';
 
-const BASE_COLOR: {[index: string]: string} = {
+const BASE_COLOR: Record<string, string> = {
   BLUE: '#2391d3',
   GRAY: '#bac8d1',
   GREEN: '#00c800',
@@ -58,9 +58,9 @@ const BASE_COLOR: {[index: string]: string} = {
   YELLOW: '#febf02',
 };
 
-const DARK_COLOR: {[index: string]: string} = {};
-const LIGHT_COLOR: {[index: string]: string} = {};
-const OPAQUE_COLOR: {[index: string]: string} = {};
+const DARK_COLOR: Record<string, string> = {};
+const LIGHT_COLOR: Record<string, string> = {};
+const OPAQUE_COLOR: Record<string, string> = {};
 
 Object.entries(BASE_COLOR).forEach(([key, value]) => {
   steps.forEach(step => {
