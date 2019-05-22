@@ -17,8 +17,6 @@
  *
  */
 
-/// <reference types="../../global" />
-
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {
