@@ -3,30 +3,36 @@
     <div class="modal__header">
       <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
       <!-- ko if: devicesUser() -->
-        <arrow-left-icon class="modal__header__button" data-bind="clickOrDrag: clickOnBack" data-uie-name="go-back-participant-devices"></arrow-left-icon>
+        <arrow-left-icon
+          class="modal__header__button"
+          data-bind="clickOrDrag: clickOnBack"
+          data-uie-name="go-back-participant-devices"
+        ></arrow-left-icon>
       <!-- /ko -->
     </div>
     <div class="modal__body legal-hold-modal__wrapper">
       <!-- ko ifnot: devicesUser() -->
         <legal-hold-dot class="legal-hold-modal__logo" params="large: true" data-uie-name="status-modal-legal-hold-icon"></legal-hold-dot>
-        <div class="legal-hold-modal__headline" data-uie-name="status-modal-title">Legal Hold</div>
-        <p class="legal-hold-modal__info" data-uie-name="status-modal-text">
-          Legal Hold has been activated for your account.<br />All messages will be preserved for future access, including
-          deleted, edited, and timed messages.<br />Your conversation partners will be aware of the recording.
-        </p>
-        <div class="legal-hold-modal__subjects">Legal Hold Subjects</div>
+        <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')" data-uie-name="status-modal-title"></div>
+        <p
+          class="legal-hold-modal__info"
+          data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
+          data-uie-name="status-modal-text"
+        ></p>
+        <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 
         <user-list
           params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
         ></user-list>
       <!-- /ko -->
       <!-- ko if: devicesUser() -->
-        <user-devices params="clientRepository: clientRepository,
-                              conversationRepository: conversationRepository,
-                              cryptographyRepository: cryptographyRepository,
-                              userEntity: devicesUser,
-                              history: userDevicesHistory,
-                              noPadding: true">
+        <user-devices
+          params="clientRepository: clientRepository,
+                  conversationRepository: conversationRepository,
+                  cryptographyRepository: cryptographyRepository,
+                  userEntity: devicesUser,
+                  history: userDevicesHistory,
+                  noPadding: true">
         </user-devices>
       <!-- /ko -->
     </div>
