@@ -53,12 +53,6 @@ class ConversationListCallingCell {
       () => this.conversation() && this.conversation().participating_user_ets()
     );
 
-    this.selfStreamState = {
-      audioSend: () => false,
-      screenSend: () => false,
-      videoSend: () => false,
-    };
-
     const isState = state => () => call.state() === state;
     this.isIdle = ko.pureComputed(isState(CALL_STATE.NONE));
     this.isOutgoing = ko.pureComputed(isState(CALL_STATE.OUTGOING));
@@ -262,7 +256,13 @@ ko.components.register('conversation-list-calling-cell', {
             </button>
           <!-- /ko -->
           <!-- ko if: isOngoing() -->
-            <div class="call-ui__button" data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'), disabled: !disableScreenButton, position: 'bottom'}, click: () => callActions.toggleScreenshare(call), css: {'call-ui__button--active': selfStreamState.screenSend(), 'call-ui__button--disabled': disableScreenButton}, attr: {'data-uie-value': selfStreamState.screenSend() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}" data-uie-name="do-call-controls-toggle-screenshare">
+            <div class="call-ui__button"
+              data-bind="tooltip: {text: t('videoCallScreenShareNotSupported'),
+                disabled: !disableScreenButton, position: 'bottom'},
+                click: () => callActions.toggleScreenshare(call),
+                css: {'call-ui__button--active': call.selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
+                attr: {'data-uie-value': call.selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true'}"
+              data-uie-name="do-call-controls-toggle-screenshare">
               <screenshare-icon class="small-icon"></screenshare-icon>
             </div>
           <!-- /ko -->

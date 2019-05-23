@@ -63,6 +63,7 @@ export class CallingRepository {
   private readonly backendClient: any;
   private readonly conversationRepository: any;
   private readonly eventRepository: any;
+  private readonly mediaStreamHandler: any;
   private readonly mediaDevicesHandler: any;
   private readonly mediaConstraintsHandler: any;
   private readonly serverTimeHandler: any;
@@ -70,6 +71,7 @@ export class CallingRepository {
 
   private selfUserId: UserId;
   private selfClientId: DeviceId;
+  private isReady: boolean = false;
   private wUser: number | undefined;
   private wCall: Wcall | undefined;
   public readonly activeCalls: ko.ObservableArray<Call>;
@@ -94,6 +96,7 @@ export class CallingRepository {
     backendClient: any,
     conversationRepository: any,
     eventRepository: any,
+    mediaStreamHandler: any,
     mediaDevicesHandler: any,
     mediaConstraintsHandler: any,
     serverTimeHandler: any,
@@ -111,6 +114,7 @@ export class CallingRepository {
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;
     // Media Handler
+    this.mediaStreamHandler = mediaStreamHandler;
     this.mediaConstraintsHandler = mediaConstraintsHandler;
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.incomingCallCallback = () => {};
@@ -139,6 +143,10 @@ export class CallingRepository {
     });
   }
 
+  setReady(): void {
+    this.isReady = true;
+  }
+
   configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
     const avsLogger = getLogger('avs');
     wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
@@ -161,7 +169,7 @@ export class CallingRepository {
         let participant = this.findParticipant(conversationId, userId);
         if (!participant) {
           participant = new Participant(userId, deviceId);
-          this.findCall(conversationId).participants.push(participant);
+          this.findCall(conversationId).participants.unshift(participant);
         }
 
         if (streams.length === 0) {
@@ -214,6 +222,7 @@ export class CallingRepository {
       hasVideo: number,
       shouldRing: number
     ) => {
+      const canRing = shouldRing && this.isReady;
       const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
       const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       const call = new Call(
@@ -223,11 +232,11 @@ export class CallingRepository {
         hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
       );
       call.state(CALL_STATE.INCOMING);
-      if (!shouldRing) {
+      if (!canRing) {
         // an incoming call that should not ring is an ongoing group call
         call.reason(REASON.STILL_ONGOING);
       }
-      if (shouldRing && isVideoCall) {
+      if (canRing && isVideoCall) {
         this.loadVideoPreview(call);
       }
 
@@ -261,7 +270,7 @@ export class CallingRepository {
           .map(({userid, clientid}) => new Participant(userid, clientid));
         const removedMembers = call.participants().filter(({userId}) => !members.find(({userid}) => userid === userId));
 
-        newMembers.forEach(participant => call.participants.push(participant));
+        newMembers.forEach(participant => call.participants.unshift(participant));
         removedMembers.forEach(participant => call.participants.remove(participant));
       }
     });
@@ -315,16 +324,15 @@ export class CallingRepository {
     }
   }
 
-  private loadVideoPreview(call: Call): void {
+  private loadVideoPreview(call: Call): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
-    navigator.mediaDevices
-      .getUserMedia(constraints)
+    return this.getMediaStream(false, true, false, isGroup)
       .then(mediaStream => {
         call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
+        return true;
       })
-      .catch(this.showNoCameraModal);
+      .catch(() => false);
   }
 
   /**
@@ -382,6 +390,7 @@ export class CallingRepository {
         }
       }
     }
+
     const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
@@ -461,11 +470,20 @@ export class CallingRepository {
         const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
         const call = new Call(conversationId, conversationType, selfParticipant, callType);
         this.storeCall(call);
-        if (conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO) {
-          this.loadVideoPreview(call);
-        }
-        this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
-        return call;
+        const loadPreviewPromise =
+          conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO
+            ? this.loadVideoPreview(call)
+            : Promise.resolve(true);
+
+        return loadPreviewPromise.then(success => {
+          if (success) {
+            this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
+          } else {
+            this.showNoCameraModal();
+            this.removeCall(call);
+          }
+          return call;
+        });
       })
       .catch(() => {});
   }
@@ -546,21 +564,32 @@ export class CallingRepository {
     return types[mediaType] || CALL_TYPE.NORMAL;
   }
 
+  private getMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+    let type;
+    if (audio) {
+      type = video ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
+    } else if (video) {
+      type = MediaType.VIDEO;
+    } else if (screen) {
+      type = MediaType.SCREEN;
+    }
+
+    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
+
+    return this.mediaStreamHandler
+      .requestMediaStream(type, constraints)
+      .then((mediaStreamInfo: any) => mediaStreamInfo.stream);
+  }
+
   private readonly updateMediaStream = (
     conversationId: ConversationId,
     audio: boolean,
     video: boolean,
     screen: boolean
   ): Promise<MediaStream> => {
-    const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(audio, video, false);
-
-    const mediaStreamPromise = screen
-      ? (navigator.mediaDevices as any).getDisplayMedia()
-      : navigator.mediaDevices.getUserMedia(constraints);
-
-    return mediaStreamPromise
+    const call = this.findCall(conversationId);
+    return this.getMediaStream(audio, video, screen, false)
       .then((mediaStream: MediaStream) => {
-        const call = this.findCall(conversationId);
         const hasVideoStream = video || screen;
         if (call && hasVideoStream) {
           const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
@@ -572,7 +601,16 @@ export class CallingRepository {
         }
         return mediaStream;
       })
-      .catch(this.showNoCameraModal);
+      .catch(() => {
+        const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
+        if (call && !validStateWithoutCamera.includes(call.state())) {
+          this.leaveCall(call.conversationId);
+        }
+        if (call && call.state() !== CALL_STATE.ANSWERED) {
+          this.showNoCameraModal();
+        }
+        return new MediaStream();
+      });
   };
 
   /**

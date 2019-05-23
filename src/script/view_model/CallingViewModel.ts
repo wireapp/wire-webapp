@@ -66,8 +66,10 @@ export class CallingViewModel {
       audioRepository.loop(soundId).then(() => {
         const stateSubscription = ko.computed(() => {
           if (call.state() !== initialCallState || call.reason() !== undefined) {
-            audioRepository.stop(soundId);
-            stateSubscription.dispose();
+            window.setTimeout(() => {
+              audioRepository.stop(soundId);
+              stateSubscription.dispose();
+            });
           }
         });
       });
@@ -87,7 +89,7 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        this.callingRepository.answerCall(call.conversationId, CALL_TYPE.NORMAL);
+        this.callingRepository.answerCall(call.conversationId, call.initialType);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
