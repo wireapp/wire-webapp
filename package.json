@@ -145,7 +145,7 @@
     "stylelint-config-idiomatic-order": "7.0.0",
     "stylelint-config-prettier": "5.1.0",
     "svg-inline-loader": "0.8.0",
-    "terser-webpack-plugin": "1.2.3",
+    "terser-webpack-plugin": "1.2.4",
     "tslint": "5.16.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
