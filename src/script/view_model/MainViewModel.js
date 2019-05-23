@@ -83,6 +83,7 @@ export class MainViewModel {
       repositories.conversation,
       repositories.audio,
       repositories.media.devicesHandler,
+      repositories.permission,
       this.multitasking
     );
     this.content = new ContentViewModel(this, repositories);

@@ -23,12 +23,14 @@ import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
+import {PermissionState} from '../notification/PermissionState';
 
 export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
   public readonly conversationRepository: any;
   public readonly mediaDevicesHandler: any;
+  public readonly permissionRepository: any;
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
   public readonly callActions: any;
@@ -38,11 +40,13 @@ export class CallingViewModel {
     conversationRepository: any,
     audioRepository: any,
     mediaDevicesHandler: any,
+    permissionRepository: any,
     multitasking: any
   ) {
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.mediaDevicesHandler = mediaDevicesHandler;
+    this.permissionRepository = permissionRepository;
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
     );
@@ -192,5 +196,9 @@ export class CallingViewModel {
 
   getConversationById(conversationId: string): ko.Observable<any> {
     return this.conversationRepository.find_conversation_by_id(conversationId);
+  }
+
+  hasAccessToCamera(): boolean {
+    return this.permissionRepository.permissionState.camera() === PermissionState.GRANTED;
   }
 }

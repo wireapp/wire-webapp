@@ -17,16 +17,12 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
 import {Environment} from 'Util/Environment';
 
-import {Config} from '../auth/config';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaElementHandler} from './MediaElementHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {WebAppEvents} from '../event/WebApp';
 
 export class MediaRepository {
   // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
@@ -95,20 +91,5 @@ export class MediaRepository {
 
     this.logger.error('The flow audio cannot use the Web Audio API as it is unavailable.');
     return undefined;
-  }
-
-  showNoCameraModal() {
-    const modalOptions = {
-      text: {
-        htmlMessage: t('modalNoCameraMessage', Config.BRAND_NAME, {
-          '/faqLink': '</a>',
-          br: '<br>',
-          faqLink:
-            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
-        }),
-        title: t('modalNoCameraTitle'),
-      },
-    };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 }

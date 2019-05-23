@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 // @ts-ignore
 import adapter from 'webrtc-adapter';
+import {Config} from '../auth/config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {Environment} from 'Util/Environment';
@@ -89,15 +90,6 @@ export class CallingRepository {
     };
   }
 
-  /**
-   * Construct a new Calling repository.
-   *
-   * @param {BackendClient} backendClient - Client for the backend API
-   * @param {ConversationRepository} conversationRepository -  Repository for conversation interactions
-   * @param {EventRepository} eventRepository -  Repository that handles events
-   * @param {MediaRepository} mediaRepository -  Repository for media interactions
-   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   */
   constructor(
     backendClient: any,
     conversationRepository: any,
@@ -327,9 +319,12 @@ export class CallingRepository {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     const constraints = this.mediaConstraintsHandler.getMediaStreamConstraints(false, true, isGroup);
-    navigator.mediaDevices.getUserMedia(constraints).then(mediaStream => {
-      call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
-    });
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(mediaStream => {
+        call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
+      })
+      .catch(this.showNoCameraModal);
   }
 
   /**
@@ -563,19 +558,21 @@ export class CallingRepository {
       ? (navigator.mediaDevices as any).getDisplayMedia()
       : navigator.mediaDevices.getUserMedia(constraints);
 
-    return mediaStreamPromise.then((mediaStream: MediaStream) => {
-      const call = this.findCall(conversationId);
-      const hasVideoStream = video || screen;
-      if (call && hasVideoStream) {
-        const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
-        this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
-        if (call.selfParticipant.videoState() !== videoState) {
-          this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
+    return mediaStreamPromise
+      .then((mediaStream: MediaStream) => {
+        const call = this.findCall(conversationId);
+        const hasVideoStream = video || screen;
+        if (call && hasVideoStream) {
+          const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
+          this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
+          if (call.selfParticipant.videoState() !== videoState) {
+            this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
+          }
+          call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
         }
-        call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
-      }
-      return mediaStream;
-    });
+        return mediaStream;
+      })
+      .catch(this.showNoCameraModal);
   };
 
   /**
@@ -991,5 +988,20 @@ ${turnServersConfig}`;
       });
       this.callLogger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
     });
+  }
+
+  private showNoCameraModal(): void {
+    const modalOptions = {
+      text: {
+        htmlMessage: t('modalNoCameraMessage', Config.BRAND_NAME, {
+          '/faqLink': '</a>',
+          br: '<br>',
+          faqLink:
+            '<a href="https://support.wire.com/hc/articles/202935412" data-uie-name="go-no-camera-faq" target="_blank" rel="noopener noreferrer">',
+        }),
+        title: t('modalNoCameraTitle'),
+      },
+    };
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
 }
