@@ -16,7 +16,7 @@ env:
     # DOCKER_PASSWORD
     - secure: 'e7ubyFQ5K6rQAJCYX7iuUZMJW7V9XKkUFqEuGcsA0/UowIPvytpQRTnrqp22F6a5lIp1/EvcZ1luglgxkgYX/G4FeVV7F2WjIwh0sMHO6ix/P14N7Arp2vtRllg7jqMT/0QRuXLApRBG0jvs8FhiGtXFeeKP4UgiRdLXUId1vEW8MPDvPzh4yzl1ZgkaeVswid0S0pRDEeue08mkwC5WS9TL/Ns5jvGAr4fgeibpoGRIeE7gCxGVy6yjXq+qXRoL9MCvkloKUfyrwhOtq0vFlPigHsssxx3KUTjOanDjqhQasVGqMFMA0c9jBGLotDkF1245lv9ie9DD6MmnmcYHLVXXdcBH+jzOppAJ9iqA6ftPiRU6FPh7zDNVfjc8laI6sj3A/KbAsa0lin/H2dROfjB1AcGISh4RdzLFWILUV6fob842AU+6KcVE3qhSoL/Q6z3B/9lX4v20NgBnM68u4wjiwziOVfeaBxnEN+btseG193IpzSEU5hUDZzc9s0c+HwytuDDYq8Pa3MeJ69ZKcrYVteUyW0W+pCivlGwJSNPdT3iruGrWfBA1YAvazQM1mDg2CsIJBntO9m0SeW2hOil0j7g9nrOINKvh3C4FQ6VqT14eILhHPUGoFwarxz9rLRQwjtbzR6VZpCBorBKWgsNgZ5HA7jjdTDhQySS/0og='
   matrix:
-    - DISTRIBUTION="$DISTRIBUTION_1"
+    #- DISTRIBUTION="$DISTRIBUTION_1"
     - DISTRIBUTION="wire"
 
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
