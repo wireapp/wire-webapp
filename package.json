@@ -32,7 +32,7 @@
     "rimraf": "2.6.3",
     "terser-webpack-plugin": "1.2.4",
     "typescript": "3.4.5",
-    "webpack": "4.32.0",
+    "webpack": "4.32.2",
     "webpack-cli": "3.3.2"
   },
   "description": "Wire for Web's communication core.",
