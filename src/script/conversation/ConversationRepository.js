@@ -2683,20 +2683,21 @@ export class ConversationRepository {
             }
 
             amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-              action: () => {
-                sendAnyway = true;
-                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-
-                resolve(true);
-              },
               close: () => {
                 if (!sendAnyway) {
                   const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
                   reject(new z.error.ConversationError(errorType));
                 }
               },
+              primaryAction: {
+                action: () => {
+                  sendAnyway = true;
+                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: actionString,
+              },
               text: {
-                action: actionString,
                 message: messageString,
                 title: titleString,
               },

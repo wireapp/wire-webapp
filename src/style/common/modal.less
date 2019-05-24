@@ -327,6 +327,10 @@
     justify-content: flex-end;
     margin-top: 16px;
     --button-color: var(--accent-color);
+
+    &--column {
+      flex-direction: column;
+    }
   }
 
   &__button {
@@ -349,18 +353,22 @@
       margin-left: 16px;
     }
 
-    &--cancel {
+    &--secondary {
       background: #fff;
       color: var(--button-color);
     }
 
-    &--confirm {
+    &--primary {
       background: var(--button-color);
       color: #fff;
     }
 
     &--alert {
       --button-color: @w-red;
+    }
+
+    &--full {
+      width: 100%;
     }
   }
 

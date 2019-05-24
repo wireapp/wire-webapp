@@ -94,16 +94,18 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   revokeAccessCode() {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-      action: () => {
-        if (!this.requestOngoing()) {
-          this.requestOngoing(true);
-
-          this.stateHandler.revokeAccessCode(this.activeConversation()).then(() => this.requestOngoing(false));
-        }
-      },
       preventClose: true,
+      primaryAction: {
+        action: () => {
+          if (!this.requestOngoing()) {
+            this.requestOngoing(true);
+
+            this.stateHandler.revokeAccessCode(this.activeConversation()).then(() => this.requestOngoing(false));
+          }
+        },
+        text: t('modalConversationRevokeLinkAction'),
+      },
       text: {
-        action: t('modalConversationRevokeLinkAction'),
         message: t('modalConversationRevokeLinkMessage'),
         title: t('modalConversationRevokeLinkHeadline'),
       },
@@ -132,10 +134,12 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       }
 
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-        action: () => _changeAccessState(),
         preventClose: true,
+        primaryAction: {
+          action: () => _changeAccessState(),
+          text: t('modalConversationRemoveGuestsAction'),
+        },
         text: {
-          action: t('modalConversationRemoveGuestsAction'),
           message: t('modalConversationRemoveGuestsMessage'),
           title: t('modalConversationRemoveGuestsHeadline'),
         },

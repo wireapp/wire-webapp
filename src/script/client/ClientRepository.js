@@ -481,12 +481,14 @@ export class ClientRepository {
       }
 
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
-        action: clearData => {
-          return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
-        },
         preventClose: true,
+        primaryAction: {
+          action: clearData => {
+            return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+          },
+          text: t('modalAccountLogoutAction'),
+        },
         text: {
-          action: t('modalAccountLogoutAction'),
           option: t('modalAccountLogoutOption'),
           title: t('modalAccountLogoutHeadline'),
         },
