@@ -29,10 +29,10 @@
     <!-- /ko -->
     <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
       <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
-        <div data-bind="text: secondary.text, click: () => doAction(secondary.action)" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
+        <div data-bind="text: secondary.text, click: () => doAction(secondary.action), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
       <!-- /ko -->
       <!-- ko if: content().primaryAction.text -->
-        <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm)" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+        <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
       <!-- /ko -->
     </div>
   </modal>
