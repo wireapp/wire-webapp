@@ -161,6 +161,15 @@ ko.components.register('group-video-grid', {
           >
             <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
             </video>
+            <!-- ko if: participant.hasPausedVideo() -->
+              <div class="group-video-grid__pause-overlay" data-bind="switchBackground: null">
+                <div class="background">
+                  <div class="background-image"></div>
+                  <div class="background-darken"></div>
+                </div>
+                <div class="group-video-grid__pause-overlay__label" data-bind="text: t('videoCallPaused'), css: {'group-video-grid__pause-overlay__label--minimized': $parent.minimized}" data-uie-name="status-video-paused"></div>
+              </div>
+            <!-- /ko -->
           </div>
         <!-- /ko -->
       </div>

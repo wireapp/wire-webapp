@@ -978,8 +978,9 @@ ${turnServersConfig}`;
    * @returns {Promise} Resolves when the new call was joined
    */
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
-    const activeCall = this.joinedCall();
-    if (!activeCall || activeCall.conversationId === conversationId) {
+    const activeCall = this.activeCalls().find(call => call.conversationId !== conversationId);
+    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
+    if (!activeCall || idleCallStates.includes(activeCall.state())) {
       return Promise.resolve();
     }
 

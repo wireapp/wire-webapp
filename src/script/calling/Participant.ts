@@ -44,7 +44,10 @@ export class Participant {
       return this.videoState() === VIDEO_STATE.SCREENSHARE;
     });
     this.sharesCamera = ko.pureComputed(() => {
-      return this.videoState() === VIDEO_STATE.STARTED;
+      return [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(this.videoState());
+    });
+    this.hasPausedVideo = ko.pureComputed(() => {
+      return this.videoState() === VIDEO_STATE.PAUSED;
     });
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
