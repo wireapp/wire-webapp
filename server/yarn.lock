@@ -1539,10 +1539,6 @@ git-sha1@^0.1.2:
   resolved "https://registry.yarnpkg.com/git-sha1/-/git-sha1-0.1.2.tgz#599ac192b71875825e13a445f3a6e05118c2f745"
   integrity sha1-WZrBkrcYdYJeE6RF86bgURjC90U=
 
-"gkt@https://tgz.pm2.io/gkt-1.0.0.tgz":
-  version "1.0.0"
-  resolved "https://tgz.pm2.io/gkt-1.0.0.tgz#405502b007f319c3f47175c4474527300f2ab5ad"
-
 glob-parent@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"
@@ -2910,10 +2906,10 @@ pm2-multimeter@^0.1.2:
   dependencies:
     charm "~0.1.1"
 
-pm2@3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.5.0.tgz#56930de4c89fe66713f25cf94e374df793cfe831"
-  integrity sha512-/GlQ1cyy97Rw/4pLWXABRzyUkKSj6kmgPx6rygocfvXyLX44bv26RKy89wTOvaL51pb0JOS8v2FM6cRJf1pLrA==
+pm2@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-3.5.1.tgz#62be62c2c3ba5f394575479712cc3e2dea6d01c7"
+  integrity sha512-pDPBetbI48JDynxmtSPNSKRDk/LRbhsHrJ/WSCKVD1TUNnb6XNMe6GzO7DCNijJBvdaQ+u1WxNudxqExlXdhEw==
   dependencies:
     "@pm2/agent" "^0.5.22"
     "@pm2/io" "^4.1.2"
@@ -2945,8 +2941,6 @@ pm2@3.5.0:
     v8-compile-cache "^2.0.0"
     vizion "~2.0.2"
     yamljs "^0.3.0"
-  optionalDependencies:
-    gkt "https://tgz.pm2.io/gkt-1.0.0.tgz"
 
 posix-character-classes@^0.1.0:
   version "0.1.1"
