@@ -186,11 +186,11 @@ export class ModalsViewModel {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         const supportLink = buildSupportUrl(z.config.SUPPORT.FORM.BUG);
-        content.messageHtml = `${t(
-          'modalSessionResetMessage1'
-        )}<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">${t(
-          'modalSessionResetMessageLink'
-        )}</a>${t('modalSessionResetMessage2')}`;
+        content.messageHtml = t(
+          'modalSessionResetMessage',
+          {},
+          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`}
+        );
         break;
       }
       case ModalsViewModel.TYPE.MULTI_ACTIONS: {
