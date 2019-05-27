@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.5.1...@wireapp/api-client@4.6.0) (2019-05-27)
+
+
+### Features
+
+* **api-client:** Legal hold endpoints ([#1817](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1817)) ([ddf86f8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ddf86f8))
+
+
+
+
+
 ## [4.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.5.0...@wireapp/api-client@4.5.1) (2019-05-22)
 
 **Note:** Version bump only for package @wireapp/api-client
