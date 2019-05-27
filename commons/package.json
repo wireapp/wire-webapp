@@ -11,7 +11,7 @@
     "url-search-params-polyfill": "6.0.0"
   },
   "devDependencies": {
-    "@types/karma": "3.0.2",
+    "@types/karma": "3.0.3",
     "jasmine": "3.4.0",
     "karma": "4.1.0",
     "karma-chrome-launcher": "2.2.0",
