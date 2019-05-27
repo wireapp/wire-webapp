@@ -500,6 +500,12 @@ export class CallingRepository {
   answerCall(conversationId: ConversationId, callType: number): void {
     this.checkConcurrentJoinedCall(conversationId, CALL_STATE.INCOMING)
       .then(() => {
+        if (callType === CALL_TYPE.NORMAL) {
+          const call = this.findCall(conversationId);
+          if (call) {
+            call.selfParticipant.setVideoStream(undefined, VIDEO_STATE.STOPPED);
+          }
+        }
         this.wCall.answer(this.wUser, conversationId, callType, 0);
       })
       .catch(() => {

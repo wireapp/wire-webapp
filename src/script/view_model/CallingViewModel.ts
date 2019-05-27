@@ -89,7 +89,8 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: (call: Call) => {
-        this.callingRepository.answerCall(call.conversationId, call.initialType);
+        const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+        this.callingRepository.answerCall(call.conversationId, callType);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);

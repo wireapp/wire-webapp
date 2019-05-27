@@ -58,7 +58,7 @@ export class Participant {
     this.audioStream(audioStream);
   }
 
-  setVideoStream(videoStream: MediaStream, state: VIDEO_STATE): void {
+  setVideoStream(videoStream: MediaStream | undefined, state: VIDEO_STATE): void {
     this.releaseVideoStream();
     this.videoStream(videoStream);
     this.videoState(state);
