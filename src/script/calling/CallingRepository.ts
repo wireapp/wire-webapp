@@ -285,7 +285,8 @@ export class CallingRepository {
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     return this.getMediaStream(false, true, false, isGroup)
       .then(mediaStream => {
-        call.selfParticipant.setVideoStream(mediaStream, VIDEO_STATE.STARTED);
+        call.selfParticipant.videoStream(mediaStream);
+        call.selfParticipant.videoState(VIDEO_STATE.STARTED);
         return true;
       })
       .catch(() => false);
@@ -469,8 +470,6 @@ export class CallingRepository {
     }
     const selfParticipant = call.selfParticipant;
     if (selfParticipant.sharesCamera()) {
-      selfParticipant.releaseVideoStream();
-      selfParticipant.videoState(VIDEO_STATE.STOPPED);
       this.wCall.setVideoSendState(this.wUser, conversationId, VIDEO_STATE.STOPPED);
       return;
     }
@@ -489,8 +488,6 @@ export class CallingRepository {
     }
     const selfParticipant = call.selfParticipant;
     if (selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream();
-      selfParticipant.videoState(VIDEO_STATE.STOPPED);
       this.wCall.setVideoSendState(this.wUser, conversationId, VIDEO_STATE.STOPPED);
       return;
     }
@@ -503,9 +500,11 @@ export class CallingRepository {
         if (callType === CALL_TYPE.NORMAL) {
           const call = this.findCall(conversationId);
           if (call) {
-            call.selfParticipant.setVideoStream(undefined, VIDEO_STATE.STOPPED);
+            call.selfParticipant.videoState(VIDEO_STATE.STOPPED);
+            call.selfParticipant.releaseVideoStream();
           }
         }
+
         this.wCall.answer(this.wUser, conversationId, callType, 0);
       })
       .catch(() => {
@@ -577,7 +576,7 @@ export class CallingRepository {
           if (call.selfParticipant.videoState() !== videoState) {
             this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
           }
-          call.selfParticipant.setVideoStream(new MediaStream(mediaStream.getVideoTracks()), videoState);
+          call.selfParticipant.replaceVideoStream(new MediaStream(mediaStream.getVideoTracks()));
         }
         return mediaStream;
       })
@@ -757,8 +756,12 @@ export class CallingRepository {
   ) => {
     const call = this.findCall(conversationId);
     if (call) {
+      if (userId === call.selfParticipant.userId) {
+        call.selfParticipant.releaseVideoStream();
+      }
       call
         .participants()
+        .concat(call.selfParticipant)
         .filter(participant => participant.userId === userId)
         .forEach(participant => participant.videoState(state));
     }

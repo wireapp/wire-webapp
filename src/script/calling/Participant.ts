@@ -58,10 +58,9 @@ export class Participant {
     this.audioStream(audioStream);
   }
 
-  setVideoStream(videoStream: MediaStream | undefined, state: VIDEO_STATE): void {
+  replaceVideoStream(videoStream: MediaStream | undefined): void {
     this.releaseVideoStream();
     this.videoStream(videoStream);
-    this.videoState(state);
   }
 
   releaseVideoStream(): void {
@@ -69,6 +68,7 @@ export class Participant {
       this.videoStream()
         .getTracks()
         .forEach(track => track.stop());
+      this.videoStream(undefined);
     }
   }
 }
