@@ -38,6 +38,7 @@ import {CallLogger} from '../telemetry/calling/CallLogger';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
+import {ConversationRepository} from '../conversation/ConversationRepository';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
@@ -334,6 +335,8 @@ export class CallingRepository {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
+
+    let validatedPromise = Promise.resolve();
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
         if (userId === this.selfUserId && clientId !== this.selfClientId) {
@@ -343,25 +346,40 @@ export class CallingRepository {
             call.reason(REASON.STILL_ONGOING);
           }
         }
+        break;
+      }
+
+      case CALL_MESSAGE_TYPE.SETUP:
+      case CALL_MESSAGE_TYPE.GROUP_START: {
+        if (source !== EventRepository.SOURCE.STREAM) {
+          const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients: [userId]});
+          eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
+          const consentType = ConversationRepository.CONSENT_TYPE.INCOMING_CALL;
+          validatedPromise = this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+        }
+
+        break;
       }
     }
 
-    const res = this.wCall.recvMsg(
-      this.wUser,
-      contentStr,
-      contentStr.length,
-      toSecond(currentTimestamp),
-      toSecond(new Date(time).getTime()),
-      conversationId,
-      userId,
-      clientId
-    );
+    validatedPromise.then(() => {
+      const res = this.wCall.recvMsg(
+        this.wUser,
+        contentStr,
+        contentStr.length,
+        toSecond(currentTimestamp),
+        toSecond(new Date(time).getTime()),
+        conversationId,
+        userId,
+        clientId
+      );
 
-    if (res !== 0) {
-      this.callLogger.warn(`recv_msg failed with code: ${res}`);
-      return;
-    }
-    this.handleCallEventSaving(content.type, conversationId, userId, time, source);
+      if (res !== 0) {
+        this.callLogger.warn(`recv_msg failed with code: ${res}`);
+        return;
+      }
+      this.handleCallEventSaving(content.type, conversationId, userId, time, source);
+    });
   }
 
   handleCallEventSaving(
