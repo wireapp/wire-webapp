@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,6 @@
  *
  */
 
-export * from './identityprovider/';
-export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation/';
-export {LegalHoldAPI} from './legalhold/';
-export {MemberAPI, MemberData, Members, PermissionsData} from './member/';
-export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team/';
-export {PaymentAPI, PaymentData} from './payment/';
-export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
-export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './TeamError';
-export * from './MemberRole';
+export * from './LegalHoldAPI';
+export * from './LegalHoldData';
+export * from './NewLegalHoldData';
