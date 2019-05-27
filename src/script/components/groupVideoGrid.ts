@@ -35,6 +35,7 @@ class GroupVideoGrid {
   private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
   public readonly muted: ko.Observable<boolean>;
+  public readonly selfUserId: string;
 
   static get CONFIG(): any {
     return {
@@ -48,9 +49,11 @@ class GroupVideoGrid {
       minimized,
       grid,
       muted,
-    }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined},
+      selfUserId,
+    }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined; selfUserId: string},
     rootElement: HTMLElement
   ) {
+    this.selfUserId = selfUserId;
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
     this.muted = muted || ko.observable(false);
@@ -161,13 +164,18 @@ ko.components.register('group-video-grid', {
           >
             <video class="group-video-grid__element-video" autoplay playsinline data-bind="sourceStream: participant.videoStream(), css: {'group-video-grid__element-video--contain': participant.sharesScreen()}">
             </video>
+            <!-- ko if: !minimized && muted() && participant.userId === selfUserId -->
+              <div class="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
+                <micoff-icon></micoff-icon>
+              </div>
+            <!-- /ko -->
             <!-- ko if: participant.hasPausedVideo() -->
               <div class="group-video-grid__pause-overlay" data-bind="switchBackground: null">
                 <div class="background">
                   <div class="background-image"></div>
                   <div class="background-darken"></div>
                 </div>
-                <div class="group-video-grid__pause-overlay__label" data-bind="text: t('videoCallPaused'), css: {'group-video-grid__pause-overlay__label--minimized': $parent.minimized}" data-uie-name="status-video-paused"></div>
+                <div class="group-video-grid__pause-overlay__label" data-bind="text: t('videoCallPaused'), css: {'group-video-grid__pause-overlay__label--minimized': minimized}" data-uie-name="status-video-paused"></div>
               </div>
             <!-- /ko -->
           </div>

@@ -162,7 +162,20 @@ export class CallingRepository {
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
 
-    wCall.setUserMediaHandler(this.updateMediaStream);
+    wCall.setUserMediaHandler((conversationId: ConversationId, audio: boolean, video: boolean, screen: boolean) => {
+      const call = this.findCall(conversationId);
+      if (!call) {
+        return Promise.reject();
+      }
+      const selfParticipant = call.selfParticipant;
+      if (video && !audio && !screen && selfParticipant.sharesCamera()) {
+        return Promise.resolve(call.selfParticipant.videoStream());
+      }
+      if (screen && !video && !audio && selfParticipant.sharesScreen()) {
+        return Promise.resolve(selfParticipant.videoStream());
+      }
+      return this.updateMediaStream(conversationId, audio, video, screen);
+    });
 
     wCall.setMediaStreamHandler(
       (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, streams: MediaStream[]) => {
@@ -186,78 +199,20 @@ export class CallingRepository {
       }
     );
 
-    const requestConfig = () => {
-      this.getConfig().then((config: any) => wCall.configUpdate(this.wUser, 0, JSON.stringify(config)));
-      return 0;
-    };
-
-    const callClosed = (reason: REASON, conversationId: ConversationId) => {
-      const call = this.findCall(conversationId);
-      if (!call) {
-        return;
-      }
-      const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
-      if (!stillActiveState.includes(reason)) {
-        this.removeCall(call);
-        return;
-      }
-      call.selfParticipant.releaseVideoStream();
-      call.reason(reason);
-    };
-
-    const videoStateChanged = (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, state: number) => {
-      const call = this.findCall(conversationId);
-      if (call) {
-        call
-          .participants()
-          .filter(participant => participant.userId === userId)
-          .forEach(participant => participant.videoState(state));
-      }
-    };
-
-    const incomingCall = (
-      conversationId: ConversationId,
-      timestamp: number,
-      userId: UserId,
-      hasVideo: number,
-      shouldRing: number
-    ) => {
-      const canRing = shouldRing && this.isReady;
-      const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-      const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      const call = new Call(
-        conversationId,
-        CONV_TYPE.ONEONONE,
-        selfParticipant,
-        hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
-      );
-      call.state(CALL_STATE.INCOMING);
-      if (!canRing) {
-        // an incoming call that should not ring is an ongoing group call
-        call.reason(REASON.STILL_ONGOING);
-      }
-      if (canRing && isVideoCall) {
-        this.loadVideoPreview(call);
-      }
-
-      this.storeCall(call);
-      this.incomingCallCallback(call);
-    };
-
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
       () => {}, //readyh,
       this.sendMessage, //sendh,
-      incomingCall, //incomingh,
+      this.incomingCall, //incomingh,
       () => {}, //missedh,
       () => {}, //answerh,
       () => {}, //estabh,
-      callClosed, //closeh,
+      this.callClosed, //closeh,
       () => {}, //metricsh,
-      requestConfig, //cfg_reqh,
+      this.requestConfig, //cfg_reqh,
       () => {}, //acbrh,
-      videoStateChanged, //vstateh,
+      this.videoStateChanged, //vstateh,
       0
     );
 
@@ -418,11 +373,12 @@ export class CallingRepository {
   ): void {
     // save event if needed
     switch (type) {
-      case 'SETUP':
+      case CALL_MESSAGE_TYPE.SETUP:
+      case CALL_MESSAGE_TYPE.GROUP_START:
         this.injectActivateEvent(conversationId, userId, time, source);
         break;
 
-      case 'CANCEL':
+      case CALL_MESSAGE_TYPE.CANCEL:
         const reason = TERMINATION_REASON.MISSED; // TODO check other reasons
         this.injectDeactivateEvent(conversationId, userId, reason, time, source);
         break;
@@ -719,6 +675,69 @@ export class CallingRepository {
       this.leaveCall(conversationId);
     });
     return 0;
+  };
+
+  private readonly requestConfig = () => {
+    this.getConfig().then((config: any) => this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config)));
+    return 0;
+  };
+
+  private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+    const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
+    if (!stillActiveState.includes(reason)) {
+      this.removeCall(call);
+      return;
+    }
+    call.selfParticipant.releaseVideoStream();
+    call.reason(reason);
+  };
+
+  private readonly incomingCall = (
+    conversationId: ConversationId,
+    timestamp: number,
+    userId: UserId,
+    hasVideo: number,
+    shouldRing: number
+  ) => {
+    const canRing = shouldRing && this.isReady;
+    const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
+    const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    const call = new Call(
+      conversationId,
+      CONV_TYPE.ONEONONE,
+      selfParticipant,
+      hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
+    );
+    call.state(CALL_STATE.INCOMING);
+    if (!canRing) {
+      // an incoming call that should not ring is an ongoing group call
+      call.reason(REASON.STILL_ONGOING);
+    }
+    if (canRing && isVideoCall) {
+      this.loadVideoPreview(call);
+    }
+
+    this.storeCall(call);
+    this.incomingCallCallback(call);
+  };
+
+  private readonly videoStateChanged = (
+    conversationId: ConversationId,
+    userId: UserId,
+    deviceId: DeviceId,
+    state: number
+  ) => {
+    const call = this.findCall(conversationId);
+    if (call) {
+      call
+        .participants()
+        .filter(participant => participant.userId === userId)
+        .forEach(participant => participant.videoState(state));
+    }
   };
 
   private targetMessageRecipients(

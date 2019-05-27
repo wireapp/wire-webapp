@@ -32,6 +32,7 @@ export class Participant {
   public hasActiveVideo: ko.PureComputed<boolean>;
   public sharesScreen: ko.PureComputed<boolean>;
   public sharesCamera: ko.PureComputed<boolean>;
+  public hasPausedVideo: ko.PureComputed<boolean>;
 
   constructor(userId: UserId, deviceId: DeviceId) {
     this.userId = userId;

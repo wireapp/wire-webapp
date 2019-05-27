@@ -210,7 +210,7 @@ ko.components.register('fullscreen-video-call', {
   template: `
 <div id="video-calling" data-bind="hide_controls: {timeout: HIDE_CONTROLS_TIMEOUT, skipClass: 'video-controls__button'}" class="video-calling">
   <div id="video-element-remote" class="video-element-remote">
-    <group-video-grid params="grid: videoGrid, muted: isMuted"></group-video-grid>
+    <group-video-grid params="grid: videoGrid, muted: isMuted, selfUserId: call.selfParticipant.userId"></group-video-grid>
   </div>
 
   <!-- ko if: !isChoosingScreen() -->

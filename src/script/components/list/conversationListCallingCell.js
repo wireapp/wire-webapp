@@ -110,55 +110,6 @@ class ConversationListCallingCell {
       window.clearInterval(callDurationUpdateInterval);
       startedAtSubscription.dispose();
     };
-    /*
-    this.conversation = params.conversation;
-
-    const permissionRepository = params.permissionRepository;
-
-    this.calls = this.callingRepository.calls;
-    this.call = this.conversation.call;
-    this.joinedCall = this.callingRepository.joinedCall;
-    this.selfStreamState = this.callingRepository.selfStreamState;
-    this.selfUser = this.conversation.selfUser();
-    this.selfInTeam = this.selfUser.inTeam();
-
-
-
-    this.callParticipants = ko.pureComputed(() => {
-      const callParticipants = this.call().participants();
-      return callParticipants.slice().reverse();
-    });
-
-    this.isVideoCall = ko.pureComputed(() => this.call().isLocalVideoCall() || this.call().isRemoteVideoCall());
-
-    this.canJoin = ko.pureComputed(() => {
-      if (this.selfUser.isTemporaryGuest()) {
-        const isOngoingCall = !this.call().selfUserJoined() && this.isOngoing();
-        return this.call().isDeclined() || isOngoingCall;
-      }
-      return false;
-    });
-
-    this.disableVideoButton = ko.pureComputed(() => {
-      const isOutgoingVideoCall = this.isOutgoing() && this.selfStreamState.videoSend();
-      const isVideoUnsupported = !this.selfStreamState.videoSend() && !this.conversation.supportsVideoCall();
-      return isOutgoingVideoCall || isVideoUnsupported;
-    });
-    this.showVideoPreview = ko.pureComputed(() => {
-      const hasOtherOngoingCalls = this.calls().some(callEntity => {
-        return callEntity.id !== this.call().id && callEntity.isOngoing();
-      });
-
-      const isInMinimizedState = this.multitasking.isMinimized() || !this.isConnected();
-      const hasPreJoinVideo = !this.isConnected() && this.call().selfState.videoSend();
-      const isOngoingVideoCall = this.isConnected() && this.isVideoCall() && !this.isDeclined();
-
-      return !hasOtherOngoingCalls && isInMinimizedState && (hasPreJoinVideo || isOngoingVideoCall);
-    });
-
-
-    this.TimeUtil = TimeUtil;
-    */
   }
 
   endCall(call) {
@@ -230,7 +181,7 @@ ko.components.register('conversation-list-calling-cell', {
 
     <!-- ko if: showVideoGrid() -->
       <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-        <group-video-grid params="minimized: true, grid: videoGrid"></group-video-grid>
+        <group-video-grid params="minimized: true, grid: videoGrid, selfUserId: call.selfParticipant.userId"></group-video-grid>
         <!-- ko if: showMaximize() -->
           <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
             <fullscreen-icon></fullscreen-icon>
