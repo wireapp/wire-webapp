@@ -22,6 +22,7 @@ import {PermissionsData} from './PermissionsData';
 export interface MemberData {
   created_at?: Date;
   created_by?: string;
+  legal_hold?: boolean;
   permissions: PermissionsData;
   user: string;
 }
