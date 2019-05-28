@@ -39,7 +39,7 @@ class TeamAPI {
     return this.client.sendJSON(config).then(response => response.headers['location']);
   }
 
-  public putTeam(team: TeamData): Promise<void> {
+  public async putTeam(team: TeamData): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         icon: team.icon,
@@ -49,7 +49,7 @@ class TeamAPI {
       url: `${TeamAPI.URL.TEAMS}/${team.id}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    await this.client.sendJSON(config);
   }
 
   public getTeams(): Promise<TeamChunkData> {
@@ -70,7 +70,7 @@ class TeamAPI {
     return this.client.sendJSON<TeamData>(config).then(response => response.data);
   }
 
-  public deleteTeam(teamId: string, password: string): Promise<void> {
+  public async deleteTeam(teamId: string, password: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         password,
@@ -79,7 +79,7 @@ class TeamAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    await this.client.sendJSON(config);
   }
 }
 

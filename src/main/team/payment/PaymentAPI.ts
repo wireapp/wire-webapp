@@ -93,14 +93,14 @@ class PaymentAPI {
     return this.client.sendJSON<PaymentBillingData>(config).then(response => response.data);
   }
 
-  public putPaymentPlan(teamId: string, plan: PaymentPlan): Promise<void> {
+  public async putPaymentPlan(teamId: string, plan: PaymentPlan): Promise<void> {
     const config: AxiosRequestConfig = {
       data: plan,
       method: 'put',
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}/${PaymentAPI.URL.PLAN}/${plan.id}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    await this.client.sendJSON(config);
   }
 
   public getPlans(teamId: string): Promise<PaymentStripePlan[]> {

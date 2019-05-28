@@ -59,8 +59,7 @@ class IdentityProviderAPI {
       url: `${IdentityProviderAPI.URL.PROVIDER}/${identityProviderId}`,
     };
 
-    const response = await this.client.sendJSON<void>(config);
-    return response.data;
+    await this.client.sendJSON(config);
   }
 
   public async postIdentityProvider(data: string | NewIdentityProviderMetadataURL): Promise<IdentityProvider> {
