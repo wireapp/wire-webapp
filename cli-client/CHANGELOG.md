@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@5.0.40...@wireapp/cli-client@6.0.0) (2019-05-28)
+
+
+### Code Refactoring
+
+* **store-engine:** Remove FileEngine ([#1867](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/1867)) ([cde57c2](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/cde57c2))
+
+
+### BREAKING CHANGES
+
+* **store-engine:** All engines, except the `MemoryEngine`, got moved into seperate packages
+
+
+
+
+
 ## [5.0.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@5.0.39...@wireapp/cli-client@5.0.40) (2019-05-27)
 
 **Note:** Version bump only for package @wireapp/cli-client
