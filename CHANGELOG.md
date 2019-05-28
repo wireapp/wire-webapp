@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.6.0...@wireapp/api-client@5.0.0) (2019-05-28)
+
+
+### Bug Fixes
+
+* **api-client:** Add password parameter when deactivating legal hold for the team ([#1869](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1869)) ([3bbaf30](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3bbaf30))
+
+
+### Code Refactoring
+
+* **store-engine:** Remove FileEngine ([#1867](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1867)) ([cde57c2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/cde57c2))
+
+
+### BREAKING CHANGES
+
+* **store-engine:** All engines, except the `MemoryEngine`, got moved into seperate packages
+
+
+
+
+
 # [4.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@4.5.1...@wireapp/api-client@4.6.0) (2019-05-27)
 
 
