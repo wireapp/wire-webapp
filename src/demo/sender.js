@@ -28,7 +28,7 @@ logger.state.isEnabled = true;
 const {Account} = require('@wireapp/core');
 const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
-const {FileEngine} = require('@wireapp/store-engine');
+const {FileEngine} = require('@wireapp/store-engine-fs');
 
 (async () => {
   const CONVERSATION_ID = program.conversationId || process.env.WIRE_CONVERSATION_ID;
