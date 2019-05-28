@@ -74,13 +74,13 @@ class TeamInvitationAPI {
     return this.client.sendJSON<TeamInvitationChunk>(config).then(response => response.data);
   }
 
-  public deleteInvitation(teamId: string, invitationId: string): Promise<void> {
+  public async deleteInvitation(teamId: string, invitationId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}/${invitationId}`,
     };
 
-    return this.client.sendJSON<void>(config).then(response => response.data);
+    await this.client.sendJSON(config);
   }
 
   public postInvitation(teamId: string, invitation: NewTeamInvitation): Promise<TeamInvitation> {
