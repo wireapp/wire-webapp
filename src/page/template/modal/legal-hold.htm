@@ -14,16 +14,21 @@
       <!-- ko ifnot: devicesUser() -->
         <legal-hold-dot class="legal-hold-modal__logo" params="large: true" data-uie-name="status-modal-legal-hold-icon"></legal-hold-dot>
         <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')" data-uie-name="status-modal-title"></div>
-        <p
-          class="legal-hold-modal__info"
-          data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
-          data-uie-name="status-modal-text"
-        ></p>
-        <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
+        <!-- ko if: isLoading() -->
+          <loading-icon></loading-icon>
+        <!-- /ko -->
+        <!-- ko ifnot: isLoading() -->
+          <p
+            class="legal-hold-modal__info"
+            data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
+            data-uie-name="status-modal-text"
+          ></p>
+          <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 
-        <user-list
-          params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
-        ></user-list>
+          <user-list
+            params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
+          ></user-list>
+        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: devicesUser() -->
         <user-devices

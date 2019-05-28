@@ -19,14 +19,12 @@
 
 import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
-import {UserRepository} from '../user/UserRepository';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface LegalHoldParams {
   isPending: boolean;
   large: boolean;
   conversation?: Conversation;
-  userRepository?: UserRepository;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
@@ -39,27 +37,20 @@ ko.components.register('legal-hold-dot', {
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({
-    isPending = false,
-    large = false,
-    conversation,
-    userRepository,
-    legalHoldModal,
-  }: LegalHoldParams): void {
+  viewModel: function({isPending = false, large = false, conversation, legalHoldModal}: LegalHoldParams): void {
     this.large = large;
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
 
-    this.onClick = () => {
+    this.onClick = (data: any, event: MouseEvent) => {
+      event.stopPropagation();
       if (legalHoldModal) {
         if (conversation) {
-          legalHoldModal.showUsers(conversation.participating_user_ets());
-        } else if (userRepository) {
-          legalHoldModal.showUsers([userRepository.self()]);
+          legalHoldModal.showUsers(conversation);
+        } else {
+          legalHoldModal.showUsers();
         }
       }
-      // TODO: Implement opening the legal hold modal once built
-      // if a conversation is passed, open the conversation specific modal, otherwise the one for the selfuser
     };
   },
 });

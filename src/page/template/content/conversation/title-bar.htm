@@ -9,10 +9,13 @@
     </div>
 
     <div id="show-participants"
-          data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
-          data-placement="bottom"
-          data-uie-name="do-participants"
-          class="conversation-title-bar-name">
+         data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
+         data-placement="bottom"
+         data-uie-name="do-participants"
+         class="conversation-title-bar-name">
+      <!-- ko if: true || conversationEntity().isOnLegalHold() -->
+        <legal-hold-dot style="margin: 0 16px 0 0" params="legalHoldModal: contentViewModel.legalHoldModal, conversation: conversationEntity" data-uie-name="status-legal-hold-conversation"></legal-hold-dot>
+      <!-- /ko -->
       <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
         <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
       <!-- /ko -->

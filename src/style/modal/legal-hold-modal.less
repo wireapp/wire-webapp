@@ -44,9 +44,24 @@
   }
 
   &__subjects {
+    margin-top: 32px;
     color: var(--background-fade-56);
     font-size: 11px;
     text-transform: uppercase;
+  }
+
+  loading-icon {
+    display: block;
+    opacity: 0.5;
+    text-align: center;
+    svg {
+      width: 32px;
+      height: 32px;
+
+      path {
+        color: currentColor;
+      }
+    }
   }
 
   user-list {
