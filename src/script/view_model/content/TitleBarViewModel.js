@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CONV_TYPE, CALL_TYPE} from 'avs-web';
+import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {WebAppEvents} from '../../event/WebApp';

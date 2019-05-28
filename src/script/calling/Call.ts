@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 import {Participant} from './Participant';
 

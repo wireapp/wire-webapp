@@ -17,7 +17,7 @@
  *
  */
 
-import {VIDEO_STATE} from 'avs-web';
+import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
 export type UserId = string;

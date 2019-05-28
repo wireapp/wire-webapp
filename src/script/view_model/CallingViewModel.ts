@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from 'avs-web';
+import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
@@ -108,13 +108,13 @@ export class CallingViewModel {
         this.callingRepository.switchCameraInput(call.conversationId, deviceId);
       },
       toggleCamera: (call: Call) => {
-        this.callingRepository.toggleCamera(call.conversationId);
+        this.callingRepository.toggleCamera(call);
       },
       toggleMute: (call: Call, muteState: boolean) => {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
       toggleScreenshare: (call: Call) => {
-        this.callingRepository.toggleScreenshare(call.conversationId);
+        this.callingRepository.toggleScreenshare(call);
       },
     };
 

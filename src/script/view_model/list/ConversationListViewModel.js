@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 
-import {STATE as CALL_STATE, REASON as CALL_REASON} from 'avs-web';
+import {STATE as CALL_STATE, REASON as CALL_REASON} from '@wireapp/avs';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';

@@ -22,7 +22,7 @@ import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
 //import {PermissionState} from '../../notification/PermissionState';
-import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from 'avs-web';
+import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
 
 import 'Components/list/participantItem';
 import 'Components/calling/fullscreenVideoCall';
