@@ -24,7 +24,7 @@ import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/cl
 import {BackendErrorLabel} from '@wireapp/api-client/dist/commonjs/http/';
 import {Account} from '@wireapp/core';
 import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/';
-import {FileEngine} from '@wireapp/store-engine';
+import {FileEngine} from '@wireapp/store-engine-fs';
 import {AxiosError} from 'axios';
 import * as program from 'commander';
 import * as fs from 'fs-extra';

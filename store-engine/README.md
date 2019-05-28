@@ -8,43 +8,50 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ## Store Engine
 
-Provider for the following storage engines: File, FileSystem, IndexedDB, Memory & LocalStorage.
+This package provides an interface to operate with various storage technologies in a uniform manner. There is a `MemoryEngine` which serves as an example.
+
+Additional storage engines can be found in separate packages such as:
+
+- [FileEngine][1]
 
 ### Motivation
 
-#### One API to rule them all!
-
-![big deal](https://user-images.githubusercontent.com/469989/28491995-c5f0ea34-6efa-11e7-97d1-2f8b1d159981.jpg)
-
-Nowadays there are more and more storage possibilities and developers must be familiar with the characteristics of each individual solution to reliably store data. Because it can be sometimes hard to keep up with the highly dynamic world of data storages, we have developed a system which unifies the usage of [IndexedDB](https://developer.mozilla.org/docs/IndexedDB), [In-memory storage](https://en.wikipedia.org/wiki/In-memory_database), [File-based storage](https://nodejs.org/api/fs.html) and [LocalStorage](https://developer.mozilla.org/docs/Web/API/Window/localStorage). In addition we built some functionality (like a transient store which deletes data after a [TTL](https://en.wikipedia.org/wiki/Time_to_live)) on top.
+Nowadays there are more and more storage possibilities and developers must be familiar with the characteristics of each individual solution to reliably store data. Because it can be sometimes hard to keep up with the highly dynamic world of data storages, we have developed a system which unifies the use of different storages / databases.
 
 ### Quickstart
 
-#### Engines
+#### Popular engines
 
 | Engine | Available in Browser | Available in Node.js | Description |
 | :-- | :-: | :-: | :-- |
-| FileEngine | 🞫 | ✓ | Rudimentary persistent store based on files. Very generic and easy to read. |
+| [FileEngine][1] | 🞫 | ✓ | Rudimentary persistent store based on files. Very generic and easy to read. |
 | FileSystemEngine | ✓ | 🞫 | FileSystem is used to represent a file system which is managed by modern browsers. It is often used to build Chrome Web Store apps. |  |
 | IndexedDBEngine | ✓ | 🞫 | Persistent storage which handles significant amounts of structured data, including files/blobs. Enables very fast searches. |
 | MemoryEngine | ✓ | ✓ | Transient store which loses data on application restart. Suitable for testing environments. |
 | LocalStorageEngine | ✓ | 🞫 | Can save very small amount of data. Stored data is saved across browser sessions. Suitable for simple objects and strings. |
 
-#### Stores
-
-With an engine you can build a store which has special capabilities like a timeout.
-
-**Using a TransientStore**
+#### Engine instantiation
 
 ```javascript
-const {Store, LocalStorageEngine} = require('@wireapp/store-engine');
+const {MemoryEngine} = require('@wireapp/store-engine');
+const engine = new MemoryEngine('my-database');
+```
 
-const engine = new LocalStorageEngine('my-favorite-actors');
+#### Transient store
+
+As a bonus to the store engine, we built a transient store which deletes data after a specified [TTL](https://en.wikipedia.org/wiki/Time_to_live):
+
+```javascript
+const {Store, MemoryEngine} = require('@wireapp/store-engine');
+
+const engine = new MemoryEngine('my-favorite-actors');
 const store = new Store.TransientStore(engine);
+
+const ttl = 1000;
 
 store
   .init('the-simpsons')
-  .then(() => store.set('bart', {name: 'Bart Simpson'}, 1000))
+  .then(() => store.set('bart', {name: 'Bart Simpson'}, ttl))
   .then(transientBundle => {
     console.log(`The record of "${transientBundle.payload.name}" will expires in "${transientBundle.expires}"ms.`);
   });
@@ -52,9 +59,11 @@ store
 
 ### API
 
-No matter what engine you use, all [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) work the same. 🙂
+No matter which engine you use, they all support common [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 
-In the following examples this data is used:
+**Example**
+
+The following API calls we use this data:
 
 ```javascript
 const TABLE_NAME = 'the-simpsons';
@@ -129,3 +138,5 @@ engine.update(TABLE_NAME, PRIMARY_KEY, {brother: 'Bart Simpson'}).then((primaryK
   console.log(`The brother of "${updatedRecord.name}" is "${updatedRecord.brother}".`):
 })
 ```
+
+[1]: https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs

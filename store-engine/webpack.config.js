@@ -10,12 +10,8 @@ module.exports = {
   },
   externals: {
     dexie: 'Dexie',
-    'fs-extra': '{}',
   },
   mode: 'production',
-  node: {
-    path: 'empty',
-  },
   output: {
     filename: '[name].bundle.js',
     library: 'StoreEngine',

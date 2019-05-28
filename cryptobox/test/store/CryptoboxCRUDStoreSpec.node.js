@@ -24,7 +24,7 @@ const fs = require('fs-extra');
 const {LRUCache} = require('@wireapp/lru-cache');
 const path = require('path');
 const Proteus = require('@wireapp/proteus');
-const {FileEngine} = require('@wireapp/store-engine');
+const {FileEngine} = require('@wireapp/store-engine-fs');
 
 describe('cryptobox.store.CryptoboxCRUDStore', () => {
   const TEMP_DIRECTORY = path.normalize(`${__dirname}/.tmp`);

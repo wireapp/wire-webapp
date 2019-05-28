@@ -17,8 +17,8 @@
  *
  */
 
-import {CRUDEngine, FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine/';
+import {CRUDEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine} from './engine/';
 import * as error from './engine/error/';
 import * as Store from './store/';
 
-export {CRUDEngine, FileEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine, error, Store};
+export {CRUDEngine, FileSystemEngine, IndexedDBEngine, LocalStorageEngine, MemoryEngine, error, Store};
