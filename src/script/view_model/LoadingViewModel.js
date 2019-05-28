@@ -23,6 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../event/WebApp';
 
+import 'Components/loadingBar';
+
 export class LoadingViewModel {
   constructor() {
     this.loadingMessage = ko.observable('');

@@ -15,7 +15,7 @@
         <legal-hold-dot class="legal-hold-modal__logo" params="large: true" data-uie-name="status-modal-legal-hold-icon"></legal-hold-dot>
         <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')" data-uie-name="status-modal-title"></div>
         <!-- ko if: isLoading() -->
-          <loading-icon></loading-icon>
+          <loading-bar params="progress: progress() * 100"></loading-bar>
         <!-- /ko -->
         <!-- ko ifnot: isLoading() -->
           <p

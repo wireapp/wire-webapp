@@ -26,6 +26,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {promiseProgress} from 'Util/PromiseUtil';
 
 export class LegalHoldModalViewModel {
   userRepository: UserRepository;
@@ -43,6 +44,7 @@ export class LegalHoldModalViewModel {
   userDevicesHistory: UserDevicesHistory;
   showDeviceList: () => boolean;
   isLoading: ko.Observable<boolean>;
+  progress: ko.Observable<number>;
 
   constructor(
     userRepository: UserRepository,
@@ -63,6 +65,7 @@ export class LegalHoldModalViewModel {
     this.users = ko.observable([]);
     this.devicesUser = ko.observable();
     this.userDevicesHistory = makeUserDevicesHistory();
+    this.progress = ko.observable(0);
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
 
     this.hide = () => this.isVisible(false);
@@ -81,7 +84,10 @@ export class LegalHoldModalViewModel {
       return;
     }
     conversation = ko.unwrap(conversation);
-    Promise.all(conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)))
+    promiseProgress(
+      conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)),
+      progress => this.progress(progress)
+    )
       .then(() => this.conversationRepository.get_all_users_in_conversation(conversation.id))
       .then(allUsers => {
         const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());

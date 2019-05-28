@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,46 +17,22 @@
  *
  */
 
-.legal-hold-modal {
-  &__wrapper {
-    height: 448px;
-  }
+import ko from 'knockout';
 
-  &__logo {
-    display: block;
-    width: 48px;
-    margin: auto;
-  }
-
-  &__headline {
-    margin: 32px 0;
-    font-size: 24px;
-    font-weight: @font-weight-bold;
-    text-align: center;
-  }
-
-  &__info {
-    line-height: 1.5;
-
-    br {
-      line-height: 2;
-    }
-  }
-
-  &__subjects {
-    margin-top: 32px;
-    color: var(--background-fade-56);
-    font-size: 11px;
-    text-transform: uppercase;
-  }
-
-  loading-bar {
-    display: block;
-    width: 256px;
-    margin: auto;
-  }
-
-  user-list {
-    margin: 16px -16px -16px;
-  }
+interface LoadingBarParams {
+  progress: ko.Subscribable<number>;
+  message: ko.Subscribable<string>;
 }
+
+ko.components.register('loading-bar', {
+  template: `
+    <div class="text-center">
+      <div class="progress-console" data-bind="text: loadingMessage"></div>
+      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
+    </div>
+`,
+  viewModel: function({progress, message}: LoadingBarParams): void {
+    this.loadingMessage = message;
+    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
+  },
+});
