@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -41,6 +42,7 @@ export class LegalHoldModalViewModel {
   onClosed: () => void;
   userDevicesHistory: UserDevicesHistory;
   showDeviceList: () => boolean;
+  isLoading: ko.Observable<boolean>;
 
   constructor(
     userRepository: UserRepository,
@@ -55,6 +57,7 @@ export class LegalHoldModalViewModel {
     this.clientRepository = clientRepository;
     this.cryptographyRepository = cryptographyRepository;
 
+    this.isLoading = ko.observable(false);
     this.isVisible = ko.observable(false);
     this.isOnlyMe = ko.observable(false);
     this.users = ko.observable([]);
@@ -69,10 +72,26 @@ export class LegalHoldModalViewModel {
     };
   }
 
-  showUsers = (users: User[]) => {
-    const isOnlyMe = users.length === 1 && users[0].is_me;
-    this.users(users);
-    this.isOnlyMe(isOnlyMe);
+  showUsers = (conversation?: Conversation) => {
+    if (conversation === undefined) {
+      this.users([this.userRepository.self()]);
+      this.isOnlyMe(true);
+      this.isLoading(false);
+      this.isVisible(true);
+      return;
+    }
+    conversation = ko.unwrap(conversation);
+    Promise.all(conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)))
+      .then(() => this.conversationRepository.get_all_users_in_conversation(conversation.id))
+      .then(allUsers => {
+        const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
+        const isOnlyMe = legalHoldUsers.length === 1 && legalHoldUsers[0].is_me;
+        this.users(legalHoldUsers);
+        this.isOnlyMe(isOnlyMe);
+        this.isLoading(false);
+      });
+
+    this.isLoading(true);
     this.isVisible(true);
   };
 
