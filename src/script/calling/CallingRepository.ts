@@ -278,6 +278,8 @@ export class CallingRepository {
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
+    const reason = TERMINATION_REASON.MISSED; // TODO check other reasons
+    this.injectDeactivateEvent(call.conversationId, call.initiator, reason, Date.now(), EventRepository.SOURCE.STREAM);
   }
 
   private loadVideoPreview(call: Call): Promise<boolean> {
@@ -396,11 +398,6 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.GROUP_START:
         this.injectActivateEvent(conversationId, userId, time, source);
         break;
-
-      case CALL_MESSAGE_TYPE.CANCEL:
-        const reason = TERMINATION_REASON.MISSED; // TODO check other reasons
-        this.injectDeactivateEvent(conversationId, userId, reason, time, source);
-        break;
     }
   }
 
@@ -443,7 +440,7 @@ export class CallingRepository {
           this.removeCall(rejectedCallInConversation);
         }
         const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-        const call = new Call(conversationId, conversationType, selfParticipant, callType);
+        const call = new Call(this.selfUserId, conversationId, conversationType, selfParticipant, callType);
         this.storeCall(call);
         const loadPreviewPromise =
           conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO
@@ -730,6 +727,7 @@ export class CallingRepository {
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const call = new Call(
+      userId,
       conversationId,
       CONV_TYPE.ONEONONE,
       selfParticipant,

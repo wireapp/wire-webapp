@@ -22,9 +22,11 @@ import ko from 'knockout';
 import {Participant} from './Participant';
 
 export type ConversationId = string;
+export type UserId = string;
 
 export class Call {
   public readonly conversationId: ConversationId;
+  public readonly initiator: UserId;
   public readonly reason: ko.Observable<number | undefined>;
   public readonly startedAt: ko.Observable<number | undefined>;
   public readonly state: ko.Observable<number>;
@@ -35,11 +37,13 @@ export class Call {
   public blockMessages: boolean = false;
 
   constructor(
+    initiator: UserId,
     conversationId: ConversationId,
     conversationType: CONV_TYPE,
     selfParticipant: Participant,
     callType: CALL_TYPE
   ) {
+    this.initiator = initiator;
     this.conversationId = conversationId;
     this.state = ko.observable(CALL_STATE.NONE);
     this.conversationType = conversationType;
