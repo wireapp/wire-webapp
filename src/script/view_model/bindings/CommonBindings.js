@@ -563,6 +563,11 @@ ko.bindingHandlers.hide_controls = {
   init(element, valueAccessor) {
     const {timeout = valueAccessor(), skipClass} = valueAccessor();
     let hide_timeout = undefined;
+    const startTimer = () => {
+      hide_timeout = window.setTimeout(() => {
+        element.classList.add('hide-controls');
+      }, timeout);
+    };
 
     element.onmouseenter = function() {
       element.classList.remove('hide-controls');
@@ -575,9 +580,7 @@ ko.bindingHandlers.hide_controls = {
     };
 
     element.onmousemove = function({target}) {
-      if (hide_timeout) {
-        window.clearTimeout(hide_timeout);
-      }
+      window.clearTimeout(hide_timeout);
 
       element.classList.remove('hide-controls');
 
@@ -588,11 +591,10 @@ ko.bindingHandlers.hide_controls = {
         }
         node = node.parentNode;
       }
-
-      hide_timeout = window.setTimeout(() => {
-        element.classList.add('hide-controls');
-      }, timeout);
+      startTimer();
     };
+
+    startTimer();
   },
 };
 
