@@ -18,13 +18,14 @@
  */
 
 import Dexie from 'dexie';
+import {IndexedDBEngine} from '@wireapp/store-engine';
 
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 
 import {Config} from '../auth/config';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageKey} from '../storage/StorageKey';
+import {StorageSchemata} from './StorageSchemata';
+import {StorageKey} from './StorageKey';
 import {ClientType} from '../client/ClientType';
 
 export class StorageService {
@@ -37,11 +38,11 @@ export class StorageService {
       LISTENABLE_TABLES: [StorageSchemata.OBJECT_STORE.EVENTS],
     };
   }
-  // Construct an new StorageService.
+
   constructor() {
     this.logger = getLogger('StorageService');
+    this.engine = new IndexedDBEngine();
 
-    this.db = undefined;
     this.dbName = undefined;
     this.userId = undefined;
 
@@ -59,36 +60,35 @@ export class StorageService {
    * @returns {Promise} Resolves with the database name
    */
   init(userId = this.userId) {
-    return Promise.resolve().then(() => {
-      const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
-      const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+    const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
+    const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
-      this.userId = userId;
-      this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
+    this.userId = userId;
+    this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
 
-      this.db = new Dexie(this.dbName);
+    this.db = new Dexie(this.dbName);
 
-      this.db.on('blocked', event => {
-        if (event.dataLoss !== 'none') {
-          this.logger.error('Database is blocked', event);
-        }
-      });
-
-      this._upgradeStores(this.db);
-
-      return this.db
-        .open()
-        .then(() => {
-          this._initCrudHooks();
-          this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
-          return this.dbName;
-        })
-        .catch(error => {
-          const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
-          this.logger.error(logMessage, {error: error});
-          throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
-        });
+    this.db.on('blocked', event => {
+      if (event.dataLoss !== 'none') {
+        this.logger.error('Database is blocked', event);
+      }
     });
+
+    this._upgradeStores(this.db);
+
+    return this.engine
+      .initWithDb(this.db)
+      .then(() => this.db.open())
+      .then(() => {
+        this._initCrudHooks();
+        this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+        return this.dbName;
+      })
+      .catch(error => {
+        const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
+        this.logger.error(logMessage, {error: error});
+        throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
+      });
   }
 
   _initCrudHooks() {
@@ -159,20 +159,7 @@ export class StorageService {
    * @returns {Promise} Resolves when the object is deleted
    */
   delete(storeName, primaryKey) {
-    if (this.db[storeName]) {
-      return this.db[storeName]
-        .delete(primaryKey)
-        .then(() => {
-          this.logger.info(`Deleted '${primaryKey}' from object store '${storeName}'`);
-          return primaryKey;
-        })
-        .catch(error => {
-          this.logger.error(`Failed to delete '${primaryKey}' from store '${storeName}'`, error);
-          throw error;
-        });
-    }
-
-    return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.DATA_STORE_NOT_FOUND));
+    return this.engine.delete(storeName, primaryKey);
   }
 
   /**
