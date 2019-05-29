@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.0.2...@wireapp/api-client@5.0.3) (2019-05-29)
+
+
+### Bug Fixes
+
+* **api-client:** Update LegalHoldStatus ([4d4fce6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4d4fce6))
+
+
+
+
+
 ## [5.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.0.1...@wireapp/api-client@5.0.2) (2019-05-29)
 
 **Note:** Version bump only for package @wireapp/api-client
