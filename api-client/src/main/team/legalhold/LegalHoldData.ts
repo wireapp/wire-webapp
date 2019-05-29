@@ -19,8 +19,8 @@
 
 export enum LegalHoldStatus {
   DISABLED = 'disabled',
-  ENABLED_NOT_CONFIGURED = 'enabled_not_configured',
-  ENABLED_CONFIGURED = 'enabled_configured',
+  ENABLED_NOT_CONFIGURED = 'not_configured',
+  ENABLED_CONFIGURED = 'configured',
 }
 
 export interface LegalHoldDataUnconfigured {
