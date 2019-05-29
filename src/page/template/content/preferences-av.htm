@@ -2,6 +2,10 @@
   <div class="preferences-titlebar" data-bind="text: t('preferencesAV')"></div>
   <div class="preferences-content" data-bind="fadingscrollbar">
 
+  <!-- ko if: hasOngoingCall() -->
+    Changing the settings during the call is temporarily unavailable
+  <!-- /ko -->
+  <!-- ko if: !hasOngoingCall() -->
     <!-- ko if: deviceSupport.audioInput() -->
       <section class="preferences-section">
         <header class="preferences-header preferences-av-header" data-bind="text: t('preferencesAVMicrophone')"></header>
@@ -96,6 +100,7 @@
         <!-- /ko -->
       </section>
     <!-- /ko -->
+  <!-- /ko -->
 
   </div>
 </div>
