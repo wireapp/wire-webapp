@@ -17,19 +17,21 @@
  *
  */
 
-class LoadingBar {
-  constructor({progress, message}) {
-    this.loadingMessage = message;
-    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
-  }
-}
+import {noop} from './util';
 
-ko.components.register('loading-bar', {
-  template: `
-    <div class="text-center">
-      <div class="progress-console" data-bind="text: loadingMessage"></div>
-      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
-    </div>
-`,
-  viewModel: LoadingBar,
-});
+// https://stackoverflow.com/questions/42341331/es6-promise-all-progress/42342373
+
+export function promiseProgress<T>(
+  promises: PromiseLike<T>[],
+  progressCallback: (progress: number) => void = noop
+): Promise<T[]> {
+  let progress = 0;
+  progressCallback(0);
+  for (const promise of promises) {
+    promise.then(() => {
+      progress++;
+      progressCallback(progress / promises.length);
+    });
+  }
+  return Promise.all(promises);
+}

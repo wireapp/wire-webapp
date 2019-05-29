@@ -26,6 +26,8 @@ import {WebAppEvents} from '../../event/WebApp';
 import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 
+import 'Components/loadingBar';
+
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 window.z.viewModel.content = z.viewModel.content || {};
