@@ -39,6 +39,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
+    this.hasOngoingCall = ko.observable(false);
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
@@ -46,6 +47,7 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
+    this.callingRepository = repositories.calling;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
@@ -91,6 +93,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {undefined} No return value
    */
   initiateDevices() {
+    if (this.callingRepository.joinedCall()) {
+      this.hasOngoingCall(true);
+      return;
+    }
+    this.hasOngoingCall(false);
     this.isVisible = true;
 
     this._getMediaStream().then(mediaStream => {
