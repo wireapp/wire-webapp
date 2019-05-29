@@ -21,6 +21,7 @@
 export const WIDTH = {
   TINY: 320,
   MOBILE: 480,
+  MOBILE_MAX: 639,
   TABLET_MIN: 640,
   TABLET_MAX: 919,
   DESKTOP_MIN: 920,

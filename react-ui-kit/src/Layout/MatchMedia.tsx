@@ -56,9 +56,21 @@ export interface NamedMatchMediaProps extends Omit<MatchMediaProps, 'query'> {}
 const IsDesktop = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP} {...props} />;
 const IsDesktopXL = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP_XL} {...props} />;
 const IsMobile = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE} {...props} />;
+const IsMobileDown = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE_DOWN} {...props} />;
 const IsMobileUp = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.MOBILE_UP} {...props} />;
 const IsTablet = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET} {...props} />;
 const IsTabletDown = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET_DOWN} {...props} />;
 const IsTabletUp = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.TABLET_UP} {...props} />;
 
-export {useMatchMedia, MatchMedia, IsDesktop, IsDesktopXL, IsMobile, IsMobileUp, IsTablet, IsTabletDown, IsTabletUp};
+export {
+  useMatchMedia,
+  MatchMedia,
+  IsDesktop,
+  IsDesktopXL,
+  IsMobile,
+  IsMobileDown,
+  IsMobileUp,
+  IsTablet,
+  IsTabletDown,
+  IsTabletUp,
+};
