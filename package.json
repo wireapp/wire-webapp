@@ -10,7 +10,7 @@
     "@types/tough-cookie": "2.3.5",
     "@wireapp/priority-queue": "1.0.4",
     "@wireapp/store-engine": "3.0.0",
-    "axios": "0.18.0",
+    "axios": "0.19.0",
     "html5-websocket": "2.0.4",
     "logdown": "3.2.8",
     "reconnecting-websocket": "3.2.2",
