@@ -17,9 +17,7 @@
  *
  */
 
-enum AssetTransferState {
+export enum AssetTransferState {
   NOT_UPLOADED = 'notUploaded',
   UPLOADED = 'uploaded',
 }
-
-export {AssetTransferState};

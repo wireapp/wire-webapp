@@ -21,7 +21,8 @@
   "name": "@wireapp/store-engine-fs",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn build:node",
+    "build:node": "tsc",
     "clean": "rimraf .nyc_output coverage dist",
     "dist": "yarn clean && yarn build",
     "test": "nyc jasmine --config=jasmine.json",

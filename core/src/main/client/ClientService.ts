@@ -82,30 +82,28 @@ export class ClientService {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
     }
+
     if (loginData.clientType === ClientType.NONE) {
       throw new Error(`Can't register client of type "${ClientType.NONE}"`);
     }
 
     const serializedPreKeys: PreKey[] = await this.cryptographyService.createCryptobox();
 
-    let newClient: NewClient;
-    if (this.cryptographyService.cryptobox.lastResortPreKey) {
-      newClient = {
-        class: clientInfo.classification,
-        cookie: clientInfo.cookieLabel,
-        label: clientInfo.label,
-        lastkey: this.cryptographyService.cryptobox.serialize_prekey(
-          this.cryptographyService.cryptobox.lastResortPreKey
-        ),
-        location: clientInfo.location,
-        model: clientInfo.model,
-        password: loginData.password ? String(loginData.password) : undefined,
-        prekeys: serializedPreKeys,
-        type: loginData.clientType,
-      };
-    } else {
+    if (!this.cryptographyService.cryptobox.lastResortPreKey) {
       throw new Error('Cryptobox got initialized without a last resort PreKey.');
     }
+
+    const newClient: NewClient = {
+      class: clientInfo.classification,
+      cookie: clientInfo.cookieLabel,
+      label: clientInfo.label,
+      lastkey: this.cryptographyService.cryptobox.serialize_prekey(this.cryptographyService.cryptobox.lastResortPreKey),
+      location: clientInfo.location,
+      model: clientInfo.model,
+      password: loginData.password ? String(loginData.password) : undefined,
+      prekeys: serializedPreKeys,
+      type: loginData.clientType,
+    };
 
     const client = await this.backend.postClient(newClient);
     await this.createLocalClient(client);

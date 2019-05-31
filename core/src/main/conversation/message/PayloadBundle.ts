@@ -19,13 +19,13 @@
 
 import {ConversationContent} from '../content';
 
-enum PayloadBundleState {
+export enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
   OUTGOING_SENT = 'PayloadBundleState.OUTGOING_SENT',
   OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
 }
 
-interface PayloadBundle {
+export interface PayloadBundle {
   content?: ConversationContent;
   conversation: string;
   from: string;
@@ -36,7 +36,7 @@ interface PayloadBundle {
   messageTimer?: number;
 }
 
-enum PayloadBundleType {
+export enum PayloadBundleType {
   ASSET = 'PayloadBundleType.ASSET',
   ASSET_ABORT = 'PayloadBundleType.ASSET_ABORT',
   ASSET_IMAGE = 'PayloadBundleType.ASSET_IMAGE',
@@ -62,5 +62,3 @@ enum PayloadBundleType {
   TYPING = 'PayloadBundleType.TYPING',
   UNKNOWN = 'PayloadBundleType.UNKNOWN',
 }
-
-export {PayloadBundle, PayloadBundleType, PayloadBundleState};

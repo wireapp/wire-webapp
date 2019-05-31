@@ -19,12 +19,10 @@
 
 import {ClientClassification, Location} from '@wireapp/api-client/dist/commonjs/client/';
 
-interface ClientInfo {
+export interface ClientInfo {
   classification: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
   cookieLabel: string;
   model: string;
   label?: string;
   location?: Location;
 }
-
-export {ClientInfo};
