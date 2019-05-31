@@ -69,6 +69,10 @@ const messageIdCache = {};
       additionalContent.push('(expecting read confirmation)');
     }
 
+    if (content.legalHoldStatus) {
+      additionalContent.push('(sent to legal hold)');
+    }
+
     logger.log(
       `Receiving: "${type}" ("${messageId}") in "${conversationId}" from "${from}" ${additionalContent.join(' ')}`
     );
@@ -151,7 +155,7 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {
-      content: {expectsReadConfirmation, linkPreviews, mentions, quote, text},
+      content: {expectsReadConfirmation, legalHoldStatus, linkPreviews, mentions, quote, text},
       conversation: conversationId,
       id: messageId,
     } = data;
@@ -175,6 +179,7 @@ const messageIdCache = {};
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
+        .withLegalHoldStatus(legalHoldStatus)
         .build();
     } else {
       await handleIncomingMessage(data);
@@ -183,6 +188,7 @@ const messageIdCache = {};
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
+        .withLegalHoldStatus(legalHoldStatus)
         .build();
     }
 
@@ -309,13 +315,14 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.PING, async data => {
     const {
-      content: {expectsReadConfirmation},
+      content: {expectsReadConfirmation, legalHoldStatus},
       conversation: conversationId,
     } = data;
     await handleIncomingMessage(data);
 
     const pingPayload = account.service.conversation.messageBuilder.createPing(conversationId, {
       expectsReadConfirmation,
+      legalHoldStatus,
     });
 
     await sendMessageResponse(data, pingPayload);
@@ -370,7 +377,7 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.MESSAGE_EDIT, async data => {
     const {
-      content: {expectsReadConfirmation, linkPreviews, mentions, originalMessageId, quote, text},
+      content: {expectsReadConfirmation, legalHoldStatus, linkPreviews, mentions, originalMessageId, quote, text},
       conversation: conversationId,
       id: messageId,
     } = data;
@@ -400,6 +407,7 @@ const messageIdCache = {};
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
+        .withLegalHoldStatus(legalHoldStatus)
         .build();
     } else {
       await handleIncomingMessage(data);
@@ -408,6 +416,7 @@ const messageIdCache = {};
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
+        .withLegalHoldStatus(legalHoldStatus)
         .build();
     }
 

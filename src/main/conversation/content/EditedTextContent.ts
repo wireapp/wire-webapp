@@ -20,7 +20,6 @@
 import {QuoteContent, TextContent} from '../content/';
 
 interface EditedTextContent extends TextContent {
-  expectsReadConfirmation?: boolean;
   originalMessageId: string;
   /**
    * While this field exists in the Protobuf spec, it should be

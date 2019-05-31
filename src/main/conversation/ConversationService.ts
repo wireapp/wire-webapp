@@ -285,11 +285,20 @@ class ConversationService {
   }
 
   private async sendEditedText(payloadBundle: EditedTextMessage, userIds?: string[]): Promise<EditedTextMessage> {
-    const {expectsReadConfirmation, linkPreviews, mentions, originalMessageId, quote, text} = payloadBundle.content;
+    const {
+      expectsReadConfirmation,
+      legalHoldStatus,
+      linkPreviews,
+      mentions,
+      originalMessageId,
+      quote,
+      text,
+    } = payloadBundle.content;
 
     const textMessage = Text.create({
       content: text,
       expectsReadConfirmation,
+      legalHoldStatus,
     });
 
     if (linkPreviews && linkPreviews.length) {
@@ -331,7 +340,7 @@ class ConversationService {
       throw new Error('No content for sendFileData provided.');
     }
 
-    const {asset, expectsReadConfirmation} = payloadBundle.content;
+    const {asset, expectsReadConfirmation, legalHoldStatus} = payloadBundle.content;
 
     const remoteData = Asset.RemoteData.create({
       assetId: asset.key,
@@ -342,6 +351,7 @@ class ConversationService {
 
     const assetMessage = Asset.create({
       expectsReadConfirmation,
+      legalHoldStatus,
       uploaded: remoteData,
     });
 
@@ -374,7 +384,7 @@ class ConversationService {
       throw new Error('No content for sendFileMetaData provided.');
     }
 
-    const {expectsReadConfirmation, metaData} = payloadBundle.content;
+    const {expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle.content;
 
     const original = Asset.Original.create({
       mimeType: metaData.type,
@@ -384,6 +394,7 @@ class ConversationService {
 
     const assetMessage = Asset.create({
       expectsReadConfirmation,
+      legalHoldStatus,
       original,
     });
 
@@ -414,10 +425,11 @@ class ConversationService {
       throw new Error('No content for sendFileAbort provided.');
     }
 
-    const {expectsReadConfirmation, reason} = payloadBundle.content;
+    const {expectsReadConfirmation, legalHoldStatus, reason} = payloadBundle.content;
 
     const assetMessage = Asset.create({
-      expectsReadConfirmation: expectsReadConfirmation,
+      expectsReadConfirmation,
+      legalHoldStatus,
       notUploaded: reason,
     });
 
@@ -447,7 +459,7 @@ class ConversationService {
       throw new Error('No content for sendImage provided.');
     }
 
-    const {asset, expectsReadConfirmation, image} = payloadBundle.content;
+    const {asset, expectsReadConfirmation, image, legalHoldStatus} = payloadBundle.content;
 
     const imageMetadata = Asset.ImageMetaData.create({
       height: image.height,
@@ -470,6 +482,7 @@ class ConversationService {
 
     const assetMessage = Asset.create({
       expectsReadConfirmation,
+      legalHoldStatus,
       original,
       uploaded: remoteData,
     });
@@ -497,11 +510,12 @@ class ConversationService {
   }
 
   private async sendLocation(payloadBundle: LocationMessage, userIds?: string[]): Promise<LocationMessage> {
-    const {expectsReadConfirmation, latitude, longitude, name, zoom} = payloadBundle.content;
+    const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle.content;
 
     const locationMessage = Location.create({
       expectsReadConfirmation,
       latitude,
+      legalHoldStatus,
       longitude,
       name,
       zoom,
@@ -527,11 +541,12 @@ class ConversationService {
   }
 
   private async sendPing(payloadBundle: PingMessage, userIds?: string[]): Promise<PingMessage> {
-    const {expectsReadConfirmation, hotKnock = false} = payloadBundle.content;
+    const {expectsReadConfirmation, hotKnock = false, legalHoldStatus} = payloadBundle.content;
 
     const knockMessage = Knock.create({
       expectsReadConfirmation,
       hotKnock,
+      legalHoldStatus,
     });
 
     let genericMessage = GenericMessage.create({
@@ -592,11 +607,19 @@ class ConversationService {
   }
 
   private async sendText(payloadBundle: TextMessage, userIds?: string[]): Promise<TextMessage> {
-    const {expectsReadConfirmation, linkPreviews, mentions, quote, text} = payloadBundle.content as TextContent;
+    const {
+      expectsReadConfirmation,
+      legalHoldStatus,
+      linkPreviews,
+      mentions,
+      quote,
+      text,
+    } = payloadBundle.content as TextContent;
 
     const textMessage = Text.create({
       content: text,
       expectsReadConfirmation,
+      legalHoldStatus,
     });
 
     if (linkPreviews && linkPreviews.length) {

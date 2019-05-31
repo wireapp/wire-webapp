@@ -286,11 +286,16 @@ class Account extends EventEmitter {
   private mapGenericMessage(genericMessage: any, event: ConversationOtrMessageAddEvent): PayloadBundle {
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
-        const {content: text, expectsReadConfirmation, linkPreview: linkPreviews, mentions, quote} = genericMessage[
-          GenericMessageType.TEXT
-        ];
+        const {
+          content: text,
+          expectsReadConfirmation,
+          legalHoldStatus,
+          linkPreview: linkPreviews,
+          mentions,
+          quote,
+        } = genericMessage[GenericMessageType.TEXT];
 
-        const content: TextContent = {expectsReadConfirmation, text};
+        const content: TextContent = {expectsReadConfirmation, legalHoldStatus, text};
 
         if (linkPreviews && linkPreviews.length) {
           content.linkPreviews = linkPreviews;
@@ -302,6 +307,10 @@ class Account extends EventEmitter {
 
         if (quote) {
           content.quote = quote;
+        }
+
+        if (typeof legalHoldStatus !== 'undefined') {
+          content.legalHoldStatus = legalHoldStatus;
         }
 
         return {
@@ -364,12 +373,19 @@ class Account extends EventEmitter {
       case GenericMessageType.EDITED: {
         const {
           expectsReadConfirmation,
-          text: {content: editedText, linkPreview: editedLinkPreviews, mentions: editedMentions, quote: editedQuote},
+          text: {
+            content: editedText,
+            legalHoldStatus,
+            linkPreview: editedLinkPreviews,
+            mentions: editedMentions,
+            quote: editedQuote,
+          },
           replacingMessageId,
         } = genericMessage[GenericMessageType.EDITED];
 
         const content: EditedTextContent = {
           expectsReadConfirmation,
+          legalHoldStatus,
           originalMessageId: replacingMessageId,
           text: editedText,
         };
@@ -417,8 +433,8 @@ class Account extends EventEmitter {
         };
       }
       case GenericMessageType.KNOCK: {
-        const {expectsReadConfirmation} = genericMessage[GenericMessageType.KNOCK];
-        const content: KnockContent = {expectsReadConfirmation};
+        const {expectsReadConfirmation, legalHoldStatus} = genericMessage[GenericMessageType.KNOCK];
+        const content: KnockContent = {expectsReadConfirmation, legalHoldStatus};
 
         return {
           content,

@@ -17,14 +17,13 @@
  *
  */
 
-import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
+import {LegalHoldStatus, LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
 
-interface TextContent {
+export interface TextContent {
   expectsReadConfirmation?: boolean;
+  legalHoldStatus?: LegalHoldStatus;
   linkPreviews?: LinkPreviewUploadedContent[];
   mentions?: MentionContent[];
   quote?: QuoteContent;
   text: string;
 }
-
-export {TextContent};

@@ -17,7 +17,10 @@
  *
  */
 
+export {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import * as ContentType from './ContentType';
+export {ContentType};
 
 export * from './AssetContent';
 export * from './ClearedContent';
@@ -37,5 +40,3 @@ export * from './QuoteContent';
 export * from './ReactionContent';
 export * from './TextContent';
 export * from './TweetContent';
-
-export {ContentType};

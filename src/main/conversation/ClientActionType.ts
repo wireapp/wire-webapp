@@ -17,8 +17,4 @@
  *
  */
 
-enum ClientActionType {
-  RESET_SESSION = 0,
-}
-
-export {ClientActionType};
+export {ClientAction as ClientActionType} from '@wireapp/protocol-messaging';

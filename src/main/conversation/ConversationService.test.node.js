@@ -22,6 +22,7 @@ const {APIClient} = require('@wireapp/api-client');
 const {Account} = require('@wireapp/core');
 const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const {MemoryEngine} = require('@wireapp/store-engine');
+const {LegalHoldStatus} = require('@wireapp/core/dist/conversation/content/');
 
 const PayloadHelper = require('../test/PayloadHelper');
 
@@ -378,6 +379,29 @@ describe('ConversationService', () => {
 
       expect(replyMessage.content.text).toEqual(text);
       expect(replyMessage.content.expectsReadConfirmation).toEqual(true);
+    });
+
+    it('adds a legal hold status', () => {
+      account.apiClient.context = {
+        userId: PayloadHelper.getUUID(),
+      };
+
+      const text = 'Please read me';
+
+      const firstMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
+        .withLegalHoldStatus()
+        .build();
+
+      expect(firstMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.DISABLED);
+
+      const replyMessage = account.service.conversation.messageBuilder
+        .createText(undefined, text)
+        .withLegalHoldStatus(LegalHoldStatus.ENABLED)
+        .build();
+
+      expect(replyMessage.content.text).toEqual(text);
+      expect(replyMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.ENABLED);
     });
   });
 });

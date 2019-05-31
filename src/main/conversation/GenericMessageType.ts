@@ -17,7 +17,7 @@
  *
  */
 
-enum GenericMessageType {
+export enum GenericMessageType {
   ASSET = 'asset',
   ASSET_ABORT = 'assetAbort',
   ASSET_META = 'assetMeta',
@@ -38,5 +38,3 @@ enum GenericMessageType {
   REACTION = 'reaction',
   TEXT = 'text',
 }
-
-export {GenericMessageType};

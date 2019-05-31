@@ -17,11 +17,12 @@
  *
  */
 
-import {ImageAssetContent, ImageContent, TweetContent} from '../content/';
+import {ImageAssetContent, ImageContent, LegalHoldStatus, TweetContent} from '../content/';
 
-interface LinkPreviewContent {
+export interface LinkPreviewContent {
   expectsReadConfirmation?: boolean;
   image?: ImageContent;
+  legalHoldStatus?: LegalHoldStatus;
   permanentUrl?: string;
   summary?: string;
   title?: string;
@@ -30,8 +31,6 @@ interface LinkPreviewContent {
   urlOffset: number;
 }
 
-interface LinkPreviewUploadedContent extends LinkPreviewContent {
+export interface LinkPreviewUploadedContent extends LinkPreviewContent {
   imageUploaded?: ImageAssetContent;
 }
-
-export {LinkPreviewContent, LinkPreviewUploadedContent};

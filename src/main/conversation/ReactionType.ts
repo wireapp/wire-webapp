@@ -17,9 +17,7 @@
  *
  */
 
-enum ReactionType {
+export enum ReactionType {
   LIKE = '❤️',
   NONE = '',
 }
-
-export {ReactionType};
