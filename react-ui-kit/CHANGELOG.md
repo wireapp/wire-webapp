@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.5.0...@wireapp/react-ui-kit@6.5.1) (2019-05-31)
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
+
+
+
+
+
 # [6.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.4.5...@wireapp/react-ui-kit@6.5.0) (2019-05-29)
 
 
