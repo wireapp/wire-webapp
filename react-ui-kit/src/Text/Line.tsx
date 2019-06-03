@@ -35,4 +35,4 @@ const lineStyle: <T>(props: LineProps<T>) => ObjectInterpolation<undefined> = ({
 
 const Line = (props: LineProps) => <hr css={lineStyle(props)} {...props} />;
 
-export {Line};
+export {Line, lineStyle};
