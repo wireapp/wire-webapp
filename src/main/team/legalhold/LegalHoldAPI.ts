@@ -100,9 +100,7 @@ export class LegalHoldAPI {
 
   public async postSettings(teamId: string, legalHoldData: NewLegalHoldData): Promise<LegalHoldData> {
     const config: AxiosRequestConfig = {
-      data: {
-        legalHoldData,
-      },
+      data: legalHoldData,
       method: 'post',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${LegalHoldAPI.URL.LEGAL_HOLD}/${LegalHoldAPI.URL.SETTINGS_LEGAL_HOLD}`,
     };
