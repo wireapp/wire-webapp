@@ -22,6 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../../http';
 import {TeamAPI} from '../team/TeamAPI';
 import {LegalHoldData} from './LegalHoldData';
+import {LegalHoldMemberData} from './LegalHoldMemberData';
 import {NewLegalHoldData} from './NewLegalHoldData';
 
 export class LegalHoldAPI {
@@ -33,13 +34,14 @@ export class LegalHoldAPI {
     SETTINGS_LEGAL_HOLD: 'settings',
   };
 
-  public async getMemberLegalHold(teamId: string, userId: string): Promise<void> {
+  public async getMemberLegalHold(teamId: string, userId: string): Promise<LegalHoldMemberData> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${LegalHoldAPI.URL.LEGAL_HOLD}/${userId}`,
     };
 
-    await this.client.sendJSON(config);
+    const response = await this.client.sendJSON<LegalHoldMemberData>(config);
+    return response.data;
   }
 
   public async deleteMemberLegalHold(teamId: string, userId: string): Promise<void> {
