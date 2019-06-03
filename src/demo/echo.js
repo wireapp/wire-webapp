@@ -330,17 +330,17 @@ const messageIdCache = {};
 
   account.on(PayloadBundleType.REACTION, async data => {
     const {
-      content: {type, originalMessageId},
+      content: {legalHoldStatus, originalMessageId, type},
       conversation: conversationId,
     } = data;
 
     await handleIncomingMessage(data);
 
-    const reactionPayload = account.service.conversation.messageBuilder.createReaction(
-      conversationId,
+    const reactionPayload = account.service.conversation.messageBuilder.createReaction(conversationId, {
+      legalHoldStatus,
       originalMessageId,
-      type
-    );
+      type,
+    });
 
     await sendMessageResponse(data, reactionPayload);
   });

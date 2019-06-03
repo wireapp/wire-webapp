@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
-import {AbortReason, PayloadBundleState, PayloadBundleType, ReactionType} from '..';
+import {AbortReason, PayloadBundleState, PayloadBundleType} from '..';
 import {AssetService} from '../AssetService';
 import {
   ClientActionContent,
@@ -204,14 +204,11 @@ class MessageBuilder {
 
   public createReaction(
     conversationId: string,
-    originalMessageId: string,
-    type: ReactionType,
+    reaction: ReactionContent,
     messageId = MessageBuilder.createId()
   ): ReactionMessage {
-    const content: ReactionContent = {originalMessageId, type};
-
     return {
-      content,
+      content: reaction,
       conversation: conversationId,
       from: this.getSelfUserId(),
       id: messageId,
