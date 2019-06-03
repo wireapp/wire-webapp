@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.0.3...@wireapp/core@12.0.4) (2019-06-03)
+
+
+### Bug Fixes
+
+* **core:** Add Legal Hold flag to Reaction ([#1888](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1888)) ([1b5f505](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/1b5f505))
+
+
+
+
+
 ## [12.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.0.2...@wireapp/core@12.0.3) (2019-06-03)
 
 **Note:** Version bump only for package @wireapp/core
