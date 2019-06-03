@@ -22,7 +22,3 @@ export enum LegalHoldMemberStatus {
   ENABLED = 'enabled',
   PENDING = 'pending',
 }
-
-export interface LegalHoldMemberData {
-  status: LegalHoldMemberStatus;
-}
