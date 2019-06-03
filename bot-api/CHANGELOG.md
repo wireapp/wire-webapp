@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.49](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.0.48...@wireapp/bot-api@4.0.49) (2019-06-03)
+
+
+### Bug Fixes
+
+* **core:** Add Legal Hold flag to Reaction ([#1888](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1888)) ([1b5f505](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/1b5f505))
+
+
+
+
+
 ## [4.0.48](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.0.47...@wireapp/bot-api@4.0.48) (2019-06-03)
 
 **Note:** Version bump only for package @wireapp/bot-api
