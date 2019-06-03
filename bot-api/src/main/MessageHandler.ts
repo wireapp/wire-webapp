@@ -160,11 +160,10 @@ abstract class MessageHandler {
 
   public async sendReaction(conversationId: string, originalMessageId: string, type: ReactionType): Promise<void> {
     if (this.account && this.account.service) {
-      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(
-        conversationId,
+      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(conversationId, {
         originalMessageId,
-        type
-      );
+        type,
+      });
       await this.account.service.conversation.send(reactionPayload);
     }
   }
