@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.5.3...@wireapp/react-ui-kit@6.6.0) (2019-06-03)
+
+
+### Features
+
+* **react-ui-kit:** Export lineStyle ([#1892](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1892)) ([6377436](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6377436))
+
+
+
+
+
 ## [6.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.5.2...@wireapp/react-ui-kit@6.5.3) (2019-06-03)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
