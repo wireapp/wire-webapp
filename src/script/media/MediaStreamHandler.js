@@ -196,7 +196,7 @@ export class MediaStreamHandler {
 
   /**
    * Replace the MediaStream after a change of the selected input device.
-   * @param {MediaStream} mediaStream - the new mediastream (tracks will be clone, this mediaStream can be disposed of once changed)
+   * @param {MediaStream} mediaStream - the new mediastream (tracks will be cloned, this mediaStream can be disposed of once changed)
    * @param {MediaType} mediaType - Type of the media that needs to be changed
    * @returns {Promise<void>} Resolves when the local media stream and the call have been updated
    */
