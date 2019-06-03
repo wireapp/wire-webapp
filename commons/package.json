@@ -17,7 +17,7 @@
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "2.0.1",
     "karma-jasmine-diff-reporter": "2.0.0",
-    "karma-typescript": "4.0.0",
+    "karma-typescript": "4.1.0",
     "rimraf": "2.6.3",
     "typescript": "3.4.5"
   },
