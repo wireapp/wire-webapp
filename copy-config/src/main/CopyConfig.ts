@@ -39,8 +39,8 @@ export class CopyConfig {
   private readonly noCleanup: boolean = false;
   private readonly filterFiles: string[] = ['.DS_Store'];
 
-  constructor(filesOrOptions: CopyConfigOptions) {
-    this.options = {...defaultOptions, ...filesOrOptions};
+  constructor(options: CopyConfigOptions) {
+    this.options = {...defaultOptions, ...options};
     this.readEnvVars();
 
     if (!this.options.repositoryUrl && !this.options.externalDir) {
@@ -61,13 +61,20 @@ export class CopyConfig {
   }
 
   private readEnvVars(): void {
-    const setString = (variable: string | undefined, optionKey: keyof CopyConfigOptions) =>
-      typeof variable !== 'undefined' && (this.options[optionKey] = String(variable));
+    const externalDir = process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
+    const repositoryUrl = process.env.WIRE_CONFIGURATION_REPOSITORY;
+    const configurationFiles = process.env.WIRE_CONFIGURATION_FILES;
 
-    setString(process.env.WIRE_CONFIGURATION_EXTERNAL_DIR, 'externalDir');
-    setString(process.env.WIRE_CONFIGURATION_REPOSITORY, 'repositoryUrl');
-    if (typeof process.env.WIRE_CONFIGURATION_FILES !== 'undefined') {
-      const files = this.getFilesFromString(process.env.WIRE_CONFIGURATION_FILES);
+    if (typeof externalDir !== 'undefined') {
+      this.options.externalDir = String(externalDir);
+    }
+
+    if (typeof repositoryUrl !== 'undefined') {
+      this.options.repositoryUrl = String(repositoryUrl);
+    }
+
+    if (typeof configurationFiles !== 'undefined') {
+      const files = this.getFilesFromString(configurationFiles);
       Object.assign(this.options.files, files);
     }
   }

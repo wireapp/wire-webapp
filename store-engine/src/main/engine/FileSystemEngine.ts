@@ -96,7 +96,7 @@ export class FileSystemEngine implements CRUDEngine {
       try {
         data = JSON.stringify(entity);
       } catch (error) {
-        data = entity.toString();
+        data = String(entity);
       }
       await fs.writeFile(filePath, data);
       return primaryKey;

@@ -142,10 +142,10 @@ export class LocalStorageEngine implements CRUDEngine {
 
   public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.read(tableName, primaryKey)
-      .then((entity: Object) => {
+      .then(entity => {
         return {...entity, ...changes};
       })
-      .then((updatedEntity: Object) => {
+      .then(updatedEntity => {
         return this.create(tableName, primaryKey, updatedEntity).catch(error => {
           if (error instanceof RecordAlreadyExistsError) {
             return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, updatedEntity));
