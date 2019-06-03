@@ -53,7 +53,6 @@ import HistoryImportViewModelGlobal from '../view_model/content/HistoryImportVie
 import InputBarViewModelGlobal from '../view_model/content/InputBarViewModel.js';
 import PreferencesAboutViewModelGlobal from '../view_model/content/PreferencesAboutViewModel.js';
 import PreferencesAccountViewModelGlobal from '../view_model/content/PreferencesAccountViewModel.js';
-import PreferencesAVViewModelGlobal from '../view_model/content/PreferencesAVViewModel.js';
 import PreferencesDeviceDetailsViewModelGlobal from '../view_model/content/PreferencesDeviceDetailsViewModel.js';
 import PreferencesDevicesViewModelGlobal from '../view_model/content/PreferencesDevicesViewModel.js';
 import PreferencesOptionsViewModelGlobal from '../view_model/content/PreferencesOptionsViewModel.js';

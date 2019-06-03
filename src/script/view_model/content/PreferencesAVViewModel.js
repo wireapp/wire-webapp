@@ -22,11 +22,9 @@ import {Environment} from 'Util/Environment';
 import {Config} from '../../auth/config';
 import {MediaType} from '../../media/MediaType';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+const noop = () => {};
 
-z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
+export class PreferencesAVViewModel {
   static get CONFIG() {
     return {
       AUDIO_METER: {
@@ -38,15 +36,16 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(mediaRepository, userRepository, callbacks) {
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
+    this.willChangeMediaSource = callbacks.willChangeMediaSource || noop;
+    this.mediaSourceChanged = callbacks.mediaSourceChanged || noop;
 
-    this.logger = getLogger('z.viewModel.content.PreferencesAVViewModel');
+    this.logger = getLogger('PreferencesAVViewModel');
 
-    this.mediaRepository = repositories.media;
-    this.userRepository = repositories.user;
-    this.callingRepository = repositories.calling;
+    this.mediaRepository = mediaRepository;
+    this.userRepository = userRepository;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
@@ -56,25 +55,19 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
     const updateStream = mediaType => {
-      const hasActiveStreams = this.streamHandler.localMediaStream() || this.mediaStream();
-      if (!hasActiveStreams) {
-        // if there is no active call or the preferences is not showing any streams, we do not need to request a new stream
-        return;
-      }
-      const currentCallMediaStream = this.streamHandler.localMediaStream();
-      // release first the current call's tracks and the preferences' tracks (Firefox doesn't allow to request another mic if one is already active)
-      if (currentCallMediaStream) {
-        this.streamHandler.releaseTracksFromStream(currentCallMediaStream, mediaType);
-      }
+      const needsStreamUpdate = this.willChangeMediaSource(mediaType);
       if (this.mediaStream()) {
         this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
+      }
+      if (!needsStreamUpdate && !this.mediaStream()) {
+        return;
       }
 
       return this._getMediaStream(mediaType).then(stream => {
         if (!stream) {
           return this.mediaStream(undefined);
         }
-        this.streamHandler.changeMediaStream(stream, mediaType);
+        this.mediaSourceChanged(stream, mediaType);
         if (this.mediaStream()) {
           stream.getTracks().forEach(track => {
             this.mediaStream().addTrack(track);
@@ -241,4 +234,4 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     }
     this.permissionDenied(false);
   }
-};
+}

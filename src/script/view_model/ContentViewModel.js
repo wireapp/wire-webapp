@@ -29,6 +29,7 @@ import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {WebAppEvents} from '../event/WebApp';
+import {PreferencesAVViewModel} from './content/PreferencesAVViewModel.js';
 
 export class ContentViewModel {
   static get STATE() {
@@ -94,7 +95,10 @@ export class ContentViewModel {
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);
     this.preferencesAccount = new z.viewModel.content.PreferencesAccountViewModel(mainViewModel, this, repositories);
-    this.preferencesAV = new z.viewModel.content.PreferencesAVViewModel(mainViewModel, this, repositories);
+    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.user, {
+      mediaSourceChanged: repositories.calling.changeMediaSource.bind(repositories.calling),
+      willChangeMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+    });
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,

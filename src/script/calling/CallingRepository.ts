@@ -168,13 +168,42 @@ export class CallingRepository {
         return Promise.reject();
       }
       const selfParticipant = call.selfParticipant;
-      if (video && !audio && !screen && selfParticipant.sharesCamera()) {
-        return Promise.resolve(call.selfParticipant.videoStream());
+      const audioStream = selfParticipant.audioStream();
+      const cameraStream = selfParticipant.sharesCamera() && selfParticipant.videoStream();
+      const screenStream = selfParticipant.sharesScreen() && selfParticipant.videoStream();
+
+      const isMissingAudio = audio && !audioStream;
+      const isMissingCamera = video && !cameraStream;
+      const isMissingScreen = screen && !screenStream;
+
+      const localTracks: MediaStreamTrack[] = [];
+      if (audioStream) {
+        localTracks.push.apply(localTracks, audioStream.getTracks());
       }
-      if (screen && !video && !audio && selfParticipant.sharesScreen()) {
-        return Promise.resolve(selfParticipant.videoStream());
+      if (selfParticipant.videoStream()) {
+        localTracks.push.apply(localTracks, selfParticipant.videoStream().getTracks());
       }
-      return this.updateMediaStream(conversationId, audio, video, screen);
+      if (!isMissingAudio && !isMissingCamera && !isMissingScreen) {
+        return Promise.resolve(new MediaStream(localTracks));
+      }
+      const isGroup = call.conversationType === CONV_TYPE.GROUP;
+      avsLogger.info(
+        `requesting audio: ${audio} ${audio && !isMissingAudio ? '(from cache)' : ''}, camera: ${video} ${
+          video && !isMissingCamera ? '(from cache)' : ''
+        }, screen: ${screen} ${screen && !isMissingScreen ? '(from cache)' : ''}`
+      );
+      return this.getMediaStream(isMissingAudio, isMissingCamera, isMissingScreen, isGroup)
+        .then(mediaStream => {
+          if (video || screen) {
+            this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STARTED);
+            selfParticipant.videoState(VIDEO_STATE.STARTED);
+          }
+          // merge the local tracks with the one we just requested
+          localTracks.forEach(localTrack => mediaStream.addTrack(localTrack.clone()));
+          selfParticipant.replaceMediaStream(mediaStream);
+          return mediaStream;
+        })
+        .catch(() => this.handleMediaStreamError(call));
     });
 
     wCall.setMediaStreamHandler(
@@ -272,7 +301,7 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.activeCalls().indexOf(call);
-    call.selfParticipant.releaseVideoStream();
+    call.selfParticipant.releaseMediaStream();
     call.participants.removeAll();
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
@@ -447,26 +476,19 @@ export class CallingRepository {
   // Toggles the camera ON and OFF for the given call (does not switch between different cameras)
   toggleCamera(call: Call): void {
     const selfParticipant = call.selfParticipant;
-    if (selfParticipant.sharesCamera()) {
-      this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
-      return;
-    }
-    this.updateMediaStream(call.conversationId, false, true, false);
+    const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
+    this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 
   switchCameraInput(conversationId: ConversationId, deviceId: string): void {
     this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
-    this.updateMediaStream(conversationId, false, true, false);
   }
 
   // Toggles screenshare ON and OFF for the given call (does not switch between different screens)
   toggleScreenshare(call: Call): void {
     const selfParticipant = call.selfParticipant;
-    if (selfParticipant.sharesScreen()) {
-      this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
-      return;
-    }
-    this.updateMediaStream(call.conversationId, false, false, true);
+    const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
+    this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 
   answerCall(conversationId: ConversationId, callType: number): void {
@@ -529,37 +551,51 @@ export class CallingRepository {
       .then((mediaStreamInfo: any) => mediaStreamInfo.stream);
   }
 
-  private readonly updateMediaStream = (
-    conversationId: ConversationId,
-    audio: boolean,
-    video: boolean,
-    screen: boolean
-  ): Promise<MediaStream> => {
-    const call = this.findCall(conversationId);
-    return this.getMediaStream(audio, video, screen, false)
-      .then((mediaStream: MediaStream) => {
-        const hasVideoStream = video || screen;
-        if (call && hasVideoStream) {
-          const videoState = screen ? VIDEO_STATE.SCREENSHARE : VIDEO_STATE.STARTED;
-          this.wCall.replaceTrack(conversationId, mediaStream.getVideoTracks()[0]);
-          if (call.selfParticipant.videoState() !== videoState) {
-            this.wCall.setVideoSendState(this.wUser, conversationId, videoState);
-          }
-          call.selfParticipant.replaceVideoStream(new MediaStream(mediaStream.getVideoTracks()));
-        }
-        return mediaStream;
-      })
-      .catch(() => {
-        const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
-        if (call && !validStateWithoutCamera.includes(call.state())) {
-          this.leaveCall(call.conversationId);
-        }
-        if (call && call.state() !== CALL_STATE.ANSWERED) {
-          this.showNoCameraModal();
-        }
-        return new MediaStream();
-      });
-  };
+  private handleMediaStreamError(call: Call): MediaStream {
+    const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
+    if (call && !validStateWithoutCamera.includes(call.state())) {
+      this.leaveCall(call.conversationId);
+    }
+    if (call && call.state() !== CALL_STATE.ANSWERED) {
+      this.showNoCameraModal();
+    }
+    return new MediaStream();
+  }
+
+  // returns true if a media stream has been stopped.
+  public stopMediaSource(mediaType: MediaType): void {
+    const activeCall = this.joinedCall();
+    if (!activeCall) {
+      return false;
+    }
+    switch (mediaType) {
+      case MediaType.AUDIO:
+        activeCall.selfParticipant.releaseAudioStream();
+        break;
+
+      case MediaType.VIDEO:
+        activeCall.selfParticipant.releaseVideoStream();
+        break;
+    }
+    return true;
+  }
+
+  // will change the input source of all the active calls for the given media type
+  public changeMediaSource(mediaStream: MediaStream, mediaType: MediaType, call: Call = this.joinedCall()): void {
+    if (!call) {
+      return;
+    }
+    if (mediaType === MediaType.AUDIO) {
+      const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
+      call.selfParticipant.setAudioStream(new MediaStream(audioTracks));
+      this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
+    }
+    if (mediaType === MediaType.VIDEO && call.selfParticipant.sharesCamera()) {
+      const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
+      call.selfParticipant.setVideoStream(new MediaStream(videoTracks));
+      this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
+    }
+  }
 
   //##############################################################################
   // Notifications

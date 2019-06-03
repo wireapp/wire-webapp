@@ -55,20 +55,47 @@ export class Participant {
   }
 
   setAudioStream(audioStream: MediaStream): void {
+    this.releaseStream(this.audioStream());
     this.audioStream(audioStream);
   }
 
-  replaceVideoStream(videoStream: MediaStream | undefined): void {
-    this.releaseVideoStream();
+  setVideoStream(videoStream: MediaStream | undefined): void {
+    this.releaseStream(this.videoStream());
     this.videoStream(videoStream);
   }
 
-  releaseVideoStream(): void {
-    if (this.videoStream()) {
-      this.videoStream()
-        .getTracks()
-        .forEach(track => track.stop());
-      this.videoStream(undefined);
+  replaceMediaStream(newStream: MediaStream): void {
+    if (newStream.getVideoTracks().length) {
+      this.videoStream(new MediaStream(newStream.getVideoTracks()));
     }
+    if (newStream.getAudioTracks().length) {
+      this.audioStream(new MediaStream(newStream.getAudioTracks()));
+    }
+  }
+
+  releaseVideoStream(): void {
+    this.releaseStream(this.videoStream());
+    this.videoStream(undefined);
+  }
+
+  releaseAudioStream(): void {
+    this.releaseStream(this.audioStream());
+    this.audioStream(undefined);
+  }
+
+  releaseMediaStream(): void {
+    this.releaseVideoStream();
+    this.releaseAudioStream();
+  }
+
+  private releaseStream(mediaStream: MediaStream | undefined): void {
+    if (!mediaStream) {
+      return;
+    }
+
+    mediaStream.getTracks().forEach(track => {
+      track.stop();
+      mediaStream.removeTrack(track);
+    });
   }
 }
