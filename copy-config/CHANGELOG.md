@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.5.12...@wireapp/copy-config@0.5.13) (2019-06-03)
+
+
+### Bug Fixes
+
+* **copy-config:** Apply ESLint fixes for tests ([d1db3e1](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/d1db3e1))
+
+
+
+
+
 ## [0.5.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.5.11...@wireapp/copy-config@0.5.12) (2019-05-31)
 
 **Note:** Version bump only for package @wireapp/copy-config
