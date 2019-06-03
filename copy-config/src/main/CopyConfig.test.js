@@ -39,8 +39,8 @@ describe('CopyConfig', () => {
         repositoryUrl: '',
       });
 
-      expect(copyConfig['options'].externalDir.endsWith('externalDir')).toBe(true);
-      expect(copyConfig['options'].files).toEqual({
+      expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
+      expect(copyConfig.options.files).toEqual({
         './spec/helpers/**': TEMP_DIR,
         './spec/helpers/test1.txt': [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
       });
@@ -192,7 +192,7 @@ describe('CopyConfig', () => {
         repositoryUrl: '',
       });
 
-      const resolvedPaths = copyConfig['getFilesFromString'](copyString);
+      const resolvedPaths = copyConfig.getFilesFromString(copyString);
       expect(Object.keys(resolvedPaths)[0]).toBe('C:\\source');
       expect(Object.values(resolvedPaths)[0]).toBe('D:\\target');
     });
