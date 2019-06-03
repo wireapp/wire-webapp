@@ -43,7 +43,7 @@
     "typescript": "3.4.5",
     "webpack": "4.32.2",
     "webpack-cli": "3.3.2",
-    "webpack-dev-server": "3.4.1"
+    "webpack-dev-server": "3.5.1"
   },
   "description": "Wire API Client to send and receive data.",
   "files": [
