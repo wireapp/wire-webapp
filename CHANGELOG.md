@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.8.0...@wireapp/react-ui-kit@6.8.1) (2019-06-04)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Center & set default spinner color in loading button ([#1896](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1896)) ([5568066](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/5568066))
+
+
+
+
+
 # [6.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.7.0...@wireapp/react-ui-kit@6.8.0) (2019-06-04)
 
 
