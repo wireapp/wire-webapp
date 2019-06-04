@@ -21,12 +21,15 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
+import {Loading} from '../Misc';
 import {TextProps, filterTextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   backgroundColor?: string;
   noCapital?: boolean;
+  showLoading?: boolean;
+  loadingColor?: string;
 }
 
 const filterButtonProps = (props: Object) => {
@@ -90,7 +93,11 @@ const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpol
   display: 'inline-block !important',
 });
 
-const Button = (props: ButtonProps) => <button css={buttonStyle(props)} {...filterButtonProps(props)} />;
+const Button = ({showLoading, children, loadingColor, ...props}: ButtonProps) => (
+  <button css={buttonStyle(props)} {...filterButtonProps(props)}>
+    {showLoading ? <Loading size={30} color={loadingColor} /> : children}
+  </button>
+);
 const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
   <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)} />
 );

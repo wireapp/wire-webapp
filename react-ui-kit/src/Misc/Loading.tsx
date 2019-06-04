@@ -20,14 +20,16 @@
 /** @jsx jsx */
 import {jsx, keyframes} from '@emotion/core';
 import React from 'react';
+import {COLOR} from '../Identity';
 import {ANIMATION, DURATION} from '../Identity/motions';
 
 export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
   progress?: number;
   size?: number;
+  color?: string;
 }
 
-const Loading = ({progress = undefined, size = 43, ...props}: LoadingProps) => {
+const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...props}: LoadingProps) => {
   const pathLength = 125.68;
   const rotationOffset = -0.75;
   const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;
@@ -42,7 +44,7 @@ const Loading = ({progress = undefined, size = 43, ...props}: LoadingProps) => {
 
   return (
     <svg width={size} height={size} viewBox="0 0 43 43" strokeWidth="3" fill="none" {...props}>
-      <circle cx="21.5" cy="21.5" r="20" stroke="rgba(51,55,58,.08)" />
+      <circle cx="21.5" cy="21.5" r="20" stroke={COLOR.opaque(color, 0.08)} />
       <circle
         css={
           !progress && {
@@ -55,7 +57,7 @@ const Loading = ({progress = undefined, size = 43, ...props}: LoadingProps) => {
         cx="21.5"
         cy="21.5"
         r="20"
-        stroke="#218fd1"
+        stroke={color}
         strokeLinecap="round"
         strokeDasharray={pathLength}
         strokeDashoffset={progress && `${pathLength - pathLength * progress}`}

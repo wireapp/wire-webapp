@@ -278,7 +278,7 @@ const DemoInputs = () => {
             <Tooltip text="This shows a placeholder input">
               <Input placeholder="Placeholder" type="email" required />
             </Tooltip>
-            <Button type="submit" formNoValidate>
+            <Button type="submit" formNoValidate showLoading loadingColor={COLOR.WHITE}>
               Submit Button
             </Button>
             <InputBlock>

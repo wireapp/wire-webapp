@@ -86,5 +86,6 @@ export const COLOR: any = {
   ...COMPONENT_COLOR,
   BLACK,
   WHITE,
+  opaque,
   shade,
 };
