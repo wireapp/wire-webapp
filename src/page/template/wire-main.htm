@@ -98,8 +98,12 @@
           canShareScreen: callingRepository.supportsScreenSharing,
           callActions: callActions,
           mediaDevicesHandler: mediaDevicesHandler,
-          isMuted: callingRepository.isMuted">
+          isMuted: callingRepository.isMuted,
+          isChoosingScreen: isChoosingScreen">
        </fullscreen-video-call>
+      <!-- /ko -->
+      <!-- ko if: isChoosingScreen() -->
+        <choose-screen params="cancel: onCancelScreenSelection, choose: onChooseScreen, screens: selectableScreens()"></choose-screen>
       <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->

@@ -19,12 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
-import {Environment} from 'Util/Environment';
 
-import * as trackingHelpers from '../../tracking/Helpers';
-import {EventName} from '../../tracking/EventName';
-import {MediaType} from '../../media/MediaType';
-//import {MediaDeviceType} from '../../media/MediaDeviceType';
 import {WebAppEvents} from '../../event/WebApp';
 
 import 'Components/calling/deviceToggleButton';
@@ -46,6 +41,7 @@ export class FullscreenVideoCalling {
     canShareScreen,
     callActions,
     isMuted,
+    isChoosingScreen,
   }) {
     this.call = call;
     this.conversation = conversation;
@@ -77,7 +73,7 @@ export class FullscreenVideoCalling {
       return this.selfSharesScreen() && this.availableScreens().length > 1;
     });
 
-    this.isChoosingScreen = ko.observable(false); // TODO
+    this.isChoosingScreen = isChoosingScreen;
     this.showToggleVideo = ko.pureComputed(() => {
       return conversation().supportsVideoCall(false);
     });
@@ -122,73 +118,6 @@ export class FullscreenVideoCalling {
     };
   }
 
-  chooseSharedScreen(conversationId) {
-    const skipScreenSelection =
-      this.selfStreamState.screenSend() || Environment.browser.firefox || navigator.mediaDevices.getDisplayMedia;
-    if (skipScreenSelection) {
-      amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
-      return;
-    }
-
-    if (window.desktopCapturer) {
-      this.mediaRepository.devicesHandler
-        .getScreenSources()
-        .then(screenSources => {
-          const conversationEntity = this.joinedCall().conversationEntity;
-
-          const attributes = {
-            conversation_type: trackingHelpers.getConversationType(conversationEntity),
-            kind_of_call_when_sharing: this.joinedCall().isRemoteVideoSend() ? 'video' : 'audio',
-            num_screens: screenSources.length,
-          };
-
-          const isTeamConversation = !!conversationEntity.team_id;
-          if (isTeamConversation) {
-            Object.assign(attributes, trackingHelpers.getGuestAttributes(conversationEntity));
-          }
-
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.SHARED_SCREEN, attributes);
-
-          const hasMultipleScreens = screenSources.length > 1;
-          if (hasMultipleScreens) {
-            this.isChoosingScreen(true);
-            if (this.multitasking.isMinimized()) {
-              this.multitasking.resetMinimize(true);
-              this.multitasking.isMinimized(false);
-            }
-          } else {
-            amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, conversationId, MediaType.SCREEN);
-          }
-        })
-        .catch(error => {
-          this.logger.error('Unable to get screens sources for sharing', error);
-        });
-    }
-  }
-
-  clickedOnCancelScreen() {
-    this.isChoosingScreen(false);
-  }
-
-  clickedOnShareScreen() {
-    this.chooseSharedScreen(this.joinedCall().id);
-  }
-
-  clickedOnChooseScreen(screenSource) {
-    this.currentDeviceId.screenInput('');
-
-    this.logger.info(`Selected '${screenSource.name}' for screen sharing`, screenSource);
-    this.isChoosingScreen(false);
-    this.currentDeviceId.screenInput(screenSource.id);
-    amplify.publish(WebAppEvents.CALL.MEDIA.TOGGLE, this.joinedCall().id, MediaType.SCREEN);
-
-    if (this.multitasking.resetMinimize()) {
-      this.multitasking.isMinimized(true);
-      this.multitasking.resetMinimize(false);
-      this.logger.info(`Minimizing call '${this.joinedCall().id}' on screen selection to return to previous state`);
-    }
-  }
-
   switchCameraSource = (call, deviceId) => {
     this.callActions.switchCameraInput(call, deviceId);
   };
@@ -196,10 +125,6 @@ export class FullscreenVideoCalling {
   switchScreenSource = (call, deviceId) => {
     this.callActions.switchScreenInput(call, deviceId);
   };
-
-  clickedOnToggleScreen() {
-    this.mediaRepository.devicesHandler.toggleNextScreen();
-  }
 
   minimize() {
     this.multitasking.isMinimized(true);

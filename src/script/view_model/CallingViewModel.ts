@@ -25,6 +25,8 @@ import {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
 import {PermissionState} from '../notification/PermissionState';
 
+import '../components/calling/chooseScreen';
+
 export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
@@ -34,6 +36,9 @@ export class CallingViewModel {
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
   public readonly callActions: any;
+  public readonly selectableScreens: ko.Observable<any[]>;
+  public readonly isChoosingScreen: ko.PureComputed<boolean>;
+  private onChooseScreen: (deviceId: string) => void;
 
   constructor(
     callingRepository: CallingRepository,
@@ -50,7 +55,11 @@ export class CallingViewModel {
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
     );
+    this.selectableScreens = ko.observable([]);
+    this.isChoosingScreen = ko.pureComputed(() => this.selectableScreens().length > 0);
     this.multitasking = multitasking;
+
+    this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
       const sounds: any = {
@@ -114,6 +123,19 @@ export class CallingViewModel {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
       toggleScreenshare: (call: Call) => {
+        if (window.desktopCapturer && !call.selfParticipant.sharesScreen()) {
+          this.onChooseScreen = (deviceId: string): void => {
+            this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+            this.callingRepository.toggleScreenshare(call);
+            this.selectableScreens([]);
+          };
+          return this.mediaDevicesHandler.getScreenSources().then((sources: any) => {
+            if (false && sources.length === 1) {
+              return this.onChooseScreen(sources[0]);
+            }
+            this.selectableScreens(sources);
+          });
+        }
         this.callingRepository.toggleScreenshare(call);
       },
     };
@@ -204,4 +226,8 @@ export class CallingViewModel {
   hasAccessToCamera(): boolean {
     return this.permissionRepository.permissionState.camera() === PermissionState.GRANTED;
   }
+
+  onCancelScreenSelection = () => {
+    this.selectableScreens([]);
+  };
 }

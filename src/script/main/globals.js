@@ -83,7 +83,6 @@ import assetHeaderGlobal from 'Components/asset/assetHeader.js';
 import audioSeekBarGlobal from 'Components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from 'Components/asset/controls/seekBar.js';
 import mediaButtonGlobal from 'Components/asset/controls/mediaButton.js';
-import chooseScreenGlobal from 'Components/calling/chooseScreen.js';
 import conversationListCallingCellGlobal from 'Components/list/conversationListCallingCell.js';
 import conversationListCellGlobal from 'Components/list/conversationListCell.js';
 import groupAvatarGlobal from 'Components/list/groupAvatar.js';

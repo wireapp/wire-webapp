@@ -187,11 +187,6 @@ export class CallingRepository {
         return Promise.resolve(new MediaStream(localTracks));
       }
       const isGroup = call.conversationType === CONV_TYPE.GROUP;
-      avsLogger.info(
-        `requesting audio: ${audio} ${audio && !isMissingAudio ? '(from cache)' : ''}, camera: ${video} ${
-          video && !isMissingCamera ? '(from cache)' : ''
-        }, screen: ${screen} ${screen && !isMissingScreen ? '(from cache)' : ''}`
-      );
       return this.getMediaStream(isMissingAudio, isMissingCamera, isMissingScreen, isGroup)
         .then(mediaStream => {
           if (video || screen) {
@@ -313,9 +308,9 @@ export class CallingRepository {
   private loadVideoPreview(call: Call): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    return this.getMediaStream(false, true, false, isGroup)
+    return this.getMediaStream(true, true, false, isGroup)
       .then(mediaStream => {
-        call.selfParticipant.videoStream(mediaStream);
+        call.selfParticipant.replaceMediaStream(mediaStream);
         call.selfParticipant.videoState(VIDEO_STATE.STARTED);
         return true;
       })

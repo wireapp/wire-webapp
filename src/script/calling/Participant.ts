@@ -66,10 +66,10 @@ export class Participant {
 
   replaceMediaStream(newStream: MediaStream): void {
     if (newStream.getVideoTracks().length) {
-      this.videoStream(new MediaStream(newStream.getVideoTracks()));
+      this.setVideoStream(new MediaStream(newStream.getVideoTracks()));
     }
     if (newStream.getAudioTracks().length) {
-      this.audioStream(new MediaStream(newStream.getAudioTracks()));
+      this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
     }
   }
 

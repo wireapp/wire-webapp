@@ -17,17 +17,6 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ChooseScreen = class ChooseScreen {
-  constructor(params) {
-    this.on_cancel = params.cancel;
-    this.on_choose = params.choose;
-    this.screens = params.screens || [];
-  }
-};
-
 ko.components.register('choose-screen', {
   template: `
     <div class="choose-screen-list" data-bind="foreach: screens">
@@ -42,5 +31,9 @@ ko.components.register('choose-screen', {
            data-bind="click: on_cancel"></div>
     </div>
   `,
-  viewModel: z.components.ChooseScreen,
+  viewModel: function({cancel, choose, screens}) {
+    this.on_cancel = cancel;
+    this.on_choose = choose;
+    this.screens = screens || [];
+  },
 });

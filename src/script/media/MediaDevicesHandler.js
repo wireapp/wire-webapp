@@ -254,16 +254,8 @@ export class MediaDevicesHandler {
         if (error) {
           return reject(error);
         }
-
         this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`, screenSources);
         this.availableDevices.screenInput(screenSources);
-
-        if (screenSources.length === 1) {
-          const [firstScreenSource] = screenSources;
-          this.currentDeviceId.screenInput('');
-          this.logger.info(`Selected '${firstScreenSource.name}' for screen sharing`, firstScreenSource);
-          this.currentDeviceId.screenInput(firstScreenSource.id);
-        }
         return resolve(screenSources);
       });
     });
