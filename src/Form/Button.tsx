@@ -90,16 +90,18 @@ const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> 
 
 const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
   ...buttonStyle(props),
-  display: 'inline-block !important',
+  display: 'inline-flex !important',
 });
 
-const Button = ({showLoading, children, loadingColor, ...props}: ButtonProps) => (
+const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
   <button css={buttonStyle(props)} {...filterButtonProps(props)}>
-    {showLoading ? <Loading size={30} color={loadingColor} /> : children}
+    {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </button>
 );
-const ButtonLink = (props: ButtonProps<HTMLAnchorElement>) => (
-  <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)} />
+const ButtonLink = ({children, showLoading, loadingColor = COLOR.WHITE, ...props}: ButtonProps<HTMLAnchorElement>) => (
+  <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)}>
+    {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
+  </a>
 );
 
 export {Button, ButtonLink, buttonStyle, filterButtonProps, buttonLinkStyle};
