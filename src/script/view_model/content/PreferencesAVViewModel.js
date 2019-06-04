@@ -56,6 +56,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
     const updateStream = mediaType => {
+      const hasActiveStreams = this.streamHandler.localMediaStream() || this.mediaStream();
+      if (!hasActiveStreams) {
+        // if there is no active call or the preferences is not showing any streams, we do not need to request a new stream
+        return;
+      }
       const currentCallMediaStream = this.streamHandler.localMediaStream();
       // release first the current call's tracks and the preferences' tracks (Firefox doesn't allow to request another mic if one is already active)
       if (currentCallMediaStream) {
