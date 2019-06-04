@@ -57,7 +57,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.selfStreamState = this.callingRepository.selfStreamState;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {

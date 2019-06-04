@@ -262,24 +262,6 @@ export class MediaDevicesHandler {
   }
 
   /**
-   * Replace input device of given type
-   *
-   * @private
-   * @param {MediaType} mediaType - Media type to change device for
-   * @param {MediaDeviceType} mediaDeviceType - Media device type to change
-   * @param {string} mediaDeviceId - New media device Id
-   * @returns {undefined} No return value
-   */
-  _replaceInputDevice(mediaType, mediaDeviceType, mediaDeviceId) {
-    this.mediaRepository.streamHandler
-      .replaceInputSource(mediaType)
-      .then(() => this._updateCurrentIndexFromId(mediaDeviceType, mediaDeviceId))
-      .catch(error => {
-        this.logger.error(`Failed to replace input device of type '${mediaType}'`, error);
-      });
-  }
-
-  /**
    * Toggle between the available cameras.
    * @returns {Promise} Resolves when camera has been toggled.
    */

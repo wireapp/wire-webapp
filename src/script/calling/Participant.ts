@@ -64,12 +64,12 @@ export class Participant {
     this.videoStream(videoStream);
   }
 
-  replaceMediaStream(newStream: MediaStream): void {
+  setMediaStream(newStream: MediaStream): void {
     if (newStream.getVideoTracks().length) {
-      this.setVideoStream(new MediaStream(newStream.getVideoTracks()));
+      this.videoStream(new MediaStream(newStream.getVideoTracks()));
     }
     if (newStream.getAudioTracks().length) {
-      this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
+      this.audioStream(new MediaStream(newStream.getAudioTracks()));
     }
   }
 

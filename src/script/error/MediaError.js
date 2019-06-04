@@ -19,14 +19,9 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
-
-z.error.MediaError = class MediaError extends BaseError {
+export class MediaError extends BaseError {
   constructor(type, mediaType, message) {
     super('MediaError', type, message);
-
-    this.mediaType = mediaType;
   }
 
   static get MESSAGE() {
@@ -52,4 +47,4 @@ z.error.MediaError = class MediaError extends BaseError {
       UNHANDLED_MEDIA_TYPE: 'MediaError.UNHANDLED_MEDIA_TYPE',
     };
   }
-};
+}
