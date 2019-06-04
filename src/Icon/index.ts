@@ -49,6 +49,7 @@ export * from './SpeakerIcon';
 export * from './TeamIcon';
 export * from './TimedIcon';
 export * from './TrashIcon';
+export * from './TriangleIcon';
 export * from './WireIcon';
 
 // Brand Icons

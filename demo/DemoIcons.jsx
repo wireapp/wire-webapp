@@ -60,6 +60,7 @@ import {
   TeamIcon,
   TimedIcon,
   TrashIcon,
+  TriangleIcon,
   TwitterIcon,
   WireIcon,
 } from '@wireapp/react-ui-kit';
@@ -105,6 +106,7 @@ class DemoIcons extends React.PureComponent {
           <TeamIcon height={32} />
           <TimedIcon height={32} />
           <TrashIcon height={32} />
+          <TriangleIcon height={32} />
           <WireIcon width={32} />
         </div>
         <Line />
