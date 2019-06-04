@@ -364,19 +364,24 @@ export class UserRepository {
       messageId: createRandomUuid(),
     });
 
-    const recipients = this.teamUsers().concat(this.self());
-    const withoutLegalHoldDevices = recipients.map(user => this._withoutLegalHoldDevices(user));
-    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients: withoutLegalHoldDevices});
+    const users = this.teamUsers().concat(this.self());
+    const recipients = this._createRecipients(users, true);
+    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
   /**
-   * @param {User} user - A user with legal hold devices
-   * @returns {User} The user without legal hold devices
+   * @param {Array<User>} userEntities - Recipients of the message
+   * @param {boolean} [filterLegalHold] - `true` if Legal Hold devices should be filtered
+   * @returns {Object} A user client map
    */
-  _withoutLegalHoldDevices(user) {
-    const nonLegalHoldDevices = user.devices().filter(device => device.class !== ClientClassification.LEGAL_HOLD);
-    user.devices(nonLegalHoldDevices);
-    return user;
+  _createRecipients(userEntities, filterLegalHold = false) {
+    return userEntities.reduce((recipients, userEntity) => {
+      recipients[userEntity.id] = userEntity
+        .devices()
+        .filter(clientEntity => (filterLegalHold ? clientEntity.class !== ClientClassification.LEGAL_HOLD : true))
+        .map(clientEntity => clientEntity.id);
+      return recipients;
+    }, {});
   }
 
   /**
