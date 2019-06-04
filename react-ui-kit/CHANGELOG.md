@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.7.0...@wireapp/react-ui-kit@6.8.0) (2019-06-04)
+
+
+### Features
+
+* **react-ui-kit:** Loading spinner inside of Button ([#1895](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1895)) ([e036a51](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e036a51))
+
+
+
+
+
 # [6.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.6.0...@wireapp/react-ui-kit@6.7.0) (2019-06-04)
 
 
