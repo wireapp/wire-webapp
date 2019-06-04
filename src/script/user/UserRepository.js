@@ -372,6 +372,7 @@ export class UserRepository {
   /**
    * @param {Array<User>} userEntities - Recipients of the message
    * @param {boolean} [filterLegalHold] - `true` if Legal Hold devices should be filtered
+   * @private
    * @returns {Object} A user client map
    */
   _createRecipients(userEntities, filterLegalHold = false) {
