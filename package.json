@@ -3,7 +3,7 @@
     "@emotion/core": "10.0.10",
     "@types/color": "3.0.0",
     "bazinga64": "5.4.6",
-    "color": "3.1.1",
+    "color": "3.1.2",
     "emotion-normalize": "10.0.0",
     "react-transition-group": "4.1.0"
   },
