@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
@@ -364,7 +365,18 @@ export class UserRepository {
     });
 
     const recipients = this.teamUsers().concat(this.self());
-    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+    const withoutLegalHoldDevices = recipients.map(user => this._withoutLegalHoldDevices(user));
+    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients: withoutLegalHoldDevices});
+  }
+
+  /**
+   * @param {User} user - A user with legal hold devices
+   * @returns {User} The user without legal hold devices
+   */
+  _withoutLegalHoldDevices(user) {
+    const nonLegalHoldDevices = user.devices().filter(device => device.class !== ClientClassification.LEGAL_HOLD);
+    user.devices(nonLegalHoldDevices);
+    return user;
   }
 
   /**
