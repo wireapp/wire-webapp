@@ -10,7 +10,7 @@
     "@wireapp/commons": "1.7.2",
     "@wireapp/core": "10.2.5",
     "@wireapp/protocol-messaging": "1.24.0",
-    "@wireapp/react-ui-kit": "6.1.2",
+    "@wireapp/react-ui-kit": "6.8.1",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.5",
     "crypto-js": "3.1.9-1",
