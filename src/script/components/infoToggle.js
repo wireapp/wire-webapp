@@ -36,9 +36,9 @@ ko.components.register('info-toggle', {
     <div class="info-toggle__row">
       <div data-bind="text: name"></div>
       <div class="slider" data-bind="css: {'disabled': isDisabled}">
-        <input 
-          class="slider-input" 
-          data-bind="attr: { id: inputId, name: inputId }, checked: isChecked" 
+        <input
+          class="slider-input"
+          data-bind="attr: { id: inputId, name: inputId }, checked: isChecked"
           type="checkbox">
         <label class="button-label" data-bind="attr: { for: inputId, 'data-uie-value': isChecked() ? 'checked': 'unchecked', 'data-uie-name': dataUieNameLabelText }"></label>
       </div>

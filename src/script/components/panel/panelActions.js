@@ -25,7 +25,7 @@ ko.components.register('panel-actions', {
       <div class="panel__action-item" data-bind="click: click, attr: {'data-uie-name': identifier}">
         <div data-bind="component: icon" class="panel__action-item__icon"></div>
         <div class="panel__action-item__text" data-bind="text: label"></div>
-      </div> 
+      </div>
     <!-- /ko -->
   `,
   viewModel: function({items = ko.observable([])}) {

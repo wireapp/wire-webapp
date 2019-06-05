@@ -42,7 +42,7 @@ ko.components.register('device-card', {
       <!-- ko if: showOtherIcon -->
         <devices-icon class="device-card__icon" data-uie-name="status-mobile-device"></devices-icon>
       <!-- /ko -->
-      <div class="device-card__info" data-uie-name="device-card-info" data-bind="attr: {'data-uie-value': label}">    
+      <div class="device-card__info" data-uie-name="device-card-info" data-bind="attr: {'data-uie-value': label}">
         <!-- ko if: detailed -->
           <div class="label-xs device-card__label" data-bind="text: label"></div>
           <div class="label-xs">
