@@ -125,8 +125,7 @@ export class CallingRepository {
     this.enableDebugging();
   }
 
-  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}> {
-    // @ts-ignore
+  getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}[]> {
     return this.wCall.getStats(conversationId);
   }
 
@@ -632,7 +631,11 @@ export class CallingRepository {
     hasVideo: number,
     shouldRing: number
   ) => {
-    const canRing = shouldRing && this.isReady;
+    const conversationEntity = this.conversationRepository.find_conversation_by_id(conversationId);
+    if (!conversationEntity) {
+      return;
+    }
+    const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const call = new Call(
@@ -642,11 +645,11 @@ export class CallingRepository {
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
     );
-    call.state(CALL_STATE.INCOMING);
     if (!canRing) {
       // an incoming call that should not ring is an ongoing group call
       call.reason(REASON.STILL_ONGOING);
     }
+    call.state(CALL_STATE.INCOMING);
     if (canRing && isVideoCall) {
       this.loadVideoPreview(call);
     }
