@@ -31,6 +31,7 @@ import {Environment} from 'Util/Environment';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {TERMINATION_REASON} from './enum/TerminationReason';
 
@@ -64,7 +65,7 @@ export class CallingRepository {
   private readonly backendClient: any;
   private readonly conversationRepository: any;
   private readonly eventRepository: any;
-  private readonly mediaStreamHandler: any;
+  private readonly mediaStreamHandler: MediaStreamHandler;
   private readonly mediaDevicesHandler: any;
   private readonly serverTimeHandler: any;
   private readonly userRepository: any;
@@ -95,7 +96,7 @@ export class CallingRepository {
     backendClient: any,
     conversationRepository: any,
     eventRepository: any,
-    mediaStreamHandler: any,
+    mediaStreamHandler: MediaStreamHandler,
     mediaDevicesHandler: any,
     serverTimeHandler: any,
     userRepository: any
@@ -157,46 +158,8 @@ export class CallingRepository {
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
-
-    wCall.setUserMediaHandler((conversationId: ConversationId, audio: boolean, video: boolean, screen: boolean) => {
-      const call = this.findCall(conversationId);
-      if (!call) {
-        return Promise.reject();
-      }
-      const isGroup = call.conversationType === CONV_TYPE.GROUP;
-      return this.getMediaStream(audio, video, screen, isGroup)
-        .then(mediaStream => {
-          call.selfParticipant.setMediaStream(mediaStream);
-          return mediaStream;
-        })
-        .catch(() => {
-          this.handleMediaStreamError(call);
-          return new MediaStream();
-        });
-    });
-
-    wCall.setMediaStreamHandler(
-      (conversationId: ConversationId, userId: UserId, deviceId: DeviceId, streams: MediaStream[]) => {
-        let participant = this.findParticipant(conversationId, userId);
-        if (!participant) {
-          participant = new Participant(userId, deviceId);
-          this.findCall(conversationId).participants.unshift(participant);
-        }
-
-        if (streams.length === 0) {
-          return;
-        }
-
-        const [stream] = streams;
-        if (stream.getAudioTracks().length > 0) {
-          participant.audioStream(stream);
-        }
-        if (stream.getVideoTracks().length > 0) {
-          participant.videoStream(stream);
-        }
-      }
-    );
-
+    wCall.setUserMediaHandler(this.getCallMediaStream);
+    wCall.setMediaStreamHandler(this.updateParticipantStream);
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -213,39 +176,10 @@ export class CallingRepository {
       this.videoStateChanged, //vstateh,
       0
     );
-
-    wCall.setParticipantChangedHandler(wUser, (conversationId: ConversationId, membersJson: string) => {
-      const call = this.findCall(conversationId);
-      if (call) {
-        const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
-        const newMembers = members
-          .filter(({userid}) => !this.findParticipant(conversationId, userid))
-          .map(({userid, clientid}) => new Participant(userid, clientid));
-        const removedMembers = call.participants().filter(({userId}) => !members.find(({userid}) => userid === userId));
-
-        newMembers.forEach(participant => call.participants.unshift(participant));
-        removedMembers.forEach(participant => call.participants.remove(participant));
-      }
-    });
-
     wCall.setMuteHandler(wUser, this.isMuted);
-    wCall.setStateHandler(wUser, (conversationId: ConversationId, state: number) => {
-      const call = this.findCall(conversationId);
-      if (!call) {
-        this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
-        return;
-      }
+    wCall.setStateHandler(wUser, this.updateCallState);
+    wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
 
-      // If a call goes from a state to INCOMING, it means it's a group call that just ended
-      call.reason(state === CALL_STATE.INCOMING ? REASON.STILL_ONGOING : undefined);
-      call.state(state);
-
-      switch (state) {
-        case CALL_STATE.MEDIA_ESTAB:
-          call.startedAt(Date.now());
-          break;
-      }
-    });
     setInterval(wCall.poll.bind(wCall), 500);
 
     return {wCall, wUser};
@@ -656,6 +590,85 @@ export class CallingRepository {
 
     this.storeCall(call);
     this.incomingCallCallback(call);
+  };
+
+  private readonly updateCallState = (conversationId: ConversationId, state: number) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
+      return;
+    }
+
+    // If a call goes from a state to INCOMING, it means it's a group call that just ended
+    call.reason(state === CALL_STATE.INCOMING ? REASON.STILL_ONGOING : undefined);
+    call.state(state);
+
+    switch (state) {
+      case CALL_STATE.MEDIA_ESTAB:
+        call.startedAt(Date.now());
+        break;
+    }
+  };
+
+  private readonly updateCallParticipants = (conversationId: ConversationId, membersJson: string) => {
+    const call = this.findCall(conversationId);
+    if (call) {
+      const {members}: {members: {userid: UserId; clientid: DeviceId}[]} = JSON.parse(membersJson);
+      const newMembers = members
+        .filter(({userid}) => !this.findParticipant(conversationId, userid))
+        .map(({userid, clientid}) => new Participant(userid, clientid));
+      const removedMembers = call.participants().filter(({userId}) => !members.find(({userid}) => userid === userId));
+
+      newMembers.forEach(participant => call.participants.unshift(participant));
+      removedMembers.forEach(participant => call.participants.remove(participant));
+    }
+  };
+
+  private readonly getCallMediaStream = (
+    conversationId: ConversationId,
+    audio: boolean,
+    video: boolean,
+    screen: boolean
+  ) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return Promise.reject();
+    }
+    const isGroup = call.conversationType === CONV_TYPE.GROUP;
+    return this.getMediaStream(audio, video, screen, isGroup)
+      .then(mediaStream => {
+        call.selfParticipant.setMediaStream(mediaStream);
+        return mediaStream;
+      })
+      .catch(() => {
+        this.handleMediaStreamError(call);
+        return new MediaStream();
+      });
+  };
+
+  private readonly updateParticipantStream = (
+    conversationId: ConversationId,
+    userId: UserId,
+    deviceId: DeviceId,
+    streams: MediaStream[]
+  ): void => {
+    let participant = this.findParticipant(conversationId, userId);
+    if (!participant) {
+      participant = new Participant(userId, deviceId);
+      this.findCall(conversationId).participants.unshift(participant);
+    }
+
+    if (streams.length === 0) {
+      return;
+    }
+
+    const [stream] = streams;
+    if (stream.getAudioTracks().length > 0) {
+      participant.audioStream(stream);
+    }
+    if (stream.getVideoTracks().length > 0) {
+      participant.videoStream(stream);
+    }
   };
 
   private readonly videoStateChanged = (

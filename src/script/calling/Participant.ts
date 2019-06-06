@@ -39,7 +39,7 @@ export class Participant {
     this.deviceId = deviceId;
     this.videoState = ko.observable(VIDEO_STATE.STOPPED);
     this.hasActiveVideo = ko.pureComputed(() => {
-      return this.sharesCamera() || this.sharesScreen();
+      return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
     this.sharesScreen = ko.pureComputed(() => {
       return this.videoState() === VIDEO_STATE.SCREENSHARE;

@@ -32,31 +32,6 @@ import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
 export class MediaStreamHandler {
-  static getMediaTracks(mediaStream: MediaStream, mediaType: MediaType = MediaType.AUDIO_VIDEO): MediaStreamTrack[] {
-    if (!mediaStream) {
-      throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND);
-    }
-
-    switch (mediaType) {
-      case MediaType.AUDIO: {
-        return mediaStream.getAudioTracks();
-      }
-
-      case MediaType.AUDIO_VIDEO: {
-        return mediaStream.getTracks();
-      }
-
-      case MediaType.SCREEN:
-      case MediaType.VIDEO: {
-        return mediaStream.getVideoTracks();
-      }
-
-      default: {
-        throw new MediaError(MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
-      }
-    }
-  }
-
   static get CONFIG(): any {
     return {
       MEDIA_TYPE: {
@@ -159,24 +134,19 @@ export class MediaStreamHandler {
       });
     };
 
-    const permissionTypes = this.getPermissionTypes(audio, video);
+    const permissionTypes = [];
+    if (audio) {
+      permissionTypes.push(PermissionType.MICROPHONE);
+    }
+    if (video) {
+      permissionTypes.push(PermissionType.CAMERA);
+    }
     const shouldCheckPermissions = permissionTypes && permissionTypes.length;
     return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : Promise.resolve(true);
   }
 
-  private getPermissionTypes(audio: boolean, video: boolean): PermissionType[] {
-    const types = [];
-    if (audio) {
-      types.push(PermissionType.MICROPHONE);
-    }
-    if (video) {
-      types.push(PermissionType.CAMERA);
-    }
-    return types;
-  }
-
   releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): boolean {
-    const mediaStreamTracks = MediaStreamHandler.getMediaTracks(mediaStream, mediaType);
+    const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     if (mediaStreamTracks.length) {
       mediaStreamTracks.forEach(mediaStreamTrack => {
@@ -244,6 +214,31 @@ export class MediaStreamHandler {
 
         throw error;
       });
+  }
+
+  private getMediaTracks(mediaStream: MediaStream, mediaType: MediaType = MediaType.AUDIO_VIDEO): MediaStreamTrack[] {
+    if (!mediaStream) {
+      throw new MediaError(MediaError.TYPE.STREAM_NOT_FOUND);
+    }
+
+    switch (mediaType) {
+      case MediaType.AUDIO: {
+        return mediaStream.getAudioTracks();
+      }
+
+      case MediaType.AUDIO_VIDEO: {
+        return mediaStream.getTracks();
+      }
+
+      case MediaType.SCREEN:
+      case MediaType.VIDEO: {
+        return mediaStream.getVideoTracks();
+      }
+
+      default: {
+        throw new MediaError(MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+      }
+    }
   }
 
   private schedulePermissionHint(audio: boolean, video: boolean, screen: boolean): void {
