@@ -17,10 +17,8 @@
  *
  */
 
-enum AudioPreference {
+export enum AudioPreference {
   ALL = 'all',
   NONE = 'none',
   SOME = 'some',
 }
-
-export {AudioPreference};

@@ -17,11 +17,9 @@
  *
  */
 
-enum MemberRole {
+export enum MemberRole {
   ADMIN = 'admin',
   MEMBER = 'member',
   OWNER = 'owner',
   PARTNER = 'partner',
 }
-
-export {MemberRole};

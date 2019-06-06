@@ -25,7 +25,7 @@ interface PaymentCoupon {
   percentOff: number;
 }
 
-interface InvoiceData {
+export interface InvoiceData {
   amount: number;
   balance: number;
   company: string;
@@ -39,5 +39,3 @@ interface InvoiceData {
   taxPercent: number;
   total: number;
 }
-
-export {InvoiceData, PaymentCoupon};

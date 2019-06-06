@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '../connection/';
 
-interface Connection {
+export interface Connection {
   conversation: string;
   from: string;
   last_update: string;
@@ -27,5 +27,3 @@ interface Connection {
   status: ConnectionStatus;
   to: string;
 }
-
-export {Connection};

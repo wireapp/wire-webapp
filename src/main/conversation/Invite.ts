@@ -17,8 +17,6 @@
  *
  */
 
-interface Invite {
+export interface Invite {
   user: string[];
 }
-
-export {Invite};

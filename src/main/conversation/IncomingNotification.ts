@@ -19,10 +19,8 @@
 
 import {IncomingEvent} from '../event/';
 
-interface IncomingNotification {
+export interface IncomingNotification {
   id: string;
   payload: IncomingEvent[];
   transient?: boolean;
 }
-
-export {IncomingNotification};

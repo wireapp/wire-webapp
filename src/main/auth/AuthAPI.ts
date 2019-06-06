@@ -28,7 +28,7 @@ import {User} from '../user/';
 import {CookieList} from './CookieList';
 import {RegisterData} from './RegisterData';
 
-class AuthAPI {
+export class AuthAPI {
   constructor(private readonly client: HttpClient, private readonly engine: CRUDEngine) {}
 
   static URL = {
@@ -120,5 +120,3 @@ class AuthAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {AuthAPI};

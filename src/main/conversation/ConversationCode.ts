@@ -17,10 +17,8 @@
  *
  */
 
-interface ConversationCode {
+export interface ConversationCode {
   code: string;
   key: string;
   uri?: string;
 }
-
-export {ConversationCode};

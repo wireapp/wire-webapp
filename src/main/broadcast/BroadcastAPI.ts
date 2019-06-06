@@ -22,7 +22,7 @@ import {NewOTRMessage, UserClients} from '../conversation/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 
-class BroadcastAPI {
+export class BroadcastAPI {
   constructor(private readonly client: HttpClient) {}
 
   static readonly URL = {
@@ -71,5 +71,3 @@ class BroadcastAPI {
     return this.client.sendProtocolBuffer<UserClients>(config).then(response => response.data);
   }
 }
-
-export {BroadcastAPI};

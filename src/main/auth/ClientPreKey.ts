@@ -19,9 +19,7 @@
 
 import {PreKey} from '../auth/';
 
-interface ClientPreKey {
+export interface ClientPreKey {
   client: string;
   prekey: PreKey;
 }
-
-export {ClientPreKey};

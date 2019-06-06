@@ -19,9 +19,7 @@
 
 import {Member, OtherMember} from '../conversation/';
 
-interface ConversationMembers {
+export interface ConversationMembers {
   others: OtherMember[];
   self: Member;
 }
-
-export {ConversationMembers};

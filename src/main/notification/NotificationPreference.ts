@@ -17,11 +17,9 @@
  *
  */
 
-enum NotificationPreference {
+export enum NotificationPreference {
   NONE = 'none',
   OBFUSCATE = 'obfuscate',
   OBFUSCATE_MESSAGE = 'obfuscate-message',
   ON = 'on',
 }
-
-export {NotificationPreference};

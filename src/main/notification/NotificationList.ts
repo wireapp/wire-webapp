@@ -19,9 +19,7 @@
 
 import {Notification} from './Notification';
 
-interface NotificationList {
+export interface NotificationList {
   has_more: boolean;
   notifications: Notification[];
 }
-
-export {NotificationList};

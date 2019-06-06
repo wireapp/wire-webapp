@@ -19,9 +19,7 @@
 
 import {Connection} from '../connection/';
 
-interface UserConnectionList {
+export interface UserConnectionList {
   connections: Connection[];
   has_more: boolean;
 }
-
-export {UserConnectionList};

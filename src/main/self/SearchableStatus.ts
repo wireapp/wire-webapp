@@ -17,8 +17,6 @@
  *
  */
 
-interface SearchableStatus {
+export interface SearchableStatus {
   searchable: boolean;
 }
-
-export {SearchableStatus};

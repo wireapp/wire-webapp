@@ -24,7 +24,7 @@ import {ChangePassword, Delete, SearchableStatus, Self} from '../self/';
 import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
 
-class SelfAPI {
+export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -250,5 +250,3 @@ class SelfAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {SelfAPI};

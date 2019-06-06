@@ -19,9 +19,7 @@
 
 import {RTCIceServer} from '../user/';
 
-interface RTCConfiguration {
+export interface RTCConfiguration {
   ttl: number;
   ice_servers: RTCIceServer[];
 }
-
-export {RTCConfiguration};

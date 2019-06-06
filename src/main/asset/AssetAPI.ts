@@ -25,7 +25,7 @@ import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {AssetUploadData} from './AssetUploadData';
 import {isValidAssetId, isValidToken} from './AssetUtil';
 
-class AssetAPI {
+export class AssetAPI {
   private static readonly ASSET_URL = '/assets/v3';
 
   constructor(private readonly client: HttpClient) {}
@@ -90,5 +90,3 @@ class AssetAPI {
       .then(response => response.data);
   }
 }
-
-export {AssetAPI};

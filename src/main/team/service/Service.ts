@@ -16,9 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {UserAsset} from '../../user/';
 
-interface Service {
+export interface Service {
   id: string;
   name: string;
   provider: string;
@@ -28,5 +29,3 @@ interface Service {
   tags: string[];
   enabled: boolean;
 }
-
-export {Service};

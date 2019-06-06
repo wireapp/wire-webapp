@@ -19,11 +19,9 @@
 
 import {Contact} from '../user/';
 
-interface SearchResult {
+export interface SearchResult {
   documents: Contact[];
   found: number;
   returned: number;
   took: number;
 }
-
-export {SearchResult};

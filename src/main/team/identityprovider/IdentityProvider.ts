@@ -17,16 +17,14 @@
  *
  */
 
-interface IdentityProvider {
+export interface IdentityProvider {
   extraInfo: string;
   id: string;
   metadata: IdentityProviderMetaData;
 }
 
-interface IdentityProviderMetaData {
+export interface IdentityProviderMetaData {
   certAuthnResponse: string[];
   issuer: string;
   requestURI: string;
 }
-
-export {IdentityProvider, IdentityProviderMetaData};

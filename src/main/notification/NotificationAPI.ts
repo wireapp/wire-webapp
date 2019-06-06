@@ -23,7 +23,7 @@ import {Notification, NotificationList} from './';
 
 const NOTIFICATION_SIZE_MAXIMUM = 10000;
 
-class NotificationAPI {
+export class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -92,5 +92,3 @@ class NotificationAPI {
     return this.client.sendJSON<Notification>(config).then(response => response.data);
   }
 }
-
-export {NotificationAPI};

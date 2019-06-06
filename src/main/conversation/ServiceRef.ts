@@ -17,9 +17,7 @@
  *
  */
 
-interface ServiceRef {
+export interface ServiceRef {
   id: string;
   provider: string;
 }
-
-export {ServiceRef};

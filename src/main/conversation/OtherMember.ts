@@ -19,10 +19,8 @@
 
 import {ServiceRef} from '../conversation/';
 
-interface OtherMember {
+export interface OtherMember {
   id: string;
   service?: ServiceRef;
   status: number;
 }
-
-export {OtherMember};

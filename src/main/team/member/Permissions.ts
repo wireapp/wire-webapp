@@ -18,7 +18,7 @@
  */
 
 /* tslint:disable:object-literal-sort-keys */
-enum Permissions {
+export enum Permissions {
   CREATE_CONVERSATION = 1 << 0,
   DELETE_CONVERSATION = 1 << 1,
   ADD_TEAM_MEMBER = 1 << 2,
@@ -35,13 +35,11 @@ enum Permissions {
 }
 /* tslint:enable:object-literal-sort-keys */
 
-const hasPermissions = (permissions: Permissions, expectedPermissions: Permissions): boolean => {
+export const hasPermissions = (permissions: Permissions, expectedPermissions: Permissions): boolean => {
   const validPermissions = Number.isSafeInteger(permissions) && permissions > 0;
   return validPermissions && (permissions & expectedPermissions) === expectedPermissions;
 };
 
-const combinePermissions = (permissionList: Permissions[]): Permissions => {
+export const combinePermissions = (permissionList: Permissions[]): Permissions => {
   return permissionList.reduce((acc, permission) => acc | permission, 0);
 };
-
-export {Permissions, hasPermissions, combinePermissions};

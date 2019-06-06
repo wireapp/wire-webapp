@@ -19,9 +19,7 @@
 
 import {ClientPreKey} from '../auth/';
 
-interface PreKeyBundle {
+export interface PreKeyBundle {
   clients: ClientPreKey[];
   user: string;
 }
-
-export {PreKeyBundle};

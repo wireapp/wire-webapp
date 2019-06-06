@@ -17,9 +17,7 @@
  *
  */
 
-interface Location {
+export interface Location {
   lon: number;
   lat: number;
 }
-
-export {Location};

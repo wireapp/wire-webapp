@@ -21,7 +21,7 @@ import EventEmitter from 'events';
 import logdown from 'logdown';
 import {AccessTokenData} from '../auth/';
 
-class AccessTokenStore extends EventEmitter {
+export class AccessTokenStore extends EventEmitter {
   private readonly logger: logdown.Logger;
 
   constructor() {
@@ -53,5 +53,3 @@ class AccessTokenStore extends EventEmitter {
     return this.accessToken;
   }
 }
-
-export {AccessTokenStore};

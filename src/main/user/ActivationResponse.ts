@@ -17,10 +17,8 @@
  *
  */
 
-interface ActivationResponse {
+export interface ActivationResponse {
   email?: string;
   first: boolean;
   phone?: string;
 }
-
-export {ActivationResponse};

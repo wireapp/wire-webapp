@@ -30,7 +30,7 @@ import {
   PaymentStripePlan,
 } from './';
 
-class PaymentAPI {
+export class PaymentAPI {
   static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
   constructor(private readonly client: HttpClient) {}
 
@@ -147,5 +147,3 @@ class PaymentAPI {
     return this.client.sendJSON<string[]>(config).then(response => response.data);
   }
 }
-
-export {PaymentAPI};

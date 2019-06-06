@@ -19,9 +19,7 @@
 
 import {NotificationEvent} from './NotificationEvent';
 
-interface Notification {
+export interface Notification {
   id: string;
   payload: NotificationEvent[];
 }
-
-export {Notification};

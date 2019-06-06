@@ -37,7 +37,7 @@ import {
   VerifyDelete,
 } from '../user/';
 
-class UserAPI {
+export class UserAPI {
   static readonly URL = {
     ACTIVATE: '/activate',
     CALLS: '/calls',
@@ -402,5 +402,3 @@ class UserAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {UserAPI};

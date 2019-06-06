@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-type NodeWebSocket = WebSocket;
+
+export type NodeWebSocket = WebSocket;
 
 export {NodeWebSocket as WebSocket};

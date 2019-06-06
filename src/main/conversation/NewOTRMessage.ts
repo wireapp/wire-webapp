@@ -19,7 +19,7 @@
 
 import {OTRRecipients} from '../conversation/';
 
-interface NewOTRMessage {
+export interface NewOTRMessage {
   data?: any; // Defaults to Protocol Buffer. Use type 'string' for JSON.
   native_priority?: 'low' | 'high';
   native_push?: boolean;
@@ -27,5 +27,3 @@ interface NewOTRMessage {
   sender: string;
   transient?: boolean;
 }
-
-export {NewOTRMessage};

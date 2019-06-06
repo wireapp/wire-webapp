@@ -115,6 +115,7 @@ class Auth extends Component {
     );
   }
 }
+
 window.onload = function() {
   const config = {
     schemaCallback: db => {

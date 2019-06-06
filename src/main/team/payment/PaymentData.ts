@@ -44,7 +44,7 @@ interface PaymentSuspension {
   invoice: string;
 }
 
-interface PaymentData {
+export interface PaymentData {
   bankTransfer: boolean;
   card: PaymentCardData;
   invoice: InvoiceData;
@@ -55,5 +55,3 @@ interface PaymentData {
   suspend?: PaymentSuspension;
   trialEndsAt: number;
 }
-
-export {PaymentData, PaymentStatus, PaymentSuspension, PaymentCardData};

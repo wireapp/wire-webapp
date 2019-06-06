@@ -19,10 +19,8 @@
 
 import {UserAsset} from '../user/';
 
-interface UserUpdate {
+export interface UserUpdate {
   accent_id?: number;
   assets?: UserAsset[];
   name: string;
 }
-
-export {UserUpdate};

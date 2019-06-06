@@ -20,7 +20,7 @@
 import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http';
 
-class AccountAPI {
+export class AccountAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -116,5 +116,3 @@ class AccountAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {AccountAPI};

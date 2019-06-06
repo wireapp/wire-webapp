@@ -19,8 +19,6 @@
 
 import {ConnectionStatus} from '../connection/';
 
-interface ConnectionUpdate {
+export interface ConnectionUpdate {
   status: ConnectionStatus;
 }
-
-export {ConnectionUpdate};

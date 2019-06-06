@@ -17,7 +17,7 @@
  *
  */
 
-class ValidationError extends Error {
+export class ValidationError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, ValidationError.prototype);
@@ -27,5 +27,3 @@ class ValidationError extends Error {
     this.stack = new Error().stack;
   }
 }
-
-export {ValidationError};

@@ -19,17 +19,15 @@
 
 import {PaymentInterval} from '../payment/';
 
-enum PaymentPlanID {
+export enum PaymentPlanID {
   ANNUAL = 'wire_annual_plan',
   MONTHLY = 'wire_monthly_plan',
 }
 
-interface PaymentPlan {
+export interface PaymentPlan {
   amount: number;
   custom: boolean;
   id: PaymentPlanID;
   interval: PaymentInterval;
   name: string;
 }
-
-export {PaymentPlan, PaymentPlanID};

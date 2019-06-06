@@ -19,8 +19,6 @@
 
 import {MemberData} from './MemberData';
 
-interface Members {
+export interface Members {
   members: MemberData[];
 }
-
-export {Members};

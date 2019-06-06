@@ -20,7 +20,7 @@
 import {Picture, SSOSignature} from '../self/';
 import {UserAsset} from '../user/';
 
-interface Self {
+export interface Self {
   accent_id?: number;
   assets: UserAsset[];
   deleted?: boolean;
@@ -35,5 +35,3 @@ interface Self {
   sso_id?: SSOSignature;
   team?: string;
 }
-
-export {Self};

@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {HttpClient} from '../../http/';
 
-class TeamAPI {
+export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -82,5 +82,3 @@ class TeamAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {TeamAPI};

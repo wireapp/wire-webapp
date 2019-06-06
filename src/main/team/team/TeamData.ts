@@ -19,7 +19,7 @@
 
 import {SupportedCurrency} from '../payment/';
 
-interface TeamData {
+export interface TeamData {
   binding: boolean;
   creator: string;
   currency?: SupportedCurrency;
@@ -27,5 +27,3 @@ interface TeamData {
   id: string;
   name: string;
 }
-
-export {TeamData};
