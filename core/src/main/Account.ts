@@ -27,6 +27,8 @@ import {
   ConversationOtrMessageAddEvent,
   IncomingEvent,
   USER_EVENT,
+  UserClientAddEvent,
+  UserClientRemoveEvent,
   UserConnectionEvent,
   UserEvent,
 } from '@wireapp/api-client/dist/commonjs/event/';
@@ -71,7 +73,7 @@ import logdown from 'logdown';
 import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {UserService} from './user/';
 
-class Account extends EventEmitter {
+export class Account extends EventEmitter {
   private readonly logger: logdown.Logger;
 
   private readonly apiClient: APIClient;
@@ -555,18 +557,46 @@ class Account extends EventEmitter {
   }
 
   private mapUserEvent(event: UserEvent): PayloadBundle | void {
-    if (event.type === USER_EVENT.CONNECTION) {
-      const {connection} = event as UserConnectionEvent;
-      return {
-        content: connection,
-        conversation: connection.conversation,
-        from: connection.from,
-        id: MessageBuilder.createId(),
-        messageTimer: 0,
-        state: PayloadBundleState.INCOMING,
-        timestamp: new Date(connection.last_update).getTime(),
-        type: PayloadBundleType.CONNECTION_REQUEST,
-      };
+    switch (event.type) {
+      case USER_EVENT.CONNECTION: {
+        const {connection} = event as UserConnectionEvent;
+        return {
+          content: connection,
+          conversation: connection.conversation,
+          from: connection.from,
+          id: MessageBuilder.createId(),
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(connection.last_update).getTime(),
+          type: PayloadBundleType.CONNECTION_REQUEST,
+        };
+      }
+      case USER_EVENT.CLIENT_ADD: {
+        const {client} = event as UserClientAddEvent;
+        return {
+          content: {client},
+          conversation: this.apiClient.context!.userId,
+          from: this.apiClient.context!.userId,
+          id: MessageBuilder.createId(),
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date().getTime(),
+          type: PayloadBundleType.CLIENT_ADD,
+        };
+      }
+      case USER_EVENT.CLIENT_REMOVE: {
+        const {client} = event as UserClientRemoveEvent;
+        return {
+          content: {client},
+          conversation: this.apiClient.context!.userId,
+          from: this.apiClient.context!.userId,
+          id: MessageBuilder.createId(),
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date().getTime(),
+          type: PayloadBundleType.CLIENT_REMOVE,
+        };
+      }
     }
   }
 
@@ -579,7 +609,7 @@ class Account extends EventEmitter {
       CONVERSATION_EVENT.RENAME,
       CONVERSATION_EVENT.TYPING,
     ];
-    const USER_EVENTS = [USER_EVENT.CONNECTION];
+    const USER_EVENTS = [USER_EVENT.CONNECTION, USER_EVENT.CLIENT_ADD, USER_EVENT.CLIENT_REMOVE];
 
     if (ENCRYPTED_EVENTS.includes(event.type as CONVERSATION_EVENT)) {
       return this.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
@@ -608,6 +638,8 @@ class Account extends EventEmitter {
           case PayloadBundleType.ASSET_IMAGE:
           case PayloadBundleType.CLEARED:
           case PayloadBundleType.CLIENT_ACTION:
+          case PayloadBundleType.CLIENT_ADD:
+          case PayloadBundleType.CLIENT_REMOVE:
           case PayloadBundleType.CONFIRMATION:
           case PayloadBundleType.CONNECTION_REQUEST:
           case PayloadBundleType.LOCATION:
@@ -664,5 +696,3 @@ class Account extends EventEmitter {
     }
   }
 }
-
-export {Account};

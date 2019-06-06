@@ -17,13 +17,15 @@
  *
  */
 
-import {Connection} from '@wireapp/api-client/dist/commonjs/connection/';
 import {ClientActionType} from '../';
 import {
   AssetContent,
   ClearedContent,
   ClientActionContent,
+  ClientAddContent,
+  ClientRemoveContent,
   ConfirmationContent,
+  ConnectionContent,
   DeletedContent,
   EditedTextContent,
   FileAssetAbortContent,
@@ -38,13 +40,15 @@ import {
   TextContent,
 } from './';
 
-type ConversationContent =
+export type ConversationContent =
   | AssetContent
   | ClearedContent
   | ClientActionContent
   | ClientActionType
+  | ClientAddContent
+  | ClientRemoveContent
   | ConfirmationContent
-  | Connection
+  | ConnectionContent
   | DeletedContent
   | EditedTextContent
   | FileAssetContent
@@ -57,5 +61,3 @@ type ConversationContent =
   | LocationContent
   | ReactionContent
   | TextContent;
-
-export {ConversationContent};

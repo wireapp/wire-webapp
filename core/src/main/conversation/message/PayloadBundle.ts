@@ -45,6 +45,8 @@ export enum PayloadBundleType {
   CALL = 'PayloadBundleType.CALL',
   CLEARED = 'PayloadBundleType.CLEARED',
   CLIENT_ACTION = 'PayloadBundleType.CLIENT_ACTION',
+  CLIENT_ADD = 'PayloadBundleType.CLIENT_ADD',
+  CLIENT_REMOVE = 'PayloadBundleType.CLIENT_REMOVE',
   CONFIRMATION = 'PayloadBundleType.CONFIRMATION',
   CONNECTION_REQUEST = 'PayloadBundleType.CONNECTION_REQUEST',
   CONVERSATION_CLEAR = 'PayloadBundleType.CONVERSATION_CLEAR',
