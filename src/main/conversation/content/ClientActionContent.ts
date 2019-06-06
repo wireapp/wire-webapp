@@ -19,8 +19,6 @@
 
 import {ClientAction} from '@wireapp/protocol-messaging';
 
-interface ClientActionContent {
+export interface ClientActionContent {
   clientAction: ClientAction;
 }
-
-export {ClientActionContent};

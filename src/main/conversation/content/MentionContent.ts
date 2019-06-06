@@ -17,10 +17,8 @@
  *
  */
 
-interface MentionContent {
+export interface MentionContent {
   length: number;
   start: number;
   userId?: string;
 }
-
-export {MentionContent};

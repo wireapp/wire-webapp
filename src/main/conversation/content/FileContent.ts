@@ -17,14 +17,12 @@
  *
  */
 
-interface FileContent {
+export interface FileContent {
   data: Buffer;
 }
 
-interface FileMetaDataContent {
+export interface FileMetaDataContent {
   name: string;
   length: number;
   type: string;
 }
-
-export {FileContent, FileMetaDataContent};

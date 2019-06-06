@@ -20,7 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {GiphyOptions, GiphyResult} from '@wireapp/api-client/dist/commonjs/giphy/';
 
-class GiphyService {
+export class GiphyService {
   constructor(private readonly apiClient: APIClient) {}
 
   public getRandomGif(tag?: string): Promise<GiphyResult> {
@@ -31,5 +31,3 @@ class GiphyService {
     return this.apiClient.giphy.api.getGiphySearch(query, options);
   }
 }
-
-export {GiphyService};

@@ -17,9 +17,7 @@
  *
  */
 
-interface SessionPayloadBundle {
+export interface SessionPayloadBundle {
   sessionId: string;
   encryptedPayload: string;
 }
-
-export {SessionPayloadBundle};

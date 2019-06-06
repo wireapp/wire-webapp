@@ -20,7 +20,7 @@
 import {APIClient} from '@wireapp/api-client';
 import {MemberData, Members, NewTeamData, TeamChunkData, TeamData} from '@wireapp/api-client/dist/commonjs/team';
 
-class TeamService {
+export class TeamService {
   constructor(private readonly apiClient: APIClient) {}
 
   public addMember(teamId: string, member: MemberData): Promise<void> {
@@ -59,5 +59,3 @@ class TeamService {
     return this.apiClient.teams.team.api.putTeam(team);
   }
 }
-
-export {TeamService};

@@ -17,6 +17,4 @@
  *
  */
 
-import {SelfService} from './SelfService';
-
-export {SelfService};
+export * from './SelfService';

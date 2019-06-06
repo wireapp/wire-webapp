@@ -19,14 +19,12 @@
 
 import {AssetContent, LocationContent, TextContent} from '../content/';
 
-interface QuoteContent {
+export interface QuoteContent {
   quotedMessageId: string;
   quotedMessageSha256: Uint8Array;
 }
 
-interface QuoteMessageContent {
+export interface QuoteMessageContent {
   content: AssetContent | LocationContent | TextContent;
   quotedMessageId: string;
 }
-
-export {QuoteContent, QuoteMessageContent};

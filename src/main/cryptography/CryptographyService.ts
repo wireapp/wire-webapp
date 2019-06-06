@@ -47,7 +47,7 @@ export type DecryptionResult =
       error: Error;
     };
 
-class CryptographyService {
+export class CryptographyService {
   private readonly logger: logdown.Logger;
 
   public cryptobox: Cryptobox;
@@ -176,5 +176,3 @@ class CryptographyService {
     this.logger.log(`Deleted session ID "${sessionId}".`);
   }
 }
-
-export {CryptographyService};

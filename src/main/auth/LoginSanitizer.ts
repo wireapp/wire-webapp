@@ -19,7 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
-class LoginSanitizer {
+export class LoginSanitizer {
   constructor() {}
 
   public static removeNonPrintableCharacters(loginData: LoginData): void {
@@ -42,5 +42,3 @@ class LoginSanitizer {
     }
   }
 }
-
-export {LoginSanitizer};

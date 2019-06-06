@@ -17,6 +17,4 @@
  *
  */
 
-import {GiphyService} from './GiphyService';
-
-export {GiphyService};
+export * from './GiphyService';

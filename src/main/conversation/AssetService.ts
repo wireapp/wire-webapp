@@ -28,7 +28,7 @@ export interface AssetOptions {
   retention: AssetRetentionPolicy;
 }
 
-class AssetService {
+export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
   private async postAsset(buffer: Buffer, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
@@ -52,5 +52,3 @@ class AssetService {
     return this.postAsset(file.data, options);
   }
 }
-
-export {AssetService};

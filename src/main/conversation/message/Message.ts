@@ -36,83 +36,83 @@ import {
 } from '../content';
 import {PayloadBundle, PayloadBundleType} from './PayloadBundle';
 
-interface TextMessage extends PayloadBundle {
+export interface TextMessage extends PayloadBundle {
   content: TextContent;
   type: PayloadBundleType.TEXT;
 }
 
-interface EditedTextMessage extends PayloadBundle {
+export interface EditedTextMessage extends PayloadBundle {
   content: EditedTextContent;
   type: PayloadBundleType.MESSAGE_EDIT;
 }
 
-interface FileAssetMessage extends PayloadBundle {
+export interface FileAssetMessage extends PayloadBundle {
   content: FileAssetContent;
   type: PayloadBundleType.ASSET;
 }
 
-interface FileAssetMetaDataMessage extends PayloadBundle {
+export interface FileAssetMetaDataMessage extends PayloadBundle {
   content: FileAssetMetaDataContent;
   type: PayloadBundleType.ASSET_META;
 }
 
-interface FileAssetAbortMessage extends PayloadBundle {
+export interface FileAssetAbortMessage extends PayloadBundle {
   content: FileAssetAbortContent;
   type: PayloadBundleType.ASSET_ABORT;
 }
 
 // TODO Merge ImageAssetMessageOutgoing & ImageAssetMessage
-interface ImageAssetMessageOutgoing extends PayloadBundle {
+export interface ImageAssetMessageOutgoing extends PayloadBundle {
   content: ImageAssetContent;
   type: PayloadBundleType.ASSET_IMAGE;
 }
 
-interface ImageAssetMessage extends PayloadBundle {
+export interface ImageAssetMessage extends PayloadBundle {
   content: AssetContent;
   type: PayloadBundleType.ASSET_IMAGE;
 }
 
-interface LocationMessage extends PayloadBundle {
+export interface LocationMessage extends PayloadBundle {
   content: LocationContent;
   type: PayloadBundleType.LOCATION;
 }
 
-interface ReactionMessage extends PayloadBundle {
+export interface ReactionMessage extends PayloadBundle {
   content: ReactionContent;
   type: PayloadBundleType.REACTION;
 }
 
-interface ConfirmationMessage extends PayloadBundle {
+export interface ConfirmationMessage extends PayloadBundle {
   content: ConfirmationContent;
   type: PayloadBundleType.CONFIRMATION;
 }
 
-interface PingMessage extends PayloadBundle {
+export interface PingMessage extends PayloadBundle {
   content: KnockContent;
   type: PayloadBundleType.PING;
 }
 
-interface ResetSessionMessage extends PayloadBundle {
+export interface ResetSessionMessage extends PayloadBundle {
   content: ClientActionContent;
   type: PayloadBundleType.CLIENT_ACTION;
 }
 
-interface ClearConversationMessage extends PayloadBundle {
+export interface ClearConversationMessage extends PayloadBundle {
   content: ClearedContent;
   type: PayloadBundleType.CLEARED;
 }
 
-interface HideMessage extends PayloadBundle {
+export interface HideMessage extends PayloadBundle {
   content: HiddenContent;
   type: PayloadBundleType.MESSAGE_HIDE;
 }
 
-interface DeleteMessage extends PayloadBundle {
+export interface DeleteMessage extends PayloadBundle {
   content: DeletedContent;
   type: PayloadBundleType.MESSAGE_DELETE;
 }
 
-type Message =
+export type Message =
   | ClearConversationMessage
   | ConfirmationMessage
   | DeleteMessage
@@ -128,22 +128,3 @@ type Message =
   | ReactionMessage
   | ResetSessionMessage
   | TextMessage;
-
-export {
-  Message,
-  ClearConversationMessage,
-  ConfirmationMessage,
-  DeleteMessage,
-  EditedTextMessage,
-  FileAssetAbortMessage,
-  FileAssetMessage,
-  FileAssetMetaDataMessage,
-  HideMessage,
-  ImageAssetMessage,
-  ImageAssetMessageOutgoing,
-  LocationMessage,
-  PingMessage,
-  ReactionMessage,
-  ResetSessionMessage,
-  TextMessage,
-};

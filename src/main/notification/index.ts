@@ -17,6 +17,4 @@
  *
  */
 
-import {NotificationService} from './NotificationService';
-
-export {NotificationService};
+export * from './NotificationService';
