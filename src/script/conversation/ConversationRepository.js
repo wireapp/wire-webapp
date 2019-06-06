@@ -79,7 +79,6 @@ import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 
 import {PROPERTY_STATE} from '../calling/enum/PropertyState';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
@@ -240,7 +239,6 @@ export class ConversationRepository {
     });
 
     this.conversations_archived = ko.observableArray([]);
-    this.conversations_calls = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
 
@@ -279,21 +277,10 @@ export class ConversationRepository {
   _initStateUpdates() {
     ko.computed(() => {
       const conversationsArchived = [];
-      const conversationsCalls = [];
       const conversationsCleared = [];
       const conversationsUnarchived = [];
 
       this.sorted_conversations().forEach(conversationEntity => {
-        const conversationWithCall = this.selfUser().isTemporaryGuest()
-          ? conversationEntity.hasActiveCall() || conversationEntity.hasJoinableCall()
-          : conversationEntity.hasActiveCall();
-        if (conversationWithCall) {
-          if (conversationEntity.call().isOngoing()) {
-            conversationsCalls.unshift(conversationEntity);
-          } else {
-            conversationsCalls.push(conversationEntity);
-          }
-        }
         if (conversationEntity.is_cleared()) {
           conversationsCleared.push(conversationEntity);
         } else if (conversationEntity.is_archived()) {
@@ -304,7 +291,6 @@ export class ConversationRepository {
       });
 
       this.conversations_archived(conversationsArchived);
-      this.conversations_calls(conversationsCalls);
       this.conversations_cleared(conversationsCleared);
       this.conversations_unarchived(conversationsUnarchived);
     });
@@ -3549,11 +3535,6 @@ export class ConversationRepository {
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
 
-      if (conversationEntity.call()) {
-        const reason = TERMINATION_REASON.MEMBER_LEAVE;
-        amplify.publish(WebAppEvents.CALL.STATE.LEAVE, conversationEntity.id, reason);
-      }
-
       if (this.selfUser().isTemporaryGuest()) {
         eventJson.from = this.selfUser().id;
       }
@@ -3622,13 +3603,6 @@ export class ConversationRepository {
 
     if (conversationEntity.is_cleared()) {
       this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
-    }
-
-    if (!conversationEntity.showNotificationsEverything()) {
-      const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
-      if (hasIncomingCall) {
-        this.callingRepository.rejectCall(conversationEntity.id);
-      }
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {

@@ -152,16 +152,16 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: 'WARN ',
       [LOG_LEVEL.ERROR]: 'ERROR',
     };
+    const logFunctions: Record<LOG_LEVEL, Function> = {
+      [LOG_LEVEL.DEBUG]: avsLogger.debug,
+      [LOG_LEVEL.INFO]: avsLogger.log,
+      [LOG_LEVEL.WARN]: avsLogger.warn,
+      [LOG_LEVEL.ERROR]: avsLogger.error,
+    };
+
     wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
       const trimedMessage = message.trim();
-      const logFunctions: Record<LOG_LEVEL, Function> = {
-        [LOG_LEVEL.DEBUG]: avsLogger.debug,
-        [LOG_LEVEL.INFO]: avsLogger.log,
-        [LOG_LEVEL.WARN]: avsLogger.warn,
-        [LOG_LEVEL.ERROR]: avsLogger.error,
-      };
       logFunctions[level].call(avsLogger, trimedMessage);
-
       this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimedMessage}`);
     });
 
@@ -190,7 +190,6 @@ export class CallingRepository {
     wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
 
     setInterval(wCall.poll.bind(wCall), 500);
-
     return {wCall, wUser};
   }
 
@@ -402,7 +401,7 @@ export class CallingRepository {
   // Toggles screenshare ON and OFF for the given call (does not switch between different screens)
   toggleScreenshare(call: Call): void {
     const selfParticipant = call.selfParticipant;
-    const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
+    const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 

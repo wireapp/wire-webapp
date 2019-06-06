@@ -42,7 +42,6 @@ class TemporaryGuestViewModel {
 
     this.logger = getLogger('TemporaryGuestViewModel');
 
-    this.callConversations = this.conversationRepository.conversations_calls;
     this.selfUser = this.userRepository.self;
   }
 

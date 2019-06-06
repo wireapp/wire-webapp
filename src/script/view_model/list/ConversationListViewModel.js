@@ -88,20 +88,18 @@ export class ConversationListViewModel {
       return this.contentState() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     });
 
-    this.callConversations = this.conversationRepository.conversations_calls;
     this.archivedConversations = this.conversationRepository.conversations_archived;
     this.unarchivedConversations = this.conversationRepository.conversations_unarchived;
 
     this.noConversations = ko.pureComputed(() => {
-      const noConversations = !this.unarchivedConversations().length && !this.callConversations().length;
-      return noConversations && !this.connectRequests().length;
+      return !this.unarchivedConversations().length && !this.connectRequests().length;
     });
 
     this.webappIsLoaded = ko.observable(false);
 
     this.shouldUpdateScrollbar = ko
       .computed(() => {
-        const numberOfConversations = this.unarchivedConversations().length + this.callConversations().length;
+        const numberOfConversations = this.unarchivedConversations().length;
         return this.webappIsLoaded() || numberOfConversations || this.connectRequests().length;
       })
       .extend({notify: 'always', rateLimit: 500});

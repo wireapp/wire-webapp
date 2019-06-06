@@ -113,10 +113,8 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
 
       const hasConnectRequests = !!this.userRepository.connect_requests().length;
-      const states = hasConnectRequests ? ContentViewModel.STATE.CONNECTION_REQUESTS : [];
-      return this.conversationRepository
-        .conversations_calls()
-        .concat(states, this.conversationRepository.conversations_unarchived());
+      const states = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
+      return states.concat(this.conversationRepository.conversations_unarchived());
     });
 
     // Nested view models
