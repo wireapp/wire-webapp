@@ -45,18 +45,12 @@ describe('FileEngine', () => {
     return storeEngine;
   }
 
-  beforeEach(async done => {
+  beforeEach(async () => {
     FileEngine.path = path;
     engine = await initEngine();
-    done();
   });
 
-  afterEach(done =>
-    fs
-      .remove(TEST_DIRECTORY)
-      .then(done)
-      .catch(done.fail)
-  );
+  afterEach(async () => fs.remove(TEST_DIRECTORY));
 
   describe('enforcePathRestrictions', () => {
     const enforcePathRestrictions = (givenTrustedRoot: string, givenPath: string) => () =>
@@ -122,7 +116,7 @@ describe('FileEngine', () => {
       expect(enforcePathRestrictions('C:/', '\\Windows\\System32\\drivers\\etc\\hosts')).toThrowError(expectedError);
     });
 
-    it('is applied to all store operations.', async done => {
+    it('is applied to all store operations.', async () => {
       const functionNames = [
         'append',
         'create',
@@ -138,12 +132,11 @@ describe('FileEngine', () => {
       for (const operation of functionNames) {
         try {
           await engine[operation]('../etc', 'primary-key', {});
-          done.fail();
+          fail();
         } catch (error) {
           expect(error instanceof expectedError).toBe(true);
         }
       }
-      done();
     });
   });
 
@@ -163,6 +156,20 @@ describe('FileEngine', () => {
     Object.entries(appendSpec).map(([description, testFunction]) => {
       it(description, done => testFunction(done, engine));
     });
+
+    it('throws if record is not a string', async () => {
+      const options = {
+        fileExtension: '.json',
+      };
+      engine = new FileEngine(BASE_DIRECTORY);
+      await engine.init(STORE_NAME, options);
+      await engine.create('test', 'index', {});
+
+      try {
+        await engine.append('test', 'index', 'oh no');
+        fail('Did not throw on append');
+      } catch (error) {}
+    });
   });
 
   describe('create', () => {
@@ -172,7 +179,7 @@ describe('FileEngine', () => {
       });
     });
 
-    it('accepts custom file extensions.', async done => {
+    it('accepts custom file extensions.', async () => {
       const options = {
         fileExtension: '.json',
       };
@@ -180,7 +187,6 @@ describe('FileEngine', () => {
       await engine.init(STORE_NAME, options);
 
       expect(engine.options.fileExtension).toBe(options.fileExtension);
-      done();
     });
   });
 
