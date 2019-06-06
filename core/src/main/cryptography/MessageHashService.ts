@@ -22,9 +22,9 @@ import Long from 'long';
 
 import {AssetContent, ContentType, ConversationContent, LocationContent, TextContent} from '../conversation/content';
 
-type AvailableMessageContent = AssetContent | LocationContent | TextContent;
+export type AvailableMessageContent = AssetContent | LocationContent | TextContent;
 
-class MessageHashService {
+export class MessageHashService {
   private readonly messageContent: AvailableMessageContent;
   private readonly timestamp: number;
 
@@ -111,5 +111,3 @@ class MessageHashService {
     return this.createSha256Hash(buffer);
   }
 }
-
-export {MessageHashService};

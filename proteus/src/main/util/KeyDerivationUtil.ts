@@ -29,7 +29,7 @@ import * as MemoryUtil from '../util/MemoryUtil';
  * @param info Key Derivation Data (Info)
  * @param length Length of the derived key in bytes (L)
  */
-function hkdf(
+export function hkdf(
   salt: Uint8Array | string,
   input: Uint8Array | string | number[] | ArrayBuffer[],
   info: Uint8Array | string,
@@ -84,5 +84,3 @@ function hkdf(
 
   return expand(key, info, length);
 }
-
-export {hkdf};

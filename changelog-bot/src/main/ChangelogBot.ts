@@ -35,7 +35,7 @@ const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
 
 logger.state.isEnabled = true;
 
-class ChangelogBot {
+export class ChangelogBot {
   public static SETUP = {
     EXCLUDED_COMMIT_TYPES: ['build', 'chore', 'docs', 'refactor', 'runfix', 'test'],
   };
@@ -143,5 +143,3 @@ class ChangelogBot {
     return stdout.trim();
   }
 }
-
-export {ChangelogBot};

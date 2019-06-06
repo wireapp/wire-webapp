@@ -21,12 +21,10 @@ import {CRUDEngine} from '@wireapp/store-engine';
 import {Dexie} from 'dexie';
 import {BackendData} from './env/';
 
-type SchemaCallbackFunction = (db: Dexie) => void;
+export type SchemaCallbackFunction = (db: Dexie) => void;
 
-interface Config {
+export interface Config {
   store: CRUDEngine;
   urls: BackendData;
   schemaCallback?: SchemaCallbackFunction;
 }
-
-export {Config, SchemaCallbackFunction};

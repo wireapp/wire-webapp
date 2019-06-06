@@ -19,7 +19,7 @@
 
 import {MutedStatus} from '../conversation/';
 
-interface MemberUpdate {
+export interface MemberUpdate {
   hidden_ref?: string;
   hidden?: boolean;
   otr_archived_ref?: string;
@@ -28,5 +28,3 @@ interface MemberUpdate {
   otr_muted?: boolean | null;
   otr_muted_status?: MutedStatus | null;
 }
-
-export {MemberUpdate};

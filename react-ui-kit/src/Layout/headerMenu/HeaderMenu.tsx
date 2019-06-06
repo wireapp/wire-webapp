@@ -29,7 +29,7 @@ export interface HeaderMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> 
   logoElement?: React.ReactNode;
 }
 
-const HeaderMenu = ({children, logoElement = null, ...props}: HeaderMenuProps) => {
+export const HeaderMenu = ({children, logoElement = null, ...props}: HeaderMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -55,5 +55,3 @@ const HeaderMenu = ({children, logoElement = null, ...props}: HeaderMenuProps) =
     </div>
   );
 };
-
-export {HeaderMenu};

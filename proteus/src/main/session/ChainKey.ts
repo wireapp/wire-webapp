@@ -24,7 +24,7 @@ import {MacKey} from '../derived/MacKey';
 import * as ClassUtil from '../util/ClassUtil';
 import {MessageKeys} from './MessageKeys';
 
-class ChainKey {
+export class ChainKey {
   idx: number;
   key: MacKey;
 
@@ -81,5 +81,3 @@ class ChainKey {
     return self;
   }
 }
-
-export {ChainKey};

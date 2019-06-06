@@ -19,7 +19,7 @@
 
 import {ProteusError} from '../errors/ProteusError';
 
-function assert_is_not_zeros(array: number[] | Uint8Array): void {
+export function assert_is_not_zeros(array: number[] | Uint8Array): void {
   let only_zeroes = true;
   for (const val in array) {
     if (parseInt(val) > 0) {
@@ -34,7 +34,7 @@ function assert_is_not_zeros(array: number[] | Uint8Array): void {
 }
 
 /** Concatenates array buffers (usually 8-bit unsigned). */
-function concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
+export function concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
   return buffers.reduce(
     (accumulator: Uint8Array, bytes: Uint8Array): Uint8Array => {
       const buffer = new Uint8Array(accumulator.byteLength + bytes.byteLength);
@@ -44,5 +44,3 @@ function concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
     }
   );
 }
-
-export {assert_is_not_zeros, concatenate_array_buffers};

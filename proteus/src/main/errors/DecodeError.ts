@@ -19,7 +19,7 @@
 
 import {ProteusError} from './ProteusError';
 
-class DecodeError extends ProteusError {
+export class DecodeError extends ProteusError {
   static CODE = {
     CASE_300: 300,
     CASE_301: 301,
@@ -33,7 +33,7 @@ class DecodeError extends ProteusError {
   }
 }
 
-namespace DecodeError {
+export namespace DecodeError {
   export class InvalidType extends DecodeError {
     constructor(message = 'Invalid type', code: number) {
       super(message, code);
@@ -55,5 +55,3 @@ namespace DecodeError {
     }
   }
 }
-
-export {DecodeError};

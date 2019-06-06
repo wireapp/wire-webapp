@@ -28,7 +28,7 @@ import JSZip from 'jszip';
 import rimraf from 'rimraf';
 import File from 'vinyl';
 
-async function copyAsync(source: string, destination: string): Promise<File[]> {
+export async function copyAsync(source: string, destination: string): Promise<File[]> {
   if (isFile(destination)) {
     await fs.ensureDir(path.dirname(destination));
   } else {
@@ -40,7 +40,7 @@ async function copyAsync(source: string, destination: string): Promise<File[]> {
   );
 }
 
-async function downloadFileAsync(url: string, baseDir: string): Promise<void> {
+export async function downloadFileAsync(url: string, baseDir: string): Promise<void> {
   const zipFile = path.join(baseDir, 'archive.zip');
   await fs.ensureDir(baseDir);
 
@@ -65,7 +65,7 @@ async function downloadFileAsync(url: string, baseDir: string): Promise<void> {
   await fs.remove(zipFile);
 }
 
-async function extractAsync(zipFile: string, destination: string): Promise<void> {
+export async function extractAsync(zipFile: string, destination: string): Promise<void> {
   const jszip = new JSZip();
   await fs.ensureDir(destination);
 
@@ -89,8 +89,6 @@ async function extractAsync(zipFile: string, destination: string): Promise<void>
   );
 }
 
-const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
-const rimrafAsync = promisify(rimraf);
-const execAsync = promisify(exec);
-
-export {isFile, copyAsync, downloadFileAsync, execAsync, extractAsync, rimrafAsync};
+export const isFile = (path: string) => /[^.\/\\]+\..+$/.test(path);
+export const rimrafAsync = promisify(rimraf);
+export const execAsync = promisify(exec);

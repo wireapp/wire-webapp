@@ -24,7 +24,7 @@ import {NotificationPreference} from '../notification/';
 import {Self} from '../self/';
 import {BackendEvent} from './BackendEvent';
 
-enum USER_EVENT {
+export enum USER_EVENT {
   ACTIVATE = 'user.activate',
   CLIENT_ADD = 'user.client-add',
   CLIENT_REMOVE = 'user.client-remove',
@@ -34,28 +34,28 @@ enum USER_EVENT {
   UPDATE = 'user.update',
 }
 
-interface UserEvent extends BackendEvent {
+export interface UserEvent extends BackendEvent {
   type: USER_EVENT;
 }
 
-interface UserActivateEvent extends UserEvent {
+export interface UserActivateEvent extends UserEvent {
   type: USER_EVENT.ACTIVATE;
   user: Self;
 }
 
-interface UserClientAddEvent extends UserEvent {
+export interface UserClientAddEvent extends UserEvent {
   client: RegisteredClient;
   type: USER_EVENT.CLIENT_ADD;
 }
 
-interface UserClientRemoveEvent extends UserEvent {
+export interface UserClientRemoveEvent extends UserEvent {
   client: {
     id: string;
   };
   type: USER_EVENT.CLIENT_REMOVE;
 }
 
-interface UserConnectionEvent extends UserEvent {
+export interface UserConnectionEvent extends UserEvent {
   connection: Connection;
   user: {
     name: string;
@@ -63,11 +63,11 @@ interface UserConnectionEvent extends UserEvent {
   type: USER_EVENT.CONNECTION;
 }
 
-interface UserDeleteEvent extends UserEvent {
+export interface UserDeleteEvent extends UserEvent {
   type: USER_EVENT.DELETE;
 }
 
-interface UserPropertiesSetEvent extends UserEvent {
+export interface UserPropertiesSetEvent extends UserEvent {
   value: {
     contact_import: Object;
     enable_debugging: boolean;
@@ -92,18 +92,6 @@ interface UserPropertiesSetEvent extends UserEvent {
   type: USER_EVENT.PROPERTIES_SET;
 }
 
-interface UserUpdateEvent extends UserEvent {
+export interface UserUpdateEvent extends UserEvent {
   type: USER_EVENT.UPDATE;
 }
-
-export {
-  USER_EVENT,
-  UserActivateEvent,
-  UserClientAddEvent,
-  UserClientRemoveEvent,
-  UserConnectionEvent,
-  UserDeleteEvent,
-  UserEvent,
-  UserPropertiesSetEvent,
-  UserUpdateEvent,
-};

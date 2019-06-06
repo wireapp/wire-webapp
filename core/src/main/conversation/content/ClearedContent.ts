@@ -17,9 +17,7 @@
  *
  */
 
-interface ClearedContent {
+export interface ClearedContent {
   clearedTimestamp: number;
   conversationId: string;
 }
-
-export {ClearedContent};

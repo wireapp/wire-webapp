@@ -23,7 +23,7 @@ import {HttpClient} from '../../http/';
 import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/TeamAPI';
 
-class MemberAPI {
+export class MemberAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -84,5 +84,3 @@ class MemberAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {MemberAPI};

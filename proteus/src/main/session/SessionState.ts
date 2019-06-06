@@ -45,7 +45,7 @@ import {RootKey} from './RootKey';
 import {SendChain} from './SendChain';
 import {Session} from './Session';
 
-class SessionState {
+export class SessionState {
   prev_counter: number;
   recv_chains: RecvChain[];
   root_key: RootKey;
@@ -278,5 +278,3 @@ class SessionState {
     return self;
   }
 }
-
-export {SessionState};

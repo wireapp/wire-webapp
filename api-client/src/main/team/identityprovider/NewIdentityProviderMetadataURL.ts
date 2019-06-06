@@ -17,8 +17,6 @@
  *
  */
 
-interface NewIdentityProviderMetadataURL {
+export interface NewIdentityProviderMetadataURL {
   url: string;
 }
-
-export {NewIdentityProviderMetadataURL};

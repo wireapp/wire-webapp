@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../../http/';
 import {Provider, Service, ServiceWhitelistData, Services} from './';
 
-class ServiceAPI {
+export class ServiceAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -98,5 +98,3 @@ class ServiceAPI {
     return this.client.sendJSON<Services>(config).then(response => response.data);
   }
 }
-
-export {ServiceAPI};

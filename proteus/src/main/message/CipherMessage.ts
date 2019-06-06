@@ -25,7 +25,7 @@ import * as ClassUtil from '../util/ClassUtil';
 import {Message} from './Message';
 import {SessionTag} from './SessionTag';
 
-class CipherMessage extends Message {
+export class CipherMessage extends Message {
   cipher_text: Uint8Array;
   counter: number;
   prev_counter: number;
@@ -114,5 +114,3 @@ class CipherMessage extends Message {
     }
   }
 }
-
-export {CipherMessage};

@@ -19,11 +19,9 @@
 
 import {MemberData} from '../member/MemberData';
 
-interface NewTeamData {
+export interface NewTeamData {
   members?: MemberData[];
   name: string;
   icon: string;
   binding?: boolean;
 }
-
-export {NewTeamData};

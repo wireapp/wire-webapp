@@ -17,8 +17,6 @@
  *
  */
 
-interface NotificationEvent {
+export interface NotificationEvent {
   type: string;
 }
-
-export {NotificationEvent};

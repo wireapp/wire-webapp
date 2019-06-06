@@ -17,11 +17,9 @@
  *
  */
 
-interface ImageContent {
+export interface ImageContent {
   data: Buffer;
   height: number;
   type: string;
   width: number;
 }
-
-export {ImageContent};

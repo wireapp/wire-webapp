@@ -24,7 +24,7 @@ import {IdentityProvider} from './IdentityProvider';
 import {IdentityProviders} from './IdentityProviders';
 import {NewIdentityProviderMetadataURL} from './NewIdentityProviderMetadataURL';
 
-class IdentityProviderAPI {
+export class IdentityProviderAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -86,5 +86,3 @@ class IdentityProviderAPI {
     return response.data;
   }
 }
-
-export {IdentityProviderAPI};

@@ -22,7 +22,7 @@ import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
 
 const UNKNOWN_PROPERTY = 'unknown';
 
-enum OperatingSystem {
+export enum OperatingSystem {
   ANDROID = 'OperatingSystem.ANDROID',
   IOS = 'OperatingSystem.IOS',
   LINUX = 'OperatingSystem.LINUX',
@@ -36,7 +36,7 @@ export interface OS {
   version: string;
 }
 
-class Runtime {
+export class Runtime {
   public static getPlatform(): Platform {
     const unsetPlatform: Platform = ({} as unknown) as Platform;
     return platform || unsetPlatform;
@@ -160,5 +160,3 @@ class Runtime {
     return Runtime.getOSFamily() === OperatingSystem.IOS;
   }
 }
-
-export {OperatingSystem, Runtime};

@@ -17,7 +17,7 @@
  *
  */
 
-class Cookie {
+export class Cookie {
   public expiration = '0';
   public zuid = '';
 
@@ -30,5 +30,3 @@ class Cookie {
     return new Date() > new Date(this.expiration);
   }
 }
-
-export {Cookie};

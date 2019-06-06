@@ -17,7 +17,7 @@
  *
  */
 
-class UnsupportedInputError extends Error {
+export class UnsupportedInputError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, UnsupportedInputError.prototype);
@@ -26,5 +26,3 @@ class UnsupportedInputError extends Error {
     this.stack = new Error().stack;
   }
 }
-
-export {UnsupportedInputError};

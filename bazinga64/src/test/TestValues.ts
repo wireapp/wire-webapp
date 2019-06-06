@@ -17,20 +17,10 @@
  *
  */
 
-const helloDecodedArray = [72, 101, 108, 108, 111];
-const helloDecodedString = 'Hello';
-const helloEncodedArray = [83, 71, 86, 115, 98, 71, 56, 61];
-const helloEncodedString = 'SGVsbG8=';
-const numberDecoded = 1337;
-const numberEncoded = 'MTMzNw==';
-const numberString = '1337';
-
-export {
-  helloDecodedArray,
-  helloDecodedString,
-  helloEncodedArray,
-  helloEncodedString,
-  numberDecoded,
-  numberEncoded,
-  numberString,
-};
+export const helloDecodedArray = [72, 101, 108, 108, 111];
+export const helloDecodedString = 'Hello';
+export const helloEncodedArray = [83, 71, 86, 115, 98, 71, 56, 61];
+export const helloEncodedString = 'SGVsbG8=';
+export const numberDecoded = 1337;
+export const numberEncoded = 'MTMzNw==';
+export const numberString = '1337';

@@ -17,7 +17,7 @@
  *
  */
 
-enum ConnectionStatus {
+export enum ConnectionStatus {
   ACCEPTED = 'accepted',
   BLOCKED = 'blocked',
   CANCELLED = 'cancelled',
@@ -25,5 +25,3 @@ enum ConnectionStatus {
   PENDING = 'pending',
   SENT = 'sent',
 }
-
-export {ConnectionStatus};

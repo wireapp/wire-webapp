@@ -27,7 +27,7 @@ export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps
   open?: boolean;
 }
 
-const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpolation<undefined> = ({open}) => ({
+export const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpolation<undefined> = ({open}) => ({
   display: 'block',
   div: {
     backgroundColor: COLOR.TEXT,
@@ -54,12 +54,10 @@ const menuOpenButtonStyle: <T>(props: MenuOpenButtonProps<T>) => ObjectInterpola
 
 const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => filterProps(props, ['open']);
 
-const MenuOpenButton = (props: MenuOpenButtonProps) => (
+export const MenuOpenButton = (props: MenuOpenButtonProps) => (
   <div css={menuOpenButtonStyle(props)} {...filterMenuOpenButtonProps(props)}>
     <div />
     <div />
     <div />
   </div>
 );
-
-export {MenuOpenButton, menuOpenButtonStyle};

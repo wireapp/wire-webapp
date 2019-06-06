@@ -28,7 +28,7 @@ import * as buffer from '../shims/node/buffer';
 
 const ReconnectingWebsocket = require('reconnecting-websocket');
 
-class WebSocketClient extends EventEmitter {
+export class WebSocketClient extends EventEmitter {
   private clientId: string | undefined;
 
   private readonly logger: logdown.Logger;
@@ -125,5 +125,3 @@ class WebSocketClient extends EventEmitter {
     }
   }
 }
-
-export {WebSocketClient};

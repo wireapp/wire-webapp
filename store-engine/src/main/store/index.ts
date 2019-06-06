@@ -17,8 +17,6 @@
  *
  */
 
-import {ExpiredBundle} from './ExpiredBundle';
-import {TransientBundle} from './TransientBundle';
-import {TransientStore} from './TransientStore';
-
-export {ExpiredBundle, TransientBundle, TransientStore};
+export * from './ExpiredBundle';
+export * from './TransientBundle';
+export * from './TransientStore';

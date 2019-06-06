@@ -32,7 +32,7 @@ export interface SerialisedJSON {
   key: string;
 }
 
-class PreKeyBundle {
+export class PreKeyBundle {
   version: number;
   prekey_id: number;
   public_key: PublicKey;
@@ -149,5 +149,3 @@ class PreKeyBundle {
     return self;
   }
 }
-
-export {PreKeyBundle};

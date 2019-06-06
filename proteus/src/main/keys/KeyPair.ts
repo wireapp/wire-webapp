@@ -28,7 +28,7 @@ import {SecretKey} from './SecretKey';
 import {InputError} from '../errors/InputError';
 
 /** Construct an ephemeral key pair. */
-class KeyPair {
+export class KeyPair {
   public_key: PublicKey;
   secret_key: SecretKey;
 
@@ -109,5 +109,3 @@ class KeyPair {
     return self;
   }
 }
-
-export {KeyPair};

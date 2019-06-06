@@ -20,7 +20,7 @@
 import {SupportedCurrency} from './SupportedCurrency';
 
 // https://stripe.com/docs/api#invoice_object
-interface PaymentStripeInvoice {
+export interface PaymentStripeInvoice {
   closed: boolean;
   currency: SupportedCurrency;
   date: number;
@@ -30,5 +30,3 @@ interface PaymentStripeInvoice {
   total: number;
   url: string;
 }
-
-export {PaymentStripeInvoice};

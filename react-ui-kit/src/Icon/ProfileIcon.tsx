@@ -21,10 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const ProfileIcon = (props: SVGIconProps) => (
+export const ProfileIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={31} realHeight={31} {...props}>
     <path d="M15.43 30.86C6.9 30.86 0 23.96 0 15.43S6.9 0 15.43 0c8.52 0 15.43 6.9 15.43 15.43 0 8.52-6.9 15.43-15.43 15.43zM3.86 15.43c0 2.9 1.07 5.56 2.84 7.6l.15-.88c.28-1.58 1.8-2.86 3.4-2.86H20.6c1.6 0 3.1 1.2 3.4 2.8l.14.84c1.8-2 2.86-4.7 2.86-7.6C27 9 21.82 3.84 15.43 3.84 9.03 3.83 3.86 9 3.86 15.4zm11.57 1.93c-2.66 0-4.82-2.16-4.82-4.82 0-2.67 2.2-4.83 4.9-4.83s4.8 2.2 4.8 4.9-2.14 4.8-4.8 4.8z" />
   </SVGIcon>
 );
-
-export {ProfileIcon};

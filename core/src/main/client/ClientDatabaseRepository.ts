@@ -26,7 +26,7 @@ export enum DatabaseStores {
   CLIENTS = 'clients',
 }
 
-class ClientDatabaseRepository {
+export class ClientDatabaseRepository {
   public static readonly STORES = DatabaseStores;
 
   public static KEYS = {
@@ -112,5 +112,3 @@ class ClientDatabaseRepository {
     };
   }
 }
-
-export {ClientDatabaseRepository};

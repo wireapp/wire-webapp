@@ -57,7 +57,7 @@ import {TextContentBuilder} from './TextContentBuilder';
 
 const UUID = require('pure-uuid');
 
-class MessageBuilder {
+export class MessageBuilder {
   constructor(private readonly apiClient: APIClient, private readonly assetService: AssetService) {}
 
   public createEditedText(
@@ -313,5 +313,3 @@ class MessageBuilder {
     return this.apiClient.context!.userId;
   }
 }
-
-export {MessageBuilder};

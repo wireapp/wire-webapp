@@ -17,7 +17,7 @@
  *
  */
 
-class InvalidPreKeyFormatError extends Error {
+export class InvalidPreKeyFormatError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, InvalidPreKeyFormatError.prototype);
@@ -26,5 +26,3 @@ class InvalidPreKeyFormatError extends Error {
     this.stack = new Error().stack;
   }
 }
-
-export {InvalidPreKeyFormatError};

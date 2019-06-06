@@ -36,6 +36,4 @@ const inputBlockStyle: (props: InputBlockProps) => ObjectInterpolation<undefined
   },
 });
 
-const InputBlock = (props: InputBlockProps) => <div css={inputBlockStyle(props)} {...props} />;
-
-export {InputBlock};
+export const InputBlock = (props: InputBlockProps) => <div css={inputBlockStyle(props)} {...props} />;

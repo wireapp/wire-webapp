@@ -19,7 +19,7 @@
 
 import {ProteusError} from './ProteusError';
 
-class InputError extends ProteusError {
+export class InputError extends ProteusError {
   static CODE = {
     CASE_400: 400,
     CASE_401: 401,
@@ -39,7 +39,7 @@ class InputError extends ProteusError {
   }
 }
 
-namespace InputError {
+export namespace InputError {
   export class RangeError extends InputError {
     constructor(message = 'Invalid array length', code: number) {
       super(message, code);
@@ -61,5 +61,3 @@ namespace InputError {
     }
   }
 }
-
-export {InputError};

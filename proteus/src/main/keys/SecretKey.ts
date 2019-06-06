@@ -27,7 +27,7 @@ import {InputError} from '../errors/InputError';
 import * as ArrayUtil from '../util/ArrayUtil';
 import {PublicKey} from './PublicKey';
 
-class SecretKey {
+export class SecretKey {
   sec_curve: Uint8Array;
   sec_edward: Uint8Array;
 
@@ -95,5 +95,3 @@ class SecretKey {
     throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
   }
 }
-
-export {SecretKey};

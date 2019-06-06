@@ -53,9 +53,9 @@ const desktopStyledHeaderSubMenuStyle: (
   },
 });
 
-const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
+export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
-const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
+export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
   <div className={DESKTOP_HEADER_SUB_MENU_CLASSNAME} css={desktopStyledHeaderSubMenuStyle(props)} {...props} />
 );
 
@@ -78,7 +78,7 @@ const mobileStyledHeaderSubMenuStyle: (
   paddingTop: '8px',
 });
 
-const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => (
+export const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => (
   <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />
 );
 
@@ -87,7 +87,7 @@ export interface HeaderSubMenuProps<T = HTMLParagraphElement> extends React.HTML
   isOpen: boolean;
 }
 
-const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, children, ...props}) => {
+export const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, children, ...props}) => {
   const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
   return (
     <MenuSubLink
@@ -135,5 +135,3 @@ const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, children
     </MenuSubLink>
   );
 };
-
-export {HeaderSubMenu, DesktopStyledHeaderSubMenu, DESKTOP_HEADER_SUB_MENU_CLASSNAME, MobileStyledHeaderSubMenu};

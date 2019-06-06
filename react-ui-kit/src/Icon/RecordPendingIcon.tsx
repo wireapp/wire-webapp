@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const RecordPendingIcon = (props: SVGIconProps) => (
+export const RecordPendingIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <g fill="#FB0807">
       <circle fill-opacity=".24" cx="8" cy="8" r="8" />
@@ -29,5 +29,3 @@ const RecordPendingIcon = (props: SVGIconProps) => (
     </g>
   </SVGIcon>
 );
-
-export {RecordPendingIcon};

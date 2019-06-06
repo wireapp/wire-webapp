@@ -35,7 +35,7 @@ const defaultConfig: Required<BotConfig> = {
   owners: [],
 };
 
-class Bot {
+export class Bot {
   public account?: Account;
 
   private readonly config: Required<BotConfig>;
@@ -143,5 +143,3 @@ class Bot {
     return this.isAllowedConversation(conversationID) && this.isOwner(userID);
   }
 }
-
-export {Bot};

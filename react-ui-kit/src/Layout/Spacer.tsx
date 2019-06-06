@@ -26,8 +26,6 @@ export interface SpacerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   vertical?: boolean;
 }
 
-function Spacer({size = 8, vertical = false}: SpacerProps): JSX.Element {
+export function Spacer({size = 8, vertical = false}: SpacerProps): JSX.Element {
   return <div style={vertical ? {display: 'inline-block', width: size} : {height: size}} />;
 }
-
-export {Spacer};

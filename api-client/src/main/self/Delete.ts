@@ -17,8 +17,6 @@
  *
  */
 
-interface Delete {
+export interface Delete {
   password?: string;
 }
-
-export {Delete};

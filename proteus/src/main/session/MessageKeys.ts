@@ -23,7 +23,7 @@ import {CipherKey} from '../derived/CipherKey';
 import {MacKey} from '../derived/MacKey';
 import * as ClassUtil from '../util/ClassUtil';
 
-class MessageKeys {
+export class MessageKeys {
   cipher_key: CipherKey;
   counter: number;
   mac_key: MacKey;
@@ -89,5 +89,3 @@ class MessageKeys {
     return self;
   }
 }
-
-export {MessageKeys};

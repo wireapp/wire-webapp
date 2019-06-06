@@ -17,10 +17,8 @@
  *
  */
 
-class PreKeyAuth {
+export class PreKeyAuth {
   static INVALID = 'Invalid';
   static UNKNOWN = 'Unknown';
   static VALID = 'Valid';
 }
-
-export {PreKeyAuth};

@@ -19,7 +19,7 @@
 
 import {BackendEvent} from './BackendEvent';
 
-enum TEAM_EVENT {
+export enum TEAM_EVENT {
   CONVERSATION_CREATE = 'team.conversation-create',
   CONVERSATION_DELETE = 'team.conversation-delete',
   CREATE = 'team.create',
@@ -29,51 +29,39 @@ enum TEAM_EVENT {
   MEMBER_UPDATE = 'team.member-update',
   UPDATE = 'team.update',
 }
-interface TeamEvent extends BackendEvent {
+
+export interface TeamEvent extends BackendEvent {
   type: TEAM_EVENT;
 }
 
-interface TeamConversationCreateEvent extends TeamEvent {
+export interface TeamConversationCreateEvent extends TeamEvent {
   type: TEAM_EVENT.CONVERSATION_CREATE;
 }
 
-interface TeamConversationDeleteEvent extends TeamEvent {
+export interface TeamConversationDeleteEvent extends TeamEvent {
   type: TEAM_EVENT.CONVERSATION_DELETE;
 }
 
-interface TeamCreateEvent extends TeamEvent {
+export interface TeamCreateEvent extends TeamEvent {
   type: TEAM_EVENT.CREATE;
 }
 
-interface TeamDeleteEvent extends TeamEvent {
+export interface TeamDeleteEvent extends TeamEvent {
   type: TEAM_EVENT.DELETE;
 }
 
-interface TeamMemberJoinEvent extends TeamEvent {
+export interface TeamMemberJoinEvent extends TeamEvent {
   type: TEAM_EVENT.MEMBER_JOIN;
 }
 
-interface TeamMemberLeaveEvent extends TeamEvent {
+export interface TeamMemberLeaveEvent extends TeamEvent {
   type: TEAM_EVENT.MEMBER_LEAVE;
 }
 
-interface TeamMemberUpdateEvent extends TeamEvent {
+export interface TeamMemberUpdateEvent extends TeamEvent {
   type: TEAM_EVENT.MEMBER_UPDATE;
 }
 
-interface TeamUpdateEvent extends TeamEvent {
+export interface TeamUpdateEvent extends TeamEvent {
   type: TEAM_EVENT.UPDATE;
 }
-
-export {
-  TEAM_EVENT,
-  TeamEvent,
-  TeamConversationCreateEvent,
-  TeamConversationDeleteEvent,
-  TeamCreateEvent,
-  TeamDeleteEvent,
-  TeamMemberJoinEvent,
-  TeamMemberLeaveEvent,
-  TeamMemberUpdateEvent,
-  TeamUpdateEvent,
-};

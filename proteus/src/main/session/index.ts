@@ -17,13 +17,11 @@
  *
  */
 
-import {ChainKey} from './ChainKey';
-import {MessageKeys} from './MessageKeys';
-import {PreKeyStore} from './PreKeyStore';
-import {RecvChain} from './RecvChain';
-import {RootKey} from './RootKey';
-import {SendChain} from './SendChain';
-import {Session} from './Session';
-import {SessionState} from './SessionState';
-
-export {ChainKey, MessageKeys, PreKeyStore, RecvChain, RootKey, SendChain, Session, SessionState};
+export * from './ChainKey';
+export * from './MessageKeys';
+export * from './PreKeyStore';
+export * from './RecvChain';
+export * from './RootKey';
+export * from './SendChain';
+export * from './Session';
+export * from './SessionState';

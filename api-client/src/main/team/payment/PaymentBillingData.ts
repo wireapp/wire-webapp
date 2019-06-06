@@ -16,9 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {SupportedCurrency} from './SupportedCurrency';
 
-interface PaymentBillingData {
+export interface PaymentBillingData {
   city: string;
   company: string;
   country: string;
@@ -29,5 +30,3 @@ interface PaymentBillingData {
   street: string;
   zip: string;
 }
-
-export {PaymentBillingData};

@@ -20,7 +20,7 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-class MacKey {
+export class MacKey {
   key: Uint8Array;
 
   /**
@@ -68,5 +68,3 @@ class MacKey {
     return new MacKey(key_bytes);
   }
 }
-
-export {MacKey};

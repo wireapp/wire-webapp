@@ -19,7 +19,7 @@
 
 import {BackendErrorLabel, StatusCode} from '../http/';
 
-class BackendError extends Error {
+export class BackendError extends Error {
   code: StatusCode;
   label: BackendErrorLabel;
   message: string;
@@ -37,5 +37,3 @@ class BackendError extends Error {
     Object.setPrototypeOf(this, BackendError.prototype);
   }
 }
-
-export {BackendError};

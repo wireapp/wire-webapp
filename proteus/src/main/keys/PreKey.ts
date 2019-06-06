@@ -26,10 +26,10 @@ import {InputError} from '../errors/InputError';
 import {KeyPair} from './KeyPair';
 
 /**
- * @classdesc Pre-generated (and regularly refreshed) pre-keys.
+ * Pre-generated (and regularly refreshed) pre-keys.
  * A Pre-Shared Key contains the public long-term identity and ephemeral handshake keys for the initial triple DH.
  */
-class PreKey {
+export class PreKey {
   static MAX_PREKEY_ID = 0xffff;
   key_id: number;
   key_pair: KeyPair;
@@ -128,5 +128,3 @@ class PreKey {
     return self;
   }
 }
-
-export {PreKey};

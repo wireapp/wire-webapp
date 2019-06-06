@@ -36,7 +36,7 @@ export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   truncate?: boolean;
 }
 
-const filterTextProps = (props: Object) => {
+export const filterTextProps = (props: Object) => {
   return filterProps(props, [
     'block',
     'bold',
@@ -75,12 +75,10 @@ export const textStyle: <T>(props: TextProps<T>) => ObjectInterpolation<undefine
   whiteSpace: noWrap ? 'nowrap' : undefined,
 });
 
-const Text = (props: TextProps) => <span css={textStyle(props)} {...filterTextProps(props)} />;
+export const Text = (props: TextProps) => <span css={textStyle(props)} {...filterTextProps(props)} />;
 
-const Bold = (props: TextProps) => <Text bold {...props} />;
-const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;
-const Muted = (props: TextProps) => <Text muted {...props} />;
-const Uppercase = (props: TextProps) => <Text textTransform={'uppercase'} {...props} />;
-const Large = (props: TextProps) => <Text fontSize={'48px'} light {...props} />;
-
-export {Bold, Muted, Small, Text, Uppercase, Large, filterTextProps};
+export const Bold = (props: TextProps) => <Text bold {...props} />;
+export const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;
+export const Muted = (props: TextProps) => <Text muted {...props} />;
+export const Uppercase = (props: TextProps) => <Text textTransform={'uppercase'} {...props} />;
+export const Large = (props: TextProps) => <Text fontSize={'48px'} light {...props} />;

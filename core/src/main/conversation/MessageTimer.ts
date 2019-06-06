@@ -16,7 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-class MessageTimer {
+
+export class MessageTimer {
   private readonly conversationLevelTimers: Map<string, number>;
   private readonly messageLevelTimers: Map<string, number>;
 
@@ -53,5 +54,3 @@ class MessageTimer {
     }
   }
 }
-
-export {MessageTimer};

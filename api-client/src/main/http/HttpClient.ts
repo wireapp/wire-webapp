@@ -27,7 +27,7 @@ import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCo
 import * as ObfuscationUtil from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
-class HttpClient extends EventEmitter {
+export class HttpClient extends EventEmitter {
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
@@ -203,5 +203,3 @@ class HttpClient extends EventEmitter {
     return this.sendRequest<T>(config);
   }
 }
-
-export {HttpClient};

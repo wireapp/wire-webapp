@@ -21,10 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const CloseIcon = (props: SVGIconProps) => (
+export const CloseIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={14} realHeight={14} {...props}>
     <path d="M1.4 13.3l5.25-5.23 5.25 5.24 1.4-1.4-5.23-5.24L13.3 1.4 11.9 0 6.65 5.24 1.4 0 0 1.4l5.24 5.26L0 11.9" />
   </SVGIcon>
 );
-
-export {CloseIcon};

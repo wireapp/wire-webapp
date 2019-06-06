@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {HttpClient} from '../http/';
 
-class ConnectionAPI {
+export class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}
 
   static readonly URL = {
@@ -122,5 +122,3 @@ class ConnectionAPI {
     return this.client.sendJSON<Connection>(config).then(response => response.data);
   }
 }
-
-export {ConnectionAPI};

@@ -17,9 +17,7 @@
  *
  */
 
-interface IData {
+export interface IData {
   asBytes: Uint8Array;
   asString: string;
 }
-
-export {IData};

@@ -17,6 +17,4 @@
  *
  */
 
-import {CryptoboxError} from './CryptoboxError';
-
-export {CryptoboxError};
+export * from './CryptoboxError';

@@ -17,16 +17,14 @@
  *
  */
 
-interface EncryptedAsset {
+export interface EncryptedAsset {
   cipherText: Buffer;
   keyBytes: Buffer;
   /** The SHA-256 sum of `cipherText` */
   sha256: Buffer;
 }
 
-interface EncryptedAssetUploaded extends EncryptedAsset {
+export interface EncryptedAssetUploaded extends EncryptedAsset {
   key: string;
   token: string;
 }
-
-export {EncryptedAsset, EncryptedAssetUploaded};

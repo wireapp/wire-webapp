@@ -19,9 +19,7 @@
 
 import {TeamData} from './TeamData';
 
-interface TeamChunkData {
+export interface TeamChunkData {
   has_more: boolean;
   teams: TeamData[];
 }
-
-export {TeamChunkData};

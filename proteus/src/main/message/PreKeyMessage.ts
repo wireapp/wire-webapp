@@ -27,7 +27,7 @@ import {InputError} from '../errors/InputError';
 import {CipherMessage} from './CipherMessage';
 import {Message} from './Message';
 
-class PreKeyMessage extends Message {
+export class PreKeyMessage extends Message {
   base_key: PublicKey;
   identity_key: IdentityKey;
   message: CipherMessage;
@@ -100,5 +100,3 @@ class PreKeyMessage extends Message {
     }
   }
 }
-
-export {PreKeyMessage};

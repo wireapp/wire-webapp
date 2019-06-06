@@ -19,9 +19,7 @@
 
 import {Conversation} from '../conversation/';
 
-interface Conversations {
+export interface Conversations {
   conversations: Conversation[];
   has_more: boolean;
 }
-
-export {Conversations};

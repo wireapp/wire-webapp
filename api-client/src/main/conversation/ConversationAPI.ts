@@ -37,7 +37,7 @@ import {ConversationEvent, ConversationMemberJoinEvent, ConversationMemberLeaveE
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 
-class ConversationAPI {
+export class ConversationAPI {
   static readonly MAX_CHUNK_SIZE = 500;
   static readonly URL = {
     BOTS: 'bots',
@@ -485,5 +485,3 @@ class ConversationAPI {
     await this.client.sendJSON(config);
   }
 }
-
-export {ConversationAPI};

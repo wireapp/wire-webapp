@@ -22,10 +22,8 @@ enum UserAssetType {
   PREVIEW = 'preview',
 }
 
-interface UserAsset {
+export interface UserAsset {
   key: string;
   size: UserAssetType;
   type: 'image';
 }
-
-export {UserAsset, UserAssetType};

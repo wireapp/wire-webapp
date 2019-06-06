@@ -17,7 +17,7 @@
  *
  */
 
-class ProteusError extends Error {
+export class ProteusError extends Error {
   static CODE: Record<string, number> = {
     CASE_100: 100,
     CASE_101: 101,
@@ -35,5 +35,3 @@ class ProteusError extends Error {
     this.name = this.constructor.name;
   }
 }
-
-export {ProteusError};

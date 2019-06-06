@@ -17,7 +17,7 @@
  *
  */
 
-const random_bytes = (length: number): Uint8Array => {
+export const random_bytes = (length: number): Uint8Array => {
   if (typeof window !== 'undefined' && window.crypto) {
     // browser
     const buffer = new ArrayBuffer(length);
@@ -29,5 +29,3 @@ const random_bytes = (length: number): Uint8Array => {
     return new Uint8Array(crypto.randomBytes(length));
   }
 };
-
-export {random_bytes};

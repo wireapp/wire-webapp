@@ -17,10 +17,8 @@
  *
  */
 
-enum ClientType {
+export enum ClientType {
   NONE = 'none',
   PERMANENT = 'permanent',
   TEMPORARY = 'temporary',
 }
-
-export {ClientType};

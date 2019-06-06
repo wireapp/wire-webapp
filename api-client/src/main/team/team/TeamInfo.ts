@@ -17,9 +17,7 @@
  *
  */
 
-interface TeamInfo {
+export interface TeamInfo {
   managed: boolean;
   teamid: string;
 }
-
-export {TeamInfo};

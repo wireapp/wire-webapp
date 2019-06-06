@@ -27,7 +27,7 @@ interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 
-const h1Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
+export const h1Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   level = '1',
@@ -48,9 +48,9 @@ const h1Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
   },
 });
 
-const H1 = (props: HeadingProps) => <h1 css={h1Style(props)} {...filterTextProps(props)} />;
+export const H1 = (props: HeadingProps) => <h1 css={h1Style(props)} {...filterTextProps(props)} />;
 
-const h2Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
+export const h2Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,
@@ -71,9 +71,9 @@ const h2Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
   },
 });
 
-const H2 = (props: HeadingProps) => <h2 css={h2Style(props)} {...filterTextProps(props)} />;
+export const H2 = (props: HeadingProps) => <h2 css={h2Style(props)} {...filterTextProps(props)} />;
 
-const h3Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
+export const h3Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,
@@ -86,9 +86,9 @@ const h3Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
   marginBottom: '16px',
 });
 
-const H3 = (props: HeadingProps) => <h3 css={h3Style(props)} {...filterTextProps(props)} />;
+export const H3 = (props: HeadingProps) => <h3 css={h3Style(props)} {...filterTextProps(props)} />;
 
-const h4Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
+export const h4Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   color = COLOR.TEXT,
   noWrap = false,
@@ -102,9 +102,9 @@ const h4Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
   marginTop: '20px',
 });
 
-const H4 = (props: HeadingProps) => <h3 css={h4Style(props)} {...filterTextProps(props)} />;
+export const H4 = (props: HeadingProps) => <h3 css={h4Style(props)} {...filterTextProps(props)} />;
 
-const Heading = ({level, ...props}) => {
+export const Heading = ({level, ...props}) => {
   switch (level) {
     case '2':
       return <H2 {...props} />;
@@ -117,5 +117,3 @@ const Heading = ({level, ...props}) => {
       return <H1 {...props} />;
   }
 };
-
-export {Heading, H1, h1Style, H2, h2Style, H3, h3Style, H4, h4Style};

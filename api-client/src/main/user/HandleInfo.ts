@@ -17,8 +17,6 @@
  *
  */
 
-interface HandleInfo {
+export interface HandleInfo {
   user: string;
 }
-
-export {HandleInfo};

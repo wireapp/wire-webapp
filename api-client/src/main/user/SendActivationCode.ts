@@ -17,7 +17,7 @@
  *
  */
 
-interface SendActivationCode {
+export interface SendActivationCode {
   /** Email address to send the code to. */
   email?: string;
 
@@ -30,5 +30,3 @@ interface SendActivationCode {
   /** Request the code with a call instead (default is SMS). */
   voice_call?: boolean;
 }
-
-export {SendActivationCode};

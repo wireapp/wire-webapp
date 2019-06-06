@@ -20,9 +20,7 @@
 import {PaymentStripeInvoice} from './PaymentStripeInvoice';
 
 // https://stripe.com/docs/api#invoice_object
-interface PaymentStripeInvoices {
+export interface PaymentStripeInvoices {
   has_more: boolean;
   invoices: PaymentStripeInvoice[];
 }
-
-export {PaymentStripeInvoices};

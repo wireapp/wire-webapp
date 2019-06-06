@@ -30,7 +30,7 @@ export interface TextAreaProps<T = HTMLTextAreaElement> extends TextProps<T> {
   placeholderTextTransform?: TextTransformProperty;
 }
 
-const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<undefined> = ({
+export const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<undefined> = ({
   markInvalid = false,
   placeholderTextTransform = 'uppercase',
   disabled = false,
@@ -73,14 +73,12 @@ const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<undefin
   };
 };
 
-const TEXTAREA_CLASSNAME = 'textarea';
+export const TEXTAREA_CLASSNAME = 'textarea';
 const filterTextAreaProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
-const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forwardRef<
+export const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forwardRef<
   HTMLTextAreaElement,
   TextAreaProps<HTMLTextAreaElement>
 >((props, ref) => (
   <textarea className={TEXTAREA_CLASSNAME} css={textAreaStyle(props)} ref={ref} {...filterTextAreaProps(props)} />
 ));
-
-export {TEXTAREA_CLASSNAME, TextArea, textAreaStyle};

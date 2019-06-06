@@ -19,11 +19,9 @@
 
 import {UserClients} from '../conversation/';
 
-interface ClientMismatch {
+export interface ClientMismatch {
   deleted: UserClients;
   missing: UserClients;
   redundant: UserClients;
   time: string;
 }
-
-export {ClientMismatch};

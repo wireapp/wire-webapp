@@ -17,9 +17,7 @@
  *
  */
 
-interface SSOSignature {
+export interface SSOSignature {
   subject: string;
   tenant: string;
 }
-
-export {SSOSignature};

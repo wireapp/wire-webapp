@@ -20,7 +20,7 @@
 import {TeamData} from '../team/team/TeamData';
 import {UserAsset} from '../user/';
 
-interface RegisterData {
+export interface RegisterData {
   accent_id?: number;
   assets?: UserAsset[];
   email?: string;
@@ -35,5 +35,3 @@ interface RegisterData {
   phone_code?: string;
   team?: TeamData;
 }
-
-export {RegisterData};

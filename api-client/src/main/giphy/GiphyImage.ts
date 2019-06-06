@@ -17,7 +17,7 @@
  *
  */
 
-interface GiphyImage {
+export interface GiphyImage {
   caption: string;
   fixed_height_downsampled_height: string;
   fixed_height_downsampled_url: string;
@@ -44,5 +44,3 @@ interface GiphyImage {
   url: string;
   username: string;
 }
-
-export {GiphyImage};

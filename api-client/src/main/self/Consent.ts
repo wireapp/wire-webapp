@@ -16,12 +16,11 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {ConsentType} from './ConsentType';
 
-interface Consent {
+export interface Consent {
   type: ConsentType;
   value: number;
   source: string;
 }
-
-export {Consent};

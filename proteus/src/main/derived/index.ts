@@ -17,8 +17,6 @@
  *
  */
 
-import {CipherKey} from './CipherKey';
-import {DerivedSecrets} from './DerivedSecrets';
-import {MacKey} from './MacKey';
-
-export {CipherKey, DerivedSecrets, MacKey};
+export * from './CipherKey';
+export * from './DerivedSecrets';
+export * from './MacKey';

@@ -18,10 +18,8 @@
  */
 
 /* tslint:disable:object-literal-sort-keys */
-enum MutedStatus {
+export enum MutedStatus {
   ALL_NOTIFICATIONS = 0b00,
   ONLY_MENTIONS = 0b01,
   NO_NOTIFICATIONS = 0b11,
 }
-
-export {MutedStatus};

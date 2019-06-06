@@ -96,7 +96,7 @@ import {
 } from './message/Message';
 import {MessageBuilder} from './message/MessageBuilder';
 
-class ConversationService {
+export class ConversationService {
   private clientID: string = '';
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
@@ -975,5 +975,3 @@ class ConversationService {
     return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 }
-
-export {ConversationService};

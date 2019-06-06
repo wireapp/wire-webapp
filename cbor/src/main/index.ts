@@ -17,10 +17,8 @@
  *
  */
 
-import {BaseError} from './cbor/BaseError';
-import {DecodeError} from './cbor/DecodeError';
-import {Decoder} from './cbor/Decoder';
-import {Encoder} from './cbor/Encoder';
-import {Type} from './cbor/Type';
-
-export {DecodeError, BaseError, Decoder, Encoder, Type};
+export {BaseError} from './cbor/BaseError';
+export {DecodeError} from './cbor/DecodeError';
+export {Decoder} from './cbor/Decoder';
+export {Encoder} from './cbor/Encoder';
+export {Type} from './cbor/Type';

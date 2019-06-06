@@ -17,10 +17,8 @@
  *
  */
 
-interface RTCIceServer {
+export interface RTCIceServer {
   urls: string[];
   credential: string;
   username: string;
 }
-
-export {RTCIceServer};

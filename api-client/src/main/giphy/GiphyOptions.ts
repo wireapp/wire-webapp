@@ -17,10 +17,8 @@
  *
  */
 
-interface GiphyOptions {
+export interface GiphyOptions {
   limit?: number;
   offset?: number;
   sort?: 'relevant' | 'recent';
 }
-
-export {GiphyOptions};

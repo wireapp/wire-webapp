@@ -30,7 +30,7 @@ const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined
   [media[QueryKeys.MOBILE]]: {flexDirection: 'column'},
 });
 
-const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...props} />;
+export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...props} />;
 
 export interface ColumnProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
@@ -42,6 +42,4 @@ const columnStyle: <T>(props: ColumnProps<T>) => ObjectInterpolation<undefined> 
   marginLeft: `${GUTTER}px`,
 });
 
-const Column = (props: ColumnProps) => <div css={columnStyle(props)} {...props} />;
-
-export {Column, Columns};
+export const Column = (props: ColumnProps) => <div css={columnStyle(props)} {...props} />;

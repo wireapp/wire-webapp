@@ -59,7 +59,13 @@ export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   onCodeComplete?: (completeCode?: string) => void;
 }
 
-const CodeInput = ({style, digits = 6, autoFocus = false, markInvalid, onCodeComplete = noop}: CodeInputProps) => {
+export const CodeInput = ({
+  style,
+  digits = 6,
+  autoFocus = false,
+  markInvalid,
+  onCodeComplete = noop,
+}: CodeInputProps) => {
   const [values, setValues] = useState(Array(digits).fill(''));
   const inputs = Array(digits);
 
@@ -165,5 +171,3 @@ const CodeInput = ({style, digits = 6, autoFocus = false, markInvalid, onCodeCom
     </CodeInputWrapper>
   );
 };
-
-export {CodeInput};

@@ -17,7 +17,7 @@
  *
  */
 
-interface Activate {
+export interface Activate {
   /** The activation code */
   code: string;
   /**
@@ -45,5 +45,3 @@ interface Activate {
   /** A known phone number to activate. */
   phone?: string;
 }
-
-export {Activate};

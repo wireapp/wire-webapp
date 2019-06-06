@@ -55,10 +55,11 @@ const defaultConfig: Config = {
   urls: Backend.PRODUCTION,
 };
 
-class APIClient extends EventEmitter {
+export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
   private readonly STORE_NAME_PREFIX = 'wire';
+
   // APIs
   public account: {api: AccountAPI};
   public asset: {api: AssetAPI};
@@ -283,5 +284,3 @@ class APIClient extends EventEmitter {
     return this.config.store;
   }
 }
-
-export {APIClient};

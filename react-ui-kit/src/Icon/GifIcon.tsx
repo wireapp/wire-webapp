@@ -21,10 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const GifIcon = (props: SVGIconProps) => (
+export const GifIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={13} {...props}>
     <path d="M12 7.2v5h-2V.2h6v2h-4v3h3v2h-3zm-5-7h2v12H7V.2zm-2 5h1v4.2a3 3 0 0 1-6 0V3a3 3 0 0 1 6 0v.2H4V3c0-.5-.5-1-1-1a1 1 0 0 0-1 1v6.4c0 .5.5 1 1 1 .6 0 1-.4 1-1V7.2H3v-2h2z" />
   </SVGIcon>
 );
-
-export {GifIcon};

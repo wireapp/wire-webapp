@@ -23,7 +23,7 @@ import {MacKey} from '../derived/MacKey';
 import * as ClassUtil from '../util/ClassUtil';
 import {Message} from './Message';
 
-class Envelope {
+export class Envelope {
   _message_enc: Uint8Array;
   mac: Uint8Array;
   message: Message;
@@ -122,5 +122,3 @@ class Envelope {
     return env;
   }
 }
-
-export {Envelope};

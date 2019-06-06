@@ -48,7 +48,7 @@ export interface MessageData {
   conversationIds?: string[];
 }
 
-class TravisBot {
+export class TravisBot {
   constructor(private readonly loginData: LoginData, private readonly messageData: MessageData) {}
 
   get message(): string {
@@ -146,5 +146,3 @@ class TravisBot {
     return stdout.trim();
   }
 }
-
-export {TravisBot};

@@ -31,7 +31,7 @@ import {Envelope} from '../message/Envelope';
 import {ChainKey} from './ChainKey';
 import {MessageKeys} from './MessageKeys';
 
-class RecvChain {
+export class RecvChain {
   chain_key: ChainKey;
   message_keys: MessageKeys[];
   ratchet_key: PublicKey;
@@ -172,5 +172,3 @@ class RecvChain {
     return self;
   }
 }
-
-export {RecvChain};

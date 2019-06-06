@@ -17,10 +17,8 @@
  *
  */
 
-import {CRUDEngine} from './CRUDEngine';
-import {FileSystemEngine} from './FileSystemEngine';
-import {IndexedDBEngine} from './IndexedDBEngine';
-import {LocalStorageEngine} from './LocalStorageEngine';
-import {MemoryEngine} from './MemoryEngine';
-
-export {CRUDEngine, FileSystemEngine, IndexedDBEngine, MemoryEngine, LocalStorageEngine};
+export * from './CRUDEngine';
+export * from './FileSystemEngine';
+export * from './IndexedDBEngine';
+export * from './LocalStorageEngine';
+export * from './MemoryEngine';

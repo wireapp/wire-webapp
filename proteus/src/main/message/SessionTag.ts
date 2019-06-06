@@ -24,7 +24,7 @@ import {DecodeError} from '../errors/DecodeError';
 import * as ClassUtil from '../util/ClassUtil';
 import * as RandomUtil from '../util/RandomUtil';
 
-class SessionTag {
+export class SessionTag {
   tag: Uint8Array;
 
   constructor() {
@@ -63,5 +63,3 @@ class SessionTag {
     return st;
   }
 }
-
-export {SessionTag};

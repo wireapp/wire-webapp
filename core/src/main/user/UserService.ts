@@ -24,7 +24,7 @@ import {AvailabilityType, BroadcastService} from '../broadcast/';
 
 const UUID = require('pure-uuid');
 
-class UserService {
+export class UserService {
   constructor(private readonly apiClient: APIClient, private readonly broadcastService: BroadcastService) {}
 
   public async getUsers(userId: string): Promise<User>;
@@ -45,5 +45,3 @@ class UserService {
     return this.broadcastService.broadcastGenericMessage(teamId, genericMessage);
   }
 }
-
-export {UserService};

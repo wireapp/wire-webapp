@@ -19,7 +19,7 @@
 
 import {ClientType} from '../client/';
 
-interface LoginData {
+export interface LoginData {
   code?: string;
   email?: string;
   handle?: string;
@@ -27,5 +27,3 @@ interface LoginData {
   clientType: ClientType;
   phone?: string;
 }
-
-export {LoginData};

@@ -17,7 +17,7 @@
  *
  */
 
-interface Picture {
+export interface Picture {
   content_length: number;
   content_type: string;
   data: string | null;
@@ -34,5 +34,3 @@ interface Picture {
     width: number;
   };
 }
-
-export {Picture};

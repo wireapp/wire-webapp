@@ -30,7 +30,7 @@ import {
 } from '@wireapp/core/dist/conversation/content/';
 import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 
-abstract class MessageHandler {
+export abstract class MessageHandler {
   public account: Account | undefined = undefined;
 
   abstract handleEvent(payload: PayloadBundle): void;
@@ -207,5 +207,3 @@ abstract class MessageHandler {
     }
   }
 }
-
-export {MessageHandler};

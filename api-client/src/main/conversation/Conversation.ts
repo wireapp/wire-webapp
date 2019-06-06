@@ -19,28 +19,28 @@
 
 import {ConversationMembers} from '../conversation/';
 
-enum CONVERSATION_TYPE {
+export enum CONVERSATION_TYPE {
   REGULAR = 0,
   SELF = 1,
   ONE_TO_ONE = 2,
   CONNECT = 3,
 }
 
-enum CONVERSATION_ACCESS_ROLE {
+export enum CONVERSATION_ACCESS_ROLE {
   ACTIVATED = 'activated',
   NON_ACTIVATED = 'non_activated',
   PRIVATE = 'private',
   TEAM = 'team',
 }
 
-enum CONVERSATION_ACCESS {
+export enum CONVERSATION_ACCESS {
   CODE = 'code',
   INVITE = 'invite',
   LINK = 'link',
   PRIVATE = 'private',
 }
 
-interface Conversation {
+export interface Conversation {
   access:
     | CONVERSATION_ACCESS.PRIVATE
     | CONVERSATION_ACCESS.INVITE
@@ -59,5 +59,3 @@ interface Conversation {
   team?: string;
   type: CONVERSATION_TYPE.REGULAR | CONVERSATION_TYPE.SELF | CONVERSATION_TYPE.ONE_TO_ONE | CONVERSATION_TYPE.CONNECT;
 }
-
-export {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS, CONVERSATION_TYPE, Conversation};

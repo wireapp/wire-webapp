@@ -19,16 +19,16 @@
 
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
-interface ChangelogData {
+export interface ChangelogData {
   content: string;
   conversationIds?: string[];
   isCustomMessage?: boolean;
   repoSlug: string;
 }
 
-type LoginDataBackend = LoginData & {backend?: string};
+export type LoginDataBackend = LoginData & {backend?: string};
 
-interface Parameters {
+export interface Parameters {
   conversationIds?: string;
   backend?: string;
   email: string;
@@ -39,5 +39,3 @@ interface Parameters {
   travisRepoSlug: string;
   travisTag?: string;
 }
-
-export {ChangelogData, LoginDataBackend, Parameters};

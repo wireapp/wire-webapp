@@ -19,7 +19,7 @@
 
 import {ProteusError} from './ProteusError';
 
-class DecryptError extends ProteusError {
+export class DecryptError extends ProteusError {
   static CODE = {
     CASE_200: 200,
     CASE_201: 201,
@@ -43,7 +43,7 @@ class DecryptError extends ProteusError {
   }
 }
 
-namespace DecryptError {
+export namespace DecryptError {
   export class DuplicateMessage extends DecryptError {
     constructor(message = 'Duplicate message', code: number = DecryptError.CODE.CASE_209) {
       super(message, code);
@@ -100,5 +100,3 @@ namespace DecryptError {
     }
   }
 }
-
-export {DecryptError};

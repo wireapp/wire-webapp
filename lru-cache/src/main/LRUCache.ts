@@ -26,7 +26,7 @@ export interface Node<T> {
   previous: Node<T> | null;
 }
 
-class LRUCache<T> {
+export class LRUCache<T> {
   private map: NodeMap<Node<T>>;
   private head: Node<T> | null;
   private end: Node<T> | null;
@@ -209,5 +209,3 @@ class LRUCache<T> {
     }
   }
 }
-
-export {LRUCache};

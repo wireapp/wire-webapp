@@ -34,7 +34,7 @@ const labelStyle: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = 
   ...textStyle({bold, color, fontSize, ...props}),
 });
 
-const Label = (props: LabelProps) => <span css={labelStyle(props)} {...filterTextProps(props)} />;
+export const Label = (props: LabelProps) => <span css={labelStyle(props)} {...filterTextProps(props)} />;
 
 export interface LabelLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
 
@@ -45,8 +45,6 @@ const labelLinkStyle: <T>(props: LabelLinkProps<T>) => ObjectInterpolation<undef
   ...linkStyle({fontSize, ...props}),
 });
 
-const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
+export const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
   <a css={labelLinkStyle(props)} {...filterTextProps(props)} />
 );
-
-export {Label, LabelLink};

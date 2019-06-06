@@ -19,7 +19,7 @@
 
 import {MutedStatus, ServiceRef} from '../conversation/';
 
-interface Member {
+export interface Member {
   hidden_ref?: string;
   hidden?: boolean;
   id: string;
@@ -30,5 +30,3 @@ interface Member {
   otr_muted_status?: MutedStatus | null;
   service?: ServiceRef;
 }
-
-export {Member};

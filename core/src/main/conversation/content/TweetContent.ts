@@ -17,9 +17,7 @@
  *
  */
 
-interface TweetContent {
+export interface TweetContent {
   author?: string;
   username?: string;
 }
-
-export {TweetContent};

@@ -41,10 +41,8 @@ const rotation: Rotation = {
 };
 /* tslint:enable:object-literal-sort-keys */
 
-const ArrowIcon = ({direction = 'right', ...props}: ArrowProps) => (
+export const ArrowIcon = ({direction = 'right', ...props}: ArrowProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <path transform={`rotate(${rotation[direction]} 8 8)`} d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6" />
   </SVGIcon>
 );
-
-export {ArrowIcon};

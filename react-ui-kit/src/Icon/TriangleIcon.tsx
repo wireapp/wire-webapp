@@ -35,10 +35,8 @@ const rotation: Rotation = {
 };
 /* tslint:enable:object-literal-sort-keys */
 
-const TriangleIcon = ({direction = 'down', ...props}: Props) => (
+export const TriangleIcon = ({direction = 'down', ...props}: Props) => (
   <SVGIcon realWidth={8} realHeight={8} {...props}>
     <path transform={`rotate(${rotation[direction]} 4 4)`} fillRule="evenodd" d="M0 2h8L4 7" />
   </SVGIcon>
 );
-
-export {TriangleIcon};

@@ -20,7 +20,7 @@
 import {Converter} from './Converter';
 import {EncodedData} from './EncodedData';
 
-class Encoder {
+export class Encoder {
   public static toBase64(data: string | number | number[] | ArrayBuffer | Buffer | Uint8Array): EncodedData {
     const decoded = Converter.toArrayBufferView(data);
     const asString = Encoder.fromByteArray(decoded);
@@ -38,5 +38,3 @@ class Encoder {
     return Buffer.from(decoded.buffer).toString('base64');
   }
 }
-
-export {Encoder};

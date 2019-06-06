@@ -23,9 +23,9 @@ import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 
 export interface InputSubmitComboProps<T = HTMLDivElement> extends InputProps<T> {}
 
-const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
+export const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
 
-const InputSubmitCombo = (props: InputSubmitComboProps) => (
+export const InputSubmitCombo = (props: InputSubmitComboProps) => (
   <div
     className={INPUT_SUBMIT_COMBO_CLASSNAME}
     css={{
@@ -44,5 +44,3 @@ const InputSubmitCombo = (props: InputSubmitComboProps) => (
     {...props}
   />
 );
-
-export {INPUT_SUBMIT_COMBO_CLASSNAME, InputSubmitCombo};

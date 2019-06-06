@@ -17,13 +17,11 @@
  *
  */
 
-import {IdentityKey} from './IdentityKey';
-import {IdentityKeyPair} from './IdentityKeyPair';
-import {KeyPair} from './KeyPair';
-import {PreKey} from './PreKey';
-import {PreKeyAuth} from './PreKeyAuth';
-import {PreKeyBundle} from './PreKeyBundle';
-import {PublicKey} from './PublicKey';
-import {SecretKey} from './SecretKey';
-
-export {IdentityKey, IdentityKeyPair, KeyPair, PreKey, PreKeyAuth, PreKeyBundle, PublicKey, SecretKey};
+export {IdentityKey} from './IdentityKey';
+export {IdentityKeyPair} from './IdentityKeyPair';
+export {KeyPair} from './KeyPair';
+export {PreKey} from './PreKey';
+export {PreKeyAuth} from './PreKeyAuth';
+export {PreKeyBundle} from './PreKeyBundle';
+export {PublicKey} from './PublicKey';
+export {SecretKey} from './SecretKey';

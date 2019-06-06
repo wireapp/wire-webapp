@@ -31,7 +31,7 @@ import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError}
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
 import {BackendError, BackendErrorLabel, StatusCode} from './';
 
-class BackendErrorMapper {
+export class BackendErrorMapper {
   public static get ERRORS(): Record<number, Record<string, Record<string, BackendError>>> {
     return {
       [StatusCode.BAD_REQUEST]: {
@@ -101,5 +101,3 @@ class BackendErrorMapper {
     }
   }
 }
-
-export {BackendErrorMapper};

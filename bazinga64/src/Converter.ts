@@ -19,7 +19,7 @@
 
 import {UnsupportedInputError} from './UnsupportedInputError';
 
-class Converter {
+export class Converter {
   public static arrayBufferViewToStringUTF8(arrayBufferView: Uint8Array): string {
     try {
       return this.arrayBufferViewToString(arrayBufferView);
@@ -152,5 +152,3 @@ class Converter {
     return decodeURIComponent(escapedString);
   }
 }
-
-export {Converter};

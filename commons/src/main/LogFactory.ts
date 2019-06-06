@@ -23,9 +23,9 @@ import * as logdown from 'logdown';
 import * as moment from 'moment';
 import * as path from 'path';
 
-type Logger = logdown.Logger;
+export type Logger = logdown.Logger;
 
-interface LoggerOptions {
+export interface LoggerOptions {
   color?: string;
   forceEnable?: boolean;
   logFilePath?: string;
@@ -33,7 +33,7 @@ interface LoggerOptions {
   separator?: string;
 }
 
-class LogFactory {
+export class LogFactory {
   private static readonly logFilePath?: string = undefined;
 
   static COLOR_STEP = {
@@ -119,5 +119,3 @@ class LogFactory {
     return logger;
   }
 }
-
-export {LogFactory, Logger, LoggerOptions};

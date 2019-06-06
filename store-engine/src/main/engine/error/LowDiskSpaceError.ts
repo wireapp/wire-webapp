@@ -17,7 +17,7 @@
  *
  */
 
-class LowDiskSpaceError extends Error {
+export class LowDiskSpaceError extends Error {
   constructor(public message: string = 'Not enough storage to save the record.') {
     super(message);
     Object.setPrototypeOf(this, LowDiskSpaceError.prototype);
@@ -27,5 +27,3 @@ class LowDiskSpaceError extends Error {
     this.stack = new Error().stack;
   }
 }
-
-export {LowDiskSpaceError};

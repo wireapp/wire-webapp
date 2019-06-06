@@ -17,7 +17,7 @@
  *
  */
 
-class Type {
+export class Type {
   static readonly ARRAY = 1;
   static readonly BOOL = 2;
   static readonly BREAK = 3;
@@ -86,5 +86,3 @@ class Type {
     }
   }
 }
-
-export {Type};

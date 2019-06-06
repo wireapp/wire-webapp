@@ -19,11 +19,9 @@
 
 import {TeamInfo} from '../team/';
 
-interface NewConversation {
+export interface NewConversation {
   message_timer?: number;
   name?: string;
   team?: TeamInfo;
   users: string[];
 }
-
-export {NewConversation};

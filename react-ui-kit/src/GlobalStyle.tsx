@@ -54,8 +54,6 @@ const globalStyle = css`
   ${globalStyles()}
 `;
 
-const GlobalStyle = () => {
+export const GlobalStyle = () => {
   return <Global styles={globalStyle} />;
 };
-
-export {GlobalStyle};

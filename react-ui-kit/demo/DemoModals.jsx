@@ -34,7 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 
-class DemoModals extends React.PureComponent {
+export class DemoModals extends React.PureComponent {
   state = {
     isFullscreenModalOpen: false,
     isMenuModalOpen: false,
@@ -116,5 +116,3 @@ class DemoModals extends React.PureComponent {
     );
   }
 }
-
-export {DemoModals};

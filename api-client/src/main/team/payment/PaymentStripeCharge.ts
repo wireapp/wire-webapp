@@ -27,7 +27,7 @@ enum PaymentStripeChargeStatus {
   SUCCEEDED = 'succeeded',
 }
 
-interface PaymentStripeCharge {
+export interface PaymentStripeCharge {
   id: string;
   amount: number;
   created: number;
@@ -39,5 +39,3 @@ interface PaymentStripeCharge {
   paid: boolean;
   status: PaymentStripeChargeStatus;
 }
-
-export {PaymentStripeCharge, PaymentStripeChargeStatus};

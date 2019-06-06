@@ -17,7 +17,7 @@
  *
  */
 
-class NetworkError extends Error {
+export class NetworkError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, NetworkError.prototype);
@@ -25,5 +25,3 @@ class NetworkError extends Error {
     this.stack = new Error().stack;
   }
 }
-
-export {NetworkError};

@@ -66,26 +66,24 @@ const containerStyle: <T>(props: ContainerProps<T>) => ObjectInterpolation<undef
 
 const filterContainerProps = (props: Object) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
 
-const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
+export const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
   <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />
 ));
 
 export interface LevelContainerProps extends Omit<ContainerProps, 'level'> {}
 
-const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'lg'} {...props} />
 ));
-const ContainerMD = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerMD = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'md'} {...props} />
 ));
-const ContainerSM = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerSM = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'sm'} {...props} />
 ));
-const ContainerXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xs'} {...props} />
 ));
-const ContainerXXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerXXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xxs'} {...props} />
 ));
-
-export {Container, ContainerLG, ContainerMD, ContainerSM, ContainerXS, ContainerXXS};

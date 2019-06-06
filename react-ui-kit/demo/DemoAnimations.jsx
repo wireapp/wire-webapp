@@ -34,7 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 
-class DemoAnimations extends React.PureComponent {
+export class DemoAnimations extends React.PureComponent {
   state = {
     showBottomUpAnimation: false,
     showCombinedAnimation: false,
@@ -142,5 +142,3 @@ class DemoAnimations extends React.PureComponent {
     );
   }
 }
-
-export {DemoAnimations};

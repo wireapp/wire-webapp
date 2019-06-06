@@ -17,8 +17,6 @@
  *
  */
 
-import {Item} from './Item';
-import {Priority} from './Priority';
-import {PriorityQueue} from './PriorityQueue';
-
-export {Item, Priority, PriorityQueue};
+export * from './Item';
+export * from './Priority';
+export * from './PriorityQueue';

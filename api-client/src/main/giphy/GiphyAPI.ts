@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 import {GiphyOptions, GiphyResult, GiphySearchResult} from '../giphy/';
 import {HttpClient} from '../http/';
 
-class GiphyAPI {
+export class GiphyAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -71,5 +71,3 @@ class GiphyAPI {
     return this.client.sendJSON<GiphySearchResult>(config).then(response => response.data);
   }
 }
-
-export {GiphyAPI};

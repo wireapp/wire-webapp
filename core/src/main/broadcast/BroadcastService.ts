@@ -24,7 +24,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {ConversationService} from '../conversation/';
 import {CryptographyService} from '../cryptography/';
 
-class BroadcastService {
+export class BroadcastService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly conversationService: ConversationService,
@@ -81,5 +81,3 @@ class BroadcastService {
     }
   }
 }
-
-export {BroadcastService};

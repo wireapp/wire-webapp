@@ -97,7 +97,7 @@ interface ModalProps {
   onClose?: () => void;
 }
 
-const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
+export const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
   children,
   fullscreen,
   onClose,
@@ -123,5 +123,3 @@ Modal.defaultProps = {
   onBackgroundClick: noop,
   onClose: noop,
 };
-
-export {Modal};

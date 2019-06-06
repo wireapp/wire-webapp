@@ -17,9 +17,7 @@
  *
  */
 
-interface VerifyDelete {
+export interface VerifyDelete {
   key: string;
   code: string;
 }
-
-export {VerifyDelete};

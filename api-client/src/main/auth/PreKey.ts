@@ -17,9 +17,7 @@
  *
  */
 
-interface PreKey {
+export interface PreKey {
   id: number;
   key: string;
 }
-
-export {PreKey};

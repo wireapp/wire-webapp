@@ -19,8 +19,6 @@
 
 import {CONVERSATION_TYPING} from '../event/';
 
-interface Typing {
+export interface Typing {
   status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
 }
-
-export {Typing};

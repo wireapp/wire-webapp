@@ -20,7 +20,7 @@
 import {Permissions, combinePermissions, hasPermissions} from './Permissions';
 import {PermissionsData} from './PermissionsData';
 
-enum Role {
+export enum Role {
   ADMIN = 'admin',
   PARTNER = 'partner',
   MEMBER = 'member',
@@ -28,7 +28,7 @@ enum Role {
   NONE = 'none',
 }
 
-const roleToPermissions = (role: string): Permissions => {
+export const roleToPermissions = (role: string): Permissions => {
   switch (role.toLowerCase()) {
     case Role.OWNER: {
       return combinePermissions([
@@ -65,7 +65,7 @@ const roleToPermissions = (role: string): Permissions => {
   }
 };
 
-const permissionsToRole = (permissions: PermissionsData): Role => {
+export const permissionsToRole = (permissions: PermissionsData): Role => {
   if (hasPermissions(permissions.self, roleToPermissions(Role.OWNER))) {
     return Role.OWNER;
   }
@@ -81,53 +81,39 @@ const permissionsToRole = (permissions: PermissionsData): Role => {
   return Role.NONE;
 };
 
-const isPartner = (permissions: PermissionsData): boolean => {
+export const isPartner = (permissions: PermissionsData): boolean => {
   return !!(permissions && permissionsToRole(permissions) === Role.PARTNER);
 };
 
-const isMember = (permissions: PermissionsData): boolean => {
+export const isMember = (permissions: PermissionsData): boolean => {
   return !!(permissions && permissionsToRole(permissions) === Role.MEMBER);
 };
 
-const isAdmin = (permissions: PermissionsData): boolean => {
+export const isAdmin = (permissions: PermissionsData): boolean => {
   return !!(permissions && permissionsToRole(permissions) === Role.ADMIN);
 };
 
-const isOwner = (permissions: PermissionsData): boolean => {
+export const isOwner = (permissions: PermissionsData): boolean => {
   return !!(permissions && permissionsToRole(permissions) === Role.OWNER);
 };
 
-const isAtLeastPartner = (permissions: PermissionsData): boolean => {
+export const isAtLeastPartner = (permissions: PermissionsData): boolean => {
   return isPartner(permissions) || isMember(permissions) || isAdmin(permissions) || isOwner(permissions);
 };
 
-const isAtLeastMember = (permissions: PermissionsData): boolean => {
+export const isAtLeastMember = (permissions: PermissionsData): boolean => {
   return isMember(permissions) || isAdmin(permissions) || isOwner(permissions);
 };
 
-const isAtLeastAdmin = (permissions: PermissionsData): boolean => {
+export const isAtLeastAdmin = (permissions: PermissionsData): boolean => {
   return isAdmin(permissions) || isOwner(permissions);
 };
 
-const isAtLeastEqual = (permissions: PermissionsData, otherPermissions: PermissionsData): boolean => {
+export const isAtLeastEqual = (permissions: PermissionsData, otherPermissions: PermissionsData): boolean => {
   return (
     (isOwner(permissions) && isOwner(otherPermissions)) ||
     (isAtLeastAdmin(permissions) && isAdmin(otherPermissions)) ||
     (isAtLeastMember(permissions) && isMember(otherPermissions)) ||
     (isAtLeastPartner(permissions) && isPartner(otherPermissions))
   );
-};
-
-export {
-  Role,
-  roleToPermissions,
-  permissionsToRole,
-  isPartner,
-  isMember,
-  isAdmin,
-  isOwner,
-  isAtLeastPartner,
-  isAtLeastMember,
-  isAtLeastAdmin,
-  isAtLeastEqual,
 };

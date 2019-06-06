@@ -34,7 +34,7 @@ const ArrowDown = `
   </svg>
 `;
 
-const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> = ({
+export const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> = ({
   disabled = false,
   markInvalid,
   ...props
@@ -57,6 +57,4 @@ const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<undefined> 
   paddingRight: '30px',
 });
 
-const Select = (props: SelectProps) => <select css={selectStyle(props)} {...props} />;
-
-export {Select, selectStyle};
+export const Select = (props: SelectProps) => <select css={selectStyle(props)} {...props} />;

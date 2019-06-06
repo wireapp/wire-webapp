@@ -20,7 +20,7 @@
 import {ServiceRef} from '../conversation/';
 import {UserAsset} from '../user/';
 
-interface User {
+export interface User {
   accent_id?: number;
   assets: UserAsset[];
   deleted?: boolean;
@@ -31,5 +31,3 @@ interface User {
   name: string;
   service?: ServiceRef;
 }
-
-export {User};

@@ -17,7 +17,7 @@
  *
  */
 
-class BaseError extends Error {
+export class BaseError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, BaseError.prototype);
@@ -26,5 +26,3 @@ class BaseError extends Error {
     this.name = this.constructor.name;
   }
 }
-
-export {BaseError};

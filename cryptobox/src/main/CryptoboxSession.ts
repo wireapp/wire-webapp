@@ -21,7 +21,7 @@ import {message as ProteusMessage, session as ProteusSession} from '@wireapp/pro
 import {DecryptionError} from './DecryptionError';
 import {CryptoboxCRUDStore} from './store/';
 
-class CryptoboxSession {
+export class CryptoboxSession {
   public id: string;
   public session: ProteusSession.Session;
 
@@ -52,5 +52,3 @@ class CryptoboxSession {
     return this.session.remote_identity.fingerprint();
   }
 }
-
-export {CryptoboxSession};

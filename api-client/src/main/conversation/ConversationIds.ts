@@ -17,9 +17,7 @@
  *
  */
 
-interface ConversationIds {
+export interface ConversationIds {
   conversations: string[];
   has_more: boolean;
 }
-
-export {ConversationIds};

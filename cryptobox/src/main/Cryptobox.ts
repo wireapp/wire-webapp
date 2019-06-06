@@ -34,7 +34,7 @@ import {CryptoboxCRUDStore} from './store/';
 const DEFAULT_CAPACITY = 1000;
 const {version}: {version: string} = require('../../package.json');
 
-class Cryptobox extends EventEmitter {
+export class Cryptobox extends EventEmitter {
   public static TOPIC = {
     NEW_PREKEYS: 'new-prekeys',
     NEW_SESSION: 'new-session',
@@ -517,5 +517,3 @@ class Cryptobox extends EventEmitter {
     return data;
   }
 }
-
-export {Cryptobox};

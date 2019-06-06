@@ -19,7 +19,7 @@
 
 import {MemberRole} from '../MemberRole';
 
-interface TeamInvitation {
+export interface TeamInvitation {
   created_at: Date;
   created_by: string;
   email: string;
@@ -27,5 +27,3 @@ interface TeamInvitation {
   role: MemberRole;
   team: string;
 }
-
-export {TeamInvitation};

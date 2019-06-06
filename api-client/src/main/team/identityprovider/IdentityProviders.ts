@@ -19,8 +19,6 @@
 
 import {IdentityProvider} from './IdentityProvider';
 
-interface IdentityProviders {
+export interface IdentityProviders {
   providers: IdentityProvider[];
 }
-
-export {IdentityProviders};

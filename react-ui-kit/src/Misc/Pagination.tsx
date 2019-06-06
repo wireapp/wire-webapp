@@ -32,7 +32,7 @@ interface PaginationProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   previousPageComponent?: any;
 }
 
-const Pagination: React.SFC<PaginationProps> = ({
+export const Pagination: React.SFC<PaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goPage,
@@ -110,5 +110,3 @@ const Pagination: React.SFC<PaginationProps> = ({
     </FlexBox>
   );
 };
-
-export {Pagination};

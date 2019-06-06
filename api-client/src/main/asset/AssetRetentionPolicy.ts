@@ -17,10 +17,8 @@
  *
  */
 
-enum AssetRetentionPolicy {
+export enum AssetRetentionPolicy {
   ETERNAL = 'eternal',
   PERSISTENT = 'persistent',
   VOLATILE = 'volatile',
 }
-
-export {AssetRetentionPolicy};

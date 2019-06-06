@@ -23,7 +23,7 @@ import {KeyPair} from '../keys/KeyPair';
 import * as ClassUtil from '../util/ClassUtil';
 import {ChainKey} from './ChainKey';
 
-class SendChain {
+export class SendChain {
   chain_key: ChainKey;
   ratchet_key: KeyPair;
 
@@ -66,5 +66,3 @@ class SendChain {
     return self;
   }
 }
-
-export {SendChain};

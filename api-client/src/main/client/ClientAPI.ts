@@ -23,7 +23,7 @@ import {PreKeyBundle} from '../auth/';
 import {NewClient, RegisteredClient} from '../client/';
 import {HttpClient} from '../http/';
 
-class ClientAPI {
+export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
   static URL = {
@@ -82,5 +82,3 @@ class ClientAPI {
     return this.client.sendJSON<PreKeyBundle>(config).then(response => response.data);
   }
 }
-
-export {ClientAPI};

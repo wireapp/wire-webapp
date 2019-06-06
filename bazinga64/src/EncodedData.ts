@@ -19,8 +19,6 @@
 
 import {IData} from './IData';
 
-class EncodedData implements IData {
+export class EncodedData implements IData {
   constructor(public asBytes: Uint8Array, public asString: string) {}
 }
-
-export {EncodedData};

@@ -19,8 +19,8 @@
 
 import {Cryptobox} from '../Cryptobox';
 
-// Record that is written into the store
-class SerialisedRecord {
+/** Record that is written into the store */
+export class SerialisedRecord {
   public created: number;
   public id: string;
   public serialised: string;
@@ -33,5 +33,3 @@ class SerialisedRecord {
     this.version = Cryptobox.VERSION;
   }
 }
-
-export {SerialisedRecord};

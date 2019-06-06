@@ -17,8 +17,6 @@
  *
  */
 
-interface ConversationMessageTimerUpdate {
+export interface ConversationMessageTimerUpdate {
   message_timer: number | null;
 }
-
-export {ConversationMessageTimerUpdate};

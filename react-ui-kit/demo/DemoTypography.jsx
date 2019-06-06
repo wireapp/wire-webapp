@@ -39,7 +39,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 
-class DemoTypography extends React.PureComponent {
+export class DemoTypography extends React.PureComponent {
   state = {};
 
   render() {
@@ -174,5 +174,3 @@ class DemoTypography extends React.PureComponent {
     );
   }
 }
-
-export {DemoTypography};

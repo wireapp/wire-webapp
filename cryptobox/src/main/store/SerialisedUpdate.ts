@@ -17,8 +17,6 @@
  *
  */
 
-interface SerialisedUpdate {
+export interface SerialisedUpdate {
   serialised: ArrayBuffer;
 }
-
-export {SerialisedUpdate};

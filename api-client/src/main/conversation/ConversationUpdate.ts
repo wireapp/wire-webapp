@@ -17,8 +17,6 @@
  *
  */
 
-interface ConversationUpdate {
+export interface ConversationUpdate {
   name: string;
 }
-
-export {ConversationUpdate};

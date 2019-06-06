@@ -50,7 +50,7 @@ import Helmet from 'react-helmet';
 import React from 'react';
 import {avatarBase64} from './avatarImage';
 
-class Demo extends React.PureComponent {
+export class Demo extends React.PureComponent {
   state = {
     currentPage: 0,
     showFirstDropdown: false,
@@ -215,5 +215,3 @@ class Demo extends React.PureComponent {
     );
   }
 }
-
-export {Demo};

@@ -32,7 +32,7 @@ export enum CrudStoreStores {
   SESSIONS = 'sessions',
 }
 
-class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
+export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
   public static readonly KEYS = CRUDStoreKeys;
   public static readonly STORES = CrudStoreStores;
 
@@ -200,5 +200,3 @@ class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
       .then((primary_key: string) => primary_key);
   }
 }
-
-export {CryptoboxCRUDStore};

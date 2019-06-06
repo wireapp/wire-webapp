@@ -23,7 +23,7 @@ import {HttpClient} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {TeamAPI} from '../team/';
 
-class TeamInvitationAPI {
+export class TeamInvitationAPI {
   static readonly MAX_CHUNK_SIZE = 100;
   constructor(private readonly client: HttpClient) {}
 
@@ -105,5 +105,3 @@ class TeamInvitationAPI {
     return this.client.sendJSON<TeamInvitation>(config).then(response => response.data);
   }
 }
-
-export {TeamInvitationAPI};

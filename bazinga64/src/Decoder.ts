@@ -20,7 +20,7 @@
 import {Converter} from './Converter';
 import {DecodedData} from './DecodedData';
 
-class Decoder {
+export class Decoder {
   public static fromBase64(data: string | number[]): DecodedData {
     /**
      * RFC 2045: The encoded output stream must be represented in lines of no more than 76 characters each.
@@ -57,5 +57,3 @@ class Decoder {
     }
   }
 }
-
-export {Decoder};

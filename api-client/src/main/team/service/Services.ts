@@ -16,11 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {Service} from './Service';
 
-interface Services {
+export interface Services {
   services: Service[];
   has_more: boolean;
 }
-
-export {Services};

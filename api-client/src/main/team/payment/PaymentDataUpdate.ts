@@ -19,10 +19,8 @@
 
 import {PaymentInterval} from '../payment/';
 
-interface PaymentDataUpdate {
+export interface PaymentDataUpdate {
   coupon?: string;
   interval?: PaymentInterval;
   source?: string;
 }
-
-export {PaymentDataUpdate};
