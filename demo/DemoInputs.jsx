@@ -52,7 +52,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 
-const DemoInputs = () => {
+export const DemoInputs = () => {
   const shakeBox = useRef();
   const [activeTab, setActiveTab] = useState(0);
 
@@ -329,4 +329,3 @@ const DemoInputs = () => {
     </Container>
   );
 };
-export {DemoInputs};

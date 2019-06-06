@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-const Form = (props: React.HTMLProps<HTMLFormElement>) => (
+export const Form = (props: React.HTMLProps<HTMLFormElement>) => (
   <form
     css={{
       display: 'flex',
@@ -32,5 +32,3 @@ const Form = (props: React.HTMLProps<HTMLFormElement>) => (
     {...props}
   />
 );
-
-export {Form};

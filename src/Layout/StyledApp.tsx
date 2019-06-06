@@ -39,11 +39,9 @@ const StyledAppContainer = (props: StyledAppContainerProps) => (
   <div css={styledAppContainerStyle(props)} {...filterStyledAppContainerProps(props)} />
 );
 
-const StyledApp = ({children, ...props}) => (
+export const StyledApp = ({children, ...props}) => (
   <StyledAppContainer {...props}>
     <GlobalStyle />
     {children}
   </StyledAppContainer>
 );
-
-export {StyledApp};

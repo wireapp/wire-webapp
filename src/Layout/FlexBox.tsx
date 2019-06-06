@@ -30,7 +30,7 @@ export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   flexWrap?: FlexWrapProperty;
 }
 
-const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined> = ({
+export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined> = ({
   align = 'flex-start',
   column = false,
   justify = 'flex-start',
@@ -43,12 +43,8 @@ const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<undefined
   justifyContent: justify,
 });
 
-const filterFlexBoxProps = (props: Object) => {
-  return filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
-};
+const filterFlexBoxProps = (props: Object) => filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
 
-const FlexBox: React.FC<FlexBoxProps> = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
+export const FlexBox: React.FC<FlexBoxProps> = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
   <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />
 ));
-
-export {FlexBox, flexBoxStyle};

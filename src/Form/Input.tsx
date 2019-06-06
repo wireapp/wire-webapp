@@ -30,7 +30,7 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   placeholderTextTransform?: TextTransformProperty;
 }
 
-const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = ({
+export const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = ({
   markInvalid = false,
   placeholderTextTransform = 'uppercase',
   disabled = false,
@@ -73,13 +73,12 @@ const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = 
   };
 };
 
-const INPUT_CLASSNAME = 'input';
+export const INPUT_CLASSNAME = 'input';
 const filterInputProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
-const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElement>>(
-  ({type, ...props}, ref) => (
-    <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
-  )
-);
-
-export {INPUT_CLASSNAME, Input, inputStyle};
+export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
+  HTMLInputElement,
+  InputProps<HTMLInputElement>
+>(({type, ...props}, ref) => (
+  <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
+));

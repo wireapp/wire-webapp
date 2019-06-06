@@ -61,7 +61,7 @@ const avatarStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = prop
 const filteredAvatarProps = (props: Props) =>
   filterProps(props, ['size', 'forceInitials', 'name', 'base64Image', 'borderColor', 'backgroundColor', 'fetchImage']);
 
-const Avatar = (props: Props) => {
+export const Avatar = (props: Props) => {
   const {base64Image, forceInitials, name, fetchImage} = props;
   const element = useRef<HTMLDivElement>();
 
@@ -104,5 +104,3 @@ const Avatar = (props: Props) => {
     </div>
   );
 };
-
-export {Avatar};

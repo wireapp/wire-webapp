@@ -29,7 +29,7 @@ export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
   color?: string;
 }
 
-const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...props}: LoadingProps) => {
+export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...props}: LoadingProps) => {
   const pathLength = 125.68;
   const rotationOffset = -0.75;
   const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;
@@ -70,5 +70,3 @@ Loading.defaultProps = {
   progress: undefined,
   size: 43,
 };
-
-export {Loading};

@@ -34,7 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 
-class DemoLayouts extends React.PureComponent {
+export class DemoLayouts extends React.PureComponent {
   state = {};
 
   render() {
@@ -143,5 +143,3 @@ class DemoLayouts extends React.PureComponent {
     );
   }
 }
-
-export {DemoLayouts};

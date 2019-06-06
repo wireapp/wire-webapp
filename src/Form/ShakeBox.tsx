@@ -32,7 +32,7 @@ export interface ShakeBoxRef {
   shake: () => void;
 }
 
-const ShakeBox: React.FC<ShakeBoxProps> = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
+export const ShakeBox: React.FC<ShakeBoxProps> = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
   ({children, amplitude = 8, damping = 0.75, speed = 4, threshold = 1}: ShakeBoxProps, ref) => {
     const [offset, setOffset] = useState(0);
     let requestAnimationId = 0;
@@ -66,5 +66,3 @@ const ShakeBox: React.FC<ShakeBoxProps> = React.forwardRef<ShakeBoxRef, ShakeBox
     return <div style={{transform: `translateX(${offset}px)`}}>{children}</div>;
   }
 );
-
-export {ShakeBox};

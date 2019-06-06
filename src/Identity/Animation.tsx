@@ -44,9 +44,9 @@ type TransitionContainerProps = React.HTMLProps<any> & {
   exit?: boolean;
 };
 
-const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
+export const TransitionContainer = (props: TransitionContainerProps) => <TransitionGroup {...props} />;
 
-const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => (
+export const Transition = ({animationStyle, timeout, component = 'div', children, ...props}: TransitionProps) => (
   <ClassNames>
     {({css}) => (
       <CSSTransition timeout={timeout} classNames={css(animationStyle)} {...props}>
@@ -56,7 +56,7 @@ const Transition = ({animationStyle, timeout, component = 'div', children, ...pr
   </ClassNames>
 );
 
-const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
+export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => (
   <Transition
     animationStyle={{
       '&-enter': {opacity: startValue},
@@ -77,7 +77,7 @@ const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...p
   />
 );
 
-const YAxisMovement = ({
+export const YAxisMovement = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
@@ -103,7 +103,7 @@ const YAxisMovement = ({
   />
 );
 
-const XAxisMovement = ({
+export const XAxisMovement = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
@@ -129,7 +129,7 @@ const XAxisMovement = ({
   />
 );
 
-const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => (
+export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => (
   <Transition
     animationStyle={{
       '&-enter': {marginTop: startValue},
@@ -150,20 +150,8 @@ const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAUL
   />
 );
 
-const LeftRightMovement = props => <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
-const RightLeftMovement = props => <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
+export const LeftRightMovement = props => <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
+export const RightLeftMovement = props => <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
 
-const TopDownMovement = props => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
-const BottomUpMovement = props => <YAxisMovement startValue="100%" endValue="0%" {...props} />;
-
-export {
-  BottomUpMovement,
-  LeftRightMovement,
-  Opacity,
-  RightLeftMovement,
-  Slide,
-  TopDownMovement,
-  TransitionContainer,
-  XAxisMovement,
-  YAxisMovement,
-};
+export const TopDownMovement = props => <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
+export const BottomUpMovement = props => <YAxisMovement startValue="100%" endValue="0%" {...props} />;

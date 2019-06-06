@@ -24,17 +24,20 @@ import {TextProps, filterTextProps, textStyle} from './Text';
 
 export interface ParagraphProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({block = true, ...props}) => ({
+export const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({
+  block = true,
+  ...props
+}) => ({
   ...textStyle({block, ...props}),
   marginBottom: '16px',
   marginTop: 0,
 });
 
-const Paragraph = (props: ParagraphProps) => <p css={paragraphStyle(props)} {...filterTextProps(props)} />;
+export const Paragraph = (props: ParagraphProps) => <p css={paragraphStyle(props)} {...filterTextProps(props)} />;
 
 export interface LeadProps<T = HTMLParagraphElement> extends TextProps<T> {}
 
-const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
+export const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
   center = true,
   fontSize = '24px',
@@ -48,6 +51,4 @@ const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
   },
 });
 
-const Lead = (props: LeadProps) => <p css={leadStyle(props)} {...filterTextProps(props)} />;
-
-export {Paragraph, paragraphStyle, Lead, leadStyle};
+export const Lead = (props: LeadProps) => <p css={leadStyle(props)} {...filterTextProps(props)} />;

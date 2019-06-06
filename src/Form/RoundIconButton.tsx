@@ -44,7 +44,7 @@ export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps
   iconWidth?: number;
 }
 
-const roundIconButtonStyle: <T>(props: RoundIconButtonProps<T>) => ObjectInterpolation<undefined> = props => ({
+export const roundIconButtonStyle: <T>(props: RoundIconButtonProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...buttonStyle(props),
   alignItems: 'center',
   borderRadius: '50%',
@@ -73,7 +73,7 @@ export enum ICON_NAME {
   TRASH = 'trash',
 }
 
-const RoundIconButton: React.SFC<RoundIconButtonProps> = ({
+export const RoundIconButton: React.SFC<RoundIconButtonProps> = ({
   icon,
   iconColor,
   iconHeight,
@@ -136,5 +136,3 @@ RoundIconButton.defaultProps = {
   iconColor: COLOR.WHITE,
   size: 32,
 };
-
-export {RoundIconButton, roundIconButtonStyle};

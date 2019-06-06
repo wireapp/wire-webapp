@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const RecordIcon = (props: SVGIconProps) => (
+export const RecordIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <g fill="#FB0807" fill-rule="evenodd">
       <circle fill-opacity=".24" cx="8" cy="8" r="8" />
@@ -29,5 +29,3 @@ const RecordIcon = (props: SVGIconProps) => (
     </g>
   </SVGIcon>
 );
-
-export {RecordIcon};

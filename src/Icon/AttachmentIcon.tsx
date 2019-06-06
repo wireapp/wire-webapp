@@ -21,10 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const AttachmentIcon = (props: SVGIconProps) => (
+export const AttachmentIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={14} realHeight={16} {...props}>
     <path d="M1.6 7.7l4.8-4.8A3.3 3.3 0 0 1 11 3a3.4 3.4 0 0 1 0 4.8L9.8 9.1l-4.4 4.4a2 2 0 0 1-2.8 0 2 2 0 0 1 0-2.7L4 9.4 8.4 5c.2-.2.5-.2.7 0 .2.2.2.5 0 .6l-4.8 4.8a1 1 0 0 0 0 1.4c.4.4 1 .4 1.4 0L10.4 7c1-1 1-2.5 0-3.4-1-1-2.4-1-3.3 0L2.6 8 1.3 9.4a3.9 3.9 0 0 0 0 5.5c1.5 1.5 4 1.5 5.4 0l4.4-4.5 1.4-1.3c2-2.1 2-5.5 0-7.5a5.3 5.3 0 0 0-7.5 0L.3 6.3a1 1 0 0 0 0 1.4c.4.4 1 .4 1.3 0z" />
   </SVGIcon>
 );
-
-export {AttachmentIcon};

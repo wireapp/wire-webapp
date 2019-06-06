@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import {COLOR} from '../Identity/colors';
 
-interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
+export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
   realWidth: number;
   realHeight: number;
 }
@@ -33,7 +33,7 @@ export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   width?: number;
 }
 
-const SVGIcon = ({
+export const SVGIcon = ({
   realWidth,
   realHeight,
   scale = 1,
@@ -57,5 +57,3 @@ const SVGIcon = ({
     </svg>
   );
 };
-
-export {SVGIcon};

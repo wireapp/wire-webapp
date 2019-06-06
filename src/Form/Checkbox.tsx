@@ -67,7 +67,7 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
 }
 
-const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
+export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
 >(({id = Math.random().toString(), children, style, disabled, ...props}, ref) => (
@@ -100,7 +100,7 @@ const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
 
 export interface CheckboxLabelProps<T = HTMLSpanElement> extends TextProps<T> {}
 
-const CheckboxLabel = ({
+export const CheckboxLabel = ({
   bold = true,
   color = COLOR.GRAY_DARKEN_24,
   fontSize = '11px',
@@ -124,5 +124,3 @@ const CheckboxLabel = ({
     {...props}
   />
 );
-
-export {Checkbox, CheckboxLabel};

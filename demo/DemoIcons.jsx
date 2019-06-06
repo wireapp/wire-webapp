@@ -66,7 +66,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 
-class DemoIcons extends React.PureComponent {
+export class DemoIcons extends React.PureComponent {
   state = {};
 
   render() {
@@ -126,5 +126,3 @@ class DemoIcons extends React.PureComponent {
     );
   }
 }
-
-export {DemoIcons};

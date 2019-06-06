@@ -21,10 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-const OptionsIcon = (props: SVGIconProps) => (
+export const OptionsIcon = (props: SVGIconProps) => (
   <SVGIcon realWidth={16} realHeight={16} {...props}>
     <path d="M9.7 15H15a1 1 0 1 0 0-2H9.7a2 2 0 0 0-3.4 0H1a1 1 0 1 0 0 2h5.3a2 2 0 0 0 3.4 0zm-3-6H15a1 1 0 1 0 0-2H6.7a2 2 0 0 0-3.4 0H1a1 1 0 1 0 0 2h2.3a2 2 0 0 0 3.4 0zm6-6H15a1 1 0 1 0 0-2h-2.3a2 2 0 0 0-3.4 0H1a1 1 0 1 0 0 2h8.3a2 2 0 0 0 3.4 0z" />
   </SVGIcon>
 );
-
-export {OptionsIcon};

@@ -32,7 +32,7 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   loadingColor?: string;
 }
 
-const filterButtonProps = (props: Object) => {
+export const filterButtonProps = (props: Object) => {
   return filterProps(filterTextProps(props), ['backgroundColor', 'noCapital']);
 };
 
@@ -40,7 +40,7 @@ const filterButtonLinkProps = (props: Object) => {
   return filterProps(filterTextProps(props), ['backgroundColor', 'disabled', 'noCapital']);
 };
 
-const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
+export const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.BLUE,
   block = false,
   disabled = false,
@@ -88,20 +88,24 @@ const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> 
   width: block ? '100%' : 'auto',
 });
 
-const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
+export const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectInterpolation<undefined> = props => ({
   ...buttonStyle(props),
   display: 'inline-flex !important',
 });
 
-const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
+export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
   <button css={buttonStyle(props)} {...filterButtonProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </button>
 );
-const ButtonLink = ({children, showLoading, loadingColor = COLOR.WHITE, ...props}: ButtonProps<HTMLAnchorElement>) => (
+
+export const ButtonLink = ({
+  children,
+  showLoading,
+  loadingColor = COLOR.WHITE,
+  ...props
+}: ButtonProps<HTMLAnchorElement>) => (
   <a css={buttonLinkStyle(props)} {...filterButtonLinkProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </a>
 );
-
-export {Button, ButtonLink, buttonStyle, filterButtonProps, buttonLinkStyle};

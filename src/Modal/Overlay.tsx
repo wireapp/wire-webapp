@@ -26,7 +26,7 @@ import {QueryKeys, media} from '../mediaQueries';
 
 export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
+export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
   bottom: 0,
   display: 'flex',
   left: 0,
@@ -38,9 +38,9 @@ const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpola
   zIndex: 9997,
 });
 
-const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyle} {...props} />;
+export const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyle} {...props} />;
 
-const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
+export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
     css={{
       '*': {
@@ -66,7 +66,7 @@ const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
 
 export interface OverlayBackgroundProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
+export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
   background: 'rgba(0, 0, 0, 0.88)',
   height: '100vh',
@@ -77,15 +77,13 @@ const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInt
   zIndex: 9998,
 });
 
-const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
+export const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
 
 export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
 
-const Overlay = ({children = null, ...props}: OverlayProps) => (
+export const Overlay = ({children = null, ...props}: OverlayProps) => (
   <OverlayWrapper {...props} data-uie-name="modal">
     <OverlayContent>{children}</OverlayContent>
     <OverlayBackground data-uie-name="overlay-background" />
   </OverlayWrapper>
 );
-
-export {Overlay, OverlayBackground, overlayBackgroundStyle, OverlayWrapper, overlayWrapperStyle};

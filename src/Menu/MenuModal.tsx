@@ -89,7 +89,7 @@ interface MenuModalProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;
 }
 
-const MenuModal = ({
+export const MenuModal = ({
   children = null,
   onBackgroundClick = noop,
   ...props
@@ -104,7 +104,7 @@ const MenuModal = ({
 
 export interface MenuItemProps<T = HTMLLIElement> extends React.HTMLProps<T> {}
 
-const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
+export const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
   <li
     css={{
       alignItems: 'center',
@@ -120,5 +120,3 @@ const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<H
     {children}
   </li>
 );
-
-export {MenuModal, MenuItem};

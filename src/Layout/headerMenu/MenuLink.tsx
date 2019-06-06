@@ -29,7 +29,7 @@ export interface MenuLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {
   button?: boolean;
 }
 
-const menuLinkStyle: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefined> = ({
+export const menuLinkStyle: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   color = COLOR.LINK,
   fontSize = '11px',
@@ -68,8 +68,6 @@ const menuLinkStyle: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<undefin
   padding: button ? '10px 16px' : undefined,
 });
 
-const filterMenuLinkProps = (props: Object) => filterProps(filterLinkProps(props), ['button']);
+export const filterMenuLinkProps = (props: Object) => filterProps(filterLinkProps(props), ['button']);
 
-const MenuLink = (props: MenuLinkProps) => <a css={menuLinkStyle(props)} {...filterMenuLinkProps(props)} />;
-
-export {MenuLink, menuLinkStyle, filterMenuLinkProps};
+export const MenuLink = (props: MenuLinkProps) => <a css={menuLinkStyle(props)} {...filterMenuLinkProps(props)} />;

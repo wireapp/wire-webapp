@@ -24,7 +24,7 @@ import {Text, TextProps, linkStyle, textStyle} from '../Text';
 
 interface ErrorMessageProps<T = HTMLSpanElement> extends TextProps<T> {}
 
-const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = ({
+export const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
   center = true,
   color = COLOR.RED,
@@ -40,6 +40,4 @@ const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation
   marginBottom: '12px',
 });
 
-const ErrorMessage = (props: ErrorMessageProps) => <Text css={errorMessageStyle(props)} {...props} />;
-
-export {ErrorMessage, errorMessageStyle};
+export const ErrorMessage = (props: ErrorMessageProps) => <Text css={errorMessageStyle(props)} {...props} />;

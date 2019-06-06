@@ -27,7 +27,7 @@ export interface MenuContentProps<T = HTMLDivElement> extends TextProps<T> {
   open?: boolean;
 }
 
-const menuContentStyle: <T>(props: MenuContentProps<T>) => ObjectInterpolation<undefined> = props => ({
+export const menuContentStyle: <T>(props: MenuContentProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...contentStyle(props),
   alignItems: 'center',
   flexDirection: 'row',
@@ -41,8 +41,6 @@ const menuContentStyle: <T>(props: MenuContentProps<T>) => ObjectInterpolation<u
 
 const filterMenuContentProps = (props: MenuContentProps) => filterProps(props, ['open']);
 
-const MenuContent = (props: MenuContentProps) => (
+export const MenuContent = (props: MenuContentProps) => (
   <div css={menuContentStyle(props)} {...filterMenuContentProps(props)} />
 );
-
-export {MenuContent, menuContentStyle};

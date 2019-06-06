@@ -64,7 +64,7 @@ const ColorElement = ({name, value, alpha, backgroundColor, ...props}) => (
   />
 );
 
-class DemoColors extends React.PureComponent {
+export class DemoColors extends React.PureComponent {
   renderColor(name) {
     const color = Color(COLOR[name]);
     const value = color.hex().toString();
@@ -125,5 +125,3 @@ class DemoColors extends React.PureComponent {
     );
   }
 }
-
-export {DemoColors};

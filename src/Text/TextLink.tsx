@@ -24,7 +24,7 @@ import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 export interface TextLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
 
-const textLinkStyle: <T>(props: TextLinkProps<T>) => ObjectInterpolation<undefined> = ({
+export const textLinkStyle: <T>(props: TextLinkProps<T>) => ObjectInterpolation<undefined> = ({
   color = COLOR.BLUE,
   fontSize = '16px',
   bold = false,
@@ -34,8 +34,6 @@ const textLinkStyle: <T>(props: TextLinkProps<T>) => ObjectInterpolation<undefin
   ...linkStyle({color, fontSize, bold, textTransform, ...props}),
 });
 
-const TextLink = (props: TextLinkProps<HTMLAnchorElement>) => (
+export const TextLink = (props: TextLinkProps<HTMLAnchorElement>) => (
   <a css={textLinkStyle(props)} {...filterLinkProps(props)} />
 );
-
-export {TextLink, textLinkStyle};

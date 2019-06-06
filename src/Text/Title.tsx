@@ -36,6 +36,4 @@ const titleStyle: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> = 
   marginBottom: '8px',
 });
 
-const Title = (props: TitleProps) => <div css={titleStyle(props)} {...filterTextProps(props)} />;
-
-export {Title};
+export const Title = (props: TitleProps) => <div css={titleStyle(props)} {...filterTextProps(props)} />;

@@ -35,7 +35,10 @@ export enum PILL_TYPE {
   warning = 'WARNING',
 }
 
-const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({active = false, type = null}) => {
+export const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({
+  active = false,
+  type = null,
+}) => {
   const backgroundColors = {
     [PILL_TYPE.error]: COLOR.RED_OPAQUE_16,
     [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_16,
@@ -72,10 +75,8 @@ const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({
   };
 };
 
-const filterPillProps = (props: Object) => filterProps(props, ['active']);
+export const filterPillProps = (props: Object) => filterProps(props, ['active']);
 
-const Pill = (props: PillProps) => (
+export const Pill = (props: PillProps) => (
   <span css={pillStyle(props)} data-uie-name="element-pill" data-uie-status={props.type} {...filterPillProps(props)} />
 );
-
-export {Pill, pillStyle, filterPillProps};
