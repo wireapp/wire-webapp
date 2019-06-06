@@ -434,6 +434,14 @@ const messageIdCache = {};
     }
   });
 
+  account.on(PayloadBundleType.CLIENT_ADD, async data => {
+    logger.log(`User added client with ID "${data.content.client.id}"`, data);
+  });
+
+  account.on(PayloadBundleType.CLIENT_REMOVE, async data => {
+    logger.log(`User removed client with ID "${data.content.client.id}"`, data);
+  });
+
   try {
     logger.log('Logging in ...');
     await account.login(login);
