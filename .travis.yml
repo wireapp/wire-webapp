@@ -58,7 +58,7 @@ after_success:
       fi
     fi
   - |
-    if [ "$TRAVIS_BRANCH" == "prod" ]; then
+    if [ "$TRAVIS_BRANCH" == "prod" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       yarn build:prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; }
       if [ "$DISTRIBUTION" == "wire" ]; then
         yarn docker '' production

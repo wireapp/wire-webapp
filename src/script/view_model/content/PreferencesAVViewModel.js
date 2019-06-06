@@ -39,7 +39,6 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   constructor(mainViewModel, contentViewModel, repositories) {
-    this.hasOngoingCall = ko.observable(false);
     this.initiateDevices = this.initiateDevices.bind(this);
     this.releaseDevices = this.releaseDevices.bind(this);
 
@@ -56,9 +55,42 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
+    const updateStream = mediaType => {
+      const hasActiveStreams = this.streamHandler.localMediaStream() || this.mediaStream();
+      if (!hasActiveStreams) {
+        // if there is no active call or the preferences is not showing any streams, we do not need to request a new stream
+        return;
+      }
+      const currentCallMediaStream = this.streamHandler.localMediaStream();
+      // release first the current call's tracks and the preferences' tracks (Firefox doesn't allow to request another mic if one is already active)
+      if (currentCallMediaStream) {
+        this.streamHandler.releaseTracksFromStream(currentCallMediaStream, mediaType);
+      }
+      if (this.mediaStream()) {
+        this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
+      }
+
+      return this._getMediaStream(mediaType).then(stream => {
+        if (!stream) {
+          return this.mediaStream(undefined);
+        }
+        this.streamHandler.changeMediaStream(stream, mediaType);
+        if (this.mediaStream()) {
+          stream.getTracks().forEach(track => {
+            this.mediaStream().addTrack(track);
+          });
+        } else {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      });
+    };
+
+    this.currentDeviceId.audioInput.subscribe(() => updateStream(MediaType.AUDIO));
+    this.currentDeviceId.videoInput.subscribe(() => updateStream(MediaType.VIDEO));
+
     this.constraintsHandler = this.mediaRepository.constraintsHandler;
     this.streamHandler = this.mediaRepository.streamHandler;
-    this.mediaStream = this.streamHandler.localMediaStream;
+    this.mediaStream = ko.observable();
 
     this.isVisible = false;
 
@@ -93,14 +125,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {undefined} No return value
    */
   initiateDevices() {
-    if (this.callingRepository.joinedCall()) {
-      this.hasOngoingCall(true);
-      return;
-    }
-    this.hasOngoingCall(false);
     this.isVisible = true;
 
     this._getMediaStream().then(mediaStream => {
+      this.mediaStream(mediaStream);
       if (mediaStream && !this.audioInterval) {
         this._initiateAudioMeter(mediaStream);
       }
@@ -123,65 +151,24 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   /**
-   * Check supported media type.
+   * Get current MediaStream or initiate it.
    * @private
-   * @returns {Promise} Resolves with a MediaType or false
+   * @param {MediaType} requestedMediaType - MediaType to request the user
+   * @returns {Promise} Resolves with a MediaStream
    */
-  _checkMediaSupport() {
-    let mediaType;
-    if (this.deviceSupport.audioInput()) {
-      mediaType = this.deviceSupport.videoInput() ? MediaType.AUDIO_VIDEO : MediaType.AUDIO;
-    } else {
-      mediaType = this.deviceSupport.videoInput() ? MediaType.VIDEO : undefined;
+  _getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO) {
+    if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
+      this.permissionDenied(true);
+      return Promise.resolve(undefined);
     }
-
-    return mediaType
-      ? Promise.resolve(mediaType)
-      : Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE));
-  }
-
-  /**
-   * Get current MediaStream or initiate it.
-   * @private
-   * @returns {Promise} Resolves with a MediaStream
-   */
-  _getCurrentMediaStream() {
-    const hasActiveStream = this.deviceSupport.videoInput()
-      ? !!this.mediaStream() && this.streamHandler.localMediaType() === MediaType.VIDEO
-      : !!this.mediaStream();
-
-    return Promise.resolve(hasActiveStream ? this.mediaStream() : undefined);
-  }
-
-  /**
-   * Get current MediaStream or initiate it.
-   * @private
-   * @returns {Promise} Resolves with a MediaStream
-   */
-  _getMediaStream() {
-    return this._getCurrentMediaStream().then(mediaStream => (mediaStream ? mediaStream : this._initiateMediaStream()));
-  }
-
-  /**
-   * Initiate MediaStream.
-   * @private
-   * @returns {Promise} Resolves with a MediaStream
-   */
-  _initiateMediaStream() {
-    return this._checkMediaSupport()
-      .then(mediaType => {
-        return this.constraintsHandler
-          .getMediaStreamConstraints(this.deviceSupport.audioInput(), this.deviceSupport.videoInput())
-          .then(streamConstraints => this.streamHandler.requestMediaStream(mediaType, streamConstraints));
-      })
-      .then(mediaStreamInfo => {
-        if (this.deviceSupport.videoInput()) {
-          this.streamHandler.localMediaType(MediaType.VIDEO);
-        }
-
-        this.streamHandler.localMediaStream(mediaStreamInfo.stream);
-        return this.streamHandler.localMediaStream();
-      })
+    const supportsVideo = this.deviceSupport.videoInput();
+    const supportsAudio = this.deviceSupport.audioInput();
+    const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
+    const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
+    return this.constraintsHandler
+      .getMediaStreamConstraints(requestAudio, requestVideo)
+      .then(streamConstraints => this.streamHandler.requestMediaStream(requestedMediaType, streamConstraints))
+      .then(({stream}) => stream)
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
 
@@ -244,7 +231,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   }
 
   _releaseMediaStream() {
-    this.streamHandler.resetMediaStream();
+    if (this.mediaStream()) {
+      this.streamHandler.releaseTracksFromStream(this.mediaStream());
+      this.mediaStream(undefined);
+    }
     this.permissionDenied(false);
   }
 };

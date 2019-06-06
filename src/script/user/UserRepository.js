@@ -439,17 +439,10 @@ export class UserRepository {
   /**
    * Find a local user.
    * @param {string} userId - User ID
-   * @returns {Promise<User>} Resolves with the matching user entity
+   * @returns {User | undefined} matching user entity if found. Undefined else
    */
   findUserById(userId) {
-    if (!userId) {
-      return Promise.reject(new z.error.UserError(z.error.BaseError.TYPE.MISSING_PARAMETER));
-    }
-
-    const matchingUserEntity = this.users().find(userEntity => userEntity.id === userId);
-    return matchingUserEntity
-      ? Promise.resolve(matchingUserEntity)
-      : Promise.reject(new z.error.UserError(z.error.UserError.TYPE.USER_NOT_FOUND));
+    return this.users().find(userEntity => userEntity.id === userId);
   }
 
   /**
@@ -501,21 +494,16 @@ export class UserRepository {
    * @returns {Promise<User>} Promise that resolves with the matching user entity
    */
   get_user_by_id(user_id) {
-    return this.findUserById(user_id)
-      .catch(error => {
-        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
-        if (isNotFound) {
-          return this._fetchUserById(user_id);
-        }
-        throw error;
-      })
-      .catch(error => {
-        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
-        if (!isNotFound) {
-          this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
-        }
-        throw error;
-      });
+    const user = this.findUserById(user_id);
+    return user
+      ? Promise.resolve(user)
+      : this._fetchUserById(user_id).catch(error => {
+          const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
+          if (!isNotFound) {
+            this.logger.warn(`Failed to find user with ID '${user_id}': ${error.message}`, error);
+          }
+          throw error;
+        });
   }
 
   get_user_id_by_handle(handle) {
@@ -541,12 +529,7 @@ export class UserRepository {
     }
 
     const _find_user = user_id => {
-      return this.findUserById(user_id).catch(error => {
-        if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
-          throw error;
-        }
-        return user_id;
-      });
+      return this.findUserById(user_id) || user_id;
     };
 
     const find_users = user_ids.map(user_id => _find_user(user_id));
@@ -582,18 +565,15 @@ export class UserRepository {
    * @returns {Promise} Resolves with the user entity
    */
   save_user(user_et, is_me = false) {
-    return this.findUserById(user_et.id).catch(error => {
-      if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
-        throw error;
-      }
-
+    const user = this.findUserById(user_et.id);
+    if (!user) {
       if (is_me) {
         user_et.is_me = true;
         this.self(user_et);
       }
       this.users.push(user_et);
-      return user_et;
-    });
+    }
+    return user_et;
   }
 
   /**
@@ -602,23 +582,9 @@ export class UserRepository {
    * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
-    const _find_users = user_et => {
-      return this.findUserById(user_et.id)
-        .then(() => undefined)
-        .catch(error => {
-          if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {
-            throw error;
-          }
-          return user_et;
-        });
-    };
-
-    const find_users = user_ets.map(user_et => _find_users(user_et));
-
-    return Promise.all(find_users).then(resolve_array => {
-      koArrayPushAll(this.users, resolve_array.filter(user_et => user_et));
-      return user_ets;
-    });
+    const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
+    koArrayPushAll(this.users, newUsers);
+    return user_ets;
   }
 
   /**
@@ -627,14 +593,9 @@ export class UserRepository {
    * @returns {Promise} Resolves when user was updated
    */
   updateUserById(userId) {
-    const getLocalUser = () =>
-      this.findUserById(userId).catch(error => {
-        const isNotFound = error.type === z.error.UserError.TYPE.USER_NOT_FOUND;
-        if (isNotFound) {
-          return new User();
-        }
-        throw error;
-      });
+    const getLocalUser = () => {
+      return this.findUserById(userId) || new User();
+    };
 
     return Promise.all([getLocalUser(userId), this.user_service.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
