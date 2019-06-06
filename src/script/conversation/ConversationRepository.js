@@ -826,6 +826,11 @@ export class ConversationRepository {
     );
   }
 
+  conversationNeedsLegalHoldVerification(conversationId) {
+    const conversation = this.find_conversation_by_id(conversationId);
+    return conversation && conversation.legalHoldVerificationNeeded();
+  }
+
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
@@ -1950,7 +1955,7 @@ export class ConversationRepository {
     });
 
     this.messageSender.queueMessage(() => {
-      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+      return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
@@ -1973,7 +1978,7 @@ export class ConversationRepository {
         const options = eventInfoEntity.options;
         const recipientsPromise = options.recipients
           ? Promise.resolve(eventInfoEntity)
-          : this.create_recipients(conversationEntity.id, false).then(recipients => {
+          : this.createRecipients(conversationEntity.id, false).then(recipients => {
               eventInfoEntity.updateOptions({recipients});
               return eventInfoEntity;
             });
@@ -2348,32 +2353,32 @@ export class ConversationRepository {
   /**
    * Create a user client map for a given conversation.
    *
-   * @param {string} conversation_id - Conversation ID
-   * @param {boolean} [skip_own_clients=false] - True, if other own clients should be skipped (to not sync messages on own clients)
-   * @param {Array<string>} user_ids - Optionally the intended recipient users
+   * @param {string} conversationId - Conversation ID
+   * @param {boolean} [skipOwnClients=false] - True, if other own clients should be skipped (to not sync messages on own clients)
+   * @param {Array<string>} userIds - Optionally the intended recipient users
+   * @param {Array<string>} refreshClients - Should all clients be requested from the backend again
    * @returns {Promise} Resolves with a user client map
    */
-  create_recipients(conversation_id, skip_own_clients = false, user_ids) {
-    return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
-      const recipients = {};
-
-      for (const user_et of user_ets) {
-        if (!(skip_own_clients && user_et.is_me)) {
-          if (user_ids && !user_ids.includes(user_et.id)) {
-            continue;
-          }
-
-          recipients[user_et.id] = user_et.devices().map(client_et => client_et.id);
-        }
+  createRecipients(conversationId, skipOwnClients = false, userIds, refreshClients = false) {
+    return this.get_all_users_in_conversation(conversationId).then(userEts => {
+      if (skipOwnClients) {
+        userEts = userEts.filter(({is_me}) => !is_me);
       }
-
-      return recipients;
+      if (userIds) {
+        userEts = userEts.filter(({id}) => userIds.includes(id));
+      }
+      if (refreshClients) {
+        return userEts.reduce((allUsers, {id}) => ({...allUsers, [id]: []}), {});
+      }
+      return userEts.reduce((allUsers, user) => ({...allUsers, [user.id]: user.devices().map(({id}) => id)}), {});
     });
   }
 
   sendGenericMessageToConversation(eventInfoEntity) {
+    const {conversationId} = eventInfoEntity;
+    const updateConversationClients = this.conversationNeedsLegalHoldVerification(conversationId);
     return this.messageSender.queueMessage(() => {
-      return this.create_recipients(eventInfoEntity.conversationId).then(recipients => {
+      return this.createRecipients(conversationId, false, undefined, updateConversationClients).then(recipients => {
         eventInfoEntity.updateOptions({recipients});
         return this._sendGenericMessage(eventInfoEntity);
       });
@@ -2810,7 +2815,7 @@ export class ConversationRepository {
         });
 
         return this.messageSender.queueMessage(() => {
-          return this.create_recipients(conversationId, false, precondition).then(recipients => {
+          return this.createRecipients(conversationId, false, precondition).then(recipients => {
             const options = {precondition, recipients};
             const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
             this._sendGenericMessage(eventInfoEntity);

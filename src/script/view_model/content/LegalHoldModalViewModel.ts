@@ -29,12 +29,6 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {promiseProgress} from 'Util/PromiseUtil';
 
 export class LegalHoldModalViewModel {
-  userRepository: UserRepository;
-  conversationRepository: ConversationRepository;
-  teamRepository: TeamRepository;
-  clientRepository: ClientRepository;
-  cryptographyRepository: CryptographyRepository;
-
   isVisible: ko.Observable<boolean>;
   isOnlyMe: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
@@ -47,18 +41,12 @@ export class LegalHoldModalViewModel {
   progress: ko.Observable<number>;
 
   constructor(
-    userRepository: UserRepository,
-    conversationRepository: ConversationRepository,
-    teamRepository: TeamRepository,
-    clientRepository: ClientRepository,
-    cryptographyRepository: CryptographyRepository
+    public userRepository: UserRepository,
+    public conversationRepository: ConversationRepository,
+    public teamRepository: TeamRepository,
+    public clientRepository: ClientRepository,
+    public cryptographyRepository: CryptographyRepository
   ) {
-    this.userRepository = userRepository;
-    this.conversationRepository = conversationRepository;
-    this.teamRepository = teamRepository;
-    this.clientRepository = clientRepository;
-    this.cryptographyRepository = cryptographyRepository;
-
     this.isLoading = ko.observable(false);
     this.isVisible = ko.observable(false);
     this.isOnlyMe = ko.observable(false);

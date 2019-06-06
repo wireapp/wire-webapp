@@ -164,13 +164,13 @@ export class Conversation {
 
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
-    this.isOnLegalHold = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
-        return undefined;
-      }
 
-      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    this.computedLegalHoldStatus = ko.pureComputed(() => {
+      return this._isInitialized() && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
     });
+
+    this.legalHoldStatus = ko.observable(false);
+    this.legalHoldVerificationNeeded = ko.pureComputed(() => this.legalHoldStatus() !== this.verifiedLegalHoldStatus());
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
