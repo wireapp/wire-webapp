@@ -64,6 +64,7 @@ export class ConversationListViewModel {
     this.contentState = this.contentViewModel.state;
     this.selectedConversation = ko.observable();
 
+    this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
     this.isTeam = this.teamRepository.isTeam;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
