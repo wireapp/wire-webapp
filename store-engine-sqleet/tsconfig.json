@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "exclude": ["dist", "karma.conf.ts", "node_modules", "webpack.config.ts"],
+  "extends": "../../tsconfig.json"
+}
