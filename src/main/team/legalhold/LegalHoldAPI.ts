@@ -62,7 +62,7 @@ export class LegalHoldAPI {
     await this.client.sendJSON(config);
   }
 
-  public async putMemberLegalHold(teamId: string, userId: string, password: string): Promise<void> {
+  public async putMemberApproveLegalHold(teamId: string, userId: string, password: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         password,
