@@ -62,8 +62,7 @@ export class ConversationListViewModel {
     repositories.event.notificationHandlingState.subscribe(this.setShowCallsState.bind(this));
 
     this.contentState = this.contentViewModel.state;
-    this.selectedConversation = ko.observable();
-
+    this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
     this.isTeam = this.teamRepository.isTeam;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
