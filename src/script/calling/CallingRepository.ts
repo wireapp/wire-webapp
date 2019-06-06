@@ -21,7 +21,7 @@ import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 // @ts-ignore
 import adapter from 'webrtc-adapter';
 import {Config} from '../auth/config';
@@ -34,8 +34,6 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {TERMINATION_REASON} from './enum/TerminationReason';
-
-import {CallLogger} from '../telemetry/calling/CallLogger';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
@@ -83,7 +81,8 @@ export class CallingRepository {
 
   private callingConfig: any;
   private callingConfigTimeout: number | undefined;
-  private readonly callLogger: CallLogger;
+  private readonly logger: Logger;
+  private readonly callLog: string[];
 
   static get CONFIG(): any {
     return {
@@ -117,7 +116,8 @@ export class CallingRepository {
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.incomingCallCallback = () => {};
 
-    this.callLogger = new CallLogger('CallingRepository', null, []);
+    this.logger = getLogger('CallingRepository');
+    this.callLog = [];
 
     this.callingConfig = undefined;
     this.callingConfigTimeout = undefined;
@@ -146,14 +146,23 @@ export class CallingRepository {
 
   configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
     const avsLogger = getLogger('avs');
+    const logLevelStrs: Record<LOG_LEVEL, string> = {
+      [LOG_LEVEL.DEBUG]: 'DEBUG',
+      [LOG_LEVEL.INFO]: 'INFO ',
+      [LOG_LEVEL.WARN]: 'WARN ',
+      [LOG_LEVEL.ERROR]: 'ERROR',
+    };
     wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
-      const logFunctions = {
+      const trimedMessage = message.trim();
+      const logFunctions: Record<LOG_LEVEL, Function> = {
         [LOG_LEVEL.DEBUG]: avsLogger.debug,
         [LOG_LEVEL.INFO]: avsLogger.log,
         [LOG_LEVEL.WARN]: avsLogger.warn,
         [LOG_LEVEL.ERROR]: avsLogger.error,
       };
-      logFunctions[level].call(avsLogger, message);
+      logFunctions[level].call(avsLogger, trimedMessage);
+
+      this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimedMessage}`);
     });
 
     const avsEnv = Environment.browser.firefox ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
@@ -309,7 +318,7 @@ export class CallingRepository {
       );
 
       if (res !== 0) {
-        this.callLogger.warn(`recv_msg failed with code: ${res}`);
+        this.logger.warn(`recv_msg failed with code: ${res}`);
         return;
       }
       this.handleCallEventSaving(content.type, conversationId, userId, time, source);
@@ -595,7 +604,7 @@ export class CallingRepository {
   private readonly updateCallState = (conversationId: ConversationId, state: number) => {
     const call = this.findCall(conversationId);
     if (!call) {
-      this.callLogger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
+      this.logger.warn(`received state for call in conversation '${conversationId}' but no stored call found`);
       return;
     }
 
@@ -773,7 +782,7 @@ export class CallingRepository {
       const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
 
       if (!isExpiredConfig) {
-        this.callLogger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
+        this.logger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
         return Promise.resolve(this.callingConfig);
       }
 
@@ -806,7 +815,7 @@ export class CallingRepository {
   private clearConfig(): void {
     if (this.callingConfig) {
       const expirationDate = this.callingConfig.expiration.toISOString();
-      this.callLogger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
+      this.logger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
       this.callingConfig = undefined;
     }
   }
@@ -836,7 +845,7 @@ export class CallingRepository {
           .join('\n');
         const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
 ${turnServersConfig}`;
-        this.callLogger.info(logMessage);
+        this.logger.info(logMessage);
         this.callingConfig = callingConfig;
 
         this.callingConfigTimeout = window.setTimeout(() => {
@@ -913,7 +922,7 @@ ${turnServersConfig}`;
           title: titleString,
         },
       });
-      this.callLogger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
+      this.logger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
     });
   }
 
@@ -930,5 +939,9 @@ ${turnServersConfig}`;
       },
     };
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+  }
+
+  public getCallLog(): string[] {
+    return this.callLog;
   }
 }
