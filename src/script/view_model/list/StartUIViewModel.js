@@ -547,9 +547,11 @@ class StartUIViewModel {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            action: () => this.importContacts(source),
+            primaryAction: {
+              action: () => this.importContacts(source),
+              text: t('modalUploadContactsAction'),
+            },
             text: {
-              action: t('modalUploadContactsAction'),
               message: t('modalUploadContactsMessage'),
             },
           });

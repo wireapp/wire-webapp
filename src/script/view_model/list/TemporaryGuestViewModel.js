@@ -51,10 +51,12 @@ class TemporaryGuestViewModel {
 
   clickToCreateAccount() {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-      action: () => window.location.replace(`/auth/${location.search}`),
       preventClose: true,
+      primaryAction: {
+        action: () => window.location.replace(`/auth/${location.search}`),
+        text: t('modalAccountCreateAction'),
+      },
       text: {
-        action: t('modalAccountCreateAction'),
         message: t('modalAccountCreateMessage'),
         title: t('modalAccountCreateHeadline'),
       },

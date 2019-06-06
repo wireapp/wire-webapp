@@ -221,8 +221,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         modals.showModal(ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES, {
           data: aggregatedNotifications.map(notification => notification.data),
           preventClose: true,
-          secondary: () => {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+          secondaryAction: {
+            action: () => {
+              amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+            },
           },
         });
         break;
@@ -268,9 +270,11 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnDeleteAccount() {
     modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.userRepository.delete_me(),
+      primaryAction: {
+        action: () => this.userRepository.delete_me(),
+        text: t('modalAccountDeletionAction'),
+      },
       text: {
-        action: t('modalAccountDeletionAction'),
         message: t('modalAccountDeletionMessage'),
         title: t('modalAccountDeletionHeadline'),
       },
@@ -279,10 +283,12 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnLeaveGuestRoom() {
     modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
-      action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
       preventClose: true,
+      primaryAction: {
+        action: () => this.conversationRepository.leaveGuestRoom().then(() => this.clientRepository.logoutClient()),
+        text: t('modalAccountLeaveGuestRoomAction'),
+      },
       text: {
-        action: t('modalAccountLeaveGuestRoomAction'),
         message: t('modalAccountLeaveGuestRoomMessage'),
         title: t('modalAccountLeaveGuestRoomHeadline'),
       },

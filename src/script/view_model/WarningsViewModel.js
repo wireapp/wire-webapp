@@ -128,12 +128,14 @@ export class WarningsViewModel {
     switch (warningToClose) {
       case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          action: () => {
-            const url = buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
-            safeWindowOpen(url);
+          primaryAction: {
+            action: () => {
+              const url = buildSupportUrl(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED);
+              safeWindowOpen(url);
+            },
+            text: t('modalCallNoMicrophoneAction'),
           },
           text: {
-            action: t('modalCallNoMicrophoneAction'),
             message: t('modalCallNoMicrophoneMessage'),
             title: t('modalCallNoMicrophoneHeadline'),
           },

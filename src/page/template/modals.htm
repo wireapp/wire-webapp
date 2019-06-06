@@ -27,12 +27,12 @@
         </div>
       </div>
     <!-- /ko -->
-    <div class="modal__buttons">
-      <!-- ko if: content().secondaryText -->
-        <div data-bind="text: content().secondaryText, click: doSecondary" class="modal__button modal__button--cancel" data-uie-name="do-secondary"></div>
+    <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
+      <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
+        <div data-bind="text: secondary.text, click: () => doAction(secondary.action), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
       <!-- /ko -->
-      <!-- ko if: content().actionText -->
-        <div data-bind="text: content().actionText, click: doAction" class="modal__button modal__button--confirm" data-uie-name="do-action"></div>
+      <!-- ko if: content().primaryAction.text -->
+        <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
       <!-- /ko -->
     </div>
   </modal>
