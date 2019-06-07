@@ -17,6 +17,7 @@
  *
  */
 
+import {TimeUtil} from '@wireapp/commons';
 import EventEmitter from 'events';
 import logdown from 'logdown';
 import {IncomingNotification} from '../conversation/';
@@ -43,12 +44,12 @@ export class WebSocketClient extends EventEmitter {
   };
 
   public static RECONNECTING_OPTIONS = {
-    connectionTimeout: 4000,
+    connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
     constructor: typeof window !== 'undefined' ? WebSocket : Html5WebSocket,
     debug: false,
-    maxReconnectionDelay: 10000,
+    maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,
     maxRetries: Infinity,
-    minReconnectionDelay: 4000,
+    minReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 4,
     reconnectionDelayGrowFactor: 1.3,
   };
 

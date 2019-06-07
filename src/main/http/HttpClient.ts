@@ -17,6 +17,7 @@
  *
  */
 
+import {TimeUtil} from '@wireapp/commons';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {CRUDEngine} from '@wireapp/store-engine';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
@@ -52,7 +53,7 @@ export class HttpClient extends EventEmitter {
 
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
-      retryDelay: 1000,
+      retryDelay: TimeUtil.TimeInMillis.SECOND,
     });
 
     // Log all failing HTTP requests
