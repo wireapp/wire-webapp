@@ -241,8 +241,7 @@ class App {
       repositories.conversation,
       repositories.event,
       repositories.media.streamHandler,
-      repositories.media.devicesHandler,
-      serverTimeHandler,
+      serverTimeHandler
     );
     repositories.integration = new IntegrationRepository(
       this.service.integration,
@@ -326,8 +325,8 @@ class App {
         return this._initiateSelfUserClients();
       })
       .then(clientEntity => {
-        const selfId = this.repository.user.self().id;
-        this.repository.calling.initAvs(selfId, clientEntity.id);
+        const selfUser = this.repository.user.self();
+        this.repository.calling.initAvs(selfUser, clientEntity.id);
         return clientEntity;
       })
       .then(clientEntity => {

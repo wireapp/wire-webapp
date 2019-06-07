@@ -27,6 +27,16 @@ import {PermissionState} from '../notification/PermissionState';
 
 import '../components/calling/chooseScreen';
 
+declare global {
+  interface Window {
+    desktopCapturer: any;
+  }
+
+  interface MediaDevices {
+    getDisplayMedia: any;
+  }
+}
+
 export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
@@ -114,7 +124,7 @@ export class CallingViewModel {
         startCall(conversationEntity, CALL_TYPE.VIDEO);
       },
       switchCameraInput: (call: Call, deviceId: string) => {
-        this.callingRepository.switchCameraInput(call.conversationId, deviceId);
+        this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);

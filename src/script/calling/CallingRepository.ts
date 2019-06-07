@@ -47,6 +47,12 @@ import {DeviceId, Participant, UserId} from './Participant';
 
 import {WebAppEvents} from '../event/WebApp';
 
+interface MediaStreamQuery {
+  audio?: boolean;
+  camera?: boolean;
+  screen?: boolean;
+}
+
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -64,11 +70,9 @@ export class CallingRepository {
   private readonly conversationRepository: any;
   private readonly eventRepository: any;
   private readonly mediaStreamHandler: MediaStreamHandler;
-  private readonly mediaDevicesHandler: any;
   private readonly serverTimeHandler: any;
-  private readonly userRepository: any;
 
-  private selfUserId: UserId;
+  private selfUser: any;
   private selfClientId: DeviceId;
   private isReady: boolean = false;
   private wUser: number | undefined;
@@ -96,9 +100,7 @@ export class CallingRepository {
     conversationRepository: any,
     eventRepository: any,
     mediaStreamHandler: MediaStreamHandler,
-    mediaDevicesHandler: any,
-    serverTimeHandler: any,
-    userRepository: any
+    serverTimeHandler: any
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -110,10 +112,8 @@ export class CallingRepository {
     this.conversationRepository = conversationRepository;
     this.eventRepository = eventRepository;
     this.serverTimeHandler = serverTimeHandler;
-    this.userRepository = userRepository;
     // Media Handler
     this.mediaStreamHandler = mediaStreamHandler;
-    this.mediaDevicesHandler = mediaDevicesHandler;
     this.incomingCallCallback = () => {};
 
     this.logger = getLogger('CallingRepository');
@@ -130,13 +130,14 @@ export class CallingRepository {
     return this.wCall.getStats(conversationId);
   }
 
-  initAvs(selfUserId: UserId, clientId: DeviceId): void {
-    this.selfUserId = selfUserId;
+  initAvs(selfUser: any, clientId: DeviceId): Promise<{wCall: Wcall; wUser: number}> {
+    this.selfUser = selfUser;
     this.selfClientId = clientId;
-    getAvsInstance().then(callingInstance => {
-      const {wCall, wUser} = this.configureCallingApi(callingInstance, selfUserId, clientId);
+    return getAvsInstance().then(callingInstance => {
+      const {wCall, wUser} = this.configureCallingApi(callingInstance, this.selfUser.id, clientId);
       this.wCall = wCall;
       this.wUser = wUser;
+      return {wCall, wUser};
     });
   }
 
@@ -224,9 +225,9 @@ export class CallingRepository {
   private loadVideoPreview(call: Call): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    return this.getMediaStream(false, true, false, isGroup)
+    return this.getMediaStream({audio: true, camera: true}, isGroup)
       .then(mediaStream => {
-        call.selfParticipant.setMediaStream(mediaStream);
+        call.selfParticipant.updateMediaStream(mediaStream);
         call.selfParticipant.videoState(VIDEO_STATE.STARTED);
         return true;
       })
@@ -281,7 +282,7 @@ export class CallingRepository {
     let validatedPromise = Promise.resolve();
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        if (userId === this.selfUserId && clientId !== this.selfClientId) {
+        if (userId === this.selfUser.id && clientId !== this.selfClientId) {
           const call = this.findCall(conversationId);
           if (call) {
             // If the group leave was sent from the self user from another device, we reset the reason so that the call would show in the UI again
@@ -363,8 +364,8 @@ export class CallingRepository {
           // if there is a rejected call, we can remove it from the store
           this.removeCall(rejectedCallInConversation);
         }
-        const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
-        const call = new Call(this.selfUserId, conversationId, conversationType, selfParticipant, callType);
+        const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
+        const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
         this.storeCall(call);
         const loadPreviewPromise =
           conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO
@@ -392,10 +393,6 @@ export class CallingRepository {
     const selfParticipant = call.selfParticipant;
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
-  }
-
-  switchCameraInput(conversationId: ConversationId, deviceId: string): void {
-    this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
   }
 
   // Toggles screenshare ON and OFF for the given call (does not switch between different screens)
@@ -442,8 +439,8 @@ export class CallingRepository {
     return types[mediaType] || CALL_TYPE.NORMAL;
   }
 
-  private getMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
-    return this.mediaStreamHandler.requestMediaStream(audio, video, screen, isGroup);
+  private getMediaStream({audio, camera, screen}: MediaStreamQuery, isGroup: boolean): Promise<MediaStream> {
+    return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
   private handleMediaStreamError(call: Call): void {
@@ -578,7 +575,7 @@ export class CallingRepository {
       return;
     }
     const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
-    const selfParticipant = new Participant(this.selfUserId, this.selfClientId);
+    const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const call = new Call(
       userId,
@@ -635,31 +632,45 @@ export class CallingRepository {
   private readonly getCallMediaStream = (
     conversationId: ConversationId,
     audio: boolean,
-    video: boolean,
+    camera: boolean,
     screen: boolean
-  ) => {
+  ): Promise<MediaStream> => {
     const call = this.findCall(conversationId);
     if (!call) {
       return Promise.reject();
     }
     const selfParticipant = call.selfParticipant;
-    const audioStream = audio && selfParticipant.getActiveAudioStream();
-    const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    const needsAudio = audio && !audioStream;
-    this.logger.debug(
-      `media streams requested (audio: ${audio}${
-        audio && needsAudio ? '' : ' (from cache)'
-      }, video: ${video}, screen: ${screen})`
-    );
-    if (!needsAudio && !video && !screen) {
-      return Promise.resolve(audioStream);
+    const query = {audio, camera, screen};
+    const cache = {
+      audio: selfParticipant.audioStream(),
+      camera: selfParticipant.videoStream(),
+      screen: selfParticipant.videoStream(),
+    };
+    const missingStreams: MediaStreamQuery = Object.entries(cache).reduce((missings, [type, isCached]) => {
+      if (isCached || !(query as any)[type]) {
+        return missings;
+      }
+      return {...missings, [type]: true};
+    }, {});
+
+    const queryLog = Object.entries(query)
+      .filter(([type, needed]) => needed)
+      .map(([type]) => ((missingStreams as any)[type] ? type : `${type} (from cache)`))
+      .join(', ');
+    this.logger.debug(`mediaStream requested: ${queryLog}`);
+
+    if (Object.keys(missingStreams).length === 0) {
+      // we have everything in cache, just return the participant's stream
+      return Promise.resolve(selfParticipant.getMediaStream());
     }
-    return this.getMediaStream(needsAudio, video, screen, isGroup)
+    const isGroup = call.conversationType === CONV_TYPE.GROUP;
+    return this.getMediaStream(missingStreams, isGroup)
       .then(mediaStream => {
-        selfParticipant.setMediaStream(mediaStream);
-        return mediaStream;
+        const newStream = selfParticipant.updateMediaStream(mediaStream);
+        return newStream;
       })
-      .catch(() => {
+      .catch(error => {
+        this.logger.error(error);
         this.handleMediaStreamError(call);
         return new MediaStream();
       });
@@ -698,7 +709,7 @@ export class CallingRepository {
   ) => {
     const call = this.findCall(conversationId);
     if (call) {
-      if (userId === call.selfParticipant.userId) {
+      if (call.state() === CALL_STATE.MEDIA_ESTAB && userId === call.selfParticipant.userId) {
         call.selfParticipant.releaseVideoStream();
       }
       call
@@ -715,7 +726,6 @@ export class CallingRepository {
     remoteClientId: DeviceId | null
   ): {precondition: any; recipients: any} {
     const {type, resp} = JSON.parse(payload);
-    const selfUserEntity = this.userRepository.self();
     let precondition;
     let recipients;
 
@@ -747,9 +757,9 @@ export class CallingRepository {
 
       case CALL_MESSAGE_TYPE.REJECT: {
         // Send to all clients of self user
-        precondition = [selfUserEntity.id];
+        precondition = [this.selfUser.id];
         recipients = {
-          [selfUserEntity.id]: selfUserEntity.devices().map((device: any) => device.id),
+          [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
         };
         break;
       }
@@ -757,10 +767,10 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.SETUP: {
         if (resp && remoteUserId) {
           // Send to remote client that initiated call and all clients of self user
-          precondition = [selfUserEntity.id];
+          precondition = [this.selfUser.id];
           recipients = {
             [remoteUserId]: [`${remoteClientId}`],
-            [selfUserEntity.id]: selfUserEntity.devices().map((device: any) => device.id),
+            [this.selfUser.id]: this.selfUser.devices().map((device: any) => device.id),
           };
         }
         break;

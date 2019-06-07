@@ -17,62 +17,67 @@
  *
  */
 
-/*
-import {MediaType} from 'src/script/media/MediaType';
+import UUID from 'uuidjs';
+import {Participant} from 'src/script/calling/Participant';
+import {Call} from 'src/script/calling/Call';
+import {User} from 'src/script/entity/User';
+import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+import {WebAppEvents} from 'src/script/event/WebApp';
+import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
   let callingRepository;
+  let wCall;
+  let wUser;
+  const selfUser = new User(genUUID());
+  const clientId = genUUID();
 
   beforeEach(() => {
-    return testFactory
-      .exposeCallingActors()
-      .then(injectedCallingRepository => (callingRepository = injectedCallingRepository));
+    return testFactory.exposeCallingActors().then(injectedCallingRepository => {
+      callingRepository = injectedCallingRepository;
+      return callingRepository.initAvs(selfUser, clientId).then(avsApi => {
+        wCall = avsApi.wCall;
+        wUser = avsApi.wUser;
+      });
+    });
   });
 
-  describe('toggleMedia', () => {
-    it('does nothing if the conversation is not found', () => {
-      spyOn(callingRepository, 'getCallById').and.returnValue(Promise.reject(z.error.CallError.TYPE.NOT_FOUND));
-      spyOn(callingRepository, '_toggleMediaState');
-      return callingRepository.toggleMedia('notfoundid', 'audio').then(() => {
-        expect(callingRepository._toggleMediaState).not.toHaveBeenCalled();
-      });
+  describe('startCall', () => {
+    it('warns the user that there is an ongoing call before starting a new one', done => {
+      const activeCall = new Call(selfUser.id, genUUID(), CONV_TYPE.ONEONONE, new Participant(), CALL_TYPE.NORMAL);
+      activeCall.state(CALL_STATE.MEDIA_ESTAB);
+      spyOn(callingRepository, 'activeCalls').and.returnValue([activeCall]);
+      spyOn(amplify, 'publish').and.returnValue(undefined);
+      const conversationId = genUUID();
+      const conversationType = CONV_TYPE.ONEONONE;
+      const callType = CALL_TYPE.NORMAL;
+      spyOn(wCall, 'start');
+      callingRepository.startCall(conversationId, conversationType, callType).catch(done);
+      setTimeout(() => {
+        expect(amplify.publish).toHaveBeenCalledWith(
+          WebAppEvents.WARNING.MODAL,
+          ModalsViewModel.TYPE.CONFIRM,
+          jasmine.any(Object)
+        );
+
+        expect(wCall.start).not.toHaveBeenCalled();
+        done();
+      }, 10);
     });
 
-    it('does nothing if media type is not recognized', () => {
-      const callEntityMock = {
-        toggleMedia: () => Promise.resolve(),
-      };
-
-      spyOn(callingRepository, 'getCallById').and.returnValue(Promise.resolve(callEntityMock));
-      spyOn(callEntityMock, 'toggleMedia');
-
-      return callingRepository.toggleMedia('validid', 'unrecognized').then(() => {
-        expect(callEntityMock.toggleMedia).not.toHaveBeenCalled();
+    it('starts a normal call in a 1:1 conversation', () => {
+      const conversationId = genUUID();
+      const conversationType = CONV_TYPE.ONEONONE;
+      const callType = CALL_TYPE.NORMAL;
+      spyOn(wCall, 'start');
+      return callingRepository.startCall(conversationId, conversationType, callType).then(() => {
+        expect(wCall.start).toHaveBeenCalledWith(wUser, conversationId, conversationType, callType, 0);
       });
-    });
-
-    it('toggles media if conversation is found', () => {
-      const callEntityMock = {
-        toggleMedia: () => Promise.resolve(),
-      };
-      const tests = [
-        {mediaType: MediaType.AUDIO, methodCalled: 'toggleAudioSend'},
-        {mediaType: MediaType.VIDEO, methodCalled: 'toggleVideoSend'},
-        {mediaType: MediaType.SCREEN, methodCalled: 'toggleScreenSend'},
-      ];
-
-      spyOn(callingRepository, 'getCallById').and.returnValue(Promise.resolve(callEntityMock));
-
-      const testPromises = tests.map(({mediaType, methodCalled}) => {
-        spyOn(callingRepository.mediaStreamHandler, methodCalled).and.returnValue(Promise.resolve());
-        return callingRepository.toggleMedia('validid', mediaType).then(() => {
-          expect(callingRepository.mediaStreamHandler[methodCalled]).toHaveBeenCalledWith();
-        });
-      });
-
-      return Promise.all(testPromises);
     });
   });
 });
-*/
+
+function genUUID() {
+  return UUID.genV4().hexString;
+}

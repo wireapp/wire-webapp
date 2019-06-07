@@ -54,17 +54,6 @@ export class Participant {
     this.audioStream = ko.observable();
   }
 
-  getActiveAudioStream(): MediaStream | void {
-    const stream = this.audioStream();
-    if (!stream) {
-      return;
-    }
-    const activeAudioTracks = stream.getAudioTracks().filter(track => track.readyState === 'live');
-    if (activeAudioTracks.length > 0) {
-      return stream;
-    }
-  }
-
   setAudioStream(audioStream: MediaStream): void {
     this.releaseStream(this.audioStream());
     this.audioStream(audioStream);
@@ -75,13 +64,20 @@ export class Participant {
     this.videoStream(videoStream);
   }
 
-  setMediaStream(newStream: MediaStream): void {
+  updateMediaStream(newStream: MediaStream): MediaStream {
     if (newStream.getVideoTracks().length) {
-      this.videoStream(new MediaStream(newStream.getVideoTracks()));
+      this.setVideoStream(new MediaStream(newStream.getVideoTracks()));
     }
     if (newStream.getAudioTracks().length) {
-      this.audioStream(new MediaStream(newStream.getAudioTracks()));
+      this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
     }
+    return this.getMediaStream();
+  }
+
+  getMediaStream(): MediaStream {
+    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
+    const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream().getTracks() : [];
+    return new MediaStream(audioTracks.concat(videoTracks));
   }
 
   releaseVideoStream(): void {

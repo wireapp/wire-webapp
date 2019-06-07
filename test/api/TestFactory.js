@@ -317,7 +317,7 @@ window.TestFactory = class TestFactory {
       resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolveDependency(graph.MediaRepository),
+      resolveDependency(graph.MediaRepository).streamHandler,
       serverTimeHandler
     );
 
