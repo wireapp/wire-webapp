@@ -24,6 +24,8 @@ import {
   RecordTypeError,
   UnsupportedError,
 } from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import initSqlJs from 'sql.js';
+
 import {
   SQLeetEnginePrimaryKeyName,
   SQLiteDatabaseDefinition,
@@ -35,8 +37,6 @@ import {
   getProtectedColumnReferences,
   hashColumnName,
 } from './SchemaConverter';
-
-const initSqlJs = require('sql.js');
 
 export class SQLeetEngine implements CRUDEngine {
   private db: any;
@@ -148,10 +148,10 @@ export class SQLeetEngine implements CRUDEngine {
       if (typeof table[entity] !== 'string') {
         continue;
       }
-      let value: any = entities[entity];
+      let value = entities[entity];
       // Stringify objects for the database
       if (table[entity] === SQLiteType.JSON) {
-        value = JSON.stringify(value);
+        value = JSON.stringify(value) as SQLiteType;
       }
       const reference = `@${hashColumnName(entity)}`;
       columns[reference] = entity;
