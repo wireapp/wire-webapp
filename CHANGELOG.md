@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.0.15...@wireapp/api-client@5.1.0) (2019-06-07)
+
+
+### Features
+
+* **commons:** Add TimeUtil ([#1911](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1911)) ([8a2d8a2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8a2d8a2))
+
+
+
+
+
 ## [5.0.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.0.14...@wireapp/api-client@5.0.15) (2019-06-06)
 
 **Note:** Version bump only for package @wireapp/api-client
