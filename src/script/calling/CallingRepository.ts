@@ -642,10 +642,21 @@ export class CallingRepository {
     if (!call) {
       return Promise.reject();
     }
+    const selfParticipant = call.selfParticipant;
+    const audioStream = audio && selfParticipant.getActiveAudioStream();
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    return this.getMediaStream(audio, video, screen, isGroup)
+    const needsAudio = audio && !audioStream;
+    this.logger.debug(
+      `media streams requested (audio: ${audio}${
+        audio && needsAudio ? '' : ' (from cache)'
+      }, video: ${video}, screen: ${screen})`
+    );
+    if (!needsAudio && !video && !screen) {
+      return Promise.resolve(audioStream);
+    }
+    return this.getMediaStream(needsAudio, video, screen, isGroup)
       .then(mediaStream => {
-        call.selfParticipant.setMediaStream(mediaStream);
+        selfParticipant.setMediaStream(mediaStream);
         return mediaStream;
       })
       .catch(() => {

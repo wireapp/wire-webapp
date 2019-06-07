@@ -54,6 +54,17 @@ export class Participant {
     this.audioStream = ko.observable();
   }
 
+  getActiveAudioStream(): MediaStream | void {
+    const stream = this.audioStream();
+    if (!stream) {
+      return;
+    }
+    const activeAudioTracks = stream.getAudioTracks().filter(track => track.readyState === 'live');
+    if (activeAudioTracks.length > 0) {
+      return stream;
+    }
+  }
+
   setAudioStream(audioStream: MediaStream): void {
     this.releaseStream(this.audioStream());
     this.audioStream(audioStream);
