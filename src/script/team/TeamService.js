@@ -50,6 +50,13 @@ export class TeamService {
     });
   }
 
+  getLegalHoldState(teamId, userId) {
+    return this.backendClient.sendRequest({
+      type: 'GET',
+      url: `${TeamService.URL.TEAMS}/${teamId}/legalhold/${userId}`,
+    });
+  }
+
   getTeamMembers(teamId) {
     return this.backendClient.sendRequest({
       type: 'GET',
