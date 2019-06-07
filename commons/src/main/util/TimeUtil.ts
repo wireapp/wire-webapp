@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,11 @@
  *
  */
 
-import * as CommonConfig from './config/CommonConfig';
-export {CommonConfig};
-
-export {LogFactory, LoggerOptions} from './LogFactory';
-
-export * from './util/';
+export enum TimeInMillis {
+  SECOND = 1000,
+  MINUTE = SECOND * 60,
+  HOUR = MINUTE * 60,
+  DAY = HOUR * 24,
+  WEEK = DAY * 7,
+  YEAR = DAY * 365,
+}

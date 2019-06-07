@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,14 @@
  *
  */
 
-import * as CommonConfig from './config/CommonConfig';
-export {CommonConfig};
+import * as AccentColor from './AccentColor';
+import * as ArrayUtil from './ArrayUtil';
+import * as RandomUtil from './RandomUtil';
+import * as StringUtil from './StringUtil';
+import * as TimeUtil from './TimeUtil';
+import * as TypeUtil from './TypeUtil';
+import * as UrlUtil from './UrlUtil';
+import * as ValidationUtil from './ValidationUtil';
 
-export {LogFactory, LoggerOptions} from './LogFactory';
-
-export * from './util/';
+export {AccentColor, ArrayUtil, RandomUtil, StringUtil, TimeUtil, TypeUtil, UrlUtil, ValidationUtil};
+export * from './Runtime';

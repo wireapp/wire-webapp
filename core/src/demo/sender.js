@@ -12,7 +12,7 @@ const program = require('commander');
 const logdown = require('logdown');
 const fs = require('fs');
 const path = require('path');
-const TimeUnits = require('./TimeUnits');
+const {TimeUtil} = require('@wireapp/commons');
 const {promisify} = require('util');
 
 program.option('-c, --conversationId <conversationId>').parse(process.argv);
@@ -32,7 +32,7 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
 
 (async () => {
   const CONVERSATION_ID = program.conversationId || process.env.WIRE_CONVERSATION_ID;
-  const MESSAGE_TIMER = 5000;
+  const MESSAGE_TIMER = TimeUtil.TimeInMillis.SECOND * 5;
 
   const login = {
     clientType: ClientType.TEMPORARY,
@@ -63,13 +63,13 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
       .build();
     const {id: messageId} = await account.service.conversation.send(deleteTextPayload);
 
-    const fiveSecondsInMillis = 5000;
+    const fiveSecondsInMillis = TimeUtil.TimeInMillis.SECOND * 5;
     setTimeout(async () => {
       await account.service.conversation.deleteMessageEveryone(CONVERSATION_ID, messageId);
     }, fiveSecondsInMillis);
   }
 
-  async function sendConversationLevelTimer(timeInMillis = TimeUnits.ONE_YEAR_IN_MILLIS) {
+  async function sendConversationLevelTimer(timeInMillis = TimeUtil.TimeInMillis.YEAR) {
     await account.apiClient.conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
       message_timer: timeInMillis,
     });
@@ -104,7 +104,7 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
         .createEditedText(CONVERSATION_ID, 'Hello, World!', originalMessageId)
         .build();
       await account.service.conversation.send(editedPayload);
-    }, 2000);
+    }, TimeUtil.TimeInMillis.SECOND * 2);
   }
 
   async function sendImage() {
@@ -202,7 +202,7 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
     sendText,
   ];
 
-  const timeoutInMillis = 2000;
+  const timeoutInMillis = TimeUtil.TimeInMillis.SECOND * 2;
   setInterval(() => {
     const randomMethod = methods[Math.floor(Math.random() * methods.length)];
     randomMethod();

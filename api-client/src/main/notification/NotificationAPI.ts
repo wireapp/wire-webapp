@@ -17,11 +17,12 @@
  *
  */
 
+import {TimeUtil} from '@wireapp/commons';
 import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http/';
 import {Notification, NotificationList} from './';
 
-const NOTIFICATION_SIZE_MAXIMUM = 10000;
+const NOTIFICATION_SIZE_MAXIMUM = TimeUtil.TimeInMillis.SECOND * 10;
 
 export class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
