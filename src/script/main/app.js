@@ -530,7 +530,7 @@ class App {
    * @returns {Promise<User>} Resolves with the self user entity
    */
   async _initiateSelfUser() {
-    const userEntity = this.repository.user.getSelf();
+    const userEntity = await this.repository.user.getSelf();
 
     this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
