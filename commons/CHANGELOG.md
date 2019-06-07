@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.7.6...@wireapp/commons@1.8.0) (2019-06-07)
+
+
+### Features
+
+* **commons:** Add TimeUtil ([#1911](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1911)) ([8a2d8a2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/8a2d8a2))
+
+
+
+
+
 ## [1.7.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.7.5...@wireapp/commons@1.7.6) (2019-06-06)
 
 **Note:** Version bump only for package @wireapp/commons
