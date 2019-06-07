@@ -17,7 +17,7 @@
  *
  */
 
-import uint32 from 'uint32';
+const uint32 = require('uint32');
 
 export const SQLeetEnginePrimaryKeyName: string = '`key`';
 
