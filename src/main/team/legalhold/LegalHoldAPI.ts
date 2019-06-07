@@ -68,9 +68,7 @@ export class LegalHoldAPI {
         password,
       },
       method: 'put',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${LegalHoldAPI.URL.LEGAL_HOLD}/${userId}/${
-        LegalHoldAPI.URL.APPROVE_LEGAL_HOLD
-      }`,
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${LegalHoldAPI.URL.LEGAL_HOLD}/${userId}/${LegalHoldAPI.URL.APPROVE_LEGAL_HOLD}`,
     };
 
     await this.client.sendJSON(config);
