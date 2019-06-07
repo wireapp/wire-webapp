@@ -53,9 +53,7 @@ export class RecvChain {
 
   try_message_keys(envelope: Envelope, msg: CipherMessage): Uint8Array {
     if (this.message_keys[0] && this.message_keys[0].counter > msg.counter) {
-      const message = `Message too old. Counter for oldest staged chain key is '${
-        this.message_keys[0].counter
-      }' while message counter is '${msg.counter}'.`;
+      const message = `Message too old. Counter for oldest staged chain key is '${this.message_keys[0].counter}' while message counter is '${msg.counter}'.`;
       throw new DecryptError.OutdatedMessage(message, DecryptError.CODE.CASE_208);
     }
 
@@ -68,9 +66,7 @@ export class RecvChain {
     }
     const mk = this.message_keys.splice(idx, 1)[0];
     if (!envelope.verify(mk.mac_key)) {
-      const message = `Envelope verification failed for message with counter behind. Message index is '${
-        msg.counter
-      }' while receive chain index is '${this.chain_key.idx}'.`;
+      const message = `Envelope verification failed for message with counter behind. Message index is '${msg.counter}' while receive chain index is '${this.chain_key.idx}'.`;
       throw new DecryptError.InvalidSignature(message, DecryptError.CODE.CASE_210);
     }
 

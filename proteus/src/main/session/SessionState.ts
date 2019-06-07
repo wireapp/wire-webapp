@@ -189,9 +189,7 @@ export class SessionState {
 
       if (!envelope.verify(mks.mac_key)) {
         throw new DecryptError.InvalidSignature(
-          `Envelope verification failed for message with counters in sync at '${
-            msg.counter
-          }'. The received message was possibly encrypted for another client.`,
+          `Envelope verification failed for message with counters in sync at '${msg.counter}'. The received message was possibly encrypted for another client.`,
           DecryptError.CODE.CASE_206
         );
       }
@@ -204,9 +202,7 @@ export class SessionState {
 
       if (!envelope.verify(mk.mac_key)) {
         throw new DecryptError.InvalidSignature(
-          `Envelope verification failed for message with counter ahead. Message index is '${
-            msg.counter
-          }' while receive chain index is '${rc.chain_key.idx}'.`,
+          `Envelope verification failed for message with counter ahead. Message index is '${msg.counter}' while receive chain index is '${rc.chain_key.idx}'.`,
           DecryptError.CODE.CASE_207
         );
       }

@@ -121,9 +121,7 @@ export class TransientStore extends EventEmitter {
     return new Promise((resolve, reject) =>
       this.getFromCache(primaryKey).then((cachedBundle: TransientBundle) => {
         if (cachedBundle) {
-          const message = `Record with primary key "${primaryKey}" already exists in table "${
-            this.tableName
-          }" of database "${this.engine.storeName}".`;
+          const message = `Record with primary key "${primaryKey}" already exists in table "${this.tableName}" of database "${this.engine.storeName}".`;
           return reject(new RecordAlreadyExistsError(message));
         } else {
           return this.save(primaryKey, bundle)

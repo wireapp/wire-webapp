@@ -374,9 +374,7 @@ export class ConversationAPI {
         ignore_missing: !!messageData.data,
         ...params,
       },
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${
-        ConversationAPI.URL.MESSAGES
-      }`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
     };
 
     if (typeof messageData.recipients === 'object') {
