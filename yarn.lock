@@ -1600,17 +1600,17 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@6.1.2":
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-6.1.2.tgz#ad4aec698294d8c0b8715ee1de4a59bba975a8ea"
-  integrity sha512-1emXHxg/pukfRt84pK9msKLR0rM8jeIY1OrSM7XvlUqcYlRQCzIjfgp+NGW7shi12/e/pQhMzGuKW1V2mbDo1w==
+"@wireapp/react-ui-kit@6.8.4":
+  version "6.8.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-6.8.4.tgz#b87f3ce8392a43ddb253360bd5f7a0c3d0ac6a87"
+  integrity sha512-7Y/GZVWAkdKkBb+KZCZdFdvezvkOc65bxiqPknpDXHyzRf8if5bFj6Ij0qWvAfcGcy2WRhORyfzWJNqBYDKTOw==
   dependencies:
     "@emotion/core" "10.0.10"
     "@types/color" "3.0.0"
-    bazinga64 "5.3.60"
-    color "3.1.1"
+    bazinga64 "5.4.8"
+    color "3.1.2"
     emotion-normalize "10.0.0"
-    react-transition-group "4.0.0"
+    react-transition-group "4.1.0"
 
 "@wireapp/store-engine@2.1.2":
   version "2.1.2"
@@ -2378,15 +2378,15 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-bazinga64@5.3.60:
-  version "5.3.60"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.3.60.tgz#7698fe2e6faf6484fa2f732fe8a0fdf3a3739a3e"
-  integrity sha512-ISJcwkgu6xw/sZVrjdtinNPBOhz2/CCP83eldQVmfhC0o6YqbZ9hgfRm42A9ZPLc1j2qfGmrRDqfZo4X0mArEQ==
-
 bazinga64@5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.4.1.tgz#f36c580296140c327961cbcd628d3f1282df45f0"
   integrity sha512-KBIvrjZOHqGkutuxRlDcaUK9DdHceCZJoUNuvH8JTdJbts5Bnt4tgLuN2+/nlCzC1d9oybQf1zAcU2DQq8jW8g==
+
+bazinga64@5.4.8:
+  version "5.4.8"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.4.8.tgz#68b8247188c2907d86c669e1740470d3ae216266"
+  integrity sha512-F7hXBgADh0uId3FZSxV/07lQMetGhGbXtEmxcXUVQdu0eUlIWDX1qm2zfYLC3zmci/158MjAqNBsKFtgb8wLKQ==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
@@ -3107,10 +3107,10 @@ color-string@^1.4.0, color-string@^1.5.2:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
 
-color@3.1.1, color@^3.0.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/color/-/color-3.1.1.tgz#7abf5c0d38e89378284e873c207ae2172dcc8a61"
-  integrity sha512-PvUltIXRjehRKPSy89VnDWFKY58xyhTLyxIg21vwQBI6qLwZNPmC8k3C1uytIgFKEpOIzN4y32iPm8231zFHIg==
+color@3.1.2, color@^3.0.0:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/color/-/color-3.1.2.tgz#68148e7f85d41ad7649c5fa8c8106f098d229e10"
+  integrity sha512-vXTJhHebByxZn3lDvDJYw4lR5+uB3vuoHsuYA5AKuxRVn5wzzIfQKGLBmgdVRHKTJYeK5rvJcHnrd0Li49CFpg==
   dependencies:
     color-convert "^1.9.1"
     color-string "^1.5.2"
@@ -10202,10 +10202,10 @@ react-test-renderer@^16.0.0-0:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
 
-react-transition-group@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.0.0.tgz#1d82b20d78aa09eac6268ceef0349307146942c6"
-  integrity sha512-b+uvkr15Pb80mqcsz5WAB+d53zS8/pTp3wDEsOiqpea93G8BqfsMFcPv2XZR0owqU13BJWoJvd17VjOPEY/9aA==
+react-transition-group@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.1.0.tgz#7b50c0a93a6c127336187252c3c1a70eff3304ce"
+  integrity sha512-/OITbogb3emGN49WaP7468QGSde7er5w6eIHldIDCSQBq/9QTSCzs8OgpgmOnaUXCXzBUcK1zoZ6DqRlM8CJtA==
   dependencies:
     dom-helpers "^3.4.0"
     loose-envify "^1.4.0"
