@@ -17,6 +17,7 @@
  *
  */
 
+import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/commonjs/team/legalhold/';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../event/WebApp';
 import {TeamRepository} from '../team/TeamRepository';
@@ -43,7 +44,7 @@ export const showRequestModal = async (fingerprint?: string) => {
   }
   if (typeof fingerprint === 'undefined') {
     const state = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
-    if (state === 'pending') {
+    if (state === LegalHoldMemberStatus.PENDING) {
       selfUser.hasPendingLegalHold(true);
       // TODO: wait for backend to properly return fingerprint
       fingerprint = '00';
