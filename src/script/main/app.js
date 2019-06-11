@@ -97,6 +97,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {showRequestModal, initLegalHold} from 'Util/LegalHoldUtil';
 
 class App {
   static get CONFIG() {
@@ -547,12 +548,8 @@ class App {
     await this.repository.properties.init(userEntity);
     await this._checkUserInformation(userEntity);
 
-    if (userEntity.inTeam()) {
-      const state = await this.repository.team.teamService.getLegalHoldState(userEntity.teamId, userEntity.id);
-      if (state === 'pending') {
-        // TODO
-      }
-    }
+    initLegalHold(this.repository.user, this.repository.team);
+    showRequestModal();
 
     return userEntity;
   }

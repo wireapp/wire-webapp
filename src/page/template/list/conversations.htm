@@ -6,8 +6,8 @@
                           data-uie-name="status-availability"
                           params="availability: selfAvailability, label: selfUserName">
       </availability-state>
-      <!-- ko if: isOnLegalHold() -->
-        <legal-hold-dot style="margin: 0 16px 0 auto" params="legalHoldModal: contentViewModel.legalHoldModal" data-uie-name="status-legal-hold"></legal-hold-dot>
+      <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
+        <legal-hold-dot style="margin: 0 16px 0 auto" params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()" data-uie-name="status-legal-hold"></legal-hold-dot>
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko ifnot: isTeam() -->
