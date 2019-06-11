@@ -1,0 +1,201 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Select" renders 1`] = `
+.emotion-0 {
+  background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(52%2C%2056%2C%2059)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 30px;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+.emotion-0:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-0:disabled {
+  color: #bac8d1;
+}
+
+<select
+  className="emotion-0"
+>
+  <option>
+    a
+  </option>
+  <option>
+    b
+  </option>
+</select>
+`;
+
+exports[`"Select" renders as disabled 1`] = `
+.emotion-0 {
+  background: rgb(240,240,240);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: normal;
+  padding-right: 30px;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+.emotion-0:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-0:disabled {
+  color: #bac8d1;
+}
+
+<select
+  className="emotion-0"
+  disabled={true}
+>
+  <option>
+    a
+  </option>
+  <option>
+    b
+  </option>
+</select>
+`;
+
+exports[`"Select" renders as invalid 1`] = `
+.emotion-0 {
+  background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(52%2C%2056%2C%2059)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #fb0807;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 30px;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+.emotion-0:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-0:disabled {
+  color: #bac8d1;
+}
+
+<select
+  className="emotion-0"
+  markInvalid={true}
+>
+  <option>
+    a
+  </option>
+  <option>
+    b
+  </option>
+</select>
+`;

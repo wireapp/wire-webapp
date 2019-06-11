@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "@types/node": "~10",
+    "@types/long": "4.0.0",
     "@wireapp/api-client": "5.2.1",
     "@wireapp/cryptobox": "11.0.9",
     "@wireapp/protocol-messaging": "1.24.1",

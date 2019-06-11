@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Lead" renders 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 24px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: center;
+  text-transform: none;
+  margin-bottom: 56px;
+  margin-top: 0;
+}
+
+@media (max-width:480px) {
+  .emotion-0 {
+    font-size: 20px;
+  }
+}
+
+<p
+  className="emotion-0"
+>
+  Lead
+</p>
+`;
+
+exports[`"Paragraph" renders 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+<p
+  className="emotion-0"
+>
+  Paragraph
+</p>
+`;

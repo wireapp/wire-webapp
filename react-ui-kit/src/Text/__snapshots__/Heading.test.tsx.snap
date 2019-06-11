@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Heading" renders H1 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 48px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  line-height: 56px;
+  margin-bottom: 64px;
+  margin-top: 0;
+  min-height: 48px;
+}
+
+@media (max-width:480px) {
+  .emotion-0 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+<h1
+  className="emotion-0"
+>
+  H1
+</h1>
+`;
+
+exports[`"Heading" renders H1 2`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 48px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  line-height: 56px;
+  margin-bottom: 64px;
+  margin-top: 0;
+  min-height: 48px;
+}
+
+@media (max-width:480px) {
+  .emotion-0 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+<h1
+  className="emotion-0"
+>
+  H1
+</h1>
+`;
+
+exports[`"Heading" renders H2 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  line-height: 32px;
+  margin-bottom: 24px;
+  margin-top: 48px;
+}
+
+@media (max-width:480px) {
+  .emotion-0 {
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 20px;
+    margin-top: 44px;
+  }
+}
+
+<h2
+  className="emotion-0"
+>
+  H2
+</h2>
+`;
+
+exports[`"Heading" renders H3 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  margin-bottom: 16px;
+}
+
+<h3
+  className="emotion-0"
+>
+  H3
+</h3>
+`;
+
+exports[`"Heading" renders H4 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 11px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  margin-bottom: 5px;
+  margin-top: 20px;
+}
+
+<h3
+  className="emotion-0"
+>
+  H4
+</h3>
+`;

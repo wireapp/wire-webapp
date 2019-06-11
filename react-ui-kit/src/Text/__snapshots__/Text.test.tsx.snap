@@ -1,0 +1,290 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Text" renders 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders as block 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: block;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders bold 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders centered 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: center;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders light 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 200;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders muted 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 0.56;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders no wrap 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders with color 1`] = `
+.emotion-0 {
+  color: #2391d3;
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders with size 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 2px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders with textTransform 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<span
+  className="emotion-0"
+>
+  Text
+</span>
+`;
+
+exports[`"Text" renders with truncation 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<span
+  className="emotion-0"
+>
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+</span>
+`;
+
+exports[`Utility components renders Bold 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Bold
+</span>
+`;
+
+exports[`Utility components renders Large 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 48px;
+  font-weight: 200;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Large
+</span>
+`;
+
+exports[`Utility components renders Muted 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 0.56;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Muted
+</span>
+`;
+
+exports[`Utility components renders Small 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 12px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Small
+</span>
+`;
+
+exports[`Utility components renders Uppercase 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<span
+  className="emotion-0"
+>
+  Uppercase
+</span>
+`;

@@ -3,6 +3,7 @@
   "devDependencies": {
     "@types/jasmine": "3.3.13",
     "@types/karma": "3.0.3",
+    "@types/libsodium-wrappers-sumo": "0.7.1",
     "cross-env": "5.2.0",
     "jasmine": "3.4.0",
     "karma": "4.1.0",
@@ -13,7 +14,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "karma-typescript": "4.1.0",
-    "libsodium-wrappers": "0.7.4",
+    "libsodium-wrappers-sumo": "0.7.4",
     "nyc": "14.1.1",
     "rimraf": "2.6.3",
     "ts-node": "8.2.0",
