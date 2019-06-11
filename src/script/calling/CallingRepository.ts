@@ -670,7 +670,7 @@ export class CallingRepository {
         return newStream;
       })
       .catch(error => {
-        this.logger.error(error);
+        this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call);
         return new MediaStream();
       });

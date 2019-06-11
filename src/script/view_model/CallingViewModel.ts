@@ -31,10 +31,6 @@ declare global {
   interface Window {
     desktopCapturer: any;
   }
-
-  interface MediaDevices {
-    getDisplayMedia: any;
-  }
 }
 
 export class CallingViewModel {

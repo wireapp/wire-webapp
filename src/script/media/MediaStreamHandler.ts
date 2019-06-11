@@ -31,6 +31,12 @@ import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
+declare global {
+  interface MediaDevices {
+    getDisplayMedia: any;
+  }
+}
+
 export class MediaStreamHandler {
   static get CONFIG(): any {
     return {
@@ -108,30 +114,25 @@ export class MediaStreamHandler {
    * @param {MediaType} mediaType - Requested media type
    * @returns {Promise} Resolves true when permissions is granted
    */
-  private hasPermissionToAccess(audio: boolean, video: boolean): Promise<boolean> {
-    if (!Environment.browser.supports.mediaPermissions) {
-      return Promise.resolve(false);
-    }
-
-    const checkPermissionStates = (typesToCheck: PermissionType[]) => {
-      return this.permissionRepository.getPermissionStates(typesToCheck).then((permissions: any[]) => {
-        for (const permission of permissions) {
-          const {permissionState, permissionType} = permission;
-          const isPermissionPrompt = permissionState === PermissionStatusState.PROMPT;
-          if (isPermissionPrompt) {
-            this.logger.info(`Need to prompt for '${permissionType}' permission`, permissions);
-            return Promise.resolve(false);
-          }
-
-          const isPermissionDenied = permissionState === PermissionStatusState.DENIED;
-          if (isPermissionDenied) {
-            this.logger.warn(`Permission for '${permissionType}' is denied`, permissions);
-            return Promise.reject(new PermissionError(PermissionError.TYPE.DENIED));
-          }
+  private hasPermissionToAccess(audio: boolean, video: boolean): boolean {
+    const checkPermissionStates = (typesToCheck: PermissionType[]): boolean => {
+      const permissions = this.permissionRepository.getPermissionStates(typesToCheck);
+      for (const permission of permissions) {
+        const {state, type} = permission;
+        const isPermissionPrompt = state === PermissionStatusState.PROMPT;
+        if (isPermissionPrompt) {
+          this.logger.info(`Need to prompt for '${type}' permission`, permissions);
+          return false;
         }
 
-        return Promise.resolve(true);
-      });
+        const isPermissionDenied = state === PermissionStatusState.DENIED;
+        if (isPermissionDenied) {
+          this.logger.warn(`Permission for '${type}' is denied`, permissions);
+          return false;
+        }
+      }
+
+      return true;
     };
 
     const permissionTypes = [];
@@ -141,8 +142,8 @@ export class MediaStreamHandler {
     if (video) {
       permissionTypes.push(PermissionType.CAMERA);
     }
-    const shouldCheckPermissions = permissionTypes && permissionTypes.length;
-    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : Promise.resolve(true);
+    const shouldCheckPermissions = permissionTypes.length;
+    return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
   }
 
   releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): boolean {
@@ -242,6 +243,7 @@ export class MediaStreamHandler {
   }
 
   private schedulePermissionHint(audio: boolean, video: boolean, screen: boolean): void {
+    window.clearTimeout(this.requestHintTimeout);
     this.requestHintTimeout = window.setTimeout(() => {
       this.hidePermissionFailedHint(audio, video, screen);
       this.showPermissionRequestHint(audio, video, screen);
@@ -250,9 +252,7 @@ export class MediaStreamHandler {
   }
 
   private clearPermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
-    if (this.requestHintTimeout) {
-      return window.clearTimeout(this.requestHintTimeout);
-    }
+    window.clearTimeout(this.requestHintTimeout);
     this.hidePermissionRequestHint(audio, video, screen);
   }
 

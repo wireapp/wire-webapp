@@ -123,10 +123,9 @@ export class NotificationRepository {
       }
 
       if (Environment.browser.supports.permissions) {
-        return this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS).then(() => {
-          const shouldRequestPermission = this.permissionState() === PermissionStatusState.PROMPT;
-          return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
-        });
+        const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
+        const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
+        return shouldRequestPermission ? this._requestPermission() : this._checkPermissionState();
       }
 
       const currentPermission = window.Notification.permission;
