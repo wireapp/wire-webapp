@@ -29,13 +29,13 @@ const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
 const {ValidationUtil} = require('@wireapp/commons');
-const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {Server: MockSocketServer} = require('mock-socket');
 
 const BASE_URL = 'mock-backend.wire.com';
-const BASE_URL_HTTPS = `https://${BASE_URL}`;
 const MOCK_BACKEND = {
   name: 'mock',
-  rest: BASE_URL_HTTPS,
+  rest: `https://${BASE_URL}`,
   ws: `wss://${BASE_URL}`,
 };
 
@@ -59,10 +59,8 @@ describe('Account', () => {
   };
 
   beforeEach(() => {
-    nock(BASE_URL_HTTPS)
-      .post(`${AuthAPI.URL.LOGIN}`, body => {
-        return body.email && body.password;
-      })
+    nock(MOCK_BACKEND.rest)
+      .post(AuthAPI.URL.LOGIN, body => body.email && body.password)
       .query(() => true)
       .reply((uri, body) => {
         const parsedBody = JSON.parse(body);
@@ -79,19 +77,19 @@ describe('Account', () => {
         return [StatusCode.OK, JSON.stringify(accessTokenData)];
       });
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
       .reply(StatusCode.OK, undefined);
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .post(AuthAPI.URL.ACCESS)
       .reply(StatusCode.OK, accessTokenData);
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .post(ClientAPI.URL.CLIENTS)
       .reply(StatusCode.OK, {id: CLIENT_ID});
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .post(
         new RegExp(`${ConversationAPI.URL.CONVERSATIONS}/.*/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`)
       )
@@ -99,18 +97,18 @@ describe('Account', () => {
       .reply(StatusCode.OK)
       .persist();
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .get(`${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`)
       .query({client: CLIENT_ID})
       .reply(StatusCode.OK, {});
 
-    nock(BASE_URL_HTTPS)
+    nock(MOCK_BACKEND.rest)
       .get(ClientAPI.URL.CLIENTS)
       .reply(StatusCode.OK, [{id: CLIENT_ID}]);
   });
 
   describe('"createText"', () => {
-    it('creates a text payload', async done => {
+    it('creates a text payload', async () => {
       const account = await createAccount();
       expect(account.apiClient.context).toBeUndefined();
 
@@ -128,13 +126,11 @@ describe('Account', () => {
       const payload = account.service.conversation.messageBuilder.createText(text).build();
 
       expect(payload.timestamp).toBeGreaterThan(0);
-
-      done();
     });
   });
 
   describe('"init"', () => {
-    it('initializes the Protocol buffers', async done => {
+    it('initializes the Protocol buffers', async () => {
       const account = new Account();
 
       await account.init();
@@ -148,7 +144,6 @@ describe('Account', () => {
       });
 
       expect(message.content).toBe('text');
-      done();
     });
   });
 
@@ -281,7 +276,7 @@ describe('Account', () => {
   });
 
   describe('"login"', () => {
-    it('logs in with correct credentials', async done => {
+    it('logs in with correct credentials', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');
 
@@ -298,11 +293,9 @@ describe('Account', () => {
       expect(clientId).toBe(CLIENT_ID);
       expect(ValidationUtil.isUUIDv4(userId)).toBe(true);
       expect(clientType).toBe(ClientType.TEMPORARY);
-
-      done();
     });
 
-    it('does not log in with incorrect credentials', async done => {
+    it('does not log in with incorrect credentials', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');
 
@@ -318,12 +311,10 @@ describe('Account', () => {
           password: 'wrong',
         });
 
-        done.fail('Should not be logged in');
+        fail('Should not be logged in');
       } catch (error) {
         expect(error.code).toBe(StatusCode.FORBIDDEN);
         expect(error.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
-
-        done();
       }
     });
   });
@@ -334,8 +325,11 @@ describe('Account', () => {
       await storeEngine.init('account.test');
 
       const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const mockSocketServer = new MockSocketServer(MOCK_BACKEND.rest, {});
+
       const account = new Account(apiClient);
       spyOn(account, 'handleEvent').and.throwError('Test error');
+      spyOn(account.apiClient.transport.ws, 'connect').and.returnValue(Promise.resolve(mockSocketServer));
 
       await account.init();
 
@@ -356,7 +350,7 @@ describe('Account', () => {
         payload: [{}],
       };
 
-      account.apiClient.transport.ws.emit(WebSocketClient.TOPIC.ON_MESSAGE, notification);
+      account.apiClient.transport.ws.emit(WebSocketTopic.ON_MESSAGE, notification);
     });
   });
 });

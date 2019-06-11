@@ -26,7 +26,7 @@ const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
 describe('APIClient', () => {
-  const baseURL = APIClient.BACKEND.PRODUCTION.rest;
+  const baseUrl = APIClient.BACKEND.PRODUCTION.rest;
 
   let accessTokenData = {
     access_token:
@@ -39,20 +39,20 @@ describe('APIClient', () => {
   describe('"constructor"', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new APIClient();
-      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
       const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
       const client = new APIClient({store: new MemoryEngine()});
-      expect(client.transport.http.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
-      expect(client.transport.ws.baseURL).toBe(APIClient.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseUrl).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs schema callback when provided', () => {
@@ -129,7 +129,7 @@ describe('APIClient', () => {
     ];
 
     beforeEach(() => {
-      nock(baseURL)
+      nock(baseUrl)
         .post(`${AuthAPI.URL.LOGIN}`, {
           email: loginData.email,
           password: loginData.password,
@@ -137,7 +137,7 @@ describe('APIClient', () => {
         .query({persist: loginData.clientType === 'permanent'})
         .reply(200, accessTokenData);
 
-      nock(baseURL)
+      nock(baseUrl)
         .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
         .reply(200, undefined);
     });
@@ -163,19 +163,19 @@ describe('APIClient', () => {
     it('refreshes an access token when it becomes invalid', done => {
       const queriedHandle = 'webappbot';
 
-      nock(baseURL)
+      nock(baseUrl)
         .get(UserAPI.URL.USERS)
         .query({handles: queriedHandle})
         .once()
         .reply(401);
 
-      nock(baseURL)
+      nock(baseUrl)
         .get(UserAPI.URL.USERS)
         .query({handles: queriedHandle})
         .twice()
         .reply(200, userData);
 
-      nock(baseURL)
+      nock(baseUrl)
         .post(AuthAPI.URL.ACCESS)
         .reply(200, accessTokenData);
 
@@ -187,7 +187,7 @@ describe('APIClient', () => {
           // Make access token invalid
           client.accessTokenStore.accessToken.access_token = undefined;
           /**
-           * Make a backend call. This will fail because the access token was made invalid.
+           * Make a backend call. This will fail because the access token was invalidated.
            * Thus the client needs to run an access token refresh in the background and
            * automatically retry the backend call right after.
            */
@@ -204,7 +204,7 @@ describe('APIClient', () => {
 
   describe('"logout"', () => {
     beforeEach(() => {
-      nock(baseURL)
+      nock(baseUrl)
         .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
         .reply(200, undefined);
     });
@@ -269,11 +269,11 @@ describe('APIClient', () => {
     };
 
     beforeEach(() => {
-      nock(baseURL)
+      nock(baseUrl)
         .post(AuthAPI.URL.REGISTER, registerData)
         .reply(200, registerData);
 
-      nock(baseURL)
+      nock(baseUrl)
         .post(AuthAPI.URL.ACCESS)
         .reply(200, accessTokenData);
     });

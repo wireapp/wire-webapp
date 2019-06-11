@@ -36,7 +36,7 @@ import {NotificationAPI} from './notification/';
 import * as ObfuscationUtil from './obfuscation/';
 import {SelfAPI} from './self/';
 import {retrieveCookie} from './shims/node/cookie';
-import {WebSocketClient} from './tcp/';
+import {WebSocketClient, WebSocketTopic} from './tcp/';
 import {
   IdentityProviderAPI,
   LegalHoldAPI,
@@ -104,13 +104,17 @@ export class APIClient extends EventEmitter {
     });
 
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
-
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
-    webSocket.on(WebSocketClient.TOPIC.ON_DISCONNECT, async (error: InvalidTokenError) => {
+
+    webSocket.on(WebSocketTopic.ON_DISCONNECT, async (error: InvalidTokenError) => {
       this.logger.warn(`Cannot renew access token because cookie is invalid: ${error.message}`, error);
       await this.logout();
       this.emit(APIClient.TOPIC.ON_LOGOUT, error);
     });
+
+    webSocket.on(WebSocketTopic.ON_DISCONNECT, (error: InvalidTokenError) =>
+      this.emit(APIClient.TOPIC.ON_LOGOUT, error)
+    );
 
     this.transport = {
       http: httpClient,

@@ -37,7 +37,7 @@ describe('Account', () => {
       }
     });
 
-    it('creates a client if there is none', async done => {
+    it('creates a client if there is none', async () => {
       const engine = new IndexedDBEngine();
       const apiClient = new APIClient({
         schemaCallback: db => {
@@ -71,16 +71,15 @@ describe('Account', () => {
         storeName = engine.storeName;
         await account.initClient(context);
       } catch (error) {
-        return done.fail(error);
+        return fail(error);
       }
 
       expect(account.service.client.register).toHaveBeenCalledTimes(1);
-      done();
     });
   });
 
   describe('"loadAndValidateLocalClient"', () => {
-    it('synchronizes the client ID', async done => {
+    it('synchronizes the client ID', async () => {
       const engine = new IndexedDBEngine();
       const apiClient = new APIClient({
         schemaCallback: db => {},
@@ -92,23 +91,23 @@ describe('Account', () => {
 
       try {
         await account.init();
-        account.service.cryptography.initCryptobox = () => Promise.resolve();
-        account.service.client.getLocalClient = () => Promise.resolve({id: clientId});
-        account.apiClient.client.api.getClient = () => Promise.resolve({id: clientId});
+        spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
+        spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
+        spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
         account.apiClient.createContext('userId', 'clientType', 'clientId');
 
         await account.loadAndValidateLocalClient();
       } catch (error) {
-        return done.fail(error);
+        return fail(error);
       }
+
       expect(account.apiClient.context.clientId).toBe(clientId);
       expect(account.service.conversation.clientID).toBe(clientId);
-      done();
     });
   });
 
   describe('"registerClient"', () => {
-    it('synchronizes the client ID', async done => {
+    it('synchronizes the client ID', async () => {
       const engine = new IndexedDBEngine();
       const apiClient = new APIClient({
         schemaCallback: db => {},
@@ -120,18 +119,18 @@ describe('Account', () => {
 
       try {
         await account.init();
-        account.service.client.register = () => Promise.resolve({id: clientId});
-        account.service.client.synchronizeClients = () => Promise.resolve();
-        account.service.notification.initializeNotificationStream = () => Promise.resolve();
+        spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
+        spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
+        spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());
         account.apiClient.createContext('userId', 'clientType', 'clientId');
 
         await account.registerClient();
       } catch (error) {
-        return done.fail(error);
+        return fail(error);
       }
+
       expect(account.apiClient.context.clientId).toBe(clientId);
       expect(account.service.conversation.clientID).toBe(clientId);
-      done();
     });
   });
 });
