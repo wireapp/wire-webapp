@@ -48,7 +48,7 @@
     "underscore": "1.9.1",
     "url-search-params-polyfill": "6.0.0",
     "uuidjs": "4.2.1",
-    "webrtc-adapter": "6.4.8"
+    "webrtc-adapter": "~6"
   },
   "devDependencies": {
     "@babel/core": "7.4.4",
