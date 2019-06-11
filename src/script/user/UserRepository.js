@@ -49,6 +49,7 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
+import {showRequestModal, getFingerprint} from 'Util/LegalHoldUtil';
 
 export class UserRepository {
   static get CONFIG() {
@@ -128,36 +129,40 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  on_user_event(event_json, source) {
-    const type = event_json.type;
+  on_user_event(eventJson, source) {
+    const type = eventJson.type;
 
-    const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case BackendEvent.USER.DELETE:
-        this.user_delete(event_json);
+        this.user_delete(eventJson);
         break;
       case BackendEvent.USER.UPDATE:
-        this.user_update(event_json);
+        this.user_update(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
-        this.onUserAvailability(event_json);
+        this.onUserAvailability(eventJson);
         break;
+      case BackendEvent.USER.LEGAL_HOLD_REQUEST: {
+        this.onLegalHoldRequest(eventJson);
+        break;
+      }
     }
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
         case BackendEvent.USER.PROPERTIES_DELETE:
-          this.propertyRepository.deleteProperty(event_json.key);
+          this.propertyRepository.deleteProperty(eventJson.key);
           break;
         case BackendEvent.USER.PROPERTIES_SET:
-          this.propertyRepository.setProperty(event_json.key, event_json.value);
+          this.propertyRepository.setProperty(eventJson.key, eventJson.value);
           break;
       }
     }
@@ -367,6 +372,16 @@ export class UserRepository {
     const users = this.teamUsers().concat(this.self());
     const recipients = this._createRecipients(users, true);
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+  }
+
+  onLegalHoldRequest(eventJson) {
+    if (this.self().id !== eventJson.target_user) {
+      return;
+    }
+    const self = this.self();
+    self.hasPendingLegalHold(true);
+    const fingerprint = getFingerprint();
+    showRequestModal(fingerprint);
   }
 
   /**

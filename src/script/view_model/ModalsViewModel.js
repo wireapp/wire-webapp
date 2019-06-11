@@ -48,18 +48,20 @@ const States = {
   READY: 'ModalState.READY',
 };
 
+const Types = {
+  ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
+  ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
+  ACKNOWLEDGE: 'modal-template-acknowledge',
+  CONFIRM: 'modal-template-confirm',
+  INPUT: 'modal-template-input',
+  MULTI_ACTIONS: 'modal-multi-actions',
+  OPTION: 'modal-template-option',
+  SESSION_RESET: 'modal-session-reset',
+};
+
 export class ModalsViewModel {
   static get TYPE() {
-    return {
-      ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
-      ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
-      ACKNOWLEDGE: 'modal-template-acknowledge',
-      CONFIRM: 'modal-template-confirm',
-      INPUT: 'modal-template-input',
-      MULTI_ACTIONS: 'modal-multi-actions',
-      OPTION: 'modal-template-option',
-      SESSION_RESET: 'modal-session-reset',
-    };
+    return Types;
   }
 
   constructor() {
@@ -114,7 +116,7 @@ export class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _showModal = (type, options = {}) => {
-    if (!Object.values(ModalsViewModel.TYPE).includes(type)) {
+    if (!Object.values(Types).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
@@ -142,7 +144,7 @@ export class ModalsViewModel {
     };
 
     switch (type) {
-      case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES: {
+      case Types.ACCOUNT_NEW_DEVICES: {
         content.titleText = t('modalAccountNewDevicesHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
@@ -157,7 +159,7 @@ export class ModalsViewModel {
         content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
         break;
       }
-      case ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED: {
+      case Types.ACCOUNT_READ_RECEIPTS_CHANGED: {
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
@@ -165,24 +167,24 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
       }
-      case ModalsViewModel.TYPE.ACKNOWLEDGE: {
+      case Types.ACKNOWLEDGE: {
         content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
         content.titleText = text.title || t('modalAcknowledgeHeadline');
         content.messageText = !text.htmlMessage && text.message;
         break;
       }
-      case ModalsViewModel.TYPE.CONFIRM: {
+      case Types.CONFIRM: {
         content.secondaryAction = {...content.secondaryAction, text: t('modalConfirmSecondary')};
         break;
       }
-      case ModalsViewModel.TYPE.INPUT:
-      case ModalsViewModel.TYPE.OPTION: {
+      case Types.INPUT:
+      case Types.OPTION: {
         if (!hideSecondary) {
           content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
         }
         break;
       }
-      case ModalsViewModel.TYPE.SESSION_RESET: {
+      case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         const supportLink = buildSupportUrl(z.config.SUPPORT.FORM.BUG);
@@ -193,7 +195,7 @@ export class ModalsViewModel {
         );
         break;
       }
-      case ModalsViewModel.TYPE.MULTI_ACTIONS: {
+      case Types.MULTI_ACTIONS: {
         // no additional actions needed for now
       }
     }
@@ -205,17 +207,17 @@ export class ModalsViewModel {
     this.state(States.OPEN);
   };
 
-  hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
-  hasOption = () => this.content().currentType === ModalsViewModel.TYPE.OPTION;
-  hasMultipleSecondary = () => this.content().currentType === ModalsViewModel.TYPE.MULTI_ACTIONS;
+  hasInput = () => this.content().currentType === Types.INPUT;
+  hasOption = () => this.content().currentType === Types.OPTION;
+  hasMultipleSecondary = () => this.content().currentType === Types.MULTI_ACTIONS;
 
   confirm = () => {
     const action = this.content().primaryAction.action;
     if (typeof action === 'function') {
-      if (this.content().currentType === ModalsViewModel.TYPE.OPTION) {
+      if (this.content().currentType === Types.OPTION) {
         return action(this.optionChecked());
       }
-      if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
+      if (this.content().currentType === Types.INPUT) {
         return action(this.inputValue());
       }
       action();
