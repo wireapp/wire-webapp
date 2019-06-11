@@ -138,8 +138,8 @@ class User {
     
     const _hasPendingLegalHold = ko.observable(false);
     this.hasPendingLegalHold = ko.pureComputed({
-      read: () => this.is_me && !this.isOnLegalHold() && hasPendingLegalHold(),
-      write: value => hasPendingLegalHold(value),
+      read: () => this.is_me && !this.isOnLegalHold() && _hasPendingLegalHold(),
+      write: value => _hasPendingLegalHold(value),
       owner: this,
     });
 
