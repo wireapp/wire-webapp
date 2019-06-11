@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.21 (2019-06-11)
+
+
+### Bug Fixes
+
+* **api-client:** Remove legal hold member data ([#1889](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/1889)) ([7175ce0](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/7175ce0))
+
+
+
+
+
 ## [0.1.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.1.19...@wireapp/license-collector@0.1.20) (2019-05-14)
 
 **Note:** Version bump only for package @wireapp/license-collector

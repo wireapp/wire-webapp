@@ -15,7 +15,7 @@
     "@types/node": "~10",
     "@types/uint32": "0.2.0",
     "babel-loader": "8.0.6",
-    "bazinga64": "5.4.8",
+    "bazinga64": "5.4.9",
     "jasmine": "3.4.0",
     "karma": "4.1.0",
     "karma-chrome-launcher": "2.2.0",
@@ -41,5 +41,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.1.3"
+  "version": "0.1.4"
 }
