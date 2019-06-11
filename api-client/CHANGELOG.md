@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.1.0...@wireapp/api-client@5.2.0) (2019-06-11)
+
+
+### Features
+
+* **api-client:** Detect WebSocket connection changes ([#1910](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1910)) ([f9e661f](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/f9e661f))
+
+
+
+
+
 # [5.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.0.15...@wireapp/api-client@5.1.0) (2019-06-07)
 
 
