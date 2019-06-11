@@ -17,7 +17,7 @@
  *
  */
 
-enum UserAssetType {
+export enum UserAssetType {
   COMPLETE = 'complete',
   PREVIEW = 'preview',
 }
