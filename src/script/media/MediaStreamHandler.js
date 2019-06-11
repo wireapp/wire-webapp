@@ -196,11 +196,14 @@ export class MediaStreamHandler {
 
   /**
    * Replace the MediaStream after a change of the selected input device.
-   * @param {MediaStreamInfo} mediaStreamInfo - Info about new MediaStream
-   * @returns {undefined} No return value
+   * @param {MediaStream} mediaStream - the new mediastream (tracks will be cloned, this mediaStream can be disposed of once changed)
+   * @param {MediaType} mediaType - Type of the media that needs to be changed
+   * @returns {Promise<void>} Resolves when the local media stream and the call have been updated
    */
-  changeMediaStream(mediaStreamInfo) {
-    const mediaStream = mediaStreamInfo.stream;
+  changeMediaStream(mediaStream, mediaType) {
+    if (!this.localMediaStream()) {
+      return Promise.resolve();
+    }
 
     const logMessage = `Received new MediaStream containing '${mediaStream.getTracks().length}' track/s`;
     const logObject = {
@@ -208,39 +211,43 @@ export class MediaStreamHandler {
       stream: mediaStream,
       videoTracks: mediaStream.getVideoTracks(),
     };
+
     this.logger.debug(logMessage, logObject);
+    const newTracks = MediaStreamHandler.getMediaTracks(mediaStream, mediaType);
+    const newMediaStream = new MediaStream(newTracks.map(track => track.clone()));
+    const mediaStreamInfo = new MediaStreamInfo(MediaStreamSource.LOCAL, 'self', newMediaStream);
 
     const replacePromise = this.joinedCall()
       ? this._updateJoinedCall(mediaStreamInfo)
       : Promise.resolve({replacedTrack: false, streamInfo: mediaStreamInfo});
 
-    replacePromise.then(this._handleReplacedMediaStream.bind(this));
+    return replacePromise.then(this._handleReplacedMediaStream.bind(this));
   }
 
   _handleReplacedMediaStream({replacedTrack, streamInfo: mediaStreamInfo}) {
-    const replaceMediaStreamLocally = newMediaStreamInfo => {
-      const newMediaStream = newMediaStreamInfo.stream;
-      const newMediaStreamType = newMediaStreamInfo.getType();
+    const replaceMediaStreamLocally = mediaStream => {
+      const newMediaStreamType = MediaStreamHandler.detectMediaStreamType(mediaStream);
 
       this._releaseMediaStream(this.localMediaStream());
-      this._setStreamState(newMediaStream, newMediaStreamType);
-      this.localMediaStream(newMediaStream);
+      this._setStreamState(mediaStream, newMediaStreamType);
+      this.localMediaStream(mediaStream);
     };
 
-    const replaceMediaTracksLocally = newMediaStreamInfo => {
-      const mediaStream = newMediaStreamInfo.stream;
-      const mediaType = newMediaStreamInfo.getType();
+    const replaceMediaTracksLocally = mediaStream => {
+      const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStream);
       const localMediaStream = this.localMediaStream();
 
       if (localMediaStream) {
-        this._releaseTracksFromStream(localMediaStream, mediaType);
+        this.releaseTracksFromStream(localMediaStream, mediaType);
         this._addTracksToStream(mediaStream, localMediaStream, mediaType);
       } else {
         this.localMediaStream(mediaStream);
       }
     };
 
-    return replacedTrack ? replaceMediaTracksLocally(mediaStreamInfo) : replaceMediaStreamLocally(mediaStreamInfo);
+    return replacedTrack
+      ? replaceMediaTracksLocally(mediaStreamInfo.stream)
+      : replaceMediaStreamLocally(mediaStreamInfo.stream);
   }
 
   /**
@@ -275,16 +282,9 @@ export class MediaStreamHandler {
 
     return constraintsPromise
       .then(streamConstraints => this.requestMediaStream(mediaType, streamConstraints))
-      .then(mediaStreamInfo => {
-        // FIXME: the mediaStreamInUse should be more intelligent and handle all scenarios where the stream is actually needed
-        if (!isPreferenceChange && !this.mediaStreamInUse()) {
-          // in case the stream is returned after the call has actually ended, we need to release the stream right away
-          this.logger.warn('Releasing obsolete MediaStream as there is no active call', mediaStreamInfo);
-          return this._releaseMediaStream(mediaStreamInfo.stream);
-        }
-
+      .then(({stream}) => {
         this._setSelfStreamState(mediaType);
-        this.changeMediaStream(mediaStreamInfo);
+        this.changeMediaStream(stream, mediaType).then(() => stream.getTracks().forEach(track => track.stop()));
       })
       .catch(error => {
         const isMediaTypeScreen = mediaType === MediaType.SCREEN;
@@ -523,7 +523,7 @@ export class MediaStreamHandler {
    * @returns {boolean} Have tracks been stopped
    */
   _releaseMediaStream(mediaStream, mediaType = MediaType.AUDIO_VIDEO) {
-    return mediaStream ? this._releaseTracksFromStream(mediaStream, mediaType) : false;
+    return mediaStream ? this.releaseTracksFromStream(mediaStream, mediaType) : false;
   }
 
   /**
@@ -534,7 +534,7 @@ export class MediaStreamHandler {
    * @param {MediaType} [mediaType=MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
    * @returns {boolean} Have tracks been stopped
    */
-  _releaseTracksFromStream(mediaStream, mediaType) {
+  releaseTracksFromStream(mediaStream, mediaType) {
     const mediaStreamTracks = MediaStreamHandler.getMediaTracks(mediaStream, mediaType);
 
     if (mediaStreamTracks.length) {
@@ -751,15 +751,14 @@ export class MediaStreamHandler {
       return Promise.reject(new z.error.MediaError(z.error.MediaError.TYPE.STREAM_NOT_FOUND));
     }
 
-    const newMediaStream = mediaStreamInfo.stream;
-    const mediaType = mediaStreamInfo.getType();
-    this._releaseTracksFromStream(this.localMediaStream(), mediaType);
+    const mediaType = MediaStreamHandler.detectMediaStreamType(mediaStreamInfo.stream);
+    this.releaseTracksFromStream(this.localMediaStream(), mediaType);
 
     const clonedMediaStream = this.localMediaStream().clone();
     const clonedMediaStreamType = MediaStreamHandler.detectMediaStreamType(clonedMediaStream);
     // Reset MediaStreamTrack enabled states as older Chrome versions fail to copy these when cloning
     this._setStreamState(clonedMediaStream, clonedMediaStreamType);
-    this._addTracksToStream(newMediaStream, clonedMediaStream, mediaType);
+    this._addTracksToStream(mediaStreamInfo.stream, clonedMediaStream, mediaType);
 
     this.logger.info(`Upgraded the MediaStream to update '${mediaType}'`, clonedMediaStream);
     return Promise.resolve(new MediaStreamInfo(MediaStreamSource.LOCAL, 'self', clonedMediaStream));
@@ -807,21 +806,6 @@ export class MediaStreamHandler {
   // Media handling
   //##############################################################################
 
-  /**
-   * Check for active calls that need a MediaStream.
-   * @returns {boolean} Returns true if an active media stream is needed for at least one call
-   */
-  mediaStreamInUse() {
-    for (const callEntity of this.currentCalls.values()) {
-      const callNeedsMediaStream = callEntity.needsMediaStream();
-      if (callNeedsMediaStream) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   // Toggle the mute state of the microphone.
   toggleAudioSend() {
     return this._toggleAudioSend();
@@ -847,11 +831,9 @@ export class MediaStreamHandler {
 
   // Reset the MediaStream and states.
   resetMediaStream() {
-    if (!this.mediaStreamInUse()) {
-      this.releaseMediaStream();
-      this.resetSelfStates();
-      this.mediaRepository.closeAudioContext();
-    }
+    this.releaseMediaStream();
+    this.resetSelfStates();
+    this.mediaRepository.closeAudioContext();
   }
 
   /**

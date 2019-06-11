@@ -28,6 +28,9 @@ ko.bindingHandlers.muteMediaElement = {
 
 ko.bindingHandlers.sourceStream = {
   update(element, valueAccessor) {
-    element.srcObject = valueAccessor();
+    const stream = valueAccessor();
+    if (stream) {
+      element.srcObject = stream;
+    }
   },
 };
