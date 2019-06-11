@@ -32,7 +32,7 @@ logger.state.isEnabled = true;
 const {APIClient} = require('@wireapp/api-client');
 const path = require('path');
 const {FileEngine} = require('@wireapp/store-engine-fs');
-const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/');
+const {WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
 
 const login = {
@@ -66,7 +66,7 @@ apiClient
     return apiClient.connect();
   })
   .then(webSocketClient => {
-    webSocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
+    webSocketClient.on(WebSocketTopic.ON_MESSAGE, notification => {
       logger.log('Received notification via WebSocket', notification);
     });
   })

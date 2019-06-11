@@ -40,13 +40,13 @@ export class AccessTokenStore extends EventEmitter {
   public accessToken: AccessTokenData | undefined;
 
   public async delete(): Promise<void> {
-    this.logger.log('Deleting access token');
+    this.logger.log('Deleting local access token');
     this.accessToken = undefined;
   }
 
   public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
-      this.logger.log('Updating access token');
+      this.logger.log('Updating local access token');
       this.accessToken = accessToken;
       this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessToken);
     }

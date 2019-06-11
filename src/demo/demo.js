@@ -26,7 +26,7 @@ import {APIClient} from '@wireapp/api-client';
 import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
-import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
+import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp/';
 import logdown from 'logdown';
 
 const logger = logdown('@wireapp/api-client/demo/demo.js');
@@ -125,7 +125,7 @@ window.onload = function() {
     urls: BACKEND_ENV,
   };
   const client = new APIClient(config);
-  client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
+  client.transport.ws.on(WebSocketTopic.ON_MESSAGE, notification => {
     logger.log('Received notification via WebSocket', notification);
   });
   client.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, accessToken => {
