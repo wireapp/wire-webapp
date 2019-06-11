@@ -12,7 +12,7 @@ This package provides an interface to operate with various storage technologies 
 
 Additional storage engines can be found in separate packages such as:
 
-- [FileEngine][1]
+- [FileEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs)
 
 ### Motivation
 
@@ -24,7 +24,7 @@ Nowadays there are more and more storage possibilities and developers must be fa
 
 | Engine | Available in Browser | Available in Node.js | Description |
 | :-- | :-: | :-: | :-- |
-| [FileEngine][1] | 🞫 | ✓ | Rudimentary persistent store based on files. Very generic and easy to read. |
+| [FileEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs) | 🞫 | ✓ | Rudimentary persistent store based on files. Very generic and easy to read. |
 | FileSystemEngine | ✓ | 🞫 | FileSystem is used to represent a file system which is managed by modern browsers. It is often used to build Chrome Web Store apps. |  |
 | IndexedDBEngine | ✓ | 🞫 | Persistent storage which handles significant amounts of structured data, including files/blobs. Enables very fast searches. |
 | MemoryEngine | ✓ | ✓ | Transient store which loses data on application restart. Suitable for testing environments. |
@@ -138,5 +138,3 @@ engine.update(TABLE_NAME, PRIMARY_KEY, {brother: 'Bart Simpson'}).then((primaryK
   console.log(`The brother of "${updatedRecord.name}" is "${updatedRecord.brother}".`):
 })
 ```
-
-[1]: https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs

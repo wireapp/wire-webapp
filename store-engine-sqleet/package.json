@@ -1,29 +1,29 @@
 {
   "dependencies": {
-    "@babel/core": "7.4.4",
+    "@babel/core": "7.4.5",
     "@babel/plugin-proposal-class-properties": "7.4.4",
     "@babel/plugin-proposal-object-rest-spread": "7.4.4",
     "@babel/preset-typescript": "7.3.3",
-    "@types/node": "~10",
     "@types/sql.js": "1.0.1",
-    "@wireapp/store-engine": "2.1.2",
+    "@wireapp/store-engine": "3.0.6",
     "sql.js": "https://github.com/pwnsdx/sqleet.js#a078babcad5e6beda01370466328e47b3c4a2de7",
     "uint32": "0.2.1"
   },
   "devDependencies": {
-    "@types/jasmine": "3.3.12",
-    "@types/karma": "3.0.2",
+    "@types/jasmine": "3.3.13",
+    "@types/karma": "3.0.3",
+    "@types/node": "~10",
     "@types/uint32": "0.2.0",
-    "babel-loader": "8.0.5",
-    "bazinga64": "5.4.2",
+    "babel-loader": "8.0.6",
+    "bazinga64": "5.4.8",
     "jasmine": "3.4.0",
     "karma": "4.1.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "2.0.1",
-    "karma-typescript": "4.0.0",
+    "karma-typescript": "4.1.0",
     "rimraf": "2.6.3",
     "ts-node": "8.1.0",
-    "typescript": "3.4.5"
+    "typescript": "3.5.1"
   },
   "description": "",
   "files": [
@@ -34,7 +34,8 @@
   "name": "@wireapp/store-engine-sqleet",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn build:node",
+    "build:node": "tsc",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build",
     "test": "karma start",
