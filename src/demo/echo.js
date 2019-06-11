@@ -20,6 +20,7 @@ logger.state.isEnabled = true;
 const {Account} = require('@wireapp/core');
 const {PayloadBundleType} = require('@wireapp/core/dist/conversation/');
 const {APIClient} = require('@wireapp/api-client');
+const {WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/');
 const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientType');
 const {ConnectionStatus} = require('@wireapp/api-client/dist/commonjs/connection/');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/');
@@ -152,6 +153,10 @@ const messageIdCache = {};
     }
     return newLinkPreviews;
   };
+
+  apiClient.transport.ws.on(WebSocketTopic.ON_OFFLINE, () => logger.info('API Client is offline'));
+
+  apiClient.transport.ws.on(WebSocketTopic.ON_RECONNECT, () => logger.info('API Client is reconnected'));
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {

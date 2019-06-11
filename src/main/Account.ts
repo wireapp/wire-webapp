@@ -33,7 +33,7 @@ import {
   UserEvent,
 } from '@wireapp/api-client/dist/commonjs/event/';
 import {StatusCode} from '@wireapp/api-client/dist/commonjs/http/';
-import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
+import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {error as StoreEngineError} from '@wireapp/store-engine';
@@ -240,14 +240,14 @@ export class Account extends EventEmitter {
     }
     return Promise.resolve()
       .then(() => {
-        this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+        this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
 
         if (notificationHandler) {
-          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
-            notificationHandler(notification)
-          );
+          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, (notification: IncomingNotification) => {
+            notificationHandler(notification);
+          });
         } else {
-          this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, this.handleNotification.bind(this));
+          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, this.handleNotification.bind(this));
         }
         return this.apiClient.connect();
       })
