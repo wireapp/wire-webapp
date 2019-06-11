@@ -1593,10 +1593,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/protocol-messaging@1.24.0":
-  version "1.24.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.0.tgz#b1e00251e52f2cf2ecd34da02d50f30285fce64c"
-  integrity sha512-AJV/34m526Z8ktC3HfaZm9vFG/9ma/IPUo2hzyeeQ7lyRJx3vDx2N5pXohSH7fSWbtr+L5gvtIgyKs1vN6IxBQ==
+"@wireapp/protocol-messaging@1.24.1":
+  version "1.24.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.1.tgz#e29da795869515143e558357afc4df6bdd6fe0a0"
+  integrity sha512-BrZtB2Nij9vnwyox8mTP9EPfqWWnTq+CNElz7Yne+ZmVLvnekY7RAh9ad4DMMqDdKwOYIoyBJhxpB0/FlEiK4g==
   dependencies:
     protobufjs "6.8.8"
 
