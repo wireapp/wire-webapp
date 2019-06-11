@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"TextArea" renders 1`] = `
+.emotion-0 {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 16px 16px;
+  resize: none;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+<textarea
+  className="textarea emotion-0"
+>
+  TextArea
+</textarea>
+`;
+
+exports[`"TextArea" renders as disabled 1`] = `
+.emotion-0 {
+  background: rgb(240,240,240);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 16px 16px;
+  resize: none;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+<textarea
+  className="textarea emotion-0"
+  disabled={true}
+>
+  TextArea
+</textarea>
+`;
+
+exports[`"TextArea" renders as invalid 1`] = `
+.emotion-0 {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #fb0807;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 16px 16px;
+  resize: none;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+<textarea
+  className="textarea emotion-0"
+>
+  TextArea
+</textarea>
+`;
+
+exports[`"TextArea" renders with placeholderTextTransform 1`] = `
+.emotion-0 {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 16px 16px;
+  resize: none;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: lowercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: lowercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: lowercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+<textarea
+  className="textarea emotion-0"
+  placeholder="TextArea"
+>
+  TextArea
+</textarea>
+`;

@@ -1,0 +1,400 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Button" renders 1`] = `
+.emotion-0 {
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: #2391d3;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-0:hover,
+.emotion-0:focus {
+  background-color: rgb(33,136,198);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<button
+  className="emotion-0"
+>
+  Submit
+</button>
+`;
+
+exports[`"Button" renders as block 1`] = `
+.emotion-0 {
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: #2391d3;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: 100%;
+}
+
+.emotion-0:hover,
+.emotion-0:focus {
+  background-color: rgb(33,136,198);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<button
+  className="emotion-0"
+>
+  Submit
+</button>
+`;
+
+exports[`"Button" renders in loading state 1`] = `
+@keyframes animation-0 {
+  0% {
+    stroke-dashoffset: 251.36;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes animation-1 {
+  0% {
+    -webkit-transform: rotate(0);
+    -ms-transform: rotate(0);
+    transform: rotate(0);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.emotion-1 {
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: #2391d3;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-1:hover,
+.emotion-1:focus {
+  background-color: rgb(33,136,198);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.emotion-0 {
+  -webkit-animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
+  animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
+  stroke-dasharray: 125.68;
+  -webkit-transform-origin: 50% 50%;
+  -ms-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+}
+
+<button
+  className="emotion-1"
+>
+  <svg
+    fill="none"
+    height={30}
+    strokeWidth="3"
+    style={
+      Object {
+        "display": "flex",
+        "margin": "auto",
+      }
+    }
+    viewBox="0 0 43 43"
+    width={30}
+  >
+    <circle
+      cx="21.5"
+      cy="21.5"
+      r="20"
+      stroke="rgba(255, 255, 255, 0.07999999999999996)"
+    />
+    <circle
+      className="emotion-0"
+      cx="21.5"
+      cy="21.5"
+      r="20"
+      stroke="#fff"
+      strokeDasharray={125.68}
+      strokeLinecap="round"
+    />
+  </svg>
+</button>
+`;
+
+exports[`"Button" renders when disabled 1`] = `
+.emotion-0 {
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: rgba(127,136,142,0.16000000000000003);
+  border: 0;
+  border-radius: 8px;
+  cursor: default;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-0:hover,
+.emotion-0:focus {
+  background-color: rgba(127,136,142,0.16000000000000003);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<button
+  className="emotion-0"
+  disabled={true}
+>
+  Submit
+</button>
+`;
+
+exports[`"ButtonLink" renders 1`] = `
+.emotion-0 {
+  color: #fff;
+  display: -webkit-inline-box !important;
+  display: -webkit-inline-flex !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: #2391d3;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-0:hover,
+.emotion-0:focus {
+  background-color: rgb(33,136,198);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<a
+  className="emotion-0"
+>
+  Submit
+</a>
+`;
+
+exports[`"ButtonLink" renders in loading state 1`] = `
+@keyframes animation-0 {
+  0% {
+    stroke-dashoffset: 251.36;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes animation-1 {
+  0% {
+    -webkit-transform: rotate(0);
+    -ms-transform: rotate(0);
+    transform: rotate(0);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.emotion-0 {
+  -webkit-animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
+  animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
+  stroke-dasharray: 125.68;
+  -webkit-transform-origin: 50% 50%;
+  -ms-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: -webkit-inline-box !important;
+  display: -webkit-inline-flex !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background-color: #2391d3;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-1:hover,
+.emotion-1:focus {
+  background-color: rgb(33,136,198);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<a
+  className="emotion-1"
+>
+  <svg
+    fill="none"
+    height={30}
+    strokeWidth="3"
+    style={
+      Object {
+        "display": "flex",
+        "margin": "auto",
+      }
+    }
+    viewBox="0 0 43 43"
+    width={30}
+  >
+    <circle
+      cx="21.5"
+      cy="21.5"
+      r="20"
+      stroke="rgba(255, 255, 255, 0.07999999999999996)"
+    />
+    <circle
+      className="emotion-0"
+      cx="21.5"
+      cy="21.5"
+      r="20"
+      stroke="#fff"
+      strokeDasharray={125.68}
+      strokeLinecap="round"
+    />
+  </svg>
+</a>
+`;

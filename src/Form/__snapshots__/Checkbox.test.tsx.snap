@@ -1,0 +1,445 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Checkbox" renders 1`] = `
+.emotion-2 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+}
+
+.emotion-0 {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+.emotion-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  opacity: 1;
+}
+
+input:checked + .emotion-1::before {
+  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+}
+
+input:focus + .emotion-1::before {
+  border-color: #2391d3;
+}
+
+.emotion-1::before {
+  border: 2px solid rgba(0,0,0,0.4);
+  border-radius: 4px;
+  box-sizing: border-box;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  margin: 0 8px 0 -16px;
+  opacity: 1;
+  width: 16px;
+}
+
+a.emotion-1 a,
+.emotion-1 a {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+a.emotion-1 a:hover,
+.emotion-1 a:hover {
+  color: rgb(44,47,50);
+}
+
+a.emotion-1 a:visited,
+.emotion-1 a:visited,
+a.emotion-1 a:link,
+.emotion-1 a:link,
+a.emotion-1 a:active,
+.emotion-1 a:active {
+  color: rgb(52,56,59);
+}
+
+<div
+  className="emotion-2"
+>
+  <input
+    className="input emotion-0"
+    id="1"
+    style={
+      Object {
+        "height": "16px",
+        "marginBottom": "0",
+        "opacity": 0,
+        "width": "16px",
+      }
+    }
+    type="checkbox"
+  />
+  <label
+    className="emotion-1"
+    htmlFor="1"
+  >
+    Check
+  </label>
+</div>
+`;
+
+exports[`"Checkbox" renders as invalid 1`] = `
+.emotion-2 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+}
+
+.emotion-0 {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px #fb0807;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  opacity: 1;
+}
+
+input:checked + .emotion-1::before {
+  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+}
+
+input:focus + .emotion-1::before {
+  border-color: #2391d3;
+}
+
+.emotion-1::before {
+  border: 2px solid #fb0807;
+  border-radius: 4px;
+  box-sizing: border-box;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  margin: 0 8px 0 -16px;
+  opacity: 1;
+  width: 16px;
+}
+
+a.emotion-1 a,
+.emotion-1 a {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+a.emotion-1 a:hover,
+.emotion-1 a:hover {
+  color: rgb(44,47,50);
+}
+
+a.emotion-1 a:visited,
+.emotion-1 a:visited,
+a.emotion-1 a:link,
+.emotion-1 a:link,
+a.emotion-1 a:active,
+.emotion-1 a:active {
+  color: rgb(52,56,59);
+}
+
+<div
+  className="emotion-2"
+>
+  <input
+    className="input emotion-0"
+    id="1"
+    style={
+      Object {
+        "height": "16px",
+        "marginBottom": "0",
+        "opacity": 0,
+        "width": "16px",
+      }
+    }
+    type="checkbox"
+  />
+  <label
+    className="emotion-1"
+    htmlFor="1"
+    markInvalid={true}
+  >
+    Check
+  </label>
+</div>
+`;
+
+exports[`"Checkbox" renders disabled 1`] = `
+.emotion-2 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+}
+
+.emotion-0 {
+  background: rgb(240,240,240);
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  caret-color: #2391d3;
+  color: rgb(52,56,59);
+  font-weight: 300;
+  height: 56px;
+  line-height: 24px;
+  margin: 0 0 16px;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-0::-moz-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-0::-ms-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgb(141,152,159);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.emotion-0:invalid {
+  box-shadow: none;
+}
+
+.emotion-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  opacity: 0.56;
+}
+
+input:checked + .emotion-1::before {
+  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+}
+
+input:focus + .emotion-1::before {
+  border-color: #2391d3;
+}
+
+.emotion-1::before {
+  border: 2px solid rgba(0,0,0,0.4);
+  border-radius: 4px;
+  box-sizing: border-box;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  margin: 0 8px 0 -16px;
+  opacity: 0.56;
+  width: 16px;
+}
+
+a.emotion-1 a,
+.emotion-1 a {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+a.emotion-1 a:hover,
+.emotion-1 a:hover {
+  color: rgb(44,47,50);
+}
+
+a.emotion-1 a:visited,
+.emotion-1 a:visited,
+a.emotion-1 a:link,
+.emotion-1 a:link,
+a.emotion-1 a:active,
+.emotion-1 a:active {
+  color: rgb(52,56,59);
+}
+
+<div
+  className="emotion-2"
+>
+  <input
+    className="input emotion-0"
+    disabled={true}
+    id="1"
+    style={
+      Object {
+        "height": "16px",
+        "marginBottom": "0",
+        "opacity": 0,
+        "width": "16px",
+      }
+    }
+    type="checkbox"
+  />
+  <label
+    className="emotion-1"
+    disabled={true}
+    htmlFor="1"
+  >
+    Check
+  </label>
+</div>
+`;
+
+exports[`"CheckboxLabel" renders 1`] = `
+.emotion-0 {
+  color: rgb(52,56,59);
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  color: rgb(141,152,159);
+  display: inline;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.emotion-0 a {
+  color: rgb(52,56,59);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<span
+  className="emotion-0"
+>
+  Label
+</span>
+`;

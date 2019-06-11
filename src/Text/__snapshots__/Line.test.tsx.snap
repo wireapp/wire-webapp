@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Line" renders 1`] = `
+.emotion-0 {
+  border: none;
+  border-bottom: 1px solid rgb(236,240,242);
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+<hr
+  className="emotion-0"
+>
+  Line
+</hr>
+`;
+
+exports[`"Line" renders with color 1`] = `
+.emotion-0 {
+  border: none;
+  border-bottom: 1px solid #fb0807;
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+<hr
+  className="emotion-0"
+  color="#fb0807"
+>
+  Line
+</hr>
+`;
