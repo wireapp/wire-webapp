@@ -135,6 +135,13 @@ class User {
     this.isOnLegalHold = ko.pureComputed(() => {
       return this.devices().some(client_et => client_et.isLegalHold());
     });
+    
+    const _hasPendingLegalHold = ko.observable(false);
+    this.hasPendingLegalHold = ko.pureComputed({
+      read: () => this.is_me && !this.isOnLegalHold() && hasPendingLegalHold(),
+      write: value => hasPendingLegalHold(value),
+      owner: this,
+    });
 
     this.availability = ko.observable(AvailabilityType.NONE);
 
