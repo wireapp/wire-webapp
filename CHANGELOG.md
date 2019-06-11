@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.2.0...@wireapp/core@12.3.0) (2019-06-11)
+
+
+### Features
+
+* **api-client:** Detect WebSocket connection changes ([#1910](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1910)) ([f9e661f](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f9e661f))
+
+
+
+
+
 # [12.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.1.3...@wireapp/core@12.2.0) (2019-06-07)
 
 
