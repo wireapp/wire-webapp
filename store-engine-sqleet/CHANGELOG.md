@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.1.2...@wireapp/store-engine-sqleet@0.1.3) (2019-06-11)
+
+
+### Bug Fixes
+
+* **store-engine-sqleet,store-engine-fs:** Streamline dependencies ([#1924](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/1924)) ([93f3a73](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/93f3a73))
+
+
+
+
+
 ## [0.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.1.1...@wireapp/store-engine-sqleet@0.1.2) (2019-06-11)
 
 
