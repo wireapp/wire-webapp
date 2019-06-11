@@ -33,10 +33,7 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    files: [
-      {included: true, nocache: true, pattern: 'dist/lib/dynamic/**/*.js', served: true},
-      'dist/cryptobox.test.bundle.js',
-    ],
+    files: ['dist/cryptobox.test.bundle.js'],
     frameworks: ['jasmine'],
     port: 9876,
     preprocessors: {

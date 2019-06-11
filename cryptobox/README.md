@@ -21,10 +21,6 @@ yarn add @wireapp/cryptobox
 
 ### Usage
 
-#### Browser
-
-- [demo.html](./src/demo/demo.html)
-
 #### Node.js
 
 - [demo.js](./src/demo/demo.js)

@@ -19,12 +19,12 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
-const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
+const cryptobox = require('@wireapp/cryptobox');
+const Proteus = require('@wireapp/proteus');
 const {MemoryEngine} = require('@wireapp/store-engine');
+const sodium = require('libsodium-wrappers-sumo');
 
 describe('cryptobox.Cryptobox', () => {
-  let sodium = undefined;
   let engine = undefined;
 
   async function createCryptobox(storeName, amountOfPreKeys = 1) {
@@ -32,18 +32,6 @@ describe('cryptobox.Cryptobox', () => {
     await memoryEngine.init(storeName);
     return new cryptobox.Cryptobox(memoryEngine, amountOfPreKeys);
   }
-
-  beforeAll(async done => {
-    if (typeof window === 'object') {
-      sodium = window.sodium;
-      done();
-    } else {
-      const _sodium = require('libsodium-wrappers-sumo');
-      await _sodium.ready;
-      sodium = _sodium;
-      done();
-    }
-  });
 
   beforeEach(async done => {
     engine = new MemoryEngine();

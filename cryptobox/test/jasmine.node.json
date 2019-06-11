@@ -2,6 +2,6 @@
   "helpers": [],
   "random": true,
   "spec_dir": "test",
-  "spec_files": ["**/*Spec.common.js", "**/*Spec.node.js"],
+  "spec_files": ["**/*test.common.js", "**/*test.node.js"],
   "stopSpecOnExpectationFailure": false
 }

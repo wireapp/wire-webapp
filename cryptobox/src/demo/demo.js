@@ -1,4 +1,4 @@
-const cryptobox = require('../../');
+const cryptobox = require('@wireapp/cryptobox');
 const {MemoryEngine} = require('@wireapp/store-engine');
 const logdown = require('logdown');
 
@@ -14,8 +14,7 @@ logger.log(`Testing Cryptobox v${cryptobox.Cryptobox.VERSION}`);
     const engine = new MemoryEngine();
     await engine.init('cache');
 
-    const store = new cryptobox.store.CryptoboxCRUDStore(engine);
-    const box = new cryptobox.Cryptobox(store, MIN_AMOUNT_PREKEYS);
+    const box = new cryptobox.Cryptobox(engine, MIN_AMOUNT_PREKEYS);
 
     await box.create();
 

@@ -18,5 +18,5 @@
  */
 
 // traverse all test files for webpack dependency resolution
-const testsContext = require.context('./', true, /test\.browser\.js$/);
+const testsContext = require.context('./', true, /test\.(browser|common)\.js$/);
 testsContext.keys().forEach(testsContext);

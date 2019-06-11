@@ -20,25 +20,13 @@
 /* eslint-disable no-magic-numbers */
 
 const {error: StoreEngineError, MemoryEngine} = require('@wireapp/store-engine');
-const cryptobox = typeof window === 'object' ? window.cryptobox : require('@wireapp/cryptobox');
-const Proteus = typeof window === 'object' ? window.Proteus : require('@wireapp/proteus');
-let sodium = undefined;
+const cryptobox = require('@wireapp/cryptobox');
+const Proteus = require('@wireapp/proteus');
+const sodium = require('libsodium-wrappers-sumo');
 
 describe('cryptobox.CryptoboxSession', () => {
   let alice = undefined;
   let bob = undefined;
-
-  beforeAll(async done => {
-    if (typeof window === 'object') {
-      sodium = window.sodium;
-      done();
-    } else {
-      const _sodium = require('libsodium-wrappers-sumo');
-      await _sodium.ready;
-      sodium = _sodium;
-      done();
-    }
-  });
 
   async function setupAliceToBob(amountOfBobsPreKeys, bobPreKeyId) {
     const aliceEngine = new MemoryEngine();

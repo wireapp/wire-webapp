@@ -1,7 +1,0 @@
-{
-  "dynamic": {
-    "dexie@copy": ["dexie/dist/dexie.js"],
-    "libsodium.js@copy": ["libsodium.js/dist/browsers-sumo/sodium.js"],
-    "logdown@copy": ["logdown/dist/logdown.js"]
-  }
-}
