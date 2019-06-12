@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.2.3...@wireapp/api-client@5.2.4) (2019-06-12)
+
+
+### Bug Fixes
+
+* **api-client:** Payment exports ([#1930](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1930)) ([b9abc3c](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b9abc3c))
+
+
+
+
+
 ## [5.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.2.2...@wireapp/api-client@5.2.3) (2019-06-11)
 
 
