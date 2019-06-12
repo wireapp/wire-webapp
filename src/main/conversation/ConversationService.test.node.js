@@ -74,7 +74,7 @@ describe('ConversationService', () => {
       expect(shouldSendAsExternal).toBe(true);
     });
 
-    it('returns false for a small payload', async done => {
+    it('returns false for a small payload', async () => {
       const {conversation} = account.service;
       const preKeyBundles = generatePreKeyBundle(2, 1);
 
@@ -83,8 +83,6 @@ describe('ConversationService', () => {
 
       const shouldSendAsExternal = conversation.shouldSendAsExternal(plainText, preKeyBundles);
       expect(shouldSendAsExternal).toBe(false);
-
-      done();
     });
 
     it('adds missing prekeys', async () => {
