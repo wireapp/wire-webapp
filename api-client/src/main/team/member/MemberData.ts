@@ -17,12 +17,13 @@
  *
  */
 
+import {LegalHoldMemberStatus} from '../legalhold';
 import {PermissionsData} from './PermissionsData';
 
 export interface MemberData {
   created_at?: Date;
   created_by?: string;
-  legal_hold?: boolean;
+  legalhold_status?: LegalHoldMemberStatus;
   permissions: PermissionsData;
   user: string;
 }
