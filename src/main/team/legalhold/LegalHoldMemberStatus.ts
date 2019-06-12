@@ -17,8 +17,22 @@
  *
  */
 
+import {PreKey} from '../../auth/';
+
 export enum LegalHoldMemberStatus {
   DISABLED = 'disabled',
   ENABLED = 'enabled',
   PENDING = 'pending',
 }
+
+export interface LegalHoldEnabledMemberData {
+  client_id: string;
+  last_prekey: PreKey;
+  status: LegalHoldMemberStatus.ENABLED | LegalHoldMemberStatus.PENDING;
+}
+
+export interface LegalHoldDisabledMemberData {
+  status: LegalHoldMemberStatus.DISABLED;
+}
+
+export type LegalHoldMemberData = LegalHoldEnabledMemberData | LegalHoldDisabledMemberData;
