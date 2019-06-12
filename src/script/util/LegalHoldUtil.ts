@@ -55,7 +55,10 @@ export const showRequestModal = async (fingerprint?: string) => {
   amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
     preventClose: true,
     primaryAction: {
-      action: (password: string) => {},
+      action: async (password: string) => {
+        const selfUser = userRepository.self();
+        await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
+      },
       text: 'Accept',
     },
     secondaryAction: {

@@ -57,6 +57,16 @@ export class TeamService {
     });
   }
 
+  sendLegalHoldApproval(teamId, userId, password) {
+    return this.backendClient.sendRequest({
+      data: {
+        password,
+      },
+      type: 'PUT',
+      url: `${TeamService.URL.TEAMS}/${teamId}/legalhold/${userId}/approve`,
+    });
+  }
+
   getTeamMembers(teamId) {
     return this.backendClient.sendRequest({
       type: 'GET',
