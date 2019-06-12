@@ -18,6 +18,7 @@
  */
 
 import {AudioPreference} from '../audio/';
+import {PreKey} from '../auth/';
 import {RegisteredClient} from '../client/';
 import {Connection} from '../connection/';
 import {NotificationPreference} from '../notification/';
@@ -27,6 +28,7 @@ import {BackendEvent} from './BackendEvent';
 export enum USER_EVENT {
   ACTIVATE = 'user.activate',
   CLIENT_ADD = 'user.client-add',
+  CLIENT_LEGAL_HOLD_REQUEST = 'user.client-legal-hold-request',
   CLIENT_REMOVE = 'user.client-remove',
   CONNECTION = 'user.connection',
   DELETE = 'user.delete',
@@ -46,6 +48,14 @@ export interface UserActivateEvent extends UserEvent {
 export interface UserClientAddEvent extends UserEvent {
   client: RegisteredClient;
   type: USER_EVENT.CLIENT_ADD;
+}
+
+export interface UserClientLegalHoldRequest extends UserEvent {
+  client_id: string;
+  last_prekey: PreKey;
+  requester: string;
+  target_user: string;
+  type: USER_EVENT.CLIENT_LEGAL_HOLD_REQUEST;
 }
 
 export interface UserClientRemoveEvent extends UserEvent {
