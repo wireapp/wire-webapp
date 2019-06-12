@@ -78,8 +78,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 
-import {PROPERTY_STATE} from '../calling/enum/PropertyState';
-
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -1981,33 +1979,16 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when the confirmation was sent
    */
   sendCallingMessage(eventInfoEntity, conversationId, callMessageEntity) {
-    return this.messageSender
-      .queueMessage(() => {
-        const options = eventInfoEntity.options;
-        const recipientsPromise = options.recipients
-          ? Promise.resolve(eventInfoEntity)
-          : this.create_recipients(conversationId, false).then(recipients => {
-              eventInfoEntity.updateOptions({recipients});
-              return eventInfoEntity;
-            });
-
-        return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
-      })
-      .then(() => {
-        /* FIXME
-        const initiatingCallMessage = [CALL_MESSAGE_TYPE.GROUP_START, CALL_MESSAGE_TYPE.SETUP];
-
-        const isCallInitiation = initiatingCallMessage.includes(callMessageEntity.type);
-        if (isCallInitiation) {
-          return this._trackContributed(conversationEntity, eventInfoEntity.genericMessage, callMessageEntity);
-        }
-        */
-      })
-      .catch(error => {
-        if (!this._isUserCancellationError(error)) {
-          throw error;
-        }
-      });
+    return this.messageSender.queueMessage(() => {
+      const options = eventInfoEntity.options;
+      const recipientsPromise = options.recipients
+        ? Promise.resolve(eventInfoEntity)
+        : this.create_recipients(conversationId, false).then(recipients => {
+            eventInfoEntity.updateOptions({recipients});
+            return eventInfoEntity;
+          });
+      return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
+    });
   }
 
   /**
@@ -4104,13 +4085,6 @@ export class ConversationRepository {
         if (protoAsset.original) {
           actionType = protoAsset.original.image ? 'photo' : 'file';
         }
-        break;
-      }
-
-      case 'calling': {
-        const properties = callMessageEntity.properties;
-        const isVideoCall = properties.videosend === PROPERTY_STATE.TRUE;
-        actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;
       }
 
