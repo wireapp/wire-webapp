@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.3.0...@wireapp/api-client@5.3.1) (2019-06-12)
+
+
+### Bug Fixes
+
+* **api-client:** Remove redundant emitter ([#1932](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1932)) ([7c02287](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7c02287))
+
+
+
+
+
 # [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.2.5...@wireapp/api-client@5.3.0) (2019-06-12)
 
 
