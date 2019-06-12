@@ -45,7 +45,7 @@ describe('HttpClient', () => {
       await client._sendRequest({});
     });
 
-    it('does not retry on 403 forbidden error', async done => {
+    it('does not retry on 403 forbidden error', async () => {
       const mockedAccessTokenStore = {
         accessToken: {
           access_token:
@@ -77,10 +77,9 @@ describe('HttpClient', () => {
 
       try {
         await client._sendRequest({});
-        done.fail();
+        fail();
       } catch (error) {
         expect(error.message).toBe(errorMessage);
-        done();
       }
     });
   });

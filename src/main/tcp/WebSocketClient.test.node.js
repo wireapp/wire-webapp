@@ -74,42 +74,34 @@ describe('WebSocketClient', () => {
       }
     });
 
-    it('connects to a WebSocket.', done => {
+    it('connects to a WebSocket.', async done => {
       const message = 'Hello, World!';
       const client = new WebSocketClient(WEBSOCKET_URL, fakeHttpClient);
       spyOn(client, 'sendPing').and.returnValue();
 
-      client
-        .connect()
-        .then(webSocketClient => {
-          expect(webSocketClient).toBeDefined();
+      const webSocketClient = await client.connect();
+      expect(webSocketClient).toBeDefined();
 
-          webSocketClient.on(WebSocketTopic.ON_MESSAGE, data => {
-            expect(data.fromServer).toBe(`Echo: ${message}`);
-            done();
-          });
+      webSocketClient.on(WebSocketTopic.ON_MESSAGE, data => {
+        expect(data.fromServer).toBe(`Echo: ${message}`);
+        done();
+      });
 
-          webSocketClient.socket.addEventListener('open', () => webSocketClient.socket.send(message));
-        })
-        .catch(done.fail);
+      webSocketClient.socket.addEventListener('open', () => webSocketClient.socket.send(message));
     });
 
     it(
       'automatically reconnects with a WebSocket.',
-      done => {
+      async done => {
         const client = new WebSocketClient(WEBSOCKET_URL, fakeHttpClient);
         spyOn(client, 'sendPing').and.returnValue();
 
-        client
-          .connect()
-          .then(webSocketClient => {
-            expect(webSocketClient).toBeDefined();
-            // "open" listener which will be triggered on WebSocket reconnect which is expected after a WebSocket server restart
-            webSocketClient.socket.addEventListener('open', done);
-            // Restart WebSocket server
-            server.close(() => startEchoServer());
-          })
-          .catch(done.fail);
+        const webSocketClient = await client.connect();
+        expect(webSocketClient).toBeDefined();
+        // "open" listener which will be triggered on WebSocket reconnect which is expected after a WebSocket server restart
+        webSocketClient.socket.addEventListener('open', done);
+        // Restart WebSocket server
+        server.close(() => startEchoServer());
       },
       WebSocketClient.RECONNECTING_OPTIONS.maxReconnectionDelay
     );
