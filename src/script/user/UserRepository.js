@@ -26,7 +26,7 @@ import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
+import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {UNSPLASH_URL} from '../externalRoute';
@@ -47,9 +47,9 @@ import {EventName} from '../tracking/EventName';
 import {SuperProperty} from '../tracking/SuperProperty';
 
 import {createSuggestions} from './UserHandleGenerator';
-import {valueFromType, protoFromType} from './AvailabilityMapper';
+import {protoFromType, valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {showRequestModal, getFingerprint} from 'Util/LegalHoldUtil';
+import {showRequestModal} from 'Util/LegalHoldUtil';
 
 export class UserRepository {
   static get CONFIG() {
@@ -374,13 +374,23 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  onLegalHoldRequest(eventJson) {
-    if (this.self().id !== eventJson.target_user) {
+  async onLegalHoldRequest(eventJson) {
+    const self = this.self();
+
+    if (this.self.id !== eventJson.target_user) {
       return;
     }
-    const self = this.self();
+
     self.hasPendingLegalHold(true);
-    const fingerprint = getFingerprint();
+
+    const {client_id, last_prekey, target_user} = eventJson;
+
+    const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
+      target_user,
+      client_id,
+      last_prekey
+    );
+
     showRequestModal(fingerprint);
   }
 

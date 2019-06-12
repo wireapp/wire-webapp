@@ -549,7 +549,10 @@ class App {
     await this._checkUserInformation(userEntity);
 
     initLegalHold(this.repository.user, this.repository.team);
-    showRequestModal();
+
+    const {client_id} = await this.repository.team.teamService.getLegalHoldState(userEntity.teamId, userEntity.id);
+    const fingerprint = await this.repository.cryptography.getRemoteFingerprint(userEntity.id, client_id);
+    showRequestModal(fingerprint);
 
     return userEntity;
   }
