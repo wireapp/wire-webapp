@@ -17,11 +17,4 @@
  *
  */
 
-export interface CollectorOptions {
-  /** Add devDependencies */
-  devDependencies?: boolean;
-  /** Which dependencies to filter */
-  filter?: string[];
-  /** Which repositories to check */
-  repositories: string[];
-}
+export * from './LicenseCollector';

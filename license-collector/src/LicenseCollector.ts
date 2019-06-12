@@ -18,18 +18,16 @@
  */
 
 import {exec} from 'child_process';
-import * as crypto from 'crypto';
-import * as os from 'os';
-import * as path from 'path';
+import crypto from 'crypto';
+import os from 'os';
+import path from 'path';
 import {promisify} from 'util';
 
-import * as fs from 'fs-extra';
-import * as logdown from 'logdown';
+import fs from 'fs-extra';
+import logdown from 'logdown';
+import pkginfo from 'npm-registry-package-info';
 
-import pkginfo = require('npm-registry-package-info');
 const execAsync = promisify(exec);
-
-import {CollectorOptions} from './CollectorOptions';
 
 interface CrawlerResult {
   data: {
@@ -63,6 +61,15 @@ const defaultOptions: Required<CollectorOptions> = {
   filter: [],
   repositories: [],
 };
+
+export interface CollectorOptions {
+  /** Add devDependencies */
+  devDependencies?: boolean;
+  /** Which dependencies to filter */
+  filter?: string[];
+  /** Which repositories to check */
+  repositories: string[];
+}
 
 export class LicenseCollector {
   private readonly options: Required<CollectorOptions>;
