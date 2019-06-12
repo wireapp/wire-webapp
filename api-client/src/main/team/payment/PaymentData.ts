@@ -20,7 +20,7 @@
 import {InvoiceData, PaymentPlan} from './';
 import {PaymentPlanID} from './PaymentPlan';
 
-enum PaymentStatus {
+export enum PaymentStatus {
   ACTIVE = 'active',
   CANCELED = 'canceled',
   PAST_DUE = 'past_due',
@@ -28,7 +28,7 @@ enum PaymentStatus {
   UNPAID = 'unpaid',
 }
 
-interface PaymentCardData {
+export interface PaymentCardData {
   brand: string;
   country: string;
   digits: string;
@@ -38,7 +38,7 @@ interface PaymentCardData {
   zip: string;
 }
 
-interface PaymentSuspension {
+export interface PaymentSuspension {
   created: number;
   graceEnding: number;
   invoice: string;
