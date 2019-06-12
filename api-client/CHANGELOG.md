@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.3.1...@wireapp/api-client@5.4.0) (2019-06-12)
+
+
+### Features
+
+* **api-client:** Add legal hold member data ([#1933](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1933)) ([23d5d81](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/23d5d81))
+
+
+
+
+
 ## [5.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.3.0...@wireapp/api-client@5.3.1) (2019-06-12)
 
 
