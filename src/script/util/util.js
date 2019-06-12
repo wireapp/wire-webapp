@@ -291,8 +291,7 @@ const markdownit = new MarkdownIt('zero', {
   breaks: true,
   html: false,
   langPrefix: 'lang-',
-  linkify: true,
-}).enable(['backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
+}).enable(['autolink', 'link', 'backticks', 'code', 'emphasis', 'fence', 'newline']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
@@ -315,6 +314,33 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   return '<br>'.repeat(count);
 };
 markdownit.renderer.rules.paragraph_close = () => '';
+
+// https://github.com/markdown-it/markdown-it/issues/458#issuecomment-401221267
+function fixMarkdownLinks(markdown) {
+  const matches = markdownit.linkify.match(markdown);
+  if (!matches || matches.length === 0) {
+    return markdown;
+  }
+  const result = [];
+  let prevEndIndex = 0;
+  for (const match of matches) {
+    const noStartBracket = match.index === 0 || markdown[match.index - 1] !== '<';
+    const noEndBracket = match.lastIndex === markdown.length || markdown[match.lastIndex] !== '>';
+    const shouldInsertBrackets = noStartBracket && noEndBracket;
+
+    result.push(markdown.slice(prevEndIndex, match.index));
+    if (shouldInsertBrackets) {
+      result.push('<');
+    }
+    result.push(match.raw);
+    if (shouldInsertBrackets) {
+      result.push('>');
+    }
+    prevEndIndex = match.lastIndex;
+  }
+  result.push(markdown.slice(prevEndIndex));
+  return result.join('');
+}
 
 export const renderMessage = (message, selfId, mentionEntities = []) => {
   const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
@@ -388,7 +414,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
     }
-    if (!isWireDeepLink && link.markup !== 'linkify') {
+    if (!isWireDeepLink && link.markup !== 'autolink') {
       const title = link.attrGet('title');
       if (title) {
         link.attrSet('title', cleanString(title));
@@ -409,8 +435,8 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
     return self.renderToken(tokens, idx, options);
   };
 
+  mentionlessText = fixMarkdownLinks(mentionlessText);
   mentionlessText = markdownit.render(mentionlessText);
-
   // Remove <br> and \n if it is the last thing in a message
   mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
