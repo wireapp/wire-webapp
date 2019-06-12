@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.2.5...@wireapp/api-client@5.3.0) (2019-06-12)
+
+
+### Features
+
+* **api-client:** Add legal hold request event ([#1931](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1931)) ([1abc965](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/1abc965))
+
+
+
+
+
 ## [5.2.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.2.4...@wireapp/api-client@5.2.5) (2019-06-12)
 
 **Note:** Version bump only for package @wireapp/api-client
