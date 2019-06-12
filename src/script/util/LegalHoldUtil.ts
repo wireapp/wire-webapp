@@ -23,6 +23,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {t} from './LocalizerUtil';
 import {noop} from './util';
 
 let userRepository: UserRepository;
@@ -60,20 +61,19 @@ export const showRequestModal = async (fingerprint?: string) => {
         await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
         // TODO: check response and show error message if needed
       },
-      text: 'Accept',
+      text: t('legalHoldModalPrimaryAction'),
     },
     secondaryAction: {
       action: noop,
-      text: 'Not now',
+      text: t('legalHoldModalSecondaryAction'),
     },
     text: {
-      htmlMessage: `
-      All future messages will be recorded by the device with fingerprint:<br>
-      3f  8b  00  d0  64  28  05  4f 54 23 98 56  3d  7h  11  14  0f  7m 33 5n 1h  77  6g  7g  33  42  9h  8w 7s 1e<br>
-      This includes deleted, edited, and timed messages in all conversations.<br>
-      Enter your password to confirm.
-      `,
-      title: 'Legal hold requested',
+      htmlMessage: t(
+        'legalHoldModalText',
+        {},
+        {br: '<br>', fingerprint: `<span data-uie-name="status-modal-fingerprint">${fingerprint}</span>`}
+      ),
+      title: t('legalHoldModalTitle'),
     },
   });
 };
