@@ -6,34 +6,36 @@
     <div class="modal__header" data-uie-name="status-modal-title">
       <div class="modal__header__title" data-bind="text: content().titleText"></div>
     </div>
-    <div class="modal__text" data-uie-name="status-modal-text">
-      <!-- ko if: content().messageHtml -->
-        <div data-bind="html: content().messageHtml"></div>
-      <!-- /ko -->
-      <!-- ko if: content().messageText -->
-        <div data-bind="text: content().messageText"></div>
-      <!-- /ko -->
-    </div>
-    <!-- ko if: hasInput() -->
-      <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}"/>
-    <!-- /ko -->
-    <!-- ko if: hasOption() -->
-      <div class="modal-option">
-        <div class="checkbox accent-text">
-          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-bind="checked: optionChecked" data-uie-name="modal-option-checkbox" />
-          <label class="label-xs" for="clear-data-checkbox">
-            <span class="modal-option-text text-background" data-bind="text: content().checkboxLabel"></span>
-          </label>
-        </div>
+    <div class="modal__body"></div>
+      <div class="modal__text" data-uie-name="status-modal-text">
+        <!-- ko if: content().messageHtml -->
+          <div data-bind="html: content().messageHtml"></div>
+        <!-- /ko -->
+        <!-- ko if: content().messageText -->
+          <div data-bind="text: content().messageText"></div>
+        <!-- /ko -->
       </div>
-    <!-- /ko -->
-    <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
-      <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
-        <div data-bind="text: secondary.text, click: () => doAction(secondary.action), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
+      <!-- ko if: hasInput() -->
+        <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}"/>
       <!-- /ko -->
-      <!-- ko if: content().primaryAction.text -->
-        <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+      <!-- ko if: hasOption() -->
+        <div class="modal-option">
+          <div class="checkbox accent-text">
+            <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-bind="checked: optionChecked" data-uie-name="modal-option-checkbox" />
+            <label class="label-xs" for="clear-data-checkbox">
+              <span class="modal-option-text text-background" data-bind="text: content().checkboxLabel"></span>
+            </label>
+          </div>
+        </div>
       <!-- /ko -->
+      <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
+        <!-- ko foreach: {data: content().secondaryAction, as: 'secondary', noChildContext: true} -->
+          <div data-bind="text: secondary.text, click: () => doAction(secondary.action), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
+        <!-- /ko -->
+        <!-- ko if: content().primaryAction.text -->
+          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+        <!-- /ko -->
+      </div>
     </div>
   </modal>
 </div>
