@@ -27,7 +27,7 @@ interface DomainEntity {
 }
 
 export const readAllSpec = {
-  'returns multiple database records.': (done: DoneFn, engine: CRUDEngine) => {
+  'returns multiple database records.': async (engine: CRUDEngine) => {
     const homer = {
       entity: {
         firstName: 'Homer',
@@ -52,16 +52,12 @@ export const readAllSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    Promise.all([
+    await Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
       engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ])
-      .then(() => engine.readAll<DomainEntity>(TABLE_NAME))
-      .then(records => {
-        expect(records.length).toBe(3);
-        done();
-      })
-      .catch(error => done.fail(error));
+    ]);
+    const records = await engine.readAll<DomainEntity>(TABLE_NAME);
+    expect(records.length).toBe(3);
   },
 };

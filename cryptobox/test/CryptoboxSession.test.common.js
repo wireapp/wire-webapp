@@ -50,48 +50,32 @@ describe('cryptobox.CryptoboxSession', () => {
   }
 
   describe('"fingerprints"', () => {
-    it('returns the local & remote fingerpint', done => {
-      setupAliceToBob(1, Proteus.keys.PreKey.MAX_PREKEY_ID)
-        .then(sessionWithBob => {
-          expect(sessionWithBob.fingerprint_local()).toBe(alice.identity.public_key.fingerprint());
-          expect(sessionWithBob.fingerprint_remote()).toBe(bob.identity.public_key.fingerprint());
-          done();
-        })
-        .catch(done.fail);
+    it('returns the local & remote fingerpint', async () => {
+      const sessionWithBob = await setupAliceToBob(1, Proteus.keys.PreKey.MAX_PREKEY_ID);
+      expect(sessionWithBob.fingerprint_local()).toBe(alice.identity.public_key.fingerprint());
+      expect(sessionWithBob.fingerprint_remote()).toBe(bob.identity.public_key.fingerprint());
     });
   });
 
   describe('"encryption & decryption"', () => {
     const plaintext = 'Hello Bob, I am Alice.';
 
-    it('encrypts a message from Alice which can be decrypted by Bob', done => {
-      setupAliceToBob(2, 0)
-        .then(sessionWithBob => sessionWithBob.encrypt(plaintext))
-        .then(serialisedCipherText => {
-          return bob.session_from_message('session-with-alice', serialisedCipherText);
-        })
-        .then(proteusSession => {
-          const decryptedBuffer = proteusSession[1];
-          const decrypted = sodium.to_string(decryptedBuffer);
-          expect(decrypted).toBe(plaintext);
-          done();
-        })
-        .catch(done.fail);
+    it('encrypts a message from Alice which can be decrypted by Bob', async () => {
+      const sessionWithBob = await setupAliceToBob(2, 0);
+      const serialisedCipherText = await sessionWithBob.encrypt(plaintext);
+      const proteusSession = await bob.session_from_message('session-with-alice', serialisedCipherText);
+      const decryptedBuffer = proteusSession[1];
+      const decrypted = sodium.to_string(decryptedBuffer);
+      expect(decrypted).toBe(plaintext);
     });
 
-    it("doesn't remove the last resort PreKey if consumed", done => {
-      setupAliceToBob(1, Proteus.keys.PreKey.MAX_PREKEY_ID)
-        .then(sessionWithBob => sessionWithBob.encrypt(plaintext))
-        .then(serialisedCipherText => {
-          return bob.session_from_message('session-with-alice', serialisedCipherText);
-        })
-        .then(proteusSession => {
-          const decryptedBuffer = proteusSession[1];
-          const decrypted = sodium.to_string(decryptedBuffer);
-          expect(decrypted).toBe(plaintext);
-          done();
-        })
-        .catch(done.fail);
+    it("doesn't remove the last resort PreKey if consumed", async () => {
+      const sessionWithBob = await setupAliceToBob(1, Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const serialisedCipherText = await sessionWithBob.encrypt(plaintext);
+      const proteusSession = await bob.session_from_message('session-with-alice', serialisedCipherText);
+      const decryptedBuffer = proteusSession[1];
+      const decrypted = sodium.to_string(decryptedBuffer);
+      expect(decrypted).toBe(plaintext);
     });
 
     it('always accepts a PreKey message even if there is already an existing session', async () => {
@@ -102,10 +86,12 @@ describe('cryptobox.CryptoboxSession', () => {
       let decryptedBuffer = await bob.decrypt(sessionIdFromBob, serialisedCipherText);
       let decryptedString = sodium.to_string(decryptedBuffer);
       expect(decryptedString).toBe(plaintext);
+
       // Alice deletes the session with Bob and creates a new one with another PreKey from Bob
       const sessionIdFromAlice = sessionWithBob.id;
       const message = 'Hello Bob. Nice to see you!';
       await alice.session_delete(sessionIdFromAlice);
+
       const bobBundle = await bob.get_prekey_bundle(1);
       serialisedCipherText = await alice.encrypt(sessionIdFromAlice, message, bobBundle.serialise());
       decryptedBuffer = await bob.decrypt(sessionIdFromBob, serialisedCipherText);
@@ -115,7 +101,7 @@ describe('cryptobox.CryptoboxSession', () => {
   });
 
   describe('"Session reset"', () => {
-    it('throws an error when a session is broken', async done => {
+    it('throws an error when a session is broken', async () => {
       const aliceEngine = new MemoryEngine();
       await aliceEngine.init('store-alice');
 
@@ -142,12 +128,11 @@ describe('cryptobox.CryptoboxSession', () => {
 
       try {
         await alice.encrypt('alice-to-bob', `I'm back!`);
+        fail();
       } catch (error) {
         expect(error).toEqual(jasmine.any(StoreEngineError.RecordNotFoundError));
         expect(error.code).toBe(2);
       }
-
-      done();
     });
   });
 });

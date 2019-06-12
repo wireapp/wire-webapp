@@ -20,7 +20,7 @@
 const Proteus = require('@wireapp/proteus');
 
 describe('Public Key', () => {
-  it('rejects shared secrets at the point of infinity', async done => {
+  it('rejects shared secrets at the point of infinity', async () => {
     try {
       const emptyCurve = new Uint8Array([1].concat(Array.from({length: 30})));
       const alice_keypair = await Proteus.keys.KeyPair.new();
@@ -35,10 +35,9 @@ describe('Public Key', () => {
 
       alice_keypair.secret_key.shared_secret(bob_keypair.public_key);
 
-      done.fail();
+      fail();
     } catch (error) {
       expect(error instanceof TypeError).toBe(true);
-      done();
     }
   });
 });

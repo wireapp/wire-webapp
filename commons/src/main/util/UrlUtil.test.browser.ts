@@ -27,33 +27,30 @@ describe('pathWithParams', () => {
 
 describe('UrlUtil', () => {
   describe('pathWithParams', () => {
-    it('keeps URL if no additional params are given', done => {
+    it('keeps URL if no additional params are given', () => {
       const path = '/resource/';
       const expected = path;
       const actual = UrlUtil.pathWithParams(path);
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('constructs path with queries from plain path', done => {
+    it('constructs path with queries from plain path', () => {
       const path = '/resource/';
       const expected = `${path}?q1=1`;
       const actual = UrlUtil.pathWithParams(path, {q1: 1});
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('constructs path with queries from a path with queries', done => {
+    it('constructs path with queries from a path with queries', () => {
       const path = '/resource/';
       const Q1 = 'q1=1';
       const Q2 = 'q2=2';
       const expected = `${path}?${Q1}&${Q2}`;
       const actual = UrlUtil.pathWithParams(path, {q2: 2}, undefined, `?${Q1}`);
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('filters non-whitelisted queries', done => {
+    it('filters non-whitelisted queries', () => {
       const Q1 = 'q1=1';
       const Q2 = 'q2=2';
       const path = `/resource/`;
@@ -62,39 +59,34 @@ describe('UrlUtil', () => {
 
       const expected = `${path}?${Q2}`;
       expect(actual).toEqual(expected);
-      done();
     });
   });
 
   describe('getURLParameter', () => {
-    it('returns empty string if parameter does not exist', done => {
+    it('returns empty string if parameter does not exist', () => {
       const expected = '';
       const actual = UrlUtil.getURLParameter('q');
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('returns parameter value if parameter exist', done => {
+    it('returns parameter value if parameter exist', () => {
       const expected = '1';
       const actual = UrlUtil.getURLParameter('q', '?q=1');
       expect(actual).toEqual(expected);
-      done();
     });
   });
 
   describe('hasURLParameter', () => {
-    it('returns false if parameter does not exist', done => {
+    it('returns false if parameter does not exist', () => {
       const expected = false;
       const actual = UrlUtil.hasURLParameter('q');
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('returns true if parameter exist', done => {
+    it('returns true if parameter exist', () => {
       const expected = true;
       const actual = UrlUtil.hasURLParameter('q', '?q=1');
       expect(actual).toEqual(expected);
-      done();
     });
   });
 });

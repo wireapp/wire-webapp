@@ -60,19 +60,15 @@ describe('Account', () => {
 
       const account = new Account(apiClient);
 
-      try {
-        await account.init();
-        spyOn(account.service.client, 'register').and.callThrough();
-        account.service.client.synchronizeClients = () => Promise.resolve();
-        account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
-        account.apiClient.context = {};
-        account.apiClient.client.api.postClient = () => Promise.resolve({id: context.clientId});
-        await apiClient.initEngine(context);
-        storeName = engine.storeName;
-        await account.initClient(context);
-      } catch (error) {
-        return fail(error);
-      }
+      await account.init();
+      spyOn(account.service.client, 'register').and.callThrough();
+      account.service.client.synchronizeClients = () => Promise.resolve();
+      account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
+      account.apiClient.context = {};
+      account.apiClient.client.api.postClient = () => Promise.resolve({id: context.clientId});
+      await apiClient.initEngine(context);
+      storeName = engine.storeName;
+      await account.initClient(context);
 
       expect(account.service.client.register).toHaveBeenCalledTimes(1);
     });
@@ -89,17 +85,13 @@ describe('Account', () => {
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient);
 
-      try {
-        await account.init();
-        spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
-        spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
-        spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
-        account.apiClient.createContext('userId', 'clientType', 'clientId');
+      await account.init();
+      spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
+      spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
+      spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
+      account.apiClient.createContext('userId', 'clientType', 'clientId');
 
-        await account.loadAndValidateLocalClient();
-      } catch (error) {
-        return fail(error);
-      }
+      await account.loadAndValidateLocalClient();
 
       expect(account.apiClient.context.clientId).toBe(clientId);
       expect(account.service.conversation.clientID).toBe(clientId);
@@ -117,17 +109,13 @@ describe('Account', () => {
       const clientId = new UUID(UUIDVersion).toString();
       const account = new Account(apiClient);
 
-      try {
-        await account.init();
-        spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
-        spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
-        spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());
-        account.apiClient.createContext('userId', 'clientType', 'clientId');
+      await account.init();
+      spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
+      spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
+      spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());
+      account.apiClient.createContext('userId', 'clientType', 'clientId');
 
-        await account.registerClient();
-      } catch (error) {
-        return fail(error);
-      }
+      await account.registerClient();
 
       expect(account.apiClient.context.clientId).toBe(clientId);
       expect(account.service.conversation.clientID).toBe(clientId);

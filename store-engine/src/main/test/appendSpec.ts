@@ -22,7 +22,7 @@ import {CRUDEngine} from '../engine';
 const TABLE_NAME = 'the-simpsons';
 
 export const appendSpec = {
-  'appends text to an existing record.': async (done: DoneFn, engine: CRUDEngine) => {
+  'appends text to an existing record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const text = 'Hello';
@@ -31,7 +31,5 @@ export const appendSpec = {
     await engine.append(TABLE_NAME, primaryKey, textExtension);
     const record = await engine.read(TABLE_NAME, primaryKey);
     expect(record).toBe(`${text}${textExtension}`);
-
-    done();
   },
 };

@@ -22,7 +22,7 @@ import {CRUDEngine} from '../engine';
 const TABLE_NAME = 'the-simpsons';
 
 export const deleteSpec = {
-  'deletes a record.': (done: DoneFn, engine: CRUDEngine) => {
+  'deletes a record.': async (engine: CRUDEngine) => {
     const homer = {
       entity: {
         firstName: 'Homer',
@@ -49,35 +49,26 @@ export const deleteSpec = {
 
     const expectedRemainingEntities = 2;
 
-    Promise.all([
+    await Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
       engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ])
-      .then(() => engine.delete(TABLE_NAME, lisa.primaryKey))
-      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
-      .then(primaryKeys => {
-        expect(primaryKeys.length).toBe(expectedRemainingEntities);
-        expect(primaryKeys.includes(homer.primaryKey));
-        expect(primaryKeys.includes(marge.primaryKey));
-        done();
-      })
-      .catch(error => done.fail(error));
+    ]);
+    await engine.delete(TABLE_NAME, lisa.primaryKey);
+    const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
+    expect(primaryKeys.length).toBe(expectedRemainingEntities);
+    expect(primaryKeys.includes(homer.primaryKey));
+    expect(primaryKeys.includes(marge.primaryKey));
   },
-  'returns the primary key of a deleted record.': (done: DoneFn, engine: CRUDEngine) => {
+  'returns the primary key of a deleted record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
       some: 'value',
     };
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(primaryKey => engine.delete(TABLE_NAME, primaryKey))
-      .then(primaryKey => {
-        expect(primaryKey).toBe(PRIMARY_KEY);
-        done();
-      })
-      .catch(error => done.fail(error));
+    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    const deletedKey = await engine.delete(TABLE_NAME, primaryKey);
+    expect(deletedKey).toBe(PRIMARY_KEY);
   },
 };

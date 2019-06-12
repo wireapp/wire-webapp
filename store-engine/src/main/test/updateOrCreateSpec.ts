@@ -26,7 +26,7 @@ interface DomainEntity {
 }
 
 export const updateOrCreateSpec = {
-  'creates a record if it does not exist in the database.': (done: DoneFn, engine: CRUDEngine) => {
+  'creates a record if it does not exist in the database.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
@@ -35,17 +35,12 @@ export const updateOrCreateSpec = {
 
     const expectedAmountOfProperties = 1;
 
-    engine
-      .updateOrCreate(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(primaryKey => engine.read<DomainEntity>(TABLE_NAME, primaryKey))
-      .then(updatedRecord => {
-        expect(updatedRecord.name).toBe(entity.name);
-        expect(Object.keys(updatedRecord).length).toBe(expectedAmountOfProperties);
-        done();
-      })
-      .catch(done.fail);
+    const primaryKey = await engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, entity);
+    const updatedRecord = await engine.read<DomainEntity>(TABLE_NAME, primaryKey);
+    expect(updatedRecord.name).toBe(entity.name);
+    expect(Object.keys(updatedRecord).length).toBe(expectedAmountOfProperties);
   },
-  'updates an existing database record.': (done: DoneFn, engine: CRUDEngine) => {
+  'updates an existing database record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
@@ -56,14 +51,9 @@ export const updateOrCreateSpec = {
       name: 'Old monitor2',
     };
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, update))
-      .then(primaryKey => engine.read<DomainEntity>(TABLE_NAME, primaryKey))
-      .then(updatedRecord => {
-        expect(updatedRecord.name).toBe(update.name);
-        done();
-      })
-      .catch(done.fail);
+    await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    const primaryKey = await engine.updateOrCreate(TABLE_NAME, PRIMARY_KEY, update);
+    const updatedRecord = await engine.read<DomainEntity>(TABLE_NAME, primaryKey);
+    expect(updatedRecord.name).toBe(update.name);
   },
 };

@@ -32,7 +32,7 @@ interface DomainEntity {
 }
 
 export const updateSpec = {
-  'fails if the record does not exist.': async (done: DoneFn, engine: CRUDEngine) => {
+  'fails if the record does not exist.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const updates = {
@@ -45,12 +45,12 @@ export const updateSpec = {
 
     try {
       await engine.update(TABLE_NAME, PRIMARY_KEY, updates);
+      fail();
     } catch (error) {
       expect(error).toEqual(jasmine.any(RecordNotFoundError));
-      done();
     }
   },
-  'updates an existing database record.': (done: DoneFn, engine: CRUDEngine) => {
+  'updates an existing database record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
@@ -67,18 +67,13 @@ export const updateSpec = {
 
     const expectedAmountOfProperties = 2;
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
-      .then(primaryKey => engine.read<DomainEntity>(TABLE_NAME, primaryKey))
-      .then(updatedRecord => {
-        expect(updatedRecord.name).toBe(entity.name);
-        expect(updatedRecord.age).toBe(updates.age);
-        expect(Object.keys(updatedRecord.size).length).toBe(expectedAmountOfProperties);
-        expect(updatedRecord.size.height).toBe(updates.size.height);
-        expect(updatedRecord.size.width).toBe(updates.size.width);
-        done();
-      })
-      .catch(done.fail);
+    await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    const primaryKey = await engine.update(TABLE_NAME, PRIMARY_KEY, updates);
+    const updatedRecord = await engine.read<DomainEntity>(TABLE_NAME, primaryKey);
+    expect(updatedRecord.name).toBe(entity.name);
+    expect(updatedRecord.age).toBe(updates.age);
+    expect(Object.keys(updatedRecord.size).length).toBe(expectedAmountOfProperties);
+    expect(updatedRecord.size.height).toBe(updates.size.height);
+    expect(updatedRecord.size.width).toBe(updates.size.width);
   },
 };

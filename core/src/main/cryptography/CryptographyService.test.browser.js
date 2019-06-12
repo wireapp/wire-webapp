@@ -36,16 +36,12 @@ describe('CryptographyService', () => {
   let aliceLastResortPreKey;
   let bob;
 
-  beforeEach(async done => {
+  beforeEach(async () => {
     cryptography = new CryptographyService(undefined, await createEngine('wire'), undefined);
-    cryptography.cryptobox
-      .create()
-      .then(async preKeys => {
-        aliceLastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID)[0];
-        bob = new Cryptobox(await createEngine('wire'));
-        return bob.create();
-      })
-      .then(done);
+    const preKeys = await cryptography.cryptobox.create();
+    aliceLastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID)[0];
+    bob = new Cryptobox(await createEngine('wire'));
+    return bob.create();
   });
 
   describe('"constructor"', () => {
@@ -66,7 +62,7 @@ describe('CryptographyService', () => {
   });
 
   describe('"decrypt"', () => {
-    it('decrypts a Base64-encoded cipher message.', async done => {
+    it('decrypts a Base64-encoded cipher message.', async () => {
       const alicePublicKey = cryptography.cryptobox.identity.public_key;
       const publicPreKeyBundle = Proteus.keys.PreKeyBundle.new(alicePublicKey, aliceLastResortPreKey);
       const text = 'Hello Alice!';
@@ -79,7 +75,6 @@ describe('CryptographyService', () => {
       const decryptResult = await cryptography.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
       const plaintext = Buffer.from(decryptResult.value).toString('utf8');
       expect(plaintext).toBe(text);
-      done();
     });
   });
 
@@ -95,7 +90,7 @@ describe('CryptographyService', () => {
   });
 
   describe('"encrypt"', () => {
-    it('generates a set of encrypted data based on PreKeys from multiple clients.', done => {
+    it('generates a set of encrypted data based on PreKeys from multiple clients.', async () => {
       const firstUserID = 'bc0c99f1-49a5-4ad2-889a-62885af37088';
       const secondUserID = '2bde49aa-bdb5-458f-98cf-7d3552b10916';
 
@@ -134,18 +129,16 @@ describe('CryptographyService', () => {
       };
 
       const text = new Uint8Array([72, 101, 108, 108, 111, 33]); // "Hello!"
-      cryptography.encrypt(text, preKeyBundleMap).then(otrBundle => {
-        expect(Object.keys(otrBundle).length).toBe(2);
-        expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
-        expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
-        expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(String));
-        done();
-      });
+      const otrBundle = await cryptography.encrypt(text, preKeyBundleMap);
+      expect(Object.keys(otrBundle).length).toBe(2);
+      expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
+      expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
+      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(String));
     });
   });
 
   describe('"encryptAsset"', () => {
-    it('encrypts and decrypts ArrayBuffer', async done => {
+    it('encrypts and decrypts ArrayBuffer', async () => {
       const bytes = new Uint8Array(16);
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
@@ -154,10 +147,9 @@ describe('CryptographyService', () => {
       const decryptedBuffer = await decryptAsset(encryptedAsset);
 
       expect(decryptedBuffer).toEqual(byteBuffer);
-      done();
     });
 
-    it('does not decrypt when the hash is missing', async done => {
+    it('does not decrypt when the hash is missing', async () => {
       const bytes = new Uint8Array(16);
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
@@ -166,13 +158,11 @@ describe('CryptographyService', () => {
 
       try {
         await decryptAsset(cipherText, keyBytes, null);
-        done.fail();
-      } catch (error) {
-        done();
-      }
+        fail();
+      } catch (error) {}
     });
 
-    it('does not decrypt when hash is an empty array', async done => {
+    it('does not decrypt when hash is an empty array', async () => {
       const bytes = new Uint8Array(16);
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
@@ -181,39 +171,37 @@ describe('CryptographyService', () => {
 
       try {
         await decryptAsset(cipherText, keyBytes, new Uint8Array([]));
-        done.fail();
-      } catch (error) {
-        done();
-      }
+        fail();
+      } catch (error) {}
     });
   });
 
   describe('"encryptPayloadForSession"', () => {
-    it('encodes plaintext.', done => {
+    it('encodes plaintext.', async () => {
       const sessionWithBobId = 'bob-user-id@bob-client-id';
       const text = new Uint8Array([72, 101, 108, 108, 111, 32, 66, 111, 98, 33]); // "Hello Bob!"
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      cryptography
-        .encryptPayloadForSession(sessionWithBobId, text, encodedPreKey)
-        .then(({sessionId, encryptedPayload}) => {
-          expect(encryptedPayload).not.toBe('💣');
-          expect(sessionId).toBe(sessionWithBobId);
-          done();
-        });
+      const {sessionId, encryptedPayload} = await cryptography.encryptPayloadForSession(
+        sessionWithBobId,
+        text,
+        encodedPreKey
+      );
+      expect(encryptedPayload).not.toBe('💣');
+      expect(sessionId).toBe(sessionWithBobId);
     });
 
-    it('encodes invalid text as Bomb Emoji.', done => {
+    it('encodes invalid text as Bomb Emoji.', async () => {
       const sessionWithBobId = 'bob-user-id@bob-client-id';
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      cryptography
-        .encryptPayloadForSession(sessionWithBobId, undefined, encodedPreKey)
-        .then(({sessionId, encryptedPayload}) => {
-          expect(encryptedPayload).toBe('💣');
-          expect(sessionId).toBe(sessionWithBobId);
-          done();
-        });
+      const {sessionId, encryptedPayload} = await cryptography.encryptPayloadForSession(
+        sessionWithBobId,
+        undefined,
+        encodedPreKey
+      );
+      expect(encryptedPayload).toBe('💣');
+      expect(sessionId).toBe(sessionWithBobId);
     });
   });
 });

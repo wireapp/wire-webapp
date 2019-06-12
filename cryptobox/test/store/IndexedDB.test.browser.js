@@ -28,10 +28,9 @@ const {IndexedDBEngine} = require('@wireapp/store-engine');
 describe('cryptobox.store.IndexedDB', () => {
   let dexieInstances = [];
 
-  afterEach(async done => {
+  afterEach(async () => {
     await Promise.all(dexieInstances.map(db => deleteDatabase(db)));
     dexieInstances = [];
-    done();
   });
 
   async function deleteDatabase(db) {
@@ -63,7 +62,7 @@ describe('cryptobox.store.IndexedDB', () => {
   }
 
   describe('"create_session"', () => {
-    it('saves a session with meta data', async done => {
+    it('saves a session with meta data', async () => {
       const store = await createStore();
 
       const alice = await Proteus.keys.IdentityKeyPair.new();
@@ -82,13 +81,11 @@ describe('cryptobox.store.IndexedDB', () => {
 
       const loadedSession = await store.read_session(alice, sessionId);
       expect(loadedSession.session_tag.tag).toEqual(proteusSession.session_tag.tag);
-
-      done();
     });
   });
 
   describe('"update_session"', () => {
-    it('updates an already persisted session', async done => {
+    it('updates an already persisted session', async () => {
       const store = await createStore();
 
       const aliceIdentity = await Proteus.keys.IdentityKeyPair.new();
@@ -110,13 +107,11 @@ describe('cryptobox.store.IndexedDB', () => {
       expect(proteusSession.local_identity.public_key.fingerprint()).toBe(aliceIdentity.public_key.fingerprint());
       expect(proteusSession.remote_identity.public_key.fingerprint()).toBe(bobIdentity.public_key.fingerprint());
       expect(proteusSession.version).toBe(2);
-
-      done();
     });
   });
 
   describe('"session_from_prekey"', () => {
-    it('saves and caches a valid session from a serialized PreKey bundle', async done => {
+    it('saves and caches a valid session from a serialized PreKey bundle', async () => {
       const store = await createStore();
 
       const alice = new Cryptobox(store.engine, 1);
@@ -137,11 +132,9 @@ describe('cryptobox.store.IndexedDB', () => {
 
       cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
       expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
-
-      done();
     });
 
-    it('reinforces a session from the indexedDB without cache', async done => {
+    it('reinforces a session from the indexedDB without cache', async () => {
       const store = await createStore();
 
       const alice = new Cryptobox(store.engine, 1);
@@ -161,13 +154,11 @@ describe('cryptobox.store.IndexedDB', () => {
 
       cryptoboxSession = await alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
       expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
-
-      done();
     });
   });
 
   describe('"refill_prekeys"', () => {
-    it('publishes refilled PreKeys when a Cryptobox is loaded', async done => {
+    it('publishes refilled PreKeys when a Cryptobox is loaded', async () => {
       const aliceStore = await createStore();
       const alice = new Cryptobox(aliceStore.engine, 2);
 
@@ -178,11 +169,9 @@ describe('cryptobox.store.IndexedDB', () => {
       await alice.load();
 
       expect(alice.publish_prekeys).toHaveBeenCalledTimes(1);
-
-      done();
     });
 
-    it(`doesn't publish refilled PreKeys when a Cryptobox is created`, async done => {
+    it(`doesn't publish refilled PreKeys when a Cryptobox is created`, async () => {
       const store = await createStore();
       const box = new Cryptobox(store.engine, 2);
 
@@ -190,11 +179,9 @@ describe('cryptobox.store.IndexedDB', () => {
       await box.create();
 
       expect(box.publish_prekeys).toHaveBeenCalledTimes(0);
-
-      done();
     });
 
-    it('refills PreKeys after a successful decryption', async done => {
+    it('refills PreKeys after a successful decryption', async () => {
       const aliceStore = await createStore();
       const alice = new Cryptobox(aliceStore.engine, 10);
 
@@ -236,8 +223,6 @@ describe('cryptobox.store.IndexedDB', () => {
 
       expect((await bob.store.load_prekeys()).length).toBe(7);
       expect((await bob.store.load_prekeys()).map(pk => pk.key_id)).toEqual([0, 1, 2, 4, 5, 6, 65535]);
-
-      done();
     });
   });
 });

@@ -22,7 +22,7 @@ import {Context} from '@wireapp/api-client/dist/commonjs/auth/Context';
 
 describe('Client', () => {
   describe('"connect"', () => {
-    it('processes WebSocket messages when executed in a web browser.', done => {
+    it('processes WebSocket messages when executed in a web browser.', async () => {
       const apiClient = new APIClient(APIClient.BACKEND.STAGING);
       const accessTokenData = {
         access_token:
@@ -35,14 +35,13 @@ describe('Client', () => {
       const message = new MessageEvent('message', {data: dataBuffer});
       apiClient.context = new Context('userId', undefined);
       apiClient.accessTokenStore.accessToken = accessTokenData;
+
       const promise = apiClient.connect();
       apiClient.transport.ws.socket.onopen(message);
-      promise
-        .then(socket => {
-          expect(socket).toBeDefined();
-          apiClient.transport.ws.socket.onmessage(message);
-        })
-        .then(done);
+      const socket = await promise;
+
+      expect(socket).toBeDefined();
+      apiClient.transport.ws.socket.onmessage(message);
     });
   });
 });

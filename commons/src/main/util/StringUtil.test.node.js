@@ -21,20 +21,18 @@ const {StringUtil} = require('@wireapp/commons');
 
 describe('StringUtil', () => {
   describe('"capitalize"', () => {
-    it('does not lowercase other characters', done => {
+    it('does not lowercase other characters', () => {
       const test = 'aBCD';
       const expected = 'ABCD';
       const actual = StringUtil.capitalize(test);
       expect(actual).toEqual(expected);
-      done();
     });
 
-    it('capitalizes first letter', done => {
+    it('capitalizes first letter', () => {
       const test = 'abcd';
       const expected = 'Abcd';
       const actual = StringUtil.capitalize(test);
       expect(actual).toEqual(expected);
-      done();
     });
   });
 });

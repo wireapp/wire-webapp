@@ -330,17 +330,11 @@ describe('Mac Key', () => {
     expect(mac_key.verify(signature, msg)).toBe(true);
   });
 
-  it('verifies calculated data', async done => {
-    try {
-      const mac_key = new Proteus.derived.MacKey(new Uint8Array(32).fill(1));
-      const msg = sodium.from_string('This is my great message in Proteus!');
-      const signature = mac_key.sign(msg);
+  it('verifies calculated data', async () => {
+    const mac_key = new Proteus.derived.MacKey(new Uint8Array(32).fill(1));
+    const msg = sodium.from_string('This is my great message in Proteus!');
+    const signature = mac_key.sign(msg);
 
-      expect(mac_key.verify(signature, msg)).toBe(true);
-
-      done();
-    } catch (err) {
-      done.fail(err);
-    }
+    expect(mac_key.verify(signature, msg)).toBe(true);
   });
 });

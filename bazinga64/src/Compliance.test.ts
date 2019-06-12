@@ -22,10 +22,9 @@ import * as bazinga64 from './index';
 
 let sodium: typeof _sodium;
 
-beforeAll(async done => {
+beforeAll(async () => {
   await _sodium.ready;
   sodium = _sodium;
-  done();
 });
 
 describe('decode Base64', () => {

@@ -29,12 +29,12 @@ describe('store.TransientStore', () => {
   let engine: CRUDEngine;
   let store: TransientStore;
 
-  beforeEach(async done => {
+  beforeEach(async () => {
     engine = new LocalStorageEngine();
     await engine.init(STORE_NAME);
+
     store = new TransientStore(engine);
     await store.init(TABLE_NAME);
-    done();
   });
 
   afterEach(() => {
@@ -48,35 +48,25 @@ describe('store.TransientStore', () => {
     const primaryKey = 'access-tokens';
     const ttl = 1000;
 
-    it("saves a record together with it's expiration date.", done => {
-      store
-        .set(primaryKey, entity, ttl)
-        .then(bundle => {
-          expect(bundle.expires).toEqual(jasmine.any(Number));
-          done();
-        })
-        .catch(error => done.fail(error));
+    it("saves a record together with it's expiration date.", async () => {
+      const bundle = await store.set(primaryKey, entity, ttl);
+      expect(bundle.expires).toEqual(jasmine.any(Number));
     });
 
-    it("saves a record together with it's timeoutID.", done => {
-      store
-        .set(primaryKey, entity, ttl)
-        .then(bundle => {
-          expect(bundle.timeoutID).toBeDefined();
-          done();
-        })
-        .catch(error => done.fail(error));
+    it("saves a record together with it's timeoutID.", async () => {
+      const bundle = await store.set(primaryKey, entity, ttl);
+      expect(bundle.timeoutID).toBeDefined();
     });
 
-    it("doesn't overwrite an existing record.", done => {
-      store
-        .set(primaryKey, entity, ttl)
-        .then(() => store.set(primaryKey, {access_token: 'ABC'}, ttl))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
-          expect(error.code).toBe(1);
-          done();
-        });
+    it("doesn't overwrite an existing record.", async () => {
+      try {
+        await store.set(primaryKey, entity, ttl);
+        await store.set(primaryKey, {access_token: 'ABC'}, ttl);
+        fail();
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
+        expect(error.code).toBe(1);
+      }
     });
   });
 
@@ -86,61 +76,42 @@ describe('store.TransientStore', () => {
     };
     const ttl = 900;
 
-    it("returns a saved record together with it's expiration.", done => {
+    it("returns a saved record together with it's expiration.", async () => {
       const primaryKey = 'access-tokens';
 
-      store
-        .set(primaryKey, entity, ttl)
-        .then(() => {
-          store
-            .get(primaryKey)
-            .then(bundle => {
-              if (bundle) {
-                expect(bundle.payload).toEqual(entity);
-              } else {
-                done.fail();
-              }
-            })
-            .then(done)
-            .catch(error => done.fail(error));
-        })
-        .catch(error => done.fail(error));
+      await store.set(primaryKey, entity, ttl);
+      const bundle = await store.get(primaryKey);
+
+      if (bundle) {
+        expect(bundle.payload).toEqual(entity);
+      } else {
+        fail();
+      }
     });
 
-    it('returns a saved record with an "@" in it\'s primary key.', done => {
+    it('returns a saved record with an "@" in it\'s primary key.', async () => {
       const primaryKey = '@access@tokens';
 
-      store
-        .set(primaryKey, entity, ttl)
-        .then(() => {
-          store
-            .get(primaryKey)
-            .then(bundle => {
-              if (bundle) {
-                expect(bundle.payload).toEqual(entity);
-              } else {
-                done.fail();
-              }
-            })
-            .then(done)
-            .catch(error => done.fail(error));
-        })
-        .catch(error => done.fail(error));
+      await store.set(primaryKey, entity, ttl);
+      const bundle = await store.get(primaryKey);
+
+      if (bundle) {
+        expect(bundle.payload).toEqual(entity);
+      } else {
+        fail();
+      }
     });
 
-    it('returns a non-existent record as "undefined".', done => {
+    it('returns a non-existent record as "undefined".', async () => {
       const primaryKey = 'not-existing';
 
-      store
-        .get(primaryKey)
-        .then(bundle => expect(bundle).toBeUndefined())
-        .then(done)
-        .catch(error => done.fail(error));
+      const bundle = await store.get(primaryKey);
+      expect(bundle).toBeUndefined();
     });
   });
 
   describe('init', () => {
-    it('initially reads data from persistent storage.', done => {
+    it('initially reads data from persistent storage.', async () => {
       const timeLapse = 2;
 
       const items = [
@@ -162,13 +133,8 @@ describe('store.TransientStore', () => {
         window.localStorage.setItem(`${STORE_NAME}@${TABLE_NAME}@${item.payload.token}`, JSON.stringify(item));
       }
 
-      store
-        .init(TABLE_NAME)
-        .then(bundles => {
-          expect(bundles.length).toBe(items.length);
-          done();
-        })
-        .catch(error => done.fail(error));
+      const bundles = await store.init(TABLE_NAME);
+      expect(bundles.length).toBe(items.length);
     });
   });
 
@@ -194,48 +160,32 @@ describe('store.TransientStore', () => {
 
     afterEach(() => jasmine.clock().uninstall());
 
-    it('publishes an event when an entity expires.', done => {
+    it('publishes an event when an entity expires.', async done => {
       store.on(TransientStore.TOPIC.EXPIRED, expiredBundle => {
         expect(expiredBundle.payload).toBe(entity);
         expect(expiredBundle.primaryKey).toBe(primaryKey);
         done();
       });
 
-      store
-        .set(primaryKey, entity, minuteInMillis)
-        .then(() => jasmine.clock().tick(minuteInMillis + 1))
-        .catch(error => done.fail(error));
+      await store.set(primaryKey, entity, minuteInMillis);
+      jasmine.clock().tick(minuteInMillis + 1);
     });
 
-    it('deletes expired entities.', done => {
-      store
-        .set(primaryKey, entity, minuteInMillis)
-        .then(() => {
-          jasmine.clock().tick(minuteInMillis + 1);
-          return store.get(primaryKey);
-        })
-        .then(bundle => {
-          expect(bundle).toBeUndefined();
-          done();
-        })
-        .catch(error => done.fail(error));
+    it('deletes expired entities.', async () => {
+      await store.set(primaryKey, entity, minuteInMillis);
+      jasmine.clock().tick(minuteInMillis + 1);
+
+      const bundle = await store.get(primaryKey);
+      expect(bundle).toBeUndefined();
     });
 
-    it('keeps the same timer when being called multiple times.', done => {
-      let timeoutID: number;
+    it('keeps the same timer when being called multiple times.', async () => {
+      const bundle = await store.set(primaryKey, entity, minuteInMillis);
+      const timeoutID = bundle.timeoutID as number;
+      const cacheKey = store['constructCacheKey'](primaryKey);
 
-      store
-        .set(primaryKey, entity, minuteInMillis)
-        .then(bundle => {
-          timeoutID = bundle.timeoutID as number;
-          const cacheKey = store['constructCacheKey'](primaryKey);
-          return store['startTimer'](cacheKey);
-        })
-        .then(bundle => {
-          expect(bundle.timeoutID).toBe(timeoutID);
-          done();
-        })
-        .catch(error => done.fail(error));
+      const newBundle = await store['startTimer'](cacheKey);
+      expect(newBundle.timeoutID).toBe(timeoutID);
     });
   });
 });

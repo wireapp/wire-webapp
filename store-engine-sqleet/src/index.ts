@@ -100,7 +100,7 @@ export class SQLeetEngine implements CRUDEngine {
 
   public async export<T>(): Promise<string> {
     if (!this.db) {
-      throw new Error('SQLite need to be available');
+      throw new Error('SQLite needs to be available');
     }
     const database: Uint8Array = new Uint8Array(this.db.export());
     const strings = [];

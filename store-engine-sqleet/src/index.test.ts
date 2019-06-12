@@ -59,18 +59,16 @@ describe('SQLeetEngine', () => {
 
   describe('delete', () => {
     Object.entries(deleteSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              firstName: SQLiteType.TEXT,
-              lastName: SQLiteType.TEXT,
-              some: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            firstName: SQLiteType.TEXT,
+            lastName: SQLiteType.TEXT,
+            some: SQLiteType.TEXT,
+          },
+        });
+        await testFunction(engine);
+      });
     });
   });
 
@@ -85,54 +83,49 @@ describe('SQLeetEngine', () => {
           },
           shouldCreateNewEngine
         );
-      it(description, async done => testFunction(done, await initEnginePurge(), initEnginePurge));
+      it(description, async () => testFunction(await initEnginePurge(), initEnginePurge));
     });
   });
 
   describe('deleteAll', () => {
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              firstName: SQLiteType.TEXT,
-              lastName: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            firstName: SQLiteType.TEXT,
+            lastName: SQLiteType.TEXT,
+          },
+        });
+        await testFunction(engine);
+      });
     });
   });
 
   describe('readAllPrimaryKeys', () => {
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              firstName: SQLiteType.TEXT,
-              lastName: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            firstName: SQLiteType.TEXT,
+            lastName: SQLiteType.TEXT,
+          },
+        });
+        await testFunction(engine);
+      });
     });
   });
 
   describe('create', () => {
     Object.entries(createSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              some: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            some: SQLiteType.TEXT,
+          },
+        });
+
+        await testFunction(engine);
+      });
     });
 
     it('saves a record to the database', async () => {
@@ -146,56 +139,54 @@ describe('SQLeetEngine', () => {
       expect(result.name).toBe('Otto');
     });
 
-    it('prevents sql injection in the column name', async done => {
+    it('prevents SQL injection in the column name', async () => {
       const engine = await initEngine({
         users: {
           name: SQLiteType.TEXT,
         },
       });
+
       try {
         const entity = {'name\'"`': 'Otto'};
         await engine.create<DBRecord>('users', '1', entity);
+        fail();
       } catch (error) {
         expect(error.message).toBe(
           'Entity is empty for table "users". Are you sure you set the right scheme / column names?'
         );
-        return done();
       }
-      done.fail();
     });
   });
 
   describe('read', () => {
     Object.entries(readSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              some: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            some: SQLiteType.TEXT,
+          },
+        });
+
+        await testFunction(engine);
+      });
     });
   });
 
   describe('readAll', () => {
     Object.entries(readAllSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              firstName: SQLiteType.TEXT,
-              lastName: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            firstName: SQLiteType.TEXT,
+            lastName: SQLiteType.TEXT,
+          },
+        });
+
+        await testFunction(engine);
+      });
     });
 
-    it('can read a set of records in the database', async () => {
+    it('reads a set of records in the database', async () => {
       const engine = await initEngine({
         users: {
           name: SQLiteType.TEXT,
@@ -212,32 +203,29 @@ describe('SQLeetEngine', () => {
   });
 
   describe('append', () => {
-    it('throws an error', async done => {
+    it('throws an error', async () => {
       const engine = await initEngine({});
       try {
         await engine.append('test', '1', 'string');
-      } catch (error) {
-        return done();
-      }
-      done.fail();
+        fail();
+      } catch (error) {}
     });
   });
 
   describe('updateOrCreate', () => {
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              name: SQLiteType.TEXT,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            name: SQLiteType.TEXT,
+          },
+        });
+
+        await testFunction(engine);
+      });
     });
 
-    it('create then update a record to the database', async () => {
+    it('creates then updates a record to the database', async () => {
       const engine = await initEngine({
         users: {
           name: SQLiteType.TEXT,
@@ -245,6 +233,7 @@ describe('SQLeetEngine', () => {
       });
       await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Otto'});
       await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Lion'});
+
       const result = await engine.read<DBRecord>('users', '1');
       expect(result.name).toBe('Lion');
     });
@@ -255,8 +244,10 @@ describe('SQLeetEngine', () => {
           name: SQLiteType.TEXT,
         },
       });
+
       try {
         await engine.updateOrCreate<DBRecord>('ffff', '1', {name: 'Otto'});
+        fail();
       } catch (error) {
         expect(error.message).toBe('Table "ffff" does not exist.');
       }
@@ -265,18 +256,17 @@ describe('SQLeetEngine', () => {
 
   describe('update', () => {
     Object.entries(updateSpec).map(([description, testFunction]) => {
-      it(description, async done =>
-        testFunction(
-          done,
-          await initEngine({
-            'the-simpsons': {
-              age: SQLiteType.INTEGER,
-              name: SQLiteType.TEXT,
-              size: SQLiteType.JSON,
-            },
-          })
-        )
-      );
+      it(description, async () => {
+        const engine = await initEngine({
+          'the-simpsons': {
+            age: SQLiteType.INTEGER,
+            name: SQLiteType.TEXT,
+            size: SQLiteType.JSON,
+          },
+        });
+
+        await testFunction(engine);
+      });
     });
 
     it('updates a record in the database', async () => {
@@ -297,7 +287,7 @@ describe('SQLeetEngine', () => {
   });
 
   describe('export', () => {
-    it('cannot export if sqlite is not available', async done => {
+    it('cannot export if SQLite is not available', async () => {
       const engine = await initEngine({
         users: {
           name: SQLiteType.TEXT,
@@ -305,16 +295,16 @@ describe('SQLeetEngine', () => {
       });
       await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Otto'});
       await engine.purge();
+
       try {
         await engine.export();
+        fail();
       } catch (error) {
-        expect(error.message).toBe('SQLite need to be available');
-        return done();
+        expect(error.message).toBe('SQLite needs to be available');
       }
-      done.fail();
     });
 
-    it('export and load a database', async () => {
+    it('exports and loads a database', async () => {
       const schema: SQLiteDatabaseDefinition<DBRecord> = {
         users: {
           age: SQLiteType.INTEGER,

@@ -67,18 +67,18 @@ describe('IndexedDBEngine', () => {
 
   describe('append', () => {
     Object.entries(appendSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('create', () => {
     describe('create', () => {
       Object.entries(createSpec).map(([description, testFunction]) => {
-        it(description, done => testFunction(done, engine));
+        it(description, () => testFunction(engine));
       });
     });
 
-    it('writes into an existing database.', async done => {
+    it('writes into an existing database.', async () => {
       const TABLE_NAME = 'friends';
       const PRIMARY_KEY = 'camilla';
       const entity = {
@@ -96,28 +96,23 @@ describe('IndexedDBEngine', () => {
       engine = new IndexedDBEngine();
       await engine.initWithDb(db);
 
-      engine
-        .create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(primaryKey => {
-          expect(primaryKey).toEqual(PRIMARY_KEY);
-          expect(engine.storeName).toBe(name);
-          expect(engine.db.name).toBe(name);
-          expect(Object.keys(engine.db._dbSchema).length).toBe(1);
-          done();
-        })
-        .catch(done.fail);
+      const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+      expect(primaryKey).toEqual(PRIMARY_KEY);
+      expect(engine.storeName).toBe(name);
+      expect(engine.db.name).toBe(name);
+      expect(Object.keys(engine.db._dbSchema).length).toBe(1);
     });
   });
 
   describe('delete', () => {
     Object.entries(deleteSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('deleteAll', () => {
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
@@ -129,7 +124,7 @@ describe('IndexedDBEngine', () => {
       }).not.toThrow();
     });
 
-    it('throws an error if there is no quota available', async done => {
+    it('throws an error if there is no quota available', async () => {
       spyOn(navigator.storage, 'estimate').and.returnValue(
         Promise.resolve({
           quota: 26025,
@@ -141,14 +136,13 @@ describe('IndexedDBEngine', () => {
 
       try {
         await engine.hasEnoughQuota();
-        done.fail();
+        fail();
       } catch (error) {
         expect(error instanceof LowDiskSpaceError).toBe(true);
-        done();
       }
     });
 
-    it('throws an error if there is no quota is given', async done => {
+    it('throws an error if there is no quota is given', async () => {
       spyOn(navigator.storage, 'estimate').and.returnValue(
         Promise.resolve({
           quota: 0,
@@ -160,47 +154,46 @@ describe('IndexedDBEngine', () => {
 
       try {
         await engine.hasEnoughQuota();
-        done.fail();
+        fail();
       } catch (error) {
         expect(error instanceof LowDiskSpaceError).toBe(true);
-        done();
       }
     });
   });
 
   describe('purge', () => {
     Object.entries(purgeSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine, initEngine));
+      it(description, () => testFunction(engine, initEngine));
     });
   });
 
   describe('readAllPrimaryKeys', () => {
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('readAll', () => {
     Object.entries(readAllSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('read', () => {
     Object.entries(readSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('updateOrCreate', () => {
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 
   describe('update', () => {
     Object.entries(updateSpec).map(([description, testFunction]) => {
-      it(description, done => testFunction(done, engine));
+      it(description, () => testFunction(engine));
     });
   });
 });

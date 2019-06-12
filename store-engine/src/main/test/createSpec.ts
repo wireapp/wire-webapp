@@ -23,48 +23,41 @@ import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
 const TABLE_NAME = 'the-simpsons';
 
 export const createSpec = {
-  'creates a serialized database record.': (done: DoneFn, engine: CRUDEngine) => {
+  'creates a serialized database record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
       some: 'value',
     };
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(primaryKey => {
-        expect(primaryKey).toEqual(PRIMARY_KEY);
-        done();
-      })
-      .catch(done.fail);
+    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    expect(primaryKey).toEqual(PRIMARY_KEY);
   },
-  "doesn't save empty values.": (done: DoneFn, engine: CRUDEngine) => {
+  "doesn't save empty values.": async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = undefined;
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-      .catch(error => {
-        expect(error).toEqual(jasmine.any(RecordTypeError));
-        done();
-      });
+    try {
+      await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+      fail(new Error('Method is supposed to throw an error.'));
+    } catch (error) {
+      expect(error).toEqual(jasmine.any(RecordTypeError));
+    }
   },
-  "doesn't save null values.": (done: DoneFn, engine: CRUDEngine) => {
+  "doesn't save null values.": async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = undefined;
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-      .catch(error => {
-        expect(error).toEqual(jasmine.any(RecordTypeError));
-        done();
-      });
+    try {
+      await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+      fail(new Error('Method is supposed to throw an error.'));
+    } catch (error) {
+      expect(error).toEqual(jasmine.any(RecordTypeError));
+    }
   },
-  'throws an error when attempting to overwrite a record.': (done: DoneFn, engine: CRUDEngine) => {
+  'throws an error when attempting to overwrite a record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const firstEntity = {
@@ -75,12 +68,12 @@ export const createSpec = {
       some: 'newer-value',
     };
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, firstEntity)
-      .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
-      .catch(error => {
-        expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
-        done();
-      });
+    try {
+      await engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity);
+      await engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity);
+      fail();
+    } catch (error) {
+      expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
+    }
   },
 };

@@ -27,18 +27,12 @@ beforeAll(async () => {
 });
 
 describe('IdentityKeyPair', () => {
-  it('serialises and deserialises', async done => {
-    try {
-      const ikp = await Proteus.keys.IdentityKeyPair.new();
-      const ikp_bytes = ikp.serialise();
-      const ikp_deser = Proteus.keys.IdentityKeyPair.deserialise(ikp_bytes);
+  it('serialises and deserialises', async () => {
+    const ikp = await Proteus.keys.IdentityKeyPair.new();
+    const ikp_bytes = ikp.serialise();
+    const ikp_deser = Proteus.keys.IdentityKeyPair.deserialise(ikp_bytes);
 
-      expect(ikp.public_key.fingerprint()).toBe(ikp_deser.public_key.fingerprint());
-      expect(sodium.to_hex(new Uint8Array(ikp_bytes))).toBe(sodium.to_hex(new Uint8Array(ikp_deser.serialise())));
-
-      done();
-    } catch (err) {
-      done.fail(err);
-    }
+    expect(ikp.public_key.fingerprint()).toBe(ikp_deser.public_key.fingerprint());
+    expect(sodium.to_hex(new Uint8Array(ikp_bytes))).toBe(sodium.to_hex(new Uint8Array(ikp_deser.serialise())));
   });
 });

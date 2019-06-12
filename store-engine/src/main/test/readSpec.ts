@@ -27,31 +27,25 @@ interface DomainEntity {
 }
 
 export const readSpec = {
-  'returns a database record.': (done: DoneFn, engine: CRUDEngine) => {
+  'returns a database record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
     const entity = {
       some: 'value',
     };
 
-    engine
-      .create(TABLE_NAME, PRIMARY_KEY, entity)
-      .then(primaryKey => engine.read<DomainEntity>(TABLE_NAME, primaryKey))
-      .then(record => {
-        expect(record.some).toBe(entity.some);
-        done();
-      })
-      .catch(error => done.fail(error));
+    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    const record = await engine.read<DomainEntity>(TABLE_NAME, primaryKey);
+    expect(record.some).toBe(entity.some);
   },
-  'throws an error if a record cannot be found.': (done: DoneFn, engine: CRUDEngine) => {
+  'throws an error if a record cannot be found.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
-    engine
-      .read(TABLE_NAME, PRIMARY_KEY)
-      .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-      .catch(error => {
-        expect(error).toEqual(jasmine.any(RecordNotFoundError));
-        done();
-      });
+    try {
+      await engine.read(TABLE_NAME, PRIMARY_KEY);
+      fail(new Error('Method is supposed to throw an error.'));
+    } catch (error) {
+      expect(error).toEqual(jasmine.any(RecordNotFoundError));
+    }
   },
 };

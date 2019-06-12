@@ -22,7 +22,7 @@ import {CRUDEngine} from '../engine';
 const TABLE_NAME = 'the-simpsons';
 
 export const deleteAllSpec = {
-  'deletes all records from a database table.': (done: DoneFn, engine: CRUDEngine) => {
+  'deletes all records from a database table.': async (engine: CRUDEngine) => {
     const homer = {
       entity: {
         firstName: 'Homer',
@@ -47,20 +47,14 @@ export const deleteAllSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    Promise.all([
+    await Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
       engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ])
-      .then(() => engine.deleteAll(TABLE_NAME))
-      .then(hasBeenDeleted => {
-        expect(hasBeenDeleted).toBe(true);
-        return engine.readAllPrimaryKeys(TABLE_NAME);
-      })
-      .then(primaryKeys => {
-        expect(primaryKeys.length).toBe(0);
-        done();
-      })
-      .catch(error => done.fail(error));
+    ]);
+    const hasBeenDeleted = await engine.deleteAll(TABLE_NAME);
+    expect(hasBeenDeleted).toBe(true);
+    const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
+    expect(primaryKeys.length).toBe(0);
   },
 };

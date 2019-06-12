@@ -22,7 +22,7 @@ import {CRUDEngine} from '../engine';
 const TABLE_NAME = 'the-simpsons';
 
 export const readAllPrimaryKeysSpec = {
-  'gets the primary keys of all records in a table.': (done: DoneFn, engine: CRUDEngine) => {
+  'gets the primary keys of all records in a table.': async (engine: CRUDEngine) => {
     const homer = {
       entity: {
         firstName: 'Homer',
@@ -47,19 +47,15 @@ export const readAllPrimaryKeysSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    Promise.all([
+    await Promise.all([
       engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
       engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
       engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ])
-      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
-      .then(primaryKeys => {
-        expect(primaryKeys.length).toBe(3);
-        expect(primaryKeys.includes(homer.primaryKey));
-        expect(primaryKeys.includes(lisa.primaryKey));
-        expect(primaryKeys.includes(marge.primaryKey));
-        done();
-      })
-      .catch(error => done.fail(error));
+    ]);
+    const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
+    expect(primaryKeys.length).toBe(3);
+    expect(primaryKeys.includes(homer.primaryKey));
+    expect(primaryKeys.includes(lisa.primaryKey));
+    expect(primaryKeys.includes(marge.primaryKey));
   },
 };

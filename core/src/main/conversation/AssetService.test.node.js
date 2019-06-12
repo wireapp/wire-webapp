@@ -26,19 +26,17 @@ const {MemoryEngine} = require('@wireapp/store-engine');
 describe('AssetService', () => {
   let account;
 
-  beforeAll(async done => {
+  beforeAll(async () => {
     const engine = new MemoryEngine();
     await engine.init('');
 
     const client = new APIClient({store: engine, urls: APIClient.BACKEND.STAGING});
     account = new Account(client);
     await account.init();
-
-    done();
   });
 
   describe('"uploadImageAsset"', () => {
-    it('builds an encrypted asset payload', async done => {
+    it('builds an encrypted asset payload', async () => {
       const assetServerData = {
         key: `3-2-${new UUID(4).format()}`,
         keyBytes: Buffer.from(new UUID(4).format()),
@@ -66,8 +64,6 @@ describe('AssetService', () => {
           token: assetServerData.token,
         })
       );
-
-      done();
     });
   });
 });

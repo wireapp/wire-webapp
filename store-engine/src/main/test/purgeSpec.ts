@@ -23,7 +23,6 @@ const TABLE_NAME = 'the-simpsons';
 
 export const purgeSpec = {
   'database can be reinitialized after purge': async (
-    done: DoneFn,
     engine: CRUDEngine,
     initEngine: (shouldCreateNewEngine?: boolean) => Promise<CRUDEngine>
   ) => {
@@ -42,11 +41,8 @@ export const purgeSpec = {
 
     keys = await engine.readAllPrimaryKeys(TABLE_NAME);
     expect(keys.length).toBe(SAVED_RECORDS);
-
-    done();
   },
   'deletes the database and all of its records.': async (
-    done: DoneFn,
     engine: CRUDEngine,
     initEngine: (shouldCreateNewEngine?: boolean) => Promise<CRUDEngine>
   ) => {
@@ -63,7 +59,5 @@ export const purgeSpec = {
     engine = await initEngine();
     keys = await engine.readAllPrimaryKeys(TABLE_NAME);
     expect(keys.length).toBe(0);
-
-    done();
   },
 };
