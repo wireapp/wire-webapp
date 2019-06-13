@@ -113,40 +113,8 @@ describe('CryptographyRepository', () => {
       };
       const fingerprint = await TestFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
 
-      expect(fingerprint).toEqual([
-        'c1',
-        '09',
-        '9e',
-        '49',
-        '5b',
-        '7c',
-        '51',
-        '6f',
-        '9c',
-        '50',
-        'b8',
-        'd6',
-        'b9',
-        'a3',
-        '0c',
-        'ca',
-        'b1',
-        'e8',
-        'bd',
-        '28',
-        '55',
-        '7e',
-        '51',
-        '31',
-        'a6',
-        'f7',
-        'b8',
-        '6c',
-        '01',
-        '81',
-        'b9',
-        '1a',
-      ]);
+      // eslint-disable-next-line
+      expect(fingerprint).toEqual(['c1', '09', '9e', '49', '5b', '7c', '51', '6f', '9c', '50', 'b8', 'd6', 'b9', 'a3', '0c', 'ca', 'b1', 'e8', 'bd', '28', '55', '7e', '51', '31', 'a6', 'f7', 'b8', '6c', '01', '81', 'b9', '1a',]);
     });
   });
 
