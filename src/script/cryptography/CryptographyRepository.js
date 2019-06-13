@@ -146,12 +146,14 @@ export class CryptographyRepository {
    * Get the fingerprint of a remote identity.
    * @param {string} userId - ID of user
    * @param {string} clientId - ID of client
+   * @param {PreKey} [preKey] - PreKey to initialize a session from
    * @returns {Promise} Resolves with the remote fingerprint
    */
-  getRemoteFingerprint(userId, clientId) {
-    return this._loadSession(userId, clientId).then(cryptoboxSession => {
-      return cryptoboxSession ? this._formatFingerprint(cryptoboxSession.fingerprint_remote()) : '';
-    });
+  async getRemoteFingerprint(userId, clientId, preKey) {
+    const cryptoboxSession = preKey
+      ? await this._createSessionFromPreKey(preKey, userId, clientId)
+      : await this._loadSession(userId, clientId);
+    return cryptoboxSession ? this._formatFingerprint(cryptoboxSession.fingerprint_remote()) : '';
   }
 
   _formatFingerprint(fingerprint) {
