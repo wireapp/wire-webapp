@@ -17,6 +17,8 @@
  *
  */
 
+import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/commonjs/team/legalhold';
+import {amplify} from 'amplify';
 import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import ko from 'knockout';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -35,11 +37,15 @@ export class LegalHoldModalViewModel {
   isOnlyMe: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
   devicesUser: ko.Observable<User>;
-  hide: () => void;
+  onBgClick: () => void;
   onClosed: () => void;
   userDevicesHistory: UserDevicesHistory;
   showDeviceList: () => boolean;
   isLoading: ko.Observable<boolean>;
+  showRequest: ko.Observable<boolean>;
+  requestFingerprint: ko.Observable<string>;
+  requestError: ko.Observable<string>;
+  passwordValue: ko.Observable<string>;
   progress: ko.Observable<number>;
 
   constructor(
@@ -51,19 +57,67 @@ export class LegalHoldModalViewModel {
   ) {
     this.isLoading = ko.observable(false);
     this.isVisible = ko.observable(false);
+    this.showRequest = ko.observable(false);
+    this.requestFingerprint = ko.observable('');
     this.isOnlyMe = ko.observable(false);
     this.users = ko.observable([]);
     this.devicesUser = ko.observable();
     this.userDevicesHistory = makeUserDevicesHistory();
     this.progress = ko.observable(0);
+    this.passwordValue = ko.observable('');
+    this.requestError = ko.observable('');
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
 
-    this.hide = () => this.isVisible(false);
+    this.onBgClick = () => {
+      if (!this.showRequest()) {
+        this.isVisible(false);
+      }
+    };
     this.onClosed = () => {
       this.users([]);
       this.devicesUser(undefined);
+      this.showRequest(false);
+      this.passwordValue('');
+      this.requestError('');
     };
+    amplify.subscribe(SHOW_REQUEST_MODAL, this.showRequestModal);
   }
+
+  showRequestModal = async (fingerprint?: string) => {
+    const selfUser = this.userRepository.self();
+    if (!selfUser.inTeam()) {
+      return;
+    }
+    if (typeof fingerprint === 'undefined') {
+      const state = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
+      if (state === LegalHoldMemberStatus.PENDING) {
+        selfUser.hasPendingLegalHold(true);
+        // TODO: wait for backend to properly return fingerprint
+        fingerprint = '00';
+      } else {
+        return;
+      }
+    }
+    this.isVisible(true);
+    this.showRequest(true);
+    this.requestFingerprint(`<span data-uie-name="status-modal-fingerprint">${fingerprint}</span>`);
+  };
+
+  closeRequest = () => {
+    this.isVisible(false);
+  };
+
+  acceptRequest = async () => {
+    const selfUser = this.userRepository.self();
+    const result = await this.teamRepository.teamService.sendLegalHoldApproval(
+      selfUser.teamId,
+      selfUser.id,
+      this.passwordValue()
+    );
+    if (result) {
+    }
+    // TODO: check result for errors
+  };
 
   showUsers = (conversation?: Conversation) => {
     if (conversation === undefined) {

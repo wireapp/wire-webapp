@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import {showRequestModal} from 'Util/LegalHoldUtil';
 import {Conversation} from '../entity/Conversation';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
@@ -47,7 +46,7 @@ ko.components.register('legal-hold-dot', {
       event.stopPropagation();
       if (this.isInteractive) {
         if (isPending) {
-          return showRequestModal();
+          return legalHoldModal.showRequestModal();
         }
         if (conversation) {
           return legalHoldModal.showUsers(conversation);

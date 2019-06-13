@@ -49,7 +49,7 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {showRequestModal, getFingerprint} from 'Util/LegalHoldUtil';
+import {SHOW_REQUEST_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 export class UserRepository {
   static get CONFIG() {
@@ -380,8 +380,8 @@ export class UserRepository {
     }
     const self = this.self();
     self.hasPendingLegalHold(true);
-    const fingerprint = getFingerprint();
-    showRequestModal(fingerprint);
+    const fingerprint = '';
+    amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
   }
 
   /**
