@@ -291,7 +291,8 @@ const markdownit = new MarkdownIt('zero', {
   breaks: true,
   html: false,
   langPrefix: 'lang-',
-}).enable(['autolink', 'link', 'backticks', 'code', 'emphasis', 'fence', 'newline']);
+  linkify: true,
+}).enable(['autolink', 'link', 'linkify', 'backticks', 'code', 'emphasis', 'fence', 'newline']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
@@ -324,9 +325,10 @@ function fixMarkdownLinks(markdown) {
   const result = [];
   let prevEndIndex = 0;
   for (const match of matches) {
+    const startsWithProto = /^https?:\/\//i.test(match.raw);
     const noStartBracket = match.index === 0 || markdown[match.index - 1] !== '<';
     const noEndBracket = match.lastIndex === markdown.length || markdown[match.lastIndex] !== '>';
-    const shouldInsertBrackets = noStartBracket && noEndBracket;
+    const shouldInsertBrackets = startsWithProto && noStartBracket && noEndBracket;
 
     result.push(markdown.slice(prevEndIndex, match.index));
     if (shouldInsertBrackets) {
@@ -414,7 +416,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
     }
-    if (!isWireDeepLink && link.markup !== 'autolink') {
+    if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
       if (title) {
         link.attrSet('title', cleanString(title));
