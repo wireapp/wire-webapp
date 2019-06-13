@@ -24,7 +24,7 @@ import {AvailabilityType} from '../user/AvailabilityType';
 interface AvailabilityStateParams {
   availability: () => AvailabilityType;
   label: string;
-  showArrow: boolean;
+  showArrow?: boolean;
   theme: boolean;
 }
 
