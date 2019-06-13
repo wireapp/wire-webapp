@@ -29,6 +29,7 @@ import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/legalHoldDot';
+import 'Components/availabilityState';
 
 export class ConversationListViewModel {
   /**
