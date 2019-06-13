@@ -15,13 +15,13 @@
         ></arrow-left-icon>
       <!-- /ko -->
     </div>
-    <div class="modal__body legal-hold-modal__wrapper">
+    <div class="modal__body legal-hold-modal__wrapper" data-bind="css: {'legal-hold-modal__wrapper--request': showRequest()}">
       <!-- ko if: showRequest() -->
         <div class="modal__text" data-uie-name="status-modal-text">
           <div data-bind="html: t('legalHoldModalText', {}, {br: '<br>', fingerprint: requestFingerprint()})"></div>
         </div>
         <input class="modal__input" type="password" data-bind="textInput: passwordValue"/>
-        <div class="modal__buttons" data-bind="css: {'modal__buttons--column': hasMultipleSecondary()}">
+        <div class="modal__buttons">
           <div data-bind="text: t('legalHoldModalSecondaryAction'), click: closeRequest" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
           <div data-bind="text: t('legalHoldModalPrimaryAction'), click: acceptRequest" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
         </div>

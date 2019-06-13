@@ -374,13 +374,19 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  onLegalHoldRequest(eventJson) {
+  async onLegalHoldRequest(eventJson) {
     if (this.self().id !== eventJson.target_user) {
       return;
     }
     const self = this.self();
     self.hasPendingLegalHold(true);
-    const fingerprint = '';
+    const {client_id, last_prekey, target_user} = eventJson;
+
+    const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
+      target_user,
+      client_id,
+      last_prekey
+    );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
   }
 

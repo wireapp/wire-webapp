@@ -83,24 +83,30 @@ export class LegalHoldModalViewModel {
     amplify.subscribe(SHOW_REQUEST_MODAL, this.showRequestModal);
   }
 
-  showRequestModal = async (fingerprint?: string) => {
+  showRequestModal = async (fingerprint?: string[]) => {
     const selfUser = this.userRepository.self();
     if (!selfUser.inTeam()) {
       return;
     }
-    if (typeof fingerprint === 'undefined') {
-      const state = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
-      if (state === LegalHoldMemberStatus.PENDING) {
+    if (!fingerprint) {
+      const response = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
+      if (response.status === LegalHoldMemberStatus.PENDING) {
+        fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
+          selfUser.id,
+          response.client_id,
+          response.last_prekey
+        );
         selfUser.hasPendingLegalHold(true);
-        // TODO: wait for backend to properly return fingerprint
-        fingerprint = '00';
       } else {
         return;
       }
     }
     this.isVisible(true);
     this.showRequest(true);
-    this.requestFingerprint(`<span data-uie-name="status-modal-fingerprint">${fingerprint}</span>`);
+    const formatedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
+    this.requestFingerprint(
+      `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`
+    );
   };
 
   closeRequest = () => {

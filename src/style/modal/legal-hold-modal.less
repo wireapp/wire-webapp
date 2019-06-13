@@ -20,6 +20,10 @@
 .legal-hold-modal {
   &__wrapper {
     height: 448px;
+
+    &--request {
+      height: auto;
+    }
   }
 
   &__logo {
@@ -40,6 +44,16 @@
 
     br {
       line-height: 2;
+    }
+  }
+
+  &__fingerprint {
+    span {
+      font-family: monospace;
+      font-weight: @font-weight-bold;
+      &:nth-child(2n) {
+        font-weight: @font-weight-regular;
+      }
     }
   }
 
