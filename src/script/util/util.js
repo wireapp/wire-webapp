@@ -292,7 +292,7 @@ const markdownit = new MarkdownIt('zero', {
   html: false,
   langPrefix: 'lang-',
   linkify: true,
-}).enable(['autolink', 'link', 'linkify', 'backticks', 'code', 'emphasis', 'fence', 'newline']);
+}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
 
 const originalFenceRule = markdownit.renderer.rules.fence;
 
@@ -331,13 +331,7 @@ function fixMarkdownLinks(markdown) {
     const shouldInsertBrackets = startsWithProto && noStartBracket && noEndBracket;
 
     result.push(markdown.slice(prevEndIndex, match.index));
-    if (shouldInsertBrackets) {
-      result.push('<');
-    }
-    result.push(match.raw);
-    if (shouldInsertBrackets) {
-      result.push('>');
-    }
+    result.push(shouldInsertBrackets ? `<${match.raw}>` : match.raw);
     prevEndIndex = match.lastIndex;
   }
   result.push(markdown.slice(prevEndIndex));
