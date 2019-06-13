@@ -23,7 +23,7 @@ import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {isString} from 'underscore';
 
-import {createRandomUuid, arrayToBase64} from 'Util/util';
+import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
@@ -97,6 +97,24 @@ describe('CryptographyRepository', () => {
         expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
         expect(isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBe(true);
       });
+    });
+  });
+
+  describe('getRemoteFingerprint', () => {
+    it('generates the remote fingerprint based on a prekey', async () => {
+      const database = TestFactory.storage_service.db;
+      await TestFactory.cryptography_repository.createCryptobox(database);
+      const userId = '6f656da7-0c52-44d1-959d-ddc9fbdca244';
+      const clientId = '689ce2df236eb2be';
+      const preKey = {
+        id: 3,
+        key:
+          'pQABAQMCoQBYIFycSfcOATSpOIkJz8ntEnFAZ+YWtzVaJ7RLeDAqGU+0A6EAoQBYIMEJnklbfFFvnFC41rmjDMqx6L0oVX5RMab3uGwBgbkaBPY=',
+      };
+      const fingerprint = await TestFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
+
+      // eslint-disable-next-line
+      expect(fingerprint).toEqual(['c1', '09', '9e', '49', '5b', '7c', '51', '6f', '9c', '50', 'b8', 'd6', 'b9', 'a3', '0c', 'ca', 'b1', 'e8', 'bd', '28', '55', '7e', '51', '31', 'a6', 'f7', 'b8', '6c', '01', '81', 'b9', '1a',]);
     });
   });
 
