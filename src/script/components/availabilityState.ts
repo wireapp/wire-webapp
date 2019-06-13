@@ -25,7 +25,7 @@ interface AvailabilityStateParams {
   availability: () => AvailabilityType;
   label: string;
   showArrow?: boolean;
-  theme: boolean;
+  theme?: boolean;
 }
 
 ko.components.register('availability-state', {
