@@ -19,17 +19,20 @@
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
+import {Logger, getLogger} from 'Util/Logger';
 import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {PermissionState} from '../notification/PermissionState';
 
 import '../components/calling/chooseScreen';
 
 declare global {
-  interface Window {
-    desktopCapturer: any;
+  interface HTMLAudioElement {
+    setSinkId: (sinkId: string) => Promise<void>;
   }
 }
 
@@ -37,7 +40,8 @@ export class CallingViewModel {
   public readonly audioRepository: any;
   public readonly callingRepository: CallingRepository;
   public readonly conversationRepository: any;
-  public readonly mediaDevicesHandler: any;
+  public readonly mediaDevicesHandler: MediaDevicesHandler;
+  public readonly mediaStreamHandler: MediaStreamHandler;
   public readonly permissionRepository: any;
   public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly multitasking: any;
@@ -45,18 +49,22 @@ export class CallingViewModel {
   public readonly selectableScreens: ko.Observable<any[]>;
   public readonly isChoosingScreen: ko.PureComputed<boolean>;
   private onChooseScreen: (deviceId: string) => void;
+  private readonly logger: Logger;
 
   constructor(
     callingRepository: CallingRepository,
     conversationRepository: any,
     audioRepository: any,
-    mediaDevicesHandler: any,
+    mediaDevicesHandler: MediaDevicesHandler,
+    mediaStreamHandler: MediaStreamHandler,
     permissionRepository: any,
     multitasking: any
   ) {
+    this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.mediaDevicesHandler = mediaDevicesHandler;
+    this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
@@ -105,7 +113,7 @@ export class CallingViewModel {
     this.callActions = {
       answer: (call: Call) => {
         const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-        this.callingRepository.answerCall(call.conversationId, callType);
+        this.callingRepository.answerCall(call, callType);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
@@ -129,39 +137,68 @@ export class CallingViewModel {
         this.callingRepository.muteCall(call.conversationId, muteState);
       },
       toggleScreenshare: (call: Call) => {
-        if (window.desktopCapturer && !call.selfParticipant.sharesScreen()) {
-          this.onChooseScreen = (deviceId: string): void => {
-            this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
-            this.callingRepository.toggleScreenshare(call);
-            this.selectableScreens([]);
-          };
-          return this.mediaDevicesHandler.getScreenSources().then((sources: any) => {
-            if (false && sources.length === 1) {
-              return this.onChooseScreen(sources[0]);
-            }
-            this.selectableScreens(sources);
-          });
+        if (call.selfParticipant.sharesScreen()) {
+          return this.callingRepository.toggleScreenshare(call);
         }
-        this.callingRepository.toggleScreenshare(call);
+        const showScreenSelection = (): Promise<void> => {
+          return new Promise(resolve => {
+            this.onChooseScreen = (deviceId: string): void => {
+              this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+              this.selectableScreens([]);
+              resolve();
+            };
+            this.mediaDevicesHandler.getScreenSources().then((sources: any[]) => {
+              if (false && sources.length === 1) {
+                return this.onChooseScreen(sources[0].id);
+              }
+              this.selectableScreens(sources);
+            });
+          });
+        };
+
+        this.mediaStreamHandler.selectScreenToShare(showScreenSelection).then(() => {
+          return this.callingRepository.toggleScreenshare(call);
+        });
       },
     };
 
     const currentCall = ko.pureComputed(() => {
       return this.activeCalls()[0];
     });
-    let currentCallSubscription: ko.Subscription | undefined;
+    let currentCallSubscription: ko.Computed | undefined;
 
     const participantsAudioElement: Record<string, HTMLAudioElement> = {};
+    let activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
+
+    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+      activeAudioOutput = newActiveAudioOutput;
+      const activeAudioElements = Object.values(participantsAudioElement);
+      this.logger.debug(`Switching audio output for ${activeAudioElements.length} call participants`);
+      activeAudioElements.forEach(audioElement => {
+        if (audioElement.setSinkId) {
+          audioElement.setSinkId(activeAudioOutput);
+        }
+      });
+    });
     ko.computed(() => {
       const call = this.callingRepository.joinedCall();
       if (call) {
         call.participants().forEach(participant => {
-          if (!participantsAudioElement[participant.userId]) {
-            const audioElement = new Audio();
-            audioElement.srcObject = participant.audioStream();
-            audioElement.play();
-            participantsAudioElement[participant.userId] = audioElement;
+          const stream = participant.audioStream();
+          if (!stream) {
+            return;
           }
+          const audioId = `${participant.userId}-${stream.id}`;
+          if (participantsAudioElement[audioId]) {
+            return;
+          }
+          const audioElement = new Audio();
+          audioElement.srcObject = stream;
+          audioElement.play();
+          if (activeAudioOutput && audioElement.setSinkId) {
+            audioElement.setSinkId(activeAudioOutput);
+          }
+          participantsAudioElement[audioId] = audioElement;
         });
       } else {
         Object.keys(participantsAudioElement).forEach(userId => {
@@ -170,6 +207,7 @@ export class CallingViewModel {
       }
     });
 
+    let nbParticipants = 0;
     ko.computed(() => {
       const call = currentCall();
       if (currentCallSubscription) {
@@ -178,21 +216,16 @@ export class CallingViewModel {
       if (!call) {
         return;
       }
-      currentCallSubscription = call.participants.subscribe(
-        participantChanges => {
-          const memberJoined = participantChanges.find(({status}) => status === 'added');
-          const memberLeft = participantChanges.find(({status}) => status === 'deleted');
-
-          if (memberJoined) {
-            audioRepository.play(AudioType.READY_TO_TALK);
-          }
-          if (memberLeft) {
-            audioRepository.play(AudioType.TALK_LATER);
-          }
-        },
-        null,
-        'arrayChange'
-      );
+      currentCallSubscription = ko.computed(() => {
+        const newNbParticipants = call.participants().length;
+        if (nbParticipants < newNbParticipants) {
+          audioRepository.play(AudioType.READY_TO_TALK);
+        }
+        if (nbParticipants > newNbParticipants) {
+          audioRepository.play(AudioType.TALK_LATER);
+        }
+        nbParticipants = newNbParticipants;
+      });
     });
   }
 

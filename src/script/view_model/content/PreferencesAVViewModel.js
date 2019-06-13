@@ -37,24 +37,22 @@ export class PreferencesAVViewModel {
   }
 
   constructor(mediaRepository, userRepository, callbacks) {
-    this.initiateDevices = this.initiateDevices.bind(this);
-    this.releaseDevices = this.releaseDevices.bind(this);
     this.willChangeMediaSource = callbacks.willChangeMediaSource || noop;
     this.mediaSourceChanged = callbacks.mediaSourceChanged || noop;
 
     this.logger = getLogger('PreferencesAVViewModel');
 
-    this.mediaRepository = mediaRepository;
     this.userRepository = userRepository;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.devicesHandler = mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
     const updateStream = mediaType => {
+      this._releaseAudioMeter();
       const needsStreamUpdate = this.willChangeMediaSource(mediaType);
       if (this.mediaStream()) {
         this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
@@ -75,30 +73,21 @@ export class PreferencesAVViewModel {
         } else {
           stream.getTracks().forEach(track => track.stop());
         }
+        this._initiateAudioMeter(this.mediaStream());
       });
     };
 
     this.currentDeviceId.audioInput.subscribe(() => updateStream(MediaType.AUDIO));
     this.currentDeviceId.videoInput.subscribe(() => updateStream(MediaType.VIDEO));
 
-    this.constraintsHandler = this.mediaRepository.constraintsHandler;
-    this.streamHandler = this.mediaRepository.streamHandler;
+    this.constraintsHandler = mediaRepository.constraintsHandler;
+    this.streamHandler = mediaRepository.streamHandler;
     this.mediaStream = ko.observable();
 
     this.isVisible = false;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
-
-    this.mediaStream.subscribe(mediaStream => {
-      if (this.audioInterval) {
-        this._releaseAudioMeter();
-      }
-
-      if (this.isVisible && mediaStream) {
-        this._initiateAudioMeter(mediaStream);
-      }
-    });
 
     this.audioContext = undefined;
     this.audioInterval = undefined;
@@ -193,7 +182,10 @@ export class PreferencesAVViewModel {
    */
   _initiateAudioMeter(mediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
-    this.audioContext = this.mediaRepository.getAudioContext();
+    if (!window.AudioContext || !window.AudioContext.prototype.createMediaStreamSource) {
+      this.logger.warn('AudioContext is not supported, no volume indicator can be generated');
+    }
+    this.audioContext = new window.AudioContext();
 
     const audioAnalyser = this.audioContext.createAnalyser();
     audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
@@ -222,8 +214,20 @@ export class PreferencesAVViewModel {
   _releaseAudioMeter() {
     window.clearInterval(this.audioInterval);
     this.audioInterval = undefined;
+
+    if (this.audioContext) {
+      this.audioContext
+        .close()
+        .then(() => {
+          this.logger.info('Closed existing AudioContext', this.audioContext);
+          this.audioContext = undefined;
+        })
+        .catch(this.logger.error);
+    }
+
     if (this.audioSource) {
       this.audioSource.disconnect();
+      this.audioSource = undefined;
     }
   }
 

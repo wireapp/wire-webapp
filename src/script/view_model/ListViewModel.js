@@ -150,7 +150,10 @@ z.viewModel.ListViewModel = class ListViewModel {
   }
 
   answerCall = conversationEntity => {
-    this.callingRepository.answerCall(conversationEntity.id, CALL_TYPE.NORMAL);
+    const call = this.callingRepository.findCall(conversationEntity.id);
+    if (call) {
+      this.callingRepository.answerCall(call, CALL_TYPE.NORMAL);
+    }
   };
 
   changeNotificationSetting() {

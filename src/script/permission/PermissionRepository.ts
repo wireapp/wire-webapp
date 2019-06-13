@@ -23,12 +23,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionType} from './PermissionType';
 
-declare global {
-  interface Navigator {
-    permissions: any;
-  }
-}
-
 interface PermissionStateResult {
   state: PermissionStatusState;
   type: PermissionType;

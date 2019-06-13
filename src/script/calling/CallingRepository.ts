@@ -22,8 +22,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-// @ts-ignore
-import adapter from 'webrtc-adapter';
+import 'webrtc-adapter';
 import {Config} from '../auth/config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
@@ -81,6 +80,9 @@ export class CallingRepository {
   private readonly isMuted: ko.Observable<boolean>;
   private incomingCallCallback: Function;
 
+  // will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers)
+  private mediaStreamQuery: Promise<MediaStream> | undefined;
+
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
 
   private callingConfig: any;
@@ -123,7 +125,6 @@ export class CallingRepository {
     this.callingConfigTimeout = undefined;
 
     this.subscribeToEvents();
-    this.enableDebugging();
   }
 
   getStats(conversationId: ConversationId): Promise<{userid: UserId; stats: RTCStatsReport}[]> {
@@ -222,10 +223,10 @@ export class CallingRepository {
     this.injectDeactivateEvent(call.conversationId, call.initiator, reason, Date.now(), EventRepository.SOURCE.STREAM);
   }
 
-  private loadVideoPreview(call: Call): Promise<boolean> {
+  private warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    return this.getMediaStream({audio: true, camera: true}, isGroup)
+    return this.getMediaStream({audio, camera}, isGroup)
       .then(mediaStream => {
         call.selfParticipant.updateMediaStream(mediaStream);
         call.selfParticipant.videoState(VIDEO_STATE.STARTED);
@@ -369,7 +370,7 @@ export class CallingRepository {
         this.storeCall(call);
         const loadPreviewPromise =
           conversationType === CONV_TYPE.GROUP && callType === CALL_TYPE.VIDEO
-            ? this.loadVideoPreview(call)
+            ? this.warmupMediaStreams(call, true, true)
             : Promise.resolve(true);
 
         return loadPreviewPromise.then(success => {
@@ -402,15 +403,18 @@ export class CallingRepository {
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 
-  answerCall(conversationId: ConversationId, callType: number): void {
-    this.checkConcurrentJoinedCall(conversationId, CALL_STATE.INCOMING)
+  answerCall(call: Call, callType: number): void {
+    this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING)
       .then(() => {
-        this.wCall.answer(this.wUser, conversationId, callType, 0);
-        const callVideoState = callType === CALL_TYPE.VIDEO ? VIDEO_STATE.STARTED : VIDEO_STATE.STOPPED;
-        this.wCall.setVideoSendState(this.wUser, conversationId, callVideoState);
+        const isVideoCall = callType === CALL_TYPE.VIDEO;
+        return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
+          this.wCall.answer(this.wUser, call.conversationId, callType, 0);
+          const callVideoState = isVideoCall ? VIDEO_STATE.STARTED : VIDEO_STATE.STOPPED;
+          this.wCall.setVideoSendState(this.wUser, call.conversationId, callVideoState);
+        });
       })
       .catch(() => {
-        this.rejectCall(conversationId);
+        this.rejectCall(call.conversationId);
       });
   }
 
@@ -590,7 +594,7 @@ export class CallingRepository {
     }
     call.state(CALL_STATE.INCOMING);
     if (canRing && isVideoCall) {
-      this.loadVideoPreview(call);
+      this.warmupMediaStreams(call, true, true);
     }
 
     this.storeCall(call);
@@ -635,6 +639,10 @@ export class CallingRepository {
     camera: boolean,
     screen: boolean
   ): Promise<MediaStream> => {
+    if (this.mediaStreamQuery) {
+      // if a query is already occuring, we will return the result of this query
+      return this.mediaStreamQuery;
+    }
     const call = this.findCall(conversationId);
     if (!call) {
       return Promise.reject();
@@ -664,16 +672,20 @@ export class CallingRepository {
       return Promise.resolve(selfParticipant.getMediaStream());
     }
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
-    return this.getMediaStream(missingStreams, isGroup)
+    this.mediaStreamQuery = this.getMediaStream(missingStreams, isGroup)
       .then(mediaStream => {
+        this.mediaStreamQuery = undefined;
         const newStream = selfParticipant.updateMediaStream(mediaStream);
         return newStream;
       })
       .catch(error => {
+        this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call);
         return new MediaStream();
       });
+
+    return this.mediaStreamQuery;
   };
 
   private readonly updateParticipantStream = (
@@ -878,22 +890,6 @@ ${turnServersConfig}`;
     });
   }
 
-  //##############################################################################
-  // Logging
-  //##############################################################################
-
-  private enableDebugging(): void {
-    adapter.disableLog = false;
-  }
-
-  /**
-   * Check whether we are actively participating in a call.
-   *
-   * @private
-   * @param {string} newCallId - Conversation ID of call about to be joined
-   * @param {CALL_STATE} callState - Call state of new call
-   * @returns {Promise} Resolves when the new call was joined
-   */
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
     const activeCall = this.activeCalls().find(call => call.conversationId !== conversationId);
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
@@ -960,6 +956,10 @@ ${turnServersConfig}`;
     };
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }
+
+  //##############################################################################
+  // Logging
+  //##############################################################################
 
   public getCallLog(): string[] {
     return this.callLog;

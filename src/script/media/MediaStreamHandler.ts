@@ -24,9 +24,12 @@ import {getLogger} from 'Util/Logger';
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
 import {WebAppEvents} from '../event/WebApp';
+import {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
+import {DeviceSupport} from './MediaDevicesHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
@@ -49,22 +52,30 @@ export class MediaStreamHandler {
   }
 
   private readonly logger: any;
-  private readonly constraintsHandler: any;
-  private readonly deviceSupport: any;
-
   private requestHintTimeout: number | undefined;
+  private readonly screensharingMethod: ScreensharingMethods;
 
   /**
    * Construct a new MediaStream handler.
    * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
    * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
    */
-  constructor(private readonly mediaRepository: any, private readonly permissionRepository: any) {
+  constructor(
+    private readonly constraintsHandler: MediaConstraintsHandler,
+    private readonly deviceSupport: DeviceSupport,
+    private readonly permissionRepository: PermissionRepository
+  ) {
     this.logger = getLogger('MediaStreamHandler');
-    this.constraintsHandler = this.mediaRepository.constraintsHandler;
-    this.deviceSupport = this.mediaRepository.devicesHandler.deviceSupport;
-
     this.requestHintTimeout = undefined;
+
+    this.screensharingMethod = ScreensharingMethods.NONE;
+    if (window.desktopCapturer) {
+      this.screensharingMethod = ScreensharingMethods.DESKTOP_CAPTURER;
+    } else if (navigator.mediaDevices.getDisplayMedia) {
+      this.screensharingMethod = ScreensharingMethods.DISPLAY_MEDIA;
+    } else if (Environment.browser.firefox) {
+      this.screensharingMethod = ScreensharingMethods.USER_MEDIA;
+    }
   }
 
   /**
@@ -82,6 +93,13 @@ export class MediaStreamHandler {
         const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
         throw isPermissionDenied ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION) : error;
       });
+  }
+
+  selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
+    if (this.screensharingMethod === ScreensharingMethods.DESKTOP_CAPTURER) {
+      return showScreenSelection();
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -171,7 +189,7 @@ export class MediaStreamHandler {
     hasPermission: boolean
   ): Promise<MediaStream> {
     const mediaContraints = screen
-      ? this.constraintsHandler.getScreenStreamConstraints()
+      ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
 
     this.logger.info(`Requesting MediaStream`, mediaContraints);
@@ -181,7 +199,7 @@ export class MediaStreamHandler {
       this.schedulePermissionHint(audio, video, screen);
     }
 
-    const supportsGetDisplayMedia = screen && navigator.mediaDevices.getDisplayMedia;
+    const supportsGetDisplayMedia = screen && this.screensharingMethod === ScreensharingMethods.DISPLAY_MEDIA;
     const mediaAPI = supportsGetDisplayMedia
       ? navigator.mediaDevices.getDisplayMedia
       : navigator.mediaDevices.getUserMedia;

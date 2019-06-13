@@ -83,6 +83,7 @@ export class MainViewModel {
       repositories.conversation,
       repositories.audio,
       repositories.media.devicesHandler,
+      repositories.media.streamHandler,
       repositories.permission,
       this.multitasking
     );
