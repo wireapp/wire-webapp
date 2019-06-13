@@ -40,6 +40,10 @@ import {
 
 declare const WebAssembly: any;
 
+// https://lowrey.me/lodash-zipobject-in-es6-javascript/
+const zipObject = (props: any[], values: any[]) =>
+  props.reduce((prev, prop, i) => ({...prev, ...{[prop]: values[i]}}), {});
+
 export class SQLeetEngine implements CRUDEngine {
   private db: any;
   private readonly dbConfig: any;
@@ -237,11 +241,20 @@ export class SQLeetEngine implements CRUDEngine {
 
   async readAll<T>(tableName: string): Promise<T[]> {
     const table = this.schema[tableName];
-    const columns = getFormattedColumnsFromTableName(table, true);
+    const columns = getFormattedColumnsFromTableName(table);
     const escapedTableName = escape(tableName);
+
     const selectRecordStatement = `SELECT ${columns} FROM ${escapedTableName};`;
-    const records = this.db.exec(selectRecordStatement);
-    return records[0].values;
+    let records = this.db.exec(selectRecordStatement);
+
+    // Ensure the record is not empty
+    if (records && records[0]) {
+      records = records[0];
+    } else {
+      return [];
+    }
+
+    return records.values.map((record: any[]) => zipObject(records.columns, record));
   }
 
   async readAllPrimaryKeys(tableName: string): Promise<string[]> {

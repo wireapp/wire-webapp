@@ -52,12 +52,11 @@ export const readAllSpec = {
       primaryKey: 'marge-simpson',
     };
 
-    await Promise.all([
-      engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
-      engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
-      engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-    ]);
+    await engine.create(TABLE_NAME, homer.primaryKey, homer.entity);
+    await engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity);
+    await engine.create(TABLE_NAME, marge.primaryKey, marge.entity);
     const records = await engine.readAll<DomainEntity>(TABLE_NAME);
     expect(records.length).toBe(3);
+    expect(records).toEqual(jasmine.arrayContaining([homer.entity, lisa.entity, marge.entity]));
   },
 };
