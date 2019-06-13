@@ -141,6 +141,7 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
+    this.legalHoldModal.showRequestModal();
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

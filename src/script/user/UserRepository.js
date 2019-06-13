@@ -49,7 +49,7 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {showRequestModal, getFingerprint} from 'Util/LegalHoldUtil';
+import {SHOW_REQUEST_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 export class UserRepository {
   static get CONFIG() {
@@ -374,14 +374,20 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  onLegalHoldRequest(eventJson) {
+  async onLegalHoldRequest(eventJson) {
     if (this.self().id !== eventJson.target_user) {
       return;
     }
     const self = this.self();
     self.hasPendingLegalHold(true);
-    const fingerprint = getFingerprint();
-    showRequestModal(fingerprint);
+    const {client_id, last_prekey, target_user} = eventJson;
+
+    const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
+      target_user,
+      client_id,
+      last_prekey
+    );
+    amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
   }
 
   /**
