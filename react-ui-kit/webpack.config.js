@@ -52,6 +52,7 @@ module.exports = {
   resolve: {
     alias: {
       '@wireapp/react-ui-kit': path.resolve(__dirname, 'src'),
+      'react-dom': '@hot-loader/react-dom',
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
