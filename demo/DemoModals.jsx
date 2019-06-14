@@ -32,87 +32,80 @@ import {
   Paragraph,
   Text,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useState} from 'react';
 
-export class DemoModals extends React.PureComponent {
-  state = {
-    isFullscreenModalOpen: false,
-    isMenuModalOpen: false,
-    isModalOpen: false,
-    isOverlayOpen: false,
-  };
-
-  closeMenuModal = () => this.setState({isMenuModalOpen: false});
-
-  render() {
-    return (
-      <Container>
-        <Line />
-        <H1>Modals</H1>
-        {this.state.isModalOpen && (
-          <Modal onClose={() => this.setState({isModalOpen: false})}>
-            <H2 style={{margin: 0}}>Normal Modal</H2>
-            <Paragraph>
-              <Text block>Normal Modal</Text>
-            </Paragraph>
-            <Button>Button</Button>
-          </Modal>
-        )}
-        {this.state.isFullscreenModalOpen && (
-          <Modal fullscreen onClose={() => this.setState({isFullscreenModalOpen: false})}>
-            <H1>Fullscreen Modal</H1>
-          </Modal>
-        )}
-        {this.state.isOverlayOpen && (
-          <Overlay>
-            <H1>Overlay</H1>
-            <Button onClick={() => this.setState({isOverlayOpen: false})}>Close</Button>
-          </Overlay>
-        )}
-        {this.state.isMenuModalOpen && (
-          <MenuModal data-uie-name="should-be-there" onBackgroundClick={this.closeMenuModal}>
-            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
-              Like
-            </MenuItem>
-            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
-              Edit
-            </MenuItem>
-            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
-              Delete for me...
-            </MenuItem>
-            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
-              Delete for everyone...
-            </MenuItem>
-            <MenuItem data-uie-name="should-be-there" onClick={this.closeMenuModal}>
-              Cancel
-            </MenuItem>
-          </MenuModal>
-        )}
-        <Columns>
-          <Column>Normal</Column>
-          <Column>
-            <Button onClick={() => this.setState({isModalOpen: true})}>Open</Button>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Full screen</Column>
-          <Column>
-            <Button onClick={() => this.setState({isFullscreenModalOpen: true})}>Open</Button>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>MenuModal</Column>
-          <Column>
-            <Button onClick={() => this.setState({isMenuModalOpen: true})}>Open</Button>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>Overlay</Column>
-          <Column>
-            <Button onClick={() => this.setState({isOverlayOpen: true})}>Open</Button>
-          </Column>
-        </Columns>
-      </Container>
-    );
-  }
-}
+export const DemoModals = () => {
+  const [isFullscreenModalOpen, setIsFullscreenModalOpen] = useState(false);
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  return (
+    <Container>
+      <Line />
+      <H1>Modals</H1>
+      {isModalOpen && (
+        <Modal onClose={() => this.setIsModalOpen(false)}>
+          <H2 style={{margin: 0}}>Normal Modal</H2>
+          <Paragraph>
+            <Text block>Normal Modal</Text>
+          </Paragraph>
+          <Button>Button</Button>
+        </Modal>
+      )}
+      {isFullscreenModalOpen && (
+        <Modal fullscreen onClose={() => setIsFullscreenModalOpen(false)}>
+          <H1>Fullscreen Modal</H1>
+        </Modal>
+      )}
+      {isOverlayOpen && (
+        <Overlay>
+          <H1>Overlay</H1>
+          <Button onClick={() => setIsOverlayOpen(false)}>Close</Button>
+        </Overlay>
+      )}
+      {isMenuModalOpen && (
+        <MenuModal data-uie-name="should-be-there" onBackgroundClick={() => setIsMenuModalOpen(false)}>
+          <MenuItem data-uie-name="should-be-there" onClick={() => setIsMenuModalOpen(false)}>
+            Like
+          </MenuItem>
+          <MenuItem data-uie-name="should-be-there" onClick={() => setIsMenuModalOpen(false)}>
+            Edit
+          </MenuItem>
+          <MenuItem data-uie-name="should-be-there" onClick={() => setIsMenuModalOpen(false)}>
+            Delete for me...
+          </MenuItem>
+          <MenuItem data-uie-name="should-be-there" onClick={() => setIsMenuModalOpen(false)}>
+            Delete for everyone...
+          </MenuItem>
+          <MenuItem data-uie-name="should-be-there" onClick={() => setIsMenuModalOpen(false)}>
+            Cancel
+          </MenuItem>
+        </MenuModal>
+      )}
+      <Columns>
+        <Column>Normal</Column>
+        <Column>
+          <Button onClick={() => setIsModalOpen(true)}>Open</Button>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Full screen</Column>
+        <Column>
+          <Button onClick={() => setIsFullscreenModalOpen(true)}>Open</Button>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>MenuModal</Column>
+        <Column>
+          <Button onClick={() => setIsMenuModalOpen(true)}>Open</Button>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Overlay</Column>
+        <Column>
+          <Button onClick={() => setIsOverlayOpen(true)}>Open</Button>
+        </Column>
+      </Columns>
+    </Container>
+  );
+};

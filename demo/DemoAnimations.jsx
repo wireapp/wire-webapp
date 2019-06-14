@@ -32,113 +32,71 @@ import {
   XAxisMovement,
   YAxisMovement,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useState} from 'react';
 
-export class DemoAnimations extends React.PureComponent {
-  state = {
-    showBottomUpAnimation: false,
-    showCombinedAnimation: false,
-    showLeftRightAnimation: false,
-    showOpacityAnimation: true,
-    showRightLeftAnimation: false,
-    showTopDownAnimation: false,
-    showXAxisAnimation: false,
-    showYAxisAnimation: false,
-  };
+export const DemoAnimations = () => {
+  const [animateBottomUp, setAnimateBottomUp] = useState(false);
+  const [animateCombined, setAnimateCombined] = useState(false);
+  const [animateLeftRight, setAnimateLeftRight] = useState(false);
+  const [animateOpacity, setAnimateOpacity] = useState(true);
+  const [animateRightLeft, setAnimateRightLeft] = useState(false);
+  const [animateTopDown, setAnimateTopDown] = useState(false);
+  const [animateXAxis, setAnimateXAxis] = useState(false);
+  const [animateYAxis, setAnimateYAxis] = useState(false);
 
-  render() {
-    return (
-      <Container>
-        <Line />
-        <H1>Animations</H1>
-        <Columns>
-          <Column>
-            <Button
-              onClick={() => this.setState(({showOpacityAnimation}) => ({showOpacityAnimation: !showOpacityAnimation}))}
-            >
-              {'Toggle Opacity Animation'}
-            </Button>
-            <Opacity in={this.state.showOpacityAnimation} startValue={'0'} endValue={'1'}>
-              {'Opacity'}
-            </Opacity>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>
-            <Button
-              onClick={() => this.setState(({showTopDownAnimation}) => ({showTopDownAnimation: !showTopDownAnimation}))}
-            >
-              {'Toggle TopDown Animation'}
-            </Button>
-            <TopDownMovement in={this.state.showTopDownAnimation}>{'TopDown'}</TopDownMovement>
-          </Column>
-          <Column>
-            <Button
-              onClick={() =>
-                this.setState(({showBottomUpAnimation}) => ({showBottomUpAnimation: !showBottomUpAnimation}))
-              }
-            >
-              {'Toggle BottomUp Animation'}
-            </Button>
-            <BottomUpMovement in={this.state.showBottomUpAnimation}>{'BottomUpMovement'}</BottomUpMovement>
-          </Column>
-          <Column>
-            <Button
-              onClick={() => this.setState(({showYAxisAnimation}) => ({showYAxisAnimation: !showYAxisAnimation}))}
-            >
-              {'Toggle YAxis Animation'}
-            </Button>
-            <YAxisMovement in={this.state.showYAxisAnimation} startValue={'50%'} endValue={'-50%'}>
-              {'YAxisMovement'}
-            </YAxisMovement>
-          </Column>
-        </Columns>
-        <Columns>
-          <Column>
-            <Button
-              onClick={() =>
-                this.setState(({showLeftRightAnimation}) => ({showLeftRightAnimation: !showLeftRightAnimation}))
-              }
-            >
-              {'Toggle LeftRight Animation'}
-            </Button>
-            <LeftRightMovement in={this.state.showLeftRightAnimation}>{'LeftRightMovement'}</LeftRightMovement>
-          </Column>
-          <Column>
-            <Button
-              onClick={() => this.setState(({showXAxisAnimation}) => ({showXAxisAnimation: !showXAxisAnimation}))}
-            >
-              {'Toggle XAxis Animation'}
-            </Button>
-            <XAxisMovement in={this.state.showXAxisAnimation} startValue={'10vh'} endValue={'-10vh'}>
-              {'XAxisMovement'}
-            </XAxisMovement>
-          </Column>
-          <Column>
-            <Button
-              onClick={() =>
-                this.setState(({showRightLeftAnimation}) => ({showRightLeftAnimation: !showRightLeftAnimation}))
-              }
-            >
-              {'Toggle RightLeft Animation'}
-            </Button>
-            <RightLeftMovement in={this.state.showRightLeftAnimation}>{'RightLeftMovement'}</RightLeftMovement>
-          </Column>
-        </Columns>
-        <br />
-        <Button
-          onClick={() => this.setState(({showCombinedAnimation}) => ({showCombinedAnimation: !showCombinedAnimation}))}
-        >
-          {'Toggle Combined Animation'}
-        </Button>
-        <TopDownMovement in={this.state.showCombinedAnimation}>
-          <Opacity in={this.state.showCombinedAnimation}>
-            <XAxisMovement in={this.state.showCombinedAnimation} startValue={'40vh'} endValue={'10vh'}>
-              {'Combined Animation'}
-            </XAxisMovement>
+  return (
+    <Container>
+      <Line />
+      <H1>Animations</H1>
+      <Columns>
+        <Column>
+          <Button onClick={() => setAnimateOpacity(!animateOpacity)}>{'Toggle Opacity Animation'}</Button>
+          <Opacity in={animateOpacity} startValue={'0'} endValue={'1'}>
+            {'Opacity'}
           </Opacity>
-        </TopDownMovement>
-      </Container>
-    );
-  }
-}
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>
+          <Button onClick={() => setAnimateTopDown(!animateTopDown)}>{'Toggle TopDown Animation'}</Button>
+          <TopDownMovement in={animateTopDown}>{'TopDown'}</TopDownMovement>
+        </Column>
+        <Column>
+          <Button onClick={() => setAnimateBottomUp(!animateBottomUp)}>{'Toggle BottomUp Animation'}</Button>
+          <BottomUpMovement in={animateBottomUp}>{'BottomUpMovement'}</BottomUpMovement>
+        </Column>
+        <Column>
+          <Button onClick={() => setAnimateYAxis(!animateYAxis)}>{'Toggle YAxis Animation'}</Button>
+          <YAxisMovement in={animateYAxis} startValue={'50%'} endValue={'-50%'}>
+            {'YAxisMovement'}
+          </YAxisMovement>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>
+          <Button onClick={() => setAnimateLeftRight(!animateLeftRight)}>{'Toggle LeftRight Animation'}</Button>
+          <LeftRightMovement in={animateLeftRight}>{'LeftRightMovement'}</LeftRightMovement>
+        </Column>
+        <Column>
+          <Button onClick={() => setAnimateXAxis(!animateXAxis)}>{'Toggle XAxis Animation'}</Button>
+          <XAxisMovement in={animateXAxis} startValue={'10vh'} endValue={'-10vh'}>
+            {'XAxisMovement'}
+          </XAxisMovement>
+        </Column>
+        <Column>
+          <Button onClick={() => setAnimateRightLeft(!animateRightLeft)}>{'Toggle RightLeft Animation'}</Button>
+          <RightLeftMovement in={animateRightLeft}>{'RightLeftMovement'}</RightLeftMovement>
+        </Column>
+      </Columns>
+      <br />
+      <Button onClick={() => setAnimateCombined(!animateCombined)}>{'Toggle Combined Animation'}</Button>
+      <TopDownMovement in={animateCombined}>
+        <Opacity in={animateCombined}>
+          <XAxisMovement in={animateCombined} startValue={'40vh'} endValue={'10vh'}>
+            {'Combined Animation'}
+          </XAxisMovement>
+        </Opacity>
+      </TopDownMovement>
+    </Container>
+  );
+};
