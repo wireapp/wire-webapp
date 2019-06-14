@@ -22,8 +22,8 @@ import {Conversation} from '../entity/Conversation';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface LegalHoldParams {
-  isPending: boolean;
-  large: boolean;
+  isPending?: ko.Observable<boolean>;
+  large?: boolean;
   conversation?: Conversation;
   legalHoldModal?: LegalHoldModalViewModel;
 }
@@ -31,13 +31,18 @@ interface LegalHoldParams {
 ko.components.register('legal-hold-dot', {
   template: `
     <div class="legal-hold-dot"
-         data-bind="click: onClick, css: {'legal-hold-dot--interactive': isInteractive, 'legal-hold-dot--large': large, 'legal-hold-dot--active': !isPending}">
+         data-bind="click: onClick, css: {'legal-hold-dot--interactive': isInteractive, 'legal-hold-dot--large': large, 'legal-hold-dot--active': !isPending()}">
       <!-- ko if: isPending -->
         <pending-icon></pending-icon>
       <!-- /ko -->
     </div>
     `,
-  viewModel: function({isPending = false, large = false, conversation, legalHoldModal}: LegalHoldParams): void {
+  viewModel: function({
+    isPending = ko.observable(false),
+    large = false,
+    conversation,
+    legalHoldModal,
+  }: LegalHoldParams): void {
     this.large = large;
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
