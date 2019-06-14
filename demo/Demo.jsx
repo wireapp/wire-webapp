@@ -50,7 +50,8 @@ import Helmet from 'react-helmet';
 import React from 'react';
 import {avatarBase64} from './avatarImage';
 
-export class Demo extends React.PureComponent {
+// eslint-disable-next-line import/no-default-export
+export default class Demo extends React.PureComponent {
   state = {
     currentPage: 0,
     showFirstDropdown: false,
