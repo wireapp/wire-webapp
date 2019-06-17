@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.8.2...@wireapp/commons@1.9.0) (2019-06-17)
+
+
+### Features
+
+* **api-client,core,commons:** Chunked /users requests & typed ArrayUtils ([#1950](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/1950)) ([b8642f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/b8642f0))
+
+
+
+
+
 ## [1.8.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@1.8.1...@wireapp/commons@1.8.2) (2019-06-12)
 
 **Note:** Version bump only for package @wireapp/commons

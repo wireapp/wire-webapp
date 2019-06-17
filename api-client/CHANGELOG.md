@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.4.3...@wireapp/api-client@5.5.0) (2019-06-17)
+
+
+### Features
+
+* **api-client,core,commons:** Chunked /users requests & typed ArrayUtils ([#1950](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1950)) ([b8642f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b8642f0))
+
+
+
+
+
 ## [5.4.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.4.2...@wireapp/api-client@5.4.3) (2019-06-14)
 
 **Note:** Version bump only for package @wireapp/api-client
