@@ -33,7 +33,7 @@ export class UserService {
     if (typeof userIds === 'string') {
       userIds = [userIds];
     }
-    return this.apiClient.user.api.getUsersByIds(userIds);
+    return this.apiClient.user.api.getUsers({ids: userIds});
   }
 
   public setAvailability(teamId: string, type: AvailabilityType): Promise<void> {
