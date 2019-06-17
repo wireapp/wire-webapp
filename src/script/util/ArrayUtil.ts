@@ -127,4 +127,4 @@ export const deArrayify = <T>(value: T[] | T): T => (value instanceof Array ? va
 
 export const uniquify = <T>(elements: T[]): T[] => Array.from(new Set<T>(elements));
 
-export const flatten = <T>(arrays: T[][]): T[] => [].concat(...arrays);
+export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);
