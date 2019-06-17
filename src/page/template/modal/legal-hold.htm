@@ -2,7 +2,7 @@
   <modal params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed" data-uie-name="legal-hold-modal">
     <div class="modal__header">
       <!-- ko if: showRequest() -->
-        <div class="modal__header__title" data-bind="text: t('legalHoldModalTitle')"></div>
+        <div class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></div>
       <!-- /ko -->
       <!-- ko ifnot: showRequest() -->
         <close-icon class="modal__header__button" data-bind="click: onBgClick" data-uie-name="do-close"></close-icon>
@@ -21,6 +21,9 @@
           <div data-bind="html: t('legalHoldModalText', {}, {br: '<br>', fingerprint: requestFingerprint()})"></div>
         </div>
         <input class="modal__input" type="password" data-bind="textInput: passwordValue"/>
+        <!-- ko if: requestError() -->
+          <div class="modal__input__error" data-bind="text: requestError()" data-uie-name="status-error"></div>
+        <!-- /ko -->
         <div class="modal__buttons">
           <div data-bind="text: t('legalHoldModalSecondaryAction'), click: closeRequest" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
           <div data-bind="text: t('legalHoldModalPrimaryAction'), click: acceptRequest" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
