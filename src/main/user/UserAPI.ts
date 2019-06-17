@@ -19,6 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {chunk, flatten, removeDuplicates} from '@wireapp/commons/dist/commonjs/util/ArrayUtil';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {PublicClient} from '../client/';
 import {UserClients} from '../conversation/UserClients';
@@ -38,6 +39,7 @@ import {
 } from '../user/';
 
 export class UserAPI {
+  static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
   static readonly URL = {
     ACTIVATE: '/activate',
     CALLS: '/calls',
@@ -254,7 +256,34 @@ export class UserAPI {
    * @param parameters Multiple user's handles or IDs
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    */
-  public getUsers(parameters: {handles?: string[]; ids?: string[]}): Promise<User[]> {
+  public async getUsers(parameters: {ids: string[]}, limit?: number): Promise<User[]>;
+  public async getUsers(parameters: {handles: string[]}, limit?: number): Promise<User[]>;
+  public async getUsers(
+    parameters: {ids?: string[]; handles?: string[]},
+    limit: number = UserAPI.DEFAULT_USERS_CHUNK_SIZE
+  ): Promise<User[]> {
+    const {handles, ids} = parameters;
+
+    if (handles && handles.length) {
+      const uniqueHandles = removeDuplicates(handles);
+      const handleChunks = chunk(uniqueHandles, limit);
+      const tasks = handleChunks.map(handleChunk => this._getUsers({handles: handleChunk}));
+      return Promise.all(tasks).then(flatten);
+    }
+
+    if (ids && ids.length) {
+      const uniqueIds = removeDuplicates(ids);
+      const idChunks = chunk(uniqueIds, limit);
+      const tasks = idChunks.map(idChunk => this._getUsers({ids: idChunk}));
+      return Promise.all(tasks).then(flatten);
+    }
+
+    return [];
+  }
+
+  private async _getUsers(parameters: {ids: string[]}): Promise<User[]>;
+  private async _getUsers(parameters: {handles: string[]}): Promise<User[]>;
+  private async _getUsers(parameters: {handles?: string[]; ids?: string[]}): Promise<User[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {},
@@ -271,26 +300,14 @@ export class UserAPI {
   }
 
   /**
-   * List users.
+   * DEPRECATED: List users.
+   * @deprecated
    * @param userIds Multiple user's IDs
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    */
   public async getUsersByIds(userIds: string[]): Promise<User[]> {
     const maxChunkSize = 100;
-    let allUsers: User[] = [];
-
-    for (let index = 0; index < userIds.length; index += maxChunkSize) {
-      const requestChunk = userIds.slice(index, index + maxChunkSize);
-      if (requestChunk.length) {
-        const conversationChunk = await this.getUsers({ids: requestChunk});
-
-        if (conversationChunk.length) {
-          allUsers = allUsers.concat(conversationChunk);
-        }
-      }
-    }
-
-    return allUsers;
+    return this.getUsers({ids: userIds}, maxChunkSize);
   }
 
   /**
