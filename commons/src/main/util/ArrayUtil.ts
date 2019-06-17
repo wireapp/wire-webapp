@@ -17,26 +17,28 @@
  *
  */
 
-export function chunk(array: any[], size: number): any[][] {
+export function chunk<T>(array: T[], chunkSize: number): T[][] {
   const chunks = [];
-  for (let index = 0, length = array.length; index < length; index += size) {
-    chunks.push(array.slice(index, index + size));
+  for (let index = 0, length = array.length; index < length; index += chunkSize) {
+    chunks.push(array.slice(index, index + chunkSize));
   }
   return chunks;
 }
 
-export function getDeduplicatedUnion(array1: any[], array2: any[]): any[] {
+export function getDeduplicatedUnion<T>(array1: T[], array2: T[]): T[] {
   return removeDuplicates(array1.concat(array2));
 }
 
-export function getDifference(array1: any[], array2: any[]): any[] {
+export function getDifference<T>(array1: T[], array2: T[]): T[] {
   return array1.filter(value => !array2.includes(value));
 }
 
-export function getIntersection(array1: any[], array2: any[]): any[] {
+export function getIntersection<T>(array1: T[], array2: T[]): T[] {
   return array1.filter(value => array2.includes(value));
 }
 
-export function removeDuplicates(array: any[]): any[] {
+export function removeDuplicates<T>(array: T[]): T[] {
   return Array.from(new Set(array));
 }
+
+export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);

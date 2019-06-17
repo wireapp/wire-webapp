@@ -124,4 +124,11 @@ describe('ArrayUtil', () => {
       expect(ArrayUtil.removeDuplicates(array)).toEqual(['T', 'o', 't']);
     });
   });
+  describe('"flatten"', () => {
+    it('returns a flattened array', () => {
+      const arrays = [[1, 2, 3], [4, 5, 6]];
+
+      expect(ArrayUtil.flatten(arrays)).toEqual([1, 2, 3, 4, 5, 6]);
+    });
+  });
 });
