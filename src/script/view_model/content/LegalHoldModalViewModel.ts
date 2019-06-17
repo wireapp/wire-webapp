@@ -115,9 +115,9 @@ export class LegalHoldModalViewModel {
 
   acceptRequest = async () => {
     const selfUser = this.userRepository.self();
+    this.requestError('');
     try {
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, this.passwordValue());
-      this.requestError('');
       this.isVisible(false);
     } catch ({message}) {
       this.requestError(message);
