@@ -20,6 +20,7 @@
 import {getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {uniquify, chunk, flatten} from 'Util/ArrayUtil';
 
 export class UserService {
   static get URL() {
@@ -126,13 +127,19 @@ export class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   getUsers(userIds) {
-    return this.backendClient.sendRequest({
-      data: {
-        ids: userIds.join(','),
-      },
-      type: 'GET',
-      url: UserService.URL.USERS,
-    });
+    const chunkSize = 50;
+    const uniqueUserIds = uniquify(userIds);
+    const idChunks = chunk(uniqueUserIds, chunkSize);
+    const idLists = idChunks.map(idChunk => idChunk.join(','));
+    return Promise.all(
+      idLists.map(ids =>
+        this.backendClient.sendRequest({
+          data: {ids},
+          type: 'GET',
+          url: UserService.URL.USERS,
+        })
+      )
+    ).then(flatten);
   }
 
   /**
