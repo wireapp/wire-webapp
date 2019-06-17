@@ -127,9 +127,9 @@ export class UserService {
    * @returns {Promise} Resolves with backend response.
    */
   getUsers(userIds) {
-    const maxRequestCount = 50;
+    const chunkSize = 50;
     const uniqueUserIds = uniquify(userIds);
-    const idChunks = chunk(uniqueUserIds, maxRequestCount);
+    const idChunks = chunk(uniqueUserIds, chunkSize);
     const idLists = idChunks.map(idChunk => idChunk.join(','));
     return Promise.all(
       idLists.map(ids =>
