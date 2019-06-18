@@ -5,7 +5,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.4.4",
     "@babel/preset-typescript": "7.3.3",
     "@types/sql.js": "1.0.1",
-    "@wireapp/store-engine": "3.0.12",
+    "@wireapp/store-engine": "3.0.13",
     "sql.js": "https://github.com/pwnsdx/sqleet.js#a078babcad5e6beda01370466328e47b3c4a2de7",
     "uint32": "0.2.1"
   },
@@ -15,7 +15,7 @@
     "@types/node": "~10",
     "@types/uint32": "0.2.0",
     "babel-loader": "8.0.6",
-    "bazinga64": "5.4.12",
+    "bazinga64": "5.4.13",
     "jasmine": "3.4.0",
     "karma": "4.1.0",
     "karma-chrome-launcher": "2.2.0",
@@ -41,5 +41,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.1.9"
+  "version": "0.1.10"
 }

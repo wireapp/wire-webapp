@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.5.0...@wireapp/api-client@5.5.1) (2019-06-18)
+
+
+### Bug Fixes
+
+* **api-client:** Require password for member legal hold deletion ([#1954](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1954)) ([5a8da3d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/5a8da3d))
+
+
+
+
+
 # [5.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.4.3...@wireapp/api-client@5.5.0) (2019-06-17)
 
 
