@@ -715,15 +715,26 @@ export class ClientRepository {
    * @param {Object} [eventJson={}] - JSON data of 'user.client-remove' event
    * @returns {Promise} Resolves when the event has been handled
    */
-  onClientRemove(eventJson = {}) {
+  async onClientRemove(eventJson = {}) {
     const clientId = eventJson.client ? eventJson.client.id : undefined;
-    if (clientId) {
-      const isCurrentClient = clientId === this.currentClient().id;
-      if (isCurrentClient) {
-        return this.removeLocalClient();
-      }
-
-      amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
+    if (!clientId) {
+      return;
     }
+
+    const isCurrentClient = clientId === this.currentClient().id;
+    if (isCurrentClient) {
+      return this.removeLocalClient();
+    }
+    const localClients = await this.getClientsForSelf();
+    const removedClient = localClients.find(client => client.id === clientId);
+    if (removedClient.class === 'legalhold') {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: 'Future messages will not be recorded.',
+          title: 'Legal hold deactivated',
+        },
+      });
+    }
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
   }
 }
