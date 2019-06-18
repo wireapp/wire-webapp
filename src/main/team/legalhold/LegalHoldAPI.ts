@@ -44,8 +44,11 @@ export class LegalHoldAPI {
     return response.data;
   }
 
-  public async deleteMemberLegalHold(teamId: string, userId: string): Promise<void> {
+  public async deleteMemberLegalHold(teamId: string, userId: string, password: string): Promise<void> {
     const config: AxiosRequestConfig = {
+      data: {
+        password,
+      },
       method: 'delete',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${LegalHoldAPI.URL.LEGAL_HOLD}/${userId}`,
     };
