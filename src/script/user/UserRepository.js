@@ -51,6 +51,8 @@ import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {SHOW_REQUEST_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class UserRepository {
   static get CONFIG() {
     return {
@@ -457,7 +459,7 @@ export class UserRepository {
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
         .catch(error => {
-          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }
@@ -562,7 +564,7 @@ export class UserRepository {
       .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
-        if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code !== BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
       });
@@ -728,7 +730,7 @@ export class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -751,10 +753,7 @@ export class UserRepository {
         })
         .catch(({code: error_code}) => {
           if (
-            [
-              z.error.BackendClientError.STATUS_CODE.CONFLICT,
-              z.error.BackendClientError.STATUS_CODE.BAD_REQUEST,
-            ].includes(error_code)
+            [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
           ) {
             throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
           }
@@ -783,10 +782,10 @@ export class UserRepository {
     return this.user_service
       .checkUserHandle(username)
       .catch(({code: error_code}) => {
-        if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
-        if (error_code === z.error.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
           throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
         throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);

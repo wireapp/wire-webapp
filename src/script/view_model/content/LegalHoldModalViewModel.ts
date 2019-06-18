@@ -28,7 +28,9 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {t} from 'Util/LocalizerUtil';
 import {promiseProgress} from 'Util/PromiseUtil';
+import {BackendClientError} from '../../error/BackendClientError';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 
@@ -119,8 +121,20 @@ export class LegalHoldModalViewModel {
     try {
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, this.passwordValue());
       this.isVisible(false);
-    } catch ({message}) {
-      this.requestError(message);
+    } catch ({code, message}) {
+      switch (code) {
+        case BackendClientError.STATUS_CODE.BAD_REQUEST: {
+          this.requestError(t('BackendError.LABEL.BAD_REQUEST'));
+          break;
+        }
+        case BackendClientError.STATUS_CODE.FORBIDDEN: {
+          this.requestError(t('BackendError.LABEL.ACCESS_DENIED'));
+          break;
+        }
+        default: {
+          this.requestError(message);
+        }
+      }
     }
   };
 

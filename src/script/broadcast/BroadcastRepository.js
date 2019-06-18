@@ -22,6 +22,8 @@ import {getLogger} from 'Util/Logger';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {WebAppEvents} from '../event/WebApp';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
   /**
@@ -97,7 +99,7 @@ class BroadcastRepository {
         return response;
       })
       .catch(error => {
-        const isUnknownClient = error.label === z.error.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           this.clientRepository.removeLocalClient();
         }

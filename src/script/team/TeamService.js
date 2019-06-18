@@ -58,7 +58,7 @@ export class TeamService {
   }
 
   sendLegalHoldApproval(teamId, userId, password) {
-    return this.backendClient.sendRequest({
+    return this.backendClient.sendJson({
       data: {
         password,
       },

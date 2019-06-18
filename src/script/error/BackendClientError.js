@@ -17,10 +17,9 @@
  *
  */
 
-window.z = window.z || {};
-window.z.error = z.error || {};
+import {BaseError} from './BaseError';
 
-z.error.BackendClientError = class BackendClientError extends z.error.BaseError {
+export class BackendClientError extends BaseError {
   constructor(params) {
     const message = params.message || `${params}`;
 
@@ -92,4 +91,8 @@ z.error.BackendClientError = class BackendClientError extends z.error.BaseError 
       GENERIC: 'GENERIC',
     };
   }
-};
+}
+
+window.z = window.z || {};
+window.z.error = z.error || {};
+z.error.BackendClientError = BackendClientError;

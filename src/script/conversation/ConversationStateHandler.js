@@ -30,6 +30,8 @@ import {AbstractConversationEventHandler} from './AbstractConversationEventHandl
 
 import {EventName} from '../tracking/EventName';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   /**
    * @param {ConversationService} conversationService - Service for conversation related backend interactions
@@ -99,7 +101,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .getConversationCode(conversationEntity.id)
       .then(response => this.conversationMapper.mapAccessCode(conversationEntity, response))
       .catch(error => {
-        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (!isNotFound) {
           this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
         }
