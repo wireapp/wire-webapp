@@ -727,11 +727,11 @@ export class ClientRepository {
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
-    if (removedClient.class === 'legalhold') {
+    if (removedClient && removedClient.isLegalHold()) {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: 'Future messages will not be recorded.',
-          title: 'Legal hold deactivated',
+          message: t('modalLegalHoldDeactivatedMessage'),
+          title: t('modalLegalHoldDeactivatedTitle'),
         },
       });
     }
