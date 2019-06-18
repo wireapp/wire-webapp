@@ -328,10 +328,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.8.1":
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.8.1.tgz#39bee8451d16fc5765454ea2d49dbf8bfe62d8b5"
-  integrity sha512-uLctPOsoBkZJu0WvR+DIrK+Tr78lPcilBGalG/1ag1vlVP+2J9CK5d+N12PKgR8AKFIfuy1ejwjkUV5PSZj7lQ==
+"@wireapp/commons@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.9.0.tgz#f6faa62bd0b5cbf596ce3f4d0fd1531bcb5e578a"
+  integrity sha512-g9OKjGzVafH0yh0t35KKLjpH71/jAqqoI43tb1051A7yNUYT3rcjrrjsmPJzZEx7BHJgreVUJ/OPFPLNgCbZ4g==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/fs-extra" "7.0.0"
@@ -3651,10 +3651,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-ts-node@8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.2.0.tgz#4a89754b00560bb24cd54526e1685fa38c45f240"
-  integrity sha512-m8XQwUurkbYqXrKqr3WHCW310utRNvV5OnRVeISeea7LoCWVcdfeB/Ntl8JYWFh+WRoUAdBgESrzKochQt7sMw==
+ts-node@8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.3.0.tgz#e4059618411371924a1fb5f3b125915f324efb57"
+  integrity sha512-dyNS/RqyVTDcmNM4NIBAeDMpsAdaQ+ojdf0GOLqE6nwJOgzEkdRNzJywhDfwnuvB10oa6NLVG1rUJQCpRN7qoQ==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
@@ -3748,10 +3748,10 @@ type-is@~1.6.17, type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-typescript@3.5.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.1.tgz#ba72a6a600b2158139c5dd8850f700e231464202"
-  integrity sha512-64HkdiRv1yYZsSe4xC1WVgamNigVYjlssIoaH2HcZF0+ijsk5YK2g0G34w9wJkze8+5ow4STd22AynfO6ZYYLw==
+typescript@3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.2.tgz#a09e1dc69bc9551cadf17dba10ee42cf55e5d56c"
+  integrity sha512-7KxJovlYhTX5RaRbUdkAXN1KUZ8PwWlTzQdHV6xNqvuFOs7+WBo10TQUqT19Q/Jz2hk5v9TQDIhyLhhJY4p5AA==
 
 typpy@2.3.10:
   version "2.3.10"
