@@ -32,7 +32,7 @@
     "typescript": "3.5.2",
     "webpack": "4.34.0",
     "webpack-cli": "3.3.4",
-    "webpack-dev-server": "3.7.1",
+    "webpack-dev-server": "3.7.2",
     "webpack-env": "0.8.0"
   },
   "peerDependencies": {
