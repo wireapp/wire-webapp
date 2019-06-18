@@ -17,7 +17,7 @@
  *
  */
 
-import {chunk, getNextItem, interpolate, isLastItem, iterateIndex} from 'Util/ArrayUtil';
+import {chunk, getNextItem, interpolate, isLastItem, iterateIndex, uniquify, flatten} from 'Util/ArrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {
@@ -124,6 +124,24 @@ describe('ArrayUtil', () => {
       expect(iterateIndex(array, 2)).toBe(3);
       expect(iterateIndex(array, 3)).toBe(4);
       expect(iterateIndex(array, 4)).toBe(0);
+    });
+  });
+
+  describe('uniquify', () => {
+    it('returns an array with unique elements of the input array', () => {
+      const numberArray = [1, 2, 3, 1, 4, 5, 5, 6];
+      const stringArray = ['abc', 'def', 'ghi', 'abc', 'jkl', 'mno', 'mno', 'pqr'];
+
+      expect(uniquify(numberArray)).toEqual([1, 2, 3, 4, 5, 6]);
+      expect(uniquify(stringArray)).toEqual(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr']);
+    });
+  });
+
+  describe('flatten', () => {
+    it('returns a flattened array', () => {
+      const arrays = [[1, 2, 3], [4, 5, 6]];
+
+      expect(flatten(arrays)).toEqual([1, 2, 3, 4, 5, 6]);
     });
   });
 });

@@ -48,9 +48,7 @@ const dependencies = {
 
 const configVersion = dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
-const dockerImageTag = `${dockerRegistryDomain}/wire/webapp${suffix}:${buildCounter}-${
-  pkg.version
-}-${commitShortSha}-${configVersion}${stage}`;
+const dockerImageTag = `${dockerRegistryDomain}/wire/webapp${suffix}:${buildCounter}-${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
 
 child.execSync(
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
