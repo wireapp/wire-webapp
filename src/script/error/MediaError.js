@@ -17,10 +17,12 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.MediaError = class MediaError extends z.error.BaseError {
+z.error.MediaError = class MediaError extends BaseError {
   constructor(type, mediaType, message) {
     super('MediaError', type, message);
 

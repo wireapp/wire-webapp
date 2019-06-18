@@ -25,6 +25,8 @@ import {AuthRepository} from '../auth/AuthRepository';
 import {QUEUE_STATE} from '../service/QueueState';
 import {WebAppEvents} from '../event/WebApp';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class BackendClient {
   static get CONFIG() {
     return {
@@ -51,25 +53,25 @@ export class BackendClient {
 
   static get IGNORED_BACKEND_ERRORS() {
     return [
-      z.error.BackendClientError.STATUS_CODE.BAD_GATEWAY,
-      z.error.BackendClientError.STATUS_CODE.CONFLICT,
-      z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
-      z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
-      z.error.BackendClientError.STATUS_CODE.NOT_FOUND,
-      z.error.BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
-      z.error.BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
-      z.error.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
-      z.error.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
+      BackendClientError.STATUS_CODE.BAD_GATEWAY,
+      BackendClientError.STATUS_CODE.CONFLICT,
+      BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
+      BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
+      BackendClientError.STATUS_CODE.NOT_FOUND,
+      BackendClientError.STATUS_CODE.PRECONDITION_FAILED,
+      BackendClientError.STATUS_CODE.REQUEST_TIMEOUT,
+      BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE,
+      BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS,
     ];
   }
 
   static get IGNORED_BACKEND_LABELS() {
     return [
-      z.error.BackendClientError.LABEL.INVALID_CREDENTIALS,
-      z.error.BackendClientError.LABEL.PASSWORD_EXISTS,
-      z.error.BackendClientError.LABEL.TOO_MANY_CLIENTS,
-      z.error.BackendClientError.LABEL.TOO_MANY_MEMBERS,
-      z.error.BackendClientError.LABEL.UNKNOWN_CLIENT,
+      BackendClientError.LABEL.INVALID_CREDENTIALS,
+      BackendClientError.LABEL.PASSWORD_EXISTS,
+      BackendClientError.LABEL.TOO_MANY_CLIENTS,
+      BackendClientError.LABEL.TOO_MANY_MEMBERS,
+      BackendClientError.LABEL.UNKNOWN_CLIENT,
     ];
   }
 
@@ -300,14 +302,14 @@ export class BackendClient {
         .done(responseData => resolve(responseData))
         .fail(({responseJSON: response, status: statusCode, wireRequest}) => {
           switch (statusCode) {
-            case z.error.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
+            case BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.queueState(QUEUE_STATE.CONNECTIVITY_PROBLEM);
               this._prependRequestQueue(config, resolve, reject);
 
               return this.executeOnConnectivity().then(() => this.executeRequestQueue());
             }
 
-            case z.error.BackendClientError.STATUS_CODE.FORBIDDEN: {
+            case BackendClientError.STATUS_CODE.FORBIDDEN: {
               if (response) {
                 const errorLabel = response.label;
                 const errorMessage = `Server request forbidden: ${errorLabel}`;
@@ -328,10 +330,10 @@ export class BackendClient {
               break;
             }
 
-            case z.error.BackendClientError.STATUS_CODE.ACCEPTED:
-            case z.error.BackendClientError.STATUS_CODE.CREATED:
-            case z.error.BackendClientError.STATUS_CODE.NO_CONTENT:
-            case z.error.BackendClientError.STATUS_CODE.OK: {
+            case BackendClientError.STATUS_CODE.ACCEPTED:
+            case BackendClientError.STATUS_CODE.CREATED:
+            case BackendClientError.STATUS_CODE.NO_CONTENT:
+            case BackendClientError.STATUS_CODE.OK: {
               // Prevent empty valid response from being rejected
               if (!response) {
                 return resolve({});
@@ -339,7 +341,7 @@ export class BackendClient {
               break;
             }
 
-            case z.error.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+            case BackendClientError.STATUS_CODE.UNAUTHORIZED: {
               if (!config.skipRetry) {
                 this._prependRequestQueue(config, resolve, reject);
 
@@ -362,7 +364,7 @@ export class BackendClient {
             }
           }
 
-          reject(response || new z.error.BackendClientError(statusCode));
+          reject(response || new BackendClientError(statusCode));
         });
     });
   }

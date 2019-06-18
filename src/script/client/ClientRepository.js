@@ -38,6 +38,8 @@ import {ClientType} from './ClientType';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class ClientRepository {
   static get CONFIG() {
     return {
@@ -117,7 +119,7 @@ export class ClientRepository {
    */
   getClientByIdFromBackend(clientId) {
     return this.clientService.getClientById(clientId).catch(error => {
-      const clientNotFoundBackend = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const clientNotFoundBackend = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
         throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
@@ -302,7 +304,7 @@ export class ClientRepository {
       .generateClientKeys()
       .then(keys => this.clientService.postClients(this._createRegistrationPayload(clientType, password, keys)))
       .catch(error => {
-        const tooManyClients = error.label === z.error.BackendClientError.LABEL.TOO_MANY_CLIENTS;
+        const tooManyClients = error.label === BackendClientError.LABEL.TOO_MANY_CLIENTS;
         if (tooManyClients) {
           throw new z.error.ClientError(z.error.ClientError.TYPE.TOO_MANY_CLIENTS);
         }
@@ -457,7 +459,7 @@ export class ClientRepository {
       .catch(error => {
         this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
 
-        const isForbidden = z.error.BackendClientError.STATUS_CODE.FORBIDDEN;
+        const isForbidden = BackendClientError.STATUS_CODE.FORBIDDEN;
         const errorType = isForbidden
           ? z.error.ClientError.TYPE.REQUEST_FORBIDDEN
           : z.error.ClientError.TYPE.REQUEST_FAILURE;

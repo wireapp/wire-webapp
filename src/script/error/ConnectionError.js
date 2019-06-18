@@ -17,10 +17,12 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.ConnectionError = class ConnectionError extends z.error.BaseError {
+z.error.ConnectionError = class ConnectionError extends BaseError {
   constructor(type, message) {
     super('ConnectionError', type, message);
   }

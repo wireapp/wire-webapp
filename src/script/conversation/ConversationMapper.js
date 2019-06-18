@@ -91,6 +91,7 @@ import {ConversationStatus} from './ConversationStatus';
 
 import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
+import {BaseError} from '../error/BaseError';
 
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 export class ConversationMapper {
@@ -108,10 +109,10 @@ export class ConversationMapper {
    */
   mapConversations(conversationsData, timestamp = 1) {
     if (conversationsData === undefined) {
-      throw new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER);
+      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
     if (!_.isArray(conversationsData) || !conversationsData.length) {
-      throw new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+      throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData, index) => {
       return this._createConversationEntity(conversationData, timestamp + index);
@@ -254,10 +255,10 @@ export class ConversationMapper {
    */
   _createConversationEntity(conversationData, initialTimestamp) {
     if (conversationData === undefined) {
-      throw new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER);
+      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
     if (!_.isObject(conversationData) || !Object.keys(conversationData).length) {
-      throw new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+      throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
 
     const {creator, id, members, name, others, type} = conversationData;

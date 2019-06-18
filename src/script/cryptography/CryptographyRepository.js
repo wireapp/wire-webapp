@@ -31,6 +31,8 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class CryptographyRepository {
   static get CONFIG() {
     return {
@@ -172,7 +174,7 @@ export class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
@@ -189,7 +191,7 @@ export class CryptographyRepository {
    */
   getUsersPreKeys(recipients) {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
         throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
       }

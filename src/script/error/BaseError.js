@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.error = z.error || {};
-
-z.error.BaseError = class BaseError extends Error {
+export class BaseError extends Error {
   constructor(name, type, message) {
     super();
 
@@ -54,4 +51,4 @@ z.error.BaseError = class BaseError extends Error {
       UNKNOWN: 'UNKNOWN',
     };
   }
-};
+}
