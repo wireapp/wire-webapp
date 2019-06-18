@@ -29,7 +29,7 @@
     "react-hot-loader": "4.11.1",
     "react-test-renderer": "16.8.6",
     "rimraf": "2.6.3",
-    "typescript": "3.5.1",
+    "typescript": "3.5.2",
     "webpack": "4.34.0",
     "webpack-cli": "3.3.4",
     "webpack-dev-server": "3.7.1",
