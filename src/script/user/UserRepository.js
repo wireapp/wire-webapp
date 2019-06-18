@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
@@ -369,8 +368,7 @@ export class UserRepository {
       messageId: createRandomUuid(),
     });
 
-    const users = this.teamUsers().concat(this.self());
-    const recipients = this._createRecipients(users, true);
+    const recipients = this.teamUsers().concat(this.self());
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
@@ -388,22 +386,6 @@ export class UserRepository {
       last_prekey
     );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
-  }
-
-  /**
-   * @param {Array<User>} userEntities - Recipients of the message
-   * @param {boolean} [filterLegalHold] - `true` if Legal Hold clients should be filtered
-   * @private
-   * @returns {Object} A user client map
-   */
-  _createRecipients(userEntities, filterLegalHold = false) {
-    return userEntities.reduce((recipients, userEntity) => {
-      recipients[userEntity.id] = userEntity
-        .devices()
-        .filter(clientEntity => (filterLegalHold ? clientEntity.class !== ClientClassification.LEGAL_HOLD : true))
-        .map(clientEntity => clientEntity.id);
-      return recipients;
-    }, {});
   }
 
   /**
