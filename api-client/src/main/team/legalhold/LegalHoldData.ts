@@ -25,7 +25,7 @@ export enum LegalHoldStatus {
 
 export interface LegalHoldSettings {
   base_url: string;
-  fingerprint: string;
+  public_key: string;
   team_id: string;
 }
 
