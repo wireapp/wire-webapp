@@ -82,7 +82,7 @@ import userInputGlobal from 'Components/userInput.js';
 import guestModeToggleGlobal from 'Components/guestModeToggle.js';
 import infoToggleGlobal from 'Components/infoToggle.js';
 import iconsGlobal from 'Components/icons.js';
-import modalGlobal from 'Components/modal.js';
+import modalGlobal from 'Components/modal.ts';
 import assetHeaderGlobal from 'Components/asset/assetHeader.js';
 import audioSeekBarGlobal from 'Components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from 'Components/asset/controls/seekBar.js';

@@ -51,7 +51,7 @@ ko.components.register('legal-hold-dot', {
       event.stopPropagation();
       if (this.isInteractive) {
         if (isPending()) {
-          return legalHoldModal.showRequestModal();
+          return legalHoldModal.showRequestModal(true);
         }
         if (conversation) {
           return legalHoldModal.showUsers(conversation);
