@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.8.11...@wireapp/react-ui-kit@7.0.0) (2019-06-19)
+
+
+### Features
+
+* **commons:** Remove Omit and empty interfaces (BREAKING) ([#1957](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/1957)) ([4e7ac1f](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4e7ac1f))
+
+
+### BREAKING CHANGES
+
+* **commons:** Omit was removed since it is included in the standard library now.
+
+
+
+
+
 ## [6.8.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@6.8.10...@wireapp/react-ui-kit@6.8.11) (2019-06-18)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
