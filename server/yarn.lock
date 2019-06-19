@@ -328,10 +328,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.9.0.tgz#f6faa62bd0b5cbf596ce3f4d0fd1531bcb5e578a"
-  integrity sha512-g9OKjGzVafH0yh0t35KKLjpH71/jAqqoI43tb1051A7yNUYT3rcjrrjsmPJzZEx7BHJgreVUJ/OPFPLNgCbZ4g==
+"@wireapp/commons@1.9.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.9.1.tgz#3d04a9b771a99244f1b668dc731153a38cb42862"
+  integrity sha512-wDxVmCo4dg3XMJMAQ5GDhcPw6K4NL/VhbvrxZuhwPLl7BvXvDAXQFWyl7cZxlkLelsg5ArTsucc0LtBGE8/mxQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/fs-extra" "7.0.0"
