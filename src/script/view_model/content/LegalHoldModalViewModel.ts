@@ -43,13 +43,15 @@ export class LegalHoldModalViewModel {
   onClosed: () => void;
   userDevicesHistory: UserDevicesHistory;
   showDeviceList: () => boolean;
-  isLoading: ko.Observable<boolean>;
+  isLoadingUsers: ko.Observable<boolean>;
   showRequest: ko.Observable<boolean>;
   requestFingerprint: ko.Observable<string>;
   requestError: ko.Observable<string>;
   passwordValue: ko.Observable<string>;
   progress: ko.Observable<number>;
   requiresPassword: ko.Observable<boolean>;
+  isLoadingRequest: ko.Observable<boolean>;
+  isSendingApprove: ko.Observable<boolean>;
 
   constructor(
     public userRepository: UserRepository,
@@ -58,7 +60,7 @@ export class LegalHoldModalViewModel {
     public clientRepository: ClientRepository,
     public cryptographyRepository: CryptographyRepository
   ) {
-    this.isLoading = ko.observable(false);
+    this.isLoadingUsers = ko.observable(false);
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
     this.requestFingerprint = ko.observable('');
@@ -70,6 +72,8 @@ export class LegalHoldModalViewModel {
     this.requiresPassword = ko.observable(true);
     this.passwordValue = ko.observable('');
     this.requestError = ko.observable('');
+    this.isLoadingRequest = ko.observable(false);
+    this.isSendingApprove = ko.observable(false);
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
 
     this.onBgClick = () => {
@@ -84,13 +88,23 @@ export class LegalHoldModalViewModel {
       this.passwordValue('');
       this.requestError('');
     };
-    amplify.subscribe(SHOW_REQUEST_MODAL, this.showRequestModal);
+    amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
   }
 
-  showRequestModal = async (fingerprint?: string[]) => {
+  showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
+    this.showRequest(true);
+    const setModalParams = (value: boolean) => {
+      this.isVisible(value);
+      this.isLoadingRequest(value);
+    };
+
+    if (showLoading) {
+      setModalParams(true);
+    }
     const selfUser = this.userRepository.self();
     this.requiresPassword(!selfUser.isSingleSignOn);
     if (!selfUser.inTeam()) {
+      setModalParams(false);
       return;
     }
     if (!fingerprint) {
@@ -103,11 +117,12 @@ export class LegalHoldModalViewModel {
         );
         selfUser.hasPendingLegalHold(true);
       } else {
+        setModalParams(false);
         return;
       }
     }
     this.isVisible(true);
-    this.showRequest(true);
+    this.isLoadingRequest(false);
     const formatedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
     this.requestFingerprint(
       `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`
@@ -121,10 +136,12 @@ export class LegalHoldModalViewModel {
   acceptRequest = async () => {
     const selfUser = this.userRepository.self();
     this.requestError('');
+    this.isSendingApprove(true);
     try {
       const password = this.requiresPassword() ? this.passwordValue() : undefined;
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
       this.isVisible(false);
+      this.isSendingApprove(false);
       await this.clientRepository.updateClientsForSelf();
     } catch ({code, message}) {
       switch (code) {
@@ -140,6 +157,7 @@ export class LegalHoldModalViewModel {
           this.requestError(message);
         }
       }
+      this.isSendingApprove(false);
     }
   };
 
@@ -147,7 +165,7 @@ export class LegalHoldModalViewModel {
     if (conversation === undefined) {
       this.users([this.userRepository.self()]);
       this.isOnlyMe(true);
-      this.isLoading(false);
+      this.isLoadingUsers(false);
       this.isVisible(true);
       return;
     }
@@ -162,10 +180,10 @@ export class LegalHoldModalViewModel {
         const isOnlyMe = legalHoldUsers.length === 1 && legalHoldUsers[0].is_me;
         this.users(legalHoldUsers);
         this.isOnlyMe(isOnlyMe);
-        this.isLoading(false);
+        this.isLoadingUsers(false);
       });
 
-    this.isLoading(true);
+    this.isLoadingUsers(true);
     this.isVisible(true);
   };
 
