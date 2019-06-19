@@ -20,7 +20,9 @@
         <div class="modal__text" data-uie-name="status-modal-text">
           <div data-bind="html: t('legalHoldModalText', {}, {br: '<br>', fingerprint: requestFingerprint()})"></div>
         </div>
-        <input class="modal__input" type="password" data-bind="textInput: passwordValue"/>
+        <!-- ko if: requiresPassword() -->
+          <input class="modal__input" type="password" data-bind="textInput: passwordValue"/>
+        <!-- /ko -->
         <!-- ko if: requestError() -->
           <div class="modal__input__error" data-bind="text: requestError()" data-uie-name="status-error"></div>
         <!-- /ko -->
