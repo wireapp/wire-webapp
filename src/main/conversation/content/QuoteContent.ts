@@ -17,12 +17,10 @@
  *
  */
 
+import {IQuote} from '@wireapp/protocol-messaging';
 import {AssetContent, LocationContent, TextContent} from '../content/';
 
-export interface QuoteContent {
-  quotedMessageId: string;
-  quotedMessageSha256: Uint8Array;
-}
+export {IQuote as QuoteContent};
 
 export interface QuoteMessageContent {
   content: AssetContent | LocationContent | TextContent;

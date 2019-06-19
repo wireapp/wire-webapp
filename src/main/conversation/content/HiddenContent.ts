@@ -17,7 +17,5 @@
  *
  */
 
-export interface HiddenContent {
-  conversationId: string;
-  messageId: string;
-}
+import {IMessageHide} from '@wireapp/protocol-messaging';
+export {IMessageHide as HiddenContent};
