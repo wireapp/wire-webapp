@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.5.3...@wireapp/api-client@5.6.0) (2019-06-19)
+
+
+### Features
+
+* **api-client:** Extract LegalHoldSettings from LegalHoldData ([#1958](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1958)) ([abc9a79](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/abc9a79))
+
+
+
+
+
 ## [5.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.5.2...@wireapp/api-client@5.5.3) (2019-06-19)
 
 **Note:** Version bump only for package @wireapp/api-client
