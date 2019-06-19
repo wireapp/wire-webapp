@@ -8,7 +8,7 @@
     "@types/node": "~10",
     "@types/spark-md5": "3.0.1",
     "@types/tough-cookie": "2.3.5",
-    "@wireapp/commons": "1.9.1",
+    "@wireapp/commons": "2.0.0",
     "@wireapp/priority-queue": "1.0.12",
     "@wireapp/store-engine": "3.0.13",
     "axios": "0.19.0",
@@ -25,7 +25,7 @@
     "@types/react": "16.8.20",
     "@types/react-dom": "16.8.4",
     "@types/ws": "6.0.1",
-    "@wireapp/react-ui-kit": "6.8.11",
+    "@wireapp/react-ui-kit": "7.0.0",
     "@wireapp/store-engine-fs": "1.0.10",
     "babel-loader": "8.0.6",
     "browser-sync": "2.26.7",
@@ -77,5 +77,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/APIClient.d.ts",
-  "version": "5.5.1"
+  "version": "5.5.2"
 }
