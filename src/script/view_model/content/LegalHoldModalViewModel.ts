@@ -121,6 +121,7 @@ export class LegalHoldModalViewModel {
     try {
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, this.passwordValue());
       this.isVisible(false);
+      this.clientRepository.updateClientsForSelf();
     } catch ({code, message}) {
       switch (code) {
         case BackendClientError.STATUS_CODE.BAD_REQUEST: {
