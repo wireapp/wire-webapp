@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 
-export interface InputSubmitComboProps<T = HTMLDivElement> extends InputProps<T> {}
+export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 
 export const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
 

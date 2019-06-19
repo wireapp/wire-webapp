@@ -21,7 +21,6 @@
 import {jsx} from '@emotion/core';
 import React, {ReactFragment, useEffect, useState} from 'react';
 import {QUERY, QueryKeys} from '../mediaQueries';
-import {Omit} from '../util';
 
 type Query = string | keyof QueryKeys;
 
@@ -51,7 +50,7 @@ export const MatchMedia: React.FC<MatchMediaProps> = ({query, children, not}) =>
   return <React.Fragment>{isMatching ? children : null}</React.Fragment>;
 };
 
-export interface NamedMatchMediaProps extends Omit<MatchMediaProps, 'query'> {}
+export type NamedMatchMediaProps = Omit<MatchMediaProps, 'query'>;
 
 export const IsDesktop = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP} {...props} />;
 export const IsDesktopXL = (props: NamedMatchMediaProps) => <MatchMedia query={QueryKeys.DESKTOP_XL} {...props} />;

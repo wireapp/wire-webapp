@@ -29,14 +29,3 @@ export type RecursivePartial<T> = {
     ? RecursivePartial<T[P]>
     : T[P];
 };
-
-/**
- * Creates a type from a given interface but excludes the selected keys
- * ```
- * interface AB {a: string, b: string};
- * type ABwithoutA = Omit<AB, "a">;
- * ```
- * @see https://stackoverflow.com/questions/48215950/exclude-property-from-type
- * @since TypeScript 2.8
- */
-export type Omit<T, U> = Pick<T, Exclude<keyof T, U>>;

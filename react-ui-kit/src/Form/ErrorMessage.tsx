@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {Text, TextProps, linkStyle, textStyle} from '../Text';
 
-interface ErrorMessageProps<T = HTMLSpanElement> extends TextProps<T> {}
+type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
 
 export const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,

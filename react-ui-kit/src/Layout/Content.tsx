@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {GUTTER} from './sizes';
 
-export interface ContentProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type ContentProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 export const contentStyle: <T>(props: ContentProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'flex',

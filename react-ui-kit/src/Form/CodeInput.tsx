@@ -33,7 +33,7 @@ const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
   />
 );
 
-interface DigitInputProps<T = HTMLInputElement> extends InputProps<T> {}
+type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
 
 const digitInputStyle: <T>(props: DigitInputProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...inputStyle(props),

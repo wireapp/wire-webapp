@@ -20,6 +20,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-interface FooterProps extends React.HTMLProps<HTMLElement> {}
+type FooterProps = React.HTMLProps<HTMLElement>;
 
 export const Footer = (props: FooterProps) => <footer {...props} />;

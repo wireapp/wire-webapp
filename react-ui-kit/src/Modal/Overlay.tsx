@@ -24,7 +24,7 @@ import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
 import {QueryKeys, media} from '../mediaQueries';
 
-export interface OverlayWrapperProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type OverlayWrapperProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
   bottom: 0,
@@ -64,7 +64,7 @@ export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
   />
 );
 
-export interface OverlayBackgroundProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type OverlayBackgroundProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
@@ -79,7 +79,7 @@ export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => Ob
 
 export const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
 
-export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type OverlayProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 export const Overlay = ({children = null, ...props}: OverlayProps) => (
   <OverlayWrapper {...props} data-uie-name="modal">

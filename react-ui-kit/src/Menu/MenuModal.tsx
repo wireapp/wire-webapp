@@ -102,7 +102,7 @@ export const MenuModal = ({
   </MenuModalWrapper>
 );
 
-export interface MenuItemProps<T = HTMLLIElement> extends React.HTMLProps<T> {}
+export type MenuItemProps<T = HTMLLIElement> = React.HTMLProps<T>;
 
 export const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
   <li
