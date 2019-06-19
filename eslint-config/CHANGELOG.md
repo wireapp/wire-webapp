@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.1.1 (2019-06-19)
+
+
+### Bug Fixes
+
+* **eslint-config:** Use latest React version ([#1959](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/1959)) ([c403d69](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/c403d69))
+* **store-engine-sqleet,store-engine-fs:** Streamline dependencies ([#1924](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/1924)) ([93f3a73](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/93f3a73))
+
+
+
+
+
 # [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.0.1...@wireapp/eslint-config@1.1.0) (2019-05-13)
 
 
