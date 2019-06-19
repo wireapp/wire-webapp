@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.6.0...@wireapp/api-client@5.6.1) (2019-06-19)
+
+
+### Bug Fixes
+
+* **api-client:** Remove fingerprint, add public_key from/to LegalHoldSettings ([#1960](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1960)) ([dbb49b1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/dbb49b1))
+
+
+
+
+
 # [5.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.5.3...@wireapp/api-client@5.6.0) (2019-06-19)
 
 
