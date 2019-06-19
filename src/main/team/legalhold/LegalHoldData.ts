@@ -23,17 +23,19 @@ export enum LegalHoldStatus {
   ENABLED_CONFIGURED = 'configured',
 }
 
+export interface LegalHoldSettings {
+  base_url: string;
+  fingerprint: string;
+  team_id: string;
+}
+
 export interface LegalHoldDataUnconfigured {
   enabled: Exclude<LegalHoldStatus, LegalHoldStatus.ENABLED_CONFIGURED>;
 }
 
 export interface LegalHoldDataConfigured {
   enabled: LegalHoldStatus.ENABLED_CONFIGURED;
-  settings: {
-    base_url: string;
-    fingerprint: string;
-    team_id: string;
-  };
+  settings: LegalHoldSettings;
 }
 
 export type LegalHoldData = LegalHoldDataUnconfigured | LegalHoldDataConfigured;
