@@ -17,10 +17,5 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
-
-export interface ConfirmationContent {
-  firstMessageId: string;
-  moreMessageIds?: string[];
-  type: Confirmation.Type;
-}
+import {IConfirmation} from '@wireapp/protocol-messaging';
+export {IConfirmation as ConfirmationContent};

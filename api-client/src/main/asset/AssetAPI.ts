@@ -30,7 +30,7 @@ export class AssetAPI {
 
   constructor(private readonly client: HttpClient) {}
 
-  getAsset(assetId: string, token?: string): Promise<ArrayBuffer> {
+  getAsset(assetId: string, token?: string | null): Promise<ArrayBuffer> {
     if (!isValidAssetId(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
