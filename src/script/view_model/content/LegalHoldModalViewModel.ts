@@ -49,6 +49,7 @@ export class LegalHoldModalViewModel {
   requestError: ko.Observable<string>;
   passwordValue: ko.Observable<string>;
   progress: ko.Observable<number>;
+  requiresPassword: ko.Observable<boolean>;
 
   constructor(
     public userRepository: UserRepository,
@@ -66,6 +67,7 @@ export class LegalHoldModalViewModel {
     this.devicesUser = ko.observable();
     this.userDevicesHistory = makeUserDevicesHistory();
     this.progress = ko.observable(0);
+    this.requiresPassword = ko.observable(true);
     this.passwordValue = ko.observable('');
     this.requestError = ko.observable('');
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
@@ -87,6 +89,7 @@ export class LegalHoldModalViewModel {
 
   showRequestModal = async (fingerprint?: string[]) => {
     const selfUser = this.userRepository.self();
+    this.requiresPassword(!selfUser.isSingleSignOn);
     if (!selfUser.inTeam()) {
       return;
     }
@@ -119,7 +122,8 @@ export class LegalHoldModalViewModel {
     const selfUser = this.userRepository.self();
     this.requestError('');
     try {
-      await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, this.passwordValue());
+      const password = this.requiresPassword() ? this.passwordValue() : undefined;
+      await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
       this.isVisible(false);
       await this.clientRepository.updateClientsForSelf();
     } catch ({code, message}) {
