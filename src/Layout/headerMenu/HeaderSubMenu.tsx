@@ -24,7 +24,7 @@ import {DURATION} from '../../Identity/motions';
 import {QUERY} from '../../mediaQueries';
 import {MenuSubLink} from './MenuSubLink';
 
-export interface DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const desktopStyledHeaderSubMenuStyle: (
   props: DesktopStyledHeaderSubMenuProps

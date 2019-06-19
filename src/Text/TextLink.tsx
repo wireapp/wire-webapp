@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
-export interface TextLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
+export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
 export const textLinkStyle: <T>(props: TextLinkProps<T>) => ObjectInterpolation<undefined> = ({
   color = COLOR.BLUE,

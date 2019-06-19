@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
-export interface ParagraphProps<T = HTMLParagraphElement> extends TextProps<T> {}
+export type ParagraphProps<T = HTMLParagraphElement> = TextProps<T>;
 
 export const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,
@@ -35,7 +35,7 @@ export const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolatio
 
 export const Paragraph = (props: ParagraphProps) => <p css={paragraphStyle(props)} {...filterTextProps(props)} />;
 
-export interface LeadProps<T = HTMLParagraphElement> extends TextProps<T> {}
+export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
 
 export const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,

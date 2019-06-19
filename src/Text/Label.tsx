@@ -23,7 +23,7 @@ import {COLOR} from '../Identity';
 import {LinkProps, linkStyle} from './Link';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
-export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {}
+export type LabelProps<T = HTMLSpanElement> = TextProps<T>;
 
 const labelStyle: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = ({
   bold = true,
@@ -36,7 +36,7 @@ const labelStyle: <T>(props: LabelProps<T>) => ObjectInterpolation<undefined> = 
 
 export const Label = (props: LabelProps) => <span css={labelStyle(props)} {...filterTextProps(props)} />;
 
-export interface LabelLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {}
+export type LabelLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
 const labelLinkStyle: <T>(props: LabelLinkProps<T>) => ObjectInterpolation<undefined> = ({
   fontSize = '12px',

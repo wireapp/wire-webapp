@@ -98,7 +98,7 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
   </div>
 ));
 
-export interface CheckboxLabelProps<T = HTMLSpanElement> extends TextProps<T> {}
+export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
 export const CheckboxLabel = ({
   bold = true,

@@ -24,7 +24,7 @@ import {COLOR} from '../Identity';
 import {TextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 
-export interface TabBarProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type TabBarProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const tabBarStyle: <T>(props: TabBarProps<T>) => ObjectInterpolation<undefined> = ({}) => {
   return {

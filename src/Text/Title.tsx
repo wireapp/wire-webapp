@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
-export interface TitleProps<T = HTMLDivElement> extends TextProps<T> {}
+export type TitleProps<T = HTMLDivElement> = TextProps<T>;
 
 const titleStyle: <T>(props: TitleProps<T>) => ObjectInterpolation<undefined> = ({
   block = true,

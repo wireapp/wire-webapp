@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {QueryKeys, media} from '../mediaQueries';
 import {GUTTER} from './sizes';
 
-export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type ColumnsProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'flex',
@@ -32,7 +32,7 @@ const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined
 
 export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...props} />;
 
-export interface ColumnProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type ColumnProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const columnStyle: <T>(props: ColumnProps<T>) => ObjectInterpolation<undefined> = props => ({
   display: 'block',

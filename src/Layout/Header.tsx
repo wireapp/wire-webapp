@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 
-export interface HeaderProps<T = HTMLHeadingElement> extends React.HTMLProps<T> {}
+export type HeaderProps<T = HTMLHeadingElement> = React.HTMLProps<T>;
 
 export const headerStyle: <T>(props: HeaderProps<T>) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'center',

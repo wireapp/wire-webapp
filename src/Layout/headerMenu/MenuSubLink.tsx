@@ -25,7 +25,7 @@ import {defaultTransition} from '../../Identity/motions';
 import {QueryKeys, media} from '../../mediaQueries';
 import {TextProps, textStyle} from '../../Text';
 
-interface MenuSubLinkProps<T = HTMLDivElement> extends TextProps<T> {}
+type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 
 export const menuSubLinkStyle: <T>(props: MenuSubLinkProps<T>) => ObjectInterpolation<undefined> = props => ({
   ...textStyle(props),

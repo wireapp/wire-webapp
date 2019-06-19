@@ -23,7 +23,7 @@ import {COLOR} from '../Identity';
 import {INPUT_CLASSNAME} from './Input';
 import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';
 
-export interface InputBlockProps<T = HTMLDivElement> extends React.HTMLProps<T> {}
+export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const inputBlockStyle: (props: InputBlockProps) => ObjectInterpolation<undefined> = props => ({
   backgroundColor: COLOR.GRAY_LIGHTEN_88,

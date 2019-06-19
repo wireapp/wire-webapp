@@ -21,7 +21,7 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
 import {QueryKeys, media} from '../mediaQueries';
-import {Omit, filterProps} from '../util';
+import {filterProps} from '../util';
 import {GUTTER, WIDTH} from './sizes';
 
 export interface ContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
@@ -70,7 +70,7 @@ export const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivEleme
   <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />
 ));
 
-export interface LevelContainerProps extends Omit<ContainerProps, 'level'> {}
+export type LevelContainerProps = Omit<ContainerProps, 'level'>;
 
 export const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'lg'} {...props} />
