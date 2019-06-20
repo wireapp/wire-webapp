@@ -20,6 +20,11 @@
 import {BackendClient} from '../service/BackendClient';
 import {GiphyGif, GiphyResult} from './GiphyResult';
 
+export enum GiphySorting {
+  RECENT = 'recent',
+  RELEVANT = 'relevant',
+}
+
 export interface GiphySearchOptions {
   /** Search query term or phrase */
   q: string;
@@ -28,7 +33,7 @@ export interface GiphySearchOptions {
   /** Results offset. Default is 0. */
   offset?: number;
   /** Specify sorting ('relevant' or 'recent'). Default is "relevant". */
-  sort?: 'relevant' | 'recent';
+  sort?: GiphySorting;
 }
 
 export class GiphyService {
@@ -83,7 +88,7 @@ export class GiphyService {
       data: {
         limit: 25,
         offset: 0,
-        sort: 'relevant',
+        sort: GiphySorting.RELEVANT,
         ...options,
       },
       type: 'GET',

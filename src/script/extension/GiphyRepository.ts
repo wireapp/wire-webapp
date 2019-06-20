@@ -18,7 +18,7 @@
  */
 
 import {Logger} from '../util/Logger';
-import {GiphyService} from './GiphyService';
+import {GiphyService, GiphySorting} from './GiphyService';
 
 export interface Gif {
   animated: string;
@@ -46,7 +46,7 @@ export interface GetGifOptions {
   /**  Will return a randomized result. Default is `true`. */
   random?: boolean;
   /**  Specify sorting ('relevant' or 'recent'). Default is "relevant". */
-  sorting: 'recent' | 'relevant';
+  sorting: GiphySorting;
 }
 
 export class GiphyRepository {
@@ -124,7 +124,7 @@ export class GiphyRepository {
       maxSize: GiphyRepository.CONFIG.MAX_SIZE,
       random: true,
       results: GiphyRepository.CONFIG.NUMBER_OF_RESULTS,
-      sorting: 'relevant',
+      sorting: GiphySorting.RELEVANT,
       ...options,
     };
 
