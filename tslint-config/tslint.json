@@ -26,6 +26,7 @@
     "no-return-await": true,
     "no-sparse-arrays": true,
     "no-this-assignment": true,
+    "no-trailing-whitespace": true,
     "no-unused-expression": true,
     "no-unused-variable": true,
     "object-literal-sort-keys": true,
