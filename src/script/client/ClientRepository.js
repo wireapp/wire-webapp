@@ -183,6 +183,13 @@ export class ClientRepository {
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
+  async loadClientFromDb(userId, clientId) {
+    const isSelfUser = userId === this.selfUser().id;
+    const primaryKey = this._constructPrimaryKey(userId, clientId);
+    const clientPayload = await this.clientService.loadClientFromDb(primaryKey);
+    return this.clientMapper.mapClient(clientPayload, isSelfUser);
+  }
+
   /**
    * Updates properties for a client record in database.
    *

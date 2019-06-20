@@ -565,14 +565,22 @@ export class EventRepository {
    * @param {EventRepository.SOURCE} source - Source of notification
    * @returns {undefined} No return value
    */
-  _distributeEvent(event, source) {
+  async _distributeEvent(event, source) {
     const {conversation: conversationId, from: userId, type} = event;
 
     const hasIds = conversationId && userId;
-    const logMessage = hasIds
-      ? `Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`
-      : `Distributed '${type}' event`;
-    this.logger.info(logMessage, event);
+    if (hasIds) {
+      const clientEntity = await this.userRepository.client_repository.loadClientFromDb(userId, event.from_client);
+      if (clientEntity && clientEntity.isLegalHold()) {
+        this.logger.info(
+          `Skipped '${type}' event for conversation '${conversationId}' from legal hold client '${event.from_client}' of user '${userId}'`
+        );
+        return;
+      }
+      this.logger.info(`Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`, event);
+    } else {
+      this.logger.info(`Distributed '${type}' event`, event);
+    }
 
     const [category] = type.split('.');
     switch (category) {
@@ -636,6 +644,7 @@ export class EventRepository {
         }, Promise.resolve(mappedEvent));
       })
       .then(mappedEvent => {
+        mappedEvent.from_client = event.data && event.data.sender ? event.data && event.data.sender : '';
         const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
