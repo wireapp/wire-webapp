@@ -563,7 +563,7 @@ export class EventRepository {
    * @private
    * @param {Object} event - Mapped event to be distributed
    * @param {EventRepository.SOURCE} source - Source of notification
-   * @returns {undefined} No return value
+   * @returns {Promise<void>} Empty promise
    */
   async _distributeEvent(event, source) {
     const {conversation: conversationId, from: userId, type} = event;
