@@ -96,6 +96,7 @@ export class LegalHoldModalViewModel {
     const setModalParams = (value: boolean) => {
       this.isVisible(value);
       this.isLoadingRequest(value);
+      this.showRequest(value);
     };
 
     if (showLoading) {
