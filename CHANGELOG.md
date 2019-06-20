@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.6.2...@wireapp/api-client@5.6.3) (2019-06-20)
+
+
+### Bug Fixes
+
+* **api-client:** Log ping/pong only as debug ([#1965](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1965)) ([0d3d117](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0d3d117))
+
+
+
+
+
 ## [5.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.6.1...@wireapp/api-client@5.6.2) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/api-client
