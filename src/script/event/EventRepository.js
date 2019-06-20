@@ -644,7 +644,7 @@ export class EventRepository {
         }, Promise.resolve(mappedEvent));
       })
       .then(mappedEvent => {
-        mappedEvent.from_client = event.data && event.data.sender ? event.data && event.data.sender : '';
+        mappedEvent.from_client = event.data && event.data.sender ? event.data.sender : '';
         const shouldSaveEvent = EventTypeHandling.STORE.includes(mappedEvent.type);
         return shouldSaveEvent ? this._handleEventSaving(mappedEvent, source) : mappedEvent;
       })
