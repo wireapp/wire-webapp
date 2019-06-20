@@ -44,6 +44,8 @@ declare global {
           ENABLE_SSO: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
+        MAX_GROUP_PARTICIPANTS: number;
+        MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {
           ACCOUNT_BASE: string;
@@ -77,7 +79,8 @@ class Configuration {
     ENABLE_SSO: false,
     SHOW_LOADING_INFORMATION: false,
   };
-  readonly MAX_VIDEO_PARTICIPANTS = 4;
+  readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 300;
+  readonly MAX_VIDEO_PARTICIPANTS = window.wire.env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly NEW_PASSWORD_MINIMUM_LENGTH =
     window.wire.env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
   readonly URL = window.wire.env.URL || {
