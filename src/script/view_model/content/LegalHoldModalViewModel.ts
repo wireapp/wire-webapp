@@ -33,6 +33,7 @@ import {promiseProgress} from 'Util/PromiseUtil';
 import {BackendClientError} from '../../error/BackendClientError';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
+export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
 
 export class LegalHoldModalViewModel {
   isVisible: ko.Observable<boolean>;
@@ -87,8 +88,10 @@ export class LegalHoldModalViewModel {
       this.showRequest(false);
       this.passwordValue('');
       this.requestError('');
+      this.isLoadingRequest(false);
     };
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
+    amplify.subscribe(HIDE_REQUEST_MODAL, this.closeRequest);
   }
 
   showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
@@ -130,7 +133,9 @@ export class LegalHoldModalViewModel {
   };
 
   closeRequest = () => {
-    this.isVisible(false);
+    if (this.showRequest()) {
+      this.isVisible(false);
+    }
   };
 
   acceptRequest = async () => {
