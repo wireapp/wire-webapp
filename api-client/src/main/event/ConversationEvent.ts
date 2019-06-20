@@ -57,16 +57,8 @@ export interface ConversationEvent extends BackendEvent {
 
 export interface ConversationAccessUpdateEvent extends ConversationEvent {
   data: {
-    access:
-      | CONVERSATION_ACCESS.PRIVATE
-      | CONVERSATION_ACCESS.INVITE
-      | CONVERSATION_ACCESS.LINK
-      | CONVERSATION_ACCESS.CODE;
-    access_role:
-      | CONVERSATION_ACCESS_ROLE.ACTIVATED
-      | CONVERSATION_ACCESS_ROLE.PRIVATE
-      | CONVERSATION_ACCESS_ROLE.TEAM
-      | CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+    access: CONVERSATION_ACCESS;
+    access_role: CONVERSATION_ACCESS_ROLE;
   };
   type: CONVERSATION_EVENT.ACCESS_UPDATE;
 }
