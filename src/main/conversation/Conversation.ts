@@ -41,21 +41,13 @@ export enum CONVERSATION_ACCESS {
 }
 
 export interface Conversation {
-  access:
-    | CONVERSATION_ACCESS.PRIVATE
-    | CONVERSATION_ACCESS.INVITE
-    | CONVERSATION_ACCESS.LINK
-    | CONVERSATION_ACCESS.CODE;
-  access_role:
-    | CONVERSATION_ACCESS_ROLE.ACTIVATED
-    | CONVERSATION_ACCESS_ROLE.PRIVATE
-    | CONVERSATION_ACCESS_ROLE.TEAM
-    | CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+  access: CONVERSATION_ACCESS;
+  access_role: CONVERSATION_ACCESS_ROLE;
   creator: string;
   id: string;
   members: ConversationMembers;
   message_timer: number | null;
   name: string;
   team?: string;
-  type: CONVERSATION_TYPE.REGULAR | CONVERSATION_TYPE.SELF | CONVERSATION_TYPE.ONE_TO_ONE | CONVERSATION_TYPE.CONNECT;
+  type: CONVERSATION_TYPE;
 }
