@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.1.1...@wireapp/eslint-config@1.2.0) (2019-06-20)
+
+
+### Features
+
+* **eslint,tslint:** Disallow trailing whitespace ([#1966](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/1966)) ([e1a3c56](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/e1a3c56))
+
+
+
+
+
 ## 1.1.1 (2019-06-19)
 
 
