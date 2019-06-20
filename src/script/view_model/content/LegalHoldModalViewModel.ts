@@ -142,6 +142,7 @@ export class LegalHoldModalViewModel {
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
       this.isVisible(false);
       this.isSendingApprove(false);
+      selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
     } catch ({code, message}) {
       switch (code) {
