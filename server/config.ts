@@ -134,8 +134,8 @@ const config: ServerConfig = {
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true' ? true : false,
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true' ? true : false,
     },
-    MAX_GROUP_PARTICIPANTS: process.env.MAX_GROUP_PARTICIPANTS || 300,
-    MAX_VIDEO_PARTICIPANTS: process.env.MAX_VIDEO_PARTICIPANTS || 4,
+    MAX_GROUP_PARTICIPANTS: (process.env.MAX_GROUP_PARTICIPANTS && Number(process.env.MAX_GROUP_PARTICIPANTS)) || 300,
+    MAX_VIDEO_PARTICIPANTS: (process.env.MAX_VIDEO_PARTICIPANTS && Number(process.env.MAX_VIDEO_PARTICIPANTS)) || 4,
     NEW_PASSWORD_MINIMUM_LENGTH:
       (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
     RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
