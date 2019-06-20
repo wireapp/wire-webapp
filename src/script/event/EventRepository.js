@@ -657,9 +657,9 @@ export class EventRepository {
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {JSON} The distributed event
+   * @returns {Promise<JSON>} The distributed event
    */
-  _handleEventDistribution(event, source) {
+  async _handleEventDistribution(event, source) {
     const eventDate = this._getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -672,7 +672,7 @@ export class EventRepository {
       this._validateCallEventLifetime(event);
     }
 
-    this._distributeEvent(event, source);
+    await this._distributeEvent(event, source);
 
     return event;
   }
