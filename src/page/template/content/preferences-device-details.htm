@@ -6,7 +6,7 @@
         <div class="preferences-devices-icon icon-back" data-bind="click: clickOnDetailsClose" data-uie-name="go-back"></div>
         <span data-bind="text: t('preferencesDevices')"></span>
       </header>
-      <div class="preferences-devices-model" data-bind="text: device().name()" data-uie-name="device-model"></div>
+      <div class="preferences-devices-model" data-bind="text: device().getName()" data-uie-name="device-model"></div>
       <div class="preferences-devices-id">
         <span data-bind="text: t('preferencesDevicesId')"></span>
         <span data-bind="foreach: device().formatId()" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
