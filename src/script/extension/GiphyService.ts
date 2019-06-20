@@ -17,27 +17,40 @@
  *
  */
 
+import {BackendClient} from '../service/BackendClient';
+import {GiphyGif, GiphyResult} from './GiphyResult';
+
+export interface GiphySearchOptions {
+  /** Search query term or phrase */
+  q: string;
+  /** Number of results to return (maximum 100). Default is 25. */
+  limit?: number;
+  /** Results offset. Default is 0. */
+  offset?: number;
+  /** Specify sorting ('relevant' or 'recent'). Default is "relevant". */
+  sort?: 'relevant' | 'recent';
+}
+
 export class GiphyService {
-  static get CONFIG() {
-    return {
-      ENDPOINT_BASE: '/proxy/giphy/v1/gifs',
-    };
-  }
+  private readonly backendClient: BackendClient;
+
+  static CONFIG = {
+    ENDPOINT_BASE: '/proxy/giphy/v1/gifs',
+  };
 
   /**
-   * Construct a new Giphy Service.
-   * @param {BackendClient} backendClient - Client for the API calls
+   * @param backendClient Client for the API calls
    */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
   }
 
   /**
    * Get GIFs for IDs.
-   * @param {string|Array} ids - A single id or comma separated list of IDs to fetch GIF size data
-   * @returns {Promise} Resolves with the size data
+   * @param ids A single id or comma separated list of IDs to fetch GIF size data
+   * @returns Resolves with the size data
    */
-  getById(ids) {
+  getById(ids: string | string[]): Promise<GiphyResult<GiphyGif>> {
     ids = [].concat(ids);
 
     return this.backendClient.sendRequest({
@@ -48,13 +61,13 @@ export class GiphyService {
 
   /**
    * Search all Giphy GIFs for a word or phrase.
-   * @param {string} tag - GIF tag to limit randomness by
-   * @returns {Promise} Resolves with random gifs for given tag
+   * @param tag GIF tag to limit randomness by
+   * @returns Resolves with random gifs for given tag
    */
-  getRandom(tag) {
+  getRandom(tag: string): Promise<GiphyResult<GiphyGif>> {
     return this.backendClient.sendRequest({
       data: {
-        tag: tag,
+        tag,
       },
       type: 'GET',
       url: `${GiphyService.CONFIG.ENDPOINT_BASE}/random`,
@@ -63,24 +76,16 @@ export class GiphyService {
 
   /**
    * Search GIFs for a word or phrase.
-   *
-   * @param {Object} options - Search options
-   * @param {string} options.q - Search query term or phrase
-   * @param {number} [options.limit=25] - Number of results to return (maximum 100)
-   * @param {number} [options.offset=0] - Results offset
-   * @param {string} [options.sorting='relevant'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with matches
    */
-  getSearch(options) {
+  getSearch(options: GiphySearchOptions): Promise<GiphyResult<GiphyGif[]>> {
     return this.backendClient.sendRequest({
-      data: Object.assign(
-        {
-          limit: 25,
-          offset: 0,
-          sort: 'relevant',
-        },
-        options
-      ),
+      data: {
+        limit: 25,
+        offset: 0,
+        sort: 'relevant',
+        ...options,
+      },
       type: 'GET',
       url: `${GiphyService.CONFIG.ENDPOINT_BASE}/search`,
     });
