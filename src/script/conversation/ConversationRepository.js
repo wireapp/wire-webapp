@@ -95,6 +95,7 @@ import {StatusType} from '../message/StatusType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
+import {Config} from '../auth/config';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -104,7 +105,7 @@ export class ConversationRepository {
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
       GROUP: {
         MAX_NAME_LENGTH: 64,
-        MAX_SIZE: 300,
+        MAX_SIZE: Config.MAX_GROUP_PARTICIPANTS,
       },
     };
   }
