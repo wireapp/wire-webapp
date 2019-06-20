@@ -109,7 +109,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket.onmessage = (event: MessageEvent) => {
       const data = buffer.bufferToString(event.data);
       if (data === PingMessage.PONG) {
-        this.logger.info('Received pong from WebSocket');
+        this.logger.debug('Received pong from WebSocket');
         this.hasUnansweredPing = false;
       } else {
         const notification: IncomingNotification = JSON.parse(data);
@@ -181,7 +181,7 @@ export class WebSocketClient extends EventEmitter {
         this.logger.warn('Ping interval check failed');
         return this.disconnect('Failed ping check', false);
       }
-      this.logger.info('Sending ping to WebSocket');
+      this.logger.debug('Sending ping to WebSocket');
       this.hasUnansweredPing = true;
       return this.socket.send(PingMessage.PING);
     }

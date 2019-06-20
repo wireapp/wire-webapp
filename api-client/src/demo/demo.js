@@ -62,9 +62,9 @@ class Auth extends Component {
   doAuth(event) {
     event.preventDefault();
     this.setState({authenticated: false});
-    return Promise.resolve()
-      .then(() => window.wire.client.init())
-      .catch(error => window.wire.client.login(this.state.login))
+    return window.wire.client
+      .init()
+      .catch(() => window.wire.client.login(this.state.login))
       .then(context => {
         logger.log('Login successful', context);
         this.setState({authenticated: true});
