@@ -41,6 +41,7 @@ export class ClientEntity {
   model?: string;
   time?: string;
   type?: ClientType;
+  name: ko.PureComputed<string>;
 
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;
@@ -63,6 +64,11 @@ export class ClientEntity {
       isVerified: ko.observable(false),
       primaryKey: undefined,
     };
+
+    this.name = ko.pureComputed(() => {
+      const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
+      return hasModel ? this.model : this.class.toUpperCase();
+    });
   }
 
   /**

@@ -19,30 +19,32 @@
     <!-- ko if: devices().length -->
       <section class="preferences-section">
         <header class="preferences-header" data-bind="text: t('preferencesDevicesActive')"></header>
-        <!-- ko foreach: devices -->
-          <div class="preferences-devices-card" data-bind="click: $parent.clickOnShowDevice">
+        <!-- ko foreach: {data: devices, as: 'device', noChildContext: true} -->
+          <div class="preferences-devices-card" data-bind="click: () => clickOnShowDevice(device)">
             <div class="preferences-devices-card-data">
-              <div class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
-                <!-- ko if: meta.isVerified()-->
+              <div class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': device.id}" data-uie-name="device-id">
+                <!-- ko if: device.meta.isVerified()-->
                   <verified-icon data-uie-name="user-device-verified"></verified-icon>
                 <!-- /ko -->
-                <!-- ko ifnot: meta.isVerified()-->
+                <!-- ko ifnot: device.meta.isVerified()-->
                   <not-verified-icon data-uie-name="user-device-not-verified"></not-verified-icon>
                 <!-- /ko -->
               </div>
               <div class="preferences-devices-card-info">
-                <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
+                <div class="preferences-devices-model" data-bind="text: device.name()" data-uie-name="preferences-device-active-model"></div>
                 <div class="preferences-devices-id">
                   <span data-bind="text: t('preferencesDevicesId')"></span>
-                  <span data-bind="foreach: formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+                  <span data-bind="foreach: device.formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
                 </div>
               </div>
             </div>
             <div class="preferences-devices-card-action">
-              <div class="preferences-devices-card-action__delete" data-bind="click: $parent.clickOnRemoveDevice, css: {'svg-red': $parent.isSSO()}" data-uie-name="do-device-remove">
-                <delete-icon></delete-icon>
-              </div>
-              <div class="icon-forward" data-uie-name="go-device-details"></div>
+              <!-- ko ifnot: device.isLegalHold() -->
+                <div class="preferences-devices-card-action__delete" data-bind="click: (data, event) => clickOnRemoveDevice(device, event), css: {'svg-red': isSSO()}" data-uie-name="do-device-remove">
+                  <delete-icon></delete-icon>
+                </div>
+              <!-- /ko -->
+              <div class="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details"></div>
             </div>
           </div>
         <!-- /ko -->

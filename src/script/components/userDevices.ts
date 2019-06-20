@@ -85,6 +85,12 @@ export const makeUserDevicesHistory = (): UserDevicesHistory => {
   };
 };
 
+export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
+  const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);
+  const otherDevices = devices.filter(device => device.class !== ClientClassification.LEGAL_HOLD);
+  return legalholdDevices.concat(otherDevices);
+};
+
 ko.components.register('user-devices', {
   template: `
     <div>
@@ -158,10 +164,7 @@ ko.components.register('user-devices', {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.pureComputed(() => {
       if (userEntity()) {
-        const devices = userEntity().devices();
-        const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);
-        const otherDevices = devices.filter(device => device.class !== ClientClassification.LEGAL_HOLD);
-        return legalholdDevices.concat(otherDevices);
+        return sortUserDevices(userEntity().devices());
       }
       return undefined;
     });
