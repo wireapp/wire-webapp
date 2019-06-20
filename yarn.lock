@@ -1545,22 +1545,6 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.0.10.tgz#2edf1180f2609efaad44bf47e6a3b1e659e4d77d"
   integrity sha512-cYVuks9YdEXKlap2OkSkw+YcplY0/p2VcTUJdVDIhHfi9PAdo9F6LpJKoQbyp2Rjh+jRZD8r7LJMvMqfTJiqqA==
 
-"@wireapp/commons@1.8.1":
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-1.8.1.tgz#39bee8451d16fc5765454ea2d49dbf8bfe62d8b5"
-  integrity sha512-uLctPOsoBkZJu0WvR+DIrK+Tr78lPcilBGalG/1ag1vlVP+2J9CK5d+N12PKgR8AKFIfuy1ejwjkUV5PSZj7lQ==
-  dependencies:
-    "@types/ansi-regex" "4.0.0"
-    "@types/fs-extra" "7.0.0"
-    "@types/node" "~10"
-    "@types/platform" "1.3.2"
-    ansi-regex "4.1.0"
-    fs-extra "8.0.1"
-    logdown "3.2.8"
-    moment "2.24.0"
-    platform "1.3.5"
-    url-search-params-polyfill "6.0.0"
-
 "@wireapp/commons@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.0.0.tgz#5b693d48d1884db62b13a67b7fe3506dc98a20e2"
