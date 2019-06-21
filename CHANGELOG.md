@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.4.7...@wireapp/core@12.5.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/55b1c76))
+
+
+
+
+
 ## [12.4.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.4.6...@wireapp/core@12.4.7) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/core
