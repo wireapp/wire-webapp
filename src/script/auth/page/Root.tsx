@@ -123,12 +123,12 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
   render = () => {
     const {isAuthenticated, language} = this.props;
 
-    const navigate = (route: string): void => {
+    const navigate = (route: string): null => {
       window.location.assign(pathWithParams(route));
       return null;
     };
 
-    const isAuthenticatedCheck = (page: any) =>
+    const isAuthenticatedCheck = (page: React.ReactNode): React.ReactNode =>
       page ? (isAuthenticated ? page : navigate(`auth#${ROUTE.LOGIN}`)) : null;
 
     const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
