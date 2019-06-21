@@ -86,12 +86,14 @@ class Message {
     this.conversation_id = '';
     this.expectsReadConfirmation = false;
     this.from = '';
+    this.fromClientId = '';
+    this.legalHoldStatus = undefined;
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
     this.user = ko.observable(new User());
-    this.visible = ko.observable(true);
     this.version = 1;
+    this.visible = ko.observable(true);
 
     this.affect_order = ko.observable(true);
     this.timestamp = ko.observable(Date.now());
