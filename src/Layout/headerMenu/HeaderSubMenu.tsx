@@ -27,7 +27,7 @@ import {MenuSubLink} from './MenuSubLink';
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const desktopStyledHeaderSubMenuStyle: (
-  props: DesktopStyledHeaderSubMenuProps
+  props: DesktopStyledHeaderSubMenuProps,
 ) => ObjectInterpolation<undefined> = props => ({
   alignItems: 'left',
   backgroundColor: 'white',
@@ -64,7 +64,7 @@ export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends Rea
 }
 
 const mobileStyledHeaderSubMenuStyle: (
-  props: MobileStyledHeaderSubMenuProps
+  props: MobileStyledHeaderSubMenuProps,
 ) => ObjectInterpolation<undefined> = props => ({
   '*': {
     fontWeight: 200,

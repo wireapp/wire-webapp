@@ -27,7 +27,7 @@ function render(Component) {
     <AppContainer>
       <Component />
     </AppContainer>,
-    document.getElementById('app')
+    document.getElementById('app'),
   );
 }
 

@@ -27,13 +27,13 @@ describe('"Checkbox"', () => {
     matchComponent(
       <Checkbox id="1" markInvalid>
         Check
-      </Checkbox>
+      </Checkbox>,
     ));
   it('renders disabled', () =>
     matchComponent(
       <Checkbox id="1" disabled>
         Check
-      </Checkbox>
+      </Checkbox>,
     ));
 });
 
