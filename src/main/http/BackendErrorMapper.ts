@@ -38,7 +38,7 @@ export class BackendErrorMapper {
         [BackendErrorLabel.CLIENT_ERROR]: {
           'Error in $: Failed reading: satisfy': new BackendError('Wrong set of parameters.'),
           "[path] 'cnv' invalid: Failed reading: Invalid UUID": new ConversationIsUnknownError(
-            'Conversation ID is unknown.'
+            'Conversation ID is unknown.',
           ),
           "[path] 'usr' invalid: Failed reading: Invalid UUID": new UserIsUnknownError('User ID is unknown.'),
         },
@@ -49,7 +49,7 @@ export class BackendErrorMapper {
       [StatusCode.FORBIDDEN]: {
         [BackendErrorLabel.INVALID_CREDENTIALS]: {
           'Authentication failed.': new InvalidCredentialsError(
-            'Authentication failed because of invalid credentials.'
+            'Authentication failed because of invalid credentials.',
           ),
           'Invalid token': new InvalidTokenError('Authentication failed because the token is invalid.'),
           'Missing cookie': new MissingCookieError('Authentication failed because the cookie is missing.'),
@@ -76,7 +76,7 @@ export class BackendErrorMapper {
         },
         [BackendErrorLabel.KEY_EXISTS]: {
           'The given e-mail address or phone number is in use.': new IdentifierExistsError(
-            'The given e-mail address or phone number is in use.'
+            'The given e-mail address or phone number is in use.',
           ),
         },
       },

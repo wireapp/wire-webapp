@@ -103,7 +103,7 @@ describe('WebSocketClient', () => {
         // Restart WebSocket server
         server.close(() => startEchoServer());
       },
-      WebSocketClient.RECONNECTING_OPTIONS.maxReconnectionDelay
+      WebSocketClient.RECONNECTING_OPTIONS.maxReconnectionDelay,
     );
   });
 });

@@ -31,7 +31,7 @@ export class ConversationIsUnknownError extends ConversationError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: StatusCode = StatusCode.BAD_REQUEST
+    code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, ConversationIsUnknownError.prototype);
@@ -43,7 +43,7 @@ export class ConversationOperationError extends ConversationError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVALID_OPERATION,
-    code: StatusCode = StatusCode.FORBIDDEN
+    code: StatusCode = StatusCode.FORBIDDEN,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, ConversationOperationError.prototype);

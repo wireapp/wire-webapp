@@ -31,7 +31,7 @@ export class InviteEmailInUseError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVITE_EMAIL_EXISTS,
-    code: StatusCode = StatusCode.CONFLICT
+    code: StatusCode = StatusCode.CONFLICT,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, InviteEmailInUseError.prototype);
@@ -43,7 +43,7 @@ export class InvalidInvitationCodeError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVALID_INVITATION_CODE,
-    code: StatusCode = StatusCode.BAD_REQUEST
+    code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, InvalidInvitationCodeError.prototype);
@@ -55,7 +55,7 @@ export class ServiceNotFoundError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.SERVICE_NOT_FOUND,
-    code: StatusCode = StatusCode.NOT_FOUND
+    code: StatusCode = StatusCode.NOT_FOUND,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, ServiceNotFoundError.prototype);

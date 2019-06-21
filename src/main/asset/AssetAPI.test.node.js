@@ -36,7 +36,7 @@ describe('"AssetAPI"', () => {
         },
         url: jasmine.stringMatching(new RegExp(assetId)),
       }),
-      true
+      true,
     );
   });
 
@@ -51,7 +51,7 @@ describe('"AssetAPI"', () => {
         params: {},
         url: jasmine.stringMatching(new RegExp(assetId)),
       }),
-      true
+      true,
     );
   });
 });

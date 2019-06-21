@@ -56,7 +56,7 @@ export class NotificationAPI {
     clientId?: string,
     size: number = NOTIFICATION_SIZE_MAXIMUM,
     since?: Date,
-    cancelFallbackNotifications?: boolean
+    cancelFallbackNotifications?: boolean,
   ): Promise<NotificationList> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -79,7 +79,7 @@ export class NotificationAPI {
   public getNotification(
     notificationId: string,
     clientId?: string,
-    cancelFallbackNotifications?: boolean
+    cancelFallbackNotifications?: boolean,
   ): Promise<Notification> {
     const config: AxiosRequestConfig = {
       method: 'get',

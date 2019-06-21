@@ -24,7 +24,7 @@ import {HttpClient} from '../../http/';
 
 export const retrieveCookie = (
   response: AxiosResponse<AccessTokenData>,
-  engine: CRUDEngine
+  engine: CRUDEngine,
 ): Promise<AccessTokenData> => Promise.resolve(response.data);
 
 export const sendRequestWithCookie = <T>(client: HttpClient, config: AxiosRequestConfig): Promise<AxiosResponse<T>> =>

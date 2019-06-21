@@ -151,7 +151,7 @@ export class ConversationAPI {
    */
   public getConversations(
     startConversationId?: string,
-    limit = ConversationAPI.MAX_CHUNK_SIZE
+    limit = ConversationAPI.MAX_CHUNK_SIZE,
   ): Promise<Conversations> {
     return this._getConversations(startConversationId, undefined, limit);
   }
@@ -169,7 +169,7 @@ export class ConversationAPI {
       const {conversations} = await this._getConversations(
         undefined,
         chunkedConversationIds,
-        ConversationAPI.MAX_CHUNK_SIZE
+        ConversationAPI.MAX_CHUNK_SIZE,
       );
       return conversations;
     };
@@ -199,7 +199,7 @@ export class ConversationAPI {
   private _getConversations(
     startConversationId?: string,
     filteredConversationIds?: string[],
-    limit = ConversationAPI.MAX_CHUNK_SIZE
+    limit = ConversationAPI.MAX_CHUNK_SIZE,
   ): Promise<Conversations> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -355,7 +355,7 @@ export class ConversationAPI {
     params?: {
       ignore_missing?: boolean;
       report_missing?: string;
-    }
+    },
   ): Promise<ClientMismatch> {
     if (!clientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');
@@ -438,7 +438,7 @@ export class ConversationAPI {
    */
   public putConversationMessageTimer(
     conversationId: string,
-    messageTimerData: ConversationMessageTimerUpdate
+    messageTimerData: ConversationMessageTimerUpdate,
   ): Promise<ConversationEvent> {
     const config: AxiosRequestConfig = {
       data: messageTimerData,

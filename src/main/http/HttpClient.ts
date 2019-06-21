@@ -40,7 +40,7 @@ export class HttpClient extends EventEmitter {
   constructor(
     private readonly baseUrl: string,
     public accessTokenStore: AccessTokenStore,
-    private readonly engine: CRUDEngine
+    private readonly engine: CRUDEngine,
   ) {
     super();
 
@@ -65,7 +65,7 @@ export class HttpClient extends EventEmitter {
           backendResponse = JSON.stringify(error.response.data);
         } finally {
           this.logger.error(
-            `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${error.message} (${backendResponse})`
+            `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${error.message} (${backendResponse})`,
           );
         }
       }
@@ -88,7 +88,7 @@ export class HttpClient extends EventEmitter {
   public async _sendRequest<T>(
     config: AxiosRequestConfig,
     tokenAsParam = false,
-    firstTry = true
+    firstTry = true,
   ): Promise<AxiosResponse<T>> {
     config.baseURL = this.baseUrl;
 
@@ -155,7 +155,7 @@ export class HttpClient extends EventEmitter {
     const accessToken = await this.postAccess(expiredAccessToken);
     this.logger.info(
       `Saved updated access token. It will expire in "${accessToken.expires_in}" seconds.`,
-      ObfuscationUtil.obfuscateAccessToken(accessToken)
+      ObfuscationUtil.obfuscateAccessToken(accessToken),
     );
     return this.accessTokenStore.updateToken(accessToken);
   }
@@ -170,7 +170,7 @@ export class HttpClient extends EventEmitter {
 
     if (expiredAccessToken && expiredAccessToken.access_token) {
       config.headers['Authorization'] = `${expiredAccessToken.token_type} ${decodeURIComponent(
-        expiredAccessToken.access_token
+        expiredAccessToken.access_token,
       )}`;
     }
 

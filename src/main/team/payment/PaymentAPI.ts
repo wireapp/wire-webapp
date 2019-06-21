@@ -124,7 +124,7 @@ export class PaymentAPI {
   public getInvoices(
     teamId: string,
     limit: number = PaymentAPI.DEFAULT_INVOICES_CHUNK_SIZE,
-    startAfterInvoiceId?: string
+    startAfterInvoiceId?: string,
   ): Promise<PaymentStripeInvoices> {
     const config: AxiosRequestConfig = {
       method: 'get',
