@@ -129,7 +129,7 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
     };
 
     const isAuthenticatedCheck = (page: JSX.Element): JSX.Element =>
-      page ? (isAuthenticated ? page : navigate(`auth#${ROUTE.LOGIN}`)) : null;
+      page ? (isAuthenticated ? page : navigate('/auth#login')) : null;
 
     const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
 
