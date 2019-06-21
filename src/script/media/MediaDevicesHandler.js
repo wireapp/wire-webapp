@@ -157,11 +157,6 @@ export class MediaDevicesHandler {
 
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
       storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
-
-      const updateStream = mediaDeviceId && this.mediaRepository.streamHandler.localMediaStream();
-      if (updateStream) {
-        this._replaceInputDevice(MediaType.AUDIO, MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
-      }
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
@@ -177,25 +172,13 @@ export class MediaDevicesHandler {
       if (mediaDeviceId) {
         this._updateCurrentIndexFromId(MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
       }
-
-      const isMediaTypeScreen = this.mediaRepository.streamHandler.localMediaType() === MediaType.SCREEN;
-      const updateStream = mediaDeviceId && isMediaTypeScreen && this.mediaRepository.streamHandler.localMediaStream();
-      if (updateStream) {
-        this._replaceInputDevice(MediaType.SCREEN, MediaDeviceType.SCREEN_INPUT, mediaDeviceId);
-      }
     });
 
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
-      if (mediaDeviceId) {
-        this._updateCurrentIndexFromId(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
-      }
-
       storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
 
-      const isMediaTypeVideo = this.mediaRepository.streamHandler.localMediaType() === MediaType.VIDEO;
-      const updateStream = mediaDeviceId && isMediaTypeVideo && this.mediaRepository.streamHandler.localMediaStream();
-      if (updateStream) {
-        this._replaceInputDevice(MediaType.VIDEO, MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
+      if (mediaDeviceId) {
+        this._updateCurrentIndexFromId(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
       }
     });
   }

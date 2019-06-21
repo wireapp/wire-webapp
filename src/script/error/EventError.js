@@ -17,10 +17,12 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.EventError = class EventError extends z.error.BaseError {
+z.error.EventError = class EventError extends BaseError {
   constructor(type, message) {
     super('EventError', type, message);
   }

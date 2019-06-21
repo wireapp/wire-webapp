@@ -24,6 +24,8 @@ import {phoneNumberToE164, encodeSha256Base64} from 'Util/util';
 
 import {PhoneBook} from './PhoneBook';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 class ConnectRepository {
   constructor(connectService, propertiesRepository) {
     this.connectService = connectService;
@@ -138,7 +140,7 @@ class ConnectRepository {
           case z.error.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:
-            if (error.code === z.error.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
+            if (error.code === BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
               this.logger.error(`Backend refused upload of '${source}' contacts: Endpoint used too frequent`, error);
             } else {
               this.logger.error(`Upload of '${source}' contacts failed`, error);

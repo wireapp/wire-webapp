@@ -20,6 +20,10 @@
 .legal-hold-modal {
   &__wrapper {
     height: 448px;
+
+    &--request {
+      height: auto;
+    }
   }
 
   &__logo {
@@ -43,11 +47,29 @@
     }
   }
 
+  &__fingerprint {
+    span {
+      font-family: monospace;
+      font-weight: @font-weight-bold;
+      &:nth-child(2n) {
+        font-weight: @font-weight-regular;
+      }
+    }
+  }
+
   &__subjects {
     margin-top: 32px;
     color: var(--background-fade-56);
     font-size: 11px;
     text-transform: uppercase;
+  }
+
+  &__loading-button {
+    line-height: 44px;
+
+    svg path {
+      fill: #fff;
+    }
   }
 
   loading-bar {

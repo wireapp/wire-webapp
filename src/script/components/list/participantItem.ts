@@ -20,9 +20,13 @@ import ko from 'knockout';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {UserlistMode} from 'Components/userList';
+import {t} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+
+import 'Components/availabilityState';
 
 interface ParticipantItemParams {
   participant: User | ServiceEntity;
@@ -47,11 +51,11 @@ ko.components.register('participant-item', {
         <!-- ko if: isUser && selfInTeam -->
           <availability-state class="participant-item-content-availability participant-item-content-name"
             data-uie-name="status-name"
-            params="availability: participant.availability, label: participant.name"></availability-state>
+            params="availability: participant.availability, label: participantName()"></availability-state>
         <!-- /ko -->
 
         <!-- ko if: isService || !selfInTeam -->
-          <div class="participant-item-content-name" data-bind="text: participant.name" data-uie-name="status-name"></div>
+          <div class="participant-item-content-name" data-bind="text: participantName()" data-uie-name="status-name"></div>
         <!-- /ko -->
         <div class="participant-item-content-info">
           <!-- ko if: contentInfo -->
@@ -95,6 +99,10 @@ ko.components.register('participant-item', {
   }: ParticipantItemParams): void {
     this.avatarSize = ParticipantAvatar.SIZE.SMALL;
     this.participant = ko.unwrap(participant);
+    this.participantName = () =>
+      this.participant.is_me
+        ? `${this.participant.name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
+        : this.participant.name;
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;
     this.isUser = this.participant instanceof User && !this.participant.isService;
     this.selfInTeam = selfInTeam;

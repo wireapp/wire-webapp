@@ -17,10 +17,12 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.StorageError = class StorageError extends z.error.BaseError {
+z.error.StorageError = class StorageError extends BaseError {
   constructor(type, message) {
     super('StorageError', type, message);
   }

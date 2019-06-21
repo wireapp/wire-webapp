@@ -66,20 +66,24 @@ class PropertiesRepository {
       ? Promise.resolve()
       : new Promise(resolve => {
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-            action: () => {
-              this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
-              this._publishProperties();
-              resolve();
-            },
             preventClose: true,
-            secondary: () => {
-              this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
-              resolve();
+            primaryAction: {
+              action: () => {
+                this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
+                this._publishProperties();
+                resolve();
+              },
+              text: t('modalImproveWireAction'),
+            },
+            secondaryAction: {
+              action: () => {
+                this.savePreference(PROPERTIES_TYPE.PRIVACY, false);
+                resolve();
+              },
+              text: t('modalImproveWireSecondary'),
             },
             text: {
-              action: t('modalImproveWireAction'),
               message: t('modalImproveWireMessage', Config.BRAND_NAME),
-              secondary: t('modalImproveWireSecondary'),
               title: t('modalImproveWireHeadline', Config.BRAND_NAME),
             },
           });
@@ -126,9 +130,7 @@ class PropertiesRepository {
       })
       .catch(() => {
         this.logger.warn(
-          `Property "${
-            PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS
-          }" doesn't exist for this account. Continuing with the default value of "${this.properties.settings}".`
+          `Property "${PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS}" doesn't exist for this account. Continuing with the default value of "${this.properties.settings}".`
         );
       });
   }
@@ -142,9 +144,7 @@ class PropertiesRepository {
         this.setProperty(property.key, value);
       })
       .catch(() => {
-        const message = `Property "${
-          property.key
-        }" doesn't exist for this account. Continuing with the default value of "${property.defaultValue}".`;
+        const message = `Property "${property.key}" doesn't exist for this account. Continuing with the default value of "${property.defaultValue}".`;
         this.logger.warn(message);
       });
   }

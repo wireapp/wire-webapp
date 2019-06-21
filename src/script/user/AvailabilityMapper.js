@@ -23,6 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 
 import {AvailabilityType} from './AvailabilityType';
 
+import {BaseError} from '../error/BaseError';
+
 const AVAILABILITY_VALUES = {
   AVAILABLE: 'available',
   AWAY: 'away',
@@ -42,7 +44,7 @@ export const valueFromType = availabilityType => {
   if (value) {
     return value;
   }
-  throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+  throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
 export const nameFromType = availabilityType => {
@@ -57,7 +59,7 @@ export const nameFromType = availabilityType => {
   if (string) {
     return string;
   }
-  throw new z.error.UserError(z.error.BaseError.TYPE.INVALID_PARAMETER);
+  throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
 export const protoFromType = availabilityType => {

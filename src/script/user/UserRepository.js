@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {getLogger} from 'Util/Logger';
@@ -49,6 +48,9 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
+import {SHOW_REQUEST_MODAL, SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+
+import {BackendClientError} from '../error/BackendClientError';
 
 export class UserRepository {
   static get CONFIG() {
@@ -128,36 +130,40 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  on_user_event(event_json, source) {
-    const type = event_json.type;
+  on_user_event(eventJson, source) {
+    const type = eventJson.type;
 
-    const logObject = {eventJson: JSON.stringify(event_json), eventObject: event_json};
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
     this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case BackendEvent.USER.DELETE:
-        this.user_delete(event_json);
+        this.user_delete(eventJson);
         break;
       case BackendEvent.USER.UPDATE:
-        this.user_update(event_json);
+        this.user_update(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
-        this.onUserAvailability(event_json);
+        this.onUserAvailability(eventJson);
         break;
+      case BackendEvent.USER.LEGAL_HOLD_REQUEST: {
+        this.onLegalHoldRequest(eventJson);
+        break;
+      }
     }
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
       switch (type) {
         case BackendEvent.USER.PROPERTIES_DELETE:
-          this.propertyRepository.deleteProperty(event_json.key);
+          this.propertyRepository.deleteProperty(eventJson.key);
           break;
         case BackendEvent.USER.PROPERTIES_SET:
-          this.propertyRepository.setProperty(event_json.key, event_json.value);
+          this.propertyRepository.setProperty(eventJson.key, eventJson.value);
           break;
       }
     }
@@ -308,6 +314,10 @@ export class UserRepository {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
           if (clientEntity.isLegalHold()) {
             amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
+            const isSelfUser = userId === this.self().id;
+            if (isSelfUser) {
+              amplify.publish(SHOW_LEGAL_HOLD_MODAL);
+            }
           } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
@@ -364,25 +374,24 @@ export class UserRepository {
       messageId: createRandomUuid(),
     });
 
-    const users = this.teamUsers().concat(this.self());
-    const recipients = this._createRecipients(users, true);
+    const recipients = this.teamUsers().concat(this.self());
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  /**
-   * @param {Array<User>} userEntities - Recipients of the message
-   * @param {boolean} [filterLegalHold] - `true` if Legal Hold clients should be filtered
-   * @private
-   * @returns {Object} A user client map
-   */
-  _createRecipients(userEntities, filterLegalHold = false) {
-    return userEntities.reduce((recipients, userEntity) => {
-      recipients[userEntity.id] = userEntity
-        .devices()
-        .filter(clientEntity => (filterLegalHold ? clientEntity.class !== ClientClassification.LEGAL_HOLD : true))
-        .map(clientEntity => clientEntity.id);
-      return recipients;
-    }, {});
+  async onLegalHoldRequest(eventJson) {
+    if (this.self().id !== eventJson.target_user) {
+      return;
+    }
+    const self = this.self();
+    self.hasPendingLegalHold(true);
+    const {client_id, last_prekey, target_user} = eventJson;
+
+    const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
+      target_user,
+      client_id,
+      last_prekey
+    );
+    amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
   }
 
   /**
@@ -436,7 +445,7 @@ export class UserRepository {
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
         .catch(error => {
-          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             return [];
           }
@@ -541,7 +550,7 @@ export class UserRepository {
       .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch(error => {
-        if (error.code !== z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code !== BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
       });
@@ -707,7 +716,7 @@ export class UserRepository {
         this.self().username(valid_suggestions[0]);
       })
       .catch(error => {
-        if (error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error.code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
 
@@ -730,10 +739,7 @@ export class UserRepository {
         })
         .catch(({code: error_code}) => {
           if (
-            [
-              z.error.BackendClientError.STATUS_CODE.CONFLICT,
-              z.error.BackendClientError.STATUS_CODE.BAD_REQUEST,
-            ].includes(error_code)
+            [BackendClientError.STATUS_CODE.CONFLICT, BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)
           ) {
             throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
           }
@@ -762,10 +768,10 @@ export class UserRepository {
     return this.user_service
       .checkUserHandle(username)
       .catch(({code: error_code}) => {
-        if (error_code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        if (error_code === BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
-        if (error_code === z.error.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === BackendClientError.STATUS_CODE.BAD_REQUEST) {
           throw new z.error.UserError(z.error.UserError.TYPE.USERNAME_TAKEN);
         }
         throw new z.error.UserError(z.error.UserError.TYPE.REQUEST_FAILURE);

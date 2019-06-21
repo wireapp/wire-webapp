@@ -31,6 +31,8 @@ import {WebAppEvents} from '../event/WebApp';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class CryptographyRepository {
   static get CONFIG() {
     return {
@@ -146,12 +148,14 @@ export class CryptographyRepository {
    * Get the fingerprint of a remote identity.
    * @param {string} userId - ID of user
    * @param {string} clientId - ID of client
+   * @param {PreKey} [preKey] - PreKey to initialize a session from
    * @returns {Promise} Resolves with the remote fingerprint
    */
-  getRemoteFingerprint(userId, clientId) {
-    return this._loadSession(userId, clientId).then(cryptoboxSession => {
-      return cryptoboxSession ? this._formatFingerprint(cryptoboxSession.fingerprint_remote()) : '';
-    });
+  async getRemoteFingerprint(userId, clientId, preKey) {
+    const cryptoboxSession = preKey
+      ? await this._createSessionFromPreKey(preKey, userId, clientId)
+      : await this._loadSession(userId, clientId);
+    return cryptoboxSession ? this._formatFingerprint(cryptoboxSession.fingerprint_remote()) : '';
   }
 
   _formatFingerprint(fingerprint) {
@@ -170,7 +174,7 @@ export class CryptographyRepository {
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
       .catch(error => {
-        const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isNotFound) {
           throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
@@ -187,7 +191,7 @@ export class CryptographyRepository {
    */
   getUsersPreKeys(recipients) {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+      const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
       if (isNotFound) {
         throw new z.error.UserError(z.error.UserError.TYPE.PRE_KEY_NOT_FOUND);
       }
@@ -497,9 +501,7 @@ export class CryptographyRepository {
     }
 
     this.logger.warn(
-      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${
-        error.message
-      }`,
+      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
       error
     );
     this._reportDecryptionFailure(error, event);

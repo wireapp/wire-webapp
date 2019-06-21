@@ -6,8 +6,12 @@
                           data-uie-name="status-availability"
                           params="availability: selfAvailability, label: selfUserName">
       </availability-state>
-      <!-- TODO: add the condition to show the dot, once we have support in the user -->
-      <legal-hold-dot style="margin: 0 16px 0 auto" params="legalHoldModal: contentViewModel.legalHoldModal" data-uie-name="status-legal-hold"></legal-hold-dot>
+      <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
+        <legal-hold-dot style="margin: 0 16px 0 auto" 
+                        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()" 
+                        data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
+        </legal-hold-dot>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- ko ifnot: isTeam() -->
       <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>

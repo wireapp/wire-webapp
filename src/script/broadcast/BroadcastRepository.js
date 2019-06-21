@@ -22,6 +22,8 @@ import {getLogger} from 'Util/Logger';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {WebAppEvents} from '../event/WebApp';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 // Broadcast repository for all broadcast interactions with the broadcast service
 class BroadcastRepository {
   /**
@@ -62,16 +64,31 @@ class BroadcastRepository {
 
   /**
    * @param {GenericMessage} genericMessage - Generic message that will be send
-   * @param {Array<Object>} recipients - A user client map
+   * @param {Array<User>} userEntities - Recipients of the message
    * @returns {Promise} - resolves when the message is sent
    */
-  broadcastGenericMessage(genericMessage, recipients) {
+  broadcastGenericMessage(genericMessage, userEntities) {
     return this.messageSender.queueMessage(() => {
+      const recipients = this._createBroadcastRecipients(userEntities);
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage).then(payload => {
         const eventInfoEntity = new EventInfoEntity(genericMessage);
         this._sendEncryptedMessage(eventInfoEntity, payload);
       });
     });
+  }
+
+  /**
+   * Create a user client map for a broadcast message.
+   * @private
+   * @param {Array<User>} userEntities - Recipients of the message
+   * @returns {Promise} Resolves with a user client map
+   */
+  _createBroadcastRecipients(userEntities) {
+    return userEntities.reduce((recipientsIndex, userEntity) => {
+      return Object.assign({}, recipientsIndex, {
+        [userEntity.id]: userEntity.devices().map(clientEntity => clientEntity.id),
+      });
+    }, {});
   }
 
   /**
@@ -97,7 +114,7 @@ class BroadcastRepository {
         return response;
       })
       .catch(error => {
-        const isUnknownClient = error.label === z.error.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           this.clientRepository.removeLocalClient();
         }
