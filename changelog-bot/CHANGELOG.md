@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@3.0.78...@wireapp/changelog-bot@3.1.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/55b1c76))
+
+
+
+
+
 ## [3.0.78](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@3.0.77...@wireapp/changelog-bot@3.0.78) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

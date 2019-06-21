@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.0.14...@wireapp/store-engine@3.1.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/55b1c76))
+
+
+
+
+
 ## [3.0.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.0.13...@wireapp/store-engine@3.0.14) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/store-engine

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@4.0.11...@wireapp/cbor@4.1.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/commit/55b1c76))
+
+
+
+
+
 ## [4.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@4.0.10...@wireapp/cbor@4.0.11) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/cbor

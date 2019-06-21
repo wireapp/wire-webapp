@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.4.14...bazinga64@5.5.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/commit/55b1c76))
+
+
+
+
+
 ## [5.4.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64/compare/bazinga64@5.4.13...bazinga64@5.4.14) (2019-06-20)
 
 **Note:** Version bump only for package bazinga64

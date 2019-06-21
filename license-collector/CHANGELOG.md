@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.1.23...@wireapp/license-collector@0.2.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/55b1c76))
+
+
+
+
+
 ## [0.1.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.1.22...@wireapp/license-collector@0.1.23) (2019-06-18)
 
 **Note:** Version bump only for package @wireapp/license-collector

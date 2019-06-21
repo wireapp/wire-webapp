@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.0.78...@wireapp/bot-api@4.1.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/55b1c76))
+
+
+
+
+
 ## [4.0.78](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.0.77...@wireapp/bot-api@4.0.78) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/bot-api

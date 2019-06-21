@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@6.0.37...@wireapp/cli-client@6.1.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/55b1c76))
+
+
+
+
+
 ## [6.0.37](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@6.0.36...@wireapp/cli-client@6.0.37) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/cli-client

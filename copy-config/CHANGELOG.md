@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.6.0 (2019-06-21)
+
+
+### Bug Fixes
+
+* **api-client:** Remove redundant emitter ([#1932](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1932)) ([7c02287](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/7c02287))
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/55b1c76))
+
+
+
+
+
 ## [0.5.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.5.13...@wireapp/copy-config@0.5.14) (2019-06-06)
 
 **Note:** Version bump only for package @wireapp/copy-config

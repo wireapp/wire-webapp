@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.1.13...@wireapp/proteus@9.2.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/55b1c76))
+
+
+
+
+
 ## [9.1.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.1.12...@wireapp/proteus@9.1.13) (2019-06-20)
 
 **Note:** Version bump only for package @wireapp/proteus
