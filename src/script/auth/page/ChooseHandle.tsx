@@ -112,7 +112,7 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
       intl: {formatMessage: _},
     } = this.props;
     return (
-      <Page isAuthenticated>
+      <Page>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
           <H1 center>{_(chooseHandleStrings.headline)}</H1>
           <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
