@@ -48,7 +48,7 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {SHOW_REQUEST_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {SHOW_REQUEST_MODAL, SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 import {BackendClientError} from '../error/BackendClientError';
 
@@ -314,6 +314,10 @@ export class UserRepository {
         return this.client_repository.saveClientInDb(userId, clientEntity.toJson()).then(() => {
           if (clientEntity.isLegalHold()) {
             amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
+            const isSelfUser = userId === this.self().id;
+            if (isSelfUser) {
+              amplify.publish(SHOW_LEGAL_HOLD_MODAL);
+            }
           } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
