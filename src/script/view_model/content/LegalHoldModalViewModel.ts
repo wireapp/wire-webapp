@@ -33,6 +33,7 @@ import {promiseProgress} from 'Util/PromiseUtil';
 import {BackendClientError} from '../../error/BackendClientError';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
+export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.hideRequestModal';
 
 export class LegalHoldModalViewModel {
   isVisible: ko.Observable<boolean>;
@@ -52,6 +53,7 @@ export class LegalHoldModalViewModel {
   requiresPassword: ko.Observable<boolean>;
   isLoadingRequest: ko.Observable<boolean>;
   isSendingApprove: ko.Observable<boolean>;
+  skipShowUsers: ko.Observable<boolean>;
 
   constructor(
     public userRepository: UserRepository,
@@ -74,6 +76,7 @@ export class LegalHoldModalViewModel {
     this.requestError = ko.observable('');
     this.isLoadingRequest = ko.observable(false);
     this.isSendingApprove = ko.observable(false);
+    this.skipShowUsers = ko.observable(false);
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
 
     this.onBgClick = () => {
@@ -87,8 +90,10 @@ export class LegalHoldModalViewModel {
       this.showRequest(false);
       this.passwordValue('');
       this.requestError('');
+      this.isLoadingRequest(false);
     };
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
+    amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
   }
 
   showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
@@ -131,7 +136,9 @@ export class LegalHoldModalViewModel {
   };
 
   closeRequest = () => {
-    this.isVisible(false);
+    if (this.showRequest()) {
+      this.isVisible(false);
+    }
   };
 
   acceptRequest = async () => {
@@ -143,6 +150,7 @@ export class LegalHoldModalViewModel {
       await this.teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
       this.isVisible(false);
       this.isSendingApprove(false);
+      this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
     } catch ({code, message}) {
@@ -164,6 +172,10 @@ export class LegalHoldModalViewModel {
   };
 
   showUsers = (conversation?: Conversation) => {
+    if (this.skipShowUsers()) {
+      return this.skipShowUsers(false);
+    }
+    this.showRequest(false);
     if (conversation === undefined) {
       this.users([this.userRepository.self()]);
       this.isOnlyMe(true);
