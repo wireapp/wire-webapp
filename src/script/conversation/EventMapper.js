@@ -274,7 +274,9 @@ export class EventMapper {
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
+    messageEntity.fromClientId = event.from_client_id;
     messageEntity.id = id;
+    messageEntity.legalHoldStatus = event.legal_hold_status;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;
