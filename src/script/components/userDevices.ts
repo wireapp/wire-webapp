@@ -42,6 +42,7 @@ export interface UserDevicesHistory {
   goTo: (to: UserDevicesState, head: string) => void;
   goBack: () => void;
   headline: ko.PureComputed<string>;
+  reset: () => void;
 }
 
 interface UserDevicesParams {
@@ -70,7 +71,11 @@ export const makeUserDevicesHistory = (): UserDevicesHistory => {
   const headlineHistory = ko.observableArray();
   const current = ko.pureComputed(() => history()[history().length - 1]);
   const headline = ko.pureComputed(() => headlineHistory()[headlineHistory().length - 1]);
-  history.push(UserDevicesState.DEVICE_LIST);
+  const reset = () => {
+    history.removeAll();
+    history.push(UserDevicesState.DEVICE_LIST);
+  };
+  reset();
   return {
     current,
     goBack: () => {
@@ -82,7 +87,14 @@ export const makeUserDevicesHistory = (): UserDevicesHistory => {
       headlineHistory.push(head);
     },
     headline,
+    reset,
   };
+};
+
+export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
+  const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);
+  const otherDevices = devices.filter(device => device.class !== ClientClassification.LEGAL_HOLD);
+  return legalholdDevices.concat(otherDevices);
 };
 
 ko.components.register('user-devices', {
@@ -152,16 +164,13 @@ ko.components.register('user-devices', {
     conversationRepository,
     cryptographyRepository,
     userEntity,
-    history: {current, goTo},
+    history,
     noPadding = false,
   }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
     this.clientEntities = ko.pureComputed(() => {
       if (userEntity()) {
-        const devices = userEntity().devices();
-        const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);
-        const otherDevices = devices.filter(device => device.class !== ClientClassification.LEGAL_HOLD);
-        return legalholdDevices.concat(otherDevices);
+        return sortUserDevices(userEntity().devices());
       }
       return undefined;
     });
@@ -178,9 +187,9 @@ ko.components.register('user-devices', {
     this.privacyHowUrl = getPrivacyHowUrl();
     this.privacyWhyUrl = getPrivacyWhyUrl();
 
-    const showDeviceList = () => current() === UserDevicesState.DEVICE_LIST;
-    this.showDeviceDetails = () => current() === UserDevicesState.DEVICE_DETAILS;
-    this.showSelfFingerprint = () => current() === UserDevicesState.SELF_FINGERPRINT;
+    const showDeviceList = () => history.current() === UserDevicesState.DEVICE_LIST;
+    this.showDeviceDetails = () => history.current() === UserDevicesState.DEVICE_DETAILS;
+    this.showSelfFingerprint = () => history.current() === UserDevicesState.SELF_FINGERPRINT;
     this.showDevicesFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.FOUND;
     this.showDevicesNotFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.NOT_FOUND;
 
@@ -229,7 +238,7 @@ ko.components.register('user-devices', {
       const headline = userEntity().is_me
         ? this.selectedClient().label || this.selectedClient().model
         : capitalizeFirstChar(this.selectedClient().class);
-      goTo(UserDevicesState.DEVICE_DETAILS, headline);
+      history.goTo(UserDevicesState.DEVICE_DETAILS, headline);
     };
 
     this.clickOnShowSelfDevices = () => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
@@ -247,7 +256,7 @@ ko.components.register('user-devices', {
       if (!this.fingerprintLocal().length) {
         this.fingerprintLocal(cryptographyRepository.getLocalFingerprint());
       }
-      goTo(UserDevicesState.SELF_FINGERPRINT, t('participantDevicesSelfFingerprint'));
+      history.goTo(UserDevicesState.SELF_FINGERPRINT, t('participantDevicesSelfFingerprint'));
     };
 
     this.clickToToggleDeviceVerification = () => {
@@ -259,6 +268,7 @@ ko.components.register('user-devices', {
 
     this.dispose = () => {
       selectedClientSubscription.dispose();
+      history.reset();
     };
   },
 });

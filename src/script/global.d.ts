@@ -48,6 +48,8 @@ declare global {
           ENABLE_SSO: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
+        MAX_GROUP_PARTICIPANTS: number;
+        MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {
           ACCOUNT_BASE: string;

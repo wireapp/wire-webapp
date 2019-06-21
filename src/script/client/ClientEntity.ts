@@ -93,6 +93,11 @@ export class ClientEntity {
     return this.type === ClientType.TEMPORARY;
   }
 
+  getName(): string {
+    const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
+    return hasModel ? this.model : this.class.toUpperCase();
+  }
+
   /**
    * This method returns an object which can be stored in our local database.
    */
