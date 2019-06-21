@@ -41,7 +41,7 @@ export class BroadcastAPI {
     params?: {
       ignore_missing?: boolean;
       report_missing?: string;
-    }
+    },
   ): Promise<UserClients> {
     if (!clientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');

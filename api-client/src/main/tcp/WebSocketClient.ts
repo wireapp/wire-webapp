@@ -103,7 +103,7 @@ export class WebSocketClient extends EventEmitter {
     this.socket = new ReconnectingWebsocket(
       () => this.buildWebSocketUrl(),
       undefined,
-      WebSocketClient.RECONNECTING_OPTIONS
+      WebSocketClient.RECONNECTING_OPTIONS,
     ) as WebSocket;
 
     this.socket.onmessage = (event: MessageEvent) => {
@@ -149,7 +149,7 @@ export class WebSocketClient extends EventEmitter {
         const mappedError = BackendErrorMapper.map(error);
         this.emit(
           error instanceof InvalidTokenError ? WebSocketTopic.ON_DISCONNECT : WebSocketTopic.ON_ERROR,
-          mappedError
+          mappedError,
         );
       }
     }

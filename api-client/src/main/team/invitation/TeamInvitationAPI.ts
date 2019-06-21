@@ -60,7 +60,7 @@ export class TeamInvitationAPI {
   public getInvitations(
     teamId: string,
     startEmail?: string,
-    limit = TeamInvitationAPI.MAX_CHUNK_SIZE
+    limit = TeamInvitationAPI.MAX_CHUNK_SIZE,
   ): Promise<TeamInvitationChunk> {
     const config: AxiosRequestConfig = {
       method: 'get',

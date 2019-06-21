@@ -67,7 +67,7 @@ export async function start(parameters: Parameters): Promise<void> {
       travisRepoSlug,
       travisCommitRange,
       MAXIMUM_CHARS,
-      excludeCommitTypes
+      excludeCommitTypes,
     );
   }
 

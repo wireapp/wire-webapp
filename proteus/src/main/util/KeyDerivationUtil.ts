@@ -33,7 +33,7 @@ export function hkdf(
   salt: Uint8Array | string,
   input: Uint8Array | string | number[] | ArrayBuffer[],
   info: Uint8Array | string,
-  length: number
+  length: number,
 ): Uint8Array {
   const convert_type = (value: string | Uint8Array) => {
     if (typeof value === 'string') {

@@ -217,7 +217,7 @@ export class FileEngine implements CRUDEngine {
     const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
     const primaryKeyPath = FileEngine.enforcePathRestrictions(
       tableNamePath,
-      primaryKey ? `${primaryKey}${this.options.fileExtension}` : ''
+      primaryKey ? `${primaryKey}${this.options.fileExtension}` : '',
     );
 
     return primaryKeyPath;

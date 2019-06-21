@@ -1,10 +1,10 @@
 //@ts-check
 
 process.on('uncaughtException', (/** @type {Error & {code: number}} */ error) =>
-  logger.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error)
+  logger.error(`Uncaught exception "${error.constructor.name}" (${error.code}): ${error.message}`, error),
 );
 process.on('unhandledRejection', (reason, promise) =>
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason)
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason),
 );
 
 const path = require('path');
@@ -75,18 +75,18 @@ const messageIdCache = {};
     }
 
     logger.log(
-      `Receiving: "${type}" ("${messageId}") in "${conversationId}" from "${from}" ${additionalContent.join(' ')}`
+      `Receiving: "${type}" ("${messageId}") in "${conversationId}" from "${from}" ${additionalContent.join(' ')}`,
     );
 
     if (CONFIRM_TYPES.includes(type)) {
       const deliveredPayload = account.service.conversation.messageBuilder.createConfirmation(
         conversationId,
         messageId,
-        0
+        0,
       );
       logger.log(
         `Sending: "${deliveredPayload.type}" ("${deliveredPayload.id}") in "${conversationId}"`,
-        deliveredPayload.content
+        deliveredPayload.content,
       );
       await account.service.conversation.send(deliveredPayload);
 
@@ -94,7 +94,7 @@ const messageIdCache = {};
         const readPayload = account.service.conversation.messageBuilder.createConfirmation(
           conversationId,
           messageId,
-          1
+          1,
         );
         logger.log(`Sending: "${readPayload.type}" ("${readPayload.id}") in "${conversationId}"`, readPayload.content);
         await account.service.conversation.send(readPayload);
@@ -102,7 +102,7 @@ const messageIdCache = {};
 
       if (messageTimer) {
         logger.log(
-          `Sending: "PayloadBundleType.MESSAGE_DELETE" in "${conversationId}" for "${messageId}" (encrypted for "${from}")`
+          `Sending: "PayloadBundleType.MESSAGE_DELETE" in "${conversationId}" for "${messageId}" (encrypted for "${from}")`,
         );
         await account.service.conversation.deleteMessageEveryone(conversationId, messageId, [from]);
       }
@@ -116,7 +116,7 @@ const messageIdCache = {};
     logger.log(
       `Sending: "${type}" ("${messageId}") in "${conversationId}"`,
       content,
-      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : ''
+      messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : '',
     );
 
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
@@ -229,7 +229,7 @@ const messageIdCache = {};
       const filePayload = await account.service.conversation.messageBuilder.createFileData(
         conversationId,
         {data: fileBuffer},
-        fileMetaDataPayload.id
+        fileMetaDataPayload.id,
       );
       messageIdCache[messageId] = filePayload.id;
       await sendMessageResponse(data, filePayload);
@@ -238,7 +238,7 @@ const messageIdCache = {};
       const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
         conversationId,
         0,
-        fileMetaDataPayload.id
+        fileMetaDataPayload.id,
       );
       await sendMessageResponse(data, fileAbortPayload);
     }
@@ -278,7 +278,7 @@ const messageIdCache = {};
     const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
       conversationId,
       0,
-      fileMetaDataPayload.id
+      fileMetaDataPayload.id,
     );
     await sendMessageResponse(data, fileAbortPayload);
 

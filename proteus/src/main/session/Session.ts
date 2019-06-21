@@ -94,21 +94,21 @@ export class Session {
   static init_from_message(
     our_identity: IdentityKeyPair,
     prekey_store: PreKeyStore,
-    envelope: Envelope
+    envelope: Envelope,
   ): Promise<[Session, Uint8Array]> {
     return new Promise((resolve, reject) => {
       const pkmsg = (() => {
         if (envelope.message instanceof CipherMessage) {
           throw new DecryptError.InvalidMessage(
             "Can't initialise a session from a CipherMessage.",
-            DecryptError.CODE.CASE_201
+            DecryptError.CODE.CASE_201,
           );
         } else if (envelope.message instanceof PreKeyMessage) {
           return envelope.message;
         } else {
           throw new DecryptError.InvalidMessage(
             'Unknown message format: The message is neither a "CipherMessage" nor a "PreKeyMessage".',
-            DecryptError.CODE.CASE_202
+            DecryptError.CODE.CASE_202,
           );
         }
       })();
@@ -135,8 +135,8 @@ export class Session {
                 reject(
                   new DecryptError.PrekeyNotFound(
                     `Could not delete PreKey: ${error.message}`,
-                    DecryptError.CODE.CASE_203
-                  )
+                    DecryptError.CODE.CASE_203,
+                  ),
                 );
               });
           }
@@ -153,12 +153,12 @@ export class Session {
           this.local_identity,
           pre_key.key_pair,
           pre_key_message.identity_key,
-          pre_key_message.base_key
+          pre_key_message.base_key,
         );
       }
       throw new ProteusError(
         `Unable to find PreKey ID "${pre_key_message.prekey_id}" in PreKey store "${pre_key_store.constructor.name}".`,
-        ProteusError.CODE.CASE_101
+        ProteusError.CODE.CASE_101,
       );
     });
   }
@@ -221,13 +221,13 @@ export class Session {
         return reject(
           new ProteusError(
             `Could not find session for tag '${(this.session_tag || '').toString()}'.`,
-            ProteusError.CODE.CASE_102
-          )
+            ProteusError.CODE.CASE_102,
+          ),
         );
       }
 
       return resolve(
-        session_state.state.encrypt(this.local_identity.public_key, this.pending_prekey, this.session_tag, plaintext)
+        session_state.state.encrypt(this.local_identity.public_key, this.pending_prekey, this.session_tag, plaintext),
       );
     });
   }
@@ -254,7 +254,7 @@ export class Session {
   private _decrypt_prekey_message(
     envelope: Envelope,
     msg: PreKeyMessage,
-    prekey_store: PreKeyStore
+    prekey_store: PreKeyStore,
   ): Promise<Uint8Array> {
     return Promise.resolve()
       .then(() => this._decrypt_cipher_message(envelope, msg.message))
@@ -284,7 +284,7 @@ export class Session {
     if (!state) {
       throw new DecryptError.InvalidMessage(
         `Local session not found for message session tag '${msg.session_tag}'.`,
-        DecryptError.CODE.CASE_205
+        DecryptError.CODE.CASE_205,
       );
     }
 

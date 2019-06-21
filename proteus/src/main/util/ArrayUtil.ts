@@ -41,6 +41,6 @@ export function concatenate_array_buffers(buffers: Uint8Array[]): Uint8Array {
       buffer.set(accumulator, 0);
       buffer.set(bytes, accumulator.byteLength);
       return buffer;
-    }
+    },
   );
 }

@@ -73,7 +73,7 @@ describe('CryptographyService', () => {
       const encryptedPreKeyMessage = await bob.encrypt(
         'alice-user-id@alice-client-id',
         text,
-        publicPreKeyBundle.serialise()
+        publicPreKeyBundle.serialise(),
       );
       const encodedPreKeyMessage = bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
       const decryptResult = await cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
@@ -203,7 +203,7 @@ describe('CryptographyService', () => {
       const {sessionId, encryptedPayload} = await cryptographyService.encryptPayloadForSession(
         sessionWithBobId,
         text,
-        encodedPreKey
+        encodedPreKey,
       );
       expect(encryptedPayload).not.toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
@@ -216,7 +216,7 @@ describe('CryptographyService', () => {
       const {sessionId, encryptedPayload} = await cryptographyService.encryptPayloadForSession(
         sessionWithBobId,
         undefined,
-        encodedPreKey
+        encodedPreKey,
       );
       expect(encryptedPayload).toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);

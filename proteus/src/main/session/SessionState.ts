@@ -61,7 +61,7 @@ export class SessionState {
   static async init_as_alice(
     alice_identity_pair: IdentityKeyPair,
     alice_base: IdentityKeyPair | KeyPair,
-    bob_pkbundle: PreKeyBundle
+    bob_pkbundle: PreKeyBundle,
   ): Promise<SessionState> {
     const master_key = ArrayUtil.concatenate_array_buffers([
       alice_identity_pair.secret_key.shared_secret(bob_pkbundle.public_key),
@@ -93,7 +93,7 @@ export class SessionState {
     bob_ident: IdentityKeyPair,
     bob_prekey: KeyPair,
     alice_ident: IdentityKey,
-    alice_base: PublicKey
+    alice_base: PublicKey,
   ): SessionState {
     const master_key = ArrayUtil.concatenate_array_buffers([
       bob_prekey.secret_key.shared_secret(alice_ident.public_key),
@@ -151,7 +151,7 @@ export class SessionState {
     identity_key: IdentityKey,
     pending: (number | PublicKey)[] | null,
     tag: SessionTag,
-    plaintext: string | Uint8Array
+    plaintext: string | Uint8Array,
   ): Envelope {
     const msgkeys = this.send_chain.chain_key.message_keys();
 
@@ -160,7 +160,7 @@ export class SessionState {
       this.send_chain.chain_key.idx,
       this.prev_counter,
       this.send_chain.ratchet_key.public_key,
-      msgkeys.encrypt(plaintext)
+      msgkeys.encrypt(plaintext),
     );
 
     if (pending) {
@@ -190,7 +190,7 @@ export class SessionState {
       if (!envelope.verify(mks.mac_key)) {
         throw new DecryptError.InvalidSignature(
           `Envelope verification failed for message with counters in sync at '${msg.counter}'. The received message was possibly encrypted for another client.`,
-          DecryptError.CODE.CASE_206
+          DecryptError.CODE.CASE_206,
         );
       }
 
@@ -203,7 +203,7 @@ export class SessionState {
       if (!envelope.verify(mk.mac_key)) {
         throw new DecryptError.InvalidSignature(
           `Envelope verification failed for message with counter ahead. Message index is '${msg.counter}' while receive chain index is '${rc.chain_key.idx}'.`,
-          DecryptError.CODE.CASE_207
+          DecryptError.CODE.CASE_207,
         );
       }
 

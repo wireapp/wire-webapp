@@ -29,6 +29,6 @@ describe('"TextArea"', () => {
     matchComponent(
       <TextArea placeholderTextTransform="lowercase" placeholder="TextArea">
         TextArea
-      </TextArea>
+      </TextArea>,
     ));
 });

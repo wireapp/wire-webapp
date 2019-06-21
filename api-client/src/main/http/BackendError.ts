@@ -27,7 +27,7 @@ export class BackendError extends Error {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.UNKNOWN,
-    code: StatusCode = StatusCode.UNKNOWN
+    code: StatusCode = StatusCode.UNKNOWN,
   ) {
     super(message);
     this.code = code;

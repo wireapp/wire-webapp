@@ -46,7 +46,7 @@ export class CipherMessage extends Message {
     counter: number,
     prev_counter: number,
     ratchet_key: PublicKey,
-    cipher_text: Uint8Array
+    cipher_text: Uint8Array,
   ): CipherMessage {
     const cm = ClassUtil.new_instance(CipherMessage);
 

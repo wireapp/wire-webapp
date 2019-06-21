@@ -81,7 +81,7 @@ describe('SQLeetEngine', () => {
               name: SQLiteType.TEXT,
             },
           },
-          shouldCreateNewEngine
+          shouldCreateNewEngine,
         );
       it(description, async () => testFunction(await initEnginePurge(), initEnginePurge));
     });
@@ -152,7 +152,7 @@ describe('SQLeetEngine', () => {
         fail();
       } catch (error) {
         expect(error.message).toBe(
-          'Entity is empty for table "users". Are you sure you set the right scheme / column names?'
+          'Entity is empty for table "users". Are you sure you set the right scheme / column names?',
         );
       }
     });

@@ -58,7 +58,7 @@ export abstract class MessageHandler {
       const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation(
         conversationId,
         firstMessageId,
-        Confirmation.Type.DELIVERED
+        Confirmation.Type.DELIVERED,
       );
       await this.account.service.conversation.send(confirmationPayload);
     }
@@ -86,7 +86,7 @@ export abstract class MessageHandler {
     newMessageText: string,
     newMentions?: MentionContent[],
     newLinkPreview?: LinkPreviewContent,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<void> {
     if (this.account && this.account.service) {
       const editedPayload = this.account.service.conversation.messageBuilder
@@ -98,7 +98,7 @@ export abstract class MessageHandler {
 
       if (newLinkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
-          newLinkPreview
+          newLinkPreview,
         );
         const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
           .createEditedText(conversationId, newMessageText, originalMessageId, editedMessage.id)
@@ -115,7 +115,7 @@ export abstract class MessageHandler {
     if (this.account && this.account.service) {
       const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata(
         conversationId,
-        metadata
+        metadata,
       );
       await this.account.service.conversation.send(metadataPayload);
 
@@ -123,14 +123,14 @@ export abstract class MessageHandler {
         const filePayload = await this.account.service.conversation.messageBuilder.createFileData(
           conversationId,
           file,
-          metadataPayload.id
+          metadataPayload.id,
         );
         await this.account.service.conversation.send(filePayload);
       } catch (error) {
         const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort(
           conversationId,
           Asset.NotUploaded.FAILED,
-          metadataPayload.id
+          metadataPayload.id,
         );
         await this.account.service.conversation.send(abortPayload);
       }
@@ -173,7 +173,7 @@ export abstract class MessageHandler {
     text: string,
     mentions?: MentionContent[],
     linkPreview?: LinkPreviewContent,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<void> {
     if (this.account && this.account.service) {
       const payload = await this.account.service.conversation.messageBuilder
@@ -184,7 +184,7 @@ export abstract class MessageHandler {
 
       if (linkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
-          linkPreview
+          linkPreview,
         );
         const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
           .createText(conversationId, text, sentMessage.id)

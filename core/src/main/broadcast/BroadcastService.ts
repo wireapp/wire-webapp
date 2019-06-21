@@ -28,7 +28,7 @@ export class BroadcastService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly conversationService: ConversationService,
-    private readonly cryptographyService: CryptographyService
+    private readonly cryptographyService: CryptographyService,
   ) {}
 
   private async getPreKeyBundle(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
@@ -66,7 +66,7 @@ export class BroadcastService {
     sendingClientId: string,
     recipients: OTRRecipients,
     plainTextArray: Uint8Array,
-    data?: any
+    data?: any,
   ): Promise<void> {
     const message: NewOTRMessage = {
       data,

@@ -89,7 +89,7 @@ export class ChangelogBot {
     repoSlug: string,
     previousGitTag: string,
     maximumChars?: number,
-    excludedCommitTypes?: string[]
+    excludedCommitTypes?: string[],
   ): Promise<string> {
     const headlines = new RegExp('^#+ (.*)$', 'gm');
     const listItems = new RegExp('^(\\s*)\\* ', 'gm');

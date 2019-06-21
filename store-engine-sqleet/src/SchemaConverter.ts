@@ -41,14 +41,14 @@ export const escape = (value: string, delimiter: string = '`') => {
 
 export function createTableIfNotExists<T>(tableName: string, columns: SQLiteTableDefinition<T>): string {
   const statements = ['`key` varchar(255) PRIMARY KEY'].concat(
-    Object.entries(columns).map(([key, type]) => `${escape(key)} ${type}`)
+    Object.entries(columns).map(([key, type]) => `${escape(key)} ${type}`),
   );
   return `CREATE TABLE IF NOT EXISTS ${escape(tableName)} (${statements.join(',')});`;
 }
 
 export function getFormattedColumnsFromTableName(
   tableNameColumns: Partial<Record<string, SQLiteType>>,
-  withKey: boolean = false
+  withKey: boolean = false,
 ): string {
   return `${withKey ? `${SQLeetEnginePrimaryKeyName},` : ''}${Object.keys(tableNameColumns)
     .map(column => escape(column))
@@ -57,7 +57,7 @@ export function getFormattedColumnsFromTableName(
 
 export function getFormattedColumnsFromColumns(
   tableNameColumns: Record<string, string>,
-  withKey: boolean = false
+  withKey: boolean = false,
 ): string {
   return `${withKey ? `${SQLeetEnginePrimaryKeyName},` : ''}${Object.values(tableNameColumns)
     .map(column => escape(column))

@@ -76,7 +76,7 @@ export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine
       await setInternalCookie(new Cookie(cookie.value, cookie.expires), engine);
       logger.info(
         `Saved internal cookie. It will expire on "${cookie.expires}".`,
-        ObfuscationUtil.obfuscateCookie(cookie)
+        ObfuscationUtil.obfuscateCookie(cookie),
       );
     }
   }
@@ -88,7 +88,7 @@ export const retrieveCookie = async (response: AxiosResponse, engine: CRUDEngine
 export const sendRequestWithCookie = <T>(
   client: HttpClient,
   config: AxiosRequestConfig,
-  engine: CRUDEngine
+  engine: CRUDEngine,
 ): Promise<AxiosResponse<T>> => {
   return loadExistingCookie(engine).then((cookie: Cookie) => {
     if (!cookie.isExpired) {

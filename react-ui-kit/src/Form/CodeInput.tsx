@@ -74,14 +74,14 @@ export const CodeInput = ({
       | React.MouseEvent<HTMLInputElement>
       | React.TouchEvent<HTMLInputElement>
       | React.KeyboardEvent<HTMLInputElement>
-      | React.FocusEvent<HTMLInputElement>
+      | React.FocusEvent<HTMLInputElement>,
   ) => {
     const target = event.target as HTMLInputElement;
     target.select();
   };
 
   const forceSelectionPreventDefault = (
-    event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>
+    event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>,
   ) => {
     forceSelection(event);
     event.preventDefault();
@@ -137,7 +137,7 @@ export const CodeInput = ({
         values
           .slice(0, fieldIndex)
           .concat(cleanedPaste.split(''))
-          .slice(0, digits)
+          .slice(0, digits),
       );
     }
   };

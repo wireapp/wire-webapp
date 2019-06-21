@@ -69,7 +69,7 @@ describe('HttpClient', () => {
             },
             status: StatusCode.FORBIDDEN,
           },
-        })
+        }),
       );
       client.refreshAccessToken = () => {
         return Promise.reject(new Error('Should not refresh access token'));

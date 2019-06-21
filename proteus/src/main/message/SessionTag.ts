@@ -54,7 +54,7 @@ export class SessionTag {
     if (bytes.byteLength !== length) {
       throw new DecodeError.InvalidArrayLen(
         `Session tag should be 16 bytes, not ${bytes.byteLength} bytes.`,
-        DecodeError.CODE.CASE_303
+        DecodeError.CODE.CASE_303,
       );
     }
 

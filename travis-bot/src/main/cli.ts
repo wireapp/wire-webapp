@@ -42,7 +42,7 @@ const setBold = (text: string): string => `\x1b[1m${text}\x1b[0m`;
 const usage = (): void => {
   console.info(`${setBold('Usage:')} ${scriptName} <conversation id(s)>\n`);
   console.info(
-    `${setBold('Example:')} ${scriptName} "e4302e84-75fd-4dc7-8a16-67018bd94ce7,44be7db8-7b7c-4acf-887d-86fbb9a5508f"`
+    `${setBold('Example:')} ${scriptName} "e4302e84-75fd-4dc7-8a16-67018bd94ce7,44be7db8-7b7c-4acf-887d-86fbb9a5508f"`,
   );
 };
 const envVarUsage = (): void => console.info(setBold('Required environment variables:'), requiredEnvVars.join(', '));
@@ -63,7 +63,7 @@ const start = async (): Promise<TravisBot> => {
     changelog = await TravisBot.generateChangelog(
       String(TRAVIS_REPO_SLUG),
       `${previousGitTag}..${TRAVIS_TAG}`,
-      MAXIMUM_CHANGELOG_CHARS
+      MAXIMUM_CHANGELOG_CHARS,
     );
   }
 
@@ -124,8 +124,8 @@ travisEnvVars.forEach(envVar => {
   if (!process.env[envVar]) {
     console.error(
       `${setBold(
-        'Error:'
-      )} Travis environment variable "${envVar}" is not set.\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables`
+        'Error:',
+      )} Travis environment variable "${envVar}" is not set.\nRead more: https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables`,
     );
     process.exit(1);
   }

@@ -30,7 +30,7 @@ const _sodium = require('libsodium-wrappers-sumo');
   const serializedIdentity = identity.serialise();
   const encodedSerializedIdentity = sodium.to_base64(
     new Uint8Array(serializedIdentity),
-    sodium.base64_variants.ORIGINAL
+    sodium.base64_variants.ORIGINAL,
   );
 
   const messageFingerprint = `Identity Test (Fingerprint): ${fingerprint}`;

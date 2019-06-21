@@ -132,7 +132,7 @@ export class Bot {
   private validateMessage(conversationID: string, userID: string): boolean {
     if (!this.isAllowedConversation(conversationID)) {
       this.logger.info(
-        `Skipping message because conversation "${conversationID}" is not in the list of allowed conversations.`
+        `Skipping message because conversation "${conversationID}" is not in the list of allowed conversations.`,
       );
     }
 

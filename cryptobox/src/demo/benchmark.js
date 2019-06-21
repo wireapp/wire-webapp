@@ -38,7 +38,7 @@ async function initialSetup() {
 
   const bobBundle = Proteus.keys.PreKeyBundle.new(
     bob.identity.public_key,
-    await bob.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID)
+    await bob.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID),
   );
 
   const cipherMessage = await alice.encrypt(createSessionId(bob), 'Hello', bobBundle.serialise());
@@ -55,7 +55,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   process.stdout.write(`Measuring encryption time for "${messageCount}" messages ... `);
   let startTime = process.hrtime();
   const encryptedMessages = await Promise.all(
-    numbers.map(value => alice.encrypt(createSessionId(bob), `This is a long message with number ${value.toString()}`))
+    numbers.map(value => alice.encrypt(createSessionId(bob), `This is a long message with number ${value.toString()}`)),
   );
   let stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
@@ -66,7 +66,7 @@ async function encryptBeforeDecrypt({alice, bob}, messageCount) {
   process.stdout.write(`Measuring decryption time for "${messageCount}" messages ... `);
   startTime = process.hrtime();
   await Promise.all(
-    encryptedMessages.map(async encryptedMessage => await bob.decrypt(createSessionId(alice), encryptedMessage))
+    encryptedMessages.map(async encryptedMessage => await bob.decrypt(createSessionId(alice), encryptedMessage)),
   );
   stopTime = getTimeInSeconds(startTime);
   process.stdout.write('Done.\n');
@@ -84,7 +84,7 @@ async function pingPong({alice, bob}, messageCount) {
   let actors = toggleActors([alice, bob]);
 
   process.stdout.write(
-    `Measuring encryption with immediate decryption (ping/pong) for "${messageCount}" messages ... `
+    `Measuring encryption with immediate decryption (ping/pong) for "${messageCount}" messages ... `,
   );
   const startTime = process.hrtime();
 
@@ -112,7 +112,7 @@ async function pingPongWithMultipleSessions(messageCount) {
 
   const aliceBundle = Proteus.keys.PreKeyBundle.new(
     alice.identity.public_key,
-    await alice.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID)
+    await alice.store.load_prekey(Proteus.keys.PreKey.MAX_PREKEY_ID),
   );
 
   process.stdout.write(`Measuring time for creating "${messageCount}" cryptoboxes ... `);
@@ -123,7 +123,7 @@ async function pingPongWithMultipleSessions(messageCount) {
       const cryptobox = await createCryptobox(`cryptobox-${number}`, 1);
       await cryptobox.create();
       return cryptobox;
-    })
+    }),
   );
 
   let stopTime = getTimeInSeconds(startTime);
@@ -131,12 +131,12 @@ async function pingPongWithMultipleSessions(messageCount) {
   console.info(`Execution time: ${stopTime} seconds.\n`);
 
   process.stdout.write(
-    `Measuring time for encrypting "${messageCount}" messages with "${messageCount}" cryptoboxes ... `
+    `Measuring time for encrypting "${messageCount}" messages with "${messageCount}" cryptoboxes ... `,
   );
   startTime = process.hrtime();
 
   const encryptions = await Promise.all(
-    cryptoboxes.map(cryptobox => cryptobox.encrypt(createSessionId(alice), 'Hello', aliceBundle.serialise()))
+    cryptoboxes.map(cryptobox => cryptobox.encrypt(createSessionId(alice), 'Hello', aliceBundle.serialise())),
   );
 
   stopTime = getTimeInSeconds(startTime);

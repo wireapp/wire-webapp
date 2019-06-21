@@ -104,7 +104,7 @@ export class ConversationService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly cryptographyService: CryptographyService,
-    private readonly assetService: AssetService
+    private readonly assetService: AssetService,
   ) {
     this.messageTimer = new MessageTimer();
     this.messageBuilder = new MessageBuilder(this.apiClient, this.assetService);
@@ -127,7 +127,7 @@ export class ConversationService {
   private async getPreKeyBundle(
     conversationId: string,
     userIds?: string[],
-    skipOwnClients = false
+    skipOwnClients = false,
   ): Promise<UserPreKeyBundleMap> {
     const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
     const members = userIds && userIds.length ? userIds.map(id => ({id})) : conversation.members.others;
@@ -156,7 +156,7 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     asset: EncryptedAsset,
-    preKeyBundles: UserPreKeyBundleMap
+    preKeyBundles: UserPreKeyBundleMap,
   ): Promise<void> {
     const {cipherText, keyBytes, sha256} = asset;
     const messageId = MessageBuilder.createId();
@@ -183,7 +183,7 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<void> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
@@ -204,7 +204,7 @@ export class ConversationService {
     conversationId: string,
     recipients: OTRRecipients,
     plainTextArray: Uint8Array,
-    data?: any
+    data?: any,
   ): Promise<void> {
     const message: NewOTRMessage = {
       data,
@@ -223,7 +223,7 @@ export class ConversationService {
   public async onClientMismatch(
     error: AxiosError,
     message: NewOTRMessage,
-    plainTextArray: Uint8Array
+    plainTextArray: Uint8Array,
   ): Promise<NewOTRMessage> {
     if (error.response && error.response.status === StatusCode.PRECONDITION_FAILED) {
       const {missing, deleted}: {missing: UserClients; deleted: UserClients} = error.response.data;
@@ -378,7 +378,7 @@ export class ConversationService {
 
   private async sendFileMetaData(
     payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<FileAssetMetaDataMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileMetaData provided.');
@@ -419,7 +419,7 @@ export class ConversationService {
 
   private async sendFileAbort(
     payloadBundle: FileAssetAbortMessage,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<FileAssetAbortMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileAbort provided.');
@@ -660,7 +660,7 @@ export class ConversationService {
   public async clearConversation(
     conversationId: string,
     timestamp: number | Date = new Date(),
-    messageId: string = MessageBuilder.createId()
+    messageId: string = MessageBuilder.createId(),
   ): Promise<ClearConversationMessage> {
     if (timestamp instanceof Date) {
       timestamp = timestamp.getTime();
@@ -726,7 +726,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[]
+    userIds?: string[],
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -909,7 +909,7 @@ export class ConversationService {
           return this.sendSessionReset(payloadBundle, userIds);
         }
         throw new Error(
-          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`
+          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
         );
       }
       case PayloadBundleType.CONFIRMATION:
@@ -944,7 +944,7 @@ export class ConversationService {
   public setConversationMutedStatus(
     conversationId: string,
     status: MutedStatus,
-    muteTimestamp: number | Date
+    muteTimestamp: number | Date,
   ): Promise<void> {
     if (typeof muteTimestamp === 'number') {
       muteTimestamp = new Date(muteTimestamp);
@@ -961,7 +961,7 @@ export class ConversationService {
   public toggleArchiveConversation(
     conversationId: string,
     archived: boolean,
-    archiveTimestamp: number | Date = new Date()
+    archiveTimestamp: number | Date = new Date(),
   ): Promise<void> {
     if (typeof archiveTimestamp === 'number') {
       archiveTimestamp = new Date(archiveTimestamp);

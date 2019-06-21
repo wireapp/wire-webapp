@@ -31,7 +31,7 @@ export class UserIsUnknownError extends UserError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: StatusCode = StatusCode.BAD_REQUEST
+    code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, UserIsUnknownError.prototype);
@@ -43,7 +43,7 @@ export class UnconnectedUserError extends UserError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.NOT_CONNECTED,
-    code: StatusCode = StatusCode.FORBIDDEN
+    code: StatusCode = StatusCode.FORBIDDEN,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, UserIsUnknownError.prototype);

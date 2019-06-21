@@ -48,7 +48,7 @@ describe('Role', () => {
           Permissions.GET_MEMBER_PERMISSIONS,
           Permissions.GET_TEAM_CONVERSATIONS,
           Permissions.REMOVE_CONVERSATION_MEMBER,
-        ])
+        ]),
       );
     });
 
@@ -66,7 +66,7 @@ describe('Role', () => {
           Permissions.REMOVE_TEAM_MEMBER,
           Permissions.SET_MEMBER_PERMISSIONS,
           Permissions.SET_TEAM_DATA,
-        ])
+        ]),
       );
     });
 
@@ -87,7 +87,7 @@ describe('Role', () => {
           Permissions.SET_BILLING,
           Permissions.SET_MEMBER_PERMISSIONS,
           Permissions.SET_TEAM_DATA,
-        ])
+        ]),
       );
     });
   });

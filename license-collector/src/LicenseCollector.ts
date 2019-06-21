@@ -176,7 +176,7 @@ export class LicenseCollector {
         this.logger.info(
           `${name}: Found ${dependencies.length} production dependenc${plural(dependencies.length)} and ${
             devDependencies.length
-          } dev dependenc${plural(devDependencies.length)} in "${packageFileNames[index]}".`
+          } dev dependenc${plural(devDependencies.length)} in "${packageFileNames[index]}".`,
         );
 
         for (const dependency of dependencies) {

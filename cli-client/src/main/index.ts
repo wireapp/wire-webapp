@@ -64,7 +64,7 @@ storeEngine
 
     account.on(PayloadBundleType.TEXT, (data: PayloadBundle) => {
       console.log(
-        `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`
+        `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`,
       );
     });
 

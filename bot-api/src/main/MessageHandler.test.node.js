@@ -83,24 +83,24 @@ describe('MessageHandler', () => {
       };
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
-        metadataPayload
+        metadataPayload,
       );
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileData').and.returnValue(
-        Promise.resolve(filePayload)
+        Promise.resolve(filePayload),
       );
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileAbort').and.returnValue(
-        Promise.resolve()
+        Promise.resolve(),
       );
 
       await mainHandler.sendFile(conversationId, file, metadata);
       expect(mainHandler.account.service.conversation.messageBuilder.createFileMetadata).toHaveBeenCalledWith(
         conversationId,
-        metadata
+        metadata,
       );
       expect(mainHandler.account.service.conversation.messageBuilder.createFileData).toHaveBeenCalledWith(
         conversationId,
         file,
-        metadataPayload.id
+        metadataPayload.id,
       );
       expect(mainHandler.account.service.conversation.messageBuilder.createFileAbort).not.toHaveBeenCalled();
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(filePayload);
@@ -119,24 +119,24 @@ describe('MessageHandler', () => {
       };
 
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileMetadata').and.returnValue(
-        metadataPayload
+        metadataPayload,
       );
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileData').and.returnValue(
-        Promise.reject(new Error())
+        Promise.reject(new Error()),
       );
       spyOn(mainHandler.account.service.conversation.messageBuilder, 'createFileAbort').and.returnValue(
-        Promise.resolve(abortPayload)
+        Promise.resolve(abortPayload),
       );
 
       await mainHandler.sendFile(conversationId, file, metadata);
       expect(mainHandler.account.service.conversation.messageBuilder.createFileMetadata).toHaveBeenCalledWith(
         conversationId,
-        metadata
+        metadata,
       );
       expect(mainHandler.account.service.conversation.messageBuilder.createFileData).toHaveBeenCalledWith(
         conversationId,
         file,
-        metadataPayload.id
+        metadataPayload.id,
       );
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(abortPayload);
     });
@@ -158,11 +158,11 @@ describe('MessageHandler', () => {
 
       expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
-        messageText
+        messageText,
       );
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})}),
-        undefined
+        undefined,
       );
     });
 
@@ -176,11 +176,11 @@ describe('MessageHandler', () => {
 
       expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
-        message
+        message,
       );
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
-        undefined
+        undefined,
       );
     });
 
@@ -195,11 +195,11 @@ describe('MessageHandler', () => {
 
       expect(mainHandler.account.service.conversation.messageBuilder.createText).toHaveBeenCalledWith(
         conversationId,
-        message
+        message,
       );
       expect(mainHandler.account.service.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
-        userIds
+        userIds,
       );
     });
   });

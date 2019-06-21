@@ -101,7 +101,7 @@ export class TravisBot {
           const textPayload = await account.service.conversation.messageBuilder.createText(id, this.message).build();
           await account.service.conversation.send(textPayload);
         }
-      })
+      }),
     );
   }
 

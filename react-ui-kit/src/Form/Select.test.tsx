@@ -27,20 +27,20 @@ describe('"Select"', () => {
       <Select>
         <option>a</option>
         <option>b</option>
-      </Select>
+      </Select>,
     ));
   it('renders as disabled', () =>
     matchComponent(
       <Select disabled>
         <option>a</option>
         <option>b</option>
-      </Select>
+      </Select>,
     ));
   it('renders as invalid', () =>
     matchComponent(
       <Select markInvalid>
         <option>a</option>
         <option>b</option>
-      </Select>
+      </Select>,
     ));
 });

@@ -44,7 +44,7 @@ describe('AuthAPI', () => {
         params: {
           persist: true,
         },
-      })
+      }),
     );
   });
 
@@ -69,7 +69,7 @@ describe('AuthAPI', () => {
         params: {
           persist: false,
         },
-      })
+      }),
     );
   });
 });

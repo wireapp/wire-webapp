@@ -49,7 +49,7 @@ describe('Envelope', () => {
       42,
       base_key,
       identity_key,
-      Proteus.message.CipherMessage.new(session_tag, 42, 43, ratchet_key, new Uint8Array([1, 2, 3, 4]))
+      Proteus.message.CipherMessage.new(session_tag, 42, 43, ratchet_key, new Uint8Array([1, 2, 3, 4])),
     );
 
     const env = Proteus.message.Envelope.new(mac_key, msg);
@@ -61,7 +61,7 @@ describe('Envelope', () => {
       42,
       base_key,
       identity_key,
-      Proteus.message.CipherMessage.new(session_tag, 42, 43, ratchet_key, new Uint8Array([1, 2, 3, 4]))
+      Proteus.message.CipherMessage.new(session_tag, 42, 43, ratchet_key, new Uint8Array([1, 2, 3, 4])),
     );
 
     const env = Proteus.message.Envelope.new(mac_key, msg);

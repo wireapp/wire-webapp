@@ -37,7 +37,7 @@ export class Converter {
     const array = Array.from(arrayBufferView);
     const chunkCount = Math.ceil(array.length / chunkSize);
     return Array.from({length: chunkCount}, (value, index) =>
-      String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize))
+      String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize)),
     ).join('');
   }
 
@@ -92,7 +92,7 @@ export class Converter {
       default:
         throw new UnsupportedInputError(
           `${data.constructor.name} is unsupported.` +
-            ` Please provide a type of 'ArrayBuffer', 'Array', 'Buffer', 'Number', 'String' or 'Uint8Array'.`
+            ` Please provide a type of 'ArrayBuffer', 'Array', 'Buffer', 'Number', 'String' or 'Uint8Array'.`,
         );
     }
   }
@@ -110,7 +110,7 @@ export class Converter {
         return this.arrayBufferViewToStringUTF8(<Uint8Array>data);
       default:
         throw new UnsupportedInputError(
-          `${data.constructor.name} is unsupported.` + ` Please provide a 'String', 'Uint8Array' or 'Array'.`
+          `${data.constructor.name} is unsupported.` + ` Please provide a 'String', 'Uint8Array' or 'Array'.`,
         );
     }
   }

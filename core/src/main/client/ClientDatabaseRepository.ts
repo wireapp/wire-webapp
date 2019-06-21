@@ -46,7 +46,7 @@ export class ClientDatabaseRepository {
   public deleteLocalClient(): Promise<string> {
     return this.storeEngine.delete(
       ClientDatabaseRepository.STORES.CLIENTS,
-      ClientDatabaseRepository.KEYS.LOCAL_IDENTITY
+      ClientDatabaseRepository.KEYS.LOCAL_IDENTITY,
     );
   }
 
@@ -82,7 +82,7 @@ export class ClientDatabaseRepository {
       .update(
         ClientDatabaseRepository.STORES.CLIENTS,
         CryptographyService.constructSessionId(userId, client.id),
-        transformedClient
+        transformedClient,
       )
       .then(() => transformedClient);
   }
@@ -93,7 +93,7 @@ export class ClientDatabaseRepository {
       .create(
         ClientDatabaseRepository.STORES.CLIENTS,
         CryptographyService.constructSessionId(userId, client.id),
-        transformedClient
+        transformedClient,
       )
       .then(() => transformedClient);
   }

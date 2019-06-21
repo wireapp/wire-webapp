@@ -133,7 +133,7 @@ export class Account extends EventEmitter {
   public login(
     loginData: LoginData,
     initClient: boolean = true,
-    clientInfo?: ClientInfo
+    clientInfo?: ClientInfo,
   ): Promise<Context | undefined> {
     return this.resetContext()
       .then(() => this.init())
@@ -148,7 +148,7 @@ export class Account extends EventEmitter {
 
   public initClient(
     loginData: LoginData,
-    clientInfo?: ClientInfo
+    clientInfo?: ClientInfo,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');
@@ -182,7 +182,7 @@ export class Account extends EventEmitter {
             }
             this.logger.log('Last client was permanent - Deleting cryptography stores');
             return this.service!.cryptography.deleteCryptographyStores().then(() =>
-              this.registerClient(loginData, clientInfo)
+              this.registerClient(loginData, clientInfo),
             );
           });
         }
@@ -203,7 +203,7 @@ export class Account extends EventEmitter {
 
   private registerClient(
     loginData: LoginData,
-    clientInfo?: ClientInfo
+    clientInfo?: ClientInfo,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');

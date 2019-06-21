@@ -42,7 +42,7 @@ export class ClientService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly storeEngine: CRUDEngine,
-    private readonly cryptographyService: CryptographyService
+    private readonly cryptographyService: CryptographyService,
   ) {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
@@ -77,7 +77,7 @@ export class ClientService {
       classification: ClientClassification.DESKTOP,
       cookieLabel: 'default',
       model: `${pkg.name} v${pkg.version}`,
-    }
+    },
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');

@@ -54,7 +54,7 @@ export class SQLeetEngine implements CRUDEngine {
     wasmLocation: Uint8Array | string,
     private readonly schema: SQLiteDatabaseDefinition<Record<string, any>>,
     private readonly encryptionKey: string,
-    rawDatabase?: string
+    rawDatabase?: string,
   ) {
     this.dbConfig = {};
 
@@ -135,7 +135,7 @@ export class SQLeetEngine implements CRUDEngine {
 
   private buildValues(
     tableName: string,
-    entities: Record<string, SQLiteType>
+    entities: Record<string, SQLiteType>,
   ): {columns: Record<string, string>; values: Record<string, any>} {
     const table = this.schema[tableName];
     if (!table) {
@@ -160,7 +160,7 @@ export class SQLeetEngine implements CRUDEngine {
 
     if (Object.keys(columns).length === 0) {
       throw new Error(
-        `Entity is empty for table "${tableName}". Are you sure you set the right scheme / column names?`
+        `Entity is empty for table "${tableName}". Are you sure you set the right scheme / column names?`,
       );
     }
 
@@ -177,7 +177,7 @@ export class SQLeetEngine implements CRUDEngine {
     const escapedTableName = escape(tableName);
     const statement = `INSERT INTO ${escapedTableName} (${getFormattedColumnsFromColumns(
       columns,
-      true
+      true,
     )}) VALUES (@primaryKey,${newValues});`;
     try {
       this.db.run(statement, {
@@ -272,7 +272,7 @@ export class SQLeetEngine implements CRUDEngine {
     const {values, columns} = this.buildValues(tableName, changes);
     const escapedTableName = escape(tableName);
     const statement = `UPDATE ${escapedTableName} SET ${getProtectedColumnReferences(
-      columns
+      columns,
     )} WHERE ${SQLeetEnginePrimaryKeyName}=@primaryKey;`;
     this.db.run(statement, {
       ...values,

@@ -67,7 +67,7 @@ describe('Message', () => {
       75,
       75,
       75,
-    ])
+    ]),
   );
   const rk = Proteus.keys.PublicKey.new(
     new Uint8Array(32).fill(0xf0),
@@ -104,7 +104,7 @@ describe('Message', () => {
       44,
       203,
       114,
-    ])
+    ]),
   );
   const ik_pk = Proteus.keys.PublicKey.new(
     new Uint8Array(32).fill(0xa0),
@@ -141,7 +141,7 @@ describe('Message', () => {
       99,
       112,
       126,
-    ])
+    ]),
   );
   const ik = Proteus.keys.IdentityKey.new(ik_pk);
 

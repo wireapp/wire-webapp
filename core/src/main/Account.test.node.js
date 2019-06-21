@@ -91,7 +91,9 @@ describe('Account', () => {
 
     nock(MOCK_BACKEND.rest)
       .post(
-        new RegExp(`${ConversationAPI.URL.CONVERSATIONS}/.*/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`)
+        new RegExp(
+          `${ConversationAPI.URL.CONVERSATIONS}/.*/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
+        ),
       )
       .query({ignore_missing: false})
       .reply(StatusCode.OK)

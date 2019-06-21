@@ -51,7 +51,7 @@ describe('Cryptobox', () => {
       const eveBundle = Proteus.keys.PreKeyBundle.new(eve.identity.public_key, await eve.store.load_prekey(0));
       const malloryBundle = Proteus.keys.PreKeyBundle.new(
         mallory.identity.public_key,
-        await mallory.store.load_prekey(0)
+        await mallory.store.load_prekey(0),
       );
 
       const [bobPayload, evePayload, malloryPayload] = await Promise.all([

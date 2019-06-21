@@ -129,7 +129,7 @@ describe('IndexedDBEngine', () => {
         Promise.resolve({
           quota: 26025,
           usage: 26025,
-        })
+        }),
       );
 
       engine = new IndexedDBEngine();
@@ -147,7 +147,7 @@ describe('IndexedDBEngine', () => {
         Promise.resolve({
           quota: 0,
           usage: 0,
-        })
+        }),
       );
 
       engine = new IndexedDBEngine();

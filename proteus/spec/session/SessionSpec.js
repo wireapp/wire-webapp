@@ -195,13 +195,13 @@ describe('Session', () => {
           expect(sodium.to_string(await bob.decrypt(bob_store, alice_to_bob))).toBe('pong');
 
           expect(alice.session_states[alice.session_tag.toString()].state.recv_chains.length).not.toBeGreaterThan(
-            Proteus.session.Session.MAX_RECV_CHAINS
+            Proteus.session.Session.MAX_RECV_CHAINS,
           );
 
           expect(bob.session_states[bob.session_tag.toString()].state.recv_chains.length).not.toBeGreaterThan(
-            Proteus.session.Session.MAX_RECV_CHAINS
+            Proteus.session.Session.MAX_RECV_CHAINS,
           );
-        })
+        }),
       );
     });
 
@@ -220,7 +220,7 @@ describe('Session', () => {
 
       const bob = await assert_init_from_message(bob_ident, bob_store, message, 'Hello Bob!');
       const ciphertexts = await Promise.all(
-        ['Hello1', 'Hello2', 'Hello3', 'Hello4', 'Hello5'].map(text => bob.encrypt(text))
+        ['Hello1', 'Hello2', 'Hello3', 'Hello4', 'Hello5'].map(text => bob.encrypt(text)),
       );
 
       expect(sodium.to_string(await alice.decrypt(alice_store, ciphertexts[1]))).toBe('Hello2');
@@ -249,7 +249,7 @@ describe('Session', () => {
             expect(error instanceof Proteus.errors.DecryptError.DuplicateMessage).toBe(true);
             expect(error.code).toBe(Proteus.errors.DecryptError.CODE.CASE_209);
           }
-        })
+        }),
       );
 
       assert_serialise_deserialise(alice_ident, alice);
@@ -597,7 +597,7 @@ describe('Session', () => {
             expect(sodium.to_string(hello_bob2_decrypted)).toBe(hello_bob2_plaintext);
             expect(Object.keys(bob.session_states).length).toBe(1);
           });
-        })
+        }),
       );
     });
 
@@ -613,7 +613,7 @@ describe('Session', () => {
         bob_store.prekeys.map(pk => {
           const bundle = Proteus.keys.PreKeyBundle.new(bob_ident.public_key, pk);
           return Proteus.session.Session.init_from_prekey(alice_ident, bundle);
-        })
+        }),
       );
 
       expect(alices.length).toBe(num_alices);
@@ -626,7 +626,7 @@ describe('Session', () => {
           await Promise.all(Array.from({length: 900}, () => alice.encrypt('hello')));
           const encrypted_message = await alice.encrypt('Hello Bob!');
           expect(sodium.to_string(await bob.decrypt(bob_store, encrypted_message))).toBe('Hello Bob!');
-        })
+        }),
       );
 
       expect(Object.keys(bob.session_states).length).toBe(num_alices);
@@ -635,7 +635,7 @@ describe('Session', () => {
         alices.map(async alice => {
           const encrypted_message = await alice.encrypt('Hello Bob!');
           expect(sodium.to_string(await bob.decrypt(bob_store, encrypted_message))).toBe('Hello Bob!');
-        })
+        }),
       );
     }, 10000);
 
@@ -663,7 +663,7 @@ describe('Session', () => {
           const deserialised_message = Proteus.message.Envelope.deserialise(serialised_message);
           const decrypted_message = await alice.decrypt(alice_store, deserialised_message);
           expect(sodium.to_string(decrypted_message)).toBe('Hello Alice!');
-        })
+        }),
       );
 
       assert_serialise_deserialise(alice_ident, alice);

@@ -64,5 +64,5 @@ export const ShakeBox: React.FC<ShakeBoxProps> = React.forwardRef<ShakeBoxRef, S
     useEffect(() => () => cancelAnimationFrame(requestAnimationId), []);
 
     return <div style={{transform: `translateX(${offset}px)`}}>{children}</div>;
-  }
+  },
 );

@@ -23,7 +23,7 @@ export function pathWithParams(
   path: string,
   additionalParams?: Record<string, any>,
   whitelistParams?: string[],
-  search = window.location.search
+  search = window.location.search,
 ): string {
   const params: Record<string, any> = paramsToRecord(search);
 

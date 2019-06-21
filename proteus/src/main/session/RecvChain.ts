@@ -79,12 +79,12 @@ export class RecvChain {
       if (this.chain_key.idx === 0) {
         throw new DecryptError.TooDistantFuture(
           'Skipped too many messages at the beginning of a receive chain.',
-          DecryptError.CODE.CASE_211
+          DecryptError.CODE.CASE_211,
         );
       }
       throw new DecryptError.TooDistantFuture(
         `Skipped too many messages within a used receive chain. Receive chain counter is '${this.chain_key.idx}'`,
-        DecryptError.CODE.CASE_212
+        DecryptError.CODE.CASE_212,
       );
     }
 
@@ -104,7 +104,7 @@ export class RecvChain {
     if (keys.length > RecvChain.MAX_COUNTER_GAP) {
       throw new ProteusError(
         `Number of message keys (${keys.length}) exceed message chain counter gap (${RecvChain.MAX_COUNTER_GAP}).`,
-        ProteusError.CODE.CASE_103
+        ProteusError.CODE.CASE_103,
       );
     }
 
@@ -119,7 +119,7 @@ export class RecvChain {
     if (keys.length > RecvChain.MAX_COUNTER_GAP) {
       throw new ProteusError(
         `Skipped message keys which exceed the message chain counter gap (${RecvChain.MAX_COUNTER_GAP}).`,
-        ProteusError.CODE.CASE_104
+        ProteusError.CODE.CASE_104,
       );
     }
   }

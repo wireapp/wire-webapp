@@ -36,7 +36,7 @@ export async function copyAsync(source: string, destination: string): Promise<Fi
   }
 
   return new Promise((resolve, reject) =>
-    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files)))
+    copy(source, destination, (error, files = []) => (error ? reject(error) : resolve(files))),
   );
 }
 
@@ -85,7 +85,7 @@ export async function extractAsync(zipFile: string, destination: string): Promis
         const content = await entry.async('nodebuffer');
         await fs.writeFile(resolvedFilePath, content);
       }
-    })
+    }),
   );
 }
 

@@ -131,7 +131,7 @@ export class TransientStore extends EventEmitter {
               resolve(this.saveInCache(cacheKey, bundle));
             });
         }
-      })
+      }),
     );
   }
 

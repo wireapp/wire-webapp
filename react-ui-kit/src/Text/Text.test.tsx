@@ -37,7 +37,7 @@ describe('"Text"', () => {
     matchComponent(
       <Text textTransform="uppercase">
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      </Text>
+      </Text>,
     ));
 });
 

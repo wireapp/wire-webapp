@@ -72,7 +72,7 @@ export class Cryptobox extends EventEmitter {
 
     const storageEngine: string = engine.constructor.name;
     this.logger.log(
-      `Constructed Cryptobox. Minimum amount of PreKeys is "${minimumAmountOfPreKeys}". Storage engine is "${storageEngine}".`
+      `Constructed Cryptobox. Minimum amount of PreKeys is "${minimumAmountOfPreKeys}". Storage engine is "${storageEngine}".`,
     );
   }
 
@@ -161,7 +161,7 @@ export class Cryptobox extends EventEmitter {
   }
 
   public async get_prekey_bundle(
-    preKeyId: number = ProteusKeys.PreKey.MAX_PREKEY_ID
+    preKeyId: number = ProteusKeys.PreKey.MAX_PREKEY_ID,
   ): Promise<ProteusKeys.PreKeyBundle> {
     const preKey = await this.get_prekey(preKeyId);
 
@@ -182,7 +182,7 @@ export class Cryptobox extends EventEmitter {
           const isLastResortPreKey = preKey.key_id === ProteusKeys.PreKey.MAX_PREKEY_ID;
           return !isLastResortPreKey;
         })
-        .map((preKey: ProteusKeys.PreKey) => this.serialize_prekey(preKey))
+        .map((preKey: ProteusKeys.PreKey) => this.serialize_prekey(preKey)),
     );
   }
 
@@ -218,7 +218,7 @@ export class Cryptobox extends EventEmitter {
           }, 0);
 
           this.logger.warn(
-            `There are not enough PreKeys in the storage. Generating "${missingAmount}" new PreKey(s), starting from ID "${startId}"...`
+            `There are not enough PreKeys in the storage. Generating "${missingAmount}" new PreKey(s), starting from ID "${startId}"...`,
           );
           return this.new_prekeys(startId, missingAmount);
         }
@@ -228,7 +228,7 @@ export class Cryptobox extends EventEmitter {
       .then((newPreKeys: ProteusKeys.PreKey[]) => {
         if (newPreKeys.length > 0) {
           this.logger.log(
-            `Generated PreKeys from ID "${newPreKeys[0].key_id}" to ID "${newPreKeys[newPreKeys.length - 1].key_id}".`
+            `Generated PreKeys from ID "${newPreKeys[0].key_id}" to ID "${newPreKeys[newPreKeys.length - 1].key_id}".`,
           );
 
           if (publishPrekeys) {
@@ -267,7 +267,7 @@ export class Cryptobox extends EventEmitter {
   public session_from_prekey(session_id: string, pre_key_bundle: ArrayBuffer): Promise<CryptoboxSession> {
     return this.session_load(session_id).catch(sessionLoadError => {
       this.logger.warn(
-        `Creating new session because session with ID "${session_id}" could not be loaded: ${sessionLoadError.message}`
+        `Creating new session because session with ID "${session_id}" could not be loaded: ${sessionLoadError.message}`,
       );
 
       let bundle: ProteusKeys.PreKeyBundle;
@@ -276,7 +276,7 @@ export class Cryptobox extends EventEmitter {
         bundle = ProteusKeys.PreKeyBundle.deserialise(pre_key_bundle);
       } catch (error) {
         throw new InvalidPreKeyFormatError(
-          `PreKey bundle for session "${session_id}" has an unsupported format: ${error.message}`
+          `PreKey bundle for session "${session_id}" has an unsupported format: ${error.message}`,
         );
       }
 
@@ -285,7 +285,7 @@ export class Cryptobox extends EventEmitter {
           (session: ProteusSession.Session) => {
             const cryptobox_session = new CryptoboxSession(session_id, session);
             return this.session_save(cryptobox_session);
-          }
+          },
         );
       }
 

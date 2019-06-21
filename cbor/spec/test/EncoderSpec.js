@@ -266,8 +266,8 @@ describe('CBOR.Encoder', () => {
       expect(encoded('62c3bc', encoder => encoder.text('\u00fc'))).toBe(true);
       expect(
         encoded('781f64667364667364660d0a7364660d0a68656c6c6f0d0a736466736673646673', encoder =>
-          encoder.text('dfsdfsdf\r\nsdf\r\nhello\r\nsdfsfsdfs')
-        )
+          encoder.text('dfsdfsdf\r\nsdf\r\nhello\r\nsdfsfsdfs'),
+        ),
       ).toBe(true);
     });
   });
@@ -292,7 +292,7 @@ describe('CBOR.Encoder', () => {
           encoder.u32(1);
           encoder.u32(2);
           encoder.u32(3);
-        })
+        }),
       ).toBe(true);
 
       expect(
@@ -306,7 +306,7 @@ describe('CBOR.Encoder', () => {
             .array(2)
             .u8(4)
             .u8(5);
-        })
+        }),
       ).toBe(true);
     });
 
@@ -324,7 +324,7 @@ describe('CBOR.Encoder', () => {
             .u8(5)
             .array_end()
             .array_end();
-        })
+        }),
       ).toBe(true);
 
       expect(
@@ -339,7 +339,7 @@ describe('CBOR.Encoder', () => {
             .u8(4)
             .u8(5)
             .array_end();
-        })
+        }),
       ).toBe(true);
 
       expect(
@@ -354,7 +354,7 @@ describe('CBOR.Encoder', () => {
             .u8(4)
             .u8(5)
             .array_end();
-        })
+        }),
       ).toBe(true);
 
       expect(
@@ -369,7 +369,7 @@ describe('CBOR.Encoder', () => {
             .array(2)
             .u8(4)
             .u8(5);
-        })
+        }),
       ).toBe(true);
     });
   });
@@ -385,7 +385,7 @@ describe('CBOR.Encoder', () => {
           .array(2)
           .u8(2)
           .u8(3);
-      })
+      }),
     ).toBe(true);
   });
 
@@ -400,7 +400,7 @@ describe('CBOR.Encoder', () => {
             .text('Amt')
             .i8(-2)
             .object_end();
-        })
+        }),
       ).toBe(true);
     });
 
@@ -414,7 +414,7 @@ describe('CBOR.Encoder', () => {
             .text('Amt')
             .i8(-2)
             .object_end();
-        })
+        }),
       ).toBe(true);
     });
   });

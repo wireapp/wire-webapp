@@ -198,7 +198,7 @@ export class APIClient extends EventEmitter {
 
     this.logger.info(
       `Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`,
-      ObfuscationUtil.obfuscateAccessToken(accessToken)
+      ObfuscationUtil.obfuscateAccessToken(accessToken),
     );
 
     const context = this.createContext(accessToken.user, loginData.clientType);
