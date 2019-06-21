@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.6.3...@wireapp/api-client@5.7.0) (2019-06-21)
+
+
+### Features
+
+* **prettier-config:** trailingComma to all and added missing options ([#1897](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1897)) ([55b1c76](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/55b1c76))
+
+
+
+
+
 ## [5.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.6.2...@wireapp/api-client@5.6.3) (2019-06-20)
 
 
