@@ -64,7 +64,7 @@ export class MessageBuilder {
     conversationId: string,
     newMessageText: string,
     originalMessageId: string,
-    messageId = MessageBuilder.createId()
+    messageId = MessageBuilder.createId(),
   ): TextContentBuilder {
     const content: EditedTextContent = {
       originalMessageId,
@@ -89,7 +89,7 @@ export class MessageBuilder {
     file: FileContent,
     originalMessageId: string,
     expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus
+    legalHoldStatus?: LegalHoldStatus,
   ): Promise<FileAssetMessage> {
     const imageAsset = await this.assetService.uploadFileAsset(file);
 
@@ -116,7 +116,7 @@ export class MessageBuilder {
     metaData: FileMetaDataContent,
     messageId = MessageBuilder.createId(),
     expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus
+    legalHoldStatus?: LegalHoldStatus,
   ): FileAssetMetaDataMessage {
     const content: FileAssetMetaDataContent = {
       expectsReadConfirmation,
@@ -140,7 +140,7 @@ export class MessageBuilder {
     reason: AbortReason,
     originalMessageId: string,
     expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus
+    legalHoldStatus?: LegalHoldStatus,
   ): Promise<FileAssetAbortMessage> {
     const content: FileAssetAbortContent = {
       expectsReadConfirmation,
@@ -164,7 +164,7 @@ export class MessageBuilder {
     image: ImageContent,
     messageId = MessageBuilder.createId(),
     expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus
+    legalHoldStatus?: LegalHoldStatus,
   ): Promise<ImageAssetMessageOutgoing> {
     const imageAsset = await this.assetService.uploadImageAsset(image);
 
@@ -189,7 +189,7 @@ export class MessageBuilder {
   public createLocation(
     conversationId: string,
     location: LocationContent,
-    messageId = MessageBuilder.createId()
+    messageId = MessageBuilder.createId(),
   ): LocationMessage {
     return {
       content: location,
@@ -205,7 +205,7 @@ export class MessageBuilder {
   public createReaction(
     conversationId: string,
     reaction: ReactionContent,
-    messageId = MessageBuilder.createId()
+    messageId = MessageBuilder.createId(),
   ): ReactionMessage {
     return {
       content: reaction,
@@ -239,7 +239,7 @@ export class MessageBuilder {
     firstMessageId: string,
     type: Confirmation.Type,
     messageId = MessageBuilder.createId(),
-    moreMessageIds?: string[]
+    moreMessageIds?: string[],
   ): ConfirmationMessage {
     const content: ConfirmationContent = {firstMessageId, moreMessageIds, type};
     return {
@@ -256,7 +256,7 @@ export class MessageBuilder {
   public createPing(
     conversationId: string,
     ping: KnockContent = {},
-    messageId = MessageBuilder.createId()
+    messageId = MessageBuilder.createId(),
   ): PingMessage {
     return {
       content: ping,

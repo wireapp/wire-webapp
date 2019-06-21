@@ -142,7 +142,7 @@ export class CryptographyService {
   private async encryptPayloadForSession(
     sessionId: string,
     plainText: Uint8Array,
-    base64EncodedPreKey: string
+    base64EncodedPreKey: string,
   ): Promise<SessionPayloadBundle> {
     this.logger.log(`Encrypting Payload for session ID "${sessionId}"`);
     let encryptedPayload;
@@ -152,7 +152,7 @@ export class CryptographyService {
       const payloadAsBuffer: ArrayBuffer = await this.cryptobox.encrypt(
         sessionId,
         plainText,
-        decodedPreKeyBundle.buffer
+        decodedPreKeyBundle.buffer,
       );
       encryptedPayload = Encoder.toBase64(payloadAsBuffer).asString;
     } catch (error) {

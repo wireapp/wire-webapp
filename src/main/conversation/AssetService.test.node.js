@@ -62,7 +62,7 @@ describe('AssetService', () => {
           keyBytes: assetServerData.keyBytes,
           sha256: assetServerData.sha256,
           token: assetServerData.token,
-        })
+        }),
       );
     });
   });

@@ -119,7 +119,7 @@ describe('ConversationService', () => {
             } else {
               resolve();
             }
-          })
+          }),
       );
       spyOn(account.apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(
         Promise.resolve({
@@ -129,7 +129,7 @@ describe('ConversationService', () => {
           [bobId]: {
             [bobClientId]: {},
           },
-        })
+        }),
       );
 
       const payload = createMessage('Hello, world!');
@@ -175,7 +175,7 @@ describe('ConversationService', () => {
             } else {
               resolve();
             }
-          })
+          }),
       );
       spyOn(account.apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve());
 
@@ -232,7 +232,7 @@ describe('ConversationService', () => {
           tweet,
           url,
           urlOffset,
-        })
+        }),
       );
     });
 
@@ -259,7 +259,7 @@ describe('ConversationService', () => {
           keyBytes: Buffer.from([]),
           sha256: Buffer.from([]),
           token: '',
-        })
+        }),
       );
 
       const url = 'http://example.com';
@@ -287,7 +287,7 @@ describe('ConversationService', () => {
         jasmine.objectContaining({
           url,
           urlOffset,
-        })
+        }),
       );
     });
 

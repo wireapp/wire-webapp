@@ -44,7 +44,7 @@ export class NotificationDatabaseRepository {
     return this.storeEngine
       .read<{value: string}>(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT
+        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
       )
       .then(({value}) => new Date(value));
   }
@@ -54,7 +54,7 @@ export class NotificationDatabaseRepository {
       .update(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
-        {value: eventDate.toISOString()}
+        {value: eventDate.toISOString()},
       )
       .then(() => eventDate);
   }
@@ -64,7 +64,7 @@ export class NotificationDatabaseRepository {
       .create(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
-        {value: eventDate.toISOString()}
+        {value: eventDate.toISOString()},
       )
       .then(() => eventDate);
   }
@@ -73,7 +73,7 @@ export class NotificationDatabaseRepository {
     return this.storeEngine
       .read<{value: string}>(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION
+        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
       )
       .then(({value}) => value);
   }
@@ -83,7 +83,7 @@ export class NotificationDatabaseRepository {
       .update(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
-        {value: lastNotification.id}
+        {value: lastNotification.id},
       )
       .then(() => lastNotification.id);
   }
@@ -93,7 +93,7 @@ export class NotificationDatabaseRepository {
       .create(
         CryptographyDatabaseRepository.STORES.AMPLIFY,
         NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
-        {value: lastNotification.id}
+        {value: lastNotification.id},
       )
       .then(() => lastNotification.id);
   }

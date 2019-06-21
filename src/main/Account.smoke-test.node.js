@@ -97,7 +97,7 @@ xdescribe('Account', () => {
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.ALICE_EMAIL}". Aborting test.`,
-          error && error.response && error.response.data ? error.response.data : ''
+          error && error.response && error.response.data ? error.response.data : '',
         );
         return fail(error);
       }
@@ -107,7 +107,7 @@ xdescribe('Account', () => {
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.BOB_EMAIL}". Aborting test.`,
-          error && error.response && error.response.data ? error.response.data : ''
+          error && error.response && error.response.data ? error.response.data : '',
         );
         return fail(error);
       }
@@ -117,7 +117,7 @@ xdescribe('Account', () => {
       } catch (error) {
         logger.error(
           `Cannot login with email "${process.env.EVE_EMAIL}". Aborting test.`,
-          error && error.response && error.response.data ? error.response.data : ''
+          error && error.response && error.response.data ? error.response.data : '',
         );
         return fail(error);
       }
@@ -156,7 +156,7 @@ xdescribe('Account', () => {
       await bob.listen();
       const conversationId = await connect(
         alice,
-        bob
+        bob,
       );
       await sendText(alice, conversationId, message);
     });
@@ -169,13 +169,13 @@ xdescribe('Account', () => {
       // Alice connects to Bob
       await connect(
         alice,
-        bob
+        bob,
       );
 
       // Alice connects to Eve (Bob doesn't know Eve)
       await connect(
         alice,
-        eve
+        eve,
       );
 
       // Bob creates a conversation with Alice

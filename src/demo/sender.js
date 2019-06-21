@@ -2,10 +2,10 @@
 //@ts-check
 
 process.on('uncaughtException', error =>
-  console.error(`Uncaught exception "${error.constructor.name}": ${error.message}`, error)
+  console.error(`Uncaught exception "${error.constructor.name}": ${error.message}`, error),
 );
 process.on('unhandledRejection', (reason, promise) =>
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason),
 );
 
 const program = require('commander');
@@ -132,7 +132,7 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
     const filePayload = await account.service.conversation.messageBuilder.createFileData(
       CONVERSATION_ID,
       {data},
-      metadataPayload.id
+      metadataPayload.id,
     );
     await account.service.conversation.send(filePayload);
   }
