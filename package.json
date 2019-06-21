@@ -12,7 +12,7 @@
     "@wireapp/protocol-messaging": "1.24.1",
     "@wireapp/react-ui-kit": "6.8.4",
     "amplify": "git+https://git@github.com/wireapp/amplify",
-    "core-js": "2.6.5",
+    "core-js": "2.6.9",
     "crypto-js": "3.1.9-1",
     "dexie": "2.0.4",
     "dexie-batch": "0.4.2",
