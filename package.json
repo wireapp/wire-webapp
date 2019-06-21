@@ -2,6 +2,7 @@
   "name": "wire-webapp",
   "license": "GPL-3.0",
   "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
