@@ -167,7 +167,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
+              error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               throw error;
@@ -242,7 +242,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(
-                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder
+                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder,
               )}
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Enter') {
@@ -334,21 +334,17 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        account: AuthSelector.getAccount(state),
-        authError: AuthSelector.getError(state),
-        isFetching: AuthSelector.isFetching(state),
-        isPersonalFlow: AuthSelector.isPersonalFlow(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
-        doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
-          return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
-        },
-      };
-    }
-  )(AccountForm)
+    (state: RootState): ConnectedProps => ({
+      account: AuthSelector.getAccount(state),
+      authError: AuthSelector.getError(state),
+      isFetching: AuthSelector.isFetching(state),
+      isPersonalFlow: AuthSelector.isPersonalFlow(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({
+      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
+      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
+        return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
+      },
+    }),
+  )(AccountForm),
 );
