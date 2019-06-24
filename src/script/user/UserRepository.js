@@ -158,7 +158,7 @@ export class UserRepository {
         this.onLegalHoldRequest(eventJson);
         break;
       }
-      case BackendEvent.USER.LEGAL_HOLD_REQUEST_CANCELED: {
+      case BackendEvent.USER.LEGAL_HOLD_DISABLED: {
         this.onLegalHoldRequestCanceled(eventJson);
         break;
       }
@@ -387,7 +387,7 @@ export class UserRepository {
   }
 
   onLegalHoldRequestCanceled(eventJson) {
-    if (this.self().id !== eventJson.target_user) {
+    if (this.self().id !== eventJson.id) {
       return;
     }
     self.hasPendingLegalHold(false);
