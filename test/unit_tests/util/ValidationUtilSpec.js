@@ -299,13 +299,13 @@ describe('ValidationUtil', () => {
 
     it('returns false if redirected from auth with login hashtag', () => {
       expect(
-        isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+        isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging'),
       ).toBeFalsy();
     });
 
     it('returns false if redirected from auth with registration hashtag', () => {
       expect(
-        isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+        isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging'),
       ).toBeFalsy();
     });
 

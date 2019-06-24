@@ -106,7 +106,7 @@ describe('ClientMismatchHandler', () => {
           expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
             conversationId,
             [unknownUserId],
-            timestamp - 1
+            timestamp - 1,
           );
         });
     });

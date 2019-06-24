@@ -387,8 +387,8 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
-          hashedString
-        )
+          hashedString,
+        ),
       );
     const link = tokens[idx];
     const href = cleanString(link.attrGet('href'));

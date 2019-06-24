@@ -92,7 +92,7 @@ export default withRouter(
       (dispatch: ThunkDispatch): DispatchProps => ({
         doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
         doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-      })
-    )(ClientManager)
-  )
+      }),
+    )(ClientManager),
+  ),
 );

@@ -167,7 +167,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
+              error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               throw error;
@@ -242,7 +242,7 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(
-                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder
+                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder,
               )}
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Enter') {
@@ -349,6 +349,6 @@ export default injectIntl(
           return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
         },
       };
-    }
-  )(AccountForm)
+    },
+  )(AccountForm),
 );

@@ -188,7 +188,7 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
           default: {
             this.setState({ssoError: error});
             const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => error.label && error.label.endsWith(errorType)
+              errorType => error.label && error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               // tslint:disable-next-line:no-console
@@ -346,7 +346,7 @@ export default withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
           validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
         };
-      }
-    )(SingleSignOnForm)
-  )
+      },
+    )(SingleSignOnForm),
+  ),
 );

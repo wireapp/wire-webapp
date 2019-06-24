@@ -63,7 +63,7 @@ class Message {
       conversationRepository,
       actionsViewModel,
     },
-    componentInfo
+    componentInfo,
   ) {
     this.message = message;
     this.conversation = conversation;
