@@ -17,11 +17,23 @@
  *
  */
 
+import ko from 'knockout';
+
+interface Params {
+  currentDevice: ko.Observable<string>;
+  devices: ko.Observable<string[]>;
+  onChooseDevice: (deviceId: string) => void;
+}
+
 class DeviceToggleButton {
-  constructor({currentDevice, devices, onChooseDevice}) {
-    this.availableDevices = devices || ko.observable([]);
+  private readonly availableDevices: ko.Observable<string[]>;
+  private readonly currentDevice: ko.Observable<string>;
+  public selectNextDevice: (data: any, event: any) => void;
+
+  constructor({currentDevice, devices, onChooseDevice}: Params) {
+    this.availableDevices = devices;
     this.currentDevice = currentDevice;
-    this.onChooseDevice = (data, event) => {
+    this.selectNextDevice = (data: any, event: any) => {
       event.preventDefault();
       event.stopPropagation();
       const currentDeviceIndex = this.availableDevices().indexOf(this.currentDevice());
@@ -34,8 +46,8 @@ class DeviceToggleButton {
 
 ko.components.register('device-toggle-button', {
   template: `
-    <div class="device-toggle-button-indicator" data-bind="foreach: {data: availableDevices, as: 'device', noChildContext: true}, click: onChooseDevice">
-      <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': device === currentDevice() }"></span>
+    <div class="device-toggle-button-indicator" data-bind="foreach: {data: availableDevices(), as: 'device', noChildContext: true}, click: selectNextDevice">
+      <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': device === currentDevice()}"></span>
     </div>
   `,
   viewModel: DeviceToggleButton,

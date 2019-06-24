@@ -52,6 +52,12 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
+interface CallingConfig {
+  expiration: Date;
+  ice_servers: any[];
+  ttl: number;
+}
+
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -74,19 +80,19 @@ export class CallingRepository {
   private selfUser: any;
   private selfClientId: DeviceId;
   private isReady: boolean = false;
-  private wUser: number | undefined;
-  private wCall: Wcall | undefined;
+  private wUser?: number;
+  private wCall?: Wcall;
   public readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
-  private incomingCallCallback: Function;
+  private incomingCallCallback: (call: Call) => void;
 
   // will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers)
-  private mediaStreamQuery: Promise<MediaStream> | undefined;
+  private mediaStreamQuery?: Promise<MediaStream>;
 
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
 
-  private callingConfig: any;
-  private callingConfigTimeout: number | undefined;
+  private callingConfig?: CallingConfig;
+  private callingConfigTimeout?: number;
   private readonly logger: Logger;
   private readonly callLog: string[];
 
@@ -135,10 +141,9 @@ export class CallingRepository {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     return getAvsInstance().then(callingInstance => {
-      const {wCall, wUser} = this.configureCallingApi(callingInstance, this.selfUser.id, clientId);
-      this.wCall = wCall;
-      this.wUser = wUser;
-      return {wCall, wUser};
+      this.wCall = this.configureCallingApi(callingInstance);
+      this.wUser = this.createWUser(this.wCall, this.selfUser.id, clientId);
+      return {wCall: this.wCall, wUser: this.wUser};
     });
   }
 
@@ -146,7 +151,7 @@ export class CallingRepository {
     this.isReady = true;
   }
 
-  private configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
+  private configureCallingApi(wCall: Wcall): Wcall {
     const avsLogger = getLogger('avs');
     const logLevelStrs: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
@@ -171,6 +176,11 @@ export class CallingRepository {
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
     wCall.setMediaStreamHandler(this.updateParticipantStream);
+    setInterval(() => wCall.poll(), 500);
+    return wCall;
+  }
+
+  private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
@@ -191,11 +201,10 @@ export class CallingRepository {
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.updateCallParticipants);
 
-    setInterval(wCall.poll.bind(wCall), 500);
-    return {wCall, wUser};
+    return wUser;
   }
 
-  onIncomingCall(callback: Function): void {
+  onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
   }
 
@@ -801,15 +810,16 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    * @returns {undefined} No return value
    */
-  leaveCallOnUnload(): void {
+  destroy(): void {
     this.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));
+    this.wCall.destroy(this.wUser);
   }
 
   //##############################################################################
   // Calling config
   //##############################################################################
 
-  getConfig = (): Promise<any> => {
+  getConfig = (): Promise<CallingConfig> => {
     if (this.callingConfig) {
       const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
 
@@ -833,7 +843,7 @@ export class CallingRepository {
    * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
    * @returns {Promise} Resolves with call config information
    */
-  fetchConfig(limit: number | undefined): Promise<any> {
+  fetchConfig(limit?: number): Promise<CallingConfig> {
     return this.backendClient.sendRequest({
       cache: false,
       data: {
@@ -859,34 +869,32 @@ export class CallingRepository {
     }
   }
 
-  private getConfigFromBackend(): Promise<any> {
+  private getConfigFromBackend(): Promise<CallingConfig | undefined> {
     const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
 
     return this.fetchConfig(limit).then(callingConfig => {
-      if (callingConfig) {
-        this.clearConfigTimeout();
+      this.clearConfigTimeout();
 
-        const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-        const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-        const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
-        const expirationDate = new Date(Date.now() + timeout);
-        callingConfig.expiration = expirationDate;
+      const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+      const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
+      const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
+      const expirationDate = new Date(Date.now() + timeout);
+      callingConfig.expiration = expirationDate;
 
-        const turnServersConfig = (callingConfig.ice_servers || [])
-          .map((server: any) => server.urls.join('\n'))
-          .join('\n');
-        const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
+      const turnServersConfig = (callingConfig.ice_servers || [])
+        .map((server: any) => server.urls.join('\n'))
+        .join('\n');
+      const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
 ${turnServersConfig}`;
-        this.logger.info(logMessage);
-        this.callingConfig = callingConfig;
+      this.logger.info(logMessage);
+      this.callingConfig = callingConfig;
 
-        this.callingConfigTimeout = window.setTimeout(() => {
-          this.clearConfig();
-          this.getConfig();
-        }, timeout);
+      this.callingConfigTimeout = window.setTimeout(() => {
+        this.clearConfig();
+        this.getConfig();
+      }, timeout);
 
-        return this.callingConfig;
-      }
+      return this.callingConfig;
     });
   }
 

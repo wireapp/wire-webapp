@@ -37,10 +37,6 @@ export interface Grid {
  * - 3 streams: [id, '', id, id]
  * - 3 streams: [id, id, '', id]
  * - 4 streams: [id, id, id, id]
- * @param {Array<string|0>} previousGrid - the previous state of the grid
- * @param {Array<MediaStream>} streams - the new array of streams to dispatch in the grid
- *
- * @returns {Array<string|0>} the new grid
  */
 function computeGrid(previousGrid: string[], participants: Participant[]): string[] {
   const previousStreamIds = previousGrid.filter(streamId => streamId !== '');

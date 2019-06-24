@@ -17,15 +17,60 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
+import {Call} from '../../calling/Call';
+import {Grid} from '../../calling/videoGridHandler';
+import {Conversation} from '../../entity/Conversation';
+import {MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 
 import {WebAppEvents} from '../../event/WebApp';
 
 import 'Components/calling/deviceToggleButton';
 
+interface Params {
+  videoGrid: ko.Observable<Grid>;
+  call: Call;
+  conversation: ko.Observable<Conversation>;
+  mediaDevicesHandler: MediaDevicesHandler;
+  multitasking: any;
+  canShareScreen: boolean;
+  callActions: any;
+  isMuted: ko.Observable<boolean>;
+  isChoosingScreen: ko.Observable<boolean>;
+}
+
 export class FullscreenVideoCalling {
-  static get CONFIG() {
+  public videoGrid: ko.Observable<Grid>;
+  public call: Call;
+  public conversation: ko.Observable<Conversation>;
+  public mediaDevicesHandler: MediaDevicesHandler;
+  public multitasking: any;
+  public canShareScreen: boolean;
+  public callActions: any;
+  public isMuted: ko.Observable<boolean>;
+  public isChoosingScreen: ko.Observable<boolean>;
+
+  public selfSharesScreen: () => boolean;
+  public selfSharesCamera: () => boolean;
+  public currentCameraDevice: ko.Observable<string>;
+  public currentScreenDevice: ko.Observable<string>;
+
+  public availableCameras: ko.PureComputed<string[]>;
+  public availableScreens: ko.PureComputed<string[]>;
+  public showSwitchCamera: ko.PureComputed<boolean>;
+  public showSwitchScreen: ko.PureComputed<boolean>;
+
+  public hasUnreadMessages: ko.Observable<boolean>;
+
+  public showToggleVideo: ko.PureComputed<boolean>;
+  public callDuration: ko.Observable<string>;
+
+  public HIDE_CONTROLS_TIMEOUT: number;
+  public dispose: () => void;
+
+  static get CONFIG(): any {
     return {
       AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
       HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
@@ -42,7 +87,7 @@ export class FullscreenVideoCalling {
     callActions,
     isMuted,
     isChoosingScreen,
-  }) {
+  }: Params) {
     this.call = call;
     this.conversation = conversation;
     this.videoGrid = videoGrid;
@@ -50,7 +95,7 @@ export class FullscreenVideoCalling {
     this.isMuted = isMuted;
     this.callActions = callActions;
     this.mediaDevicesHandler = mediaDevicesHandler;
-    this.logger = getLogger('VideoCallingViewModel');
+    this.isChoosingScreen = isChoosingScreen;
 
     this.HIDE_CONTROLS_TIMEOUT = FullscreenVideoCalling.CONFIG.HIDE_CONTROLS_TIMEOUT;
 
@@ -73,13 +118,12 @@ export class FullscreenVideoCalling {
       return this.selfSharesScreen() && this.availableScreens().length > 1;
     });
 
-    this.isChoosingScreen = isChoosingScreen;
     this.showToggleVideo = ko.pureComputed(() => {
       return conversation().supportsVideoCall(false);
     });
 
     this.callDuration = ko.observable();
-    let callDurationUpdateInterval;
+    let callDurationUpdateInterval: number;
     const startedAtSubscription = ko.computed(() => {
       const startedAt = call.startedAt();
       if (startedAt) {
@@ -92,7 +136,7 @@ export class FullscreenVideoCalling {
       }
     });
 
-    let minimizeTimeout;
+    let minimizeTimeout: number;
     const gridSubscription = ko.computed(() => {
       const grid = this.videoGrid();
       window.clearTimeout(minimizeTimeout);
@@ -109,7 +153,9 @@ export class FullscreenVideoCalling {
     });
 
     this.hasUnreadMessages = ko.observable(false);
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount => this.hasUnreadMessages(unreadCount > 0));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, (unreadCount: number) =>
+      this.hasUnreadMessages(unreadCount > 0)
+    );
 
     this.dispose = () => {
       window.clearInterval(callDurationUpdateInterval);
@@ -118,15 +164,15 @@ export class FullscreenVideoCalling {
     };
   }
 
-  switchCameraSource = (call, deviceId) => {
+  switchCameraSource = (call: Call, deviceId: string) => {
     this.callActions.switchCameraInput(call, deviceId);
   };
 
-  switchScreenSource = (call, deviceId) => {
+  switchScreenSource = (call: Call, deviceId: string) => {
     this.callActions.switchScreenInput(call, deviceId);
   };
 
-  minimize() {
+  minimize(): void {
     this.multitasking.isMinimized(true);
   }
 }

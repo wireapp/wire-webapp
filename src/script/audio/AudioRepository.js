@@ -150,7 +150,6 @@ export class AudioRepository {
    */
   _subscribeToAudioEvents() {
     amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY_IN_LOOP, this.loop.bind(this));
     amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
   }
 

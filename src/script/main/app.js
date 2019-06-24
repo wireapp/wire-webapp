@@ -680,7 +680,7 @@ class App {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
-      this.repository.calling.leaveCallOnUnload();
+      this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
         if (isTemporaryClientAndNonPersistent()) {

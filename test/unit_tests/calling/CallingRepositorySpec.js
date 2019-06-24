@@ -18,6 +18,8 @@
  */
 
 import UUID from 'uuidjs';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
@@ -26,6 +28,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -43,6 +46,10 @@ describe('CallingRepository', () => {
         wUser = avsApi.wUser;
       });
     });
+  });
+
+  afterEach(() => {
+    return wCall && wCall.destroy(wUser);
   });
 
   describe('startCall', () => {
@@ -216,13 +223,178 @@ describe('CallingRepository', () => {
   });
 });
 
+describe('e2e audio call', () => {
+  const conversationRepository = {
+    find_conversation_by_id: () => new Conversation(),
+    grantMessage: () => Promise.resolve(true),
+  };
+  const eventRepository = {injectEvent: () => {}};
+
+  const client = new CallingRepository(
+    undefined,
+    conversationRepository,
+    eventRepository,
+    undefined,
+    serverTimeHandler
+  );
+  const user = new User('user-1');
+  let remoteWuser;
+  let wCall;
+
+  beforeAll(() => {
+    spyOn(client, 'getConfig').and.returnValue(Promise.resolve({ice_servers: []}));
+    spyOn(client, 'getCallMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
+    spyOn(client, 'getMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
+    spyOn(client, 'onCallEvent').and.callThrough();
+    spyOn(client, 'updateParticipantStream').and.callThrough();
+    spyOn(client, 'incomingCallCallback').and.callFake(call => {
+      client.answerCall(call, CALL_TYPE.AUDIO);
+    });
+    spyOn(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
+    spyOn(client, 'sendMessage').and.callFake(
+      (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
+        wCall.recvMsg(remoteWuser, payload, payload.length, Date.now(), Date.now(), convId, userId, clientid);
+      }
+    );
+    return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+      remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
+      wCall = wCallInstance;
+    });
+  });
+
+  let joinedCallSub;
+  let activeCallsSub;
+  let onCallClosed = () => {};
+  let onCallConnected = () => {};
+  beforeEach(() => {
+    joinedCallSub = client.joinedCall.subscribe(call => {
+      if (call) {
+        return setTimeout(onCallConnected, 100);
+      }
+    });
+    activeCallsSub = client.activeCalls.subscribe(calls => {
+      if (calls.length === 0) {
+        onCallClosed();
+      }
+    });
+  });
+
+  afterEach(() => {
+    joinedCallSub.dispose();
+    activeCallsSub.dispose();
+  });
+
+  it('calls and connect with the remote user', done => {
+    onCallClosed = done;
+    onCallConnected = () => {
+      expect(client.sendMessage).toHaveBeenCalledTimes(1);
+      expect(client.onCallEvent).toHaveBeenCalledTimes(1);
+      expect(client.updateParticipantStream).toHaveBeenCalled();
+      client
+        .getStats('conv-1')
+        .then(extractAudioStats)
+        .then(audioStats => {
+          expect(audioStats.length).toBeGreaterThan(0);
+          audioStats.forEach(stats => {
+            expect(stats.bytesFlowing).toBeGreaterThan(0);
+          });
+
+          expect(client.joinedCall()).toBeDefined();
+          client.leaveCall('conv-1');
+        })
+        .catch(done.fail);
+    };
+    client.startCall('conv-1', CONV_TYPE.ONEONONE, CALL_TYPE.AUDIO).catch(done.fail);
+  });
+
+  it('answers an incoming call and connect with the remote peer', done => {
+    onCallClosed = done;
+    onCallConnected = () => {
+      expect(client.onCallEvent).toHaveBeenCalled();
+      expect(client.incomingCallCallback).toHaveBeenCalled();
+      client
+        .getStats('conv-1')
+        .then(extractAudioStats)
+        .then(audioStats => {
+          // we cannot test that the audio is flowing, it's never happening in an headless browser
+          expect(audioStats.length).toBeGreaterThan(0);
+          audioStats.forEach(stats => {
+            expect(stats.bytesFlowing).toBeGreaterThan(0);
+          });
+          client.leaveCall('conv-1');
+        })
+        .catch(done.fail);
+    };
+    wCall.start(remoteWuser, 'conv-1', CALL_TYPE.AUDIO, CONV_TYPE.ONEONONE, 0);
+  });
+});
+
 function genUUID() {
   return UUID.genV4().hexString;
 }
+
 function silence() {
   const ctx = new AudioContext();
   const oscillator = ctx.createOscillator();
+  oscillator.type = 'sine'; // this is the default - also square, sawtooth, triangle
+  oscillator.frequency.value = 100; // Hz
+  oscillator.start(0);
   const dst = oscillator.connect(ctx.createMediaStreamDestination());
-  oscillator.start();
-  return Object.assign(dst.stream.getAudioTracks()[0], {enabled: false});
+  return dst.stream.getAudioTracks()[0];
+}
+
+function extractAudioStats(stats) {
+  const audioStats = [];
+  stats.forEach(userStats => {
+    userStats.stats.forEach(data => {
+      if (data.kind === 'audio' || data.mediaType === 'audio') {
+        const bytesFlowing = data.bytesReceived || data.bytesSent;
+        if (bytesFlowing !== undefined) {
+          audioStats.push({bytesFlowing, id: data.id});
+        }
+      }
+    });
+  });
+  return audioStats;
+}
+
+function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
+  const selfUserId = genUUID();
+  const selfClientId = genUUID();
+  const sendMsg = (context, conversationId, userId, clientId, destinationUserId, destinationClientId, payload) => {
+    const event = {
+      content: JSON.parse(payload),
+      conversation: conversationId,
+      from: userId,
+      sender: clientId,
+      time: Date.now(),
+    };
+    remoteCallingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+  };
+
+  const incoming = conversationId => wCall.answer(wUser, conversationId, CALL_TYPE.AUDIO, 0);
+
+  const requestConfig = () => {
+    setTimeout(() => {
+      wCall.configUpdate(wUser, 0, JSON.stringify({ice_servers: []}));
+    });
+  };
+
+  const wUser = wCall.create(
+    selfUserId,
+    selfClientId,
+    () => {}, //readyh,
+    sendMsg, //sendh,
+    incoming, //incomingh,
+    () => {}, //missedh,
+    () => {}, //answerh,
+    () => {}, //estabh,
+    () => {}, //closeh,
+    () => {}, //metricsh,
+    requestConfig, //cfg_reqh,
+    () => {}, //acbrh,
+    () => {}, //vstateh,
+    0
+  );
+  return wUser;
 }

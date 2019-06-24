@@ -17,6 +17,19 @@
  *
  */
 
+import ko from 'knockout';
+
+interface Screen {
+  id: string;
+  thumbnail: any;
+}
+
+interface Params {
+  cancel: () => void;
+  choose: (screenId: string) => void;
+  screens: ko.Observable<Screen[]>;
+}
+
 ko.components.register('choose-screen', {
   template: `
     <div class="choose-screen-list" data-bind="foreach: {data: screens, as: 'screen', noChildContext: true}">
@@ -31,7 +44,7 @@ ko.components.register('choose-screen', {
            data-bind="click: onCancel"></div>
     </div>
   `,
-  viewModel: function({cancel, choose, screens}) {
+  viewModel: function({cancel, choose, screens}: Params): void {
     this.onCancel = cancel;
     this.onChoose = choose;
     this.screens = screens || [];
