@@ -35,7 +35,7 @@ describe('z.viewModel.content.InputBarViewModel', () => {
         conversation: TestFactory.conversation_repository,
         search: TestFactory.search_repository,
         user: TestFactory.user_repository,
-      },
+      }
     );
   });
 

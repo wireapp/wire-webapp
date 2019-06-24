@@ -91,7 +91,7 @@ const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData
           durationInMillis: video.duration,
           height: video.videoHeight,
           width: video.videoWidth,
-        }),
+        })
       );
       window.URL.revokeObjectURL(url);
     };
@@ -101,7 +101,7 @@ const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData
         reject(convertEventToError(error));
         window.URL.revokeObjectURL(url);
       },
-      true,
+      true
     );
     video.src = url;
   });

@@ -80,7 +80,7 @@ export class CallingRepository {
     eventRepository,
     mediaRepository,
     serverTimeHandler,
-    userRepository,
+    userRepository
   ) {
     this.getConfig = this.getConfig.bind(this);
 

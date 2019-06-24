@@ -27,7 +27,7 @@ export class CookieAction {
   startPolling = (
     name: string = CookieSelector.COOKIE_NAME_APP_OPENED,
     interval: number = COOKIE_POLL_INTERVAL,
-    asJSON: boolean = true,
+    asJSON: boolean = true
   ): ThunkAction => {
     return (dispatch, getState, {actions: {cookieAction}}) => {
       return Promise.resolve()

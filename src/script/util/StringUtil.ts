@@ -80,7 +80,7 @@ export const compareTransliteration = (
   string: string,
   query: string,
   excludedChars: Record<string, string> = {},
-  fromStart = false,
+  fromStart = false
 ) => {
   const nameSlug = computeTransliteration(string, excludedChars);
   const querySlug = computeTransliteration(query, excludedChars);

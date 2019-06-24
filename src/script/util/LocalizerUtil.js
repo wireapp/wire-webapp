@@ -90,7 +90,7 @@ export const LocalizerUtil = {
         bold: '<strong>',
         italic: '<i>',
       },
-      dangerousSubstitutions,
+      dangerousSubstitutions
     );
 
     const substitutedEscaped = skipEscape

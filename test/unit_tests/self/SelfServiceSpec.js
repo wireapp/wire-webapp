@@ -34,7 +34,7 @@ describe('SelfService', () => {
       jasmine.objectContaining({
         data: JSON.stringify({password: 'password'}),
         type: 'DELETE',
-      }),
+      })
     );
   });
 
@@ -45,7 +45,7 @@ describe('SelfService', () => {
       jasmine.objectContaining({
         type: 'GET',
         url: graph.SelfService.URL.SELF,
-      }),
+      })
     );
   });
 
@@ -56,7 +56,7 @@ describe('SelfService', () => {
       jasmine.objectContaining({
         type: 'GET',
         url: jasmine.stringMatching(/\/consent/),
-      }),
+      })
     );
   });
 
@@ -69,7 +69,7 @@ describe('SelfService', () => {
         data: JSON.stringify(updates),
         type: 'PUT',
         url: graph.SelfService.URL.SELF,
-      }),
+      })
     );
   });
 
@@ -82,7 +82,7 @@ describe('SelfService', () => {
         data: JSON.stringify(params),
         type: 'PUT',
         url: jasmine.stringMatching(/\/consent/),
-      }),
+      })
     );
   });
 
@@ -95,7 +95,7 @@ describe('SelfService', () => {
         data: JSON.stringify({email: newEmail}),
         type: 'PUT',
         url: jasmine.stringMatching(/\/email/),
-      }),
+      })
     );
   });
 
@@ -108,7 +108,7 @@ describe('SelfService', () => {
         data: JSON.stringify({handle: newHandle}),
         type: 'PUT',
         url: jasmine.stringMatching(/\/handle/),
-      }),
+      })
     );
   });
 
@@ -121,7 +121,7 @@ describe('SelfService', () => {
         data: JSON.stringify({locale: newLocale}),
         type: 'PUT',
         url: jasmine.stringMatching(/\/locale/),
-      }),
+      })
     );
   });
 
@@ -135,7 +135,7 @@ describe('SelfService', () => {
         data: JSON.stringify({new_password: newPassword, old_password: oldPassword}),
         type: 'PUT',
         url: jasmine.stringMatching(/\/password/),
-      }),
+      })
     );
   });
 
@@ -148,7 +148,7 @@ describe('SelfService', () => {
         data: JSON.stringify({phone: newPhone}),
         type: 'PUT',
         url: jasmine.stringMatching(/\/phone/),
-      }),
+      })
     );
   });
 });

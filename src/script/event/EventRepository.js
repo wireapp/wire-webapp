@@ -82,7 +82,7 @@ export class EventRepository {
     conversationService,
     cryptographyRepository,
     serverTimeHandler,
-    userRepository,
+    userRepository
   ) {
     this.eventService = eventService;
     this.notificationService = notificationService;

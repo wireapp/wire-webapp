@@ -219,11 +219,11 @@ describe('UserRepository', () => {
 
         TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]);
         const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
-          entities.clients.john_doe.permanent,
+          entities.clients.john_doe.permanent
         );
         const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
         const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
-          entities.clients.john_doe.temporary,
+          entities.clients.john_doe.temporary
         );
         const recipients = {
           [entities.user.john_doe.id]: [permanent_client, temporary_client],

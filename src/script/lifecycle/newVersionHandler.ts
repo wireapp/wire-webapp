@@ -72,7 +72,7 @@ export const checkVersion = async (overrideCurrentVersion: string): Promise<stri
  */
 export const startNewVersionPolling = (
   currentVersion: string,
-  onNewVersionAvailable: OnNewVersionAvailableFn,
+  onNewVersionAvailable: OnNewVersionAvailableFn
 ): void => {
   newVersionListeners.push({currentVersion, onNewVersionAvailable});
   if (newVersionListeners.length === 1) {

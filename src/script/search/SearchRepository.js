@@ -74,7 +74,7 @@ export class SearchRepository {
   searchUserInSet(
     term,
     userEntities,
-    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME],
+    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME]
   ) {
     if (term === '') {
       return userEntities;

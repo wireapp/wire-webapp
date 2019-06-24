@@ -120,7 +120,7 @@ describe('PreferenceNotificationRepository', () => {
 
     expect(notifications[0].type).toBe(PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT);
     expect(notifications[1].type).toBe(
-      PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
+      PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED
     );
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);

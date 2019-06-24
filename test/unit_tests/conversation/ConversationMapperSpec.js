@@ -38,35 +38,35 @@ describe('Conversation Mapper', () => {
 
       expect(functionCallUndefinedParam).toThrowError(
         z.error.ConversationError,
-        z.error.BaseError.MESSAGE.MISSING_PARAMETER,
+        z.error.BaseError.MESSAGE.MISSING_PARAMETER
       );
 
       const functionCallEmtpyArray = () => conversation_mapper.mapConversations([]);
 
       expect(functionCallEmtpyArray).toThrowError(
         z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
 
       const functionCallWrongType = () => conversation_mapper.mapConversations('Conversation');
 
       expect(functionCallWrongType).toThrowError(
         z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
 
       const functionCallUndefinedInArray = () => conversation_mapper.mapConversations([undefined]);
 
       expect(functionCallUndefinedInArray).toThrowError(
         z.error.ConversationError,
-        z.error.BaseError.MESSAGE.MISSING_PARAMETER,
+        z.error.BaseError.MESSAGE.MISSING_PARAMETER
       );
 
       const functionCallStringInArray = () => conversation_mapper.mapConversations(['Conversation']);
 
       expect(functionCallStringInArray).toThrowError(
         z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
+        z.error.BaseError.MESSAGE.INVALID_PARAMETER
       );
     });
 
@@ -398,7 +398,7 @@ describe('Conversation Mapper', () => {
 
       const [merged_conversation, merged_conversation_2] = conversation_mapper.mergeConversation(
         [local_data],
-        [remote_data, remote_data_2],
+        [remote_data, remote_data_2]
       );
 
       expect(merged_conversation.creator).toBe(remote_data.creator);

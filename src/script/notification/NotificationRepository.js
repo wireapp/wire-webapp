@@ -675,7 +675,7 @@ export class NotificationRepository {
             return isPermitted ? this._showNotification(notificationContent) : undefined;
           });
         }
-      },
+      }
     );
   }
 

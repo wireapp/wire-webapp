@@ -150,7 +150,7 @@ export class ConversationRepository {
     team_repository,
     user_repository,
     propertyRepository,
-    assetUploader,
+    assetUploader
   ) {
     this.eventRepository = eventRepository;
     this.eventService = eventRepository.eventService;
@@ -173,14 +173,14 @@ export class ConversationRepository {
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
-      this.serverTimeHandler,
+      this.serverTimeHandler
     );
     this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
       this.serverTimeHandler,
-      this.user_repository,
+      this.user_repository
     );
 
     this.active_conversation = ko.observable();
@@ -370,7 +370,7 @@ export class ConversationRepository {
         name: groupName,
         users: userIds,
       },
-      options,
+      options
     );
 
     if (this.team().id) {
@@ -525,7 +525,7 @@ export class ConversationRepository {
     conversationEntity,
     messageId,
     skipConversationMessages = false,
-    ensureUser = false,
+    ensureUser = false
   ) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
     const messagePromise = messageEntity
@@ -743,7 +743,7 @@ export class ConversationRepository {
    */
   unblocked_user(user_et) {
     this.get1To1Conversation(user_et).then(conversation_et =>
-      conversation_et.status(ConversationStatus.CURRENT_MEMBER),
+      conversation_et.status(ConversationStatus.CURRENT_MEMBER)
     );
   }
 
@@ -823,7 +823,7 @@ export class ConversationRepository {
 
   get_all_users_in_conversation(conversation_id) {
     return this.get_conversation_by_id(conversation_id).then(conversation_et =>
-      [this.selfUser()].concat(conversation_et.participating_user_ets()),
+      [this.selfUser()].concat(conversation_et.participating_user_ets())
     );
   }
 
@@ -1010,7 +1010,7 @@ export class ConversationRepository {
     return this.get_conversation_by_id(conversation_id)
       .then(conversation_et => {
         return this.get_message_in_conversation_by_id(conversation_et, message_id).then(
-          message_et => conversation_et.last_read_timestamp() >= message_et.timestamp(),
+          message_et => conversation_et.last_read_timestamp() >= message_et.timestamp()
         );
       })
       .catch(error => {
@@ -2050,7 +2050,7 @@ export class ConversationRepository {
             mentionEntities,
             quoteEntity,
             [linkPreview],
-            this.expectReadReceipt(conversationEntity),
+            this.expectReadReceipt(conversationEntity)
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
@@ -2135,7 +2135,7 @@ export class ConversationRepository {
       mentionEntities,
       undefined,
       undefined,
-      this.expectReadReceipt(conversationEntity),
+      this.expectReadReceipt(conversationEntity)
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
@@ -2241,7 +2241,7 @@ export class ConversationRepository {
       mentionEntities,
       quoteEntity,
       undefined,
-      this.expectReadReceipt(conversationEntity),
+      this.expectReadReceipt(conversationEntity)
     );
     let genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
@@ -2554,7 +2554,7 @@ export class ConversationRepository {
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`
       );
     }
 
@@ -2586,7 +2586,7 @@ export class ConversationRepository {
           .then(() => {
             this.logger.info(
               `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
-              updatedPayload,
+              updatedPayload
             );
             return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
@@ -2863,7 +2863,7 @@ export class ConversationRepository {
       .catch(error => {
         this.logger.info(
           `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
-          error,
+          error
         );
         throw error;
       });
@@ -3077,7 +3077,7 @@ export class ConversationRepository {
   _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
     const handlePromises = conversationEventHandlers.map(handler =>
-      handler.handleConversationEvent(conversationEntity, eventJson, eventSource),
+      handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
     );
     return Promise.all(handlePromises).then(() => conversationEntity);
   }
@@ -3531,7 +3531,7 @@ export class ConversationRepository {
       .catch(error => {
         this.logger.info(
           `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
-          error,
+          error
         );
         throw error;
       });

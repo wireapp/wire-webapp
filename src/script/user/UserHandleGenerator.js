@@ -26,10 +26,10 @@ const MIN_HANDLE_LENGTH = 2;
 const MAX_HANDLE_LENGTH = 21;
 
 const RANDOM_WORDS_1 = 'acid|agate|agile|amber|aqua|arid|avid|azure|baby|basic|beige|best|black|blond|blue|brass|brave|brown|busy|chief|chill|clear|cold|cool|coral|cosy|cozy|cream|curly|cyan|dear|dry|early|even|fancy|fast|fit|folk|gold|green|grey|happy|hazy|icy|iron|kind|large|lazy|lemon|light|lilac|lime|lord|lucid|mauve|melt|merry|mint|nice|noir|ochre|odd|olive|opal|peach|pearl|pink|plain|purple|quiet|rapid|red|rock|rose|ruby|rust|sand|sassy|shiny|shy|silly|slow|small|stone|sweet|swift|talc|tame|tiny|topaz|torn|total|vinyl|violet|warm|white|wise|witty|yellow|young|zinc'.split(
-  '|',
+  '|'
 );
 const RANDOM_WORDS_2 = 'alligator|alpaca|ant|antelope|asp|badger|bat|bear|bee|beetle|bird|bison|bobcat|buffalo|buzzard|camel|caribou|carp|cat|catfish|cheetah|clam|cobra|cod|condor|cow|coyote|crane|crayfish|cricket|crow|deer|dog|dolphin|donkey|dove|duck|eagle|eel|elk|falcon|ferret|finch|fly|fox|frog|gazelle|giraffe|gnu|goat|goose|gopher|grouse|gull|halibut|hamster|hare|hawk|heron|herring|horse|husky|impala|jackal|jaguar|kangaroo|koala|lemur|lion|lizard|llama|lobster|mackerel|mole|moose|moth|mouse|mule|mussel|newt|octopus|orca|ostrich|otter|owl|ox|oyster|panda|panther|parrot|pelican|penguin|pigeon|pike|pony|quail|rabbit|racoon|ram|raven|salmon|sardine|seal|shark|sheep|sloth|snail|snake|squid|sturgeon|swan|tiger|tilapia|toad|trout|tuna|turkey|turtle|walrus|wapiti|wasp|weasel|whale|wolf|wombat|yak|zebra'.split(
-  '|',
+  '|'
 );
 
 const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;

@@ -29,7 +29,7 @@ describe('z.viewModel.FaviconViewModel', () => {
     expect(dispatcher.subscribe).toHaveBeenCalledWith(
       WebAppEvents.LIFECYCLE.UNREAD_COUNT,
       faviconViewModel,
-      faviconViewModel._updateUnreadCount,
+      faviconViewModel._updateUnreadCount
     );
   });
 

@@ -570,7 +570,7 @@ class FlowEntity {
       MediaStreamSource.REMOTE,
       this.remoteUser.id,
       mediaStream,
-      this.callEntity,
+      this.callEntity
     );
     amplify.publish(WebAppEvents.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
   }
@@ -786,7 +786,7 @@ class FlowEntity {
       conversationEntity,
       callMessage,
       this.remoteUserId,
-      this.remoteClientId,
+      this.remoteClientId
     );
     amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, EventRepository.SOURCE.WEB_SOCKET);
   }
@@ -1082,7 +1082,7 @@ class FlowEntity {
       this.conversationId,
       this.selfUserId,
       this.remoteUserId,
-      this.remoteClientId,
+      this.remoteClientId
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: localSdp.sdp}, payload);
 

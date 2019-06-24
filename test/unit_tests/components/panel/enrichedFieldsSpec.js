@@ -32,7 +32,7 @@ describe('enriched-fields', () => {
     const params = {user: () => ({email: () => {}, id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
-      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]}),
+      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]})
     );
 
     return instantiateComponent('enriched-fields', params).then(domContainer => {
@@ -46,7 +46,7 @@ describe('enriched-fields', () => {
     const params = {user: () => ({email: () => 'user@inter.net', id: userId})};
 
     spyOn(richProfileRepository, 'getUserRichProfile').and.returnValue(
-      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]}),
+      Promise.resolve({fields: [{type: 'field1', value: 'value1'}, {type: 'field2', value: 'value2'}]})
     );
 
     return instantiateComponent('enriched-fields', params).then(domContainer => {

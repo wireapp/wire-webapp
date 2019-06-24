@@ -34,7 +34,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
     this.finished_reason = '';
 
     this.caption = ko.pureComputed(() =>
-      this.user().is_me ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate'),
+      this.user().is_me ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate')
     );
   }
 

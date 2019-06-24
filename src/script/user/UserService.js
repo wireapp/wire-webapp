@@ -137,8 +137,8 @@ export class UserService {
           data: {ids},
           type: 'GET',
           url: UserService.URL.USERS,
-        }),
-      ),
+        })
+      )
     ).then(flatten);
   }
 

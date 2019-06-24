@@ -100,7 +100,7 @@ window.TestFactory.prototype.exposeBackupActors = function() {
         TestFactory.client_repository,
         TestFactory.connection_repository,
         TestFactory.conversation_repository,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
 
       return TestFactory.backup_repository;
@@ -121,7 +121,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox =
 
       TestFactory.cryptography_repository = new CryptographyRepository(
         resolveDependency(graph.BackendClient),
-        TestFactory.storage_repository,
+        TestFactory.storage_repository
       );
       TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
 
@@ -158,7 +158,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
     TestFactory.client_repository = new ClientRepository(
       resolveDependency(graph.BackendClient),
       TestFactory.storage_service,
-      TestFactory.cryptography_repository,
+      TestFactory.cryptography_repository
     );
     TestFactory.client_repository.init(user);
 
@@ -194,18 +194,18 @@ window.TestFactory.prototype.exposeEventActors = function() {
     .then(() => {
       TestFactory.web_socket_service = new WebSocketService(
         resolveDependency(graph.BackendClient),
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
       TestFactory.event_service = new EventService(TestFactory.storage_service);
       TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
       TestFactory.notification_service = new NotificationService(
         resolveDependency(graph.BackendClient),
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
       TestFactory.conversation_service = new ConversationService(
         resolveDependency(graph.BackendClient),
         TestFactory.event_service,
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
 
       TestFactory.event_repository = new EventRepository(
@@ -215,7 +215,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.conversation_service,
         TestFactory.cryptography_repository,
         serverTimeHandler,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
       TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
 
@@ -240,7 +240,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
       resolveDependency(graph.SelfService),
       TestFactory.client_repository,
       serverTimeHandler,
-      TestFactory.propertyRepository,
+      TestFactory.propertyRepository
     );
     TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
@@ -258,7 +258,7 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
 
     TestFactory.connection_repository = new ConnectionRepository(
       resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
 
     return TestFactory.connect_repository;
@@ -287,7 +287,7 @@ window.TestFactory.prototype.exposeSearchActors = function() {
   return this.exposeUserActors().then(() => {
     TestFactory.search_repository = new SearchRepository(
       resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
 
     return TestFactory.search_repository;
@@ -298,7 +298,7 @@ window.TestFactory.prototype.exposeTeamActors = function() {
   return this.exposeUserActors().then(() => {
     TestFactory.team_repository = new TeamRepository(
       resolveDependency(graph.BackendClient),
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
     return TestFactory.team_repository;
   });
@@ -316,7 +316,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
       TestFactory.conversation_service = new ConversationService(
         resolveDependency(graph.BackendClient),
         TestFactory.event_service,
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
 
       TestFactory.conversation_repository = new ConversationRepository(
@@ -332,7 +332,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         serverTimeHandler,
         TestFactory.team_repository,
         TestFactory.user_repository,
-        TestFactory.propertyRepository,
+        TestFactory.propertyRepository
       );
 
       return TestFactory.conversation_repository;
@@ -351,7 +351,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
       TestFactory.conversation_repository,
       TestFactory.event_repository,
       resolveDependency(graph.MediaRepository),
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
 
     return TestFactory.calling_repository;
@@ -370,7 +370,7 @@ window.TestFactory.prototype.exposeNotificationActors = function() {
         TestFactory.calling_repository,
         TestFactory.conversation_repository,
         resolveDependency(graph.PermissionRepository),
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
 
       return TestFactory.notification_repository;
@@ -385,7 +385,7 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
   return this.exposeTeamActors().then(() => {
     TestFactory.tracking_repository = new EventTrackingRepository(
       TestFactory.team_repository,
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
 
     return TestFactory.tracking_repository;
@@ -402,7 +402,7 @@ window.TestFactory.prototype.exposeLifecycleActors = function() {
 
     TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
       TestFactory.lifecycle_service,
-      TestFactory.user_repository,
+      TestFactory.user_repository
     );
     return TestFactory.lifecycle_repository;
   });

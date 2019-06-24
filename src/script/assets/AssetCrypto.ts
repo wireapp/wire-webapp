@@ -26,7 +26,7 @@
 export const decryptAesAsset = async (
   cipherText: ArrayBuffer,
   keyBytes: ArrayBuffer,
-  referenceSha256: ArrayBuffer,
+  referenceSha256: ArrayBuffer
 ): Promise<ArrayBuffer> => {
   return window.crypto.subtle
     .digest('SHA-256', cipherText)
@@ -45,7 +45,7 @@ export const decryptAesAsset = async (
 };
 
 export const encryptAesAsset = async (
-  plaintext: ArrayBuffer,
+  plaintext: ArrayBuffer
 ): Promise<{cipherText: ArrayBuffer; keyBytes: ArrayBuffer; sha256: ArrayBuffer}> => {
   const iv = _generateRandomBytes(16);
   const rawKeyBytes = _generateRandomBytes(32);

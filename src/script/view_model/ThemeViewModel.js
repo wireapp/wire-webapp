@@ -33,7 +33,7 @@ export class ThemeViewModel {
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.setTheme);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties =>
-      this.setTheme(properties.settings.interface.theme),
+      this.setTheme(properties.settings.interface.theme)
     );
   }
 

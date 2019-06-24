@@ -32,7 +32,7 @@ describe('AssetRemoteData', () => {
       const asset_id = createRandomUuid();
       remote_data = AssetRemoteData.v1(conversation_id, asset_id);
       spyOn(remote_data, '_loadBuffer').and.returnValue(
-        Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
+        Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type})
       );
     });
 

@@ -295,7 +295,7 @@ describe('TimeUtil', () => {
       caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
 
       expect(caption).toEqual(
-        `3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')} ${t('ephemeralRemaining')}`,
+        `3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')} ${t('ephemeralRemaining')}`
       );
     });
   });

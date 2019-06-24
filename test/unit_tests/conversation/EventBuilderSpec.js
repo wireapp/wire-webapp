@@ -61,7 +61,7 @@ describe('z.conversation.EventBuilder', () => {
       conversation_et,
       user_ids,
       VerificationMessageType.NEW_DEVICE,
-      0,
+      0
     );
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {

@@ -109,7 +109,7 @@ describe('NotificationRepository', () => {
       };
       TestFactory.notification_repository.setContentViewModelStates(
         contentViewModelState.state,
-        contentViewModelState.multitasking,
+        contentViewModelState.multitasking
       );
 
       spyOn(TestFactory.notification_repository, '_showNotification');

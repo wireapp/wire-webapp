@@ -52,7 +52,7 @@ describe('PeerConnectionUtil', () => {
       [1, 2, 3, 4, 5, 6].forEach(numberOfServers => {
         const result = isValidIceCandidatesGathering(
           {iceServers: new Array(numberOfServers)},
-          relayIceCandidates.slice(0, numberOfServers),
+          relayIceCandidates.slice(0, numberOfServers)
         );
 
         expect(result).toBe(true);
@@ -71,7 +71,7 @@ describe('PeerConnectionUtil', () => {
       [1, 2, 3, 4, 5, 6].forEach(numberOfCandidates => {
         const result = isValidIceCandidatesGathering(
           {iceServers: new Array(1)},
-          relayIceCandidates.slice(0, numberOfCandidates),
+          relayIceCandidates.slice(0, numberOfCandidates)
         );
 
         expect(result).toBe(true);

@@ -54,7 +54,7 @@ export class AuthAction {
   doLoginPlain = (
     loginData: LoginData,
     onBeforeLogin: LoginLifecycleFunction = noop,
-    onAfterLogin: LoginLifecycleFunction = noop,
+    onAfterLogin: LoginLifecycleFunction = noop
   ): ThunkAction => {
     return (dispatch, getState, global) => {
       const {
@@ -69,7 +69,7 @@ export class AuthAction {
         .then(() => core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType)))
         .then(() => this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction))
         .then(() =>
-          dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID})),
+          dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.config.APP_INSTANCE_ID}))
         )
         .then(() => dispatch(selfAction.fetchSelf()))
         .then(() => onAfterLogin(dispatch, getState, global))
@@ -95,7 +95,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
+      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       dispatch(AuthActionCreator.startLogin());
       return Promise.resolve()
@@ -143,7 +143,7 @@ export class AuthAction {
     clientType: ClientType,
     core: Account,
     dispatch: ThunkDispatch,
-    localStorageAction: LocalStorageAction,
+    localStorageAction: LocalStorageAction
   ): Promise<void[]> => {
     const persist = clientType === ClientType.PERMANENT;
     // TODO: Fixed once core v6 is inside
@@ -175,7 +175,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
+      {apiClient, config, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -215,7 +215,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}},
+      {apiClient, config, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}}
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -249,7 +249,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}},
+      {apiClient, config, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}}
     ) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
@@ -283,7 +283,7 @@ export class AuthAction {
     return (
       dispatch,
       getState,
-      {apiClient, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
+      {apiClient, core, actions: {authAction, clientAction, selfAction, localStorageAction}}
     ) => {
       let clientType: ClientType;
       dispatch(AuthActionCreator.startRefresh());

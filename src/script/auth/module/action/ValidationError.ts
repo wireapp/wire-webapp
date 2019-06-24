@@ -76,7 +76,7 @@ export class ValidationError extends Error {
   static mapErrorsToField = (fieldName: string): ErrorTypes => {
     return Object.entries(ValidationError.ERROR).reduce(
       (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
-      ValidationError.ERROR,
+      ValidationError.ERROR
     );
   };
 

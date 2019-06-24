@@ -251,7 +251,7 @@ class MessageListViewModel {
             shouldStickToBottomOnMessageAdd = this._shouldStickToBottom();
           },
           null,
-          'beforeChange',
+          'beforeChange'
         );
 
         // Subscribe for incoming messages
@@ -261,7 +261,7 @@ class MessageListViewModel {
             shouldStickToBottomOnMessageAdd = undefined;
           },
           null,
-          'arrayChange',
+          'arrayChange'
         );
         resolve();
       }, 100);
@@ -434,7 +434,7 @@ class MessageListViewModel {
 
     this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
       const message_ets = items.filter(
-        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
+        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF)
       );
       const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 

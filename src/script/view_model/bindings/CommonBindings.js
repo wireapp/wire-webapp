@@ -71,7 +71,7 @@ ko.bindingHandlers.drop_file = {
           drop: onDrop,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -104,7 +104,7 @@ ko.bindingHandlers.paste_file = {
           paste: onPaste,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -123,7 +123,7 @@ ko.bindingHandlers.ignore_drop_file = {
           drop: (_data, event) => event.preventDefault(),
         },
       },
-      context,
+      context
     );
   },
 };
@@ -176,7 +176,7 @@ ko.bindingHandlers.resize = {
           input: throttledResizeTextarea,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -247,7 +247,7 @@ ko.bindingHandlers.enter = {
           keypress: wrapper,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -279,7 +279,7 @@ ko.bindingHandlers.file_select = {
           },
         },
       },
-      context,
+      context
     );
   },
 };
@@ -353,7 +353,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, eventName) {
       handler(newValue);
     },
     owner,
-    eventName,
+    eventName
   );
 };
 
@@ -474,7 +474,7 @@ ko.bindingHandlers.antiscroll = {
         resize_event,
         _.throttle(() => {
           antiscroll.rebuild();
-        }, 100),
+        }, 100)
       );
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
@@ -664,7 +664,7 @@ ko.bindingHandlers.in_viewport = {
         triggerCallbackIfVisible();
       },
       true,
-      container,
+      container
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;

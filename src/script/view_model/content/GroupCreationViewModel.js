@@ -90,12 +90,12 @@ export class GroupCreationViewModel {
     this.participantsActionText = ko.pureComputed(() =>
       this.selectedContacts().length
         ? t('groupCreationParticipantsActionCreate')
-        : t('groupCreationParticipantsActionSkip'),
+        : t('groupCreationParticipantsActionSkip')
     );
     this.participantsHeaderText = ko.pureComputed(() =>
       this.selectedContacts().length
         ? t('groupCreationParticipantsHeaderWithCounter', this.selectedContacts().length)
-        : t('groupCreationParticipantsHeader'),
+        : t('groupCreationParticipantsHeader')
     );
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);

@@ -118,7 +118,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.content_length).toEqual(
-          original_asset.size.toNumber ? original_asset.size.toNumber() : original_asset.size,
+          original_asset.size.toNumber ? original_asset.size.toNumber() : original_asset.size
         );
 
         expect(event_json.data.content_type).toEqual(original_asset.mimeType);

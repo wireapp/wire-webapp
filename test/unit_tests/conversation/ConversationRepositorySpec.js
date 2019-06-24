@@ -58,7 +58,7 @@ describe('ConversationRepository', () => {
 
   const _generate_conversation = (
     conversation_type = ConversationType.GROUP,
-    connection_status = ConnectionStatus.ACCEPTED,
+    connection_status = ConnectionStatus.ACCEPTED
   ) => {
     const conversation = new Conversation(createRandomUuid());
     conversation.type(conversation_type);
@@ -186,7 +186,7 @@ describe('ConversationRepository', () => {
       conversation_et.add_message(messageEntityToDelete);
 
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
-        Promise.resolve(conversation_et),
+        Promise.resolve(conversation_et)
       );
 
       return TestFactory.conversation_repository
@@ -203,11 +203,11 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(self_conversation_et).then(() => {
         expect(
-          _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations),
+          _find_conversation(self_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations),
+          _find_conversation(self_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeUndefined();
       });
     });
@@ -217,11 +217,11 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(blocked_conversation_et).then(() => {
         expect(
-          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations),
+          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations),
+          _find_conversation(blocked_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeUndefined();
       });
     });
@@ -231,11 +231,11 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(cancelled_conversation_et).then(() => {
         expect(
-          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations),
+          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations),
+          _find_conversation(cancelled_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeUndefined();
       });
     });
@@ -245,11 +245,11 @@ describe('ConversationRepository', () => {
 
       return TestFactory.conversation_repository.save_conversation(pending_conversation_et).then(() => {
         expect(
-          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations),
+          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.conversations)
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations),
+          _find_conversation(pending_conversation_et, TestFactory.conversation_repository.filtered_conversations)
         ).toBeUndefined();
       });
     });
@@ -386,7 +386,7 @@ describe('ConversationRepository', () => {
 
       spyOn(TestFactory.conversation_repository, 'fetch_conversation_by_id').and.callThrough();
       spyOn(TestFactory.conversation_service, 'get_conversation_by_id').and.returnValue(
-        Promise.resolve(conversation_payload),
+        Promise.resolve(conversation_payload)
       );
     });
 
@@ -415,11 +415,11 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.map_connection(connectionEntity).then(_conversation => {
         expect(_conversation.connection()).toBe(connectionEntity);
         expect(
-          _find_conversation(_conversation, TestFactory.conversation_repository.conversations),
+          _find_conversation(_conversation, TestFactory.conversation_repository.conversations)
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations),
+          _find_conversation(_conversation, TestFactory.conversation_repository.filtered_conversations)
         ).toBeUndefined();
       });
     });
@@ -438,17 +438,17 @@ describe('ConversationRepository', () => {
       };
 
       spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(
-        Promise.resolve(conversationEntity),
+        Promise.resolve(conversationEntity)
       );
       spyOn(TestFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
-        Promise.resolve(conversationEntity),
+        Promise.resolve(conversationEntity)
       );
 
       return TestFactory.conversation_repository._handleConversationEvent(event).then(() => {
         expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
           event.conversation,
           [event.from],
-          new Date(event.time).getTime() - 1,
+          new Date(event.time).getTime() - 1
         );
       });
     });
@@ -663,7 +663,7 @@ describe('ConversationRepository', () => {
           expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
           expect(TestFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
             createEvent.data,
-            time.getTime(),
+            time.getTime()
           );
         });
       });
@@ -990,7 +990,7 @@ describe('ConversationRepository', () => {
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
       spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
-        Promise.resolve(new z.entity.Message()),
+        Promise.resolve(new z.entity.Message())
       );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
@@ -1004,7 +1004,7 @@ describe('ConversationRepository', () => {
           return Promise.resolve({
             recipients: {},
           });
-        },
+        }
       );
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
@@ -1015,7 +1015,7 @@ describe('ConversationRepository', () => {
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
-          sentMessages.length,
+          sentMessages.length
         );
       });
     });
