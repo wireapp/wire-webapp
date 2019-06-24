@@ -18,9 +18,9 @@
  */
 
 /** @jsx jsx */
+import {jsx} from '@emotion/core';
 import {COLOR, Container, H1, H2, Line} from '@wireapp/react-ui-kit';
 import Color from 'color';
-import {jsx} from '@emotion/core';
 
 const colorElementStyle = props => ({
   '&::after': {

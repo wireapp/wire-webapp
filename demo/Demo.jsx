@@ -31,15 +31,18 @@ import {
   Loading,
   Logo,
   MenuLink,
-  PILL_TYPE,
   Pagination,
   Pill,
+  PILL_TYPE,
   QUERY,
   Small,
   StyledApp,
   Tooltip,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
+import Helmet from 'react-helmet';
+
+import {avatarBase64} from './avatarImage';
 import {DemoAnimations} from './DemoAnimations';
 import {DemoColors} from './DemoColors';
 import {DemoIcons} from './DemoIcons';
@@ -47,8 +50,6 @@ import {DemoInputs} from './DemoInputs';
 import {DemoLayouts} from './DemoLayouts';
 import {DemoModals} from './DemoModals';
 import {DemoTypography} from './DemoTypography';
-import Helmet from 'react-helmet';
-import {avatarBase64} from './avatarImage';
 
 const Demo = () => {
   const [currentPage, setCurrentPage] = useState(0);
