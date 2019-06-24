@@ -23,7 +23,6 @@ import platform from 'platform';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid} from 'Util/util';
-import {DebugUtil} from 'Util/DebugUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -131,7 +130,10 @@ class App {
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
     if (Config.FEATURE.ENABLE_DEBUG) {
-      this.util = {debug: new DebugUtil(this.repository)};
+      import('Util/DebugUtil').then(({DebugUtil}) => {
+        this.debug = new DebugUtil(this.repository);
+        this.util = {debug: this.debug}; //Alias for QA
+      });
     }
 
     this._publishGlobals();

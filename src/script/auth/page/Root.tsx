@@ -17,6 +17,7 @@
  *
  */
 
+import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {IntlProvider, addLocaleData} from 'react-intl';
@@ -48,6 +49,7 @@ import {Config} from '../config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
@@ -94,6 +96,7 @@ interface Props extends React.HTMLAttributes<_Root> {}
 
 interface ConnectedProps {
   language: string;
+  isAuthenticated: boolean;
 }
 
 interface DispatchProps {
@@ -118,14 +121,27 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
   };
 
   render = () => {
-    const {language} = this.props;
+    const {isAuthenticated, language} = this.props;
+
+    const navigate = (route: string): null => {
+      window.location.assign(pathWithParams(route));
+      return null;
+    };
+
+    const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
+
+    const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
+    const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
+    const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
+    const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
+
     return (
       <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
         <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
           <Router hashType="noslash">
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
-              <Route path={ROUTE.CLIENTS} component={ClientManager} />
+              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
               <Route path={ROUTE.LOGIN} component={Login} />
               <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
@@ -139,9 +155,9 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
                 component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
               />
               <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
-              <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
-              <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
-              <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
+              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
+              <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
+              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
               <Route path={ROUTE.SSO} component={SingleSignOn} />
               <Redirect to={ROUTE.INDEX} />
             </Switch>
@@ -153,9 +169,10 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
 }
 
 export const Root = connect(
-  (state: RootState): ConnectedProps => {
-    return {language: LanguageSelector.getLanguage(state)};
-  },
+  (state: RootState): ConnectedProps => ({
+    isAuthenticated: AuthSelector.isAuthenticated(state),
+    language: LanguageSelector.getLanguage(state),
+  }),
   (dispatch: ThunkDispatch): DispatchProps => {
     return {
       safelyRemoveCookie: (name: string, value: string) => {

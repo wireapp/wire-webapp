@@ -149,11 +149,7 @@ class _Index extends React.Component<Props & ConnectedProps & DispatchProps & In
 
 export const Index = injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {language: LanguageSelector.getLanguage(state)};
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
+    (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
+    (dispatch: ThunkDispatch): DispatchProps => ({})
   )(_Index)
 );

@@ -32,7 +32,7 @@ import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -93,12 +93,10 @@ const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
 export const HistoryInfo = withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        };
-      }
+      (state: RootState): ConnectedProps => ({
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+      })
     )(_HistoryInfo)
   )
 );

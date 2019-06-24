@@ -17,23 +17,53 @@
  *
  */
 
-import {GiphyContentSizes} from './GiphyContentSizes';
+import {Logger} from '../util/Logger';
+import {GiphyService, GiphySorting} from './GiphyService';
+
+export interface Gif {
+  animated: string;
+  static: string;
+  url: string;
+}
+
+export interface RandomGifOptions {
+  /** Maximum gif size in bytes. Default is 3 megabytes. */
+  maxSize?: number;
+  /** How many retries to get the correct size. Default is 3. */
+  maxRetries?: number;
+  /** Search query term or phrase */
+  tag: string;
+}
+
+export interface GetGifOptions {
+  /** Maximum gif size in bytes. Default is 3 megabytes. */
+  maxSize?: number;
+  /**  Amount of GIFs to retrieve */
+  number: number;
+  /**  Search query term or phrase */
+  query: string;
+  results?: number;
+  /**  Will return a randomized result. Default is `true`. */
+  random?: boolean;
+  /**  Specify sorting ('relevant' or 'recent'). Default is "relevant". */
+  sorting: GiphySorting;
+}
 
 export class GiphyRepository {
-  static get CONFIG() {
-    return {
-      MAX_RETRIES: 3,
-      MAX_SIZE: 3 * 1024 * 1024, // 3MB
-      NUMBER_OF_RESULTS: 6,
-    };
-  }
+  private readonly giphyService: GiphyService;
+  private readonly logger: Logger;
+  private readonly gifQueryCache: Record<string, number>;
+
+  static CONFIG = {
+    MAX_RETRIES: 3,
+    MAX_SIZE: 3 * 1024 * 1024, // 3MB
+    NUMBER_OF_RESULTS: 6,
+  };
 
   /**
-   * Construct a new Giphy Repository.
-   * @param {GiphyService} giphyService - Giphy REST API implementation
-   * @param {Logger} logger - Logger
+   * @param giphyService Giphy REST API implementation
    */
-  constructor(giphyService, logger) {
+  constructor(giphyService: GiphyService, logger: Logger) {
     this.giphyService = giphyService;
     this.logger = logger;
     this.gifQueryCache = {};
@@ -41,23 +71,15 @@ export class GiphyRepository {
 
   /**
    * Get random GIF for a word or phrase.
-   *
-   * @param {Object} options - Search options
-   * @param {string} options.tag - Search query term or phrase
-   * @param {number} [options.retry=3] - How many retries to get the correct size
-   * @param {number} [options.max_size=3MB] - Maximum gif size in bytes
-   * @returns {Promise} Resolves with a random matching gif
    */
-  getRandomGif(options) {
-    options = $.extend(
-      {
-        maxRetries: GiphyRepository.CONFIG.MAX_RETRIES,
-        maxSize: GiphyRepository.CONFIG.MAX_SIZE,
-      },
-      options
-    );
+  getRandomGif(options: RandomGifOptions): Promise<Gif> {
+    options = {
+      maxRetries: GiphyRepository.CONFIG.MAX_RETRIES,
+      maxSize: GiphyRepository.CONFIG.MAX_SIZE,
+      ...options,
+    };
 
-    const _getRandomGif = (retry = 0) => {
+    const _getRandomGif = (retry = 0): Promise<Gif> => {
       const hasReachedRetryLimit = retry >= options.maxRetries;
       if (hasReachedRetryLimit) {
         throw new Error(`Unable to fetch a proper gif within ${options.maxRetries} retries`);
@@ -72,10 +94,10 @@ export class GiphyRepository {
           return this.giphyService.getById(randomGif.id);
         })
         .then(({data: {images, url}}) => {
-          const staticGif = images[GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animatedGif = images[GiphyContentSizes.DOWNSIZED];
+          const staticGif = images.fixed_width_still;
+          const animatedGif = images.downsized;
 
-          const exceedsMaxSize = animatedGif.size > options.maxSize;
+          const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
           if (exceedsMaxSize) {
             this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);
             return _getRandomGif(retry + 1);
@@ -94,27 +116,17 @@ export class GiphyRepository {
 
   /**
    * Get random GIFs for a word or phrase.
-   *
-   * @param {Object} options - Search options
-   * @param {string} options.query - Search query term or phrase
-   * @param {number} options.number - Amount of GIFs to retrieve
-   * @param {number} [options.max_size=3MB] - Maximum gif size in bytes
-   * @param {boolean} [options.random=true] - Will return an randomized result
-   * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
-   * @returns {Promise} Resolves with gifs
    */
-  getGifs(options) {
+  getGifs(options: GetGifOptions): Promise<Gif[]> {
     let offset = 0;
 
-    options = $.extend(
-      {
-        maxSize: GiphyRepository.CONFIG.MAX_SIZE,
-        random: true,
-        results: GiphyRepository.CONFIG.NUMBER_OF_RESULTS,
-        sorting: 'relevant',
-      },
-      options
-    );
+    options = {
+      maxSize: GiphyRepository.CONFIG.MAX_SIZE,
+      random: true,
+      results: GiphyRepository.CONFIG.NUMBER_OF_RESULTS,
+      sorting: GiphySorting.RELEVANT,
+      ...options,
+    };
 
     if (!options.query) {
       const error = new Error('No query specified');
@@ -134,7 +146,6 @@ export class GiphyRepository {
       .getSearch({
         limit: 100,
         offset: offset,
-        // eslint-disable-next-line id-length
         q: options.query,
         sort: options.sorting,
       })
@@ -148,15 +159,15 @@ export class GiphyRepository {
         this.gifQueryCache[options.query] = pagination.total_count;
 
         for (const {images, url} of gifs.slice(0, options.number)) {
-          const staticGif = images[GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animatedGif = images[GiphyContentSizes.DOWNSIZED];
+          const staticGif = images.fixed_width_still;
+          const animatedGif = images.downsized;
 
-          const exceedsMaxSize = animatedGif.size > options.maxSize;
+          const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
           if (!exceedsMaxSize) {
             result.push({
               animated: animatedGif.url,
               static: staticGif.url,
-              url: url,
+              url,
             });
           }
         }
