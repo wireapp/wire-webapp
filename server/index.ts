@@ -34,8 +34,8 @@ server
   .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
 
 process.on('uncaughtException', error =>
-  console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error),
+  console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error)
 );
 process.on('unhandledRejection', error =>
-  console.error(`[${formatDate()}] Uncaught rejection "${error.constructor.name}": ${error.message}`, error),
+  console.error(`[${formatDate()}] Uncaught rejection "${error.constructor.name}": ${error.message}`, error)
 );

@@ -183,5 +183,5 @@ export default connect(
       },
       stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
     };
-  },
+  }
 )(Root);

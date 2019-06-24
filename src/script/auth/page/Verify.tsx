@@ -133,7 +133,7 @@ export default withRouter(
         doRegisterTeam: (registrationData: RegisterData) =>
           dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
         doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
-      }),
-    )(Verify),
-  ),
+      })
+    )(Verify)
+  )
 );

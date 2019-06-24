@@ -96,7 +96,7 @@ export default withRouter(
       (state: RootState): ConnectedProps => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
-      }),
-    )(HistoryInfo),
-  ),
+      })
+    )(HistoryInfo)
+  )
 );

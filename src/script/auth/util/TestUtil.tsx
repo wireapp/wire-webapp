@@ -46,7 +46,7 @@ export const mockStore = (
   },
   extraArgument = {
     apiClient,
-  },
+  }
 ) => {
   const middlewares = [thunk.withExtraArgument(extraArgument)];
   return configureStore(middlewares)(state);
