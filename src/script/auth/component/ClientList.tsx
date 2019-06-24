@@ -93,7 +93,7 @@ class ClientList extends React.Component<CombinedProps, State> {
         this.setState({
           loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner, 1000),
           showLoading: true,
-        }),
+        })
       )
       .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
@@ -165,7 +165,7 @@ export default withRouter(
           getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
-      },
-    )(ClientList),
-  ),
+      }
+    )(ClientList)
+  )
 );

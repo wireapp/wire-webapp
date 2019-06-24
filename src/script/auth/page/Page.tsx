@@ -80,5 +80,5 @@ export default connect(
   },
   (dispatch: ThunkDispatch): DispatchProps => {
     return {};
-  },
+  }
 )(Page);

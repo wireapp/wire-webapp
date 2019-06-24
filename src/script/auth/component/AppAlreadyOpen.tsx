@@ -83,6 +83,6 @@ export default injectIntl(
       return {
         removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
       };
-    },
-  )(AppAlreadyOpen),
+    }
+  )(AppAlreadyOpen)
 );
