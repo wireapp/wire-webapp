@@ -77,6 +77,7 @@ module.exports = {
     },
   },
   output: {
+    chunkFilename: 'min/[name].js',
     filename: 'min/[name].js',
     path: dist,
     publicPath: '/',

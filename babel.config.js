@@ -27,6 +27,7 @@ module.exports = {
         messagesDir: './temp/i18n',
       },
     ],
+    '@babel/plugin-syntax-dynamic-import',
   ],
   presets: ['@babel/preset-react', '@babel/preset-typescript', ['@babel/preset-env', presetEnvConfig]],
 };
