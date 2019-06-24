@@ -190,8 +190,6 @@ export const WebAppEvents = {
   SHORTCUT: {
     ADD_PEOPLE: 'wire.webapp.shortcut.add_people',
     ARCHIVE: 'wire.webapp.shortcut.archive',
-    CALL_MUTE: 'wire.webapp.shortcut.call_mute',
-    CALL_REJECT: 'wire.webapp.shortcut.call_reject',
     DELETE: 'wire.webapp.shortcut.delete',
     NEXT: 'wire.webapp.shortcut.next',
     NOTIFICATIONS: 'wire.webapp.shortcut.notifications',

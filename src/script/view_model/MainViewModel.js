@@ -25,7 +25,6 @@ import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {ShortcutsViewModel} from './ShortcutsViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -92,7 +91,6 @@ export class MainViewModel {
 
     this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.shortcuts = new ShortcutsViewModel(repositories.calling);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
     this.warnings = new WarningsViewModel();

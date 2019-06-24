@@ -146,7 +146,7 @@ export class CallingRepository {
     this.isReady = true;
   }
 
-  configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
+  private configureCallingApi(wCall: Wcall, selfUserId: string, selfClientId: string): {wUser: number; wCall: any} {
     const avsLogger = getLogger('avs');
     const logLevelStrs: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
