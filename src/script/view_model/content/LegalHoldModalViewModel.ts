@@ -33,7 +33,8 @@ import {promiseProgress} from 'Util/PromiseUtil';
 import {BackendClientError} from '../../error/BackendClientError';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
-export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.hideRequestModal';
+export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
+export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.showLegalHoldModal';
 
 export class LegalHoldModalViewModel {
   isVisible: ko.Observable<boolean>;
@@ -81,7 +82,7 @@ export class LegalHoldModalViewModel {
 
     this.onBgClick = () => {
       if (!this.showRequest()) {
-        this.isVisible(false);
+        this.hideModal();
       }
     };
     this.onClosed = () => {
@@ -93,6 +94,7 @@ export class LegalHoldModalViewModel {
       this.isLoadingRequest(false);
     };
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
+    amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
     amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
   }
 
@@ -135,9 +137,13 @@ export class LegalHoldModalViewModel {
     );
   };
 
+  hideModal = () => {
+    this.isVisible(false);
+  };
+
   closeRequest = () => {
     if (this.showRequest()) {
-      this.isVisible(false);
+      this.hideModal();
     }
   };
 

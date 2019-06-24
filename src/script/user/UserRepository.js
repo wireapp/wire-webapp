@@ -48,7 +48,11 @@ import {SuperProperty} from '../tracking/SuperProperty';
 import {createSuggestions} from './UserHandleGenerator';
 import {valueFromType, protoFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
-import {SHOW_REQUEST_MODAL, SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {
+  SHOW_REQUEST_MODAL,
+  SHOW_LEGAL_HOLD_MODAL,
+  HIDE_REQUEST_MODAL,
+} from '../view_model/content/LegalHoldModalViewModel';
 
 import {BackendClientError} from '../error/BackendClientError';
 
@@ -152,6 +156,10 @@ export class UserRepository {
         break;
       case BackendEvent.USER.LEGAL_HOLD_REQUEST: {
         this.onLegalHoldRequest(eventJson);
+        break;
+      }
+      case BackendEvent.USER.LEGAL_HOLD_REQUEST_CANCELED: {
+        this.onLegalHoldRequestCanceled(eventJson);
         break;
       }
     }
@@ -376,6 +384,14 @@ export class UserRepository {
 
     const recipients = this.teamUsers().concat(this.self());
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+  }
+
+  onLegalHoldRequestCanceled(eventJson) {
+    if (this.self().id !== eventJson.target_user) {
+      return;
+    }
+    self.hasPendingLegalHold(false);
+    amplify.publish(HIDE_REQUEST_MODAL);
   }
 
   async onLegalHoldRequest(eventJson) {
