@@ -200,8 +200,8 @@ ko.components.register('user-devices', {
         const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
         this.deviceMode(deviceMode);
       })
-      .catch((error: {message: string}) => {
-        this.logger.error(`Unable to retrieve clients for user '${userEntity().id}': ${error.message || error}`);
+      .catch(error => {
+        logger.error(`Unable to retrieve clients for user '${userEntity().id}': ${error.message || error}`);
       });
 
     this.detailMessage = ko.pureComputed(() => {
