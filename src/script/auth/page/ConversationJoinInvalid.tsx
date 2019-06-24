@@ -70,11 +70,7 @@ class ConversationJoinInvalid extends React.PureComponent<
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {};
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
-  )(ConversationJoinInvalid)
+    (state: RootState): ConnectedProps => ({}),
+    (dispatch: ThunkDispatch): DispatchProps => ({}),
+  )(ConversationJoinInvalid),
 );

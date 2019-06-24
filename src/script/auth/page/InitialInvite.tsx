@@ -37,7 +37,6 @@ import {
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps} from 'react-router';
 import {inviteStrings} from '../../strings';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -50,7 +49,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 interface ConnectedProps {
   error: Error;
@@ -116,7 +115,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
             }
             default: {
               const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType)
+                error.label.endsWith(errorType),
               );
               if (!isValidationError) {
                 throw error;
@@ -147,7 +146,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
     } = this.props;
     const {enteredEmail} = this.state;
     return (
-      <Page isAuthenticated>
+      <Page>
         <ContainerXS
           centerText
           verticalCenter
@@ -205,20 +204,16 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        error: InviteSelector.getError(state),
-        invites: InviteSelector.getInvites(state),
-        isFetching: InviteSelector.isFetching(state),
-        language: LanguageSelector.getLanguage(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
-        fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
-        invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
-        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-      };
-    }
-  )(InitialInvite)
+    (state: RootState): ConnectedProps => ({
+      error: InviteSelector.getError(state),
+      invites: InviteSelector.getInvites(state),
+      isFetching: InviteSelector.isFetching(state),
+      language: LanguageSelector.getLanguage(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({
+      fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
+      invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
+      resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+    }),
+  )(InitialInvite),
 );

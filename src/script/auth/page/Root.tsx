@@ -128,10 +128,12 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
       return null;
     };
 
-    const isAuthenticatedCheck = (page: JSX.Element): JSX.Element =>
-      page ? (isAuthenticated ? page : navigate('/auth#login')) : null;
+    const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth#login')) : null);
 
     const ProtectedChooseHandle = () => isAuthenticatedCheck(<ChooseHandle />);
+    const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
+    const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
+    const ProtectedClientManager = () => isAuthenticatedCheck(<ClientManager />);
 
     return (
       <IntlProvider locale={normalizeLanguage(language)} messages={this.loadLanguage(language)}>
@@ -139,7 +141,7 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
           <Router hashType="noslash">
             <Switch>
               <Route exact path={ROUTE.INDEX} component={Index} />
-              <Route path={ROUTE.CLIENTS} component={ClientManager} />
+              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
               <Route path={ROUTE.LOGIN} component={Login} />
               <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
@@ -153,9 +155,9 @@ class Root extends React.Component<Props & ConnectedProps & DispatchProps, State
                 component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
               />
               <Route path={ROUTE.VERIFY} component={Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION && Verify} />
-              <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
+              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
               <Route path={ROUTE.CHOOSE_HANDLE} component={ProtectedChooseHandle} />
-              <Route path={ROUTE.HISTORY_INFO} component={HistoryInfo} />
+              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
               <Route path={ROUTE.SSO} component={SingleSignOn} />
               <Redirect to={ROUTE.INDEX} />
             </Switch>
@@ -181,5 +183,5 @@ export default connect(
       },
       stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
     };
-  }
+  },
 )(Root);

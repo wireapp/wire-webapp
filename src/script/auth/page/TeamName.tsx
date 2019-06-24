@@ -102,7 +102,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
               id: undefined,
               name: teamName,
             },
-          })
+          }),
         )
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
@@ -193,20 +193,16 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          error: AuthSelector.getError(state),
-          teamName: AuthSelector.getAccountTeamName(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-          pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
-            dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-          resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-        };
-      }
-    )(TeamName)
-  )
+      (state: RootState): ConnectedProps => ({
+        error: AuthSelector.getError(state),
+        teamName: AuthSelector.getAccountTeamName(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
+        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
+          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
+        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+      }),
+    )(TeamName),
+  ),
 );
