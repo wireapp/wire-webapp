@@ -48,7 +48,7 @@ import {createSuggestions} from '../util/handleUtil';
 import {pathWithParams} from '../util/urlUtil';
 import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<_ChooseHandle>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLProps<_ChooseHandle>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasUnsetMarketingConsent: boolean;

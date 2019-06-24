@@ -32,7 +32,7 @@ import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
 import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;

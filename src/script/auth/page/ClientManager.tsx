@@ -22,7 +22,7 @@ import {ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
 import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps} from 'react-router';
+import {RouteComponentProps, withRouter} from 'react-router';
 
 import {noop} from 'Util/util';
 
@@ -34,7 +34,7 @@ import {RootState, ThunkDispatch} from '../module/reducer';
 import {ROUTE} from '../route';
 import {Page} from './Page';
 
-interface Props extends React.HTMLAttributes<_ClientManager>, RouteComponentProps {}
+interface Props extends React.HTMLProps<_ClientManager>, RouteComponentProps {}
 
 interface ConnectedProps {}
 
@@ -85,16 +85,14 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
   }
 }
 
-export const ClientManager = injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => {
-      return {};
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
+export const ClientManager = withRouter(
+  injectIntl(
+    connect(
+      (state: RootState): ConnectedProps => ({}),
+      (dispatch: ThunkDispatch): DispatchProps => ({
         doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
         doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-      };
-    }
-  )(_ClientManager)
+      })
+    )(_ClientManager)
+  )
 );
