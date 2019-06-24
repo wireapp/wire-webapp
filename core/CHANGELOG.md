@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.5.1...@wireapp/core@12.6.0) (2019-06-24)
+
+
+### Features
+
+* **eslint-config:** Sort imports and keys automatically ([#1971](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1971)) ([c7954c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/c7954c8))
+
+
+
+
+
 ## [12.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.5.0...@wireapp/core@12.5.1) (2019-06-24)
 
 **Note:** Version bump only for package @wireapp/core

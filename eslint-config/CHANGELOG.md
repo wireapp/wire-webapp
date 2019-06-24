@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.2.1...@wireapp/eslint-config@1.3.0) (2019-06-24)
+
+
+### Features
+
+* **eslint-config:** Sort imports and keys automatically ([#1971](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/1971)) ([c7954c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/c7954c8))
+
+
+
+
+
 ## [1.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.2.0...@wireapp/eslint-config@1.2.1) (2019-06-24)
 
 
