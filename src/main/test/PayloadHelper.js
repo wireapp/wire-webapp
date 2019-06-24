@@ -17,7 +17,7 @@
  *
  */
 
-/* eslint-disable no-magic-numbers, sort-keys */
+/* eslint-disable no-magic-numbers */
 const faker = require('faker');
 const UUID = require('pure-uuid');
 
@@ -35,29 +35,29 @@ module.exports = {
   },
   mockUserPayload: userId => {
     return {
-      locale: 'en',
       accent_id: 3,
+      assets: [],
+      id: userId,
+      locale: 'en',
+      name: faker.name.findName(),
       picture: [
         {
           content_length: 263345,
-          data: null,
           content_type: 'image/jpeg',
+          data: null,
           id: getUUID(),
           info: {
-            height: 960,
-            tag: 'medium',
-            original_width: 1280,
-            width: 1280,
             correlation_id: getUUID(),
-            original_height: 960,
+            height: 960,
             nonce: getUUID(),
+            original_height: 960,
+            original_width: 1280,
             public: true,
+            tag: 'medium',
+            width: 1280,
           },
         },
       ],
-      name: faker.name.findName(),
-      id: userId,
-      assets: [],
     };
   },
 };
