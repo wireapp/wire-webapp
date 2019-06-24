@@ -27,14 +27,14 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {getLogger} from 'Util/Logger';
 
 import {verifyStrings} from '../../strings';
-import {RouterLink} from '../component/RouterLink';
+import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import {Page} from './Page';
+import Page from './Page';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -56,7 +56,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const _Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+const Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
   account,
   authError,
   history,
@@ -119,7 +119,7 @@ const _Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPr
   );
 };
 
-export const Verify = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -138,6 +138,6 @@ export const Verify = withRouter(
           doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
         };
       }
-    )(_Verify)
+    )(Verify)
   )
 );

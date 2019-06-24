@@ -48,9 +48,9 @@ import * as InviteSelector from '../module/selector/InviteSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
-import {Page} from './Page';
+import Page from './Page';
 
-interface Props extends React.HTMLAttributes<_InitialInvite>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<InitialInvite>, RouteComponentProps {}
 
 interface ConnectedProps {
   error: Error;
@@ -70,7 +70,7 @@ interface State {
   error: Error;
 }
 
-class _InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class InitialInvite extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   emailInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredEmail: '',
@@ -138,7 +138,7 @@ class _InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispat
     this.props.resetInviteErrors();
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       invites,
       isFetching,
@@ -203,7 +203,7 @@ class _InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispat
   }
 }
 
-export const InitialInvite = injectIntl(
+export default injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -220,5 +220,5 @@ export const InitialInvite = injectIntl(
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
       };
     }
-  )(_InitialInvite)
+  )(InitialInvite)
 );

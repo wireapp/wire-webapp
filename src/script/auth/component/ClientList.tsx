@@ -35,7 +35,7 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
-import {ClientItem} from './ClientItem';
+import ClientItem from './ClientItem';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps {}
 
@@ -63,7 +63,7 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 const logger = getLogger('ClientList');
 
-class _ClientList extends React.Component<CombinedProps, State> {
+class ClientList extends React.Component<CombinedProps, State> {
   state: State = {
     currentlySelectedClient: null,
     loadingTimeoutId: undefined,
@@ -115,7 +115,7 @@ class _ClientList extends React.Component<CombinedProps, State> {
 
   isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
 
-  render(): JSX.Element {
+  render() {
     const {clientError, isFetching, permanentClients, isSSOUser} = this.props;
     const {showLoading} = this.state;
 
@@ -145,7 +145,7 @@ class _ClientList extends React.Component<CombinedProps, State> {
   }
 }
 
-export const ClientList = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -166,6 +166,6 @@ export const ClientList = withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
       }
-    )(_ClientList)
+    )(ClientList)
   )
 );

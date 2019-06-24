@@ -51,8 +51,8 @@ import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -67,7 +67,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
-import {Page} from './Page';
+import Page from './Page';
 
 declare global {
   interface Window {
@@ -75,7 +75,7 @@ declare global {
   }
 }
 
-interface Props extends React.HTMLAttributes<_Login>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -110,7 +110,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class _Login extends React.Component<CombinedProps, State> {
+class Login extends React.Component<CombinedProps, State> {
   private readonly inputs: {
     email: React.RefObject<any>;
     password: React.RefObject<any>;
@@ -287,7 +287,7 @@ class _Login extends React.Component<CombinedProps, State> {
       });
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
       loginError,
@@ -458,7 +458,7 @@ class _Login extends React.Component<CombinedProps, State> {
   }
 }
 
-export const Login = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => {
@@ -484,6 +484,6 @@ export const Login = withRouter(
           resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
         };
       }
-    )(_Login)
+    )(Login)
   )
 );

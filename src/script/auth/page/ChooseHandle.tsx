@@ -35,7 +35,7 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {chooseHandleStrings} from '../../strings';
-import {AcceptNewsModal} from '../component/AcceptNewsModal';
+import AcceptNewsModal from '../component/AcceptNewsModal';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -46,9 +46,9 @@ import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
 import {pathWithParams} from '../util/urlUtil';
-import {Page} from './Page';
+import Page from './Page';
 
-interface Props extends React.HTMLAttributes<_ChooseHandle>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<ChooseHandle>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   hasUnsetMarketingConsent: boolean;
@@ -69,7 +69,7 @@ interface State {
   handle: string;
 }
 
-class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   state: State = {
     error: null,
     handle: '',
@@ -106,7 +106,7 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
       });
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       isFetching,
       intl: {formatMessage: _},
@@ -154,7 +154,7 @@ class _ChooseHandle extends React.PureComponent<Props & ConnectedProps & Dispatc
   }
 }
 
-export const ChooseHandle = injectIntl(
+export default injectIntl(
   withRouter(
     connect(
       (state: RootState): ConnectedProps => {
@@ -174,6 +174,6 @@ export const ChooseHandle = injectIntl(
           setHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
         };
       }
-    )(_ChooseHandle)
+    )(ChooseHandle)
   )
 );

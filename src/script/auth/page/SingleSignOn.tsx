@@ -36,21 +36,21 @@ import * as React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {ssoLoginStrings} from '../../strings';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';
-import {Page} from './Page';
-import {SingleSignOnForm} from './SingleSignOnForm';
+import Page from './Page';
+import SingleSignOnForm from './SingleSignOnForm';
 
-interface Props extends React.HTMLAttributes<_SingleSignOn>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<SingleSignOn>, RouteComponentProps<{}> {}
 
 interface State {
   isOverlayOpen: boolean;
 }
 
-class _SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State> {
+class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State> {
   private ssoWindow: Window = undefined;
   state: State = {
     isOverlayOpen: false,
@@ -179,7 +179,7 @@ class _SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State
 
   focusChildWindow = () => this.ssoWindow && this.ssoWindow.focus();
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
     } = this.props;
@@ -254,4 +254,4 @@ class _SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State
   }
 }
 
-export const SingleSignOn = withRouter(injectIntl(_SingleSignOn));
+export default withRouter(injectIntl(SingleSignOn));
