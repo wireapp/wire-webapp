@@ -148,24 +148,20 @@ class ClientList extends React.Component<CombinedProps, State> {
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          clientError: ClientSelector.getError(state),
-          isFetching: ClientSelector.isFetching(state),
-          isSSOUser: SelfSelector.isSSOUser(state),
-          permanentClients: ClientSelector.getPermanentClients(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doInitializeClient: (clientType: ClientType, password?: string) =>
-            dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-          doRemoveClient: (clientId: string, password?: string) =>
-            dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
-          getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
-          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        };
-      }
+      (state: RootState): ConnectedProps => ({
+        clientError: ClientSelector.getError(state),
+        isFetching: ClientSelector.isFetching(state),
+        isSSOUser: SelfSelector.isSSOUser(state),
+        permanentClients: ClientSelector.getPermanentClients(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doInitializeClient: (clientType: ClientType, password?: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+        doRemoveClient: (clientId: string, password?: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doRemoveClient(clientId, password)),
+        getLocalStorage: (key: string) => dispatch(ROOT_ACTIONS.localStorageAction.getLocalStorage(key)),
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+      })
     )(ClientList)
   )
 );

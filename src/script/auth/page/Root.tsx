@@ -173,15 +173,11 @@ export default connect(
     isAuthenticated: AuthSelector.isAuthenticated(state),
     language: LanguageSelector.getLanguage(state),
   }),
-  (dispatch: ThunkDispatch): DispatchProps => {
-    return {
-      safelyRemoveCookie: (name: string, value: string) => {
-        return dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value));
-      },
-      startPolling: (name?: string, interval?: number, asJSON?: boolean) => {
-        return dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON));
-      },
-      stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
-    };
-  }
+  (dispatch: ThunkDispatch): DispatchProps => ({
+    safelyRemoveCookie: (name: string, value: string) =>
+      dispatch(ROOT_ACTIONS.cookieAction.safelyRemoveCookie(name, value)),
+    startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
+      dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
+    stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
+  })
 )(Root);

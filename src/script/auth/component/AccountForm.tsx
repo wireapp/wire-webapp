@@ -334,21 +334,16 @@ class AccountForm extends React.PureComponent<CombinedProps, State> {
 
 export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        account: AuthSelector.getAccount(state),
-        authError: AuthSelector.getError(state),
-        isFetching: AuthSelector.isFetching(state),
-        isPersonalFlow: AuthSelector.isPersonalFlow(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
-        doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
-          return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
-        },
-      };
-    }
+    (state: RootState): ConnectedProps => ({
+      account: AuthSelector.getAccount(state),
+      authError: AuthSelector.getError(state),
+      isFetching: AuthSelector.isFetching(state),
+      isPersonalFlow: AuthSelector.isPersonalFlow(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({
+      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
+      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
+        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
+    })
   )(AccountForm)
 );

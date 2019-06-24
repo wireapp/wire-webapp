@@ -71,14 +71,10 @@ const Page: React.SFC<Props & ConnectedProps & DispatchProps> = ({
 };
 
 export default connect(
-  (state: RootState): ConnectedProps => {
-    return {
-      account: AuthSelector.getAccount(state),
-      currentFlow: AuthSelector.getCurrentFlow(state),
-      isStateAuthenticated: AuthSelector.isAuthenticated(state),
-    };
-  },
-  (dispatch: ThunkDispatch): DispatchProps => {
-    return {};
-  }
+  (state: RootState): ConnectedProps => ({
+    account: AuthSelector.getAccount(state),
+    currentFlow: AuthSelector.getCurrentFlow(state),
+    isStateAuthenticated: AuthSelector.isAuthenticated(state),
+  }),
+  (dispatch: ThunkDispatch): DispatchProps => ({})
 )(Page);

@@ -329,24 +329,20 @@ class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Disp
 export default withRouter(
   injectIntl(
     connect(
-      (state: RootState, ownProps: Props): ConnectedProps => {
-        return {
-          code: ownProps.match.params.code,
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-          isFetching: AuthSelector.isFetching(state),
-          loginError: AuthSelector.getError(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
-            dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
-          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-          validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
-        };
-      }
+      (state: RootState, ownProps: Props): ConnectedProps => ({
+        code: ownProps.match.params.code,
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
+          dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
+      })
     )(SingleSignOnForm)
   )
 );
