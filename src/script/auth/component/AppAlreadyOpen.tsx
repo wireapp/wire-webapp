@@ -79,6 +79,6 @@ export default injectIntl(
     }),
     (dispatch: ThunkDispatch): DispatchProps => ({
       removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
-    }),
-  )(AppAlreadyOpen),
+    })
+  )(AppAlreadyOpen)
 );

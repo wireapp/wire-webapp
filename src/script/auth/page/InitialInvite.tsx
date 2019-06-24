@@ -115,7 +115,7 @@ class InitialInvite extends React.PureComponent<Props & ConnectedProps & Dispatc
             }
             default: {
               const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType),
+                error.label.endsWith(errorType)
               );
               if (!isValidationError) {
                 throw error;
@@ -214,6 +214,6 @@ export default injectIntl(
       fetchSelf: () => dispatch(ROOT_ACTIONS.selfAction.fetchSelf()),
       invite: (invitation: {email: string}) => dispatch(ROOT_ACTIONS.invitationAction.invite(invitation)),
       resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-    }),
-  )(InitialInvite),
+    })
+  )(InitialInvite)
 );

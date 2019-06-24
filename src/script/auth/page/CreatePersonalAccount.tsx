@@ -134,7 +134,7 @@ export default withRouter(
           dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
         enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
-      }),
-    )(CreatePersonalAccount),
-  ),
+      })
+    )(CreatePersonalAccount)
+  )
 );

@@ -76,5 +76,5 @@ export default connect(
     currentFlow: AuthSelector.getCurrentFlow(state),
     isStateAuthenticated: AuthSelector.isAuthenticated(state),
   }),
-  (dispatch: ThunkDispatch): DispatchProps => ({}),
+  (dispatch: ThunkDispatch): DispatchProps => ({})
 )(Page);

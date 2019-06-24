@@ -179,5 +179,5 @@ export default connect(
     startPolling: (name?: string, interval?: number, asJSON?: boolean) =>
       dispatch(ROOT_ACTIONS.cookieAction.startPolling(name, interval, asJSON)),
     stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
-  }),
+  })
 )(Root);

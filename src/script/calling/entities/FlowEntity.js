@@ -501,13 +501,11 @@ class FlowEntity {
    * @returns {Promise} Resolves with the configuration object to initialize PeerConnection
    */
   _createPeerConnectionConfiguration() {
-    return this.callingRepository.getConfig().then(({ice_servers}) => {
-      return {
-        bundlePolicy: 'max-bundle',
-        iceServers: ice_servers,
-        rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
-      };
-    });
+    return this.callingRepository.getConfig().then(({ice_servers}) => ({
+      bundlePolicy: 'max-bundle',
+      iceServers: ice_servers,
+      rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+    }));
   }
 
   /**

@@ -70,7 +70,7 @@ export function selfReducer(state: SelfState = initialState, action: AppActions)
         ...state,
         consents: action.payload.reduce(
           (consentAccumulator, consent) => ({...consentAccumulator, [consent.type]: consent.value}),
-          {},
+          {}
         ),
 
         error: null,
