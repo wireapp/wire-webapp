@@ -27,14 +27,14 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {noop} from 'Util/util';
 
 import {clientManagerStrings} from '../../strings';
-import {ClientList} from '../component/ClientList';
+import ClientList from '../component/ClientList';
 import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {ROUTE} from '../route';
-import {Page} from './Page';
+import Page from './Page';
 
-interface Props extends React.HTMLProps<_ClientManager>, RouteComponentProps {}
+interface Props extends React.HTMLProps<ClientManager>, RouteComponentProps {}
 
 interface ConnectedProps {}
 
@@ -45,7 +45,7 @@ interface DispatchProps {
 
 interface State {}
 
-class _ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   componentWillMount = () => this.props.doGetAllClients();
 
   logout = () =>
@@ -54,7 +54,7 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
       .catch(noop)
       .then(() => this.props.history.push(ROUTE.LOGIN));
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
     } = this.props;
@@ -85,7 +85,7 @@ class _ClientManager extends React.Component<Props & ConnectedProps & DispatchPr
   }
 }
 
-export const ClientManager = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({}),
@@ -93,6 +93,6 @@ export const ClientManager = withRouter(
         doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
         doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
       })
-    )(_ClientManager)
+    )(ClientManager)
   )
 );

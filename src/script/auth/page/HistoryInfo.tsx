@@ -30,7 +30,7 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import * as URLUtil from '../util/urlUtil';
-import {Page} from './Page';
+import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
@@ -41,7 +41,7 @@ interface ConnectedProps {
 
 interface DispatchProps {}
 
-const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
+const HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlProps> = ({
   hasHistory,
   hasSelfHandle,
   history,
@@ -90,13 +90,13 @@ const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
   );
 };
 
-export const HistoryInfo = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({
         hasHistory: ClientSelector.hasHistory(state),
         hasSelfHandle: SelfSelector.hasSelfHandle(state),
       })
-    )(_HistoryInfo)
+    )(HistoryInfo)
   )
 );

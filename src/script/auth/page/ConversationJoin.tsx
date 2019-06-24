@@ -42,10 +42,10 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {noop} from 'Util/util';
 
 import {conversationJoinStrings} from '../../strings';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
-import {WirelessContainer} from '../component/WirelessContainer';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import RouterLink from '../component/RouterLink';
+import UnsupportedBrowser from '../component/UnsupportedBrowser';
+import WirelessContainer from '../component/WirelessContainer';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -62,7 +62,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {getURLParameter, hasURLParameter, pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<_ConversationJoin>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<ConversationJoin>, RouteComponentProps {}
 
 interface ConnectedProps {
   error: Error;
@@ -96,7 +96,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class _ConversationJoin extends React.Component<CombinedProps, State> {
+class ConversationJoin extends React.Component<CombinedProps, State> {
   nameInput: React.RefObject<any> = React.createRef();
   state: State = {
     accentColor: AccentColor.random(),
@@ -368,7 +368,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
     return renderTemporaryGuestAccountCreation ? this.renderTemporaryGuestAccount() : this.renderActivatedAccount();
   };
 
-  render(): JSX.Element {
+  render() {
     return (
       <UnsupportedBrowser isTemporaryGuest>
         <WirelessContainer
@@ -382,7 +382,7 @@ class _ConversationJoin extends React.Component<CombinedProps, State> {
   }
 }
 
-export const ConversationJoin = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({
@@ -404,6 +404,6 @@ export const ConversationJoin = withRouter(
           dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
         setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
       })
-    )(_ConversationJoin)
+    )(ConversationJoin)
   )
 );

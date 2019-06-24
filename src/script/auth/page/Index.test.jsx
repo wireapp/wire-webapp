@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 import {mockStore, mountWithIntl} from '../util/TestUtil';
-import {Index} from './Index';
+import Index from './Index';
 import {Config} from '../config';
 
 describe('when visiting the index page', () => {

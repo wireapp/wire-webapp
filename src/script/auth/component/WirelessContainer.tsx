@@ -28,7 +28,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export const _WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
+export const WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
   showCookiePolicyBanner,
   onCookiePolicyBannerClose,
   children,
@@ -86,4 +86,4 @@ export const _WirelessContainer: React.SFC<Props & InjectedIntlProps> = ({
   </div>
 );
 
-export const WirelessContainer = injectIntl(_WirelessContainer);
+export default injectIntl(WirelessContainer);

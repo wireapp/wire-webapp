@@ -53,19 +53,19 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
-import {ChooseHandle} from './ChooseHandle';
-import {ClientManager} from './ClientManager';
-import {ConversationJoin} from './ConversationJoin';
-import {ConversationJoinInvalid} from './ConversationJoinInvalid';
-import {CreateAccount} from './CreateAccount';
-import {CreatePersonalAccount} from './CreatePersonalAccount';
-import {HistoryInfo} from './HistoryInfo';
-import {Index} from './Index';
-import {InitialInvite} from './InitialInvite';
-import {Login} from './Login';
-import {SingleSignOn} from './SingleSignOn';
-import {TeamName} from './TeamName';
-import {Verify} from './Verify';
+import ChooseHandle from './ChooseHandle';
+import ClientManager from './ClientManager';
+import ConversationJoin from './ConversationJoin';
+import ConversationJoinInvalid from './ConversationJoinInvalid';
+import CreateAccount from './CreateAccount';
+import CreatePersonalAccount from './CreatePersonalAccount';
+import HistoryInfo from './HistoryInfo';
+import Index from './Index';
+import InitialInvite from './InitialInvite';
+import Login from './Login';
+import SingleSignOn from './SingleSignOn';
+import TeamName from './TeamName';
+import Verify from './Verify';
 
 addLocaleData([
   ...cs,
@@ -92,7 +92,7 @@ addLocaleData([
   ...uk,
 ]);
 
-interface Props extends React.HTMLAttributes<_Root> {}
+interface Props extends React.HTMLAttributes<Root> {}
 
 interface ConnectedProps {
   language: string;
@@ -107,7 +107,7 @@ interface DispatchProps {
 
 interface State {}
 
-class _Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
+class Root extends React.Component<Props & ConnectedProps & DispatchProps, State> {
   componentDidMount = () => {
     this.props.startPolling();
     window.onbeforeunload = () => {
@@ -168,7 +168,7 @@ class _Root extends React.Component<Props & ConnectedProps & DispatchProps, Stat
   };
 }
 
-export const Root = connect(
+export default connect(
   (state: RootState): ConnectedProps => ({
     isAuthenticated: AuthSelector.isAuthenticated(state),
     language: LanguageSelector.getLanguage(state),
@@ -184,4 +184,4 @@ export const Root = connect(
       stopPolling: (name?: string) => dispatch(ROOT_ACTIONS.cookieAction.stopPolling(name)),
     };
   }
-)(_Root);
+)(Root);

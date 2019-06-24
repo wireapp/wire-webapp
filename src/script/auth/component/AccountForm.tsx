@@ -68,7 +68,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class _AccountForm extends React.PureComponent<CombinedProps, State> {
+class AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
     name: React.RefObject<HTMLInputElement>;
     email: React.RefObject<HTMLInputElement>;
@@ -181,7 +181,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
     }
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       isFetching,
       isPersonalFlow,
@@ -332,7 +332,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
   }
 }
 
-export const AccountForm = injectIntl(
+export default injectIntl(
   connect(
     (state: RootState): ConnectedProps => {
       return {
@@ -350,5 +350,5 @@ export const AccountForm = injectIntl(
         },
       };
     }
-  )(_AccountForm)
+  )(AccountForm)
 );

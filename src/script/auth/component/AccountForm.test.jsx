@@ -18,8 +18,9 @@
  */
 
 import * as React from 'react';
+
 import {mockStore, mountWithIntl} from '../util/TestUtil';
-import {AccountForm} from './AccountForm';
+import AccountForm from './AccountForm';
 
 describe('when entering account data', () => {
   let wrapper;
