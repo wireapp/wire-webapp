@@ -11,6 +11,8 @@
     "eslint-plugin-no-unsanitized": ">=3",
     "eslint-plugin-prettier": ">=3",
     "eslint-plugin-react": ">=7",
+    "eslint-plugin-simple-import-sort": ">=4",
+    "eslint-plugin-sort-keys-fix": ">=1",
     "prettier": ">=1.17"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config",

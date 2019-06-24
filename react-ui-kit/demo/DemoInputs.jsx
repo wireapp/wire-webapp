@@ -20,10 +20,10 @@
 import {
   Button,
   ButtonLink,
-  COLOR,
   Checkbox,
   CheckboxLabel,
   CodeInput,
+  COLOR,
   Column,
   Columns,
   Container,

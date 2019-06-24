@@ -17,17 +17,17 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
+import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp/';
 import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
-import React, {Component} from 'react';
-import {APIClient} from '@wireapp/api-client';
-import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
 import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import ReactDOM from 'react-dom';
-import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp/';
 import logdown from 'logdown';
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 
 const logger = logdown('@wireapp/api-client/demo/demo.js');
 logger.state.isEnabled = true;
