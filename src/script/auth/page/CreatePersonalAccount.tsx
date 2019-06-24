@@ -130,9 +130,8 @@ export const CreatePersonalAccount = withRouter(
         isPersonalFlow: AuthSelector.isPersonalFlow(state),
       }),
       (dispatch: ThunkDispatch): DispatchProps => ({
-        doRegisterPersonal: (registrationData: RegisterData) => {
-          return dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData));
-        },
+        doRegisterPersonal: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
         enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
       })

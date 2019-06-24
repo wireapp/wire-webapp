@@ -93,12 +93,10 @@ const _HistoryInfo: React.SFC<Props & ConnectedProps & DispatchProps & InjectedI
 export const HistoryInfo = withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-        };
-      }
+      (state: RootState): ConnectedProps => ({
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+      })
     )(_HistoryInfo)
   )
 );
