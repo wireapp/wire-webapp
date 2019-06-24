@@ -122,22 +122,18 @@ const _Verify: React.SFC<Props & ConnectedProps & DispatchProps & InjectedIntlPr
 export const Verify = withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          account: AuthSelector.getAccount(state),
-          authError: AuthSelector.getError(state),
-          currentFlow: AuthSelector.getCurrentFlow(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doRegisterPersonal: (registrationData: RegisterData) =>
-            dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
-          doRegisterTeam: (registrationData: RegisterData) =>
-            dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
-          doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
-        };
-      }
+      (state: RootState): ConnectedProps => ({
+        account: AuthSelector.getAccount(state),
+        authError: AuthSelector.getError(state),
+        currentFlow: AuthSelector.getCurrentFlow(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doRegisterPersonal: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
+        doRegisterTeam: (registrationData: RegisterData) =>
+          dispatch(ROOT_ACTIONS.authAction.doRegisterTeam(registrationData)),
+        doSendActivationCode: (code: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(code)),
+      })
     )(_Verify)
   )
 );

@@ -193,20 +193,16 @@ class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps &
 export const TeamName = withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          error: AuthSelector.getError(state),
-          teamName: AuthSelector.getAccountTeamName(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-          pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
-            dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-          resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-        };
-      }
+      (state: RootState): ConnectedProps => ({
+        error: AuthSelector.getError(state),
+        teamName: AuthSelector.getAccountTeamName(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
+        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
+          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
+        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+      })
     )(_TeamName)
   )
 );
