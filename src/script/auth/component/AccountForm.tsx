@@ -342,9 +342,8 @@ export default injectIntl(
     }),
     (dispatch: ThunkDispatch): DispatchProps => ({
       doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
-        return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
-      },
+      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
+        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
     })
   )(AccountForm)
 );
