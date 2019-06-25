@@ -31,12 +31,9 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
-import {connect} from 'react-redux';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {indexStrings} from '../../strings';
 import {Config} from '../config';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {isDesktopApp, isMacOS} from '../Runtime';
 import {pathWithParams} from '../util/urlUtil';
@@ -44,13 +41,7 @@ import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
-interface ConnectedProps {
-  language: string;
-}
-
-interface DispatchProps {}
-
-const Index = ({history, intl: {formatMessage: _}}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+const Index = ({history, intl: {formatMessage: _}}: Props & InjectedIntlProps) => {
   const isMacOsWrapper = isDesktopApp() && isMacOS();
   return (
     <Page>
@@ -128,9 +119,4 @@ const Index = ({history, intl: {formatMessage: _}}: Props & ConnectedProps & Dis
   );
 };
 
-export default injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => ({language: LanguageSelector.getLanguage(state)}),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
-  )(Index)
-);
+export default injectIntl(Index);
