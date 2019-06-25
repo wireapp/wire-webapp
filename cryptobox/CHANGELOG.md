@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.1.1...@wireapp/cryptobox@11.2.0) (2019-06-25)
+
+
+### Features
+
+* **store-engine,store-engine-dexie:** Distribute IndexedDBEngine in separate package ([#1980](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/1980)) ([90daae9](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/90daae9))
+
+
+
+
+
 ## [11.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.1.0...@wireapp/cryptobox@11.1.1) (2019-06-24)
 
 **Note:** Version bump only for package @wireapp/cryptobox
