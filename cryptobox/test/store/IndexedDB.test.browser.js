@@ -23,7 +23,7 @@ const {store: CryptoboxStore, Cryptobox} = require('@wireapp/cryptobox');
 const {LRUCache} = require('@wireapp/lru-cache');
 const Proteus = require('@wireapp/proteus');
 const UUID = require('pure-uuid');
-const {IndexedDBEngine} = require('@wireapp/store-engine');
+const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
 
 describe('cryptobox.store.IndexedDB', () => {
   let dexieInstances = [];

@@ -3,8 +3,7 @@
     "@types/bro-fs": "0.4.2",
     "@types/filesystem": "0.0.29",
     "@types/node": "~10",
-    "bro-fs": "0.5.0",
-    "dexie": "2.0.4"
+    "bro-fs": "0.5.0"
   },
   "devDependencies": {
     "@types/jasmine": "3.3.13",
@@ -30,7 +29,6 @@
     "FileSystem",
     "fs",
     "generic",
-    "IndexedDB",
     "LocalStorage",
     "Memory",
     "persistence",

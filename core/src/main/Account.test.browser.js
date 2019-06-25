@@ -19,7 +19,7 @@
 
 const UUID = require('pure-uuid');
 const {Account} = require('@wireapp/core');
-const {IndexedDBEngine} = require('@wireapp/store-engine');
+const {IndexedDBEngine} = require('@wireapp/store-engine-dexie');
 const {APIClient} = require('@wireapp/api-client');
 
 const UUIDVersion = 4;

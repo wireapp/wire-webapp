@@ -17,11 +17,15 @@
  *
  */
 
+import {CRUDEngine} from '@wireapp/store-engine';
+import {
+  LowDiskSpaceError,
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+  UnsupportedError,
+} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import Dexie from 'dexie';
-import {CRUDEngine} from './CRUDEngine';
-import {LowDiskSpaceError, RecordTypeError, UnsupportedError} from './error/';
-import {RecordAlreadyExistsError} from './error/RecordAlreadyExistsError';
-import {RecordNotFoundError} from './error/RecordNotFoundError';
 
 /** @see https://dexie.org/docs/Typescript#create-a-subclass */
 export interface DexieInstance extends Dexie {

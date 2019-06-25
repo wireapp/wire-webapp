@@ -17,7 +17,7 @@
  *
  */
 
-import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine/IndexedDBEngine';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';

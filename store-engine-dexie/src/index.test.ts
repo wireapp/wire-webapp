@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +17,44 @@
  *
  */
 
+import {CRUDEngine} from '@wireapp/store-engine';
+import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
+import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
+import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
+import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
+import {purgeSpec} from '@wireapp/store-engine/dist/commonjs/test/purgeSpec';
+import {readAllPrimaryKeysSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllPrimaryKeysSpec';
+import {readAllSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllSpec';
+import {readSpec} from '@wireapp/store-engine/dist/commonjs/test/readSpec';
+import {updateOrCreateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateOrCreateSpec';
+import {updateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateSpec';
 import Dexie from 'dexie';
-import {appendSpec} from '../test/appendSpec';
-import {createSpec} from '../test/createSpec';
-import {deleteAllSpec} from '../test/deleteAllSpec';
-import {deleteSpec} from '../test/deleteSpec';
-import {purgeSpec} from '../test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '../test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '../test/readAllSpec';
-import {readSpec} from '../test/readSpec';
-import {updateOrCreateSpec} from '../test/updateOrCreateSpec';
-import {updateSpec} from '../test/updateSpec';
-import {CRUDEngine} from './CRUDEngine';
-import {LowDiskSpaceError} from './error';
-import {IndexedDBEngine} from './IndexedDBEngine';
-
-const STORE_NAME = 'store-name';
-
-let engine: CRUDEngine;
-
-async function initEngine(shouldCreateNewEngine = true): Promise<IndexedDBEngine | CRUDEngine> {
-  const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
-  const db = await storeEngine.init(STORE_NAME);
-  db.version(1).stores({
-    'the-simpsons': ',firstName,lastName',
-  });
-  await db.open();
-  return storeEngine;
-}
+import {IndexedDBEngine} from './index';
 
 describe('IndexedDBEngine', () => {
+  const STORE_NAME = 'store-name';
+
+  let engine: CRUDEngine;
+
+  async function initEngine(shouldCreateNewEngine = true): Promise<IndexedDBEngine | CRUDEngine> {
+    const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
+    const db = await storeEngine.init(STORE_NAME);
+    db.version(1).stores({
+      'the-simpsons': ',firstName,lastName',
+    });
+    await db.open();
+    return storeEngine;
+  }
+
   beforeEach(async () => {
     engine = await initEngine();
   });
 
-  afterEach(async () => {
+  afterEach(done => {
     if (engine && engine.db) {
-      await engine.db.delete();
+      engine.db.close();
+      const deleteRequest = window.indexedDB.deleteDatabase(STORE_NAME);
+      deleteRequest.onsuccess = () => done();
     }
   });
 
@@ -113,51 +114,6 @@ describe('IndexedDBEngine', () => {
   describe('deleteAll', () => {
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
-    });
-  });
-
-  describe('hasEnoughQuota', () => {
-    it('says if there is enough storage available to use IndexedDB', async () => {
-      engine = new IndexedDBEngine();
-      expect(async () => {
-        await engine.hasEnoughQuota();
-      }).not.toThrow();
-    });
-
-    it('throws an error if there is no quota available', async () => {
-      spyOn(navigator.storage, 'estimate').and.returnValue(
-        Promise.resolve({
-          quota: 26025,
-          usage: 26025,
-        }),
-      );
-
-      engine = new IndexedDBEngine();
-
-      try {
-        await engine.hasEnoughQuota();
-        fail();
-      } catch (error) {
-        expect(error instanceof LowDiskSpaceError).toBe(true);
-      }
-    });
-
-    it('throws an error if there is no quota is given', async () => {
-      spyOn(navigator.storage, 'estimate').and.returnValue(
-        Promise.resolve({
-          quota: 0,
-          usage: 0,
-        }),
-      );
-
-      engine = new IndexedDBEngine();
-
-      try {
-        await engine.hasEnoughQuota();
-        fail();
-      } catch (error) {
-        expect(error instanceof LowDiskSpaceError).toBe(true);
-      }
     });
   });
 
