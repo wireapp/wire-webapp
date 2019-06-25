@@ -17,20 +17,17 @@
  *
  */
 
-/**
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "SuperType".
- */
-export enum SystemMessageType {
-  CONNECTION_ACCEPTED = 'created-one-to-one',
-  CONNECTION_CONNECTED = 'connected',
-  CONNECTION_REQUEST = 'connecting',
-  CONVERSATION_CREATE = 'created-group',
-  CONVERSATION_MESSAGE_TIMER_UPDATE = 'message-timer-update',
-  CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
-  CONVERSATION_RENAME = 'rename',
-  CONVERSATION_RESUME = 'resume',
-  LEGAL_HOLD = 'legal-hold',
-  MEMBER_JOIN = 'join',
-  MEMBER_LEAVE = 'leave',
-  NORMAL = 'normal',
+//import {t} from 'Util/LocalizerUtil';
+
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
+
+export class LegalHoldMessage extends SystemMessage {
+  caption: string;
+  constructor(isActive: boolean) {
+    super();
+    this.system_message_type = SystemMessageType.LEGAL_HOLD;
+
+    this.caption = isActive ? 'Legal Hold is on' : 'Legal Hold is off';
+  }
 }

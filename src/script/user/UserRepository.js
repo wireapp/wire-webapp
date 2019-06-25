@@ -390,7 +390,7 @@ export class UserRepository {
     if (this.self().id !== eventJson.id) {
       return;
     }
-    self.hasPendingLegalHold(false);
+    this.self().hasPendingLegalHold(false);
     amplify.publish(HIDE_REQUEST_MODAL);
   }
 

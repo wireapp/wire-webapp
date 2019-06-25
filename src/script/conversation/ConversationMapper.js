@@ -96,8 +96,9 @@ import {BaseError} from '../error/BaseError';
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 export class ConversationMapper {
   // Construct a new Conversation Mapper.
-  constructor() {
+  constructor(conversationRepository) {
     this.logger = getLogger('ConversationMapper');
+    this.conversationRepository = conversationRepository;
   }
 
   /**
