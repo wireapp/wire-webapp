@@ -73,6 +73,7 @@ const ChooseHandle = ({
   hasUnsetMarketingConsent,
   checkHandles,
   isFetching,
+  name,
   intl: {formatMessage: _},
 }: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
   const [error, setError] = useState(null);
