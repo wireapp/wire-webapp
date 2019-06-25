@@ -24,7 +24,7 @@ import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
-import {IndexedDBEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import logdown from 'logdown';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
