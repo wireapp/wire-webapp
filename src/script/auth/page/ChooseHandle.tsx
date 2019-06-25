@@ -30,7 +30,7 @@ import {
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React, {useEffect, useState} from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
@@ -48,7 +48,7 @@ import {createSuggestions} from '../util/handleUtil';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLProps<ChooseHandle>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasUnsetMarketingConsent: boolean;
@@ -60,99 +60,96 @@ interface ConnectedProps {
 interface DispatchProps {
   doGetConsents: () => Promise<void>;
   checkHandles: (handles: string[]) => Promise<string>;
-  setHandle: (handle: string) => Promise<void>;
+  doSetHandle: (handle: string) => Promise<void>;
   doSetConsent: (consentType: ConsentType, value: number) => Promise<void>;
 }
 
-interface State {
-  error: Error;
-  handle: string;
-}
+const ChooseHandle = ({
+  history,
+  doGetConsents,
+  doSetConsent,
+  doSetHandle,
+  isTeamFlow,
+  hasUnsetMarketingConsent,
+  checkHandles,
+  isFetching,
+  intl: {formatMessage: _},
+}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+  const [error, setError] = useState(null);
+  const [handle, setHandle] = useState('');
+  useEffect(() => {
+    (async () => {
+      doGetConsents();
+      try {
+        const suggestions = createSuggestions(name);
+        const handle = await checkHandles(suggestions);
+        setHandle(handle);
+      } catch (error) {
+        setError(error);
+      }
+    })();
+  }, []);
+  const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
 
-class ChooseHandle extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  state: State = {
-    error: null,
-    handle: '',
-  };
-
-  componentDidMount(): void {
-    const suggestions = createSuggestions(this.props.name);
-    this.props.doGetConsents();
-    this.props
-      .checkHandles(suggestions)
-      .then(handle => this.setState({handle}))
-      .catch(error => this.setState({error}));
-  }
-
-  updateConsent = (consentType: ConsentType, value: number): Promise<void> =>
-    this.props.doSetConsent(consentType, value);
-
-  onSetHandle = (event: React.FormEvent): void => {
+  const onSetHandle = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    this.props
-      .setHandle(this.state.handle)
-      .then(() => {
-        if (this.props.isTeamFlow) {
-          this.props.history.push(ROUTE.INITIAL_INVITE);
-        } else {
-          window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
-        }
-      })
-      .catch(error => {
-        if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && this.state.handle.trim().length < 2) {
-          error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
-        }
-        this.setState({error});
-      });
+    try {
+      await doSetHandle(handle);
+      if (isTeamFlow) {
+        history.push(ROUTE.INITIAL_INVITE);
+      } else {
+        window.location.assign(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+      }
+    } catch (error) {
+      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
+        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
+      }
+      setError(error);
+    }
   };
 
-  render() {
-    const {
-      isFetching,
-      intl: {formatMessage: _},
-    } = this.props;
-    return (
-      <Page>
-        <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
-          <H1 center>{_(chooseHandleStrings.headline)}</H1>
-          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
-          <Form style={{marginTop: 30}} onSubmit={this.onSetHandle}>
-            <InputSubmitCombo style={{paddingLeft: 0}}>
-              <Text center style={{minWidth: 38}}>
-                {'@'}
-              </Text>
-              <Input
-                name="handle"
-                placeholder={_(chooseHandleStrings.handlePlaceholder)}
-                type="text"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  this.setState({error: null, handle: event.target.value})
-                }
-                value={this.state.handle}
-                autoFocus
-                data-uie-name="enter-handle"
-              />
-              <RoundIconButton
-                disabled={!this.state.handle || isFetching}
-                type="submit"
-                icon={ICON_NAME.ARROW}
-                data-uie-name="do-send-handle"
-                formNoValidate
-              />
-            </InputSubmitCombo>
-          </Form>
-          <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
-        </ContainerXS>
-        {!this.props.isFetching && this.props.hasUnsetMarketingConsent && (
-          <AcceptNewsModal
-            onConfirm={() => this.updateConsent(ConsentType.MARKETING, 1)}
-            onDecline={() => this.updateConsent(ConsentType.MARKETING, 0)}
-          />
-        )}
-      </Page>
-    );
-  }
-}
+  return (
+    <Page>
+      <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
+        <H1 center>{_(chooseHandleStrings.headline)}</H1>
+        <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+        <Form style={{marginTop: 30}} onSubmit={onSetHandle}>
+          <InputSubmitCombo style={{paddingLeft: 0}}>
+            <Text center style={{minWidth: 38}}>
+              {'@'}
+            </Text>
+            <Input
+              name="handle"
+              placeholder={_(chooseHandleStrings.handlePlaceholder)}
+              type="text"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setError(null);
+                setHandle(event.currentTarget.value);
+              }}
+              value={handle}
+              autoFocus
+              data-uie-name="enter-handle"
+            />
+            <RoundIconButton
+              disabled={!handle || isFetching}
+              type="submit"
+              icon={ICON_NAME.ARROW}
+              data-uie-name="do-send-handle"
+              formNoValidate
+            />
+          </InputSubmitCombo>
+        </Form>
+        <ErrorMessage data-uie-name="error-message">{error && parseError(error)}</ErrorMessage>
+      </ContainerXS>
+      {!isFetching && hasUnsetMarketingConsent && (
+        <AcceptNewsModal
+          onConfirm={() => updateConsent(ConsentType.MARKETING, 1)}
+          onDecline={() => updateConsent(ConsentType.MARKETING, 0)}
+        />
+      )}
+    </Page>
+  );
+};
 
 export default injectIntl(
   withRouter(
@@ -168,7 +165,7 @@ export default injectIntl(
         doGetConsents: () => dispatch(ROOT_ACTIONS.selfAction.doGetConsents()),
         doSetConsent: (consentType: ConsentType, value: number) =>
           dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
-        setHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
+        doSetHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
       })
     )(ChooseHandle)
   )
