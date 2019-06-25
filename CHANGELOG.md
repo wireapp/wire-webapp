@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.6.1...@wireapp/core@12.7.0) (2019-06-25)
+
+
+### Features
+
+* **store-engine,store-engine-dexie:** Distribute IndexedDBEngine in separate package ([#1980](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1980)) ([90daae9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/90daae9))
+
+
+
+
+
 ## [12.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.6.0...@wireapp/core@12.6.1) (2019-06-25)
 
 **Note:** Version bump only for package @wireapp/core
