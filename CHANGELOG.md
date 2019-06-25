@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.7.1...@wireapp/api-client@5.8.0) (2019-06-25)
+
+
+### Bug Fixes
+
+* **api-client:** Update LegalHoldSettings attributes ([#1979](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1979)) ([403dbbf](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/403dbbf))
+
+
+### Features
+
+* **eslint-config:** Sort imports and keys automatically ([#1971](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1971)) ([c7954c8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/c7954c8))
+
+
+
+
+
 ## [5.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.7.0...@wireapp/api-client@5.7.1) (2019-06-24)
 
 **Note:** Version bump only for package @wireapp/api-client
