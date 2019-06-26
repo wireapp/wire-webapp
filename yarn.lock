@@ -1645,6 +1645,14 @@
     emotion-normalize "10.0.0"
     react-transition-group "4.1.1"
 
+"@wireapp/store-engine-dexie@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.1.0.tgz#2729e8e947ec6db4a992703ff5849f938d5e3f9d"
+  integrity sha512-W+okwmXIC2sX4WFMrscarNNoPZ4t+vf4LtOeJFUm7rWr/QrI5SW7yf7aG0TfP72IAkfJu9NCLemU/Ojtva2wCg==
+  dependencies:
+    "@wireapp/store-engine" "3.2.0"
+    dexie "2.0.4"
+
 "@wireapp/store-engine@3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.2.0.tgz#65bf02c2fb1822aa18bf27605914f32d426c99a5"
