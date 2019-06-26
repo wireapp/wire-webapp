@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.9.0...@wireapp/api-client@5.9.1) (2019-06-26)
+
+
+### Bug Fixes
+
+* **api-client:** Remove Dexie dependency ([#1989](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1989)) ([78d5ceb](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/78d5ceb))
+
+
+
+
+
 # [5.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.8.0...@wireapp/api-client@5.9.0) (2019-06-25)
 
 
