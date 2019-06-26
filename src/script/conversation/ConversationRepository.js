@@ -2310,7 +2310,7 @@ export class ConversationRepository {
     expectsReadConfirmation,
     legalHoldStatus
   ) {
-    const protoText = new Text({content: textMessage});
+    const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
 
     if (mentionEntities && mentionEntities.length) {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
@@ -2342,14 +2342,6 @@ export class ConversationRepository {
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
-    }
-
-    if (expectsReadConfirmation) {
-      protoText[PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
-    }
-
-    if (legalHoldStatus) {
-      protoText[PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = legalHoldStatus;
     }
 
     return protoText;
