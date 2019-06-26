@@ -42,7 +42,7 @@ ko.components.register('legal-hold-dot', {
     large = false,
     conversation,
     legalHoldModal,
-  }: LegalHoldParams): void {
+  }: LegalHoldParams = {}): void {
     this.large = large;
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;

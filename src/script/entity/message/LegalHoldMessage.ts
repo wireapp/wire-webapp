@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,14 @@
 
 //import {t} from 'Util/LocalizerUtil';
 
-import {SystemMessageType} from '../../message/SystemMessageType';
-import {SystemMessage} from './SystemMessage';
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-export class LegalHoldMessage extends SystemMessage {
+export class LegalHoldMessage extends Message {
   caption: string;
   constructor(isActive: boolean) {
     super();
-    this.system_message_type = SystemMessageType.LEGAL_HOLD;
+    this.super_type = SuperType.LEGALHOLD;
 
     this.caption = isActive ? 'Legal Hold is on' : 'Legal Hold is off';
   }

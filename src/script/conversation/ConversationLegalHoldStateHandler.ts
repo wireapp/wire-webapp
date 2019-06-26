@@ -36,7 +36,11 @@ export class ConversationLegalHoldStateHandler {
 
   verifyLegalHold = async (conversationEntity: Conversation, hasLegalHoldFlag: boolean) => {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = z.conversation.EventBuilder.buildDegraded(conversationEntity, currentTimestamp);
+    const event = z.conversation.EventBuilder.buildLegalHoldChange(
+      conversationEntity,
+      hasLegalHoldFlag,
+      currentTimestamp
+    );
     this.eventRepository.injectEvent(event);
     if (hasLegalHoldFlag !== conversationEntity.hasLegalHold()) {
       await this.conversationRepository.updateAllClients(conversationEntity);

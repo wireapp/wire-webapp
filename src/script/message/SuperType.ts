@@ -23,6 +23,7 @@ export enum SuperType {
   CONTENT = 'normal',
   DELETE = 'delete',
   DEVICE = 'device',
+  LEGALHOLD = 'legal-hold',
   LOCATION = 'location',
   MEMBER = 'member',
   MISSED = 'missed',

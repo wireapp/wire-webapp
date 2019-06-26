@@ -29,7 +29,6 @@ export enum SystemMessageType {
   CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
   CONVERSATION_RENAME = 'rename',
   CONVERSATION_RESUME = 'resume',
-  LEGAL_HOLD = 'legal-hold',
   MEMBER_JOIN = 'join',
   MEMBER_LEAVE = 'leave',
   NORMAL = 'normal',

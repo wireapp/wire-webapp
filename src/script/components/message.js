@@ -426,6 +426,17 @@ const deleteTemplate = `
   </div>
   `;
 
+const legalHoldTemplate = `
+  <div class="message-header">
+    <div class="message-header-icon">
+      <legal-hold-dot></legal-hold-dot>
+    </div>
+    <div class="message-header-label">
+      <span class="message-header-label-sender" data-bind='text: message.caption'></span>
+    </div>
+  </div>
+  `;
+
 const verificationTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -593,6 +604,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
+    <!-- /ko -->
+    <!-- ko if: message.super_type === 'legal-hold' -->
+      ${legalHoldTemplate}
     <!-- /ko -->
     `,
   viewModel: {

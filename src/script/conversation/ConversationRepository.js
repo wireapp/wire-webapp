@@ -2603,10 +2603,18 @@ export class ConversationRepository {
   }
 
   async updateAllClients(conversation) {
+    // const sender = this.client_repository.currentClient().id;
+    const genericMessage = new GenericMessage({
+      messageId: createRandomUuid(),
+    });
     const recipients = await this.create_recipients(conversation.id);
-    const sender = this.client_repository.currentClient().id;
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversation.id, {recipients});
+
     try {
-      const response = await this.conversation_service.post_encrypted_message(conversation.id, {recipients, sender});
+      // TODO: we shouldn't use the complete send method here,
+      // as it has a lot of unwanted side effects for our use case
+      // and doesn't return anything
+      const response = await this._sendGenericMessage(eventInfoEntity);
       const {missing, deleted} = response;
 
       const missingUserIds = Object.keys(missing);
