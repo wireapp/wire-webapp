@@ -273,6 +273,11 @@ export const downloadFile = (url, fileName, mimeType) => {
   }, 100);
 };
 
+/**
+ * @param {string} phoneNumber - The phone number
+ * @param {string} countryCode - The country code
+ * @returns {string} The formatted phone number
+ */
 export const phoneNumberToE164 = (phoneNumber, countryCode) => {
   return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };

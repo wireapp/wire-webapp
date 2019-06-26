@@ -19,13 +19,40 @@
 
 import CryptoJS from 'crypto-js';
 
-import {getLogger} from 'Util/Logger';
-import {phoneNumberToE164, encodeSha256Base64} from 'Util/util';
+import {Logger, getLogger} from 'Util/Logger';
+import {encodeSha256Base64, phoneNumberToE164} from 'Util/util';
 
-import {PhoneBook} from './PhoneBook';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {ConnectService} from './ConnectService';
+import {ConnectSource} from './ConnectSource';
+import {Card, PhoneBook} from './PhoneBook';
 
-class ConnectRepository {
-  constructor(connectService, propertiesRepository) {
+type OnProgressCallback = (progress: number) => void;
+type OnFinishCallback = (contacts: ContactInformation[]) => void;
+
+interface ContactInformation {
+  emails: string[];
+  firstName: string;
+  lastName: string;
+  numbers: string[];
+  uid: string;
+}
+
+declare global {
+  interface Window {
+    wAddressBook: {
+      getMe(): ContactInformation;
+      getContacts(onProgress?: OnProgressCallback, onFinish?: OnFinishCallback): void;
+    };
+  }
+}
+
+export class ConnectRepository {
+  private readonly logger: Logger;
+  readonly connectService: ConnectService;
+  readonly propertiesRepository: PropertiesRepository;
+
+  constructor(connectService: ConnectService, propertiesRepository: PropertiesRepository) {
     this.connectService = connectService;
     this.propertiesRepository = propertiesRepository;
     this.logger = getLogger('ConnectRepository');
@@ -33,21 +60,20 @@ class ConnectRepository {
 
   /**
    * Get user's contacts for matching.
-   * @param {ConnectSource} source - Source for phone book retrieval
-   * @returns {Promise} Resolves with the matched user IDs
+   * @param source - Source for phone book retrieval
+   * @returns Resolves with the matched user IDs
    */
-  getContacts(source) {
+  getContacts(source: ConnectSource): Promise<string[] | {}> {
     return this._getMacosContacts().then(phoneBook => this._uploadContacts(phoneBook, source));
   }
 
   /**
    * Encode phone book
    *
-   * @private
-   * @param {PhoneBook} phoneBook - Object containing un-encoded phone book data
-   * @returns {PhoneBook} Object containing encoded phone book data
+   * @param phoneBook - Object containing raw phone book data
+   * @returns Object containing encoded phone book data
    */
-  _encodePhoneBook(phoneBook) {
+  private _encodePhoneBook(phoneBook: PhoneBook): PhoneBook {
     const {cards, self} = phoneBook;
     self.forEach((contact, contactIndex) => (self[contactIndex] = encodeSha256Base64(contact)));
 
@@ -63,19 +89,17 @@ class ConnectRepository {
 
   /**
    * Retrieve a user's macOS address book contacts.
-   * @private
    * @returns {Promise} Resolves with the user's address book contacts that match on Wire
    */
-  _getMacosContacts() {
+  private _getMacosContacts(): Promise<PhoneBook> {
     return this._parseMacosContacts();
   }
 
   /**
    * Parse a user's macOS address book Contacts.
-   * @private
-   * @returns {Promise} Resolves with encoded phone book data
+   * @returns Resolves with encoded phone book data
    */
-  _parseMacosContacts() {
+  private _parseMacosContacts(): Promise<PhoneBook> {
     return new Promise((resolve, reject) => {
       if (!window.wAddressBook) {
         return reject(new z.error.ConnectError(z.error.ConnectError.TYPE.NOT_SUPPORTED));
@@ -92,7 +116,7 @@ class ConnectRepository {
         },
         contacts => {
           contacts.forEach(({firstName, lastName, numbers}) => {
-            const card = {
+            const card: Card = {
               card_id: CryptoJS.MD5(`${firstName}${lastName}`).toString(),
               contact: [],
             };
@@ -113,12 +137,10 @@ class ConnectRepository {
   /**
    * Upload hashed phone booked to backend for matching.
    *
-   * @private
-   * @param {PhoneBook} phoneBook - Encoded phone book data
-   * @param {ConnectSource} source - Source of phone book data
-   * @returns {Promise} Resolves when phone book was uploaded
+   * @param phoneBook Encoded phone book data
+   * @param source Source of phone book data
    */
-  _uploadContacts(phoneBook, source) {
+  private _uploadContacts(phoneBook: PhoneBook, source: ConnectSource): string[] | {} {
     const cards = phoneBook.cards;
 
     if (!cards.length) {
@@ -131,7 +153,7 @@ class ConnectRepository {
       .postOnboarding(phoneBook)
       .then(({results}) => {
         this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
-        return results.map(result => result.id);
+        return results.map((result: {id: string}) => result.id);
       })
       .catch(error => {
         switch (error.type) {
@@ -148,5 +170,3 @@ class ConnectRepository {
       });
   }
 }
-
-export {ConnectRepository};
