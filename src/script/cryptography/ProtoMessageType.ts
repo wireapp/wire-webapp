@@ -24,6 +24,7 @@ export enum PROTO_MESSAGE_TYPE {
   ASSET_UPLOADED = 'uploaded',
   EPHEMERAL_EXPIRATION = 'expireAfterMillis',
   EXPECTS_READ_CONFIRMATION = 'expectsReadConfirmation',
+  LEGAL_HOLD_STATUS = 'legalHoldStatus',
   LINK_PREVIEW_IMAGE = 'image',
   LINK_PREVIEW_TITLE = 'title',
   LINK_PREVIEWS = 'linkPreview',
