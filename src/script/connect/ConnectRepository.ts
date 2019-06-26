@@ -27,9 +27,6 @@ import {ConnectService} from './ConnectService';
 import {ConnectSource} from './ConnectSource';
 import {Card, PhoneBook} from './PhoneBook';
 
-type OnProgressCallback = (progress: number) => void;
-type OnFinishCallback = (contacts: ContactInformation[]) => void;
-
 interface ContactInformation {
   emails: string[];
   firstName: string;
@@ -42,7 +39,7 @@ declare global {
   interface Window {
     wAddressBook: {
       getMe(): ContactInformation;
-      getContacts(onProgress?: OnProgressCallback, onFinish?: OnFinishCallback): void;
+      getContacts(onProgress?: (progress: number) => void, onFinish?: (contacts: ContactInformation[]) => void): void;
     };
   }
 }
