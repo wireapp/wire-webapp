@@ -39,7 +39,7 @@ export interface CompressedImage {
 }
 
 export interface AssetUploadOptions {
-  expectsReadConfirmation?: boolean;
+  expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
   public: boolean;
   retention: AssetRetentionPolicy;
