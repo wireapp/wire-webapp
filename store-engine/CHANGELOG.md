@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.2.0...@wireapp/store-engine@3.3.0) (2019-06-26)
+
+
+### Features
+
+* **store-engine,store-engine-bro-fs:** Distribute FileSystemEngine in separate package ([#1990](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/1990)) ([5c71587](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/5c71587))
+
+
+
+
+
 # [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.1.1...@wireapp/store-engine@3.2.0) (2019-06-25)
 
 
