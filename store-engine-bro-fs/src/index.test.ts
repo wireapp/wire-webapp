@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,31 @@
  *
  */
 
+import {CRUDEngine} from '@wireapp/store-engine';
+import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
+import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
+import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
+import {deleteSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteSpec';
+import {purgeSpec} from '@wireapp/store-engine/dist/commonjs/test/purgeSpec';
+import {readAllPrimaryKeysSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllPrimaryKeysSpec';
+import {readAllSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllSpec';
+import {readSpec} from '@wireapp/store-engine/dist/commonjs/test/readSpec';
+import {updateOrCreateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateOrCreateSpec';
+import {updateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateSpec';
 import * as fs from 'bro-fs';
-import {appendSpec} from '../test/appendSpec';
-import {createSpec} from '../test/createSpec';
-import {deleteAllSpec} from '../test/deleteAllSpec';
-import {deleteSpec} from '../test/deleteSpec';
-import {purgeSpec} from '../test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '../test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '../test/readAllSpec';
-import {readSpec} from '../test/readSpec';
-import {updateOrCreateSpec} from '../test/updateOrCreateSpec';
-import {updateSpec} from '../test/updateSpec';
-import {CRUDEngine} from './CRUDEngine';
-import {FileSystemEngine} from './FileSystemEngine';
-
-const STORE_NAME = 'store-name';
-
-let engine: CRUDEngine;
-
-async function initEngine(shouldCreateNewEngine = true): Promise<FileSystemEngine | CRUDEngine> {
-  const storeEngine = shouldCreateNewEngine ? new FileSystemEngine() : engine;
-  await storeEngine.init(STORE_NAME);
-  return storeEngine;
-}
+import {FileSystemEngine} from './index';
 
 describe('FileSystemEngine', () => {
+  const STORE_NAME = 'store-name';
+
+  let engine: CRUDEngine;
+
+  async function initEngine(shouldCreateNewEngine = true): Promise<FileSystemEngine | CRUDEngine> {
+    const storeEngine = shouldCreateNewEngine ? new FileSystemEngine() : engine;
+    await storeEngine.init(STORE_NAME);
+    return storeEngine;
+  }
+
   beforeEach(async () => {
     engine = await initEngine();
   });

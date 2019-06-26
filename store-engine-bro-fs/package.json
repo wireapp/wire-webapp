@@ -1,0 +1,37 @@
+{
+  "dependencies": {
+    "@types/bro-fs": "0.4.2",
+    "bro-fs": "0.5.0",
+    "@wireapp/store-engine": "3.2.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "3.3.13",
+    "@types/karma": "3.0.3",
+    "@types/node": "~10",
+    "jasmine": "3.4.0",
+    "karma": "4.1.0",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-jasmine": "2.0.1",
+    "karma-typescript": "4.1.0",
+    "rimraf": "2.6.3",
+    "ts-node": "8.3.0",
+    "typescript": "3.5.2"
+  },
+  "description": "Store Engine wrapper for File and Directory Entries API.",
+  "files": [
+    "dist"
+  ],
+  "license": "GPL-3.0",
+  "main": "./dist/index.js",
+  "name": "@wireapp/store-engine-bro-fs",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs",
+  "scripts": {
+    "build": "yarn build:node",
+    "build:node": "tsc",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
+    "test": "karma start",
+    "test:project": "yarn dist && yarn test"
+  },
+  "version": "0.1.0"
+}

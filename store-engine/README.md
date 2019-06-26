@@ -13,22 +13,14 @@ This package provides an interface to operate with various storage technologies 
 Additional storage engines can be found in separate packages such as:
 
 - [FileEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs)
+- [FileSystemEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs)
+- [IndexedDBEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie)
 
 ### Motivation
 
 Nowadays there are more and more storage possibilities and developers must be familiar with the characteristics of each individual solution to reliably store data. Because it can be sometimes hard to keep up with the highly dynamic world of data storages, we have developed a system which unifies the use of different storages / databases.
 
 ### Quickstart
-
-#### Popular engines
-
-| Engine | Available in Browser | Available in Node.js | Description |
-| :-- | :-: | :-: | :-- |
-| [FileEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs) | 🞫 | ✓ | Rudimentary persistent store based on files. Very generic and easy to read. |
-| FileSystemEngine | ✓ | 🞫 | FileSystem is used to represent a file system which is managed by modern browsers. It is often used to build Chrome Web Store apps. |  |
-| IndexedDBEngine | ✓ | 🞫 | Persistent storage which handles significant amounts of structured data, including files/blobs. Enables very fast searches. |
-| MemoryEngine | ✓ | ✓ | Transient store which loses data on application restart. Suitable for testing environments. |
-| LocalStorageEngine | ✓ | 🞫 | Can save very small amount of data. Stored data is saved across browser sessions. Suitable for simple objects and strings. |
 
 #### Engine instantiation
 

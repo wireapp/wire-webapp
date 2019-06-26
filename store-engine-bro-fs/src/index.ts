@@ -17,10 +17,14 @@
  *
  */
 
+import {CRUDEngine} from '@wireapp/store-engine';
+import {
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+  UnsupportedError,
+} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import * as fs from 'bro-fs';
-import {CRUDEngine} from './CRUDEngine';
-import {isBrowser} from './EnvironmentUtil';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
 export interface FileSystemEngineOptions {
   fileExtension: string;
@@ -41,14 +45,14 @@ export class FileSystemEngine implements CRUDEngine {
 
   constructor() {}
 
-  public async isSupported(): Promise<void> {
-    if (!isBrowser() || !fs.isSupported()) {
+  async isSupported(): Promise<void> {
+    if (typeof window === 'undefined' || !fs.isSupported()) {
       const message = `File and Directory Entries API is not available on your platform.`;
       throw new UnsupportedError(message);
     }
   }
 
-  public async init(storeName = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
+  async init(storeName = '', options?: FileSystemEngineOptions): Promise<FileSystem> {
     await this.isSupported();
     this.config = {...this.config, ...options};
     this.storeName = storeName;
