@@ -40,6 +40,7 @@ import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
+import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -220,6 +221,16 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.KNOCK: {
         messageEntity = addReadReceiptData(this._mapEventPing(), event);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_ACTIVATED: {
+        messageEntity = this._mapEventLegalHold(true);
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_DEACTIVATED: {
+        messageEntity = this._mapEventLegalHold(false);
         break;
       }
 
@@ -569,6 +580,10 @@ export class EventMapper {
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
+  }
+
+  _mapEventLegalHold(isActive) {
+    return new LegalHoldMessage(isActive);
   }
 
   /**

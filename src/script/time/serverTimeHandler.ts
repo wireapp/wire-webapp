@@ -20,19 +20,28 @@
 /* eslint-disable sort-keys */
 import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
-export const serverTimeHandler = {
+export interface ServerTimeHandler {
+  logger: Logger;
+  timeOffset: ko.Observable<number>;
+  computeTimeOffset: (serverTimeString: string) => void;
+  getTimeOffset: () => number;
+  toServerTimestamp: (localTimestamp?: number) => number;
+  toLocalTimestamp: (serverTimestamp?: number) => number;
+}
+
+export const serverTimeHandler: ServerTimeHandler = {
   logger: getLogger('serverTimeHandler'),
   timeOffset: ko.observable(undefined),
 
-  computeTimeOffset(serverTimeString) {
-    const timeOffset = new Date() - new Date(serverTimeString);
+  computeTimeOffset(serverTimeString): void {
+    const timeOffset = Date.now() - new Date(serverTimeString).valueOf();
     this.timeOffset(timeOffset);
     this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
   },
 
-  getTimeOffset() {
+  getTimeOffset(): number {
     if (this.timeOffset() === undefined) {
       this.logger.warn('Trying to get server/client time offset, but no server time has been set.');
       return 0;
@@ -45,7 +54,7 @@ export const serverTimeHandler = {
    * @param {number} [localTimestamp = Date.now()] - the local timestamp to convert
    * @returns {number} serverTimestamp - the timestamp adjusted with the client/server time shift
    */
-  toServerTimestamp(localTimestamp = Date.now()) {
+  toServerTimestamp(localTimestamp = Date.now()): number {
     return localTimestamp - this.getTimeOffset();
   },
 
@@ -54,7 +63,7 @@ export const serverTimeHandler = {
    * @param {number} [serverTimestamp = Date.now()] - the server timestamp to convert
    * @returns {number} localTimestamp - the timestamp adjusted with the client/server time shift
    */
-  toLocalTimestamp(serverTimestamp = Date.now()) {
+  toLocalTimestamp(serverTimestamp = Date.now()): number {
     return serverTimestamp + this.getTimeOffset();
   },
 };

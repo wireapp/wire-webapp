@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,17 @@
  *
  */
 
-/** Enum for different message super types */
-export enum SuperType {
-  CALL = 'call',
-  CONTENT = 'normal',
-  DELETE = 'delete',
-  DEVICE = 'device',
-  LEGALHOLD = 'legal-hold',
-  LOCATION = 'location',
-  MEMBER = 'member',
-  MISSED = 'missed',
-  PING = 'ping',
-  REACTION = 'reaction',
-  SPECIAL = 'special',
-  SYSTEM = 'system',
-  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
-  VERIFICATION = 'verification',
+//import {t} from 'Util/LocalizerUtil';
+
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
+
+export class LegalHoldMessage extends Message {
+  caption: string;
+  constructor(isActive: boolean) {
+    super();
+    this.super_type = SuperType.LEGALHOLD;
+
+    this.caption = isActive ? 'Legal Hold is on' : 'Legal Hold is off';
+  }
 }

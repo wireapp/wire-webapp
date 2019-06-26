@@ -362,7 +362,7 @@ export class ConversationService {
 
     if (_.isArray(precondition_option)) {
       url = `${url}?report_missing=${precondition_option.join(',')}`;
-    } else if (precondition_option) {
+    } else if (precondition_option === true) {
       url = `${url}?ignore_missing=true`;
     }
 

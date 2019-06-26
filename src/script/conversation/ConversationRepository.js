@@ -99,6 +99,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
+import {ConversationLegalHoldStateHandler} from './ConversationLegalHoldStateHandler';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -171,9 +172,14 @@ export class ConversationRepository {
     this.assetUploader = assetUploader;
     this.logger = getLogger('ConversationRepository');
 
-    this.conversationMapper = new ConversationMapper();
+    this.conversationMapper = new ConversationMapper(this);
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
+      this,
+      this.eventRepository,
+      this.serverTimeHandler
+    );
+    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler
@@ -2596,6 +2602,37 @@ export class ConversationRepository {
       });
   }
 
+  async updateAllClients(conversation) {
+    // const sender = this.client_repository.currentClient().id;
+    const genericMessage = new GenericMessage({
+      messageId: createRandomUuid(),
+    });
+    const recipients = await this.create_recipients(conversation.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversation.id, {recipients});
+
+    try {
+      // TODO: we shouldn't use the complete send method here,
+      // as it has a lot of unwanted side effects for our use case
+      // and doesn't return anything
+      const response = await this._sendGenericMessage(eventInfoEntity);
+      const {missing, deleted} = response;
+
+      const missingUserIds = Object.keys(missing);
+      await Promise.all(
+        missingUserIds.map(async userId => {
+          const clients = await this.userRepository.getClientsByUserId(userId, false);
+          await Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+        })
+      );
+
+      Object.entries(deleted).forEach(([userId, clients]) => {
+        clients.forEach(clientId => this.userRepository.remove_client_from_user(userId, clientId));
+      });
+    } catch (error) {
+      this.logger.error(`Update all clients failed with code ${error.code}: ${error.message}`);
+    }
+  }
+
   _grantOutgoingMessage(eventInfoEntity, userIds) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'confirmation', 'deleted', 'lastRead'];
@@ -3060,6 +3097,8 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_ACTIVATED:
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_DEACTIVATED:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:

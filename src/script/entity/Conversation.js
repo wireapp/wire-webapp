@@ -38,6 +38,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -164,12 +165,18 @@ export class Conversation {
 
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
-    this.isOnLegalHold = ko.pureComputed(() => {
+    this.hasLegalHold = ko.pureComputed(() => {
       if (!this._isInitialized()) {
         return undefined;
       }
 
       return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    });
+
+    this.hasLegalHoldFlag = ko.observable(false);
+
+    this.hasLegalHoldFlag.subscribe(hasLegalHoldFlag => {
+      amplify.publish(VERIFY_LEGAL_HOLD, this, hasLegalHoldFlag);
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
