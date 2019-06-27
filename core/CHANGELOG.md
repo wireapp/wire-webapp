@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.8.0...@wireapp/core@12.9.0) (2019-06-27)
+
+
+### Features
+
+* **core:** Send calling messages ([#1997](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1997)) ([da87945](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/da87945))
+
+
+
+
+
 # [12.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.7.3...@wireapp/core@12.8.0) (2019-06-27)
 
 
