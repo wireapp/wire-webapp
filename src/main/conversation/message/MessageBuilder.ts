@@ -22,6 +22,7 @@ import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import {AbortReason, PayloadBundleState, PayloadBundleType} from '..';
 import {AssetService} from '../AssetService';
 import {
+  CallingContent,
   ClientActionContent,
   ConfirmationContent,
   EditedTextContent,
@@ -41,6 +42,7 @@ import {
   TextContent,
 } from '../content';
 import {
+  CallMessage,
   ConfirmationMessage,
   EditedTextMessage,
   FileAssetAbortMessage,
@@ -199,6 +201,22 @@ export class MessageBuilder {
       state: PayloadBundleState.OUTGOING_UNSENT,
       timestamp: Date.now(),
       type: PayloadBundleType.LOCATION,
+    };
+  }
+
+  public createCall(
+    conversationId: string,
+    content: CallingContent,
+    messageId = MessageBuilder.createId(),
+  ): CallMessage {
+    return {
+      content,
+      conversation: conversationId,
+      from: this.getSelfUserId(),
+      id: messageId,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.CALL,
     };
   }
 
