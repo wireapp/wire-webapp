@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/fs-extra": "7.0.0",
+    "@types/fs-extra": "8.0.0",
     "@wireapp/store-engine": "3.3.0",
     "fs-extra": "8.0.1"
   },
