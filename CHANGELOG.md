@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.9.0...@wireapp/core@12.10.0) (2019-06-27)
+
+
+### Features
+
+* **bot-api,core:** Expose call signaling ([#1998](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/1998)) ([ecced28](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/ecced28))
+
+
+
+
+
 # [12.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.8.0...@wireapp/core@12.9.0) (2019-06-27)
 
 
