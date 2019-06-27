@@ -2603,33 +2603,34 @@ export class ConversationRepository {
   }
 
   async updateAllClients(conversation) {
-    // const sender = this.client_repository.currentClient().id;
-    const genericMessage = new GenericMessage({
-      messageId: createRandomUuid(),
-    });
+    const sender = this.client_repository.currentClient().id;
+
     const recipients = await this.create_recipients(conversation.id);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversation.id, {recipients});
+    for (const userId in recipients) {
+      recipients[userId] = recipients[userId].reduce((clientMap, clientId) => {
+        clientMap[clientId] = '';
+        return clientMap;
+      }, {});
+    }
 
     try {
-      // TODO: we shouldn't use the complete send method here,
-      // as it has a lot of unwanted side effects for our use case
-      // and doesn't return anything
-      const response = await this._sendGenericMessage(eventInfoEntity);
-      const {missing, deleted} = response;
-
-      const missingUserIds = Object.keys(missing);
-      await Promise.all(
-        missingUserIds.map(async userId => {
-          const clients = await this.userRepository.getClientsByUserId(userId, false);
-          await Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-        })
-      );
-
-      Object.entries(deleted).forEach(([userId, clients]) => {
-        clients.forEach(clientId => this.userRepository.remove_client_from_user(userId, clientId));
-      });
+      await this.conversation_service.post_encrypted_message(conversation.id, {recipients, sender});
     } catch (error) {
-      this.logger.error(`Update all clients failed with code ${error.code}: ${error.message}`);
+      if (error.missing) {
+        const {missing, deleted} = error;
+
+        const missingUserIds = Object.keys(missing);
+        await Promise.all(
+          missingUserIds.map(async userId => {
+            const clients = await this.user_repository.getClientsByUserId(userId, false);
+            await Promise.all(clients.map(client => this.user_repository.addClientToUser(userId, client)));
+          })
+        );
+
+        Object.entries(deleted).forEach(([userId, clients]) => {
+          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
+        });
+      }
     }
   }
 
