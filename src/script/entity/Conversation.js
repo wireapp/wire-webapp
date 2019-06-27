@@ -39,6 +39,7 @@ import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
+import {message} from '@wireapp/proteus';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -436,6 +437,9 @@ export class Conversation {
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
+      if (message.legalHoldStatus !== undefined) {
+        this.hasLegalHoldFlag(message.legalHoldStatus);
+      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
