@@ -326,6 +326,18 @@ export class Account extends EventEmitter {
           type: PayloadBundleType.TEXT,
         };
       }
+      case GenericMessageType.CALLING: {
+        return {
+          content: genericMessage.calling.content,
+          conversation: event.conversation,
+          from: event.from,
+          id: genericMessage.messageId,
+          messageTimer: 0,
+          state: PayloadBundleState.INCOMING,
+          timestamp: new Date(event.time).getTime(),
+          type: PayloadBundleType.CALL,
+        };
+      }
       case GenericMessageType.CONFIRMATION: {
         const {firstMessageId, moreMessageIds, type} = genericMessage[GenericMessageType.CONFIRMATION];
 

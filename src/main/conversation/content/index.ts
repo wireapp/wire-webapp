@@ -24,6 +24,7 @@ import * as ContentType from './ContentType';
 export {ContentType};
 
 export * from './AssetContent';
+export * from './CallingContent';
 export * from './ClearedContent';
 export * from './ClientActionContent';
 export * from './ClientAddContent';
