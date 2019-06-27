@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.9.2...@wireapp/api-client@5.10.0) (2019-06-27)
+
+
+### Features
+
+* **api-client:** Precise property typings, cleanup ([#1995](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/1995)) ([4f53f32](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4f53f32))
+
+
+
+
+
 ## [5.9.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.9.1...@wireapp/api-client@5.9.2) (2019-06-26)
 
 **Note:** Version bump only for package @wireapp/api-client

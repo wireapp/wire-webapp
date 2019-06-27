@@ -6,8 +6,8 @@
     "@types/dotenv": "6.1.1",
     "@types/fs-extra": "8.0.0",
     "@types/long": "4.0.0",
-    "@wireapp/core": "12.7.2",
-    "@wireapp/store-engine-fs": "1.1.3",
+    "@wireapp/core": "12.7.3",
+    "@wireapp/store-engine-fs": "1.1.4",
     "commander": "2.20.0",
     "dotenv": "8.0.0",
     "fs-extra": "8.0.1"
@@ -33,5 +33,5 @@
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
-  "version": "6.1.6"
+  "version": "6.1.7"
 }
