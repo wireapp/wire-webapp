@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {chunk, flatten, removeDuplicates} from '@wireapp/commons/dist/commonjs/util/ArrayUtil';
+import {ArrayUtil} from '@wireapp/commons';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {PublicClient} from '../client/';
 import {UserClients} from '../conversation/UserClients';
@@ -192,7 +192,7 @@ export class UserAPI {
    * @param propertyKey The property key to get
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getProperty
    */
-  public getProperty<T extends string>(propertyKey: string): Promise<Record<T, any>> {
+  public getProperty<T extends string>(propertyKey: T): Promise<Record<T, any>> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${UserAPI.URL.PROPERTIES}/${propertyKey}`,
@@ -265,17 +265,17 @@ export class UserAPI {
     const {handles, ids} = parameters;
 
     if (handles && handles.length) {
-      const uniqueHandles = removeDuplicates(handles);
-      const handleChunks = chunk(uniqueHandles, limit);
+      const uniqueHandles = ArrayUtil.removeDuplicates(handles);
+      const handleChunks = ArrayUtil.chunk(uniqueHandles, limit);
       const tasks = handleChunks.map(handleChunk => this._getUsers({handles: handleChunk}));
-      return Promise.all(tasks).then(flatten);
+      return Promise.all(tasks).then(ArrayUtil.flatten);
     }
 
     if (ids && ids.length) {
-      const uniqueIds = removeDuplicates(ids);
-      const idChunks = chunk(uniqueIds, limit);
+      const uniqueIds = ArrayUtil.removeDuplicates(ids);
+      const idChunks = ArrayUtil.chunk(uniqueIds, limit);
       const tasks = idChunks.map(idChunk => this._getUsers({ids: idChunk}));
-      return Promise.all(tasks).then(flatten);
+      return Promise.all(tasks).then(ArrayUtil.flatten);
     }
 
     return [];
@@ -409,7 +409,7 @@ export class UserAPI {
    * @param propertyData The property data to set
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/setProperty
    */
-  public async putProperty(propertyKey: string, propertyData: Object): Promise<void> {
+  public async putProperty<T extends string>(propertyKey: T, propertyData: Record<T, any>): Promise<void> {
     const config: AxiosRequestConfig = {
       data: propertyData,
       method: 'put',
