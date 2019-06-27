@@ -64,9 +64,9 @@ export class PaymentAPI {
     return this.client.sendJSON<PaymentData>(config).then(response => response.data);
   }
 
-  public deletePaymentData(teamId: string, data: Object): Promise<PaymentData> {
+  public deletePaymentData(teamId: string, paymentData: Object): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
-      data,
+      data: paymentData,
       method: 'delete',
       url: `${PaymentAPI.URL.TEAMS}/${teamId}/${PaymentAPI.URL.BILLING}`,
     };
