@@ -436,6 +436,9 @@ export class Conversation {
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
+      if (messageEntity.legalHoldStatus !== undefined) {
+        this.hasLegalHoldFlag(messageEntity.legalHoldStatus);
+      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
