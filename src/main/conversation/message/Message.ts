@@ -19,6 +19,7 @@
 
 import {
   AssetContent,
+  CallingContent,
   ClearedContent,
   ClientActionContent,
   ConfirmationContent,
@@ -39,6 +40,11 @@ import {PayloadBundle, PayloadBundleType} from './PayloadBundle';
 export interface TextMessage extends PayloadBundle {
   content: TextContent;
   type: PayloadBundleType.TEXT;
+}
+
+export interface CallMessage extends PayloadBundle {
+  content: CallingContent;
+  type: PayloadBundleType.CALL;
 }
 
 export interface EditedTextMessage extends PayloadBundle {
@@ -113,6 +119,7 @@ export interface DeleteMessage extends PayloadBundle {
 }
 
 export type Message =
+  | CallMessage
   | ClearConversationMessage
   | ConfirmationMessage
   | DeleteMessage

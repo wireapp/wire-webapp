@@ -77,6 +77,7 @@ import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 import {APIClient} from '@wireapp/api-client';
 import {
+  CallMessage,
   ClearConversationMessage,
   ConfirmationMessage,
   DeleteMessage,
@@ -607,6 +608,14 @@ export class ConversationService {
     };
   }
 
+  private async sendCall(payloadBundle: CallMessage, userIds?: string[]): Promise<CallMessage> {
+    return {
+      ...payloadBundle,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
+  }
+
   private async sendText(payloadBundle: TextMessage, userIds?: string[]): Promise<TextMessage> {
     const {
       expectsReadConfirmation,
@@ -904,6 +913,8 @@ export class ConversationService {
         return this.sendFileMetaData(payloadBundle, userIds);
       case PayloadBundleType.ASSET_IMAGE:
         return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds);
+      case PayloadBundleType.CALL:
+        return this.sendCall(payloadBundle, userIds);
       case PayloadBundleType.CLIENT_ACTION: {
         if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
           return this.sendSessionReset(payloadBundle, userIds);
