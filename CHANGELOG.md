@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.12.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.12.0...@wireapp/core@12.12.1) (2019-06-28)
+
+
+### Bug Fixes
+
+* **core:** Send call messages ([#2008](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2008)) ([1d14bdf](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/1d14bdf))
+
+
+
+
+
 # [12.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.11.1...@wireapp/core@12.12.0) (2019-06-28)
 
 
