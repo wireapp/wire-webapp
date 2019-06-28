@@ -1319,10 +1319,10 @@
   resolved "https://registry.yarnpkg.com/@types/uint32/-/uint32-0.2.0.tgz#75b33ddca6131469fa7bc1afe04f5649cd655b47"
   integrity sha512-t4ox9/fhkExBs5lw1xpCIpVrhyzhnrOxs/yHsoeW30mnbK1x0V+2did74R1mg+Hga29TFUFflUa9vIXqHHg0Gw==
 
-"@types/underscore@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.0.tgz#e09173200627a494c083427a35711400d06d0b5b"
-  integrity sha512-1koEJ2AhXaR0HVP3VlN0pCb51n87g5QL9rUiGaY+Nte9gBd2FYf/zNvS5ZtHg7o6owYNS6QA/4ZJ/mIiz2q1hA==
+"@types/underscore@1.9.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.1.tgz#be305f4bef84eb382d7cfba7665636c82e5a2939"
+  integrity sha512-ROHiJBeuXxVVaKm65tM/LHWlkcTFBQJqJgDB90Vj3fsl8Q290Z29cmEwnpvtlb0nSzuMIaIYWj0ZvmVgim8khA==
 
 "@types/unist@*", "@types/unist@^2.0.0":
   version "2.0.2"
