@@ -308,6 +308,10 @@ const messageIdCache = {};
     await sendMessageResponse(data, imagePayload);
   });
 
+  account.on(PayloadBundleType.CALL, async data => {
+    logger.info(`Received calling payload`, JSON.parse(data.content));
+  });
+
   account.on(PayloadBundleType.CLEARED, handleIncomingMessage);
 
   account.on(PayloadBundleType.LOCATION, async data => {
