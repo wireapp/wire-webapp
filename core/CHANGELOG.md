@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.10.0...@wireapp/core@12.11.0) (2019-06-28)
+
+
+### Features
+
+* **core:** Propagate calling events ([#2002](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2002)) ([e90ff0e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e90ff0e))
+
+
+
+
+
 # [12.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.9.0...@wireapp/core@12.10.0) (2019-06-27)
 
 
