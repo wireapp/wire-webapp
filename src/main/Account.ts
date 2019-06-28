@@ -100,6 +100,20 @@ export class Account extends EventEmitter {
     });
   }
 
+  get clientId(): string {
+    if (this.apiClient.context && this.apiClient.context.clientId) {
+      return this.apiClient.context.clientId;
+    }
+    throw new Error(`No user context available. Please login first.`);
+  }
+
+  get userId(): string {
+    if (this.apiClient.context) {
+      return this.apiClient.context.userId;
+    }
+    throw new Error(`No user context available. Please login first.`);
+  }
+
   public async init(): Promise<void> {
     const assetService = new AssetService(this.apiClient);
     const cryptographyService = new CryptographyService(this.apiClient, this.apiClient.config.store);
