@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.10.0...@wireapp/api-client@5.11.0) (2019-06-28)
+
+
+### Features
+
+* **api-client:** CallConfig endpoint ([#2003](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2003)) ([27921e5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/27921e5))
+
+
+
+
+
 # [5.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.9.2...@wireapp/api-client@5.10.0) (2019-06-27)
 
 
