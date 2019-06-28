@@ -44,6 +44,7 @@ import {
 import {
   Article,
   Asset,
+  Calling,
   Cleared,
   ClientAction,
   Confirmation,
@@ -609,6 +610,17 @@ export class ConversationService {
   }
 
   private async sendCall(payloadBundle: CallMessage, userIds?: string[]): Promise<CallMessage> {
+    const callMessage = Calling.create({
+      content: payloadBundle.content,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.CALLING]: callMessage,
+      messageId: payloadBundle.id,
+    });
+
+    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+
     return {
       ...payloadBundle,
       messageTimer: 0,
@@ -902,6 +914,11 @@ export class ConversationService {
     return userId;
   }
 
+  /**
+   * @param payloadBundle - Outgoing message
+   * @param userIds - Only send message to specified user IDs
+   * @returns Sent message
+   */
   // tslint:disable-next-line:typedef
   public async send(payloadBundle: Message, userIds?: string[]) {
     switch (payloadBundle.type) {
