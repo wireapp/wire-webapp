@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.11.1...@wireapp/core@12.12.0) (2019-06-28)
+
+
+### Features
+
+* **core:** Expose User ID & Client ID ([#2007](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2007)) ([e41e0bb](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/e41e0bb))
+
+
+
+
+
 ## [12.11.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.11.0...@wireapp/core@12.11.1) (2019-06-28)
 
 **Note:** Version bump only for package @wireapp/core
