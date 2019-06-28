@@ -29,6 +29,7 @@ export interface PayloadBundle {
   content?: ConversationContent;
   conversation: string;
   from: string;
+  fromClientId?: string;
   id: string;
   state: PayloadBundleState;
   timestamp: number;
