@@ -1,5 +1,4 @@
 {
-  "helpers": ["test/helpers/**/*.js"],
   "random": true,
   "spec_dir": "src",
   "spec_files": ["main/**/*test.node.js"],
