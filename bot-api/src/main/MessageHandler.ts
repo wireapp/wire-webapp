@@ -171,8 +171,8 @@ export abstract class MessageHandler {
 
   public async sendCall(conversationId: string, content: CallingContent): Promise<void> {
     if (this.account && this.account.service) {
-      const reactionPayload = this.account.service.conversation.messageBuilder.createCall(conversationId, content);
-      await this.account.service.conversation.send(reactionPayload);
+      const callPayload = this.account.service.conversation.messageBuilder.createCall(conversationId, content);
+      await this.account.service.conversation.send(callPayload);
     }
   }
 
