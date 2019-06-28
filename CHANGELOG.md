@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.12.2...@wireapp/core@12.13.0) (2019-06-28)
+
+
+### Features
+
+* **core:** Add client ID to encrypted messages ([#2010](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2010)) ([daf173e](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/daf173e))
+
+
+
+
+
 ## [12.12.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.12.1...@wireapp/core@12.12.2) (2019-06-28)
 
 **Note:** Version bump only for package @wireapp/core
