@@ -43,7 +43,7 @@ import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
-import {getNextItem} from 'Util/ArrayUtil';
+import {getNextItem, getDifference} from 'Util/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
@@ -2623,32 +2623,46 @@ export class ConversationRepository {
 
   async updateAllClients(conversation) {
     const sender = this.client_repository.currentClient().id;
-
-    const recipients = await this.create_recipients(conversation.id);
-    for (const userId in recipients) {
-      recipients[userId] = recipients[userId].reduce((clientMap, clientId) => {
-        clientMap[clientId] = '';
-        return clientMap;
-      }, {});
-    }
-
     try {
-      await this.conversation_service.post_encrypted_message(conversation.id, {recipients, sender});
+      await this.conversation_service.post_encrypted_message(conversation.id, {recipients: {}, sender});
     } catch (error) {
       if (error.missing) {
-        const {missing, deleted} = error;
+        const remoteUserClients = error.missing;
+        const localUserClients = await this.create_recipients(conversation.id);
+        const selfId = this.selfUser().id;
 
-        const missingUserIds = Object.keys(missing);
+        const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
+          if (userId === selfId) {
+            return deleted;
+          }
+          const deletedClients = getDifference(remoteUserClients[userId], clients);
+          if (deletedClients.length) {
+            deleted[userId] = deletedClients;
+          }
+          return deleted;
+        }, {});
+
+        Object.entries(deletedUserClients).forEach(([userId, clients]) => {
+          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
+        });
+
+        const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
+          if (userId === selfId) {
+            return missing;
+          }
+          const missingClients = getDifference(localUserClients[userId], clients);
+          if (missingClients.length) {
+            missing.push(userId);
+          }
+          return missing;
+        }, []);
+
         await Promise.all(
           missingUserIds.map(async userId => {
             const clients = await this.user_repository.getClientsByUserId(userId, false);
             await Promise.all(clients.map(client => this.user_repository.addClientToUser(userId, client)));
           })
         );
-
-        Object.entries(deleted).forEach(([userId, clients]) => {
-          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
-        });
       }
     }
   }
