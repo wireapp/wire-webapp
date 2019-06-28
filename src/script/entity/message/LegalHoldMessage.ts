@@ -23,11 +23,11 @@ import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class LegalHoldMessage extends Message {
-  caption: string;
+  isActive: boolean;
   constructor(isActive: boolean) {
     super();
     this.super_type = SuperType.LEGALHOLD;
 
-    this.caption = isActive ? 'Legal Hold is on' : 'Legal Hold is off';
+    this.isActive = isActive;
   }
 }
