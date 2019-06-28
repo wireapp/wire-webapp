@@ -3,7 +3,7 @@
     "wire-travis-bot": "dist/cli.js"
   },
   "dependencies": {
-    "@types/generate-changelog": "1.7.0",
+    "@types/generate-changelog": "1.8.0",
     "@types/long": "4.0.0",
     "@types/node": "~10",
     "@wireapp/core": "12.10.0",
