@@ -126,7 +126,7 @@ export class AccountAPI {
    *
    * @param limit Limits the number of ICE-Candidates returned. [1..10]
    */
-  public async getCallConfig(limit: number): Promise<CallConfigData> {
+  public async getCallConfig(limit?: number): Promise<CallConfigData> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
