@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/fs-extra": "8.0.0",
     "@wireapp/store-engine": "3.3.0",
-    "fs-extra": "8.0.1"
+    "fs-extra": "8.1.0"
   },
   "devDependencies": {
     "@types/jasmine": "3.3.13",
