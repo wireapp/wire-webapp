@@ -53,7 +53,7 @@ ko.components.register('device-card', {
         <!-- /ko -->
         <!-- ko ifnot: detailed -->
           <div class="label-xs">
-            <span class="device-card__model" data-bind="text: model"></span>
+            <span class="device-card__model" data-bind="text: name"></span>
             <span class="text-background" data-bind="visible: isCurrentClient, text: t('authLimitDevicesCurrent')"></span>
           </div>
           <div class="text-background label-xs">
@@ -83,12 +83,12 @@ ko.components.register('device-card', {
     showVerified = false,
     showIcon = false,
   }: DeviceCardParams): void {
-    const device = ko.unwrap(wrappedDevice);
-    const {class: deviceClass = '?', id = '', label = '?', model, meta} = device;
-    this.formattedId = id ? device.formatId() : [];
+    const clientEntity = ko.unwrap(wrappedDevice);
+    const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
+    this.formattedId = id ? clientEntity.formatId() : [];
     this.id = id;
     this.label = label;
-    this.model = model || deviceClass; // devices for other users will only provide the device class
+    this.name = clientEntity.getName();
 
     this.isCurrentClient = current;
     this.detailed = detailed;
@@ -96,7 +96,7 @@ ko.components.register('device-card', {
 
     this.dataUieName = `device-card${current ? '-current' : ''}`;
 
-    this.timestamp = formatTimestamp(device.time);
+    this.timestamp = formatTimestamp(clientEntity.time);
     this.isVerified = meta.isVerified;
     this.showVerified = showVerified;
     this.showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
@@ -105,7 +105,7 @@ ko.components.register('device-card', {
 
     this.clickOnDevice = () => {
       if (typeof click === 'function') {
-        click(device);
+        click(clientEntity);
       }
     };
   },
