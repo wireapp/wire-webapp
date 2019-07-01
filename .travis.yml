@@ -163,7 +163,7 @@ after_deploy:
 after_failure:
   - |
     if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
-      if [[ "${TRAVIS_BRANCH}" =~ ^(dev|master|staging)$ ]]; then
+      if [[ "${TRAVIS_BRANCH}" =~ ^(dev|master)$ ]]; then
         LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
         TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
         yarn global add @wireapp/changelog-bot@2.2.1
