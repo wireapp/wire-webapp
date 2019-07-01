@@ -245,9 +245,12 @@ ko.components.register('user-devices', {
 
     this.clickToResetSession = () => {
       const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
+      const conversationId = userEntity().is_me
+        ? conversationRepository.self_conversation().id
+        : conversationRepository.active_conversation().id;
       this.isResettingSession(true);
       conversationRepository
-        .reset_session(userEntity().id, this.selectedClient().id, this.activeConversation().id)
+        .reset_session(userEntity().id, this.selectedClient().id, conversationId)
         .then(_resetProgress)
         .catch(_resetProgress);
     };
