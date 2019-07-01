@@ -1,6 +1,8 @@
 branch-defaults:
   dev:
     environment: wire-webapp-dev
+  master:
+    environment: wire-webapp-master
 deploy:
   artifact: server/dist/s3/ebs.zip
 global:
