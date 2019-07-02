@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 import {mockStore, mountWithIntl} from '../util/TestUtil';
-import {TeamName} from './TeamName';
+import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
   let wrapper;

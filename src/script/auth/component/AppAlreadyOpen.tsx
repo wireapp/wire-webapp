@@ -27,7 +27,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 
-export interface Props extends React.HTMLAttributes<_AppAlreadyOpen> {
+export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
   fullscreen?: boolean;
 }
 
@@ -39,7 +39,7 @@ interface DispatchProps {
   removeCookie: (name: string) => Promise<void>;
 }
 
-class _AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
+class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
   onContinue = () => {
     this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED);
   };
@@ -72,17 +72,13 @@ class _AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchP
   };
 }
 
-export const AppAlreadyOpen = injectIntl(
+export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
-        removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
-      };
-    }
-  )(_AppAlreadyOpen)
+    (state: RootState): ConnectedProps => ({
+      isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({
+      removeCookie: (name: string) => dispatch(ROOT_ACTIONS.cookieAction.removeCookie(name)),
+    })
+  )(AppAlreadyOpen)
 );

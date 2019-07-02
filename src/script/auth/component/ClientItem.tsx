@@ -57,7 +57,7 @@ interface State {
 
 type CombinedProps = Props & InjectedIntlProps;
 
-class _ClientItem extends React.Component<CombinedProps, State> {
+class ClientItem extends React.Component<CombinedProps, State> {
   private readonly passwordInput: React.RefObject<any> = React.createRef();
   state: State;
 
@@ -81,8 +81,8 @@ class _ClientItem extends React.Component<CombinedProps, State> {
   constructor(props: CombinedProps) {
     super(props);
     this.state = {
-      ..._ClientItem.initialState,
-      animationStep: props.selected ? _ClientItem.CONFIG.animationSteps : 0,
+      ...ClientItem.initialState,
+      animationStep: props.selected ? ClientItem.CONFIG.animationSteps : 0,
       isAnimating: false,
     };
   }
@@ -100,7 +100,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
   }
 
   executeAnimateIn(): void {
-    if (this.state.animationStep < _ClientItem.CONFIG.animationSteps) {
+    if (this.state.animationStep < ClientItem.CONFIG.animationSteps) {
       window.requestAnimationFrame(this.executeAnimateIn.bind(this));
       this.setState(state => ({animationStep: state.animationStep + 1}));
     } else {
@@ -138,7 +138,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     ) ||
     '?';
 
-  resetState = () => this.setState(_ClientItem.initialState);
+  resetState = () => this.setState(ClientItem.initialState);
 
   wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>): void => {
     this.resetState();
@@ -192,7 +192,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
       });
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       client,
       selected,
@@ -202,7 +202,7 @@ class _ClientItem extends React.Component<CombinedProps, State> {
     } = this.props;
 
     const {validationError, validPassword, password, animationStep, isAnimating} = this.state;
-    const animationPosition = animationStep / _ClientItem.CONFIG.animationSteps;
+    const animationPosition = animationStep / ClientItem.CONFIG.animationSteps;
     const height = animationPosition * 56;
     const marginTop = animationPosition * 16;
     const paddingHorizontal = animationPosition * 2;
@@ -301,4 +301,4 @@ class _ClientItem extends React.Component<CombinedProps, State> {
   }
 }
 
-export const ClientItem = injectIntl(_ClientItem);
+export default injectIntl(ClientItem);

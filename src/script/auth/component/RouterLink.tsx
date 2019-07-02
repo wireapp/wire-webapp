@@ -25,4 +25,4 @@ interface LinkProps extends UILinkProps, RouterLinkProps {}
 
 const RouterLink = (props: LinkProps) => <Link component={RRLink} {...props} />;
 
-export {RouterLink};
+export default RouterLink;

@@ -17,7 +17,8 @@
  *
  */
 
-import {IndexedDBEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {error as StoreEngineError} from '@wireapp/store-engine';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -497,9 +498,7 @@ export class CryptographyRepository {
     }
 
     this.logger.warn(
-      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${
-        error.message
-      }`,
+      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
       error
     );
     this._reportDecryptionFailure(error, event);

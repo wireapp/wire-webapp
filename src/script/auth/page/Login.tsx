@@ -51,8 +51,8 @@ import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
 import {loginStrings, logoutReasonStrings} from '../../strings';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import AppAlreadyOpen from '../component/AppAlreadyOpen';
+import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -67,7 +67,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {isDesktopApp} from '../Runtime';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as URLUtil from '../util/urlUtil';
-import {Page} from './Page';
+import Page from './Page';
 
 declare global {
   interface Window {
@@ -75,7 +75,7 @@ declare global {
   }
 }
 
-interface Props extends React.HTMLAttributes<_Login>, RouteComponentProps {}
+interface Props extends React.HTMLAttributes<Login>, RouteComponentProps {}
 
 interface ConnectedProps {
   hasHistory: boolean;
@@ -110,7 +110,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class _Login extends React.Component<CombinedProps, State> {
+class Login extends React.Component<CombinedProps, State> {
   private readonly inputs: {
     email: React.RefObject<any>;
     password: React.RefObject<any>;
@@ -287,7 +287,7 @@ class _Login extends React.Component<CombinedProps, State> {
       });
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
       loginError,
@@ -458,32 +458,28 @@ class _Login extends React.Component<CombinedProps, State> {
   }
 }
 
-export const Login = withRouter(
+export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-          isFetching: AuthSelector.isFetching(state),
-          loginError: AuthSelector.getError(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
-            dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
-          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-          doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
-            dispatch(ROOT_ACTIONS.authAction.doInit(options)),
-          doInitializeClient: (clientType: ClientType, password?: string) =>
-            dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
-          doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
-          doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
-            dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
-          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-        };
-      }
-    )(_Login)
+      (state: RootState): ConnectedProps => ({
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doCheckConversationCode: (conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(conversationKey, conversationCode)),
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+        doInit: (options: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) =>
+          dispatch(ROOT_ACTIONS.authAction.doInit(options)),
+        doInitializeClient: (clientType: ClientType, password?: string) =>
+          dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(clientType, password)),
+        doLogin: (login: LoginData) => dispatch(ROOT_ACTIONS.authAction.doLogin(login)),
+        doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
+          dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+      })
+    )(Login)
   )
 );

@@ -40,7 +40,7 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {teamNameStrings} from '../../strings';
-import {RouterLink} from '../component/RouterLink';
+import RouterLink from '../component/RouterLink';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
@@ -49,9 +49,9 @@ import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {Page} from './Page';
+import Page from './Page';
 
-interface Props extends React.HTMLAttributes<_TeamName>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   error: Error;
@@ -70,7 +70,7 @@ interface State {
   isValidTeamName: boolean;
 }
 
-class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private readonly teamNameInput: React.RefObject<any> = React.createRef();
   state: State = {
     enteredTeamName: this.props.teamName || '',
@@ -114,7 +114,7 @@ class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps &
     this.props.resetInviteErrors();
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
     } = this.props;
@@ -190,23 +190,19 @@ class _TeamName extends React.Component<Props & ConnectedProps & DispatchProps &
   }
 }
 
-export const TeamName = withRouter(
+export default withRouter(
   injectIntl(
     connect(
-      (state: RootState): ConnectedProps => {
-        return {
-          error: AuthSelector.getError(state),
-          teamName: AuthSelector.getAccountTeamName(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
-          pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
-            dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
-          resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-        };
-      }
-    )(_TeamName)
+      (state: RootState): ConnectedProps => ({
+        error: AuthSelector.getError(state),
+        teamName: AuthSelector.getAccountTeamName(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        enterTeamCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterTeamCreationFlow()),
+        pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
+          dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
+        resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
+      })
+    )(TeamName)
   )
 );

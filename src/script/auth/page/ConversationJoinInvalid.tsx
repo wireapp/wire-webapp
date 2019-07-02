@@ -17,64 +17,43 @@
  *
  */
 import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React from 'react';
 import {FormattedHTMLMessage, InjectedIntlProps, injectIntl} from 'react-intl';
-import {connect} from 'react-redux';
 import {conversationJoinStrings} from '../../strings';
-import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
-import {WirelessContainer} from '../component/WirelessContainer';
+import UnsupportedBrowser from '../component/UnsupportedBrowser';
+import WirelessContainer from '../component/WirelessContainer';
 import {Config} from '../config';
-import {RootState, ThunkDispatch} from '../module/reducer';
 
-interface Props extends React.HTMLAttributes<_ConversationJoinInvalid> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 interface ConnectedProps {}
 
 interface DispatchProps {}
 
-interface State {}
+const ConversationJoinInvalid = ({
+  intl: {formatMessage: _},
+}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+  return (
+    <UnsupportedBrowser isTemporaryGuest>
+      <WirelessContainer>
+        <ContainerXS style={{margin: 'auto 0'}}>
+          <H2
+            style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
+            color={COLOR.GRAY}
+            data-uie-name="status-invalid-headline"
+          >
+            <FormattedHTMLMessage
+              {...conversationJoinStrings.invalidHeadline}
+              values={{brandName: Config.BRAND_NAME}}
+            />
+          </H2>
+          <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">
+            {_(conversationJoinStrings.invalidSubhead)}
+          </Text>
+        </ContainerXS>
+      </WirelessContainer>
+    </UnsupportedBrowser>
+  );
+};
 
-class _ConversationJoinInvalid extends React.PureComponent<
-  Props & ConnectedProps & DispatchProps & InjectedIntlProps,
-  State
-> {
-  state = {};
-
-  render(): JSX.Element {
-    const {
-      intl: {formatMessage: _},
-    } = this.props;
-    return (
-      <UnsupportedBrowser isTemporaryGuest>
-        <WirelessContainer>
-          <ContainerXS style={{margin: 'auto 0'}}>
-            <H2
-              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-              color={COLOR.GRAY}
-              data-uie-name="status-invalid-headline"
-            >
-              <FormattedHTMLMessage
-                {...conversationJoinStrings.invalidHeadline}
-                values={{brandName: Config.BRAND_NAME}}
-              />
-            </H2>
-            <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">
-              {_(conversationJoinStrings.invalidSubhead)}
-            </Text>
-          </ContainerXS>
-        </WirelessContainer>
-      </UnsupportedBrowser>
-    );
-  }
-}
-
-export const ConversationJoinInvalid = injectIntl(
-  connect(
-    (state: RootState): ConnectedProps => {
-      return {};
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {};
-    }
-  )(_ConversationJoinInvalid)
-);
+export default injectIntl(ConversationJoinInvalid);
