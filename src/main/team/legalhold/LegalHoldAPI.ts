@@ -26,13 +26,12 @@ import {LegalHoldMemberData} from './LegalHoldMemberStatus';
 import {NewLegalHoldData} from './NewLegalHoldData';
 
 export class LegalHoldAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     APPROVE_LEGAL_HOLD: 'approve',
     LEGAL_HOLD: 'legalhold',
     SETTINGS_LEGAL_HOLD: 'settings',
   };
+  constructor(private readonly client: HttpClient) {}
 
   public async getMemberLegalHold(teamId: string, userId: string): Promise<LegalHoldMemberData> {
     const config: AxiosRequestConfig = {

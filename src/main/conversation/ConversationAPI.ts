@@ -189,35 +189,6 @@ export class ConversationAPI {
   }
 
   /**
-   * Get conversations.
-   * Note: At most 500 conversations are returned per request.
-   * @param startConversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
-   * @param filteredConversationIds Mutually exclusive with `startConversationId`. At most 32 IDs per request.
-   * @param limit Max. number of conversations to return
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
-   */
-  private _getConversations(
-    startConversationId?: string,
-    filteredConversationIds?: string[],
-    limit = ConversationAPI.MAX_CHUNK_SIZE,
-  ): Promise<Conversations> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {
-        size: limit,
-        start: startConversationId,
-      },
-      url: `${ConversationAPI.URL.CONVERSATIONS}`,
-    };
-
-    if (filteredConversationIds) {
-      config.params.ids = filteredConversationIds.join(',');
-    }
-
-    return this.client.sendJSON<Conversations>(config).then(response => response.data);
-  }
-
-  /**
    * Get self membership properties.
    * @param conversationId The Conversation ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getSelf
@@ -479,5 +450,34 @@ export class ConversationAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * Get conversations.
+   * Note: At most 500 conversations are returned per request.
+   * @param startConversationId Conversation ID to start from (exclusive). Mutually exclusive with `conversationIds`.
+   * @param filteredConversationIds Mutually exclusive with `startConversationId`. At most 32 IDs per request.
+   * @param limit Max. number of conversations to return
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
+   */
+  private _getConversations(
+    startConversationId?: string,
+    filteredConversationIds?: string[],
+    limit = ConversationAPI.MAX_CHUNK_SIZE,
+  ): Promise<Conversations> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: {
+        size: limit,
+        start: startConversationId,
+      },
+      url: `${ConversationAPI.URL.CONVERSATIONS}`,
+    };
+
+    if (filteredConversationIds) {
+      config.params.ids = filteredConversationIds.join(',');
+    }
+
+    return this.client.sendJSON<Conversations>(config).then(response => response.data);
   }
 }

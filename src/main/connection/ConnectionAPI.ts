@@ -23,11 +23,10 @@ import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} fro
 import {HttpClient} from '../http/';
 
 export class ConnectionAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static readonly URL = {
     CONNECTIONS: '/connections',
   };
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Get an existing connection to another user.

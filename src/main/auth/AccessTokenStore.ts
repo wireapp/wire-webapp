@@ -22,6 +22,11 @@ import logdown from 'logdown';
 import {AccessTokenData} from '../auth/';
 
 export class AccessTokenStore extends EventEmitter {
+  public static TOPIC = {
+    ACCESS_TOKEN_REFRESH: 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
+  };
+
+  public accessToken: AccessTokenData | undefined;
   private readonly logger: logdown.Logger;
 
   constructor() {
@@ -32,12 +37,6 @@ export class AccessTokenStore extends EventEmitter {
       markdown: false,
     });
   }
-
-  public static TOPIC = {
-    ACCESS_TOKEN_REFRESH: 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',
-  };
-
-  public accessToken: AccessTokenData | undefined;
 
   public async delete(): Promise<void> {
     this.logger.log('Deleting local access token');

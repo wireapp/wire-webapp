@@ -25,12 +25,11 @@ import {Notification, NotificationList} from './';
 const NOTIFICATION_SIZE_MAXIMUM = TimeUtil.TimeInMillis.SECOND * 10;
 
 export class NotificationAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     LAST: 'last',
     NOTIFICATION: '/notifications',
   };
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Fetch the last notification.

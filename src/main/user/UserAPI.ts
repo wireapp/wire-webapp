@@ -281,24 +281,6 @@ export class UserAPI {
     return [];
   }
 
-  private async _getUsers(parameters: {ids: string[]}): Promise<User[]>;
-  private async _getUsers(parameters: {handles: string[]}): Promise<User[]>;
-  private async _getUsers(parameters: {handles?: string[]; ids?: string[]}): Promise<User[]> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {},
-      url: UserAPI.URL.USERS,
-    };
-
-    if (parameters.handles) {
-      config.params.handles = parameters.handles.join(',');
-    } else if (parameters.ids) {
-      config.params.ids = parameters.ids.join(',');
-    }
-
-    return this.client.sendJSON<User[]>(config).then(response => response.data);
-  }
-
   /**
    * DEPRECATED: List users.
    * @deprecated
@@ -417,5 +399,23 @@ export class UserAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  private async _getUsers(parameters: {ids: string[]}): Promise<User[]>;
+  private async _getUsers(parameters: {handles: string[]}): Promise<User[]>;
+  private async _getUsers(parameters: {handles?: string[]; ids?: string[]}): Promise<User[]> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      params: {},
+      url: UserAPI.URL.USERS,
+    };
+
+    if (parameters.handles) {
+      config.params.handles = parameters.handles.join(',');
+    } else if (parameters.ids) {
+      config.params.ids = parameters.ids.join(',');
+    }
+
+    return this.client.sendJSON<User[]>(config).then(response => response.data);
   }
 }
