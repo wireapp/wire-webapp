@@ -39,6 +39,7 @@ import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
+import {LegalHoldMessage} from './message/LegalHoldMessage';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -167,16 +168,10 @@ export class Conversation {
     });
     this.hasLegalHold = ko.pureComputed(() => {
       if (!this._isInitialized()) {
-        return undefined;
+        return false;
       }
 
       return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
-    });
-
-    this.hasLegalHoldFlag = ko.observable(false);
-
-    this.hasLegalHoldFlag.subscribe(hasLegalHoldFlag => {
-      amplify.publish(VERIFY_LEGAL_HOLD, this, hasLegalHoldFlag);
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
@@ -208,11 +203,36 @@ export class Conversation {
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko.pureComputed(() =>
-      this.messages_unordered().sort((message_a, message_b) => {
+    this.messages = ko.pureComputed(() => {
+      const orderedMessages = this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      })
-    );
+      });
+      if (!orderedMessages.length) {
+        return [];
+      }
+      let latestLegalHoldStatus = false;
+      const messages = [];
+      orderedMessages.forEach(message => {
+        if (typeof message.legalHoldStatus === 'undefined') {
+          return messages.push(message);
+        }
+        const legalHoldStatus = !!message.legalHoldStatus;
+        if (legalHoldStatus === latestLegalHoldStatus) {
+          return messages.push(message);
+        }
+        if (!message.isLegalHold()) {
+          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
+          legalHoldMessage.timestamp(message.timestamp() - 1);
+          messages.push(legalHoldMessage);
+        }
+        messages.push(message);
+        latestLegalHoldStatus = legalHoldStatus;
+      });
+      if (latestLegalHoldStatus !== this.hasLegalHold()) {
+        amplify.publish(VERIFY_LEGAL_HOLD, this, latestLegalHoldStatus);
+      }
+      return messages;
+    });
 
     this.hasAdditionalMessages = ko.observable(true);
 
@@ -436,9 +456,6 @@ export class Conversation {
 
       this.update_timestamps(messageEntity);
       this.messages_unordered.push(messageEntity);
-      if (messageEntity.legalHoldStatus !== undefined) {
-        this.hasLegalHoldFlag(messageEntity.legalHoldStatus);
-      }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
       return true;
     }
@@ -464,6 +481,17 @@ export class Conversation {
 
     koArrayPushAll(this.messages_unordered, message_ets);
   }
+
+  appendLegalHoldSystemMessage = (legalHoldStatus, timeStamp) => {
+    const lastMessage = this.getLastMessage();
+    if (lastMessage && lastMessage.isLegalHold() && lastMessage.isActive === legalHoldStatus) {
+      return;
+    }
+    const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
+    legalHoldMessage.timestamp(timeStamp);
+    legalHoldMessage.legalHoldStatus = legalHoldStatus;
+    this.messages_unordered.push(legalHoldMessage);
+  };
 
   getFirstUnreadSelfMention() {
     return this.unreadState()
