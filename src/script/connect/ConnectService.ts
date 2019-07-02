@@ -22,7 +22,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {BackendClient} from '../service/BackendClient';
 import {PhoneBook} from './PhoneBook';
 
-class ConnectService {
+export class ConnectService {
   backendClient: BackendClient;
   logger: Logger;
 
@@ -50,5 +50,3 @@ class ConnectService {
     });
   }
 }
-
-export {ConnectService};
