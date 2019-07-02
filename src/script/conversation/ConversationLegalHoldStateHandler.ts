@@ -19,7 +19,6 @@
 
 import {amplify} from 'amplify';
 import {Conversation} from '../entity/Conversation';
-import {EventRepository} from '../event/EventRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ConversationRepository} from './ConversationRepository';
 
@@ -27,24 +26,18 @@ export const VERIFY_LEGAL_HOLD = 'verifyLegalHold';
 
 export class ConversationLegalHoldStateHandler {
   constructor(
-    public conversationRepository: ConversationRepository,
-    public eventRepository: EventRepository,
-    public serverTimeHandler: ServerTimeHandler
+    private readonly conversationRepository: ConversationRepository,
+    private readonly serverTimeHandler: ServerTimeHandler
   ) {
     amplify.subscribe(VERIFY_LEGAL_HOLD, this.verifyLegalHold);
   }
 
   verifyLegalHold = async (conversationEntity: Conversation, hasLegalHoldFlag: boolean) => {
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = z.conversation.EventBuilder.buildLegalHoldChange(
-      conversationEntity,
-      hasLegalHoldFlag,
-      currentTimestamp
-    );
-    this.eventRepository.injectEvent(event);
-    if (hasLegalHoldFlag !== conversationEntity.hasLegalHold()) {
-      await this.conversationRepository.updateAllClients(conversationEntity);
-      conversationEntity.hasLegalHoldFlag(conversationEntity.hasLegalHold());
+    await this.conversationRepository.updateAllClients(conversationEntity);
+    const hasLegalHold = conversationEntity.hasLegalHold();
+    if (hasLegalHoldFlag !== hasLegalHold) {
+      const timeStamp = conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1;
+      conversationEntity.appendLegalHoldSystemMessage(hasLegalHold, timeStamp);
     }
   };
 }

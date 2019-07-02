@@ -180,11 +180,7 @@ export class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler
     );
-    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(
-      this,
-      this.eventRepository,
-      this.serverTimeHandler
-    );
+    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(this, this.serverTimeHandler);
     this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,

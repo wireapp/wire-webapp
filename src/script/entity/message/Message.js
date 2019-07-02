@@ -257,6 +257,10 @@ class Message {
     return this.super_type === SuperType.VERIFICATION;
   }
 
+  isLegalHold() {
+    return this.super_type === SuperType.LEGALHOLD;
+  }
+
   /**
    * Check if message can be copied.
    * @returns {boolean} True, if message can be copied.
