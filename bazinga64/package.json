@@ -19,7 +19,7 @@
     "rimraf": "2.6.3",
     "ts-node": "8.3.0",
     "typescript": "3.5.2",
-    "webpack": "4.35.0"
+    "webpack": "4.35.2"
   },
   "files": [
     "dist"
