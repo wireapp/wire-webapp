@@ -85,7 +85,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
               message: `Origin "${event.origin}" of event "${JSON.stringify(event)}" not matching "${
                 Config.BACKEND_REST
               }"`,
-            })
+            }),
           );
         }
 
@@ -104,7 +104,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
                 code: 401,
                 label: event.data.payload.label,
                 message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
-              })
+              }),
             );
           }
           default: {
@@ -115,7 +115,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
                 code: 500,
                 label: BackendError.LABEL.SSO_GENERIC_ERROR,
                 message: `Unmatched event type: "${JSON.stringify(event)}"`,
-              })
+              }),
             );
           }
         }
@@ -137,7 +137,7 @@ class SingleSignOn extends React.PureComponent<Props & InjectedIntlProps, State>
           toolbar=no,
           top=${childPosition.top},
           width=${POPUP_WIDTH}
-        `
+        `,
       );
 
       this.setState({isOverlayOpen: true});

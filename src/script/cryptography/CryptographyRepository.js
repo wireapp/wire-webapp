@@ -491,7 +491,7 @@ export class CryptographyRepository {
     // Session is broken, let's see what's really causing it...
     if (isInvalidMessage || isInvalidSignature) {
       this.logger.error(
-        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`
+        `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`,
       );
     } else if (isRemoteIdentityChanged) {
       this.logger.error(`Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`);
@@ -499,7 +499,7 @@ export class CryptographyRepository {
 
     this.logger.warn(
       `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
-      error
+      error,
     );
     this._reportDecryptionFailure(error, event);
 

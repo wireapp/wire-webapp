@@ -33,7 +33,7 @@ function getRandomWordCombination(): string {
 
 export function generateHandleVariations(
   handle: string,
-  numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS
+  numberOfVariations: number = DEFAULT_NUMBER_VARIATIONS,
 ): string[] {
   return Array.from(Array(numberOfVariations), (_, index) => {
     const digitCount = index + 1;

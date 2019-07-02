@@ -52,7 +52,7 @@ export class AssetService {
   }
 
   uploadProfileImage(
-    image: Blob | File
+    image: Blob | File,
   ): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
@@ -165,7 +165,7 @@ export class AssetService {
   postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
-    xhrAccessorFunction?: Function
+    xhrAccessorFunction?: Function,
   ): Promise<UploadAssetResponse> {
     const BOUNDARY = 'frontier';
 

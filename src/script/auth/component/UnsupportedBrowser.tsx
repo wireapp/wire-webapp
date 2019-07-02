@@ -128,6 +128,6 @@ export default injectIntl(
       isCheckingSupport: RuntimeSelector.isChecking(state),
       isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
     }),
-    (dispatch: ThunkDispatch): DispatchProps => ({})
-  )(UnsupportedBrowser)
+    (dispatch: ThunkDispatch): DispatchProps => ({}),
+  )(UnsupportedBrowser),
 );

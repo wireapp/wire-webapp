@@ -100,7 +100,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
         }));
 
         return Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message))
+          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
         );
       });
 
@@ -557,7 +557,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(() => {
         return Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message))
+          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
         ).then(ids => {
           primary_keys = ids;
         });

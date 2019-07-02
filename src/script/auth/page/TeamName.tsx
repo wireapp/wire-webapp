@@ -102,7 +102,7 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
               id: undefined,
               name: teamName,
             },
-          })
+          }),
         )
         .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
@@ -202,7 +202,7 @@ export default withRouter(
         pushAccountRegistrationData: (teamData: Partial<RegistrationDataState>) =>
           dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(teamData)),
         resetInviteErrors: () => dispatch(ROOT_ACTIONS.invitationAction.resetInviteErrors()),
-      })
-    )(TeamName)
-  )
+      }),
+    )(TeamName),
+  ),
 );

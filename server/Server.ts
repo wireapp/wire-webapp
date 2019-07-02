@@ -87,7 +87,7 @@ class Server {
         res.header('Cache-Control', `public, max-age=${this.config.SERVER.CACHE_DURATION_SECONDS}`);
         res.header(
           'Expires',
-          new Date(Date.now() + this.config.SERVER.CACHE_DURATION_SECONDS * milliSeconds).toUTCString()
+          new Date(Date.now() + this.config.SERVER.CACHE_DURATION_SECONDS * milliSeconds).toUTCString(),
         );
         next();
       });
@@ -115,7 +115,7 @@ class Server {
     this.app.use(
       helmet({
         frameguard: {action: 'deny'},
-      })
+      }),
     );
     this.app.use(helmet.noSniff());
     this.app.use(helmet.xssFilter());
@@ -124,7 +124,7 @@ class Server {
         includeSubDomains: true,
         maxAge: 31536000,
         preload: true,
-      })
+      }),
     );
     this.app.use(
       helmet.contentSecurityPolicy({
@@ -134,12 +134,12 @@ class Server {
         loose: !this.config.SERVER.DEVELOPMENT,
         reportOnly: false,
         setAllHeaders: false,
-      })
+      }),
     );
     this.app.use(
       helmet.referrerPolicy({
         policy: 'same-origin',
-      })
+      }),
     );
   }
 

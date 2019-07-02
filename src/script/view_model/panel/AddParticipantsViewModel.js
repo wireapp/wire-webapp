@@ -102,7 +102,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.headerText = ko.pureComputed(() =>
       this.selectedContacts().length
         ? t('addParticipantsHeaderWithCounter', this.selectedContacts().length)
-        : t('addParticipantsHeader')
+        : t('addParticipantsHeader'),
     );
 
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));

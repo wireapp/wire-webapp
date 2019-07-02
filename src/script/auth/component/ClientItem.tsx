@@ -163,7 +163,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
     if (!this.passwordInput.current.checkValidity()) {
       validationError = ValidationError.handleValidationState(
         this.passwordInput.current.name,
-        this.passwordInput.current.validity
+        this.passwordInput.current.validity,
       );
     }
     this.setState({validPassword: this.passwordInput.current.validity.valid, validationError});
@@ -179,7 +179,7 @@ class ClientItem extends React.Component<CombinedProps, State> {
           switch (error.label) {
             default: {
               const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType)
+                error.label.endsWith(errorType),
               );
               if (!isValidationError) {
                 throw error;

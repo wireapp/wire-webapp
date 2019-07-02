@@ -213,7 +213,7 @@ class Login extends React.Component<CombinedProps, State> {
     Object.entries(this.inputs).forEach(([inputKey, currentInput]) => {
       if (!currentInput.current.checkValidity()) {
         validationErrors.push(
-          ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity)
+          ValidationError.handleValidationState(currentInput.current.name, currentInput.current.validity),
         );
       }
       validInputs[inputKey] = currentInput.current.validity.valid;
@@ -274,7 +274,7 @@ class Login extends React.Component<CombinedProps, State> {
             }
             default: {
               const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                backendError.label.endsWith(errorType)
+                backendError.label.endsWith(errorType),
               );
               if (!isValidationError) {
                 throw backendError;
@@ -479,7 +479,7 @@ export default withRouter(
         doLoginAndJoin: (login: LoginData, conversationKey: string, conversationCode: string) =>
           dispatch(ROOT_ACTIONS.authAction.doLoginAndJoin(login, conversationKey, conversationCode)),
         resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-      })
-    )(Login)
-  )
+      }),
+    )(Login),
+  ),
 );
