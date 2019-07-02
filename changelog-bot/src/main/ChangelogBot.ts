@@ -36,54 +36,13 @@ const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
 logger.state.isEnabled = true;
 
 export class ChangelogBot {
-  public static SETUP = {
-    EXCLUDED_COMMIT_TYPES: ['build', 'chore', 'docs', 'refactor', 'runfix', 'test'],
-  };
-
-  constructor(private readonly loginData: LoginDataBackend, private readonly messageData: ChangelogData) {}
-
   get message(): string {
     const {content, isCustomMessage, repoSlug} = this.messageData;
     return isCustomMessage ? content : `\n**Changelog for "${repoSlug}":**\n\n${content}\n`;
   }
-
-  async sendMessage(): Promise<void> {
-    let {conversationIds} = this.messageData;
-
-    const engine = new MemoryEngine();
-    await engine.init('changelog-bot');
-
-    const backendUrls = this.loginData.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
-
-    const client = new APIClient({store: engine, urls: backendUrls});
-
-    const account = new Account(client);
-    try {
-      await account.login(this.loginData);
-    } catch (error) {
-      throw new Error(JSON.stringify(error));
-    }
-
-    if (!conversationIds) {
-      const allConversations = await client.conversation.api.getAllConversations();
-      const groupConversations = allConversations.filter(conversation => conversation.type === 0);
-      conversationIds = groupConversations.map(conversation => conversation.id);
-    }
-
-    if (!account.service) {
-      throw new Error('Account service is not set. Not logged in?');
-    }
-
-    for (const conversationId of conversationIds) {
-      if (conversationId) {
-        logger.log(`Sending message to conversation "${conversationId}" ...`);
-        const textPayload = await account.service.conversation.messageBuilder
-          .createText(conversationId, this.message)
-          .build();
-        await account.service.conversation.send(textPayload);
-      }
-    }
-  }
+  public static SETUP = {
+    EXCLUDED_COMMIT_TYPES: ['build', 'chore', 'docs', 'refactor', 'runfix', 'test'],
+  };
 
   static async generateChangelog(
     repoSlug: string,
@@ -141,5 +100,45 @@ export class ChangelogBot {
     }
 
     return stdout.trim();
+  }
+
+  constructor(private readonly loginData: LoginDataBackend, private readonly messageData: ChangelogData) {}
+
+  async sendMessage(): Promise<void> {
+    let {conversationIds} = this.messageData;
+
+    const engine = new MemoryEngine();
+    await engine.init('changelog-bot');
+
+    const backendUrls = this.loginData.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION;
+
+    const client = new APIClient({store: engine, urls: backendUrls});
+
+    const account = new Account(client);
+    try {
+      await account.login(this.loginData);
+    } catch (error) {
+      throw new Error(JSON.stringify(error));
+    }
+
+    if (!conversationIds) {
+      const allConversations = await client.conversation.api.getAllConversations();
+      const groupConversations = allConversations.filter(conversation => conversation.type === 0);
+      conversationIds = groupConversations.map(conversation => conversation.id);
+    }
+
+    if (!account.service) {
+      throw new Error('Account service is not set. Not logged in?');
+    }
+
+    for (const conversationId of conversationIds) {
+      if (conversationId) {
+        logger.log(`Sending message to conversation "${conversationId}" ...`);
+        const textPayload = await account.service.conversation.messageBuilder
+          .createText(conversationId, this.message)
+          .build();
+        await account.service.conversation.send(textPayload);
+      }
+    }
   }
 }

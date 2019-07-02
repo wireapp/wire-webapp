@@ -45,10 +45,10 @@ const zipObject = (props: any[], values: any[]) =>
   props.reduce((prev, prop, i) => ({...prev, ...{[prop]: values[i]}}), {});
 
 export class SQLeetEngine implements CRUDEngine {
+  public storeName = '';
   private db: any;
   private readonly dbConfig: any;
   private rawDatabase: string | undefined;
-  public storeName = '';
 
   constructor(
     wasmLocation: Uint8Array | string,
@@ -116,14 +116,6 @@ export class SQLeetEngine implements CRUDEngine {
     return strings.join('');
   }
 
-  private async load(database: string): Promise<Uint8Array | undefined> {
-    const databaseBinary = new Uint8Array(database.length);
-    for (let i = 0; i < database.length; i++) {
-      databaseBinary[i] = database.charCodeAt(i);
-    }
-    return databaseBinary;
-  }
-
   async purge(): Promise<void> {
     // Databases must be closed, when you're finished with them, or the memory consumption will grow forever.
     if (this.db) {
@@ -131,40 +123,6 @@ export class SQLeetEngine implements CRUDEngine {
     }
     this.db = null;
     this.rawDatabase = undefined;
-  }
-
-  private buildValues(
-    tableName: string,
-    entities: Record<string, SQLiteType>,
-  ): {columns: Record<string, string>; values: Record<string, any>} {
-    const table = this.schema[tableName];
-    if (!table) {
-      throw new Error(`Table "${tableName}" does not exist.`);
-    }
-    const columns: Record<string, string> = {};
-    const values: Record<string, any> = {};
-    for (const entity in entities) {
-      // Ensure the column name exists in the scheme as a first line of defense against SQL injection
-      if (typeof table[entity] !== 'string') {
-        continue;
-      }
-      let value = entities[entity];
-      // Stringify objects for the database
-      if (table[entity] === SQLiteType.JSON) {
-        value = JSON.stringify(value) as SQLiteType;
-      }
-      const reference = `@${hashColumnName(entity)}`;
-      columns[reference] = entity;
-      values[reference] = value;
-    }
-
-    if (Object.keys(columns).length === 0) {
-      throw new Error(
-        `Entity is empty for table "${tableName}". Are you sure you set the right scheme / column names?`,
-      );
-    }
-
-    return {columns, values};
   }
 
   async create<T>(tableName: string, primaryKey: string, entity: Record<string, any>): Promise<string> {
@@ -305,5 +263,47 @@ export class SQLeetEngine implements CRUDEngine {
       }
     }
     throw new UnsupportedError('WebAssembly is not supported.');
+  }
+
+  private async load(database: string): Promise<Uint8Array | undefined> {
+    const databaseBinary = new Uint8Array(database.length);
+    for (let i = 0; i < database.length; i++) {
+      databaseBinary[i] = database.charCodeAt(i);
+    }
+    return databaseBinary;
+  }
+
+  private buildValues(
+    tableName: string,
+    entities: Record<string, SQLiteType>,
+  ): {columns: Record<string, string>; values: Record<string, any>} {
+    const table = this.schema[tableName];
+    if (!table) {
+      throw new Error(`Table "${tableName}" does not exist.`);
+    }
+    const columns: Record<string, string> = {};
+    const values: Record<string, any> = {};
+    for (const entity in entities) {
+      // Ensure the column name exists in the scheme as a first line of defense against SQL injection
+      if (typeof table[entity] !== 'string') {
+        continue;
+      }
+      let value = entities[entity];
+      // Stringify objects for the database
+      if (table[entity] === SQLiteType.JSON) {
+        value = JSON.stringify(value) as SQLiteType;
+      }
+      const reference = `@${hashColumnName(entity)}`;
+      columns[reference] = entity;
+      values[reference] = value;
+    }
+
+    if (Object.keys(columns).length === 0) {
+      throw new Error(
+        `Entity is empty for table "${tableName}". Are you sure you set the right scheme / column names?`,
+      );
+    }
+
+    return {columns, values};
   }
 }

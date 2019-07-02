@@ -21,6 +21,18 @@ import * as CBOR from '@wireapp/cbor';
 import {DecodeError} from '../errors/DecodeError';
 
 export class Message {
+  static deserialise(buf: ArrayBuffer): CipherMessage | PreKeyMessage {
+    const decoder = new CBOR.Decoder(buf);
+
+    switch (decoder.u8()) {
+      case 1:
+        return CipherMessage.decode(decoder);
+      case 2:
+        return PreKeyMessage.decode(decoder);
+      default:
+        throw new DecodeError.InvalidType('Unrecognised message type', DecodeError.CODE.CASE_302);
+    }
+  }
   constructor() {}
 
   serialise(): ArrayBuffer {
@@ -35,19 +47,6 @@ export class Message {
 
     this.encode(encoder);
     return encoder.get_buffer();
-  }
-
-  static deserialise(buf: ArrayBuffer): CipherMessage | PreKeyMessage {
-    const decoder = new CBOR.Decoder(buf);
-
-    switch (decoder.u8()) {
-      case 1:
-        return CipherMessage.decode(decoder);
-      case 2:
-        return PreKeyMessage.decode(decoder);
-      default:
-        throw new DecodeError.InvalidType('Unrecognised message type', DecodeError.CODE.CASE_302);
-    }
   }
 }
 

@@ -25,26 +25,12 @@ import * as ClassUtil from '../util/ClassUtil';
 import * as RandomUtil from '../util/RandomUtil';
 
 export class SessionTag {
-  tag: Uint8Array;
-
-  constructor() {
-    this.tag = new Uint8Array([]);
-  }
-
   static new(): SessionTag {
     const length = 16;
 
     const st = ClassUtil.new_instance(SessionTag);
     st.tag = RandomUtil.random_bytes(length);
     return st;
-  }
-
-  toString(): string {
-    return sodium.to_hex(this.tag);
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    return encoder.bytes(this.tag);
   }
 
   static decode(decoder: CBOR.Decoder): SessionTag {
@@ -61,5 +47,18 @@ export class SessionTag {
     const st = ClassUtil.new_instance(SessionTag);
     st.tag = new Uint8Array(bytes);
     return st;
+  }
+  tag: Uint8Array;
+
+  constructor() {
+    this.tag = new Uint8Array([]);
+  }
+
+  toString(): string {
+    return sodium.to_hex(this.tag);
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    return encoder.bytes(this.tag);
   }
 }

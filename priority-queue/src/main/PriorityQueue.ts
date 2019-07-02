@@ -22,6 +22,22 @@ import {Item} from './Item';
 import {Priority} from './Priority';
 
 export class PriorityQueue {
+  public get all(): Item[] {
+    return this.queue;
+  }
+
+  public get first(): Item {
+    return this.queue[0];
+  }
+
+  public get last(): Item {
+    return this.queue[this.queue.length - 1];
+  }
+
+  public get size(): number {
+    return this.queue.length;
+  }
+  public isPending: boolean = false;
   private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
@@ -32,7 +48,6 @@ export class PriorityQueue {
     maxRetries: Infinity,
     retryDelay: 1000,
   };
-  public isPending: boolean = false;
   private queue: Item[] = [];
 
   constructor(config?: Config) {
@@ -67,20 +82,12 @@ export class PriorityQueue {
     this.queue = [];
   }
 
-  public get all(): Item[] {
-    return this.queue;
-  }
-
-  public get first(): Item {
-    return this.queue[0];
-  }
-
-  public get last(): Item {
-    return this.queue[this.queue.length - 1];
-  }
-
-  public get size(): number {
-    return this.queue.length;
+  public toString(): string {
+    return this.queue
+      .map((item: Item, index: number) => {
+        return `"${index}": ${item.fn.toString().replace(/(\r\n|\n|\r|\s+)/gm, '')}`;
+      })
+      .join('\r\n');
   }
 
   private resolveItems(): void {
@@ -125,13 +132,5 @@ export class PriorityQueue {
       this.isPending = true;
       this.resolveItems();
     }
-  }
-
-  public toString(): string {
-    return this.queue
-      .map((item: Item, index: number) => {
-        return `"${index}": ${item.fn.toString().replace(/(\r\n|\n|\r|\s+)/gm, '')}`;
-      })
-      .join('\r\n');
   }
 }

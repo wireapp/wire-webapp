@@ -32,16 +32,7 @@ import {ChainKey} from './ChainKey';
 import {MessageKeys} from './MessageKeys';
 
 export class RecvChain {
-  chain_key: ChainKey;
-  message_keys: MessageKeys[];
-  ratchet_key: PublicKey;
   static MAX_COUNTER_GAP = 1000;
-
-  constructor() {
-    this.chain_key = new ChainKey();
-    this.message_keys = [];
-    this.ratchet_key = new PublicKey();
-  }
 
   static new(chain_key: ChainKey, public_key: PublicKey): RecvChain {
     const rc = ClassUtil.new_instance(RecvChain);
@@ -49,6 +40,47 @@ export class RecvChain {
     rc.ratchet_key = public_key;
     rc.message_keys = [];
     return rc;
+  }
+
+  static decode(decoder: CBOR.Decoder): RecvChain {
+    const self = ClassUtil.new_instance(RecvChain);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0: {
+          self.chain_key = ChainKey.decode(decoder);
+          break;
+        }
+        case 1: {
+          self.ratchet_key = PublicKey.decode(decoder);
+          break;
+        }
+        case 2: {
+          self.message_keys = [];
+
+          let len = decoder.array();
+          while (len--) {
+            self.message_keys.push(MessageKeys.decode(decoder));
+          }
+          break;
+        }
+        default: {
+          decoder.skip();
+        }
+      }
+    }
+
+    return self;
+  }
+  chain_key: ChainKey;
+  message_keys: MessageKeys[];
+  ratchet_key: PublicKey;
+
+  constructor() {
+    this.chain_key = new ChainKey();
+    this.message_keys = [];
+    this.ratchet_key = new PublicKey();
   }
 
   try_message_keys(envelope: Envelope, msg: CipherMessage): Uint8Array {
@@ -134,37 +166,5 @@ export class RecvChain {
     encoder.u8(2);
     encoder.array(this.message_keys.length);
     return this.message_keys.map(key => key.encode(encoder));
-  }
-
-  static decode(decoder: CBOR.Decoder): RecvChain {
-    const self = ClassUtil.new_instance(RecvChain);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0: {
-          self.chain_key = ChainKey.decode(decoder);
-          break;
-        }
-        case 1: {
-          self.ratchet_key = PublicKey.decode(decoder);
-          break;
-        }
-        case 2: {
-          self.message_keys = [];
-
-          let len = decoder.array();
-          while (len--) {
-            self.message_keys.push(MessageKeys.decode(decoder));
-          }
-          break;
-        }
-        default: {
-          decoder.skip();
-        }
-      }
-    }
-
-    return self;
   }
 }

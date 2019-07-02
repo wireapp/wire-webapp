@@ -28,20 +28,41 @@ import * as ArrayUtil from '../util/ArrayUtil';
 import {PublicKey} from './PublicKey';
 
 export class SecretKey {
-  sec_curve: Uint8Array;
-  sec_edward: Uint8Array;
-
-  constructor() {
-    this.sec_curve = new Uint8Array([]);
-    this.sec_edward = new Uint8Array([]);
-  }
-
   static new(sec_edward: Uint8Array, sec_curve: Uint8Array): SecretKey {
     const sk = ClassUtil.new_instance(SecretKey);
 
     sk.sec_edward = sec_edward;
     sk.sec_curve = sec_curve;
     return sk;
+  }
+
+  static decode(decoder: CBOR.Decoder): SecretKey {
+    const self = ClassUtil.new_instance(SecretKey);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0:
+          self.sec_edward = new Uint8Array(decoder.bytes());
+          break;
+        default:
+          decoder.skip();
+      }
+    }
+
+    const sec_curve = ed2curve.convertSecretKey(self.sec_edward);
+    if (sec_curve) {
+      self.sec_curve = sec_curve;
+      return self;
+    }
+    throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
+  }
+  sec_curve: Uint8Array;
+  sec_edward: Uint8Array;
+
+  constructor() {
+    this.sec_curve = new Uint8Array([]);
+    this.sec_edward = new Uint8Array([]);
   }
 
   /**
@@ -71,27 +92,5 @@ export class SecretKey {
     encoder.object(1);
     encoder.u8(0);
     return encoder.bytes(this.sec_edward);
-  }
-
-  static decode(decoder: CBOR.Decoder): SecretKey {
-    const self = ClassUtil.new_instance(SecretKey);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.sec_edward = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
-      }
-    }
-
-    const sec_curve = ed2curve.convertSecretKey(self.sec_edward);
-    if (sec_curve) {
-      self.sec_curve = sec_curve;
-      return self;
-    }
-    throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
   }
 }

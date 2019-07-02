@@ -24,12 +24,11 @@ import {ExpiredBundle} from './ExpiredBundle';
 import {TransientBundle} from './TransientBundle';
 
 export class TransientStore extends EventEmitter {
-  private readonly bundles: Record<string, TransientBundle> = {};
-  private tableName = '';
-
   public static TOPIC = {
     EXPIRED: 'expired',
   };
+  private readonly bundles: Record<string, TransientBundle> = {};
+  private tableName = '';
 
   constructor(private readonly engine: CRUDEngine) {
     super();
@@ -66,26 +65,6 @@ export class TransientStore extends EventEmitter {
       });
   }
 
-  /**
-   * Returns a fully qualified name (FQN) which can be used to cache a transient bundle.
-   * @param {string} primaryKey - Primary key from which the FQN is created
-   * @returns {string} A fully qualified name
-   */
-  private constructCacheKey(primaryKey: string): string {
-    return `${this.engine.storeName}@${this.tableName}@${primaryKey}`;
-  }
-
-  private constructPrimaryKey(cacheKey: string): string {
-    return cacheKey.replace(`${this.engine.storeName}@${this.tableName}@`, '');
-  }
-
-  private createTransientBundle<T>(record: T, ttl: number): {expires: number; payload: T} {
-    return {
-      expires: Date.now() + ttl,
-      payload: record,
-    };
-  }
-
   public get(primaryKey: string): Promise<TransientBundle | undefined> {
     return this.getFromCache(primaryKey)
       .then((cachedBundle: TransientBundle) => {
@@ -97,15 +76,6 @@ export class TransientStore extends EventEmitter {
         }
         throw error;
       });
-  }
-
-  private getFromCache(primaryKey: string): Promise<TransientBundle> {
-    const cacheBundle = this.bundles[this.constructCacheKey(primaryKey)];
-    return Promise.resolve(cacheBundle);
-  }
-
-  private getFromStore(primaryKey: string): Promise<TransientBundle> {
-    return this.engine.read(this.tableName, primaryKey);
   }
 
   /**
@@ -135,6 +105,50 @@ export class TransientStore extends EventEmitter {
     );
   }
 
+  public delete(primaryKey: string): Promise<string> {
+    const cacheKey = this.constructCacheKey(primaryKey);
+
+    return Promise.all([this.deleteFromStore(primaryKey), this.deleteFromCache(cacheKey)]).then(() => cacheKey);
+  }
+
+  public deleteFromCache(cacheKey: string): string {
+    const timeoutID = this.bundles[cacheKey] && this.bundles[cacheKey].timeoutID;
+    if (timeoutID) {
+      clearTimeout(<number>timeoutID);
+    }
+    delete this.bundles[cacheKey];
+    return cacheKey;
+  }
+
+  /**
+   * Returns a fully qualified name (FQN) which can be used to cache a transient bundle.
+   * @param {string} primaryKey - Primary key from which the FQN is created
+   * @returns {string} A fully qualified name
+   */
+  private constructCacheKey(primaryKey: string): string {
+    return `${this.engine.storeName}@${this.tableName}@${primaryKey}`;
+  }
+
+  private constructPrimaryKey(cacheKey: string): string {
+    return cacheKey.replace(`${this.engine.storeName}@${this.tableName}@`, '');
+  }
+
+  private createTransientBundle<T>(record: T, ttl: number): {expires: number; payload: T} {
+    return {
+      expires: Date.now() + ttl,
+      payload: record,
+    };
+  }
+
+  private getFromCache(primaryKey: string): Promise<TransientBundle> {
+    const cacheBundle = this.bundles[this.constructCacheKey(primaryKey)];
+    return Promise.resolve(cacheBundle);
+  }
+
+  private getFromStore(primaryKey: string): Promise<TransientBundle> {
+    return this.engine.read(this.tableName, primaryKey);
+  }
+
   private save<TransientBundle>(primaryKey: string, bundle: TransientBundle): Promise<string> {
     const cacheKey: string = this.constructCacheKey(primaryKey);
 
@@ -149,23 +163,8 @@ export class TransientStore extends EventEmitter {
     return (this.bundles[cacheKey] = <any>bundle);
   }
 
-  public delete(primaryKey: string): Promise<string> {
-    const cacheKey = this.constructCacheKey(primaryKey);
-
-    return Promise.all([this.deleteFromStore(primaryKey), this.deleteFromCache(cacheKey)]).then(() => cacheKey);
-  }
-
   private deleteFromStore(primaryKey: string): Promise<string> {
     return this.engine.delete(this.tableName, primaryKey);
-  }
-
-  public deleteFromCache(cacheKey: string): string {
-    const timeoutID = this.bundles[cacheKey] && this.bundles[cacheKey].timeoutID;
-    if (timeoutID) {
-      clearTimeout(<number>timeoutID);
-    }
-    delete this.bundles[cacheKey];
-    return cacheKey;
   }
 
   private expireBundle(cacheKey: string): Promise<ExpiredBundle> {

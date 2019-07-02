@@ -25,8 +25,6 @@ import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
 
 export class SelfAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     CONSENT: 'consent',
     EMAIL: 'email',
@@ -38,6 +36,7 @@ export class SelfAPI {
     SEARCHABLE: 'searchable',
     SELF: '/self',
   };
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Remove your email address.

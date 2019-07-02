@@ -40,12 +40,6 @@ export class MemoryEngine implements CRUDEngine {
     delete this.stores[this.storeName];
   }
 
-  private prepareTable(tableName: string): void {
-    if (!this.stores[this.storeName][tableName]) {
-      this.stores[this.storeName][tableName] = {};
-    }
-  }
-
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       this.prepareTable(tableName);
@@ -139,5 +133,11 @@ export class MemoryEngine implements CRUDEngine {
       this.stores[this.storeName][tableName][primaryKey] = record;
       return primaryKey;
     });
+  }
+
+  private prepareTable(tableName: string): void {
+    if (!this.stores[this.storeName][tableName]) {
+      this.stores[this.storeName][tableName] = {};
+    }
   }
 }

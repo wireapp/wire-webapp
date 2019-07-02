@@ -60,14 +60,6 @@ export class Bot {
     this.handlers.delete(key);
   }
 
-  private isAllowedConversation(conversationId: string): boolean {
-    return this.config.conversations.length === 0 ? true : this.config.conversations.includes(conversationId);
-  }
-
-  private isOwner(userId: string): boolean {
-    return this.config.owners.length === 0 ? true : this.config.owners.includes(userId);
-  }
-
   public async sendText(conversationId: string, message: string): Promise<void> {
     if (this.account && this.account.service) {
       const textPayload = await this.account.service.conversation.messageBuilder
@@ -121,6 +113,14 @@ export class Bot {
     this.account.on('error', error => this.logger.error(error));
 
     this.handlers.forEach(handler => (handler.account = this.account));
+  }
+
+  private isAllowedConversation(conversationId: string): boolean {
+    return this.config.conversations.length === 0 ? true : this.config.conversations.includes(conversationId);
+  }
+
+  private isOwner(userId: string): boolean {
+    return this.config.owners.length === 0 ? true : this.config.owners.includes(userId);
   }
 
   private handlePayload(payload: PayloadBundle): void {

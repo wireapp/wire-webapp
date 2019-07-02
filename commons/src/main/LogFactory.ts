@@ -34,8 +34,6 @@ export interface LoggerOptions {
 }
 
 export class LogFactory {
-  private static readonly logFilePath?: string = undefined;
-
   static COLOR_STEP = {
     B: 97,
     G: 79,
@@ -118,4 +116,5 @@ export class LogFactory {
 
     return logger;
   }
+  private static readonly logFilePath?: string = undefined;
 }

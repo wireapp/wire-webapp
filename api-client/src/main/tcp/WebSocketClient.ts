@@ -50,15 +50,6 @@ export enum PingMessage {
 }
 
 export class WebSocketClient extends EventEmitter {
-  private readonly baseUrl: string;
-  private readonly logger: logdown.Logger;
-  private clientId?: string;
-  private hasUnansweredPing: boolean;
-  private pingInterval?: NodeJS.Timeout;
-  private socket?: WebSocket;
-  public client: HttpClient;
-  public isOnline: boolean;
-
   public static CONFIG = {
     PING_INTERVAL: TimeUtil.TimeInMillis.SECOND * 5,
   };
@@ -72,6 +63,14 @@ export class WebSocketClient extends EventEmitter {
     minReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 4,
     reconnectionDelayGrowFactor: 1.3,
   };
+  public client: HttpClient;
+  public isOnline: boolean;
+  private readonly baseUrl: string;
+  private readonly logger: logdown.Logger;
+  private clientId?: string;
+  private hasUnansweredPing: boolean;
+  private pingInterval?: NodeJS.Timeout;
+  private socket?: WebSocket;
 
   constructor(baseUrl: string, client: HttpClient) {
     super();
@@ -85,16 +84,6 @@ export class WebSocketClient extends EventEmitter {
       logger: console,
       markdown: false,
     });
-  }
-
-  private buildWebSocketUrl(accessToken = this.client.accessTokenStore.accessToken!.access_token): string {
-    let url = `${this.baseUrl}/await?access_token=${accessToken}`;
-    if (this.clientId) {
-      // Note: If no client ID is given, then the WebSocket connection will receive all notifications for all clients
-      // of the connected user
-      url += `&client=${this.clientId}`;
-    }
-    return url;
   }
 
   public async connect(clientId?: string): Promise<WebSocketClient> {
@@ -139,22 +128,6 @@ export class WebSocketClient extends EventEmitter {
     return this;
   }
 
-  private async refreshAccessToken(): Promise<void> {
-    try {
-      await this.client.refreshAccessToken();
-    } catch (error) {
-      if (error instanceof NetworkError) {
-        this.logger.warn(error);
-      } else {
-        const mappedError = BackendErrorMapper.map(error);
-        this.emit(
-          error instanceof InvalidTokenError ? WebSocketTopic.ON_DISCONNECT : WebSocketTopic.ON_ERROR,
-          mappedError,
-        );
-      }
-    }
-  }
-
   public disconnect(reason = 'Unknown reason', keepClosed = true): void {
     if (this.socket) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
@@ -173,6 +146,32 @@ export class WebSocketClient extends EventEmitter {
     }
 
     this.isOnline = false;
+  }
+
+  private buildWebSocketUrl(accessToken = this.client.accessTokenStore.accessToken!.access_token): string {
+    let url = `${this.baseUrl}/await?access_token=${accessToken}`;
+    if (this.clientId) {
+      // Note: If no client ID is given, then the WebSocket connection will receive all notifications for all clients
+      // of the connected user
+      url += `&client=${this.clientId}`;
+    }
+    return url;
+  }
+
+  private async refreshAccessToken(): Promise<void> {
+    try {
+      await this.client.refreshAccessToken();
+    } catch (error) {
+      if (error instanceof NetworkError) {
+        this.logger.warn(error);
+      } else {
+        const mappedError = BackendErrorMapper.map(error);
+        this.emit(
+          error instanceof InvalidTokenError ? WebSocketTopic.ON_DISCONNECT : WebSocketTopic.ON_ERROR,
+          mappedError,
+        );
+      }
+    }
   }
 
   private readonly sendPing = (): void => {

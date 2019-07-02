@@ -25,14 +25,6 @@ import {CipherKey} from './CipherKey';
 import {MacKey} from './MacKey';
 
 export class DerivedSecrets {
-  cipher_key: CipherKey;
-  mac_key: MacKey;
-
-  constructor() {
-    this.cipher_key = new CipherKey();
-    this.mac_key = new MacKey(new Uint8Array([]));
-  }
-
   static kdf(input: Uint8Array | ArrayBuffer[], salt: Uint8Array, info: string): DerivedSecrets {
     const byte_length = 64;
 
@@ -55,5 +47,12 @@ export class DerivedSecrets {
    */
   static kdf_without_salt(input: Uint8Array | ArrayBuffer[], info: string): DerivedSecrets {
     return this.kdf(input, new Uint8Array(0), info);
+  }
+  cipher_key: CipherKey;
+  mac_key: MacKey;
+
+  constructor() {
+    this.cipher_key = new CipherKey();
+    this.mac_key = new MacKey(new Uint8Array([]));
   }
 }

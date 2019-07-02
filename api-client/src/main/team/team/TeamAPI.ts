@@ -23,11 +23,10 @@ import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {HttpClient} from '../../http/';
 
 export class TeamAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     TEAMS: '/teams',
   };
+  constructor(private readonly client: HttpClient) {}
 
   public postTeam(team: NewTeamData): Promise<void> {
     const config: AxiosRequestConfig = {

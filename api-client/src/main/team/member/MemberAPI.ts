@@ -24,11 +24,10 @@ import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/TeamAPI';
 
 export class MemberAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     MEMBERS: 'members',
   };
+  constructor(private readonly client: HttpClient) {}
 
   public getMembers(teamId: string): Promise<Members> {
     const config: AxiosRequestConfig = {

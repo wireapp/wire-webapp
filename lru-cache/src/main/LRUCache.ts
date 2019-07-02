@@ -101,22 +101,6 @@ export class LRUCache<T> {
     return null;
   }
 
-  private remove(node: Node<T>): Node<T> {
-    if (node.previous) {
-      node.previous.next = node.next;
-    } else {
-      this.head = node.next;
-    }
-
-    if (node.next !== null) {
-      node.next.previous = node.previous;
-    } else {
-      this.end = node.previous;
-    }
-
-    return node;
-  }
-
   public set(key: string, value: T): T | undefined {
     const matchedNode = this.map[key];
     let removedNode;
@@ -166,21 +150,6 @@ export class LRUCache<T> {
     }
   }
 
-  private setHead(node: Node<T>): void {
-    node.next = this.head;
-    node.previous = null;
-
-    if (this.head) {
-      this.head.previous = node;
-    }
-
-    this.head = node;
-
-    if (!this.end) {
-      this.end = this.head;
-    }
-  }
-
   public size(): number {
     return Object.keys(this.map).length;
   }
@@ -206,6 +175,37 @@ export class LRUCache<T> {
     while (entry) {
       yield entry.value;
       entry = entry.next;
+    }
+  }
+
+  private remove(node: Node<T>): Node<T> {
+    if (node.previous) {
+      node.previous.next = node.next;
+    } else {
+      this.head = node.next;
+    }
+
+    if (node.next !== null) {
+      node.next.previous = node.previous;
+    } else {
+      this.end = node.previous;
+    }
+
+    return node;
+  }
+
+  private setHead(node: Node<T>): void {
+    node.next = this.head;
+    node.previous = null;
+
+    if (this.head) {
+      this.head.previous = node;
+    }
+
+    this.head = node;
+
+    if (!this.end) {
+      this.end = this.head;
     }
   }
 }

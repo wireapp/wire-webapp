@@ -26,47 +26,8 @@ export interface DexieInstance extends Dexie {
 }
 
 export class IndexedDBEngine implements CRUDEngine {
-  private db?: DexieInstance;
   public storeName = '';
-
-  // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on
-  // page "about:blank")
-  private canUseIndexedDB(): Promise<void> {
-    const platform = typeof global === 'undefined' ? window : global;
-    if ('indexedDB' in platform) {
-      return new Promise((resolve, reject) => {
-        const name = 'test';
-        const DBOpenRequest = platform.indexedDB.open(name);
-        DBOpenRequest.onerror = error => reject(error);
-        DBOpenRequest.onsuccess = () => {
-          const db = DBOpenRequest.result;
-          db.close();
-          const deleteRequest = platform.indexedDB.deleteDatabase(name);
-          deleteRequest.onerror = error => reject(error);
-          deleteRequest.onsuccess = () => resolve();
-        };
-      });
-    } else {
-      return Promise.reject(new StoreEngineError.UnsupportedError('Could not find indexedDB in global scope'));
-    }
-  }
-
-  /** @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space */
-  private async hasEnoughQuota(): Promise<void> {
-    if ('storage' in navigator && 'estimate' in navigator.storage) {
-      const {quota, usage} = await navigator.storage.estimate();
-
-      if (typeof quota === 'number' && typeof usage === 'number') {
-        const diskIsFull = usage >= quota;
-        if (diskIsFull) {
-          const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
-          return Promise.reject(new StoreEngineError.LowDiskSpaceError(errorMessage));
-        }
-      }
-    }
-
-    return Promise.resolve();
-  }
+  private db?: DexieInstance;
 
   public async isSupported(): Promise<void> {
     await this.canUseIndexedDB();
@@ -82,33 +43,8 @@ export class IndexedDBEngine implements CRUDEngine {
     return Promise.resolve(this.assignDb(db));
   }
 
-  // If you want to add listeners to the database and you don't care if it is a new database (init)
-  // or an existing (initWithDB) one, then this method is the right place to do it.
-  private assignDb(db: DexieInstance): DexieInstance {
-    this.db = db;
-    this.storeName = this.db.name;
-    return this.db;
-  }
-
   public purge(): Promise<void> {
     return this.db ? this.db.delete() : Dexie.delete(this.storeName);
-  }
-
-  private mapDatabaseError(error: Dexie.DexieError, tableName: string, primaryKey: string): Error {
-    const isAlreadyExisting = error instanceof Dexie.ConstraintError;
-    /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
-    const hasNotEnoughDiskSpace =
-      error.name === Dexie.errnames.QuotaExceeded || (error.inner && error.inner.name === Dexie.errnames.QuotaExceeded);
-
-    if (isAlreadyExisting) {
-      const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-      return new StoreEngineError.RecordAlreadyExistsError(message);
-    } else if (hasNotEnoughDiskSpace) {
-      const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
-      return new StoreEngineError.LowDiskSpaceError(message);
-    } else {
-      return error;
-    }
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
@@ -173,5 +109,69 @@ export class IndexedDBEngine implements CRUDEngine {
       }
       return this.updateOrCreate(tableName, primaryKey, record);
     });
+  }
+
+  // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on
+  // page "about:blank")
+  private canUseIndexedDB(): Promise<void> {
+    const platform = typeof global === 'undefined' ? window : global;
+    if ('indexedDB' in platform) {
+      return new Promise((resolve, reject) => {
+        const name = 'test';
+        const DBOpenRequest = platform.indexedDB.open(name);
+        DBOpenRequest.onerror = error => reject(error);
+        DBOpenRequest.onsuccess = () => {
+          const db = DBOpenRequest.result;
+          db.close();
+          const deleteRequest = platform.indexedDB.deleteDatabase(name);
+          deleteRequest.onerror = error => reject(error);
+          deleteRequest.onsuccess = () => resolve();
+        };
+      });
+    } else {
+      return Promise.reject(new StoreEngineError.UnsupportedError('Could not find indexedDB in global scope'));
+    }
+  }
+
+  /** @see https://developers.google.com/web/updates/2017/08/estimating-available-storage-space */
+  private async hasEnoughQuota(): Promise<void> {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const {quota, usage} = await navigator.storage.estimate();
+
+      if (typeof quota === 'number' && typeof usage === 'number') {
+        const diskIsFull = usage >= quota;
+        if (diskIsFull) {
+          const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
+          return Promise.reject(new StoreEngineError.LowDiskSpaceError(errorMessage));
+        }
+      }
+    }
+
+    return Promise.resolve();
+  }
+
+  // If you want to add listeners to the database and you don't care if it is a new database (init)
+  // or an existing (initWithDB) one, then this method is the right place to do it.
+  private assignDb(db: DexieInstance): DexieInstance {
+    this.db = db;
+    this.storeName = this.db.name;
+    return this.db;
+  }
+
+  private mapDatabaseError(error: Dexie.DexieError, tableName: string, primaryKey: string): Error {
+    const isAlreadyExisting = error instanceof Dexie.ConstraintError;
+    /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
+    const hasNotEnoughDiskSpace =
+      error.name === Dexie.errnames.QuotaExceeded || (error.inner && error.inner.name === Dexie.errnames.QuotaExceeded);
+
+    if (isAlreadyExisting) {
+      const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+      return new StoreEngineError.RecordAlreadyExistsError(message);
+    } else if (hasNotEnoughDiskSpace) {
+      const message = `Cannot save "${primaryKey}" in "${tableName}" because there is low disk space.`;
+      return new StoreEngineError.LowDiskSpaceError(message);
+    } else {
+      return error;
+    }
   }
 }

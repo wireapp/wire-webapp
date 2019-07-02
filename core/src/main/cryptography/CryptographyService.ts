@@ -48,9 +48,16 @@ export type DecryptionResult =
     };
 
 export class CryptographyService {
-  private readonly logger: logdown.Logger;
+  public static constructSessionId(userId: string, clientId: string): string {
+    return `${userId}@${clientId}`;
+  }
+
+  private static dismantleSessionId(sessionId: string): string[] {
+    return sessionId.split('@');
+  }
 
   public cryptobox: Cryptobox;
+  private readonly logger: logdown.Logger;
   private readonly database: CryptographyDatabaseRepository;
 
   constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
@@ -60,10 +67,6 @@ export class CryptographyService {
       logger: console,
       markdown: false,
     });
-  }
-
-  public static constructSessionId(userId: string, clientId: string): string {
-    return `${userId}@${clientId}`;
   }
 
   public async createCryptobox(): Promise<SerializedPreKey[]> {
@@ -106,10 +109,6 @@ export class CryptographyService {
     }
   }
 
-  private static dismantleSessionId(sessionId: string): string[] {
-    return sessionId.split('@');
-  }
-
   public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
     const recipients: OTRRecipients = {};
     const encryptions: Promise<SessionPayloadBundle>[] = [];
@@ -139,6 +138,19 @@ export class CryptographyService {
     return recipients;
   }
 
+  public async initCryptobox(): Promise<void> {
+    await this.cryptobox.load();
+  }
+
+  public deleteCryptographyStores(): Promise<boolean[]> {
+    return this.database.deleteStores();
+  }
+
+  public async resetSession(sessionId: string): Promise<void> {
+    await this.cryptobox.session_delete(sessionId);
+    this.logger.log(`Deleted session ID "${sessionId}".`);
+  }
+
   private async encryptPayloadForSession(
     sessionId: string,
     plainText: Uint8Array,
@@ -161,18 +173,5 @@ export class CryptographyService {
     }
 
     return {sessionId, encryptedPayload};
-  }
-
-  public async initCryptobox(): Promise<void> {
-    await this.cryptobox.load();
-  }
-
-  public deleteCryptographyStores(): Promise<boolean[]> {
-    return this.database.deleteStores();
-  }
-
-  public async resetSession(sessionId: string): Promise<void> {
-    await this.cryptobox.session_delete(sessionId);
-    this.logger.log(`Deleted session ID "${sessionId}".`);
   }
 }

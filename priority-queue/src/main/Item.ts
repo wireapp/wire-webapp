@@ -20,16 +20,16 @@
 import {Priority} from './Priority';
 
 export class Item {
-  /** original business logic */
-  fn: Function = () => {};
   label: string | undefined;
   priority: number = Priority.MEDIUM;
-  /** wrapped `reject` of `fn` */
-  reject: Function = () => {};
-  /** wrapped `resolve` of `fn` */
-  resolve: Function = () => {};
   /** number of remaining retries for rejecting Promises */
   retry: number = Infinity;
   /** time when the item has been added to the queue */
   timestamp: number = 0;
+  /** original business logic */
+  fn: Function = () => {};
+  /** wrapped `reject` of `fn` */
+  reject: Function = () => {};
+  /** wrapped `resolve` of `fn` */
+  resolve: Function = () => {};
 }

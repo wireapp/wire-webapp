@@ -23,14 +23,13 @@ import {GiphyOptions, GiphyResult, GiphySearchResult} from '../giphy/';
 import {HttpClient} from '../http/';
 
 export class GiphyAPI {
-  constructor(private readonly client: HttpClient) {}
-
   static URL = {
     GIPHY: 'giphy/v1/gifs',
     PROXY: '/proxy',
     RANDOM: 'random',
     SEARCH: 'search',
   };
+  constructor(private readonly client: HttpClient) {}
 
   /**
    * Get a random GIF from Giphy.

@@ -41,14 +41,6 @@ export class LocalStorageEngine implements CRUDEngine {
     window.localStorage.clear();
   }
 
-  private createKey(tableName: string, primaryKey: string): string {
-    return `${this.createPrefix(tableName)}${primaryKey}`;
-  }
-
-  private createPrefix(tableName: string): string {
-    return `${this.storeName}@${tableName}@`;
-  }
-
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       const key: string = this.createKey(tableName, primaryKey);
@@ -181,5 +173,13 @@ export class LocalStorageEngine implements CRUDEngine {
 
       return primaryKey;
     });
+  }
+
+  private createKey(tableName: string, primaryKey: string): string {
+    return `${this.createPrefix(tableName)}${primaryKey}`;
+  }
+
+  private createPrefix(tableName: string): string {
+    return `${this.storeName}@${tableName}@`;
   }
 }

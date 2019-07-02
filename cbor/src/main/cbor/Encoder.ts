@@ -32,100 +32,6 @@ export class Encoder {
     return this.buffer.slice(0, this.view.byteOffset);
   }
 
-  private _new_buffer_length(need_nbytes: number): number {
-    return ~~Math.max(this.buffer.byteLength * 1.5, this.buffer.byteLength + need_nbytes);
-  }
-
-  private _grow_buffer(need_nbytes: number): void {
-    const new_len = this._new_buffer_length(need_nbytes);
-    const new_buf = new ArrayBuffer(new_len);
-    new Uint8Array(new_buf).set(new Uint8Array(this.buffer));
-    this.buffer = new_buf;
-    this.view = new DataView(this.buffer, this.view.byteOffset);
-  }
-
-  private _ensure(bytes: number): void {
-    if (!(this.view.byteLength < bytes)) {
-      return;
-    }
-    return this._grow_buffer(bytes);
-  }
-
-  private _advance(bytes: number): void {
-    this.view = new DataView(this.buffer, this.view.byteOffset + bytes);
-  }
-
-  private _write<T>(bytes: number, callback: () => T): void {
-    this._ensure(bytes);
-    callback();
-    return this._advance(bytes);
-  }
-
-  private _write_type_and_len(type: Type, len: number): void {
-    const major = Type.major(type) << 5;
-
-    if (0 <= len && len <= 23) {
-      return this._u8(major | len);
-    } else if (24 <= len && len <= 255) {
-      this._u8(major | 24);
-      return this._u8(len);
-    } else if (0x100 <= len && len <= 0xffff) {
-      this._u8(major | 25);
-      return this._u16(len);
-    } else if (0x10000 <= len && len <= 0xffffffff) {
-      this._u8(major | 26);
-      return this._u32(len);
-    } else if (len <= Number.MAX_SAFE_INTEGER) {
-      this._u8(major | 27);
-      return this._u64(len);
-    }
-    throw new RangeError('Invalid size for CBOR object');
-  }
-
-  /*
-   * writer-like interface over our ArrayBuffer
-   */
-
-  private _u8(value: number): void {
-    return this._write(1, () => this.view.setUint8(0, value));
-  }
-
-  private _u16(value: number): void {
-    return this._write(2, () => this.view.setUint16(0, value));
-  }
-
-  private _u32(value: number): void {
-    return this._write(4, () => this.view.setUint32(0, value));
-  }
-
-  private _u64(value: number): void {
-    const low = value % Math.pow(2, 32);
-    const high = (value - low) / Math.pow(2, 32);
-    const w64 = () => {
-      this.view.setUint32(0, high);
-      return this.view.setUint32(4, low);
-    };
-    return this._write(8, w64);
-  }
-
-  private _f32(value: number): void {
-    return this._write(4, () => this.view.setFloat32(0, value));
-  }
-
-  private _f64(value: number): void {
-    return this._write(8, () => this.view.setFloat64(0, value));
-  }
-
-  private _bytes(value: ArrayBuffer | Uint8Array): void {
-    const nbytes = value.byteLength;
-
-    this._ensure(nbytes);
-
-    new Uint8Array(this.buffer, this.view.byteOffset).set(<Uint8Array>value);
-
-    return this._advance(nbytes);
-  }
-
   public u8(value: number): Encoder {
     if (0 <= value && value <= 23) {
       this._u8(value);
@@ -362,5 +268,99 @@ export class Encoder {
   public object_end(): Encoder {
     this._u8(0xff);
     return this;
+  }
+
+  private _new_buffer_length(need_nbytes: number): number {
+    return ~~Math.max(this.buffer.byteLength * 1.5, this.buffer.byteLength + need_nbytes);
+  }
+
+  private _grow_buffer(need_nbytes: number): void {
+    const new_len = this._new_buffer_length(need_nbytes);
+    const new_buf = new ArrayBuffer(new_len);
+    new Uint8Array(new_buf).set(new Uint8Array(this.buffer));
+    this.buffer = new_buf;
+    this.view = new DataView(this.buffer, this.view.byteOffset);
+  }
+
+  private _ensure(bytes: number): void {
+    if (!(this.view.byteLength < bytes)) {
+      return;
+    }
+    return this._grow_buffer(bytes);
+  }
+
+  private _advance(bytes: number): void {
+    this.view = new DataView(this.buffer, this.view.byteOffset + bytes);
+  }
+
+  private _write<T>(bytes: number, callback: () => T): void {
+    this._ensure(bytes);
+    callback();
+    return this._advance(bytes);
+  }
+
+  private _write_type_and_len(type: Type, len: number): void {
+    const major = Type.major(type) << 5;
+
+    if (0 <= len && len <= 23) {
+      return this._u8(major | len);
+    } else if (24 <= len && len <= 255) {
+      this._u8(major | 24);
+      return this._u8(len);
+    } else if (0x100 <= len && len <= 0xffff) {
+      this._u8(major | 25);
+      return this._u16(len);
+    } else if (0x10000 <= len && len <= 0xffffffff) {
+      this._u8(major | 26);
+      return this._u32(len);
+    } else if (len <= Number.MAX_SAFE_INTEGER) {
+      this._u8(major | 27);
+      return this._u64(len);
+    }
+    throw new RangeError('Invalid size for CBOR object');
+  }
+
+  /*
+   * writer-like interface over our ArrayBuffer
+   */
+
+  private _u8(value: number): void {
+    return this._write(1, () => this.view.setUint8(0, value));
+  }
+
+  private _u16(value: number): void {
+    return this._write(2, () => this.view.setUint16(0, value));
+  }
+
+  private _u32(value: number): void {
+    return this._write(4, () => this.view.setUint32(0, value));
+  }
+
+  private _u64(value: number): void {
+    const low = value % Math.pow(2, 32);
+    const high = (value - low) / Math.pow(2, 32);
+    const w64 = () => {
+      this.view.setUint32(0, high);
+      return this.view.setUint32(4, low);
+    };
+    return this._write(8, w64);
+  }
+
+  private _f32(value: number): void {
+    return this._write(4, () => this.view.setFloat32(0, value));
+  }
+
+  private _f64(value: number): void {
+    return this._write(8, () => this.view.setFloat64(0, value));
+  }
+
+  private _bytes(value: ArrayBuffer | Uint8Array): void {
+    const nbytes = value.byteLength;
+
+    this._ensure(nbytes);
+
+    new Uint8Array(this.buffer, this.view.byteOffset).set(<Uint8Array>value);
+
+    return this._advance(nbytes);
   }
 }

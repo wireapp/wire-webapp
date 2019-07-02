@@ -25,19 +25,38 @@ import * as ClassUtil from '../util/ClassUtil';
 import {MessageKeys} from './MessageKeys';
 
 export class ChainKey {
+  static from_mac_key(key: MacKey, counter: number): ChainKey {
+    const ck = ClassUtil.new_instance(ChainKey);
+    ck.key = key;
+    ck.idx = counter;
+    return ck;
+  }
+
+  static decode(decoder: CBOR.Decoder): ChainKey {
+    const self = ClassUtil.new_instance(ChainKey);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0:
+          self.key = MacKey.decode(decoder);
+          break;
+        case 1:
+          self.idx = decoder.u32();
+          break;
+        default:
+          decoder.skip();
+      }
+    }
+
+    return self;
+  }
   idx: number;
   key: MacKey;
 
   constructor() {
     this.idx = -1;
     this.key = new MacKey(new Uint8Array([]));
-  }
-
-  static from_mac_key(key: MacKey, counter: number): ChainKey {
-    const ck = ClassUtil.new_instance(ChainKey);
-    ck.key = key;
-    ck.idx = counter;
-    return ck;
   }
 
   next(): ChainKey {
@@ -59,25 +78,5 @@ export class ChainKey {
     this.key.encode(encoder);
     encoder.u8(1);
     return encoder.u32(this.idx);
-  }
-
-  static decode(decoder: CBOR.Decoder): ChainKey {
-    const self = ClassUtil.new_instance(ChainKey);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.key = MacKey.decode(decoder);
-          break;
-        case 1:
-          self.idx = decoder.u32();
-          break;
-        default:
-          decoder.skip();
-      }
-    }
-
-    return self;
   }
 }

@@ -31,15 +31,6 @@ import {KeyPair} from './KeyPair';
  */
 export class PreKey {
   static MAX_PREKEY_ID = 0xffff;
-  key_id: number;
-  key_pair: KeyPair;
-  version: number;
-
-  constructor() {
-    this.key_id = -1;
-    this.key_pair = new KeyPair();
-    this.version = -1;
-  }
 
   static async new(pre_key_id: number): Promise<PreKey> {
     this.validate_pre_key_id(pre_key_id);
@@ -85,24 +76,8 @@ export class PreKey {
     );
   }
 
-  serialise(): ArrayBuffer {
-    const encoder = new CBOR.Encoder();
-    this.encode(encoder);
-    return encoder.get_buffer();
-  }
-
   static deserialise(buf: ArrayBuffer): PreKey {
     return PreKey.decode(new CBOR.Decoder(buf));
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
-    encoder.u8(0);
-    encoder.u8(this.version);
-    encoder.u8(1);
-    encoder.u16(this.key_id);
-    encoder.u8(2);
-    return this.key_pair.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): PreKey {
@@ -126,5 +101,30 @@ export class PreKey {
     }
 
     return self;
+  }
+  key_id: number;
+  key_pair: KeyPair;
+  version: number;
+
+  constructor() {
+    this.key_id = -1;
+    this.key_pair = new KeyPair();
+    this.version = -1;
+  }
+
+  serialise(): ArrayBuffer {
+    const encoder = new CBOR.Encoder();
+    this.encode(encoder);
+    return encoder.get_buffer();
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(3);
+    encoder.u8(0);
+    encoder.u8(this.version);
+    encoder.u8(1);
+    encoder.u16(this.key_id);
+    encoder.u8(2);
+    return this.key_pair.encode(encoder);
   }
 }

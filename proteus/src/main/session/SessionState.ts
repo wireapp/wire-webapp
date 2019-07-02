@@ -46,18 +46,6 @@ import {SendChain} from './SendChain';
 import {Session} from './Session';
 
 export class SessionState {
-  prev_counter: number;
-  recv_chains: RecvChain[];
-  root_key: RootKey;
-  send_chain: SendChain;
-
-  constructor() {
-    this.prev_counter = -1;
-    this.recv_chains = [];
-    this.root_key = new RootKey();
-    this.send_chain = new SendChain();
-  }
-
   static async init_as_alice(
     alice_identity_pair: IdentityKeyPair,
     alice_base: IdentityKeyPair | KeyPair,
@@ -114,6 +102,56 @@ export class SessionState {
     state.root_key = rootkey;
     state.prev_counter = 0;
     return state;
+  }
+
+  static deserialise(buf: ArrayBuffer): SessionState {
+    return SessionState.decode(new CBOR.Decoder(buf));
+  }
+
+  static decode(decoder: CBOR.Decoder): SessionState {
+    const self = ClassUtil.new_instance(SessionState);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0: {
+          self.recv_chains = [];
+          let len = decoder.array();
+          while (len--) {
+            self.recv_chains.push(RecvChain.decode(decoder));
+          }
+          break;
+        }
+        case 1: {
+          self.send_chain = SendChain.decode(decoder);
+          break;
+        }
+        case 2: {
+          self.root_key = RootKey.decode(decoder);
+          break;
+        }
+        case 3: {
+          self.prev_counter = decoder.u32();
+          break;
+        }
+        default: {
+          decoder.skip();
+        }
+      }
+    }
+
+    return self;
+  }
+  prev_counter: number;
+  recv_chains: RecvChain[];
+  root_key: RootKey;
+  send_chain: SendChain;
+
+  constructor() {
+    this.prev_counter = -1;
+    this.recv_chains = [];
+    this.root_key = new RootKey();
+    this.send_chain = new SendChain();
   }
 
   async ratchet(ratchet_key: PublicKey): Promise<void> {
@@ -222,10 +260,6 @@ export class SessionState {
     return encoder.get_buffer();
   }
 
-  static deserialise(buf: ArrayBuffer): SessionState {
-    return SessionState.decode(new CBOR.Decoder(buf));
-  }
-
   encode(encoder: CBOR.Encoder): CBOR.Encoder {
     encoder.object(4);
     encoder.u8(0);
@@ -237,40 +271,5 @@ export class SessionState {
     this.root_key.encode(encoder);
     encoder.u8(3);
     return encoder.u32(this.prev_counter);
-  }
-
-  static decode(decoder: CBOR.Decoder): SessionState {
-    const self = ClassUtil.new_instance(SessionState);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0: {
-          self.recv_chains = [];
-          let len = decoder.array();
-          while (len--) {
-            self.recv_chains.push(RecvChain.decode(decoder));
-          }
-          break;
-        }
-        case 1: {
-          self.send_chain = SendChain.decode(decoder);
-          break;
-        }
-        case 2: {
-          self.root_key = RootKey.decode(decoder);
-          break;
-        }
-        case 3: {
-          self.prev_counter = decoder.u32();
-          break;
-        }
-        default: {
-          decoder.skip();
-        }
-      }
-    }
-
-    return self;
   }
 }

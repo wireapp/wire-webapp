@@ -28,19 +28,6 @@ import {CipherMessage} from './CipherMessage';
 import {Message} from './Message';
 
 export class PreKeyMessage extends Message {
-  base_key: PublicKey;
-  identity_key: IdentityKey;
-  message: CipherMessage;
-  prekey_id: number;
-
-  constructor() {
-    super();
-    this.base_key = new PublicKey();
-    this.identity_key = new IdentityKey();
-    this.message = new CipherMessage();
-    this.prekey_id = -1;
-  }
-
   static new(prekey_id: number, base_key: PublicKey, identity_key: IdentityKey, message: CipherMessage): PreKeyMessage {
     const pkm = ClassUtil.new_instance(PreKeyMessage);
 
@@ -51,18 +38,6 @@ export class PreKeyMessage extends Message {
 
     Object.freeze(pkm);
     return pkm;
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(4);
-    encoder.u8(0);
-    encoder.u16(this.prekey_id);
-    encoder.u8(1);
-    this.base_key.encode(encoder);
-    encoder.u8(2);
-    this.identity_key.encode(encoder);
-    encoder.u8(3);
-    return this.message.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): PreKeyMessage {
@@ -98,5 +73,29 @@ export class PreKeyMessage extends Message {
     } else {
       throw new InputError.TypeError(`Given PreKeyMessage doesn't match expected signature.`, InputError.CODE.CASE_406);
     }
+  }
+  base_key: PublicKey;
+  identity_key: IdentityKey;
+  message: CipherMessage;
+  prekey_id: number;
+
+  constructor() {
+    super();
+    this.base_key = new PublicKey();
+    this.identity_key = new IdentityKey();
+    this.message = new CipherMessage();
+    this.prekey_id = -1;
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(4);
+    encoder.u8(0);
+    encoder.u16(this.prekey_id);
+    encoder.u8(1);
+    this.base_key.encode(encoder);
+    encoder.u8(2);
+    this.identity_key.encode(encoder);
+    encoder.u8(3);
+    return this.message.encode(encoder);
   }
 }

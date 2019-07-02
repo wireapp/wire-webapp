@@ -30,11 +30,6 @@ import path from 'path';
 
 export class FileEngine implements CRUDEngine {
   [index: string]: any;
-
-  public storeName = '';
-  public options: {fileExtension: string} = {
-    fileExtension: '.dat',
-  };
   // Using a reference to Node.js' "path" module to influence the platform-specific behaviour in our tests
   public static path: any = path;
 
@@ -55,6 +50,11 @@ export class FileEngine implements CRUDEngine {
 
     return unsafePath;
   }
+
+  public storeName = '';
+  public options: {fileExtension: string} = {
+    fileExtension: '.dat',
+  };
 
   constructor(private readonly baseDirectory = './') {}
 

@@ -25,41 +25,12 @@ import {InputError} from '../errors/InputError';
 import * as ClassUtil from '../util/ClassUtil';
 
 export class PublicKey {
-  pub_edward: Uint8Array;
-  pub_curve: Uint8Array;
-
-  constructor() {
-    this.pub_edward = new Uint8Array([]);
-    this.pub_curve = new Uint8Array([]);
-  }
-
   static new(pub_edward: Uint8Array, pub_curve: Uint8Array): PublicKey {
     const pk = ClassUtil.new_instance(PublicKey);
 
     pk.pub_edward = pub_edward;
     pk.pub_curve = pub_curve;
     return pk;
-  }
-
-  /**
-   * This function can be used to verify a message signature.
-   *
-   * @param signature The signature to verify
-   * @param message The message from which the signature was computed.
-   * @returns `true` if the signature is valid, `false` otherwise.
-   */
-  verify(signature: Uint8Array, message: Uint8Array): boolean {
-    return sodium.crypto_sign_verify_detached(signature, message, this.pub_edward);
-  }
-
-  fingerprint(): string {
-    return sodium.to_hex(this.pub_edward);
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
-    encoder.u8(0);
-    return encoder.bytes(this.pub_edward);
   }
 
   static decode(decoder: CBOR.Decoder): PublicKey {
@@ -82,5 +53,33 @@ export class PublicKey {
       return self;
     }
     throw new InputError.ConversionError('Could not convert private key with ed2curve.', 409);
+  }
+  pub_edward: Uint8Array;
+  pub_curve: Uint8Array;
+
+  constructor() {
+    this.pub_edward = new Uint8Array([]);
+    this.pub_curve = new Uint8Array([]);
+  }
+
+  /**
+   * This function can be used to verify a message signature.
+   *
+   * @param signature The signature to verify
+   * @param message The message from which the signature was computed.
+   * @returns `true` if the signature is valid, `false` otherwise.
+   */
+  verify(signature: Uint8Array, message: Uint8Array): boolean {
+    return sodium.crypto_sign_verify_detached(signature, message, this.pub_edward);
+  }
+
+  fingerprint(): string {
+    return sodium.to_hex(this.pub_edward);
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(1);
+    encoder.u8(0);
+    return encoder.bytes(this.pub_edward);
   }
 }
