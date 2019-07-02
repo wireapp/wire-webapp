@@ -45,7 +45,7 @@ function showModal(storageKey, title, message) {
           title,
         },
       },
-      'availability'
+      'availability',
     );
   }
 }

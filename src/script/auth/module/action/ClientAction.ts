@@ -72,7 +72,7 @@ export class ClientAction {
         .then(creationStatus =>
           Promise.resolve()
             .then(() => dispatch(ClientActionCreator.successfulInitializeClient(creationStatus)))
-            .then(() => creationStatus)
+            .then(() => creationStatus),
         )
         .then(creationStatus => {
           const isNewSubsequentClient = !isFirstClient && creationStatus.isNewClient;

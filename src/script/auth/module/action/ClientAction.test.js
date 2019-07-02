@@ -50,7 +50,7 @@ describe('ClientAction', () => {
           actions: mockedActions,
           apiClient: mockedApiClient,
           core: mockedCore,
-        }
+        },
       );
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.PERMANENT)).then(() => {
         printActions(store.getActions());
@@ -86,7 +86,7 @@ describe('ClientAction', () => {
           actions: mockedActions,
           apiClient: mockedApiClient,
           core: mockedCore,
-        }
+        },
       );
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.PERMANENT)).catch(expectedError => {
         printActions(store.getActions());
@@ -126,7 +126,7 @@ describe('ClientAction', () => {
           actions: mockedActions,
           apiClient: mockedApiClient,
           core: mockedCore,
-        }
+        },
       );
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.TEMPORARY)).catch(expectedError => {
         printActions(store.getActions());
@@ -164,7 +164,7 @@ describe('ClientAction', () => {
           actions: mockedActions,
           apiClient: mockedApiClient,
           core: mockedCore,
-        }
+        },
       );
       return store.dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(ClientType.TEMPORARY)).catch(expectedError => {
         printActions(store.getActions());

@@ -313,12 +313,12 @@ export class TeamRepository {
         ...accumulator,
         [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
       }),
-      this.memberRoles()
+      this.memberRoles(),
     );
 
     const memberInvites = memberArray.reduce(
       (accumulator, member) => ({...accumulator, [member.userId]: member.invitedBy}),
-      this.memberInviters()
+      this.memberInviters(),
     );
 
     this.memberRoles(memberRoles);

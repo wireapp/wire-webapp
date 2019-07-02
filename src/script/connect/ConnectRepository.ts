@@ -126,7 +126,7 @@ export class ConnectRepository {
           });
 
           return resolve(this._encodePhoneBook(phoneBook));
-        }
+        },
       );
     });
   }

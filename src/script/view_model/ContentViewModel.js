@@ -78,7 +78,7 @@ export class ContentViewModel {
       repositories.conversation,
       repositories.search,
       repositories.team,
-      repositories.user
+      repositories.user,
     );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
@@ -90,7 +90,7 @@ export class ContentViewModel {
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,
-      repositories
+      repositories,
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);

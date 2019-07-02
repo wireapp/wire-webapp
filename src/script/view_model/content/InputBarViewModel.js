@@ -150,7 +150,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         this.currentMentions(),
         this.selectionStart(),
         this.selectionEnd(),
-        difference
+        difference,
       );
       this.currentMentions(updatedMentions);
       this.updateSelectionState();
@@ -189,7 +189,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
             currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
             return currentPieces;
           },
-          [this.input()]
+          [this.input()],
         );
 
       return pieces
@@ -364,7 +364,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         conversationEntity,
         replyMessageId,
         false,
-        true
+        true,
       );
     }
 
@@ -760,7 +760,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
           this.conversationEntity(),
           messageText,
           mentionEntities,
-          quoteEntity
+          quoteEntity,
         );
         this.cancelMessageReply();
       });

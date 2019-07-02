@@ -153,7 +153,7 @@ describe('VideoGridRepository', () => {
               videoSend: ko.observable(true),
             },
           },
-        })
+        }),
       );
 
       expect(groupVideoGrid.streams()).not.toContain(selfVideo);
@@ -191,7 +191,7 @@ describe('VideoGridRepository', () => {
               videoSend: ko.observable(true),
             },
           },
-        })
+        }),
       );
 
       expect(groupVideoGrid.streams().length).toBe(remoteVideos.length - 1);
@@ -218,7 +218,7 @@ describe('VideoGridRepository', () => {
                 videoSend: ko.observable(true),
               },
             },
-          })
+          }),
         );
 
         expect(groupVideoGrid.streams()[0].stream).toBe(selfVideo);
@@ -243,7 +243,7 @@ describe('VideoGridRepository', () => {
               videoSend: ko.observable(true),
             },
           },
-        })
+        }),
       );
 
       expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);
@@ -263,7 +263,7 @@ describe('VideoGridRepository', () => {
               videoSend: ko.observable(false),
             },
           },
-        })
+        }),
       );
 
       expect(groupVideoGrid.streams()).toEqual([]);
@@ -283,7 +283,7 @@ describe('VideoGridRepository', () => {
               videoSend: ko.observable(false),
             },
           },
-        })
+        }),
       );
 
       expect(groupVideoGrid.streams()[0].stream).toBe(selfStream);

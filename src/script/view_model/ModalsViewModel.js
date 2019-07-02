@@ -178,7 +178,7 @@ export class ModalsViewModel {
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},
-          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`}
+          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`},
         );
     }
     this.content(content);
