@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.3.4...@wireapp/bot-api@4.4.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/5a19864))
+
+
+
+
+
 ## [4.3.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.3.3...@wireapp/bot-api@4.3.4) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/bot-api

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.6.2...@wireapp/copy-config@0.7.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/5a19864))
+
+
+
+
+
 ## [0.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@0.6.1...@wireapp/copy-config@0.6.2) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/copy-config

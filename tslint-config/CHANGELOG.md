@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.3.0 (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config/commit/5a19864))
+
+
+
+
+
 # 1.2.0 (2019-06-20)
 
 

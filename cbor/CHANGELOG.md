@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@4.1.2...@wireapp/cbor@4.2.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/commit/5a19864))
+
+
+
+
+
 ## 4.1.2 (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/cbor

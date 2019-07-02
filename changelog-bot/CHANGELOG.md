@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@3.1.17...@wireapp/changelog-bot@3.2.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/5a19864))
+
+
+
+
+
 ## [3.1.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@3.1.16...@wireapp/changelog-bot@3.1.17) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

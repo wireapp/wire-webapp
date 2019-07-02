@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.2.2...@wireapp/proteus@9.3.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/5a19864))
+
+
+
+
+
 ## 9.2.2 (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/proteus

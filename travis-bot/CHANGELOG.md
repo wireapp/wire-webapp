@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@4.1.17...@wireapp/travis-bot@4.2.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/commit/5a19864))
+
+
+
+
+
 ## [4.1.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@4.1.16...@wireapp/travis-bot@4.1.17) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/travis-bot

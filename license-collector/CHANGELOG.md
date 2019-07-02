@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.2.2...@wireapp/license-collector@0.3.0) (2019-07-02)
+
+
+### Features
+
+* **tslint-config:** Add member ordering ([#1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/1972)) ([5a19864](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/5a19864))
+
+
+
+
+
 ## [0.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.2.1...@wireapp/license-collector@0.2.2) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/license-collector
