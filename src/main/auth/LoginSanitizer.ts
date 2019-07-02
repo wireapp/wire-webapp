@@ -20,8 +20,6 @@
 import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 
 export class LoginSanitizer {
-  constructor() {}
-
   public static removeNonPrintableCharacters(loginData: LoginData): void {
     const nonPrintableCharacters = /\s/gm;
 
@@ -41,4 +39,5 @@ export class LoginSanitizer {
       loginData.phone = loginData.phone.toString().replace(nonPrintableCharacters, '');
     }
   }
+  constructor() {}
 }

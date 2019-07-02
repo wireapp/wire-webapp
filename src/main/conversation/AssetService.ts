@@ -31,6 +31,14 @@ export interface AssetOptions {
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
+  public uploadImageAsset(image: ImageContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
+    return this.postAsset(image.data, options);
+  }
+
+  public uploadFileAsset(file: FileContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
+    return this.postAsset(file.data, options);
+  }
+
   private async postAsset(buffer: Buffer, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
     const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset(buffer);
     const {key, token} = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options);
@@ -42,13 +50,5 @@ export class AssetService {
       sha256,
       token,
     };
-  }
-
-  public uploadImageAsset(image: ImageContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
-    return this.postAsset(image.data, options);
-  }
-
-  public uploadFileAsset(file: FileContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
-    return this.postAsset(file.data, options);
   }
 }

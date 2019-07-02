@@ -44,7 +44,6 @@ import {
 import {
   Article,
   Asset,
-  Calling,
   Cleared,
   ClientAction,
   Confirmation,
@@ -78,7 +77,6 @@ import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 import {APIClient} from '@wireapp/api-client';
 import {
-  CallMessage,
   ClearConversationMessage,
   ConfirmationMessage,
   DeleteMessage,
@@ -99,9 +97,9 @@ import {
 import {MessageBuilder} from './message/MessageBuilder';
 
 export class ConversationService {
-  private clientID: string = '';
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
+  private clientID: string = '';
 
   constructor(
     private readonly apiClient: APIClient,
@@ -110,6 +108,291 @@ export class ConversationService {
   ) {
     this.messageTimer = new MessageTimer();
     this.messageBuilder = new MessageBuilder(this.apiClient, this.assetService);
+  }
+
+  // TODO: Move this to a generic "message sending class" and make it private.
+  public async onClientMismatch(
+    error: AxiosError,
+    message: NewOTRMessage,
+    plainTextArray: Uint8Array,
+  ): Promise<NewOTRMessage> {
+    if (error.response && error.response.status === StatusCode.PRECONDITION_FAILED) {
+      const {missing, deleted}: {missing: UserClients; deleted: UserClients} = error.response.data;
+
+      const deletedUserIds = Object.keys(deleted);
+      const missingUserIds = Object.keys(missing);
+
+      if (deletedUserIds.length) {
+        for (const deletedUserId of deletedUserIds) {
+          for (const deletedClientId of deleted[deletedUserId]) {
+            const deletedUser = message.recipients[deletedUserId];
+            if (deletedUser) {
+              delete deletedUser[deletedClientId];
+            }
+          }
+        }
+      }
+
+      if (missingUserIds.length) {
+        const missingPreKeyBundles = await this.apiClient.user.api.postMultiPreKeyBundles(missing);
+        const reEncryptedPayloads = await this.cryptographyService.encrypt(plainTextArray, missingPreKeyBundles);
+        for (const missingUserId of missingUserIds) {
+          for (const missingClientId in reEncryptedPayloads[missingUserId]) {
+            const missingUser = message.recipients[missingUserId];
+            if (!missingUser) {
+              message.recipients[missingUserId] = {};
+            }
+            message.recipients[missingUserId][missingClientId] = reEncryptedPayloads[missingUserId][missingClientId];
+          }
+        }
+      }
+
+      return message;
+    }
+    throw error;
+  }
+
+  public async clearConversation(
+    conversationId: string,
+    timestamp: number | Date = new Date(),
+    messageId: string = MessageBuilder.createId(),
+  ): Promise<ClearConversationMessage> {
+    if (timestamp instanceof Date) {
+      timestamp = timestamp.getTime();
+    }
+
+    const content: ClearedContent = {
+      clearedTimestamp: timestamp,
+      conversationId,
+    };
+
+    const clearedMessage = Cleared.create(content);
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.CLEARED]: clearedMessage,
+      messageId,
+    });
+
+    const {id: selfConversationId} = await this.getSelfConversation();
+
+    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+
+    return {
+      content,
+      conversation: conversationId,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      messageTimer: 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.CLEARED,
+    };
+  }
+
+  public async deleteMessageLocal(conversationId: string, messageIdToHide: string): Promise<HideMessage> {
+    const messageId = MessageBuilder.createId();
+
+    const content: HiddenContent = MessageHide.create({
+      conversationId,
+      messageId: messageIdToHide,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.HIDDEN]: content,
+      messageId,
+    });
+
+    const {id: selfConversationId} = await this.getSelfConversation();
+
+    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+
+    return {
+      content,
+      conversation: conversationId,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.MESSAGE_HIDE,
+    };
+  }
+
+  public async deleteMessageEveryone(
+    conversationId: string,
+    messageIdToDelete: string,
+    userIds?: string[],
+  ): Promise<DeleteMessage> {
+    const messageId = MessageBuilder.createId();
+
+    const content: DeletedContent = MessageDelete.create({
+      messageId: messageIdToDelete,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.DELETED]: content,
+      messageId,
+    });
+
+    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
+
+    return {
+      content,
+      conversation: conversationId,
+      from: this.apiClient.context!.userId,
+      id: messageId,
+      messageTimer: this.messageTimer.getMessageTimer(conversationId),
+      state: PayloadBundleState.OUTGOING_SENT,
+      timestamp: Date.now(),
+      type: PayloadBundleType.MESSAGE_DELETE,
+    };
+  }
+
+  public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteMember(conversationId, this.apiClient.context!.userId);
+  }
+
+  public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
+    if (!conversationIds) {
+      const conversation = await this.getConversations();
+      conversationIds = conversation
+        .filter(conversation => conversation.type === CONVERSATION_TYPE.REGULAR)
+        .map(conversation => conversation.id);
+    }
+
+    return Promise.all(conversationIds.map(conversationId => this.leaveConversation(conversationId)));
+  }
+
+  public createConversation(name: string, otherUserIds: string | string[] = []): Promise<Conversation> {
+    const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
+
+    const newConversation: NewConversation = {
+      name,
+      users: ids,
+    };
+
+    return this.apiClient.conversation.api.postConversation(newConversation);
+  }
+
+  public async getConversations(conversationId: string): Promise<Conversation>;
+  public async getConversations(conversationIds?: string[]): Promise<Conversation[]>;
+  public async getConversations(conversationIds?: string | string[]): Promise<Conversation[] | Conversation> {
+    if (!conversationIds || !conversationIds.length) {
+      return this.apiClient.conversation.api.getAllConversations();
+    }
+    if (typeof conversationIds === 'string') {
+      return this.apiClient.conversation.api.getConversation(conversationIds);
+    }
+    return this.apiClient.conversation.api.getConversationsByIds(conversationIds);
+  }
+
+  public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
+    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
+
+    return AssetCryptography.decryptAsset({
+      cipherText: Buffer.from(encryptedBuffer),
+      keyBytes: Buffer.from(otrKey),
+      sha256: Buffer.from(sha256),
+    });
+  }
+
+  public getClientID(): string {
+    return this.clientID;
+  }
+
+  public async addUser(conversationId: string, userId: string): Promise<string>;
+  public async addUser(conversationId: string, userIds: string[]): Promise<string[]>;
+  public async addUser(conversationId: string, userIds: string | string[]): Promise<string | string[]> {
+    const ids = typeof userIds === 'string' ? [userIds] : userIds;
+    await this.apiClient.conversation.api.postMembers(conversationId, ids);
+    return userIds;
+  }
+
+  public async removeUser(conversationId: string, userId: string): Promise<string> {
+    await this.apiClient.conversation.api.deleteMember(conversationId, userId);
+    return userId;
+  }
+
+  // tslint:disable-next-line:typedef
+  public async send(payloadBundle: Message, userIds?: string[]) {
+    switch (payloadBundle.type) {
+      case PayloadBundleType.ASSET:
+        return this.sendFileData(payloadBundle, userIds);
+      case PayloadBundleType.ASSET_ABORT:
+        return this.sendFileAbort(payloadBundle, userIds);
+      case PayloadBundleType.ASSET_META:
+        return this.sendFileMetaData(payloadBundle, userIds);
+      case PayloadBundleType.ASSET_IMAGE:
+        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds);
+      case PayloadBundleType.CLIENT_ACTION: {
+        if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
+          return this.sendSessionReset(payloadBundle, userIds);
+        }
+        throw new Error(
+          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
+        );
+      }
+      case PayloadBundleType.CONFIRMATION:
+        return this.sendConfirmation(payloadBundle, userIds);
+      case PayloadBundleType.LOCATION:
+        return this.sendLocation(payloadBundle, userIds);
+      case PayloadBundleType.MESSAGE_EDIT:
+        return this.sendEditedText(payloadBundle, userIds);
+      case PayloadBundleType.PING:
+        return this.sendPing(payloadBundle, userIds);
+      case PayloadBundleType.REACTION:
+        return this.sendReaction(payloadBundle, userIds);
+      case PayloadBundleType.TEXT:
+        return this.sendText(payloadBundle, userIds);
+      default:
+        throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
+    }
+  }
+
+  public sendTypingStart(conversationId: string): Promise<void> {
+    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STARTED});
+  }
+
+  public sendTypingStop(conversationId: string): Promise<void> {
+    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
+  }
+
+  public setClientID(clientID: string): void {
+    this.clientID = clientID;
+  }
+
+  public setConversationMutedStatus(
+    conversationId: string,
+    status: MutedStatus,
+    muteTimestamp: number | Date,
+  ): Promise<void> {
+    if (typeof muteTimestamp === 'number') {
+      muteTimestamp = new Date(muteTimestamp);
+    }
+
+    const payload: MemberUpdate = {
+      otr_muted_ref: muteTimestamp.toISOString(),
+      otr_muted_status: status,
+    };
+
+    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+  }
+
+  public toggleArchiveConversation(
+    conversationId: string,
+    archived: boolean,
+    archiveTimestamp: number | Date = new Date(),
+  ): Promise<void> {
+    if (typeof archiveTimestamp === 'number') {
+      archiveTimestamp = new Date(archiveTimestamp);
+    }
+
+    const payload: MemberUpdate = {
+      otr_archived: archived,
+      otr_archived_ref: archiveTimestamp.toISOString(),
+    };
+
+    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 
   private createEphemeral(originalGenericMessage: GenericMessage, expireAfterMillis: number): GenericMessage {
@@ -219,48 +502,6 @@ export class ConversationService {
       const reEncryptedMessage = await this.onClientMismatch(error, message, plainTextArray);
       await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, reEncryptedMessage);
     }
-  }
-
-  // TODO: Move this to a generic "message sending class" and make it private.
-  public async onClientMismatch(
-    error: AxiosError,
-    message: NewOTRMessage,
-    plainTextArray: Uint8Array,
-  ): Promise<NewOTRMessage> {
-    if (error.response && error.response.status === StatusCode.PRECONDITION_FAILED) {
-      const {missing, deleted}: {missing: UserClients; deleted: UserClients} = error.response.data;
-
-      const deletedUserIds = Object.keys(deleted);
-      const missingUserIds = Object.keys(missing);
-
-      if (deletedUserIds.length) {
-        for (const deletedUserId of deletedUserIds) {
-          for (const deletedClientId of deleted[deletedUserId]) {
-            const deletedUser = message.recipients[deletedUserId];
-            if (deletedUser) {
-              delete deletedUser[deletedClientId];
-            }
-          }
-        }
-      }
-
-      if (missingUserIds.length) {
-        const missingPreKeyBundles = await this.apiClient.user.api.postMultiPreKeyBundles(missing);
-        const reEncryptedPayloads = await this.cryptographyService.encrypt(plainTextArray, missingPreKeyBundles);
-        for (const missingUserId of missingUserIds) {
-          for (const missingClientId in reEncryptedPayloads[missingUserId]) {
-            const missingUser = message.recipients[missingUserId];
-            if (!missingUser) {
-              message.recipients[missingUserId] = {};
-            }
-            message.recipients[missingUserId][missingClientId] = reEncryptedPayloads[missingUserId][missingClientId];
-          }
-        }
-      }
-
-      return message;
-    }
-    throw error;
   }
 
   private async sendConfirmation(payloadBundle: ConfirmationMessage, userIds?: string[]): Promise<ConfirmationMessage> {
@@ -609,25 +850,6 @@ export class ConversationService {
     };
   }
 
-  private async sendCall(payloadBundle: CallMessage, userIds?: string[]): Promise<CallMessage> {
-    const callMessage = Calling.create({
-      content: payloadBundle.content,
-    });
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.CALLING]: callMessage,
-      messageId: payloadBundle.id,
-    });
-
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
-  }
-
   private async sendText(payloadBundle: TextMessage, userIds?: string[]): Promise<TextMessage> {
     const {
       expectsReadConfirmation,
@@ -675,102 +897,6 @@ export class ConversationService {
       ...payloadBundle,
       messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
       state: PayloadBundleState.OUTGOING_SENT,
-    };
-  }
-
-  public async clearConversation(
-    conversationId: string,
-    timestamp: number | Date = new Date(),
-    messageId: string = MessageBuilder.createId(),
-  ): Promise<ClearConversationMessage> {
-    if (timestamp instanceof Date) {
-      timestamp = timestamp.getTime();
-    }
-
-    const content: ClearedContent = {
-      clearedTimestamp: timestamp,
-      conversationId,
-    };
-
-    const clearedMessage = Cleared.create(content);
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.CLEARED]: clearedMessage,
-      messageId,
-    });
-
-    const {id: selfConversationId} = await this.getSelfConversation();
-
-    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
-
-    return {
-      content,
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-      timestamp: Date.now(),
-      type: PayloadBundleType.CLEARED,
-    };
-  }
-
-  public async deleteMessageLocal(conversationId: string, messageIdToHide: string): Promise<HideMessage> {
-    const messageId = MessageBuilder.createId();
-
-    const content: HiddenContent = MessageHide.create({
-      conversationId,
-      messageId: messageIdToHide,
-    });
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.HIDDEN]: content,
-      messageId,
-    });
-
-    const {id: selfConversationId} = await this.getSelfConversation();
-
-    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
-
-    return {
-      content,
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      messageTimer: this.messageTimer.getMessageTimer(conversationId),
-      state: PayloadBundleState.OUTGOING_SENT,
-      timestamp: Date.now(),
-      type: PayloadBundleType.MESSAGE_HIDE,
-    };
-  }
-
-  public async deleteMessageEveryone(
-    conversationId: string,
-    messageIdToDelete: string,
-    userIds?: string[],
-  ): Promise<DeleteMessage> {
-    const messageId = MessageBuilder.createId();
-
-    const content: DeletedContent = MessageDelete.create({
-      messageId: messageIdToDelete,
-    });
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.DELETED]: content,
-      messageId,
-    });
-
-    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
-
-    return {
-      content,
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      messageTimer: this.messageTimer.getMessageTimer(conversationId),
-      state: PayloadBundleState.OUTGOING_SENT,
-      timestamp: Date.now(),
-      type: PayloadBundleType.MESSAGE_DELETE,
     };
   }
 
@@ -847,159 +973,5 @@ export class ConversationService {
     const estimatedPayloadInBytes = clientCount * messageInBytes;
 
     return estimatedPayloadInBytes > EXTERNAL_MESSAGE_THRESHOLD_BYTES;
-  }
-
-  public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
-    return this.apiClient.conversation.api.deleteMember(conversationId, this.apiClient.context!.userId);
-  }
-
-  public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
-    if (!conversationIds) {
-      const conversation = await this.getConversations();
-      conversationIds = conversation
-        .filter(conversation => conversation.type === CONVERSATION_TYPE.REGULAR)
-        .map(conversation => conversation.id);
-    }
-
-    return Promise.all(conversationIds.map(conversationId => this.leaveConversation(conversationId)));
-  }
-
-  public createConversation(name: string, otherUserIds: string | string[] = []): Promise<Conversation> {
-    const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
-
-    const newConversation: NewConversation = {
-      name,
-      users: ids,
-    };
-
-    return this.apiClient.conversation.api.postConversation(newConversation);
-  }
-
-  public async getConversations(conversationId: string): Promise<Conversation>;
-  public async getConversations(conversationIds?: string[]): Promise<Conversation[]>;
-  public async getConversations(conversationIds?: string | string[]): Promise<Conversation[] | Conversation> {
-    if (!conversationIds || !conversationIds.length) {
-      return this.apiClient.conversation.api.getAllConversations();
-    }
-    if (typeof conversationIds === 'string') {
-      return this.apiClient.conversation.api.getConversation(conversationIds);
-    }
-    return this.apiClient.conversation.api.getConversationsByIds(conversationIds);
-  }
-
-  public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
-    const encryptedBuffer = await this.apiClient.asset.api.getAsset(assetId, assetToken);
-
-    return AssetCryptography.decryptAsset({
-      cipherText: Buffer.from(encryptedBuffer),
-      keyBytes: Buffer.from(otrKey),
-      sha256: Buffer.from(sha256),
-    });
-  }
-
-  public getClientID(): string {
-    return this.clientID;
-  }
-
-  public async addUser(conversationId: string, userId: string): Promise<string>;
-  public async addUser(conversationId: string, userIds: string[]): Promise<string[]>;
-  public async addUser(conversationId: string, userIds: string | string[]): Promise<string | string[]> {
-    const ids = typeof userIds === 'string' ? [userIds] : userIds;
-    await this.apiClient.conversation.api.postMembers(conversationId, ids);
-    return userIds;
-  }
-
-  public async removeUser(conversationId: string, userId: string): Promise<string> {
-    await this.apiClient.conversation.api.deleteMember(conversationId, userId);
-    return userId;
-  }
-
-  /**
-   * @param payloadBundle - Outgoing message
-   * @param userIds - Only send message to specified user IDs
-   * @returns Sent message
-   */
-  // tslint:disable-next-line:typedef
-  public async send(payloadBundle: Message, userIds?: string[]) {
-    switch (payloadBundle.type) {
-      case PayloadBundleType.ASSET:
-        return this.sendFileData(payloadBundle, userIds);
-      case PayloadBundleType.ASSET_ABORT:
-        return this.sendFileAbort(payloadBundle, userIds);
-      case PayloadBundleType.ASSET_META:
-        return this.sendFileMetaData(payloadBundle, userIds);
-      case PayloadBundleType.ASSET_IMAGE:
-        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds);
-      case PayloadBundleType.CALL:
-        return this.sendCall(payloadBundle, userIds);
-      case PayloadBundleType.CLIENT_ACTION: {
-        if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
-          return this.sendSessionReset(payloadBundle, userIds);
-        }
-        throw new Error(
-          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
-        );
-      }
-      case PayloadBundleType.CONFIRMATION:
-        return this.sendConfirmation(payloadBundle, userIds);
-      case PayloadBundleType.LOCATION:
-        return this.sendLocation(payloadBundle, userIds);
-      case PayloadBundleType.MESSAGE_EDIT:
-        return this.sendEditedText(payloadBundle, userIds);
-      case PayloadBundleType.PING:
-        return this.sendPing(payloadBundle, userIds);
-      case PayloadBundleType.REACTION:
-        return this.sendReaction(payloadBundle, userIds);
-      case PayloadBundleType.TEXT:
-        return this.sendText(payloadBundle, userIds);
-      default:
-        throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
-    }
-  }
-
-  public sendTypingStart(conversationId: string): Promise<void> {
-    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STARTED});
-  }
-
-  public sendTypingStop(conversationId: string): Promise<void> {
-    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
-  }
-
-  public setClientID(clientID: string): void {
-    this.clientID = clientID;
-  }
-
-  public setConversationMutedStatus(
-    conversationId: string,
-    status: MutedStatus,
-    muteTimestamp: number | Date,
-  ): Promise<void> {
-    if (typeof muteTimestamp === 'number') {
-      muteTimestamp = new Date(muteTimestamp);
-    }
-
-    const payload: MemberUpdate = {
-      otr_muted_ref: muteTimestamp.toISOString(),
-      otr_muted_status: status,
-    };
-
-    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
-  }
-
-  public toggleArchiveConversation(
-    conversationId: string,
-    archived: boolean,
-    archiveTimestamp: number | Date = new Date(),
-  ): Promise<void> {
-    if (typeof archiveTimestamp === 'number') {
-      archiveTimestamp = new Date(archiveTimestamp);
-    }
-
-    const payload: MemberUpdate = {
-      otr_archived: archived,
-      otr_archived_ref: archiveTimestamp.toISOString(),
-    };
-
-    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 }

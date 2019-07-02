@@ -34,6 +34,11 @@ export class MessageHashService {
     this.timestamp = Math.floor(unixTimestamp / 1e3);
   }
 
+  getHash(): Buffer {
+    const buffer = this.getBytes(this.messageContent);
+    return this.createSha256Hash(buffer);
+  }
+
   private createSha256Hash(buffer: Buffer): Buffer {
     const hashArray = hash
       .sha256()
@@ -104,10 +109,5 @@ export class MessageHashService {
 
     const timestampBuffer = this.getTimestampBuffer(this.timestamp);
     return Buffer.concat([bytes, timestampBuffer]);
-  }
-
-  getHash(): Buffer {
-    const buffer = this.getBytes(this.messageContent);
-    return this.createSha256Hash(buffer);
   }
 }
