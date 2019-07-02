@@ -19,9 +19,12 @@
       <!-- ko if: showRequest() -->
         <div class="modal__text" data-uie-name="status-modal-text">
           <div data-bind="html: t('legalHoldModalText', {}, {br: '<br>', fingerprint: requestFingerprint()})"></div>
+          <!-- ko if: requiresPassword() -->
+            <div data-bind="text: t('legalHoldModalTextPassword')"></div>
+          <!-- /ko -->
         </div>
         <!-- ko if: requiresPassword() -->
-          <input class="modal__input" type="password" data-bind="textInput: passwordValue"/>
+          <input autofocus class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: t('login.passwordPlaceholder')}, event: {keydown: handleInputKey}"/>
         <!-- /ko -->
         <!-- ko if: requestError() -->
           <div class="modal__input__error" data-bind="text: requestError()" data-uie-name="status-error"></div>
@@ -29,7 +32,7 @@
         <div class="modal__buttons">
           <div data-bind="text: t('legalHoldModalSecondaryAction'), click: closeRequest" class="modal__button modal__button--secondary" data-uie-name="do-secondary"></div>
           <!-- ko ifnot: isSendingApprove() -->
-            <div data-bind="text: t('legalHoldModalPrimaryAction'), click: acceptRequest" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+            <div data-bind="text: t('legalHoldModalPrimaryAction'), click: acceptRequest, css: {'modal__button--disabled': disableSubmit()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
           <!-- /ko -->
           <!-- ko if: isSendingApprove() -->
             <div class="modal__button modal__button--primary legal-hold-modal__loading-button"><loading-icon></loading-icon></div>

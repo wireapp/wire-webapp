@@ -55,6 +55,7 @@ export class LegalHoldModalViewModel {
   isLoadingRequest: ko.Observable<boolean>;
   isSendingApprove: ko.Observable<boolean>;
   skipShowUsers: ko.Observable<boolean>;
+  disableSubmit: ko.PureComputed<boolean>;
 
   constructor(
     public userRepository: UserRepository,
@@ -93,6 +94,7 @@ export class LegalHoldModalViewModel {
       this.requestError('');
       this.isLoadingRequest(false);
     };
+    this.disableSubmit = ko.pureComputed(() => this.passwordValue().length < 1);
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
     amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
     amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
@@ -148,6 +150,9 @@ export class LegalHoldModalViewModel {
   };
 
   acceptRequest = async () => {
+    if (this.disableSubmit()) {
+      return;
+    }
     const selfUser = this.userRepository.self();
     this.requestError('');
     this.isSendingApprove(true);
@@ -216,5 +221,13 @@ export class LegalHoldModalViewModel {
       return this.userDevicesHistory.goBack();
     }
     this.devicesUser(undefined);
+  };
+
+  handleInputKey = (_data: LegalHoldModalViewModel, {key}: JQuery.Event): boolean => {
+    if (key !== 'Enter') {
+      return true;
+    }
+    this.acceptRequest();
+    return false;
   };
 }
