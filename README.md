@@ -81,6 +81,8 @@ The command to run is:
 |   4   | master |                commit                 | wire-webapp-master  | Staging    |
 |   5   | master | tag (format: YYYY-MM-DD-production.X) |  wire-webapp-prod   | Production |
 
+Before RC testing we create a merge commit from "dev" to "master" branch, so that our QA team can run tests on the latest version of our app.
+
 #### Staging Bumps
 
 **Actions**
