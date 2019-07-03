@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.12.0...@wireapp/api-client@5.13.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/11ed87a))
+
+
+
+
+
 # [5.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.11.2...@wireapp/api-client@5.12.0) (2019-07-02)
 
 
