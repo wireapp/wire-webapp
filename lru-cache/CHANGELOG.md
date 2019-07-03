@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.2.0...@wireapp/lru-cache@3.3.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/11ed87a))
+
+
+
+
+
 # [3.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.1.26...@wireapp/lru-cache@3.2.0) (2019-07-02)
 
 

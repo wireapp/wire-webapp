@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wireapp/store-engine": "3.4.0",
+    "@wireapp/store-engine": "3.5.0",
     "dexie": "2.0.4"
   },
   "devDependencies": {
@@ -32,5 +32,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.3.0"
+  "version": "0.3.1"
 }

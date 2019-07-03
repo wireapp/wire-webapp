@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config/compare/@wireapp/tslint-config@1.3.0...@wireapp/tslint-config@1.4.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config/commit/11ed87a))
+
+
+
+
+
 # 1.3.0 (2019-07-02)
 
 

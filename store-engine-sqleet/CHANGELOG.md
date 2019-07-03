@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.4.0...@wireapp/store-engine-sqleet@0.5.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/11ed87a))
+
+
+
+
+
 # [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.3.2...@wireapp/store-engine-sqleet@0.4.0) (2019-07-02)
 
 

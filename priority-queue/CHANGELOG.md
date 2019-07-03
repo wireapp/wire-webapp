@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.1.0...@wireapp/priority-queue@1.2.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/11ed87a))
+
+
+
+
+
 # [1.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.0.15...@wireapp/priority-queue@1.1.0) (2019-07-02)
 
 

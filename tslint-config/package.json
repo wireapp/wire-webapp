@@ -12,5 +12,5 @@
     "tslint-react-hooks": ">=2"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/tslint-config",
-  "version": "1.3.0"
+  "version": "1.4.0"
 }

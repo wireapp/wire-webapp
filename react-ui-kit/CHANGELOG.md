@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.2.1...@wireapp/react-ui-kit@7.3.0) (2019-07-03)
+
+
+### Features
+
+* **react-ui-kit:** Add Screenshare Icon ([#2025](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2025)) ([aa240c7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/aa240c7))
+
+
+
+
+
 ## [7.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.2.0...@wireapp/react-ui-kit@7.2.1) (2019-07-02)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

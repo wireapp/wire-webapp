@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.4.0...@wireapp/store-engine@3.5.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/11ed87a))
+
+
+
+
+
 # [3.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.3.1...@wireapp/store-engine@3.4.0) (2019-07-02)
 
 

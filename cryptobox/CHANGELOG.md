@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.3.0...@wireapp/cryptobox@11.4.0) (2019-07-03)
+
+
+### Features
+
+* **tslint-config:** Change ordering ([#2026](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/2026)) ([11ed87a](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/11ed87a))
+
+
+
+
+
 # [11.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@11.2.3...@wireapp/cryptobox@11.3.0) (2019-07-02)
 
 
