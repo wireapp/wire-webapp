@@ -99,7 +99,6 @@ import {MessageBuilder} from './message/MessageBuilder';
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
-  private clientID: string = '';
 
   constructor(
     private readonly apiClient: APIClient,
@@ -109,6 +108,7 @@ export class ConversationService {
     this.messageTimer = new MessageTimer();
     this.messageBuilder = new MessageBuilder(this.apiClient, this.assetService);
   }
+  private clientID: string = '';
 
   // TODO: Move this to a generic "message sending class" and make it private.
   public async onClientMismatch(

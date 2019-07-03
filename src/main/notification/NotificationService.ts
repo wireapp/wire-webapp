@@ -24,13 +24,12 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 
 export class NotificationService {
-  private readonly backend: NotificationBackendRepository;
-  private readonly database: NotificationDatabaseRepository;
-
   constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
   }
+  private readonly backend: NotificationBackendRepository;
+  private readonly database: NotificationDatabaseRepository;
 
   public initializeNotificationStream(clientId: string): Promise<string> {
     return this.setLastEventDate(new Date(0))

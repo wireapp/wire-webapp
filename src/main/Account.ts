@@ -74,32 +74,6 @@ import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {UserService} from './user/';
 
 export class Account extends EventEmitter {
-  public service?: {
-    asset: AssetService;
-    broadcast: BroadcastService;
-    client: ClientService;
-    connection: ConnectionService;
-    conversation: ConversationService;
-    cryptography: CryptographyService;
-    giphy: GiphyService;
-    notification: NotificationService;
-    self: SelfService;
-    team: TeamService;
-    user: UserService;
-  };
-  private readonly logger: logdown.Logger;
-
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient = new APIClient()) {
-    super();
-    this.apiClient = apiClient;
-    this.logger = logdown('@wireapp/core/Account', {
-      logger: console,
-      markdown: false,
-    });
-  }
-
   get clientId(): string {
     if (this.apiClient.context && this.apiClient.context.clientId) {
       return this.apiClient.context.clientId;
@@ -113,6 +87,31 @@ export class Account extends EventEmitter {
     }
     throw new Error(`No user context available. Please login first.`);
   }
+  public service?: {
+    asset: AssetService;
+    broadcast: BroadcastService;
+    client: ClientService;
+    connection: ConnectionService;
+    conversation: ConversationService;
+    cryptography: CryptographyService;
+    giphy: GiphyService;
+    notification: NotificationService;
+    self: SelfService;
+    team: TeamService;
+    user: UserService;
+  };
+
+  constructor(apiClient: APIClient = new APIClient()) {
+    super();
+    this.apiClient = apiClient;
+    this.logger = logdown('@wireapp/core/Account', {
+      logger: console,
+      markdown: false,
+    });
+  }
+  private readonly logger: logdown.Logger;
+
+  private readonly apiClient: APIClient;
 
   public async init(): Promise<void> {
     const assetService = new AssetService(this.apiClient);
