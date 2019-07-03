@@ -224,16 +224,6 @@ export class EventMapper {
         break;
       }
 
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_ACTIVATED: {
-        messageEntity = this._mapEventLegalHold(true);
-        break;
-      }
-
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_DEACTIVATED: {
-        messageEntity = this._mapEventLegalHold(false);
-        break;
-      }
-
       case ClientEvent.CONVERSATION.LOCATION: {
         messageEntity = addMetadata(this._mapEventLocation(event), event);
         break;

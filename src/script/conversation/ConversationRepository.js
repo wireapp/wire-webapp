@@ -101,6 +101,7 @@ import {Config} from '../auth/config';
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
 import {ConversationLegalHoldStateHandler} from './ConversationLegalHoldStateHandler';
+import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -2646,7 +2647,7 @@ export class ConversationRepository {
           if (userId === selfId) {
             return missing;
           }
-          const missingClients = getDifference(localUserClients[userId], clients);
+          const missingClients = getDifference(localUserClients[userId] || [], clients);
           if (missingClients.length) {
             missing.push(userId);
           }
@@ -2680,11 +2681,41 @@ export class ConversationRepository {
 
   grantMessage(eventInfoEntity, consentType, userIds) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
+      const legalHoldMessageTypes = [
+        GENERIC_MESSAGE_TYPE.ASSET,
+        GENERIC_MESSAGE_TYPE.EDITED,
+        GENERIC_MESSAGE_TYPE.IMAGE,
+        GENERIC_MESSAGE_TYPE.TEXT,
+      ];
+      const isLegalHoldMessageType =
+        eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
+      const needsLegalHoldApproval = conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
-      if (!conversationDegraded) {
+      if (!conversationDegraded && !needsLegalHoldApproval) {
         return false;
+      }
+
+      if (!conversationDegraded) {
+        return new Promise((resolve, reject) => {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+            close: () => {
+              const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
+              reject(new z.error.ConversationError(errorType));
+            },
+            messageHtml: 'The conversation is now subject to legal hold.<br>Do you still want to send your message?',
+            primaryAction: {
+              action: () => resolve(true),
+              text: 'Send anyway',
+            },
+            secondaryAction: {
+              action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
+              text: 'What is legal hold?',
+            },
+            title: 'Legal hold',
+          });
+        });
       }
 
       return new Promise((resolve, reject) => {
@@ -2753,26 +2784,52 @@ export class ConversationRepository {
               }
             }
 
-            amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-              close: () => {
-                if (!sendAnyway) {
-                  const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+            if (needsLegalHoldApproval) {
+              amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
+                close: () => {
+                  const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
                   reject(new z.error.ConversationError(errorType));
-                }
-              },
-              primaryAction: {
-                action: () => {
-                  sendAnyway = true;
-                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                  resolve(true);
                 },
-                text: actionString,
-              },
-              text: {
-                message: messageString,
-                title: titleString,
-              },
-            });
+                messageHtml:
+                  'The conversation is now subject to legal hold.<br>Do you still want to send your message?',
+                primaryAction: {
+                  action: () => resolve(true),
+                  text: 'Send anyway',
+                },
+                secondaryAction: [
+                  {
+                    action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
+                    text: 'What is legal hold?',
+                  },
+                  {
+                    action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
+                    text: 'Verify devices...',
+                  },
+                ],
+                title: 'Legal hold',
+              });
+            } else {
+              amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+                close: () => {
+                  if (!sendAnyway) {
+                    const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
+                    reject(new z.error.ConversationError(errorType));
+                  }
+                },
+                primaryAction: {
+                  action: () => {
+                    sendAnyway = true;
+                    conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                    resolve(true);
+                  },
+                  text: actionString,
+                },
+                text: {
+                  message: messageString,
+                  title: titleString,
+                },
+              });
+            }
           })
           .catch(reject);
       });
@@ -3130,8 +3187,6 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_ACTIVATED:
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_DEACTIVATED:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:

@@ -36,7 +36,6 @@ export class ConversationVerificationStateHandler {
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
     amplify.subscribe(WebAppEvents.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
     amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
-    amplify.subscribe(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, this.onLegalHoldActivated.bind(this));
   }
 
   /**
@@ -104,26 +103,6 @@ export class ConversationVerificationStateHandler {
       if (!isStateChange) {
         this._checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_DEVICE);
       }
-    });
-  }
-
-  /**
-   * Legal hold was activated for the self user or another participant.
-   * @param {string} userId - ID of user that added client (can be self user ID)
-   * @returns {undefined} No return value
-   */
-  onLegalHoldActivated(userId) {
-    this.onLegalHoldsActivated([userId]);
-  }
-
-  /**
-   * Legal hold was activated for multiple participants.
-   * @param {Array<string>} userIds - Multiple user IDs (can include self user ID)
-   * @returns {undefined} No return value
-   */
-  onLegalHoldsActivated(userIds) {
-    userIds.forEach(() => {
-      // TODO: show modal
     });
   }
 
