@@ -395,16 +395,20 @@ export class UserRepository {
   }
 
   async onLegalHoldRequest(eventJson) {
-    if (this.self().id !== eventJson.target_user) {
+    if (this.self().id !== eventJson.id) {
       return;
     }
     const self = this.self();
     self.hasPendingLegalHold(true);
-    const {client_id, last_prekey, target_user} = eventJson;
+    const {
+      client: {id: clientId},
+      last_prekey,
+      id: userId,
+    } = eventJson;
 
     const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
-      target_user,
-      client_id,
+      userId,
+      clientId,
       last_prekey
     );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
