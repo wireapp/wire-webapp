@@ -57,8 +57,6 @@ export class CryptographyService {
   }
 
   public cryptobox: Cryptobox;
-  private readonly logger: logdown.Logger;
-  private readonly database: CryptographyDatabaseRepository;
 
   constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
@@ -68,6 +66,8 @@ export class CryptographyService {
       markdown: false,
     });
   }
+  private readonly logger: logdown.Logger;
+  private readonly database: CryptographyDatabaseRepository;
 
   public async createCryptobox(): Promise<SerializedPreKey[]> {
     const initialPreKeys: ProteusKeys.PreKey[] = await this.cryptobox.create();

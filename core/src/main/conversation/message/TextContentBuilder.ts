@@ -29,13 +29,12 @@ import {
 import {EditedTextMessage, TextMessage} from './Message';
 
 export class TextContentBuilder {
-  private readonly content: TextContent;
-  private readonly payloadBundle: TextMessage | EditedTextMessage;
-
   constructor(payloadBundle: TextMessage | EditedTextMessage) {
     this.payloadBundle = payloadBundle;
     this.content = this.payloadBundle.content as TextContent;
   }
+  private readonly content: TextContent;
+  private readonly payloadBundle: TextMessage | EditedTextMessage;
 
   public build(): TextMessage | EditedTextMessage {
     this.payloadBundle.content = this.content;

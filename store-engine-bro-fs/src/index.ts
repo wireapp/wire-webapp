@@ -37,13 +37,13 @@ const TEN_MEGABYTES = 1024 * 1024 * 10;
 export class FileSystemEngine implements CRUDEngine {
   public storeName = '';
 
+  constructor() {}
+
   private config: FileSystemEngineOptions = {
     fileExtension: '.dat',
     size: TEN_MEGABYTES,
     type: typeof window === 'undefined' ? 0 : window.TEMPORARY,
   };
-
-  constructor() {}
 
   async isSupported(): Promise<void> {
     if (typeof window === 'undefined' || !fs.isSupported()) {

@@ -44,12 +44,6 @@ export class Cryptobox extends EventEmitter {
   public lastResortPreKey: ProteusKeys.PreKey | undefined;
   public identity: ProteusKeys.IdentityKeyPair | undefined;
 
-  private cachedSessions: LRUCache<CryptoboxSession>;
-  private readonly logger: logdown.Logger;
-  private readonly minimumAmountOfPreKeys: number;
-  private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
-  private readonly store: CryptoboxCRUDStore;
-
   constructor(engine: CRUDEngine, minimumAmountOfPreKeys: number = 1) {
     super();
 
@@ -75,6 +69,12 @@ export class Cryptobox extends EventEmitter {
       `Constructed Cryptobox. Minimum amount of PreKeys is "${minimumAmountOfPreKeys}". Storage engine is "${storageEngine}".`,
     );
   }
+
+  private cachedSessions: LRUCache<CryptoboxSession>;
+  private readonly logger: logdown.Logger;
+  private readonly minimumAmountOfPreKeys: number;
+  private queues = new LRUCache<PriorityQueue>(DEFAULT_CAPACITY);
+  private readonly store: CryptoboxCRUDStore;
 
   public create(): Promise<ProteusKeys.PreKey[]> {
     this.logger.log('Initializing Cryptobox. Creating local identity...');

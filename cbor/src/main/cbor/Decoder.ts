@@ -49,11 +49,11 @@ export class Decoder {
     }
     return int;
   }
-  private view: DataView;
 
   constructor(private readonly buffer: ArrayBuffer, private readonly config = DEFAULT_CONFIG) {
     this.view = new DataView(this.buffer);
   }
+  private view: DataView;
 
   public u8(): number {
     const [type, minor] = this._type_info_with_assert([Type.UINT8]);

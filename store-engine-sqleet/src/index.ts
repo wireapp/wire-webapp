@@ -46,9 +46,6 @@ const zipObject = (props: any[], values: any[]) =>
 
 export class SQLeetEngine implements CRUDEngine {
   public storeName = '';
-  private db: any;
-  private readonly dbConfig: any;
-  private rawDatabase: string | undefined;
 
   constructor(
     wasmLocation: Uint8Array | string,
@@ -67,6 +64,9 @@ export class SQLeetEngine implements CRUDEngine {
       this.rawDatabase = rawDatabase;
     }
   }
+  private db: any;
+  private readonly dbConfig: any;
+  private rawDatabase: string | undefined;
 
   // TODO: Remove "append" functionality from "CRUDEngine" completely
   append(tableName: string, primaryKey: string, additions: string): Promise<string> {

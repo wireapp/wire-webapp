@@ -27,12 +27,12 @@ export class TransientStore extends EventEmitter {
   public static TOPIC = {
     EXPIRED: 'expired',
   };
-  private readonly bundles: Record<string, TransientBundle> = {};
-  private tableName = '';
 
   constructor(private readonly engine: CRUDEngine) {
     super();
   }
+  private readonly bundles: Record<string, TransientBundle> = {};
+  private tableName = '';
 
   public init(tableName: string): Promise<TransientBundle[]> {
     this.tableName = tableName;
