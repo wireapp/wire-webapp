@@ -54,6 +54,7 @@ import {
   ProfileIcon,
   RecordIcon,
   RecordPendingIcon,
+  ScreenshareIcon,
   ServicesIcon,
   SettingsIcon,
   SpeakerIcon,
@@ -96,6 +97,7 @@ export const DemoIcons = () => (
       <ProfileIcon height={32} />
       <RecordIcon width={32} />
       <RecordPendingIcon width={32} />
+      <ScreenshareIcon width={32} />
       <ServicesIcon height={32} />
       <SettingsIcon height={32} />
       <SpeakerIcon height={32} />
