@@ -38,7 +38,7 @@ export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.showLegalHoldModal';
 
 export class LegalHoldModalViewModel {
   isVisible: ko.Observable<boolean>;
-  isOnlyMe: ko.Observable<boolean>;
+  isSelfInfo: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
   devicesUser: ko.Observable<User>;
   onBgClick: () => void;
@@ -68,7 +68,7 @@ export class LegalHoldModalViewModel {
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
     this.requestFingerprint = ko.observable('');
-    this.isOnlyMe = ko.observable(false);
+    this.isSelfInfo = ko.observable(false);
     this.users = ko.observable([]);
     this.devicesUser = ko.observable();
     this.userDevicesHistory = makeUserDevicesHistory();
@@ -189,12 +189,13 @@ export class LegalHoldModalViewModel {
     this.showRequest(false);
     if (conversation === undefined) {
       this.users([this.userRepository.self()]);
-      this.isOnlyMe(true);
+      this.isSelfInfo(true);
       this.isLoadingUsers(false);
       this.isVisible(true);
       return;
     }
     conversation = ko.unwrap(conversation);
+    this.isSelfInfo(false);
     promiseProgress(
       conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)),
       progress => this.progress(progress)
@@ -202,9 +203,7 @@ export class LegalHoldModalViewModel {
       .then(() => this.conversationRepository.get_all_users_in_conversation(conversation.id))
       .then(allUsers => {
         const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
-        const isOnlyMe = legalHoldUsers.length === 1 && legalHoldUsers[0].is_me;
         this.users(legalHoldUsers);
-        this.isOnlyMe(isOnlyMe);
         this.isLoadingUsers(false);
       });
 
