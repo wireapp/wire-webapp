@@ -100,7 +100,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {ConversationLegalHoldStateHandler} from './ConversationLegalHoldStateHandler';
+import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from './ConversationLegalHoldStateHandler';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -2646,7 +2646,7 @@ export class ConversationRepository {
           if (userId === selfId) {
             return missing;
           }
-          const missingClients = getDifference(localUserClients[userId], clients);
+          const missingClients = getDifference(localUserClients[userId] || [], clients);
           if (missingClients.length) {
             missing.push(userId);
           }
@@ -2684,11 +2684,28 @@ export class ConversationRepository {
 
   grantMessage(eventInfoEntity, consentType, userIds) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
+      const legalHoldMessageTypes = [
+        GENERIC_MESSAGE_TYPE.ASSET,
+        GENERIC_MESSAGE_TYPE.EDITED,
+        GENERIC_MESSAGE_TYPE.IMAGE,
+        GENERIC_MESSAGE_TYPE.TEXT,
+      ];
+      const isLegalHoldMessageType =
+        eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
+      const needsLegalHoldApproval = conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
-      if (!conversationDegraded) {
+      if (!conversationDegraded && !needsLegalHoldApproval) {
         return false;
+      }
+
+      if (!conversationDegraded) {
+        return showLegalHoldWarning(conversationEntity);
+      }
+
+      if (needsLegalHoldApproval) {
+        return showLegalHoldWarning(conversationEntity, true);
       }
 
       return new Promise((resolve, reject) => {
@@ -3134,8 +3151,6 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_ACTIVATED:
-      case ClientEvent.CONVERSATION.LEGAL_HOLD_DEACTIVATED:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
