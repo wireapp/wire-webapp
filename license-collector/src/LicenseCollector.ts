@@ -72,6 +72,12 @@ export interface CollectorOptions {
 }
 
 export class LicenseCollector {
+  private readonly options: Required<CollectorOptions>;
+  private readonly logger: logdown.Logger;
+  private readonly repositories: Repository[];
+  private readonly dependencies: string[];
+  private TMP_DIR: string;
+
   constructor(options: CollectorOptions) {
     this.options = {...defaultOptions, ...options};
     this.logger = logdown('@wireapp/license-collector/LicenseCollector', {
@@ -87,11 +93,6 @@ export class LicenseCollector {
     this.repositories = this.options.repositories.map(url => ({dir: '', name: '', url}));
     this.TMP_DIR = '';
   }
-  private readonly options: Required<CollectorOptions>;
-  private readonly logger: logdown.Logger;
-  private readonly repositories: Repository[];
-  private readonly dependencies: string[];
-  private TMP_DIR: string;
 
   public async collect(): Promise<License[]> {
     await this.checkPrerequisites();

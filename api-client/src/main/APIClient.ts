@@ -88,6 +88,11 @@ export class APIClient extends EventEmitter {
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
   public config: Config;
+  private readonly logger: logdown.Logger;
+  private readonly STORE_NAME_PREFIX = 'wire';
+
+  // Configuration
+  private readonly accessTokenStore: AccessTokenStore;
 
   constructor(config?: Config) {
     super();
@@ -171,11 +176,6 @@ export class APIClient extends EventEmitter {
       api: new UserAPI(this.transport.http),
     };
   }
-  private readonly logger: logdown.Logger;
-  private readonly STORE_NAME_PREFIX = 'wire';
-
-  // Configuration
-  private readonly accessTokenStore: AccessTokenStore;
 
   public async init(clientType: ClientType = ClientType.NONE): Promise<Context> {
     const initialAccessToken = await this.transport.http.refreshAccessToken();

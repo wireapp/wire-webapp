@@ -20,12 +20,13 @@
 import {Type} from './Type';
 
 export class Encoder {
+  private buffer: ArrayBuffer;
+  private view: DataView;
+
   constructor() {
     this.buffer = new ArrayBuffer(4);
     this.view = new DataView(this.buffer);
   }
-  private buffer: ArrayBuffer;
-  private view: DataView;
 
   public get_buffer(): ArrayBuffer {
     return this.buffer.slice(0, this.view.byteOffset);

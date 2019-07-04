@@ -18,12 +18,13 @@
  */
 
 export class MessageTimer {
+  private readonly conversationLevelTimers: Map<string, number>;
+  private readonly messageLevelTimers: Map<string, number>;
+
   constructor() {
     this.conversationLevelTimers = new Map();
     this.messageLevelTimers = new Map();
   }
-  private readonly conversationLevelTimers: Map<string, number>;
-  private readonly messageLevelTimers: Map<string, number>;
 
   public getConversationLevelTimer(conversationId: string): number {
     return this.conversationLevelTimers.get(conversationId) || 0;

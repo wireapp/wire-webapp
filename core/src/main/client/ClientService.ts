@@ -36,6 +36,9 @@ export interface MetaClient extends RegisteredClient {
 }
 
 export class ClientService {
+  private readonly database: ClientDatabaseRepository;
+  private readonly backend: ClientBackendRepository;
+
   constructor(
     private readonly apiClient: APIClient,
     private readonly storeEngine: CRUDEngine,
@@ -44,8 +47,6 @@ export class ClientService {
     this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
   }
-  private readonly database: ClientDatabaseRepository;
-  private readonly backend: ClientBackendRepository;
 
   public deleteLocalClient(): Promise<string> {
     return this.database.deleteLocalClient();

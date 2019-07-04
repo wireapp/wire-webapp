@@ -38,10 +38,6 @@ export class PriorityQueue {
     return this.queue.length;
   }
   public isPending: boolean = false;
-
-  constructor(config?: Config) {
-    this.config = {...this.config, ...config};
-  }
   private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
@@ -53,6 +49,10 @@ export class PriorityQueue {
     retryDelay: 1000,
   };
   private queue: Item[] = [];
+
+  constructor(config?: Config) {
+    this.config = {...this.config, ...config};
+  }
 
   public add(thunkedPromise: any, priority: Priority = Priority.MEDIUM, label?: string): Promise<any> {
     if (typeof thunkedPromise !== 'function') {

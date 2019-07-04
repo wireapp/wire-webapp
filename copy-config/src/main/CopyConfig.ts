@@ -33,6 +33,12 @@ const defaultOptions: Required<CopyConfigOptions> = {
 };
 
 export class CopyConfig {
+  private readonly options: Required<CopyConfigOptions>;
+  private readonly logger: logdown.Logger;
+  private readonly noClone: boolean = false;
+  private readonly noCleanup: boolean = false;
+  private readonly filterFiles: string[] = ['.DS_Store'];
+
   constructor(options: CopyConfigOptions) {
     this.options = {...defaultOptions, ...options};
     this.readEnvVars();
@@ -53,11 +59,6 @@ export class CopyConfig {
     });
     this.logger.state.isEnabled = true;
   }
-  private readonly options: Required<CopyConfigOptions>;
-  private readonly logger: logdown.Logger;
-  private readonly noClone: boolean = false;
-  private readonly noCleanup: boolean = false;
-  private readonly filterFiles: string[] = ['.DS_Store'];
 
   public async copyDirOrFile(source: string, destination: string): Promise<string[]> {
     const filter = (src: string): boolean => {

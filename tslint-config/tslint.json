@@ -19,7 +19,7 @@
     "member-ordering": [
       true,
       {
-        "order": ["public-instance-field", "public-constructor", "private-instance-field", "private-constructor", "public-instance-method", "protected-instance-method", "private-instance-method"]
+        "order": "statics-first"
       }
     ],
     "no-default-export": true,

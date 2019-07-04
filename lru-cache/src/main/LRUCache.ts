@@ -27,14 +27,15 @@ export interface Node<T> {
 }
 
 export class LRUCache<T> {
+  private map: NodeMap<Node<T>>;
+  private head: Node<T> | null;
+  private end: Node<T> | null;
+
   constructor(public readonly capacity: number = 100) {
     this.map = {};
     this.head = null;
     this.end = null;
   }
-  private map: NodeMap<Node<T>>;
-  private head: Node<T> | null;
-  private end: Node<T> | null;
 
   public delete(key: string): boolean {
     const node = this.map[key];

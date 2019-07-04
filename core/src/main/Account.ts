@@ -74,19 +74,6 @@ import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {UserService} from './user/';
 
 export class Account extends EventEmitter {
-  get clientId(): string {
-    if (this.apiClient.context && this.apiClient.context.clientId) {
-      return this.apiClient.context.clientId;
-    }
-    throw new Error(`No user context available. Please login first.`);
-  }
-
-  get userId(): string {
-    if (this.apiClient.context) {
-      return this.apiClient.context.userId;
-    }
-    throw new Error(`No user context available. Please login first.`);
-  }
   public service?: {
     asset: AssetService;
     broadcast: BroadcastService;
@@ -100,6 +87,9 @@ export class Account extends EventEmitter {
     team: TeamService;
     user: UserService;
   };
+  private readonly logger: logdown.Logger;
+
+  private readonly apiClient: APIClient;
 
   constructor(apiClient: APIClient = new APIClient()) {
     super();
@@ -109,9 +99,20 @@ export class Account extends EventEmitter {
       markdown: false,
     });
   }
-  private readonly logger: logdown.Logger;
 
-  private readonly apiClient: APIClient;
+  get clientId(): string {
+    if (this.apiClient.context && this.apiClient.context.clientId) {
+      return this.apiClient.context.clientId;
+    }
+    throw new Error(`No user context available. Please login first.`);
+  }
+
+  get userId(): string {
+    if (this.apiClient.context) {
+      return this.apiClient.context.userId;
+    }
+    throw new Error(`No user context available. Please login first.`);
+  }
 
   public async init(): Promise<void> {
     const assetService = new AssetService(this.apiClient);

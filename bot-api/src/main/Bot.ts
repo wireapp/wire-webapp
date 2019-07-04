@@ -38,6 +38,10 @@ const defaultConfig: Required<BotConfig> = {
 export class Bot {
   public account?: Account;
 
+  private readonly config: Required<BotConfig>;
+  private readonly handlers: Map<string, MessageHandler>;
+  private readonly logger: logdown.Logger;
+
   constructor(private readonly credentials: BotCredentials, config?: BotConfig) {
     this.config = {...defaultConfig, ...config};
     this.credentials = credentials;
@@ -47,10 +51,6 @@ export class Bot {
       markdown: false,
     });
   }
-
-  private readonly config: Required<BotConfig>;
-  private readonly handlers: Map<string, MessageHandler>;
-  private readonly logger: logdown.Logger;
 
   public addHandler(handler: MessageHandler): void {
     this.handlers.set(new UUID(4).format(), handler);
