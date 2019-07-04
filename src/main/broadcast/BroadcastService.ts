@@ -31,16 +31,6 @@ export class BroadcastService {
     private readonly cryptographyService: CryptographyService,
   ) {}
 
-  public async broadcastGenericMessage(teamId: string, genericMessage: GenericMessage): Promise<void> {
-    const clientId = this.conversationService.getClientID();
-
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundle = await this.getPreKeyBundle(teamId);
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundle);
-
-    return this.sendOTRBroadcastMessage(clientId, recipients, plainTextArray);
-  }
-
   private async getPreKeyBundle(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
     const {members: teamMembers} = await this.apiClient.teams.member.api.getMembers(teamId);
 
@@ -60,6 +50,16 @@ export class BroadcastService {
       }
       return bundleMap;
     }, {});
+  }
+
+  public async broadcastGenericMessage(teamId: string, genericMessage: GenericMessage): Promise<void> {
+    const clientId = this.conversationService.getClientID();
+
+    const plainTextArray = GenericMessage.encode(genericMessage).finish();
+    const preKeyBundle = await this.getPreKeyBundle(teamId);
+    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundle);
+
+    return this.sendOTRBroadcastMessage(clientId, recipients, plainTextArray);
   }
 
   private async sendOTRBroadcastMessage(
