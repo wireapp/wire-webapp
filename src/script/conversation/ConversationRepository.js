@@ -100,8 +100,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {ConversationLegalHoldStateHandler} from './ConversationLegalHoldStateHandler';
-import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from './ConversationLegalHoldStateHandler';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -2698,24 +2697,11 @@ export class ConversationRepository {
       }
 
       if (!conversationDegraded) {
-        return new Promise((resolve, reject) => {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-            close: () => {
-              const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
-              reject(new z.error.ConversationError(errorType));
-            },
-            messageHtml: 'The conversation is now subject to legal hold.<br>Do you still want to send your message?',
-            primaryAction: {
-              action: () => resolve(true),
-              text: 'Send anyway',
-            },
-            secondaryAction: {
-              action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
-              text: 'What is legal hold?',
-            },
-            title: 'Legal hold',
-          });
-        });
+        return showLegalHoldWarning(conversationEntity);
+      }
+
+      if (needsLegalHoldApproval) {
+        return showLegalHoldWarning(conversationEntity, true);
       }
 
       return new Promise((resolve, reject) => {
@@ -2784,52 +2770,26 @@ export class ConversationRepository {
               }
             }
 
-            if (needsLegalHoldApproval) {
-              amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
-                close: () => {
-                  const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
+            amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+              close: () => {
+                if (!sendAnyway) {
+                  const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
                   reject(new z.error.ConversationError(errorType));
+                }
+              },
+              primaryAction: {
+                action: () => {
+                  sendAnyway = true;
+                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
                 },
-                messageHtml:
-                  'The conversation is now subject to legal hold.<br>Do you still want to send your message?',
-                primaryAction: {
-                  action: () => resolve(true),
-                  text: 'Send anyway',
-                },
-                secondaryAction: [
-                  {
-                    action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
-                    text: 'What is legal hold?',
-                  },
-                  {
-                    action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
-                    text: 'Verify devices...',
-                  },
-                ],
-                title: 'Legal hold',
-              });
-            } else {
-              amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-                close: () => {
-                  if (!sendAnyway) {
-                    const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
-                    reject(new z.error.ConversationError(errorType));
-                  }
-                },
-                primaryAction: {
-                  action: () => {
-                    sendAnyway = true;
-                    conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                    resolve(true);
-                  },
-                  text: actionString,
-                },
-                text: {
-                  message: messageString,
-                  title: titleString,
-                },
-              });
-            }
+                text: actionString,
+              },
+              text: {
+                message: messageString,
+                title: titleString,
+              },
+            });
           })
           .catch(reject);
       });
