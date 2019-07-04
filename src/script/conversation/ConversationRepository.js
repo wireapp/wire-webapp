@@ -2671,7 +2671,7 @@ export class ConversationRepository {
     }
     const message = eventInfoEntity.genericMessage;
     if (message) {
-      const lhstatus = this.legalHoldStatus(this.find_conversation_by_id(eventInfoEntity.conversationId));
+      const lhStatus = this.legalHoldStatus(this.find_conversation_by_id(eventInfoEntity.conversationId));
       message[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = lhstatus;
     }
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
