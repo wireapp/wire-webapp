@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {IndexedDBEngine} from '@wireapp/store-engine';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Dexie} from 'dexie';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {Config} from './config';
