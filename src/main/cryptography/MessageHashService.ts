@@ -25,13 +25,14 @@ import {AssetContent, ContentType, ConversationContent, LocationContent, TextCon
 export type AvailableMessageContent = AssetContent | LocationContent | TextContent;
 
 export class MessageHashService {
+  private readonly messageContent: AvailableMessageContent;
+  private readonly timestamp: number;
+
   constructor(messageContent: AvailableMessageContent, timestamp: number = Date.now()) {
     this.messageContent = messageContent;
     const unixTimestamp = new Date(timestamp).getTime();
     this.timestamp = Math.floor(unixTimestamp / 1e3);
   }
-  private readonly messageContent: AvailableMessageContent;
-  private readonly timestamp: number;
 
   getHash(): Buffer {
     const buffer = this.getBytes(this.messageContent);
