@@ -167,20 +167,7 @@ export class StorageService {
    * @returns {Promise} Resolves if a database is found and cleared
    */
   deleteDatabase() {
-    if (this.db) {
-      return this.db
-        .delete()
-        .then(() => {
-          this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
-          return true;
-        })
-        .catch(error => {
-          this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
-          throw error;
-        });
-    }
-    this.logger.error(`IndexedDB '${this.dbName}' not found`);
-    return Promise.resolve(true);
+    return this.engine.purge();
   }
 
   /**
@@ -190,7 +177,7 @@ export class StorageService {
    */
   deleteStore(storeName) {
     this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
-    return this.db[storeName].clear();
+    return this.engine.deleteAll(storeName);
   }
 
   /**
@@ -210,13 +197,7 @@ export class StorageService {
    * @returns {Promise} Resolves with the records from the object store
    */
   getAll(storeName) {
-    return this.db[storeName]
-      .toArray()
-      .then(resultArray => resultArray.filter(result => result))
-      .catch(error => {
-        this.logger.error(`Failed to load objects from store '${storeName}'`, error);
-        throw error;
-      });
+    return this.engine.readAll(storeName);
   }
 
   /**
@@ -236,10 +217,7 @@ export class StorageService {
    * @returns {Promise} Resolves with the record matching the primary key
    */
   load(storeName, primaryKey) {
-    return this.db[storeName].get(primaryKey).catch(error => {
-      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
-      throw error;
-    });
+    return this.engine.read(storeName, primaryKey);
   }
 
   /**
@@ -251,14 +229,7 @@ export class StorageService {
    * @returns {Promise} Resolves with the primary key of the persisted object
    */
   save(storeName, primaryKey, entity) {
-    if (!entity) {
-      return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
-    }
-
-    return this.db[storeName].put(entity, primaryKey).catch(error => {
-      this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
-      throw error;
-    });
+    return this.engine.updateOrCreate(storeName, primaryKey, entity);
   }
 
   /**
@@ -281,16 +252,6 @@ export class StorageService {
    * @returns {Promise} Promise with the number of updated records (0 if no records were changed).
    */
   update(storeName, primaryKey, changes) {
-    return this.db[storeName]
-      .update(primaryKey, changes)
-      .then(numberOfUpdates => {
-        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.info(logMessage, changes);
-        return numberOfUpdates;
-      })
-      .catch(error => {
-        this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
-        throw error;
-      });
+    return this.engine.update(storeName, primaryKey, changes);
   }
 }
