@@ -24,11 +24,27 @@ import * as ClassUtil from '../util/ClassUtil';
 import {ChainKey} from './ChainKey';
 
 export class SendChain {
+  chain_key: ChainKey;
+  ratchet_key: KeyPair;
+
+  constructor() {
+    this.chain_key = new ChainKey();
+    this.ratchet_key = new KeyPair();
+  }
+
   static new(chain_key: ChainKey, keypair: KeyPair): SendChain {
     const sc = ClassUtil.new_instance(SendChain);
     sc.chain_key = chain_key;
     sc.ratchet_key = keypair;
     return sc;
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(2);
+    encoder.u8(0);
+    this.chain_key.encode(encoder);
+    encoder.u8(1);
+    return this.ratchet_key.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): SendChain {
@@ -48,20 +64,5 @@ export class SendChain {
     }
 
     return self;
-  }
-  chain_key: ChainKey;
-  ratchet_key: KeyPair;
-
-  constructor() {
-    this.chain_key = new ChainKey();
-    this.ratchet_key = new KeyPair();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(2);
-    encoder.u8(0);
-    this.chain_key.encode(encoder);
-    encoder.u8(1);
-    return this.ratchet_key.encode(encoder);
   }
 }

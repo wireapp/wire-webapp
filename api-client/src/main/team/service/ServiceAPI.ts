@@ -23,6 +23,8 @@ import {HttpClient} from '../../http/';
 import {Provider, Service, ServiceWhitelistData, Services} from './';
 
 export class ServiceAPI {
+  constructor(private readonly client: HttpClient) {}
+
   static URL = {
     PROVIDERS: '/providers',
     SERVICES: 'services',
@@ -30,7 +32,6 @@ export class ServiceAPI {
     WHITELIST: 'whitelist',
     WHITELISTED: 'whitelisted',
   };
-  constructor(private readonly client: HttpClient) {}
 
   public getServices(limit: number = 100): Promise<Services> {
     const config: AxiosRequestConfig = {

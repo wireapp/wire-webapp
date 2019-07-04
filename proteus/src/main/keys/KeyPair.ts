@@ -29,6 +29,14 @@ import {InputError} from '../errors/InputError';
 
 /** Construct an ephemeral key pair. */
 export class KeyPair {
+  public_key: PublicKey;
+  secret_key: SecretKey;
+
+  constructor() {
+    this.public_key = new PublicKey();
+    this.secret_key = new SecretKey();
+  }
+
   static async new(): Promise<KeyPair> {
     await _sodium.ready;
     const sodium = _sodium;
@@ -40,43 +48,6 @@ export class KeyPair {
     kp.public_key = KeyPair.prototype._construct_public_key(ed25519_key_pair);
 
     return kp;
-  }
-
-  static decode(decoder: CBOR.Decoder): KeyPair {
-    const self = ClassUtil.new_instance(KeyPair);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          self.secret_key = SecretKey.decode(decoder);
-          break;
-        case 1:
-          self.public_key = PublicKey.decode(decoder);
-          break;
-        default:
-          decoder.skip();
-      }
-    }
-
-    return self;
-  }
-  public_key: PublicKey;
-  secret_key: SecretKey;
-
-  constructor() {
-    this.public_key = new PublicKey();
-    this.secret_key = new SecretKey();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(2);
-
-    encoder.u8(0);
-    this.secret_key.encode(encoder);
-
-    encoder.u8(1);
-    return this.public_key.encode(encoder);
   }
 
   /**
@@ -106,5 +77,35 @@ export class KeyPair {
       return PublicKey.new(pk_ed25519, pk_curve25519);
     }
     throw new InputError.ConversionError('Could not convert public key with ed2curve.', 408);
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(2);
+
+    encoder.u8(0);
+    this.secret_key.encode(encoder);
+
+    encoder.u8(1);
+    return this.public_key.encode(encoder);
+  }
+
+  static decode(decoder: CBOR.Decoder): KeyPair {
+    const self = ClassUtil.new_instance(KeyPair);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0:
+          self.secret_key = SecretKey.decode(decoder);
+          break;
+        case 1:
+          self.public_key = PublicKey.decode(decoder);
+          break;
+        default:
+          decoder.skip();
+      }
+    }
+
+    return self;
   }
 }

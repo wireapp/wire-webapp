@@ -25,12 +25,13 @@ import {IdentityProviders} from './IdentityProviders';
 import {NewIdentityProviderMetadataURL} from './NewIdentityProviderMetadataURL';
 
 export class IdentityProviderAPI {
+  constructor(private readonly client: HttpClient) {}
+
   static URL = {
     METADATA: 'metadata',
     PROVIDER: '/identity-providers',
     SSO: '/sso',
   };
-  constructor(private readonly client: HttpClient) {}
 
   public async getIdentityProvider(identityProviderId: string): Promise<IdentityProvider> {
     const config: AxiosRequestConfig = {

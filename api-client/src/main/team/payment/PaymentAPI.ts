@@ -32,6 +32,7 @@ import {
 
 export class PaymentAPI {
   static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;
+  constructor(private readonly client: HttpClient) {}
 
   static URL = {
     BILLING: 'billing',
@@ -43,7 +44,6 @@ export class PaymentAPI {
     PLANS: 'plans',
     TEAMS: '/teams',
   };
-  constructor(private readonly client: HttpClient) {}
 
   public putPaymentData(teamId: string, paymentData: PaymentDataUpdate): Promise<PaymentData> {
     const config: AxiosRequestConfig = {

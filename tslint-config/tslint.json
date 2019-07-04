@@ -16,12 +16,6 @@
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "jsx-wrap-multiline": false,
-    "member-ordering": [
-      true,
-      {
-        "order": "statics-first"
-      }
-    ],
     "no-default-export": true,
     "no-duplicate-imports": true,
     "no-duplicate-switch-case": true,

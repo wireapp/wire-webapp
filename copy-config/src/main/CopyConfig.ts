@@ -60,75 +60,6 @@ export class CopyConfig {
     this.logger.state.isEnabled = true;
   }
 
-  public async copyDirOrFile(source: string, destination: string): Promise<string[]> {
-    const filter = (src: string): boolean => {
-      for (const fileName in this.filterFiles) {
-        if (src.endsWith(fileName)) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    const isGlob = (path: string) => /\*$/.test(path);
-
-    if (utils.isFile(destination) && !utils.isFile(source)) {
-      throw new Error('Cannot copy a directory into a file.');
-    }
-
-    if (isGlob(source)) {
-      this.logger.info(`Resolving "${source}"`);
-
-      const copiedFiles = await utils.copyAsync(source, destination);
-
-      for (const copiedFile of copiedFiles) {
-        const [copiedFrom, copiedTo] = copiedFile.history;
-        this.logger.info(`Copying "${copiedFrom}" -> "${copiedTo}"`);
-      }
-
-      return copiedFiles.map(file => file.path);
-    }
-
-    if (utils.isFile(source) && !utils.isFile(destination)) {
-      destination = path.join(destination, path.basename(source));
-    }
-
-    this.logger.info(`Copying "${source}" -> "${destination}"`);
-
-    // Info: "fs.copy" creates all sub-folders which are needed along the way:
-    // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
-    await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
-
-    return [destination];
-  }
-
-  public async copy(): Promise<string[]> {
-    let copiedFiles: string[] = [];
-
-    if (!this.noClone) {
-      await this.clone();
-    }
-
-    this.resolveFiles();
-
-    for (const file in this.options.files) {
-      const destination = this.options.files[file];
-      if (destination instanceof Array) {
-        const results = await Promise.all(destination.map(dest => this.copyDirOrFile(file, dest)));
-        results.forEach(result => (copiedFiles = copiedFiles.concat(result)));
-      } else {
-        const result = await this.copyDirOrFile(file, destination);
-        copiedFiles = copiedFiles.concat(result);
-      }
-    }
-
-    if (!this.noCleanup) {
-      await this.removeBasedir();
-    }
-
-    return copiedFiles.sort();
-  }
-
   private readEnvVars(): void {
     const externalDir = process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
     const repositoryUrl = process.env.WIRE_CONFIGURATION_REPOSITORY;
@@ -185,6 +116,48 @@ export class CopyConfig {
     });
   }
 
+  public async copyDirOrFile(source: string, destination: string): Promise<string[]> {
+    const filter = (src: string): boolean => {
+      for (const fileName in this.filterFiles) {
+        if (src.endsWith(fileName)) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    const isGlob = (path: string) => /\*$/.test(path);
+
+    if (utils.isFile(destination) && !utils.isFile(source)) {
+      throw new Error('Cannot copy a directory into a file.');
+    }
+
+    if (isGlob(source)) {
+      this.logger.info(`Resolving "${source}"`);
+
+      const copiedFiles = await utils.copyAsync(source, destination);
+
+      for (const copiedFile of copiedFiles) {
+        const [copiedFrom, copiedTo] = copiedFile.history;
+        this.logger.info(`Copying "${copiedFrom}" -> "${copiedTo}"`);
+      }
+
+      return copiedFiles.map(file => file.path);
+    }
+
+    if (utils.isFile(source) && !utils.isFile(destination)) {
+      destination = path.join(destination, path.basename(source));
+    }
+
+    this.logger.info(`Copying "${source}" -> "${destination}"`);
+
+    // Info: "fs.copy" creates all sub-folders which are needed along the way:
+    // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
+    await fs.copy(source, destination, {filter, overwrite: true, recursive: true});
+
+    return [destination];
+  }
+
   private async clone(): Promise<void> {
     const repositoryData = this.options.repositoryUrl.split('#');
     let bareUrl = repositoryData[0];
@@ -222,5 +195,32 @@ export class CopyConfig {
   private async removeBasedir(): Promise<void> {
     this.logger.info(`Cleaning up "${this.options.baseDir}" ...`);
     await utils.rimrafAsync(this.options.baseDir);
+  }
+
+  public async copy(): Promise<string[]> {
+    let copiedFiles: string[] = [];
+
+    if (!this.noClone) {
+      await this.clone();
+    }
+
+    this.resolveFiles();
+
+    for (const file in this.options.files) {
+      const destination = this.options.files[file];
+      if (destination instanceof Array) {
+        const results = await Promise.all(destination.map(dest => this.copyDirOrFile(file, dest)));
+        results.forEach(result => (copiedFiles = copiedFiles.concat(result)));
+      } else {
+        const result = await this.copyDirOrFile(file, destination);
+        copiedFiles = copiedFiles.concat(result);
+      }
+    }
+
+    if (!this.noCleanup) {
+      await this.removeBasedir();
+    }
+
+    return copiedFiles.sort();
   }
 }

@@ -38,6 +38,16 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
 
   constructor(private readonly engine: CRUDEngine) {}
 
+  private from_store(record: PersistedRecord): ArrayBuffer {
+    return typeof record.serialised === 'string'
+      ? Decoder.fromBase64(record.serialised).asBytes.buffer
+      : record.serialised;
+  }
+
+  private to_store(serialised: ArrayBuffer | string): string {
+    return Encoder.toBase64(serialised).asString;
+  }
+
   public delete_all(): Promise<boolean> {
     return Promise.resolve()
       .then(() => this.engine.deleteAll(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY))
@@ -188,15 +198,5 @@ export class CryptoboxCRUDStore implements ProteusSession.PreKeyStore {
     return this.engine
       .delete(CryptoboxCRUDStore.STORES.SESSIONS, session_id)
       .then((primary_key: string) => primary_key);
-  }
-
-  private from_store(record: PersistedRecord): ArrayBuffer {
-    return typeof record.serialised === 'string'
-      ? Decoder.fromBase64(record.serialised).asBytes.buffer
-      : record.serialised;
-  }
-
-  private to_store(serialised: ArrayBuffer | string): string {
-    return Encoder.toBase64(serialised).asString;
   }
 }

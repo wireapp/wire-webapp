@@ -33,6 +33,20 @@ export interface SerialisedJSON {
 }
 
 export class PreKeyBundle {
+  version: number;
+  prekey_id: number;
+  public_key: PublicKey;
+  identity_key: IdentityKey;
+  signature: Uint8Array | null | undefined;
+
+  constructor() {
+    this.version = -1;
+    this.prekey_id = -1;
+    this.public_key = new PublicKey();
+    this.identity_key = new IdentityKey();
+    this.signature = null;
+  }
+
   static new(public_identity_key: IdentityKey, prekey: PreKey): PreKeyBundle {
     const bundle = ClassUtil.new_instance(PreKeyBundle);
 
@@ -60,8 +74,50 @@ export class PreKeyBundle {
     return bundle;
   }
 
+  verify(): PreKeyAuth {
+    if (!this.signature) {
+      return PreKeyAuth.UNKNOWN;
+    }
+
+    if (this.identity_key.public_key.verify(this.signature, this.public_key.pub_edward)) {
+      return PreKeyAuth.VALID;
+    }
+    return PreKeyAuth.INVALID;
+  }
+
+  serialise(): ArrayBuffer {
+    const encoder = new CBOR.Encoder();
+    this.encode(encoder);
+    return encoder.get_buffer();
+  }
+
+  serialised_json(): SerialisedJSON {
+    return {
+      id: this.prekey_id,
+      key: sodium.to_base64(new Uint8Array(this.serialise()), sodium.base64_variants.ORIGINAL),
+    };
+  }
+
   static deserialise(buf: ArrayBuffer): PreKeyBundle {
     return PreKeyBundle.decode(new CBOR.Decoder(buf));
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(5);
+    encoder.u8(0);
+    encoder.u8(this.version);
+    encoder.u8(1);
+    encoder.u16(this.prekey_id);
+    encoder.u8(2);
+    this.public_key.encode(encoder);
+    encoder.u8(3);
+    this.identity_key.encode(encoder);
+
+    encoder.u8(4);
+    if (!this.signature) {
+      return encoder.null();
+    }
+    return encoder.bytes(this.signature);
   }
 
   static decode(decoder: CBOR.Decoder): PreKeyBundle {
@@ -91,60 +147,5 @@ export class PreKeyBundle {
     }
 
     return self;
-  }
-  version: number;
-  prekey_id: number;
-  public_key: PublicKey;
-  identity_key: IdentityKey;
-  signature: Uint8Array | null | undefined;
-
-  constructor() {
-    this.version = -1;
-    this.prekey_id = -1;
-    this.public_key = new PublicKey();
-    this.identity_key = new IdentityKey();
-    this.signature = null;
-  }
-
-  verify(): PreKeyAuth {
-    if (!this.signature) {
-      return PreKeyAuth.UNKNOWN;
-    }
-
-    if (this.identity_key.public_key.verify(this.signature, this.public_key.pub_edward)) {
-      return PreKeyAuth.VALID;
-    }
-    return PreKeyAuth.INVALID;
-  }
-
-  serialise(): ArrayBuffer {
-    const encoder = new CBOR.Encoder();
-    this.encode(encoder);
-    return encoder.get_buffer();
-  }
-
-  serialised_json(): SerialisedJSON {
-    return {
-      id: this.prekey_id,
-      key: sodium.to_base64(new Uint8Array(this.serialise()), sodium.base64_variants.ORIGINAL),
-    };
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(5);
-    encoder.u8(0);
-    encoder.u8(this.version);
-    encoder.u8(1);
-    encoder.u16(this.prekey_id);
-    encoder.u8(2);
-    this.public_key.encode(encoder);
-    encoder.u8(3);
-    this.identity_key.encode(encoder);
-
-    encoder.u8(4);
-    if (!this.signature) {
-      return encoder.null();
-    }
-    return encoder.bytes(this.signature);
   }
 }

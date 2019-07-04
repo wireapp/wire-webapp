@@ -24,6 +24,18 @@ import * as ClassUtil from '../util/ClassUtil';
 import {Message} from './Message';
 
 export class Envelope {
+  _message_enc: Uint8Array;
+  mac: Uint8Array;
+  message: Message;
+  version: number;
+
+  constructor() {
+    this._message_enc = new Uint8Array([]);
+    this.mac = new Uint8Array([]);
+    this.message = new Message();
+    this.version = -1;
+  }
+
   static new(mac_key: MacKey, message: Message): Envelope {
     const serialized_message = new Uint8Array(message.serialise());
 
@@ -38,9 +50,35 @@ export class Envelope {
     return env;
   }
 
+  /** @param mac_key The remote party's MacKey */
+  verify(mac_key: MacKey): boolean {
+    return mac_key.verify(this.mac, this._message_enc);
+  }
+
+  /** @returns The serialized message envelope */
+  serialise(): ArrayBuffer {
+    const encoder = new CBOR.Encoder();
+    this.encode(encoder);
+    return encoder.get_buffer();
+  }
+
   static deserialise(buf: ArrayBuffer): Envelope {
     const decoder = new CBOR.Decoder(buf);
     return Envelope.decode(decoder);
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(3);
+    encoder.u8(0);
+    encoder.u8(this.version);
+
+    encoder.u8(1);
+    encoder.object(1);
+    encoder.u8(0);
+    encoder.bytes(this.mac);
+
+    encoder.u8(2);
+    return encoder.bytes(this._message_enc);
   }
 
   static decode(decoder: CBOR.Decoder): Envelope {
@@ -82,42 +120,5 @@ export class Envelope {
 
     Object.freeze(env);
     return env;
-  }
-  _message_enc: Uint8Array;
-  mac: Uint8Array;
-  message: Message;
-  version: number;
-
-  constructor() {
-    this._message_enc = new Uint8Array([]);
-    this.mac = new Uint8Array([]);
-    this.message = new Message();
-    this.version = -1;
-  }
-
-  /** @param mac_key The remote party's MacKey */
-  verify(mac_key: MacKey): boolean {
-    return mac_key.verify(this.mac, this._message_enc);
-  }
-
-  /** @returns The serialized message envelope */
-  serialise(): ArrayBuffer {
-    const encoder = new CBOR.Encoder();
-    this.encode(encoder);
-    return encoder.get_buffer();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
-    encoder.u8(0);
-    encoder.u8(this.version);
-
-    encoder.u8(1);
-    encoder.object(1);
-    encoder.u8(0);
-    encoder.bytes(this.mac);
-
-    encoder.u8(2);
-    return encoder.bytes(this._message_enc);
   }
 }

@@ -94,19 +94,6 @@ export class LicenseCollector {
     this.TMP_DIR = '';
   }
 
-  public async collect(): Promise<License[]> {
-    await this.checkPrerequisites();
-    await this.createTempDir();
-    await this.clone();
-    await this.findRepositories();
-
-    const result = await this.crawl();
-
-    await fs.remove(this.TMP_DIR);
-
-    return this.format(result);
-  }
-
   private async checkPrerequisites(): Promise<void> {
     const {stderr: stderrVersion} = await execAsync('git --version');
 
@@ -247,5 +234,18 @@ export class LicenseCollector {
         return error ? reject(error) : resolve(data);
       });
     });
+  }
+
+  public async collect(): Promise<License[]> {
+    await this.checkPrerequisites();
+    await this.createTempDir();
+    await this.clone();
+    await this.findRepositories();
+
+    const result = await this.crawl();
+
+    await fs.remove(this.TMP_DIR);
+
+    return this.format(result);
   }
 }

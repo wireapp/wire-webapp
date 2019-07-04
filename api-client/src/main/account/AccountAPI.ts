@@ -22,6 +22,8 @@ import {HttpClient} from '../http';
 import {CallConfigData} from './CallConfigData';
 
 export class AccountAPI {
+  constructor(private readonly client: HttpClient) {}
+
   static URL = {
     ACTIVATE: '/activate',
     CALLS: '/calls',
@@ -32,7 +34,6 @@ export class AccountAPI {
     PASSWORD_RESET_COMPLETE: 'complete',
     PROVIDER: '/provider',
   };
-  constructor(private readonly client: HttpClient) {}
 
   /**
    * Delete account

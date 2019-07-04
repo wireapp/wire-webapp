@@ -21,22 +21,6 @@ import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
 export class MacKey {
-  static decode(decoder: CBOR.Decoder): MacKey {
-    let key_bytes = new Uint8Array([]);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          key_bytes = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
-      }
-    }
-
-    return new MacKey(key_bytes);
-  }
   key: Uint8Array;
 
   /**
@@ -65,5 +49,22 @@ export class MacKey {
     encoder.object(1);
     encoder.u8(0);
     return encoder.bytes(this.key);
+  }
+
+  static decode(decoder: CBOR.Decoder): MacKey {
+    let key_bytes = new Uint8Array([]);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0:
+          key_bytes = new Uint8Array(decoder.bytes());
+          break;
+        default:
+          decoder.skip();
+      }
+    }
+
+    return new MacKey(key_bytes);
   }
 }

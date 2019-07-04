@@ -29,12 +29,13 @@ import * as ObfuscationUtil from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 export class HttpClient extends EventEmitter {
-  public static TOPIC = {
-    ON_CONNECTION_STATE_CHANGE: 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
-  };
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
+
+  public static TOPIC = {
+    ON_CONNECTION_STATE_CHANGE: 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
+  };
 
   constructor(
     private readonly baseUrl: string,
@@ -71,6 +72,13 @@ export class HttpClient extends EventEmitter {
 
       return Promise.reject(error);
     });
+  }
+
+  private updateConnectionState(state: ConnectionState): void {
+    if (this.connectionState !== state) {
+      this.connectionState = state;
+      this.emit(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE, this.connectionState);
+    }
   }
 
   public createUrl(url: string): string {
@@ -192,12 +200,5 @@ export class HttpClient extends EventEmitter {
   public sendProtocolBuffer<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     config.headers['Content-Type'] = ContentType.APPLICATION_PROTOBUF;
     return this.sendRequest<T>(config);
-  }
-
-  private updateConnectionState(state: ConnectionState): void {
-    if (this.connectionState !== state) {
-      this.connectionState = state;
-      this.emit(HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE, this.connectionState);
-    }
   }
 }

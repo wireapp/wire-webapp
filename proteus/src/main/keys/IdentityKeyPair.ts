@@ -25,6 +25,16 @@ import {KeyPair} from './KeyPair';
 import {SecretKey} from './SecretKey';
 
 export class IdentityKeyPair {
+  public_key: IdentityKey;
+  secret_key: SecretKey;
+  version: number;
+
+  constructor() {
+    this.public_key = new IdentityKey();
+    this.secret_key = new SecretKey();
+    this.version = -1;
+  }
+
   static async new(): Promise<IdentityKeyPair> {
     const key_pair = await KeyPair.new();
 
@@ -36,9 +46,25 @@ export class IdentityKeyPair {
     return ikp;
   }
 
+  serialise(): ArrayBuffer {
+    const encoder = new CBOR.Encoder();
+    this.encode(encoder);
+    return encoder.get_buffer();
+  }
+
   static deserialise(buf: ArrayBuffer): IdentityKeyPair {
     const decoder = new CBOR.Decoder(buf);
     return IdentityKeyPair.decode(decoder);
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(3);
+    encoder.u8(0);
+    encoder.u8(this.version);
+    encoder.u8(1);
+    this.secret_key.encode(encoder);
+    encoder.u8(2);
+    return this.public_key.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKeyPair {
@@ -62,30 +88,5 @@ export class IdentityKeyPair {
     }
 
     return self;
-  }
-  public_key: IdentityKey;
-  secret_key: SecretKey;
-  version: number;
-
-  constructor() {
-    this.public_key = new IdentityKey();
-    this.secret_key = new SecretKey();
-    this.version = -1;
-  }
-
-  serialise(): ArrayBuffer {
-    const encoder = new CBOR.Encoder();
-    this.encode(encoder);
-    return encoder.get_buffer();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(3);
-    encoder.u8(0);
-    encoder.u8(this.version);
-    encoder.u8(1);
-    this.secret_key.encode(encoder);
-    encoder.u8(2);
-    return this.public_key.encode(encoder);
   }
 }

@@ -60,9 +60,6 @@ import {TextContentBuilder} from './TextContentBuilder';
 const UUID = require('pure-uuid');
 
 export class MessageBuilder {
-  public static createId(): string {
-    return new UUID(4).format();
-  }
   constructor(private readonly apiClient: APIClient, private readonly assetService: AssetService) {}
 
   public createEditedText(
@@ -324,6 +321,10 @@ export class MessageBuilder {
     }
 
     return linkPreviewUploaded;
+  }
+
+  public static createId(): string {
+    return new UUID(4).format();
   }
 
   private getSelfUserId(): string {

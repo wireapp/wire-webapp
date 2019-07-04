@@ -26,6 +26,21 @@ import {Message} from './Message';
 import {SessionTag} from './SessionTag';
 
 export class CipherMessage extends Message {
+  cipher_text: Uint8Array;
+  counter: number;
+  prev_counter: number;
+  ratchet_key: PublicKey;
+  session_tag: SessionTag;
+
+  constructor() {
+    super();
+    this.cipher_text = new Uint8Array([]);
+    this.counter = -1;
+    this.prev_counter = -1;
+    this.ratchet_key = new PublicKey();
+    this.session_tag = new SessionTag();
+  }
+
   static new(
     session_tag: SessionTag,
     counter: number,
@@ -43,6 +58,20 @@ export class CipherMessage extends Message {
 
     Object.freeze(cm);
     return cm;
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(5);
+    encoder.u8(0);
+    this.session_tag.encode(encoder);
+    encoder.u8(1);
+    encoder.u32(this.counter);
+    encoder.u8(2);
+    encoder.u32(this.prev_counter);
+    encoder.u8(3);
+    this.ratchet_key.encode(encoder);
+    encoder.u8(4);
+    return encoder.bytes(this.cipher_text);
   }
 
   static decode(decoder: CBOR.Decoder): CipherMessage {
@@ -83,33 +112,5 @@ export class CipherMessage extends Message {
     } else {
       throw new InputError.TypeError(`Given CipherMessage doesn't match expected signature.`, InputError.CODE.CASE_405);
     }
-  }
-  cipher_text: Uint8Array;
-  counter: number;
-  prev_counter: number;
-  ratchet_key: PublicKey;
-  session_tag: SessionTag;
-
-  constructor() {
-    super();
-    this.cipher_text = new Uint8Array([]);
-    this.counter = -1;
-    this.prev_counter = -1;
-    this.ratchet_key = new PublicKey();
-    this.session_tag = new SessionTag();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(5);
-    encoder.u8(0);
-    this.session_tag.encode(encoder);
-    encoder.u8(1);
-    encoder.u32(this.counter);
-    encoder.u8(2);
-    encoder.u32(this.prev_counter);
-    encoder.u8(3);
-    this.ratchet_key.encode(encoder);
-    encoder.u8(4);
-    return encoder.bytes(this.cipher_text);
   }
 }

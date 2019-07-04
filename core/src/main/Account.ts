@@ -74,6 +74,9 @@ import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {UserService} from './user/';
 
 export class Account extends EventEmitter {
+  private readonly logger: logdown.Logger;
+
+  private readonly apiClient: APIClient;
   public service?: {
     asset: AssetService;
     broadcast: BroadcastService;
@@ -87,9 +90,6 @@ export class Account extends EventEmitter {
     team: TeamService;
     user: UserService;
   };
-  private readonly logger: logdown.Logger;
-
-  private readonly apiClient: APIClient;
 
   constructor(apiClient: APIClient = new APIClient()) {
     super();
@@ -215,30 +215,6 @@ export class Account extends EventEmitter {
       .then(() => loadedClient);
   }
 
-  public logout(): Promise<void> {
-    return this.apiClient.logout().then(() => this.resetContext());
-  }
-
-  public listen(notificationHandler?: Function): Promise<Account> {
-    if (!this.apiClient.context) {
-      throw new Error('Context is not set - Please login first');
-    }
-    return Promise.resolve()
-      .then(() => {
-        this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
-
-        if (notificationHandler) {
-          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, (notification: IncomingNotification) => {
-            notificationHandler(notification);
-          });
-        } else {
-          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, this.handleNotification.bind(this));
-        }
-        return this.apiClient.connect();
-      })
-      .then(() => this);
-  }
-
   private registerClient(
     loginData: LoginData,
     clientInfo?: ClientInfo,
@@ -266,6 +242,30 @@ export class Account extends EventEmitter {
       delete this.apiClient.context;
       delete this.service;
     });
+  }
+
+  public logout(): Promise<void> {
+    return this.apiClient.logout().then(() => this.resetContext());
+  }
+
+  public listen(notificationHandler?: Function): Promise<Account> {
+    if (!this.apiClient.context) {
+      throw new Error('Context is not set - Please login first');
+    }
+    return Promise.resolve()
+      .then(() => {
+        this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
+
+        if (notificationHandler) {
+          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, (notification: IncomingNotification) => {
+            notificationHandler(notification);
+          });
+        } else {
+          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, this.handleNotification.bind(this));
+        }
+        return this.apiClient.connect();
+      })
+      .then(() => this);
   }
 
   private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundle> {

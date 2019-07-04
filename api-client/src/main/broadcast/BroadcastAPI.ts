@@ -23,10 +23,11 @@ import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
 
 export class BroadcastAPI {
+  constructor(private readonly client: HttpClient) {}
+
   static readonly URL = {
     BROADCAST: '/broadcast/otr/messages',
   };
-  constructor(private readonly client: HttpClient) {}
 
   /**
    * Broadcast an encrypted message to all team members and all contacts (accepts Protobuf).

@@ -23,31 +23,16 @@ import * as sodium from 'libsodium-wrappers-sumo';
 import * as ClassUtil from '../util/ClassUtil';
 
 export class CipherKey {
-  static new(key: Uint8Array): CipherKey {
-    const ck = ClassUtil.new_instance(CipherKey);
-    ck.key = key;
-    return ck;
-  }
-
-  static decode(decoder: CBOR.Decoder): CipherKey {
-    let key_bytes = new Uint8Array([]);
-
-    const nprops = decoder.object();
-    for (let index = 0; index <= nprops - 1; index++) {
-      switch (decoder.u8()) {
-        case 0:
-          key_bytes = new Uint8Array(decoder.bytes());
-          break;
-        default:
-          decoder.skip();
-      }
-    }
-    return CipherKey.new(key_bytes);
-  }
   key: Uint8Array;
 
   constructor() {
     this.key = new Uint8Array([]);
+  }
+
+  static new(key: Uint8Array): CipherKey {
+    const ck = ClassUtil.new_instance(CipherKey);
+    ck.key = key;
+    return ck;
   }
 
   /**
@@ -72,5 +57,21 @@ export class CipherKey {
     encoder.object(1);
     encoder.u8(0);
     return encoder.bytes(this.key);
+  }
+
+  static decode(decoder: CBOR.Decoder): CipherKey {
+    let key_bytes = new Uint8Array([]);
+
+    const nprops = decoder.object();
+    for (let index = 0; index <= nprops - 1; index++) {
+      switch (decoder.u8()) {
+        case 0:
+          key_bytes = new Uint8Array(decoder.bytes());
+          break;
+        default:
+          decoder.skip();
+      }
+    }
+    return CipherKey.new(key_bytes);
   }
 }

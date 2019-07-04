@@ -29,10 +29,26 @@ import {PublicKey} from './PublicKey';
  * Long-term identity keys are used to initialise "sessions" with other clients (triple DH).
  */
 export class IdentityKey {
+  public_key: PublicKey;
+
+  constructor() {
+    this.public_key = new PublicKey();
+  }
+
   static new(public_key: PublicKey): IdentityKey {
     const key = ClassUtil.new_instance(IdentityKey);
     key.public_key = public_key;
     return key;
+  }
+
+  fingerprint(): string {
+    return this.public_key.fingerprint();
+  }
+
+  encode(encoder: CBOR.Encoder): CBOR.Encoder {
+    encoder.object(1);
+    encoder.u8(0);
+    return this.public_key.encode(encoder);
   }
 
   static decode(decoder: CBOR.Decoder): IdentityKey {
@@ -50,20 +66,5 @@ export class IdentityKey {
     }
 
     return IdentityKey.new(public_key);
-  }
-  public_key: PublicKey;
-
-  constructor() {
-    this.public_key = new PublicKey();
-  }
-
-  fingerprint(): string {
-    return this.public_key.fingerprint();
-  }
-
-  encode(encoder: CBOR.Encoder): CBOR.Encoder {
-    encoder.object(1);
-    encoder.u8(0);
-    return this.public_key.encode(encoder);
   }
 }

@@ -49,6 +49,8 @@ export interface MessageData {
 }
 
 export class TravisBot {
+  constructor(private readonly loginData: LoginData, private readonly messageData: MessageData) {}
+
   get message(): string {
     const {
       build: {number: buildNumber, repositoryName},
@@ -67,6 +69,40 @@ export class TravisBot {
     }
 
     return msg;
+  }
+
+  async start(): Promise<void> {
+    let {conversationIds} = this.messageData;
+
+    const engine = new MemoryEngine();
+    await engine.init('');
+
+    const client = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
+
+    const account = new Account(client);
+    await account.login(this.loginData);
+    await account.listen();
+
+    account.on('error', error => console.error(error));
+
+    if (!conversationIds) {
+      const allConversations = await client.conversation.api.getAllConversations();
+      const groupConversations = allConversations.filter(conversation => conversation.type === 0);
+      conversationIds = groupConversations.map(conversation => conversation.id);
+    }
+
+    await Promise.all(
+      conversationIds.map(async id => {
+        if (!account.service) {
+          throw new Error('Account service is not set. Account not listening?');
+        }
+        if (id) {
+          logger.log(`Sending message to conversation ${id} ...`);
+          const textPayload = await account.service.conversation.messageBuilder.createText(id, this.message).build();
+          await account.service.conversation.send(textPayload);
+        }
+      }),
+    );
   }
 
   static async generateChangelog(repoSlug: string, gitTag: string, maximumChars?: number): Promise<string> {
@@ -108,40 +144,5 @@ export class TravisBot {
     }
 
     return stdout.trim();
-  }
-  constructor(private readonly loginData: LoginData, private readonly messageData: MessageData) {}
-
-  async start(): Promise<void> {
-    let {conversationIds} = this.messageData;
-
-    const engine = new MemoryEngine();
-    await engine.init('');
-
-    const client = new APIClient({store: engine, urls: APIClient.BACKEND.PRODUCTION});
-
-    const account = new Account(client);
-    await account.login(this.loginData);
-    await account.listen();
-
-    account.on('error', error => console.error(error));
-
-    if (!conversationIds) {
-      const allConversations = await client.conversation.api.getAllConversations();
-      const groupConversations = allConversations.filter(conversation => conversation.type === 0);
-      conversationIds = groupConversations.map(conversation => conversation.id);
-    }
-
-    await Promise.all(
-      conversationIds.map(async id => {
-        if (!account.service) {
-          throw new Error('Account service is not set. Account not listening?');
-        }
-        if (id) {
-          logger.log(`Sending message to conversation ${id} ...`);
-          const textPayload = await account.service.conversation.messageBuilder.createText(id, this.message).build();
-          await account.service.conversation.send(textPayload);
-        }
-      }),
-    );
   }
 }
