@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.3.0...@wireapp/react-ui-kit@7.3.1) (2019-07-04)
+
+
+### Bug Fixes
+
+* bump react-hot-loader from 4.12.0 to 4.12.2 ([#2029](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2029)) ([4ed1638](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/4ed1638))
+
+
+
+
+
 # [7.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.2.1...@wireapp/react-ui-kit@7.3.0) (2019-07-03)
 
 

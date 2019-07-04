@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.13.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.13.1...@wireapp/api-client@5.13.2) (2019-07-04)
+
+
+### Bug Fixes
+
+* bump react-hot-loader from 4.12.0 to 4.12.2 ([#2029](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2029)) ([4ed1638](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4ed1638))
+
+
+
+
+
 ## [5.13.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.13.0...@wireapp/api-client@5.13.1) (2019-07-04)
 
 **Note:** Version bump only for package @wireapp/api-client
