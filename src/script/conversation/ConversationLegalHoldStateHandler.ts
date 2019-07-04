@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import {t} from 'Util/LocalizerUtil';
 import {Conversation} from '../entity/Conversation';
 import {WebAppEvents} from '../event/WebApp';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -51,27 +52,34 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
     const secondaryAction = [
       {
         action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
-        text: 'What is legal hold?',
+        text: t('legalHoldWarningSecondaryInformation'),
       },
     ];
     if (verifyDevices) {
       secondaryAction.push({
         action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
-        text: 'Verify devices...',
+        text: t('legalHoldWarningSecondaryVerify'),
       });
     }
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
       close: () => {
         const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
         reject(new z.error.ConversationError(errorType));
       },
-      messageHtml: 'The conversation is now subject to legal hold.<br>Do you still want to send your message?',
+      preventClose: true,
       primaryAction: {
-        action: () => resolve(true),
-        text: 'Send anyway',
+        action: () => {
+          conversationEntity.needsLegalHoldApproval(false);
+          resolve(true);
+        },
+        text: t('legalHoldWarningPrimary'),
       },
       secondaryAction,
-      title: 'Legal hold',
+      showClose: true,
+      text: {
+        htmlMessage: t('legalHoldWarningMessage', {}, {br: '<br>'}),
+        title: t('legalHoldWarningTitle'),
+      },
     });
   });
 };
