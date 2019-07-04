@@ -24,10 +24,11 @@ import {NewClient, RegisteredClient} from '../client/';
 import {HttpClient} from '../http/';
 
 export class ClientAPI {
+  constructor(private readonly client: HttpClient) {}
+
   static URL = {
     CLIENTS: '/clients',
   };
-  constructor(private readonly client: HttpClient) {}
 
   public postClient(newClient: NewClient): Promise<RegisteredClient> {
     const config: AxiosRequestConfig = {

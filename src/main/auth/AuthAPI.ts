@@ -29,6 +29,8 @@ import {CookieList} from './CookieList';
 import {RegisterData} from './RegisterData';
 
 export class AuthAPI {
+  constructor(private readonly client: HttpClient, private readonly engine: CRUDEngine) {}
+
   static URL = {
     ACCESS: '/access',
     COOKIES: '/cookies',
@@ -38,7 +40,6 @@ export class AuthAPI {
     REGISTER: '/register',
     SSO: '/sso',
   };
-  constructor(private readonly client: HttpClient, private readonly engine: CRUDEngine) {}
 
   public getCookies(labels?: string[]): Promise<AxiosResponse<CookieList>> {
     const config: AxiosRequestConfig = {

@@ -60,9 +60,8 @@ const defaultConfig: Config = {
 };
 
 export class APIClient extends EventEmitter {
-  public static BACKEND = Backend;
-  public static TOPIC = APIClientTopic;
-  public static VERSION = version;
+  private readonly logger: logdown.Logger;
+  private readonly STORE_NAME_PREFIX = 'wire';
 
   // APIs
   public account: {api: AccountAPI};
@@ -85,14 +84,16 @@ export class APIClient extends EventEmitter {
     team: {api: TeamAPI};
   };
   public user: {api: UserAPI};
-  public context?: Context;
-  public transport: {http: HttpClient; ws: WebSocketClient};
-  public config: Config;
-  private readonly logger: logdown.Logger;
-  private readonly STORE_NAME_PREFIX = 'wire';
 
   // Configuration
   private readonly accessTokenStore: AccessTokenStore;
+  public context?: Context;
+  public transport: {http: HttpClient; ws: WebSocketClient};
+  public config: Config;
+
+  public static BACKEND = Backend;
+  public static TOPIC = APIClientTopic;
+  public static VERSION = version;
 
   constructor(config?: Config) {
     super();
@@ -251,13 +252,13 @@ export class APIClient extends EventEmitter {
     }
   }
 
-  public disconnect(reason?: string): void {
-    this.transport.ws.disconnect(reason);
-  }
-
   private createContext(userId: string, clientType: ClientType, clientId?: string): Context {
     this.context = this.context ? {...this.context, clientId, clientType} : new Context(userId, clientType, clientId);
     return this.context;
+  }
+
+  public disconnect(reason?: string): void {
+    this.transport.ws.disconnect(reason);
   }
 
   private async initEngine(context: Context): Promise<CRUDEngine> {
