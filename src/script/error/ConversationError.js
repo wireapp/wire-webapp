@@ -31,6 +31,7 @@ z.error.ConversationError = class ConversationError extends BaseError {
     return {
       CONVERSATION_NOT_FOUND: 'Conversation not found',
       DEGRADED_CONVERSATION_CANCELLATION: 'Sending to degraded conversation was canceled by user',
+      LEGAL_HOLD_CONVERSATION_CANCELLATION: 'Sending to legal hold conversation was canceled by user',
       MESSAGE_NOT_FOUND: 'Message not found in conversation',
       NO_CHANGES: 'Missing changes to message',
       NO_CONVERSATION_ID: 'Conversation ID is not defined',
@@ -47,6 +48,7 @@ z.error.ConversationError = class ConversationError extends BaseError {
     return {
       CONVERSATION_NOT_FOUND: 'CONVERSATION_NOT_FOUND',
       DEGRADED_CONVERSATION_CANCELLATION: 'DEGRADED_CONVERSATION_CANCELLATION',
+      LEGAL_HOLD_CONVERSATION_CANCELLATION: 'LEGAL_HOLD_CONVERSATION_CANCELLATION',
       MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
       NO_CHANGES: 'NO_CHANGES',
       NO_CONVERSATION_ID: 'NO_CONVERSATION_ID',

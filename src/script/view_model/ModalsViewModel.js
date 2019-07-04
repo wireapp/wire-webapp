@@ -127,6 +127,7 @@ export class ModalsViewModel {
       primaryAction,
       secondaryAction,
       hideSecondary,
+      showClose = false,
       text = {},
     } = options;
     const content = {
@@ -140,6 +141,7 @@ export class ModalsViewModel {
       onBgClick: preventClose ? noop : this.hide,
       primaryAction,
       secondaryAction,
+      showClose,
       titleText: text.title,
     };
 

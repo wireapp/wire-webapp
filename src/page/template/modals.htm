@@ -5,6 +5,10 @@
   >
     <div class="modal__header" data-uie-name="status-modal-title">
       <div class="modal__header__title" data-bind="text: content().titleText"></div>
+      <!-- ko if: content().showClose -->
+        <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+      <!-- /ko -->
+      
     </div>
     <div class="modal__body" data-bind="fadingscrollbar">
       <div class="modal__text" data-uie-name="status-modal-text">

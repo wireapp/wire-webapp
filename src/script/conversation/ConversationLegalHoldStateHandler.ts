@@ -18,8 +18,13 @@
  */
 
 import {amplify} from 'amplify';
+import {t} from 'Util/LocalizerUtil';
 import {Conversation} from '../entity/Conversation';
+import {WebAppEvents} from '../event/WebApp';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationRepository} from './ConversationRepository';
 
 export const VERIFY_LEGAL_HOLD = 'verifyLegalHold';
@@ -41,3 +46,40 @@ export class ConversationLegalHoldStateHandler {
     }
   };
 }
+
+export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDevices: boolean = false) => {
+  return new Promise((resolve, reject) => {
+    const secondaryAction = [
+      {
+        action: () => amplify.publish(SHOW_LEGAL_HOLD_MODAL, conversationEntity),
+        text: t('legalHoldWarningSecondaryInformation'),
+      },
+    ];
+    if (verifyDevices) {
+      secondaryAction.push({
+        action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
+        text: t('legalHoldWarningSecondaryVerify'),
+      });
+    }
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
+      close: () => {
+        const errorType = z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
+        reject(new z.error.ConversationError(errorType));
+      },
+      preventClose: true,
+      primaryAction: {
+        action: () => {
+          conversationEntity.needsLegalHoldApproval(false);
+          resolve(true);
+        },
+        text: t('legalHoldWarningPrimary'),
+      },
+      secondaryAction,
+      showClose: true,
+      text: {
+        htmlMessage: t('legalHoldWarningMessage', {}, {br: '<br>'}),
+        title: t('legalHoldWarningTitle'),
+      },
+    });
+  });
+};
