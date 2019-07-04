@@ -32,6 +32,9 @@ export class HttpClient extends EventEmitter {
   public static TOPIC = {
     ON_CONNECTION_STATE_CHANGE: 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
   };
+  private readonly logger: logdown.Logger;
+  private connectionState: ConnectionState;
+  private readonly requestQueue: PriorityQueue;
 
   constructor(
     private readonly baseUrl: string,
@@ -69,9 +72,6 @@ export class HttpClient extends EventEmitter {
       return Promise.reject(error);
     });
   }
-  private readonly logger: logdown.Logger;
-  private connectionState: ConnectionState;
-  private readonly requestQueue: PriorityQueue;
 
   public createUrl(url: string): string {
     return `${this.baseUrl}${url}`;

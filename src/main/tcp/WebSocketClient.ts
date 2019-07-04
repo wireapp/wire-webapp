@@ -65,6 +65,12 @@ export class WebSocketClient extends EventEmitter {
   };
   public client: HttpClient;
   public isOnline: boolean;
+  private readonly baseUrl: string;
+  private readonly logger: logdown.Logger;
+  private clientId?: string;
+  private hasUnansweredPing: boolean;
+  private pingInterval?: NodeJS.Timeout;
+  private socket?: WebSocket;
 
   constructor(baseUrl: string, client: HttpClient) {
     super();
@@ -79,12 +85,6 @@ export class WebSocketClient extends EventEmitter {
       markdown: false,
     });
   }
-  private readonly baseUrl: string;
-  private readonly logger: logdown.Logger;
-  private clientId?: string;
-  private hasUnansweredPing: boolean;
-  private pingInterval?: NodeJS.Timeout;
-  private socket?: WebSocket;
 
   public async connect(clientId?: string): Promise<WebSocketClient> {
     this.clientId = clientId;
