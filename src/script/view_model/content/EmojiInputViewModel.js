@@ -142,12 +142,12 @@ export class EmojiInputViewModel {
       const details = emojiBindings[code];
 
       // Ignore 'tone' emojis for now, they clutter suggestions too much.
-      if (details.alpha_code.match(/_tone\d/)) {
+      if (details.name.match(/_tone\d/)) {
         continue;
       }
 
-      const icon = String.fromCodePoint.apply(null, details.output.split('-').map(char => `0x${char}`));
-      const alphaCodes = [details.alpha_code, ...details.aliases.split('|')];
+      const icon = String.fromCodePoint.apply(null, details.code.split('-').map(char => `0x${char}`));
+      const alphaCodes = [details.name, ...details.aliases];
       alphaCodes.forEach(alphaCode => {
         if (alphaCode) {
           const name = alphaCode

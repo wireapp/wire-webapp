@@ -48,7 +48,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UUID_REGEX} from '../util/stringUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLAttributes<_SingleSignOnForm>, RouteComponentProps<{code?: string}> {
+interface Props extends React.HTMLAttributes<SingleSignOnForm>, RouteComponentProps<{code?: string}> {
   handleSSOWindow: (code: string) => {};
 }
 
@@ -78,7 +78,7 @@ interface State {
   validationErrors: Error[];
 }
 
-class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
+class SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
   private static readonly SSO_CODE_PREFIX = 'wire-';
   private static readonly SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
@@ -188,7 +188,7 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
           default: {
             this.setState({ssoError: error});
             const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => error.label && error.label.endsWith(errorType)
+              errorType => error.label && error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               // tslint:disable-next-line:no-console
@@ -227,14 +227,14 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
   readFromClipboard = () => window.navigator.clipboard.readText();
 
   containsSSOCode = (text: string) =>
-    text && new RegExp(`${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
+    text && new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm').test(text);
 
   isSSOCode = (text: string) =>
-    text && new RegExp(`^${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
+    text && new RegExp(`^${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}$`, 'i').test(text);
 
   extractCode = (text: string) => {
     return this.containsSSOCode(text)
-      ? text.match(new RegExp(`${_SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
+      ? text.match(new RegExp(`${SingleSignOnForm.SSO_CODE_PREFIX}${UUID_REGEX}`, 'gm'))[0]
       : '';
   };
 
@@ -243,9 +243,9 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
     code
       .trim()
       .toLowerCase()
-      .replace(_SingleSignOnForm.SSO_CODE_PREFIX, '');
+      .replace(SingleSignOnForm.SSO_CODE_PREFIX, '');
 
-  render(): JSX.Element {
+  render() {
     const {
       intl: {formatMessage: _},
       loginError,
@@ -286,7 +286,7 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
             value={code}
             autoComplete="section-login sso-code"
             maxLength={1024}
-            pattern={`${_SingleSignOnForm.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
+            pattern={`${SingleSignOnForm.SSO_CODE_PREFIX_REGEX}${UUID_REGEX}`}
             autoFocus
             type="text"
             required
@@ -326,27 +326,23 @@ class _SingleSignOnForm extends React.PureComponent<Props & ConnectedProps & Dis
   }
 }
 
-export const SingleSignOnForm = withRouter(
+export default withRouter(
   injectIntl(
     connect(
-      (state: RootState, ownProps: Props): ConnectedProps => {
-        return {
-          code: ownProps.match.params.code,
-          hasHistory: ClientSelector.hasHistory(state),
-          hasSelfHandle: SelfSelector.hasSelfHandle(state),
-          isFetching: AuthSelector.isFetching(state),
-          loginError: AuthSelector.getError(state),
-        };
-      },
-      (dispatch: ThunkDispatch): DispatchProps => {
-        return {
-          doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
-            dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
-          doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
-          resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
-          validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
-        };
-      }
-    )(_SingleSignOnForm)
-  )
+      (state: RootState, ownProps: Props): ConnectedProps => ({
+        code: ownProps.match.params.code,
+        hasHistory: ClientSelector.hasHistory(state),
+        hasSelfHandle: SelfSelector.hasSelfHandle(state),
+        isFetching: AuthSelector.isFetching(state),
+        loginError: AuthSelector.getError(state),
+      }),
+      (dispatch: ThunkDispatch): DispatchProps => ({
+        doFinalizeSSOLogin: (options: {clientType: ClientType}) =>
+          dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(options)),
+        doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
+        resetAuthError: () => dispatch(ROOT_ACTIONS.authAction.resetAuthError()),
+        validateSSOCode: (code: string) => dispatch(ROOT_ACTIONS.authAction.validateSSOCode(code)),
+      }),
+    )(SingleSignOnForm),
+  ),
 );

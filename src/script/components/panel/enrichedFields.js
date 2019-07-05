@@ -62,7 +62,7 @@ ko.components.register('enriched-fields', {
           }
         },
         this,
-        {disposeWhenNodeIsRemoved: element}
+        {disposeWhenNodeIsRemoved: element},
       );
       return this;
     },

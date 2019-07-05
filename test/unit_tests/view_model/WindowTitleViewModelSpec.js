@@ -50,7 +50,7 @@ describe('WindowTitleViewModel', () => {
         {
           conversation: conversationRepository,
           user: TestFactory.user_repository,
-        }
+        },
       );
     });
   });

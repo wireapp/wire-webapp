@@ -501,13 +501,11 @@ class FlowEntity {
    * @returns {Promise} Resolves with the configuration object to initialize PeerConnection
    */
   _createPeerConnectionConfiguration() {
-    return this.callingRepository.getConfig().then(({ice_servers}) => {
-      return {
-        bundlePolicy: 'max-bundle',
-        iceServers: ice_servers,
-        rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
-      };
-    });
+    return this.callingRepository.getConfig().then(({ice_servers}) => ({
+      bundlePolicy: 'max-bundle',
+      iceServers: ice_servers,
+      rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+    }));
   }
 
   /**
@@ -570,7 +568,7 @@ class FlowEntity {
       MediaStreamSource.REMOTE,
       this.remoteUser.id,
       mediaStream,
-      this.callEntity
+      this.callEntity,
     );
     amplify.publish(WebAppEvents.CALL.MEDIA.ADD_STREAM, mediaStreamInfo);
   }
@@ -786,7 +784,7 @@ class FlowEntity {
       conversationEntity,
       callMessage,
       this.remoteUserId,
-      this.remoteClientId
+      this.remoteClientId,
     );
     amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, callEvent, EventRepository.SOURCE.WEB_SOCKET);
   }
@@ -1082,7 +1080,7 @@ class FlowEntity {
       this.conversationId,
       this.selfUserId,
       this.remoteUserId,
-      this.remoteClientId
+      this.remoteClientId,
     );
     const additionalPayload = Object.assign({remoteUser: this.remoteUser, sdp: localSdp.sdp}, payload);
 

@@ -409,7 +409,7 @@ export class UserRepository {
     const fingerprint = await this.client_repository.cryptographyRepository.getRemoteFingerprint(
       userId,
       clientId,
-      last_prekey
+      last_prekey,
     );
     amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
   }
@@ -658,7 +658,7 @@ export class UserRepository {
 
     return Promise.all([getLocalUser(userId), this.user_service.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
-        this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData)
+        this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData),
       )
       .then(userEntity => {
         if (this.isTeam()) {
@@ -848,7 +848,7 @@ export class UserRepository {
   initMarketingConsent() {
     if (!z.config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(
-        `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`
+        `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );
       return Promise.resolve();
     }

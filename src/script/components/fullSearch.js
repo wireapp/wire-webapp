@@ -79,7 +79,7 @@ z.components.FullSearch = class FullSearch {
             this.visibleMessageEntities(this.messageEntities.splice(0, FullSearch.CONFIG.MAX_VISIBLE_MESSAGES));
           }
         });
-      }, 100)
+      }, 100),
     );
 
     // binding?

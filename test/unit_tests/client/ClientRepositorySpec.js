@@ -52,7 +52,7 @@ describe('ClientRepository', () => {
           {class: 'desktop', id: '8e11e06549c8cf1a'},
           {class: 'tablet', id: 'c411f97b139c818b'},
           {class: 'desktop', id: 'cbf3ea49214702d8'},
-        ])
+        ]),
       );
 
       return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
@@ -93,7 +93,7 @@ describe('ClientRepository', () => {
 
     it('resolves with a valid client', () => {
       spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(clientPayloadDatabase)
+        Promise.resolve(clientPayloadDatabase),
       );
 
       server.respondWith('GET', clientUrl, [
@@ -110,7 +110,7 @@ describe('ClientRepository', () => {
 
     it('rejects with an error if no client found locally', done => {
       spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+        Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
 
       TestFactory.client_repository
@@ -125,7 +125,7 @@ describe('ClientRepository', () => {
 
     it('rejects with an error if client removed on backend', done => {
       spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(clientPayloadDatabase)
+        Promise.resolve(clientPayloadDatabase),
       );
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
 
@@ -141,7 +141,7 @@ describe('ClientRepository', () => {
 
     it('rejects with an error if something else fails', done => {
       spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.reject(new Error('Expected unit test error'))
+        Promise.reject(new Error('Expected unit test error')),
       );
 
       TestFactory.client_repository

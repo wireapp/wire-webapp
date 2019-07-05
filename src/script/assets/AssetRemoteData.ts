@@ -77,19 +77,19 @@ export class AssetRemoteData {
         return window.wire.app.service.asset.generateAssetUrlV3(
           this.urlData.assetKey,
           this.urlData.assetToken,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       case 2:
         return window.wire.app.service.asset.generateAssetUrlV2(
           this.urlData.assetId,
           this.urlData.conversationId,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       case 1:
         return window.wire.app.service.asset.generateAssetUrl(
           this.urlData.assetId,
           this.urlData.conversationId,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       default:
         throw Error('Cannot map URL data.');
@@ -101,7 +101,7 @@ export class AssetRemoteData {
     otrKey?: Uint8Array,
     sha256?: Uint8Array,
     assetToken?: string,
-    forceCaching: boolean = false
+    forceCaching: boolean = false,
   ): AssetRemoteData {
     return new AssetRemoteData(
       assetKey,
@@ -112,7 +112,7 @@ export class AssetRemoteData {
         version: 3,
       },
       otrKey,
-      sha256
+      sha256,
     );
   }
 
@@ -121,7 +121,7 @@ export class AssetRemoteData {
     assetId: string,
     otrKey: Uint8Array,
     sha256: Uint8Array,
-    forceCaching: boolean = false
+    forceCaching: boolean = false,
   ): AssetRemoteData {
     return new AssetRemoteData(
       `${conversationId}${assetId}`,
@@ -132,7 +132,7 @@ export class AssetRemoteData {
         version: 2,
       },
       otrKey,
-      sha256
+      sha256,
     );
   }
 

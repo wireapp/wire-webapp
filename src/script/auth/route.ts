@@ -17,7 +17,7 @@
  *
  */
 
-const QUERY_KEY = {
+export const QUERY_KEY = {
   CONVERSATION_CODE: 'join_code',
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
@@ -31,15 +31,15 @@ const QUERY_KEY = {
   TRACKING: 'tracking',
 };
 
-const FORWARDED_QUERY_KEYS = [QUERY_KEY.ENVIRONMENT, QUERY_KEY.LOCALE, QUERY_KEY.TRACKING];
+export const FORWARDED_QUERY_KEYS = [QUERY_KEY.ENVIRONMENT, QUERY_KEY.LOCALE, QUERY_KEY.TRACKING];
 
-const LOGOUT_REASON = {
+export const LOGOUT_REASON = {
   ACCOUNT_REMOVED: 'deleted',
   CLIENT_REMOVED: 'client_removed',
   SESSION_EXPIRED: 'expired',
 };
 
-const ROUTE = {
+export const ROUTE = {
   CHOOSE_HANDLE: '/choosehandle',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
@@ -54,5 +54,3 @@ const ROUTE = {
   SSO: '/sso/:code?',
   VERIFY: '/verify',
 };
-
-export {ROUTE, QUERY_KEY, FORWARDED_QUERY_KEYS, LOGOUT_REASON};

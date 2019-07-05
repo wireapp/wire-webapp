@@ -18,29 +18,27 @@
  */
 import {alias} from 'Util/util';
 
-ko.bindingHandlers.switchBackground = (() => {
-  return {
-    update(element, valueAccessor) {
-      const imageResource = ko.unwrap(valueAccessor());
+ko.bindingHandlers.switchBackground = (() => ({
+  update(element, valueAccessor) {
+    const imageResource = ko.unwrap(valueAccessor());
 
-      if (imageResource) {
-        const backgroundImages = $(element).find('.background');
-        const backgroundLast = backgroundImages.last();
-        const backgroundNext = backgroundLast.clone();
-        backgroundNext.css({opacity: '0'});
-        backgroundNext.insertAfter(backgroundLast);
+    if (imageResource) {
+      const backgroundImages = $(element).find('.background');
+      const backgroundLast = backgroundImages.last();
+      const backgroundNext = backgroundLast.clone();
+      backgroundNext.css({opacity: '0'});
+      backgroundNext.insertAfter(backgroundLast);
 
-        imageResource
-          .load()
-          .then(blob => {
-            if (blob) {
-              backgroundNext
-                .find('.background-image')
-                .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
-            }
-          })
-          .then(() => backgroundNext.css({opacity: '1'}).one(alias.animationend, backgroundLast.remove));
-      }
-    },
-  };
-})();
+      imageResource
+        .load()
+        .then(blob => {
+          if (blob) {
+            backgroundNext
+              .find('.background-image')
+              .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
+          }
+        })
+        .then(() => backgroundNext.css({opacity: '1'}).one(alias.animationend, backgroundLast.remove));
+    }
+  },
+}))();
