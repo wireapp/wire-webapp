@@ -233,7 +233,7 @@ export class StorageService {
       return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
     }
 
-    return this.engine.create(storeName, primaryKey, entity);
+    return this.engine.updateOrCreate(storeName, primaryKey, entity);
   }
 
   /**
