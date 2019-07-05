@@ -26,6 +26,7 @@ import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewMod
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 export const VERIFY_LEGAL_HOLD = 'verifyLegalHold';
 
@@ -70,6 +71,9 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
       primaryAction: {
         action: () => {
           conversationEntity.needsLegalHoldApproval(false);
+          if (verifyDevices) {
+            conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+          }
           resolve(true);
         },
         text: t('legalHoldWarningPrimary'),
