@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.15.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.15.2...@wireapp/core@12.15.3) (2019-07-05)
+
+
+### Bug Fixes
+
+* **core:** add missing LH fields ([#2033](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2033)) ([05aab49](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/05aab49))
+
+
+
+
+
 ## [12.15.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.15.1...@wireapp/core@12.15.2) (2019-07-04)
 
 **Note:** Version bump only for package @wireapp/core
