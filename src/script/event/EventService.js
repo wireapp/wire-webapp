@@ -26,6 +26,8 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
+import {BaseError} from '../error/BaseError';
+
 /** Handles all databases interactions related to events */
 export class EventService {
   /**
@@ -48,7 +50,7 @@ export class EventService {
   loadEvents(conversationId, eventIds) {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
-      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER));
     }
 
     return this.storageService.db[this.EVENT_STORE_NAME]
@@ -75,7 +77,7 @@ export class EventService {
   loadEvent(conversationId, eventId) {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER));
     }
 
     return this.storageService.db[this.EVENT_STORE_NAME]

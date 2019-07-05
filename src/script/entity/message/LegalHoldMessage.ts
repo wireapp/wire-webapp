@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,17 @@
  *
  */
 
-class LoadingBar {
-  constructor({progress, message}) {
-    this.loadingMessage = message;
-    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
+//import {t} from 'Util/LocalizerUtil';
+
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
+
+export class LegalHoldMessage extends Message {
+  isActive: boolean;
+  constructor(isActive: boolean) {
+    super();
+    this.super_type = SuperType.LEGALHOLD;
+
+    this.isActive = isActive;
   }
 }
-
-ko.components.register('loading-bar', {
-  template: `
-    <div class="text-center">
-      <div class="progress-console" data-bind="text: loadingMessage"></div>
-      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
-    </div>
-`,
-  viewModel: LoadingBar,
-});

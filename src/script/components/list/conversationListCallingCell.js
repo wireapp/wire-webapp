@@ -26,6 +26,8 @@ import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
 
+import 'Components/list/participantItem';
+
 class ConversationListCallingCell {
   constructor(params) {
     this.conversation = params.conversation;
@@ -43,6 +45,7 @@ class ConversationListCallingCell {
     this.joinedCall = this.callingRepository.joinedCall;
     this.selfStreamState = this.callingRepository.selfStreamState;
     this.selfUser = this.conversation.selfUser();
+    this.selfInTeam = this.selfUser.inTeam();
 
     this.isConnected = this.call().isConnected;
 
@@ -263,7 +266,7 @@ ko.components.register('conversation-list-calling-cell', {
       </div>
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
         <div class="call-ui__participant-list" data-bind="foreach: callParticipants, antiscroll: shouldUpdateScrollbar" data-uie-name="list-call-ui-participants">
-          <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend()" data-bind="css: {'no-underline': true}"></participant-item>
+          <participant-item params="participant: $data.user, hideInfo: true, showCamera: $data.activeState.videoSend(), selfInTeam: $parent.selfInTeam" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
     <!-- /ko -->

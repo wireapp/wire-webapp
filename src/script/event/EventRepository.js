@@ -35,6 +35,8 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export class EventRepository {
   static get CONFIG() {
     return {
@@ -293,7 +295,7 @@ export class EventRepository {
             return _gotNotifications(errorResponse);
           }
 
-          const isNotFound = errorResponse.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (isNotFound) {
             this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
             return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));

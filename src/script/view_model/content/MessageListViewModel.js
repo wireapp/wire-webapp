@@ -600,11 +600,13 @@ class MessageListViewModel {
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          safeWindowOpen(href);
+        primaryAction: {
+          action: () => {
+            safeWindowOpen(href);
+          },
+          text: t('modalOpenLinkAction'),
         },
         text: {
-          action: t('modalOpenLinkAction'),
           message: t('modalOpenLinkMessage', href),
           title: t('modalOpenLinkTitle'),
         },

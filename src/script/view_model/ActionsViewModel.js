@@ -53,12 +53,15 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (userEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+              resolve();
+            },
+            text: t('modalUserBlockAction'),
           },
+
           text: {
-            action: t('modalUserBlockAction'),
             message: t('modalUserBlockMessage', userEntity.first_name()),
             title: t('modalUserBlockHeadline', userEntity.first_name()),
           },
@@ -71,14 +74,18 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (userEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+              resolve();
+            },
+            text: t('modalConnectCancelAction'),
+          },
+          secondaryAction: {
+            text: t('modalConnectCancelSecondary'),
           },
           text: {
-            action: t('modalConnectCancelAction'),
             message: t('modalConnectCancelMessage', userEntity.first_name()),
-            secondary: t('modalConnectCancelSecondary'),
             title: t('modalConnectCancelHeadline'),
           },
         });
@@ -91,11 +98,13 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
       const modalType = conversationEntity.isLeavable() ? ModalsViewModel.TYPE.OPTION : ModalsViewModel.TYPE.CONFIRM;
 
       amplify.publish(WebAppEvents.WARNING.MODAL, modalType, {
-        action: (leaveConversation = false) => {
-          this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
+        primaryAction: {
+          action: (leaveConversation = false) => {
+            this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
+          },
+          text: t('modalConversationClearAction'),
         },
         text: {
-          action: t('modalConversationClearAction'),
           message: t('modalConversationClearMessage'),
           option: t('modalConversationClearOption'),
           title: t('modalConversationClearHeadline'),
@@ -113,17 +122,19 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
     return new Promise((resolve, reject) => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
-        action: password => {
-          this.clientRepository
-            .deleteClient(clientEntity.id, password)
-            .then(resolve)
-            .catch(error => {
-              reject(error);
-            });
-        },
         preventClose: true,
+        primaryAction: {
+          action: password => {
+            this.clientRepository
+              .deleteClient(clientEntity.id, password)
+              .then(resolve)
+              .catch(error => {
+                reject(error);
+              });
+          },
+          text: t('modalAccountRemoveDeviceAction'),
+        },
         text: {
-          action: t('modalAccountRemoveDeviceAction'),
           input: t('modalAccountRemoveDevicePlaceholder'),
           message: t('modalAccountRemoveDeviceMessage'),
           title: t('modalAccountRemoveDeviceHeadline', clientEntity.model),
@@ -136,12 +147,14 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.conversationRepository.deleteMessage(conversationEntity, messageEntity);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.conversationRepository.deleteMessage(conversationEntity, messageEntity);
+              resolve();
+            },
+            text: t('modalConversationDeleteMessageAction'),
           },
           text: {
-            action: t('modalConversationDeleteMessageAction'),
             message: t('modalConversationDeleteMessageMessage'),
             title: t('modalConversationDeleteMessageHeadline'),
           },
@@ -154,12 +167,14 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.conversationRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.conversationRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              resolve();
+            },
+            text: t('modalConversationDeleteMessageEveryoneAction'),
           },
           text: {
-            action: t('modalConversationDeleteMessageEveryoneAction'),
             message: t('modalConversationDeleteMessageEveryoneMessage'),
             title: t('modalConversationDeleteMessageEveryoneHeadline'),
           },
@@ -178,12 +193,14 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (conversationEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+              resolve();
+            },
+            text: t('modalConversationLeaveAction'),
           },
           text: {
-            action: t('modalConversationLeaveAction'),
             message: t('modalConversationLeaveMessage'),
             title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
           },
@@ -236,12 +253,14 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.conversationRepository.removeMember(conversationEntity, userEntity.id);
-            resolve();
+          primaryAction: {
+            action: () => {
+              this.conversationRepository.removeMember(conversationEntity, userEntity.id);
+              resolve();
+            },
+            text: t('modalConversationRemoveAction'),
           },
           text: {
-            action: t('modalConversationRemoveAction'),
             message: t('modalConversationRemoveMessage', userEntity.first_name()),
             title: t('modalConversationRemoveHeadline'),
           },
@@ -269,17 +288,19 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     if (userEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            this.connectionRepository
-              .unblockUser(userEntity, showConversation)
-              .then(() => this.conversationRepository.get1To1Conversation(userEntity))
-              .then(conversationEntity => {
-                resolve();
-                return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-              });
+          primaryAction: {
+            action: () => {
+              this.connectionRepository
+                .unblockUser(userEntity, showConversation)
+                .then(() => this.conversationRepository.get1To1Conversation(userEntity))
+                .then(conversationEntity => {
+                  resolve();
+                  return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+                });
+            },
+            text: t('modalUserUnblockAction'),
           },
           text: {
-            action: t('modalUserUnblockAction'),
             message: t('modalUserUnblockMessage', userEntity.first_name()),
             title: t('modalUserUnblockHeadline'),
           },

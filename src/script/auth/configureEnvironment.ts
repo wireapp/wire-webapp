@@ -32,17 +32,6 @@ import '../message/MessageCategory';
 import '../service/BackendEnvironment';
 import '../storage/StorageSchemata';
 
-declare global {
-  interface Window {
-    $: any;
-    amplify: amplify.Static;
-    bazinga64: any;
-    jQuery: any;
-    platform: any;
-    z: any;
-  }
-}
-
 window.amplify = amplify;
 window.bazinga64 = bazinga64;
 window.platform = platform;

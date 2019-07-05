@@ -21,20 +21,39 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
+interface ModalParams {
+  isShown: ko.Observable<boolean>;
+  large?: boolean;
+  onBgClick?: () => void;
+  onClosed?: () => void;
+  showLoading: ko.Observable<boolean>;
+}
+
 ko.components.register('modal', {
   template: `
     <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
-      <div class="modal__content" data-bind="click: () => true, clickBubble: false, css: {'modal__content--large': large}, fadingscrollbar" >
-        <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
-      </div>
+      <!-- ko if: showLoading() -->
+        <loading-icon class="modal__loading"></loading-icon>
+      <!-- /ko -->
+      <!-- ko ifnot: showLoading() -->
+        <div class="modal__content" data-bind="click: () => true, clickBubble: false, css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar" >
+          <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
+        </div>
+      <!-- /ko -->
     </div>
     `,
-  viewModel: function({isShown, large, onBgClick = noop, onClosed = noop}) {
+  viewModel: function({
+    isShown,
+    large,
+    onBgClick = noop,
+    onClosed = noop,
+    showLoading = ko.observable(false),
+  }: ModalParams): void {
     this.large = large;
-    this.onBgClick = onBgClick;
+    this.onBgClick = () => ko.unwrap(onBgClick)();
     this.displayNone = ko.observable(!ko.unwrap(isShown));
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
-
+    this.showLoading = showLoading;
     let timeoutId = 0;
     const isShownSubscription = isShown.subscribe(visible => {
       if (visible) {

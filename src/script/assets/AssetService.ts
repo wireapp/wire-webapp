@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset} from '@wireapp/protocol-messaging';
+import {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {arrayToMd5Base64, loadFileBuffer, loadImage} from 'Util/util';
 import {assetV3, legacyAsset} from 'Util/ValidationUtil';
@@ -40,6 +40,7 @@ export interface CompressedImage {
 
 export interface AssetUploadOptions {
   expectsReadConfirmation: boolean;
+  legalHoldStatus?: LegalHoldStatus;
   public: boolean;
   retention: AssetRetentionPolicy;
 }
@@ -88,6 +89,7 @@ export class AssetService {
         const protoAsset = new Asset({
           [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
           [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
         });
 
         return protoAsset;

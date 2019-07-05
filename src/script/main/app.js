@@ -531,24 +531,25 @@ class App {
    * Initiate the self user by getting it from the backend.
    * @returns {Promise<User>} Resolves with the self user entity
    */
-  _initiateSelfUser() {
-    return this.repository.user.getSelf().then(userEntity => {
-      this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
+  async _initiateSelfUser() {
+    const userEntity = await this.repository.user.getSelf();
 
-      if (!userEntity.hasActivatedIdentity()) {
-        this.logger.info('User does not have an activated identity and seems to be a temporary guest');
+    this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
-        if (!userEntity.isTemporaryGuest()) {
-          throw new Error('User does not have an activated identity');
-        }
+    if (!userEntity.hasActivatedIdentity()) {
+      this.logger.info('User does not have an activated identity and seems to be a temporary guest');
+
+      if (!userEntity.isTemporaryGuest()) {
+        throw new Error('User does not have an activated identity');
       }
+    }
 
-      return this.service.storage
-        .init(userEntity.id)
-        .then(() => this.repository.client.init(userEntity))
-        .then(() => this.repository.properties.init(userEntity))
-        .then(() => this._checkUserInformation(userEntity));
-    });
+    await this.service.storage.init(userEntity.id);
+    await this.repository.client.init(userEntity);
+    await this.repository.properties.init(userEntity);
+    await this._checkUserInformation(userEntity);
+
+    return userEntity;
   }
 
   /**

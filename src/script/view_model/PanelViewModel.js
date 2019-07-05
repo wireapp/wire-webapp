@@ -34,6 +34,8 @@ import {ContentViewModel} from './ContentViewModel';
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
 
+export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
+
 z.viewModel.PanelViewModel = class PanelViewModel {
   static get STATE() {
     return {
@@ -101,6 +103,7 @@ z.viewModel.PanelViewModel = class PanelViewModel {
     this.subViews = this.buildSubViews();
 
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent.bind(this));
+    amplify.subscribe(OPEN_CONVERSATION_DETAILS, this._goToRoot.bind(this));
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 

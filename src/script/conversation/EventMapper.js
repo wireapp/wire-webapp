@@ -40,6 +40,7 @@ import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
+import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -158,7 +159,7 @@ export class EventMapper {
       originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
     }
 
-    return addReadReceiptData(originalEntity, event);
+    return addMetadata(originalEntity, event);
   }
 
   /**
@@ -198,7 +199,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.ASSET_ADD: {
-        messageEntity = addReadReceiptData(this._mapEventAssetAdd(event), event);
+        messageEntity = addMetadata(this._mapEventAssetAdd(event), event);
         break;
       }
 
@@ -219,17 +220,17 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.KNOCK: {
-        messageEntity = addReadReceiptData(this._mapEventPing(), event);
+        messageEntity = addMetadata(this._mapEventPing(), event);
         break;
       }
 
       case ClientEvent.CONVERSATION.LOCATION: {
-        messageEntity = addReadReceiptData(this._mapEventLocation(event), event);
+        messageEntity = addMetadata(this._mapEventLocation(event), event);
         break;
       }
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        messageEntity = addReadReceiptData(this._mapEventMessageAdd(event), event);
+        messageEntity = addMetadata(this._mapEventMessageAdd(event), event);
         break;
       }
 
@@ -274,7 +275,9 @@ export class EventMapper {
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
+    messageEntity.fromClientId = event.from_client_id;
     messageEntity.id = id;
+    messageEntity.legalHoldStatus = event.legal_hold_status;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;
@@ -569,6 +572,10 @@ export class EventMapper {
     return messageEntity;
   }
 
+  _mapEventLegalHold(isActive) {
+    return new LegalHoldMessage(isActive);
+  }
+
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity.
    * @private
@@ -793,10 +800,11 @@ export class EventMapper {
   }
 }
 
-function addReadReceiptData(entity, event) {
+function addMetadata(entity, event) {
   const {data: eventData, read_receipts} = event;
   if (eventData) {
     entity.expectsReadConfirmation = eventData.expects_read_confirmation;
+    entity.legalHoldStatus = eventData.legal_hold_status;
   }
   entity.readReceipts(read_receipts || []);
   return entity;

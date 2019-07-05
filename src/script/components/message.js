@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
@@ -35,6 +36,7 @@ import './asset/imageAsset';
 import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
+import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 class Message {
   constructor(
@@ -145,6 +147,10 @@ class Message {
     const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
+
+  showLegalHold = () => {
+    amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
+  };
 
   showContextMenu(messageEntity, event) {
     const entries = [];
@@ -426,6 +432,23 @@ const deleteTemplate = `
   </div>
   `;
 
+const legalHoldTemplate = `
+  <div class="message-header">
+    <div class="message-header-icon">
+      <legal-hold-dot></legal-hold-dot>
+    </div>
+    <div class="message-header-label">
+      <!-- ko if: message.isActive -->
+        <span data-bind="text: t('legalHoldActivated')"></span>
+        <span class="message-header-label__learn-more" data-bind="click: showLegalHold, text: t('legalHoldActivatedLearnMore')"></span>
+      <!-- /ko -->
+      <!-- ko ifnot: message.isActive -->
+        <span class="message-header-label" data-bind="text: t('legalHoldDeactivated')"></span>
+      <!-- /ko -->
+    </div>
+  </div>
+  `;
+
 const verificationTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -593,6 +616,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
+    <!-- /ko -->
+    <!-- ko if: message.super_type === 'legal-hold' -->
+      ${legalHoldTemplate}
     <!-- /ko -->
     `,
   viewModel: {

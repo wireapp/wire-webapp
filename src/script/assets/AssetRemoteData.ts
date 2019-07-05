@@ -24,6 +24,8 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 
 export interface AssetUrlDataVersion3 {
@@ -171,8 +173,8 @@ export class AssetRemoteData {
       .catch(error => {
         this.loadPromise = undefined;
         const errorMessage = (error && error.message) || '';
-        const isAssetNotFound = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
-        const isServerError = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
+        const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
+        const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 
         const isExpectedError = isAssetNotFound || isServerError;
         if (!isExpectedError) {

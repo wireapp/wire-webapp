@@ -20,6 +20,8 @@
 import {AvailabilityType} from '../../user/AvailabilityType';
 import {nameFromType} from '../../user/AvailabilityMapper';
 
+import 'Components/availabilityState';
+
 ko.components.register('panel-user-details', {
   template: `
     <div class="panel-participant">

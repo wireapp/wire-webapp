@@ -68,7 +68,7 @@ export class CryptographyMapper {
 
     switch (genericMessage.content) {
       case GENERIC_MESSAGE_TYPE.ASSET: {
-        specificContent = addExpectReadReceiptData(this._mapAsset(genericMessage.asset), genericMessage.asset);
+        specificContent = addMetadata(this._mapAsset(genericMessage.asset), genericMessage.asset);
         break;
       }
 
@@ -113,15 +113,12 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.IMAGE: {
-        specificContent = addExpectReadReceiptData(
-          this._mapImage(genericMessage.image, event.data.id),
-          genericMessage.image,
-        );
+        specificContent = addMetadata(this._mapImage(genericMessage.image, event.data.id), genericMessage.image);
         break;
       }
 
       case GENERIC_MESSAGE_TYPE.KNOCK: {
-        specificContent = addExpectReadReceiptData(this._mapKnock(genericMessage.knock), genericMessage.knock);
+        specificContent = addMetadata(this._mapKnock(genericMessage.knock), genericMessage.knock);
         break;
       }
 
@@ -131,7 +128,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.LOCATION: {
-        specificContent = addExpectReadReceiptData(this._mapLocation(genericMessage.location), genericMessage.location);
+        specificContent = addMetadata(this._mapLocation(genericMessage.location), genericMessage.location);
         break;
       }
 
@@ -141,7 +138,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.TEXT: {
-        specificContent = addExpectReadReceiptData(this._mapText(genericMessage.text), genericMessage.text);
+        specificContent = addMetadata(this._mapText(genericMessage.text), genericMessage.text);
         break;
       }
 
@@ -155,10 +152,15 @@ export class CryptographyMapper {
     const genericContent = {
       conversation: event.conversation,
       from: event.from,
+      from_client_id: event.data.sender,
       id: genericMessage.messageId,
       status: event.status,
       time: event.time,
     };
+
+    if (genericMessage[genericMessage.content].hasOwnProperty('legalHoldStatus')) {
+      genericContent.legal_hold_status = genericMessage[genericMessage.content].legalHoldStatus;
+    }
 
     return Object.assign(genericContent, specificContent);
   }
@@ -454,9 +456,10 @@ export class CryptographyMapper {
   }
 }
 
-function addExpectReadReceiptData(mappedEvent, rawEvent) {
+function addMetadata(mappedEvent, rawEvent) {
   mappedEvent.data = Object.assign({}, mappedEvent.data, {
     expects_read_confirmation: rawEvent.expectsReadConfirmation,
+    legal_hold_status: rawEvent.legalHoldStatus,
   });
   return mappedEvent;
 }

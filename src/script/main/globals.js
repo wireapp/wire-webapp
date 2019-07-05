@@ -15,10 +15,8 @@ import configGlobal from '../config.js';
 
 import LocalizerUtilGlobal from 'Util/LocalizerUtil.js';
 
-import BaseErrorGlobal from '../error/BaseError.js';
 import AccessTokenErrorGlobal from '../error/AccessTokenError.js';
 import AuthErrorGlobal from '../error/AuthError.js';
-import BackendClientErrorGlobal from '../error/BackendClientError.js';
 import CallErrorGlobal from '../error/CallError.js';
 import ClientErrorGlobal from '../error/ClientError.js';
 import ConnectErrorGlobal from '../error/ConnectError.js';
@@ -65,9 +63,7 @@ import TitleBarViewModelGlobal from '../view_model/content/TitleBarViewModel.js'
 import PanelViewModelGlobal from '../view_model/PanelViewModel.js';
 import ListViewModelGlobal from '../view_model/ListViewModel.js';
 import accentColorPickerGlobal from 'Components/accentColorPicker.js';
-import availabilityStateGlobal from 'Components/availabilityState.js';
 import copyToClipboardGlobal from 'Components/copyToClipboard.js';
-import deviceCardGlobal from 'Components/deviceCard.js';
 import deviceRemoveGlobal from 'Components/deviceRemove.js';
 import ephemeralTimerGlobal from 'Components/ephemeralTimer.js';
 import fullSearchGlobal from 'Components/fullSearch.js';
@@ -81,15 +77,12 @@ import messageTimerButtonGlobal from 'Components/messageTimerButton.js';
 import serviceListGlobal from 'Components/serviceList.js';
 import topPeopleGlobal from 'Components/topPeople.js';
 import participantAvatarGlobal from 'Components/participantAvatar.js';
-import participantItemGlobal from 'Components/list/participantItem.js';
 import userProfileGlobal from 'Components/userProfile.js';
 import userInputGlobal from 'Components/userInput.js';
-import userListGlobal from 'Components/userList.js';
 import guestModeToggleGlobal from 'Components/guestModeToggle.js';
 import infoToggleGlobal from 'Components/infoToggle.js';
 import iconsGlobal from 'Components/icons.js';
-import loadingBarGlobal from 'Components/loadingBar.js';
-import modalGlobal from 'Components/modal.js';
+import modalGlobal from 'Components/modal.ts';
 import assetHeaderGlobal from 'Components/asset/assetHeader.js';
 import audioSeekBarGlobal from 'Components/asset/controls/audioSeekBar.js';
 import seekBarGlobal from 'Components/asset/controls/seekBar.js';

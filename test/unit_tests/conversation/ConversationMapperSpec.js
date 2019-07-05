@@ -26,6 +26,7 @@ import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {BaseError} from 'src/script/error/BaseError';
 
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
@@ -36,38 +37,23 @@ describe('Conversation Mapper', () => {
     it('throws an error for unexpected parameters', () => {
       const functionCallUndefinedParam = () => conversation_mapper.mapConversations();
 
-      expect(functionCallUndefinedParam).toThrowError(
-        z.error.ConversationError,
-        z.error.BaseError.MESSAGE.MISSING_PARAMETER,
-      );
+      expect(functionCallUndefinedParam).toThrowError(z.error.ConversationError, BaseError.MESSAGE.MISSING_PARAMETER);
 
       const functionCallEmtpyArray = () => conversation_mapper.mapConversations([]);
 
-      expect(functionCallEmtpyArray).toThrowError(
-        z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
-      );
+      expect(functionCallEmtpyArray).toThrowError(z.error.ConversationError, BaseError.MESSAGE.INVALID_PARAMETER);
 
       const functionCallWrongType = () => conversation_mapper.mapConversations('Conversation');
 
-      expect(functionCallWrongType).toThrowError(
-        z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
-      );
+      expect(functionCallWrongType).toThrowError(z.error.ConversationError, BaseError.MESSAGE.INVALID_PARAMETER);
 
       const functionCallUndefinedInArray = () => conversation_mapper.mapConversations([undefined]);
 
-      expect(functionCallUndefinedInArray).toThrowError(
-        z.error.ConversationError,
-        z.error.BaseError.MESSAGE.MISSING_PARAMETER,
-      );
+      expect(functionCallUndefinedInArray).toThrowError(z.error.ConversationError, BaseError.MESSAGE.MISSING_PARAMETER);
 
       const functionCallStringInArray = () => conversation_mapper.mapConversations(['Conversation']);
 
-      expect(functionCallStringInArray).toThrowError(
-        z.error.ConversationError,
-        z.error.BaseError.MESSAGE.INVALID_PARAMETER,
-      );
+      expect(functionCallStringInArray).toThrowError(z.error.ConversationError, BaseError.MESSAGE.INVALID_PARAMETER);
     });
 
     it('maps a single conversation', () => {
