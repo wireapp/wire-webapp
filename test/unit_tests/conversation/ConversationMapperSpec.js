@@ -36,7 +36,7 @@ describe('Conversation Mapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
       const functionCallUndefinedParam = () => conversation_mapper.mapConversations();
-
+      
       expect(functionCallUndefinedParam).toThrowError(z.error.ConversationError, BaseError.MESSAGE.MISSING_PARAMETER);
 
       const functionCallEmtpyArray = () => conversation_mapper.mapConversations([]);

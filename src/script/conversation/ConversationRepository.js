@@ -2431,9 +2431,10 @@ export class ConversationRepository {
       .then(injectedEvent => {
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
         eventInfoEntity.setTimestamp(injectedEvent.time);
-        return this.sendGenericMessageToConversation(eventInfoEntity).then(sentPayload => {
-          return {event: injectedEvent, sentPayload};
-        });
+        return this.sendGenericMessageToConversation(eventInfoEntity).then(sentPayload => ({
+          event: injectedEvent,
+          sentPayload,
+        }));
       })
       .then(({event, sentPayload}) => {
         this._trackContributed(conversationEntity, genericMessage);
