@@ -50,7 +50,7 @@ class ConversationListCallingCell {
 
     this.videoGrid = videoGrid;
     this.conversationParticipants = ko.pureComputed(
-      () => this.conversation() && this.conversation().participating_user_ets()
+      () => this.conversation() && this.conversation().participating_user_ets(),
     );
 
     const isState = state => () => call.state() === state;
@@ -61,7 +61,7 @@ class ConversationListCallingCell {
     this.isOngoing = ko.pureComputed(isState(CALL_STATE.MEDIA_ESTAB));
 
     this.isDeclined = ko.pureComputed(() =>
-      [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(call.reason())
+      [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(call.reason()),
     );
 
     this.isMuted = callingRepository.isMuted;
@@ -98,7 +98,7 @@ class ConversationListCallingCell {
     this.disableScreenButton = !this.callingRepository.supportsScreenSharing;
     this.disableVideoButton = ko.pureComputed(() => {
       const isOutgoingVideoCall = this.isOutgoing() && call.selfParticipant.sharesCamera();
-      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall();
+      const isVideoUnsupported = !call.selfParticipant.sharesCamera() && !conversation().supportsVideoCall(true);
       return isOutgoingVideoCall || isVideoUnsupported;
     });
 
@@ -240,7 +240,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
         <div class="call-ui__participant-list" data-bind="foreach: {data: call.participants(), as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo()" data-bind="css: {'no-underline': true}"></participant-item>
+            <participant-item params="participant: findUser(participant.userId), hideInfo: true, showCamera: participant.hasActiveVideo(), selfInTeam: $parent.selfInTeam" data-bind="css: {'no-underline': true}"></participant-item>
         </div>
       </div>
 

@@ -49,6 +49,7 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
+import {CallMessage} from '../entity/message/CallMessage';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
@@ -599,14 +600,11 @@ export class EventMapper {
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity.
    * @private
-   * @returns {CallMessageEntity} Call message entity
+   * @returns {CallMessage} Call message entity
    */
   _mapEventVoiceChannelActivate() {
-    const messageEntity = new CallMessage();
-
-    messageEntity.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+    const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
     messageEntity.visible(false);
-
     return messageEntity;
   }
 
@@ -615,14 +613,18 @@ export class EventMapper {
    *
    * @private
    * @param {Object} eventData - Message data
-   * @returns {CallMessageEntity} Call message entity
+   * @returns {CallMessage} Call message entity
    */
   _mapEventVoiceChannelDeactivate({data: eventData}) {
-    const messageEntity = new CallMessage();
+    const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, eventData.reason, eventData.duration);
 
-    messageEntity.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
-    messageEntity.finished_reason = eventData.reason;
-    messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
+    if (typeof eventData.duration !== 'undefined') {
+      // new message format, including duration
+      messageEntity.visible(!messageEntity.was_completed());
+    } else {
+      // legacy format that we still need to map (no migration)
+      messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);
+    }
 
     return messageEntity;
   }

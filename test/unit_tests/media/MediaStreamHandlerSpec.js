@@ -24,9 +24,6 @@ describe('MediaStreamHandler', () => {
 
   beforeEach(() => {
     streamHandler = resolve(graph.MediaRepository).streamHandler;
-    spyOn(streamHandler.deviceSupport, 'videoInput').and.returnValue(true);
-    spyOn(streamHandler.deviceSupport, 'audioInput').and.returnValue(true);
-    spyOn(streamHandler.deviceSupport, 'screenInput').and.returnValue(true);
   });
 
   describe('requestMediaStream', () => {
@@ -35,7 +32,7 @@ describe('MediaStreamHandler', () => {
 
       return streamHandler.requestMediaStream(true, false, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: true, video: undefined})
+          jasmine.objectContaining({audio: true, video: undefined}),
         );
       });
     });
@@ -45,7 +42,7 @@ describe('MediaStreamHandler', () => {
 
       return streamHandler.requestMediaStream(false, true, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: undefined, video: jasmine.any(Object)})
+          jasmine.objectContaining({audio: undefined, video: jasmine.any(Object)}),
         );
       });
     });
@@ -55,7 +52,7 @@ describe('MediaStreamHandler', () => {
 
       return streamHandler.requestMediaStream(true, true, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: true, video: jasmine.any(Object)})
+          jasmine.objectContaining({audio: true, video: jasmine.any(Object)}),
         );
       });
     });

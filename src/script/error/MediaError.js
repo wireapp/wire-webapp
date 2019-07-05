@@ -17,11 +17,10 @@
  *
  */
 
-import {BaseError} from './BaseError';
-
-export class MediaError extends BaseError {
-  constructor(type, mediaType, message) {
-    super('MediaError', type, message);
+export class MediaError extends Error {
+  constructor(type, message) {
+    super(message);
+    this.type = type;
   }
 
   static get MESSAGE() {

@@ -30,10 +30,6 @@ export class MediaRepository {
   constructor(permissionRepository: PermissionRepository) {
     this.devicesHandler = new MediaDevicesHandler();
     this.constraintsHandler = new MediaConstraintsHandler(this.devicesHandler.currentAvailableDeviceId);
-    this.streamHandler = new MediaStreamHandler(
-      this.constraintsHandler,
-      this.devicesHandler.deviceSupport,
-      permissionRepository
-    );
+    this.streamHandler = new MediaStreamHandler(this.constraintsHandler, permissionRepository);
   }
 }

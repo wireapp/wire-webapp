@@ -82,9 +82,13 @@ export class MediaDevicesHandler {
 
     const getCurrentAvailableDeviceId = (deviceType: DeviceTypes): string => {
       const currentDeviceId = this.currentDeviceId[deviceType]();
-      if (
-        this.availableDevices[deviceType]().find(device => (device.deviceId || (device as any).id) === currentDeviceId)
-      ) {
+      if (this.availableDevices[deviceType]().length === 0) {
+        return '';
+      }
+      const isAvailable = this.availableDevices[deviceType]().find(
+        device => (device.deviceId || (device as any).id) === currentDeviceId,
+      );
+      if (isAvailable) {
         return currentDeviceId;
       }
       return MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];

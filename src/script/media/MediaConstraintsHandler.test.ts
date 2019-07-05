@@ -57,7 +57,7 @@ describe('MediaConstraintsHandler', () => {
           frameRate: jasmine.any(Number),
           height: jasmine.any(Number),
           width: jasmine.any(Number),
-        })
+        }),
       );
     });
   });
@@ -67,7 +67,7 @@ describe('MediaConstraintsHandler', () => {
       const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DISPLAY_MEDIA) as any;
       expect(constraints.audio).toBe(false);
       expect(constraints.video.height).toEqual(
-        jasmine.objectContaining({ideal: jasmine.any(Number), max: jasmine.any(Number)})
+        jasmine.objectContaining({ideal: jasmine.any(Number), max: jasmine.any(Number)}),
       );
     });
 
@@ -75,7 +75,7 @@ describe('MediaConstraintsHandler', () => {
       const constraints = constraintsHandler.getScreenStreamConstraints(ScreensharingMethods.DESKTOP_CAPTURER) as any;
       expect(constraints.audio).toBe(false);
       expect(constraints.video.mandatory).toEqual(
-        jasmine.objectContaining({maxHeight: jasmine.any(Number), minHeight: jasmine.any(Number)})
+        jasmine.objectContaining({maxHeight: jasmine.any(Number), minHeight: jasmine.any(Number)}),
       );
     });
 
@@ -87,7 +87,7 @@ describe('MediaConstraintsHandler', () => {
           frameRate: jasmine.any(Number),
           height: {exact: jasmine.any(Number)},
           mediaSource: 'screen',
-        })
+        }),
       );
     });
   });

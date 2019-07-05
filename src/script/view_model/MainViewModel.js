@@ -84,7 +84,7 @@ export class MainViewModel {
       repositories.media.devicesHandler,
       repositories.media.streamHandler,
       repositories.permission,
-      this.multitasking
+      this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);

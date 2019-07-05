@@ -21,6 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {Config} from '../../auth/config';
 import {MediaType} from '../../media/MediaType';
+import {MediaError} from '../../error/MediaError';
 
 const noop = () => {};
 
@@ -149,7 +150,6 @@ export class PreferencesAVViewModel {
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     return this.streamHandler
       .requestMediaStream(requestAudio, requestVideo, false, false)
-
       .then(({stream}) => {
         // refresh devices list in order to display the labels (see https://stackoverflow.com/a/46659819/2745879)
         this.devicesHandler.getMediaDevices();
@@ -158,10 +158,7 @@ export class PreferencesAVViewModel {
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
 
-        const expectedErrors = [
-          z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE,
-          z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
-        ];
+        const expectedErrors = [MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.TYPE.MEDIA_STREAM_PERMISSION];
 
         const isExpectedError = expectedErrors.includes(error.type);
         if (isExpectedError) {

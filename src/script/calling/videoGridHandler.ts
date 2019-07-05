@@ -56,7 +56,7 @@ function computeGrid(previousGrid: string[], participants: Participant[]): strin
 
 export function getGrid(
   participants: ko.Observable<Participant[]>,
-  selfParticipant: Participant
+  selfParticipant: Participant,
 ): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];

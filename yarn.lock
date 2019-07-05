@@ -1512,6 +1512,11 @@
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
 
+"@wireapp/avs@5.1.15":
+  version "5.1.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.15.tgz#c37c8ded2cb28a681f597dae7636df504ad4f42d"
+  integrity sha512-19m7wT3WpBewIGgDKhJ8KGXWoZng/P7uiBzVAwoY76QtU7YztX1LNYPg/bsU8U+l6ceY/OfSV7IRFciHr0lkBQ==
+
 "@wireapp/cbor@4.3.9":
   version "4.3.9"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.3.9.tgz#67fdf73c6bb14e693b7dc7d3bfb05b320344d4ac"
@@ -1602,17 +1607,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-3.3.8.tgz#9b8f0592d2fa7eb3511777d349920ef56cd09596"
   integrity sha512-u/v08RB7yZ2+7pCBrqEr057Wh9sLjlJh3t5EXM8OzORkfQ9k68FL8JOM6+J9NvEPZtsWCr9XEQqBLxgFFmrd9g==
 
-<<<<<<< HEAD
 "@wireapp/prettier-config@0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.3.0.tgz#e8129b31021c81d90d564d9c4ff0f7f7b514e943"
   integrity sha512-BFokvX4NZlkhWq5/OoJUCS8Iels+MeRgzpd5V9QR3hj5swwCFGxJOAL7soPXkSNWo91gI1qwiTp8szB1O9aCfQ==
-=======
-"@wireapp/prettier-config@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.2.0.tgz#822f5d1db902550c09c8ef5efda2a36ca263a481"
-  integrity sha512-wgFtwop3vWW1MaXwkcbDiwM9NP1JHRWwr09RLTAMQhCs9J1z8ciBnfpty/LxY2LXTRWZt1gEL2a+am/a0xpVPA==
->>>>>>> f34591cc6... upgrade avs version
 
 "@wireapp/priority-queue@1.2.9":
   version "1.2.9"
@@ -2208,17 +2206,6 @@ autoprefixer@^7.1.1:
     postcss "^6.0.17"
     postcss-value-parser "^3.2.3"
 
-<<<<<<< HEAD
-=======
-avs-web@./avs-web-5.0.0.tgz:
-  version "5.0.0"
-  resolved "./avs-web-5.0.0.tgz#71534193d00a95850ff21a2b31c20085e0b1c25a"
-
-avs-web@./avs-web-5.1.0.tgz:
-  version "5.1.0"
-  resolved "./avs-web-5.1.0.tgz#b00589cf658b3aa7b66c1b5a869c4b8a4149b8e6"
-
->>>>>>> f34591cc6... upgrade avs version
 aws-sdk@2.0.x:
   version "2.0.31"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.0.31.tgz#e72cf1fdc69015bd9fd2bdf3d3b88c16507d268e"

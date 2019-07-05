@@ -19,9 +19,6 @@
 
 import {createRandomUuid} from 'Util/util';
 
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-
-import {Config} from '../auth/config';
 import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
 
@@ -222,25 +219,26 @@ z.conversation.EventBuilder = {
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
     };
   },
-  buildVoiceChannelActivate(conversationId, userId, time) {
+  buildVoiceChannelActivate(conversationId, userId, time, protocolVersion) {
     return {
       conversation: conversationId,
       from: userId,
       id: createRandomUuid(),
-      protocol_version: Config.CALLING_PROTOCOL_VERSION,
+      protocol_version: protocolVersion,
       time: time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   },
-  buildVoiceChannelDeactivate(conversationId, userId, reason, time) {
+  buildVoiceChannelDeactivate(conversationId, userId, duration, reason, time, protocolVersion) {
     return {
       conversation: conversationId,
       data: {
-        reason: reason || TERMINATION_REASON.COMPLETED,
+        duration,
+        reason: reason,
       },
       from: userId,
       id: createRandomUuid(),
-      protocol_version: Config.CALLING_PROTOCOL_VERSION,
+      protocol_version: protocolVersion,
       time: time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };

@@ -107,7 +107,7 @@ export class MediaConstraintsHandler {
   getMediaStreamConstraints(
     requestAudio: boolean = false,
     requestVideo: boolean = false,
-    isGroup: boolean = false
+    isGroup: boolean = false,
   ): MediaStreamConstraints {
     const currentDeviceId = this.currentDeviceId;
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
@@ -158,7 +158,7 @@ export class MediaConstraintsHandler {
 
   private getVideoStreamConstraints(
     mediaDeviceId: string,
-    mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE
+    mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE,
   ): MediaTrackConstraints {
     const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
 

@@ -29,7 +29,6 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {DeviceSupport} from './MediaDevicesHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
@@ -55,15 +54,9 @@ export class MediaStreamHandler {
   private requestHintTimeout: number | undefined;
   private readonly screensharingMethod: ScreensharingMethods;
 
-  /**
-   * Construct a new MediaStream handler.
-   * @param {MediaRepository} mediaRepository - Media repository with with references to all other handlers
-   * @param {PermissionRepository} permissionRepository - Repository for all permission interactions
-   */
   constructor(
     private readonly constraintsHandler: MediaConstraintsHandler,
-    private readonly deviceSupport: DeviceSupport,
-    private readonly permissionRepository: PermissionRepository
+    private readonly permissionRepository: PermissionRepository,
   ) {
     this.logger = getLogger('MediaStreamHandler');
     this.requestHintTimeout = undefined;
@@ -78,50 +71,18 @@ export class MediaStreamHandler {
     }
   }
 
-  /**
-   * Request a MediaStream.
-   *
-   * @param {MediaType} mediaType - Type of MediaStream to be requested
-   * @param {RTCMediaStreamConstraints} mediaStreamConstraints - Constraints for the MediaStream to be requested
-   * @returns {Promise} Resolves with the stream and its type
-   */
   requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
-    return this.checkDeviceAvailability(audio, video, screen)
-      .then(() => this.hasPermissionToAccess(audio, video))
-      .then(hasPermission => this.getMediaStream(audio, video, screen, isGroup, hasPermission))
-      .catch(error => {
-        const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
-        throw isPermissionDenied ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION) : error;
-      });
+    const hasPermission = this.hasPermissionToAccess(audio, video);
+    return this.getMediaStream(audio, video, screen, isGroup, hasPermission).catch(error => {
+      const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
+      throw isPermissionDenied ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION) : error;
+    });
   }
 
   selectScreenToShare(showScreenSelection: () => Promise<void>): Promise<void> {
     if (this.screensharingMethod === ScreensharingMethods.DESKTOP_CAPTURER) {
       return showScreenSelection();
     }
-    return Promise.resolve();
-  }
-
-  /**
-   * Check for devices of requested media type.
-   *
-   * @private
-   * @param {MediaType} mediaType - Requested media type
-   * @returns {Promise} Resolves when the device availability has been verified
-   */
-  private checkDeviceAvailability(audio: boolean, video: boolean, screen: boolean): Promise<void> {
-    const noVideoTypes = video && !this.deviceSupport.videoInput();
-    if (noVideoTypes) {
-      const mediaError = new MediaError(MediaError.TYPE.MEDIA_STREAM_DEVICE);
-      return Promise.reject(mediaError);
-    }
-
-    const noAudioDevice = audio && !this.deviceSupport.audioInput();
-    if (noAudioDevice) {
-      const mediaError = new MediaError(MediaError.TYPE.MEDIA_STREAM_DEVICE);
-      return Promise.reject(mediaError);
-    }
-
     return Promise.resolve();
   }
 
@@ -186,7 +147,7 @@ export class MediaStreamHandler {
     video: boolean,
     screen: boolean,
     isGroup: boolean,
-    hasPermission: boolean
+    hasPermission: boolean,
   ): Promise<MediaStream> {
     const mediaContraints = screen
       ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
@@ -215,7 +176,7 @@ export class MediaStreamHandler {
         const name = error.name as MEDIA_STREAM_ERROR;
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,
-          error
+          error,
         );
         this.clearPermissionRequestHint(audio, video, screen);
 

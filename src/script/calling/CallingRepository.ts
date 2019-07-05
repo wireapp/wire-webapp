@@ -27,12 +27,10 @@ import {Config} from '../auth/config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {Environment} from 'Util/Environment';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {TERMINATION_REASON} from './enum/TerminationReason';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
@@ -50,12 +48,6 @@ interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
   screen?: boolean;
-}
-
-interface CallingConfig {
-  expiration: Date;
-  ice_servers: any[];
-  ttl: number;
 }
 
 import {
@@ -82,6 +74,7 @@ export class CallingRepository {
   private isReady: boolean = false;
   private wUser?: number;
   private wCall?: Wcall;
+  private avsVersion: number;
   public readonly activeCalls: ko.ObservableArray<Call>;
   private readonly isMuted: ko.Observable<boolean>;
   private incomingCallCallback: (call: Call) => void;
@@ -91,8 +84,6 @@ export class CallingRepository {
 
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
 
-  private callingConfig?: CallingConfig;
-  private callingConfigTimeout?: number;
   private readonly logger: Logger;
   private readonly callLog: string[];
 
@@ -108,7 +99,7 @@ export class CallingRepository {
     conversationRepository: any,
     eventRepository: any,
     mediaStreamHandler: MediaStreamHandler,
-    serverTimeHandler: any
+    serverTimeHandler: any,
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -126,9 +117,6 @@ export class CallingRepository {
 
     this.logger = getLogger('CallingRepository');
     this.callLog = [];
-
-    this.callingConfig = undefined;
-    this.callingConfigTimeout = undefined;
 
     this.subscribeToEvents();
   }
@@ -166,7 +154,7 @@ export class CallingRepository {
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
 
-    wCall.setLogHandler((level: LOG_LEVEL, message: string, arg: any) => {
+    wCall.setLogHandler((level: LOG_LEVEL, message: string) => {
       const trimedMessage = message.trim();
       logFunctions[level].call(avsLogger, trimedMessage);
       this.callLog.push(`${new Date().toISOString()} [${logLevelStrs[level]}] ${trimedMessage}`);
@@ -184,7 +172,7 @@ export class CallingRepository {
     const wUser = wCall.create(
       selfUserId,
       selfClientId,
-      () => {}, //readyh,
+      this.setAvsVersion, //readyh,
       this.sendMessage, //sendh,
       this.incomingCall, //incomingh,
       () => {}, //missedh,
@@ -195,7 +183,7 @@ export class CallingRepository {
       this.requestConfig, //cfg_reqh,
       () => {}, //acbrh,
       this.videoStateChanged, //vstateh,
-      0
+      0,
     );
     wCall.setMuteHandler(wUser, this.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
@@ -228,8 +216,6 @@ export class CallingRepository {
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
-    const reason = TERMINATION_REASON.MISSED; // TODO check other reasons
-    this.injectDeactivateEvent(call.conversationId, call.initiator, reason, Date.now(), EventRepository.SOURCE.STREAM);
   }
 
   private warmupMediaStreams(call: Call, audio: boolean, camera: boolean): Promise<boolean> {
@@ -266,10 +252,7 @@ export class CallingRepository {
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.LEAVE, this.leaveCall.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.REJECT, this.rejectCall.bind(this));
     amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
-    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.getConfig);
   }
 
   //##############################################################################
@@ -324,7 +307,7 @@ export class CallingRepository {
         toSecond(new Date(time).getTime()),
         conversationId,
         userId,
-        clientId
+        clientId,
       );
 
       if (res !== 0) {
@@ -340,7 +323,7 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     time: number,
-    source: string
+    source: string,
   ): void {
     // save event if needed
     switch (type) {
@@ -428,7 +411,6 @@ export class CallingRepository {
   }
 
   rejectCall(conversationId: ConversationId): void {
-    // TODO sort out if rejection should be shared accross devices (does avs handle it?)
     this.wCall.reject(this.wUser, conversationId);
   }
 
@@ -439,6 +421,10 @@ export class CallingRepository {
   muteCall(conversationId: ConversationId, shouldMute: boolean): void {
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
   }
+
+  private readonly setAvsVersion = (version: number) => {
+    this.avsVersion = version;
+  };
 
   private callTypeFromMediaType(mediaType: MediaType): CALL_TYPE {
     const types: Record<MediaType, CALL_TYPE> = {
@@ -506,18 +492,26 @@ export class CallingRepository {
   //##############################################################################
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: number, source: string): void {
-    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time);
+    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event, source);
   }
 
   private injectDeactivateEvent(
     conversationId: ConversationId,
     userId: UserId,
-    reason: TERMINATION_REASON,
-    time: number,
-    source: string
+    duration: number,
+    reason: REASON,
+    time: string,
+    source: string,
   ): void {
-    const event = EventBuilder.buildVoiceChannelDeactivate(conversationId, userId, reason, time);
+    const event = EventBuilder.buildVoiceChannelDeactivate(
+      conversationId,
+      userId,
+      duration,
+      reason,
+      time,
+      this.avsVersion,
+    );
     this.eventRepository.injectEvent(event, source);
   }
 
@@ -528,7 +522,7 @@ export class CallingRepository {
     clientId: DeviceId,
     destinationUserId: UserId,
     destinationClientId: DeviceId,
-    payload: string
+    payload: string,
   ): number => {
     const protoCalling = new Calling({content: payload});
     const genericMessage = new GenericMessage({
@@ -538,11 +532,6 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (call && call.blockMessages) {
       return 0;
-    }
-
-    const type = JSON.parse(payload).type;
-    if (type) {
-      this.handleCallEventSaving(type, conversationId, userId, Date.now(), EventRepository.SOURCE.INJECTED);
     }
 
     const options = this.targetMessageRecipients(payload, destinationUserId, destinationClientId);
@@ -558,7 +547,10 @@ export class CallingRepository {
   };
 
   private readonly requestConfig = () => {
-    this.getConfig().then((config: any) => this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config)));
+    const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
+    this.fetchConfig(limit)
+      .then(config => this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config)))
+      .catch(() => this.wCall.configUpdate(this.wUser, 1, ''));
     return 0;
   };
 
@@ -569,6 +561,14 @@ export class CallingRepository {
     }
     const stillActiveState = [REASON.STILL_ONGOING, REASON.ANSWERED_ELSEWHERE];
     if (!stillActiveState.includes(reason)) {
+      this.injectDeactivateEvent(
+        call.conversationId,
+        call.initiator,
+        call.startedAt() ? Date.now() - call.startedAt() : 0,
+        reason,
+        new Date().toISOString(),
+        EventRepository.SOURCE.STREAM,
+      );
       this.removeCall(call);
       return;
     }
@@ -581,7 +581,7 @@ export class CallingRepository {
     timestamp: number,
     userId: UserId,
     hasVideo: number,
-    shouldRing: number
+    shouldRing: number,
   ) => {
     const conversationEntity = this.conversationRepository.find_conversation_by_id(conversationId);
     if (!conversationEntity) {
@@ -595,7 +595,7 @@ export class CallingRepository {
       conversationId,
       CONV_TYPE.ONEONONE,
       selfParticipant,
-      hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL
+      hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
     );
     if (!canRing) {
       // an incoming call that should not ring is an ongoing group call
@@ -646,7 +646,7 @@ export class CallingRepository {
     conversationId: ConversationId,
     audio: boolean,
     camera: boolean,
-    screen: boolean
+    screen: boolean,
   ): Promise<MediaStream> => {
     if (this.mediaStreamQuery) {
       // if a query is already occuring, we will return the result of this query
@@ -701,7 +701,7 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     deviceId: DeviceId,
-    streams: MediaStream[]
+    streams: MediaStream[],
   ): void => {
     let participant = this.findParticipant(conversationId, userId);
     if (!participant) {
@@ -726,7 +726,7 @@ export class CallingRepository {
     conversationId: ConversationId,
     userId: UserId,
     deviceId: DeviceId,
-    state: number
+    state: number,
   ) => {
     const call = this.findCall(conversationId);
     if (call) {
@@ -744,7 +744,7 @@ export class CallingRepository {
   private targetMessageRecipients(
     payload: string,
     remoteUserId: UserId | null,
-    remoteClientId: DeviceId | null
+    remoteClientId: DeviceId | null,
   ): {precondition: any; recipients: any} {
     const {type, resp} = JSON.parse(payload);
     let precondition;
@@ -819,82 +819,12 @@ export class CallingRepository {
   // Calling config
   //##############################################################################
 
-  getConfig = (): Promise<CallingConfig> => {
-    if (this.callingConfig) {
-      const isExpiredConfig = this.callingConfig.expiration.getTime() < Date.now();
-
-      if (!isExpiredConfig) {
-        this.logger.debug('Returning local calling configuration. No update needed.', this.callingConfig);
-        return Promise.resolve(this.callingConfig);
-      }
-
-      this.clearConfig();
-    }
-
-    return this.getConfigFromBackend();
-  };
-
-  /**
-   * Retrieves a calling config from the backend.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCallsConfigV2
-   * @see ./documentation/blob/master/topics/web/calling/calling-v3.md#limiting
-   *
-   * @param {number} [limit] - Limit the number of TURNs servers in the response (range 1, 10)
-   * @returns {Promise} Resolves with call config information
-   */
-  fetchConfig(limit?: number): Promise<CallingConfig> {
+  fetchConfig(limit?: number): Promise<any> {
     return this.backendClient.sendRequest({
       cache: false,
-      data: {
-        limit,
-      },
+      data: {limit},
       type: 'GET',
       url: '/calls/config/v2',
-    });
-  }
-
-  private clearConfig(): void {
-    if (this.callingConfig) {
-      const expirationDate = this.callingConfig.expiration.toISOString();
-      this.logger.debug(`Removing calling configuration with expiration of '${expirationDate}'`);
-      this.callingConfig = undefined;
-    }
-  }
-
-  private clearConfigTimeout(): void {
-    if (this.callingConfigTimeout) {
-      window.clearTimeout(this.callingConfigTimeout);
-      this.callingConfigTimeout = undefined;
-    }
-  }
-
-  private getConfigFromBackend(): Promise<CallingConfig | undefined> {
-    const limit = Environment.browser.firefox ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-
-    return this.fetchConfig(limit).then(callingConfig => {
-      this.clearConfigTimeout();
-
-      const DEFAULT_CONFIG_TTL = CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-      const ttl = callingConfig.ttl * 0.9 || DEFAULT_CONFIG_TTL;
-      const timeout = Math.min(ttl, DEFAULT_CONFIG_TTL) * TIME_IN_MILLIS.SECOND;
-      const expirationDate = new Date(Date.now() + timeout);
-      callingConfig.expiration = expirationDate;
-
-      const turnServersConfig = (callingConfig.ice_servers || [])
-        .map((server: any) => server.urls.join('\n'))
-        .join('\n');
-      const logMessage = `Updated calling configuration expires on '${expirationDate.toISOString()}' with servers:
-${turnServersConfig}`;
-      this.logger.info(logMessage);
-      this.callingConfig = callingConfig;
-
-      this.callingConfigTimeout = window.setTimeout(() => {
-        this.clearConfig();
-        this.getConfig();
-      }, timeout);
-
-      return this.callingConfig;
     });
   }
 
@@ -931,17 +861,21 @@ ${turnServersConfig}`;
 
     return new Promise((resolve, reject) => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-        action: () => {
-          if (activeCall.state() === CALL_STATE.INCOMING) {
-            this.rejectCall(activeCall.conversationId);
-          } else {
-            this.leaveCall(activeCall.conversationId);
-          }
-          window.setTimeout(resolve, 1000);
+        primaryAction: {
+          action: () => {
+            if (activeCall.state() === CALL_STATE.INCOMING) {
+              this.rejectCall(activeCall.conversationId);
+            } else {
+              this.leaveCall(activeCall.conversationId);
+            }
+            window.setTimeout(resolve, 1000);
+          },
+          text: actionString,
         },
-        secondary: reject,
+        secondaryAction: {
+          action: reject,
+        },
         text: {
-          action: actionString,
           message: messageString,
           title: titleString,
         },

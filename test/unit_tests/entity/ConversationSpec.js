@@ -22,6 +22,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {PingMessage} from 'src/script/entity/message/PingMessage';
 import {CallMessage} from 'src/script/entity/message/CallMessage';

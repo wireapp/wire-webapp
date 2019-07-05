@@ -106,10 +106,10 @@ export class FullscreenVideoCalling {
     this.currentScreenDevice = mediaDevicesHandler.currentDeviceId.screenInput;
 
     this.availableCameras = ko.pureComputed(() =>
-      mediaDevicesHandler.availableDevices.videoInput().map(device => device.deviceId)
+      mediaDevicesHandler.availableDevices.videoInput().map(device => device.deviceId),
     );
     this.availableScreens = ko.pureComputed(() =>
-      mediaDevicesHandler.availableDevices.screenInput().map(device => device.deviceId)
+      mediaDevicesHandler.availableDevices.screenInput().map(device => device.deviceId),
     );
     this.showSwitchCamera = ko.pureComputed(() => {
       return this.selfSharesCamera() && this.availableCameras().length > 1;
@@ -119,7 +119,7 @@ export class FullscreenVideoCalling {
     });
 
     this.showToggleVideo = ko.pureComputed(() => {
-      return conversation().supportsVideoCall(false);
+      return conversation().supportsVideoCall(true);
     });
 
     this.callDuration = ko.observable();
@@ -144,9 +144,9 @@ export class FullscreenVideoCalling {
       if (!grid.hasRemoteVideo) {
         if (this.multitasking.autoMinimize()) {
           minimizeTimeout = window.setTimeout(() => {
-            //if (!this.isChoosingScreen()) {
-            this.multitasking.isMinimized(true);
-            //}
+            if (!this.isChoosingScreen()) {
+              this.multitasking.isMinimized(true);
+            }
           }, FullscreenVideoCalling.CONFIG.AUTO_MINIMIZE_TIMEOUT);
         }
       }
@@ -154,7 +154,7 @@ export class FullscreenVideoCalling {
 
     this.hasUnreadMessages = ko.observable(false);
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, (unreadCount: number) =>
-      this.hasUnreadMessages(unreadCount > 0)
+      this.hasUnreadMessages(unreadCount > 0),
     );
 
     this.dispose = () => {

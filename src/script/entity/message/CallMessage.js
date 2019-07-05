@@ -19,44 +19,33 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
+import {Message} from './Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class CallMessage extends Message {
-  constructor() {
+  constructor(type, reason = undefined, duration = 0) {
     super();
     this.super_type = SuperType.CALL;
-    this.call_message_type = '';
-    this.finished_reason = '';
+    this.call_message_type = type;
+    this.finished_reason = reason;
+    this.duration = duration;
 
     this.caption = ko.pureComputed(() =>
       this.user().is_me ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate'),
     );
   }
 
-  /**
-   * Check if call message is call activation.
-   * @returns {boolean} Is message of type activate
-   */
   is_activation() {
     return this.call_message_type === CALL_MESSAGE_TYPE.ACTIVATED;
   }
 
-  /**
-   * Check if call message is call deactivation.
-   * @returns {boolean} Is message of type deactivate
-   */
   is_deactivation() {
     return this.call_message_type === CALL_MESSAGE_TYPE.DEACTIVATED;
   }
 
   was_completed() {
-    return this.finished_reason === TERMINATION_REASON.COMPLETED;
-  }
-
-  was_missed() {
-    return this.finished_reason === TERMINATION_REASON.MISSED;
+    return this.duration > 0;
   }
 }

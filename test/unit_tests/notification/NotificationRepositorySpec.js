@@ -48,6 +48,7 @@ import {BackendEvent} from 'src/script/event/Backend';
 import {WebAppEvents} from 'src/script/event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 
+import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';

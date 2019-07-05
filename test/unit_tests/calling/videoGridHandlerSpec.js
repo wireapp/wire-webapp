@@ -141,7 +141,7 @@ describe('videoGridHandler', () => {
         const grid = getGrid(ko.observable([participants[0], participants[1]]), selfUser);
 
         expect(grid().grid.map(toParticipantId)).toEqual(
-          [selfUser, null, participants[0], participants[1]].map(toParticipantId)
+          [selfUser, null, participants[0], participants[1]].map(toParticipantId),
         );
 
         expect(grid().thumbnail).toBe(null);

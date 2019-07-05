@@ -37,6 +37,8 @@ class GroupVideoGrid {
   public readonly muted: ko.Observable<boolean>;
   public readonly selfUserId: string;
 
+  public readonly dispose: () => void;
+
   static get CONFIG(): any {
     return {
       CONTAIN_CLASS: 'group-video-grid__element-video--contain',
@@ -51,7 +53,7 @@ class GroupVideoGrid {
       muted,
       selfUserId,
     }: {minimized: boolean; grid: ko.PureComputed<Grid>; muted: ko.Observable<boolean> | undefined; selfUserId: string},
-    rootElement: HTMLElement
+    rootElement: HTMLElement,
   ) {
     this.selfUserId = selfUserId;
     this.scaleVideos = this.scaleVideos.bind(this, rootElement);
@@ -61,8 +63,8 @@ class GroupVideoGrid {
 
     this.minimized = minimized;
     // scale videos when the grid is updated (on the next rendering cycle)
-    //TODO unsubscribe grid
-    this.grid.subscribe(() => afterRender(this.scaleVideos));
+    const gridSubscription = this.grid.subscribe(() => afterRender(this.scaleVideos));
+    this.dispose = () => gridSubscription.dispose();
   }
 
   hasBlackBackground(): boolean {
@@ -83,7 +85,7 @@ class GroupVideoGrid {
     const updateContainClass = (
       videoElement: HTMLVideoElement,
       wrapper: HTMLElement,
-      participant: Participant
+      participant: Participant,
     ): void => {
       const wrapperRatio = wrapper.clientWidth / wrapper.clientHeight;
       const videoRatio = videoElement.videoWidth / videoElement.videoHeight;

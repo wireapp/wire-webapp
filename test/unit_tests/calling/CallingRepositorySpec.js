@@ -67,7 +67,7 @@ describe('CallingRepository', () => {
         expect(amplify.publish).toHaveBeenCalledWith(
           WebAppEvents.WARNING.MODAL,
           ModalsViewModel.TYPE.CONFIRM,
-          jasmine.any(Object)
+          jasmine.any(Object),
         );
 
         expect(wCall.start).not.toHaveBeenCalled();
@@ -130,7 +130,7 @@ describe('CallingRepository', () => {
       const selfMediaStream = new MediaStream([audioTrack]);
       call.selfParticipant = new Participant();
       spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
-        Promise.resolve(selfMediaStream)
+        Promise.resolve(selfMediaStream),
       );
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
@@ -235,14 +235,14 @@ describe('e2e audio call', () => {
     conversationRepository,
     eventRepository,
     undefined,
-    serverTimeHandler
+    serverTimeHandler,
   );
   const user = new User('user-1');
   let remoteWuser;
   let wCall;
 
   beforeAll(() => {
-    spyOn(client, 'getConfig').and.returnValue(Promise.resolve({ice_servers: []}));
+    spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
     spyOn(client, 'getCallMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
     spyOn(client, 'getMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
     spyOn(client, 'onCallEvent').and.callThrough();
@@ -254,7 +254,7 @@ describe('e2e audio call', () => {
     spyOn(client, 'sendMessage').and.callFake(
       (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
         wCall.recvMsg(remoteWuser, payload, payload.length, Date.now(), Date.now(), convId, userId, clientid);
-      }
+      },
     );
     return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
       remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
@@ -394,7 +394,7 @@ function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
     requestConfig, //cfg_reqh,
     () => {}, //acbrh,
     () => {}, //vstateh,
-    0
+    0,
   );
   return wUser;
 }

@@ -90,7 +90,7 @@ export class ContentViewModel {
       mainViewModel.calling,
       mainViewModel.panel,
       this,
-      repositories
+      repositories,
     );
 
     this.preferencesAbout = new z.viewModel.content.PreferencesAboutViewModel(mainViewModel, this, repositories);

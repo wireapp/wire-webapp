@@ -58,7 +58,7 @@ export class CallingViewModel {
     mediaDevicesHandler: MediaDevicesHandler,
     mediaStreamHandler: MediaStreamHandler,
     permissionRepository: any,
-    multitasking: any
+    multitasking: any,
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
@@ -67,7 +67,7 @@ export class CallingViewModel {
     this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
     this.activeCalls = ko.pureComputed(() =>
-      callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE)
+      callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
     );
     this.selectableScreens = ko.observable([]);
     this.isChoosingScreen = ko.pureComputed(() => this.selectableScreens().length > 0);
@@ -217,7 +217,10 @@ export class CallingViewModel {
         return;
       }
       currentCallSubscription = ko.computed(() => {
-        const newNbParticipants = call.participants().length;
+        if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
+          return;
+        }
+        const newNbParticipants = call.participants().filter(participant => !!participant.audioStream()).length;
         if (nbParticipants < newNbParticipants) {
           audioRepository.play(AudioType.READY_TO_TALK);
         }

@@ -29,7 +29,7 @@ export class Call {
   public readonly initiator: UserId;
   public readonly reason: ko.Observable<number | undefined>;
   public readonly startedAt: ko.Observable<number | undefined>;
-  public readonly state: ko.Observable<number>;
+  public readonly state: ko.Observable<CALL_STATE>;
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfParticipant: Participant;
   public readonly conversationType: CONV_TYPE;
@@ -41,7 +41,7 @@ export class Call {
     conversationId: ConversationId,
     conversationType: CONV_TYPE,
     selfParticipant: Participant,
-    callType: CALL_TYPE
+    callType: CALL_TYPE,
   ) {
     this.initiator = initiator;
     this.conversationId = conversationId;
