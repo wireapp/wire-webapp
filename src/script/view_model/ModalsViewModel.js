@@ -203,7 +203,11 @@ export class ModalsViewModel {
     }
     if (content.secondaryAction) {
       // force it into array format
-      content.secondaryAction = [].concat(content.secondaryAction);
+      const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
+      content.secondaryAction = [].concat(content.secondaryAction).map((action, index) => {
+        const uieName = uieNames[index] || 'do-remaining';
+        return {...action, uieName};
+      });
     }
     this.content(content);
     this.state(States.OPEN);
