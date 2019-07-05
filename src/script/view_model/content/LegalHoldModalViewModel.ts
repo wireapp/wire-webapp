@@ -94,7 +94,7 @@ export class LegalHoldModalViewModel {
       this.requestError('');
       this.isLoadingRequest(false);
     };
-    this.disableSubmit = ko.pureComputed(() => this.passwordValue().length < 1);
+    this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
     amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
     amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
