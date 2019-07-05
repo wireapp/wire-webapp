@@ -484,10 +484,14 @@ export class Account extends EventEmitter {
         };
       }
       case GenericMessageType.LOCATION: {
-        const {latitude, longitude, name, zoom} = genericMessage[GenericMessageType.LOCATION];
+        const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = genericMessage[
+          GenericMessageType.LOCATION
+        ];
 
         const content: LocationContent = {
+          expectsReadConfirmation,
           latitude,
+          legalHoldStatus,
           longitude,
           name,
           zoom,
@@ -530,9 +534,10 @@ export class Account extends EventEmitter {
         };
       }
       case GenericMessageType.REACTION: {
-        const {emoji, messageId} = genericMessage[GenericMessageType.REACTION];
+        const {emoji, legalHoldStatus, messageId} = genericMessage[GenericMessageType.REACTION];
 
         const content: ReactionContent = {
+          legalHoldStatus,
           originalMessageId: messageId,
           type: emoji,
         };
