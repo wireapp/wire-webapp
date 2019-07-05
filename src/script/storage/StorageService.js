@@ -229,7 +229,11 @@ export class StorageService {
    * @returns {Promise} Resolves with the primary key of the persisted object
    */
   save(storeName, primaryKey, entity) {
-    return this.engine.updateOrCreate(storeName, primaryKey, entity);
+    if (!entity) {
+      return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
+    }
+
+    return this.engine.create(storeName, primaryKey, entity);
   }
 
   /**
