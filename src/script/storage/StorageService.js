@@ -217,7 +217,10 @@ export class StorageService {
    * @returns {Promise} Resolves with the record matching the primary key
    */
   load(storeName, primaryKey) {
-    return this.engine.read(storeName, primaryKey);
+    return this.engine.read(storeName, primaryKey).catch(error => {
+      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      throw error;
+    });
   }
 
   /**
