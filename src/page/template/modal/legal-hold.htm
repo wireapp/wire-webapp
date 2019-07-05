@@ -49,7 +49,7 @@
           <!-- ko ifnot: isLoadingUsers() -->
             <p
               class="legal-hold-modal__info"
-              data-bind="html: isOnlyMe ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
+              data-bind="html: isSelfInfo ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
               data-uie-name="status-modal-text"
             ></p>
             <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
