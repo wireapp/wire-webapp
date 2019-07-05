@@ -125,7 +125,7 @@ z.viewModel.ListViewModel = class ListViewModel {
       this.contentViewModel,
       this,
       repositories.user,
-      repositories.calling
+      repositories.calling,
     );
     this.start = new StartUIViewModel(mainViewModel, this, repositories);
     this.takeover = new TakeoverViewModel(mainViewModel, this, repositories);

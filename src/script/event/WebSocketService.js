@@ -157,7 +157,7 @@ export class WebSocketService {
       this.pendingReconnectTrigger = trigger;
       return amplify.publish(
         WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW,
-        AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
+        AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET,
       );
     }
 

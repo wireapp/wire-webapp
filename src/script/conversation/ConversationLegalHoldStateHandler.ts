@@ -32,7 +32,7 @@ export const VERIFY_LEGAL_HOLD = 'verifyLegalHold';
 export class ConversationLegalHoldStateHandler {
   constructor(
     private readonly conversationRepository: ConversationRepository,
-    private readonly serverTimeHandler: ServerTimeHandler
+    private readonly serverTimeHandler: ServerTimeHandler,
   ) {
     amplify.subscribe(VERIFY_LEGAL_HOLD, this.verifyLegalHold);
   }

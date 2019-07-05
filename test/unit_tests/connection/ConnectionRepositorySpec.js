@@ -114,7 +114,7 @@ describe('ConnectionRepository', () => {
       server.respondWith(
         'GET',
         `${backendConfig.restUrl}/users?ids=${entities.user.jane_roe.id}%2C${entities.user.jane_roe.id}`,
-        [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
+        [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)],
       );
 
       return connectionRepository.getConnections().then(() => {

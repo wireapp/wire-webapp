@@ -39,7 +39,7 @@ export const getSelfError = (state: RootState) => state.selfState.error;
 export const getSelfHandle = (state: RootState) => getSelf(state).handle;
 export const getSelfName = (state: RootState) => getSelf(state).name;
 export const getSelfTeamId = (state: RootState) => getSelf(state).team;
-export const hasSelfHandle = (state: RootState) => !!getSelf(state).handle;
+export const hasSelfHandle = (state: RootState) => !!getSelfHandle(state);
 export const isFetching = (state: RootState) => state.selfState.fetching;
 export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
 export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;

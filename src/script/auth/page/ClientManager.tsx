@@ -19,22 +19,19 @@
 
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
 import {ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
-import * as React from 'react';
+import React, {useEffect} from 'react';
 import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
-
-import {noop} from 'Util/util';
-
 import {clientManagerStrings} from '../../strings';
-import {ClientList} from '../component/ClientList';
+import ClientList from '../component/ClientList';
 import {Config} from '../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {ROUTE} from '../route';
-import {Page} from './Page';
+import Page from './Page';
 
-interface Props extends React.HTMLProps<_ClientManager>, RouteComponentProps {}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps {}
 
 interface ConnectedProps {}
 
@@ -43,56 +40,51 @@ interface DispatchProps {
   doLogout: () => Promise<void>;
 }
 
-interface State {}
+const ClientManager = ({
+  doGetAllClients,
+  doLogout,
+  history,
+  intl: {formatMessage: _},
+}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+  useEffect(() => {
+    doGetAllClients();
+  }, []);
+  const logout = async () => {
+    try {
+      await doLogout();
+      history.push(ROUTE.LOGIN);
+    } catch (error) {}
+  };
+  return (
+    <Page>
+      <ContainerXS
+        centerText
+        verticalCenter
+        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
+      >
+        <H1 center style={{marginTop: '140px'}}>
+          {_(clientManagerStrings.headline)}
+        </H1>
+        <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
+          {_(clientManagerStrings.subhead, {brandName: Config.BRAND_NAME})}
+        </Muted>
+        <ClientList />
+        <Link onClick={logout} style={{alignSelf: 'center', margin: '48px 0 80px 0'}} data-uie-name="go-sign-out">
+          {_(clientManagerStrings.logout)}
+        </Link>
+      </ContainerXS>
+    </Page>
+  );
+};
 
-class _ClientManager extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  componentWillMount = () => this.props.doGetAllClients();
-
-  logout = () =>
-    this.props
-      .doLogout()
-      .catch(noop)
-      .then(() => this.props.history.push(ROUTE.LOGIN));
-
-  render(): JSX.Element {
-    const {
-      intl: {formatMessage: _},
-    } = this.props;
-    return (
-      <Page>
-        <ContainerXS
-          centerText
-          verticalCenter
-          style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
-        >
-          <H1 center style={{marginTop: '140px'}}>
-            {_(clientManagerStrings.headline)}
-          </H1>
-          <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
-            {_(clientManagerStrings.subhead, {brandName: Config.BRAND_NAME})}
-          </Muted>
-          <ClientList />
-          <Link
-            onClick={this.logout}
-            style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
-            data-uie-name="go-sign-out"
-          >
-            {_(clientManagerStrings.logout)}
-          </Link>
-        </ContainerXS>
-      </Page>
-    );
-  }
-}
-
-export const ClientManager = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({}),
       (dispatch: ThunkDispatch): DispatchProps => ({
         doGetAllClients: () => dispatch(ROOT_ACTIONS.clientAction.doGetAllClients()),
         doLogout: () => dispatch(ROOT_ACTIONS.authAction.doLogout()),
-      })
-    )(_ClientManager)
-  )
+      }),
+    )(ClientManager),
+  ),
 );

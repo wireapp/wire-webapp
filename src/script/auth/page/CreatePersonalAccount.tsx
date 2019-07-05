@@ -27,20 +27,20 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {getLogger} from 'Util/Logger';
 
 import {createPersonalAccountStrings} from '../../strings';
-import {AccountForm} from '../component/AccountForm';
-import {RouterLink} from '../component/RouterLink';
+import AccountForm from '../component/AccountForm';
+import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {Page} from './Page';
+import Page from './Page';
 
 interface URLParams {
   invitationCode: string;
 }
 
-interface Props extends React.HTMLAttributes<_CreatePersonalAccount>, RouteComponentProps<URLParams> {}
+interface Props extends React.HTMLAttributes<CreatePersonalAccount>, RouteComponentProps<URLParams> {}
 
 interface ConnectedProps {
   account: RegistrationDataState;
@@ -60,7 +60,7 @@ type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 const logger = getLogger('CreatePersonalAccount');
 
-class _CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
+class CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
   componentDidMount(): Promise<void> {
     return this.props.enterPersonalCreationFlow();
   }
@@ -76,7 +76,7 @@ class _CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
     this.props.history.push(ROUTE.VERIFY);
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       isPersonalFlow,
       intl: {formatMessage: _},
@@ -121,7 +121,7 @@ class _CreatePersonalAccount extends React.PureComponent<CombinedProps, State> {
   }
 }
 
-export const CreatePersonalAccount = withRouter(
+export default withRouter(
   injectIntl(
     connect(
       (state: RootState): ConnectedProps => ({
@@ -134,7 +134,7 @@ export const CreatePersonalAccount = withRouter(
           dispatch(ROOT_ACTIONS.authAction.doRegisterPersonal(registrationData)),
         enterGenericInviteCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterGenericInviteCreationFlow()),
         enterPersonalCreationFlow: () => dispatch(ROOT_ACTIONS.authAction.enterPersonalCreationFlow()),
-      })
-    )(_CreatePersonalAccount)
-  )
+      }),
+    )(CreatePersonalAccount),
+  ),
 );

@@ -22,7 +22,7 @@ import {FORWARDED_QUERY_KEYS} from '../route';
 export function pathWithParams(
   path: string,
   additionalParams?: string,
-  whitelistParams: string[] = FORWARDED_QUERY_KEYS
+  whitelistParams: string[] = FORWARDED_QUERY_KEYS,
 ): string {
   const searchParams = window.location.search
     .replace(/^\?/, '')

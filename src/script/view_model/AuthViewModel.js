@@ -95,7 +95,7 @@ class AuthViewModel {
 
     this.cryptography_repository = new CryptographyRepository(
       resolveDependency(graph.BackendClient),
-      this.storage_repository
+      this.storage_repository,
     );
     this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
 
@@ -105,7 +105,7 @@ class AuthViewModel {
       this.asset_service,
       this.selfService,
       this.client_repository,
-      serverTimeHandler
+      serverTimeHandler,
     );
 
     this.singleInstanceHandler = new SingleInstanceHandler();
@@ -119,7 +119,7 @@ class AuthViewModel {
       this.web_socket_service,
       undefined,
       this.cryptography_repository,
-      this.user_repository
+      this.user_repository,
     );
 
     this.pending_server_request = ko.observable(false);
@@ -1156,7 +1156,7 @@ class AuthViewModel {
                     opacity: '',
                   });
                 });
-            })
+            }),
           );
         }
 
@@ -1167,7 +1167,7 @@ class AuthViewModel {
                 resolve();
                 $(this).css({opacity: 1});
               });
-            })
+            }),
           );
         }
 

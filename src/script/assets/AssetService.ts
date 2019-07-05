@@ -53,7 +53,7 @@ export class AssetService {
   }
 
   uploadProfileImage(
-    image: Blob | File
+    image: Blob | File,
   ): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
@@ -70,9 +70,10 @@ export class AssetService {
           this.postAsset(mediumImageBytes, assetUploadOptions),
         ]);
       })
-      .then(([previewCredentials, mediumCredentials]) => {
-        return {mediumImageKey: mediumCredentials.key, previewImageKey: previewCredentials.key};
-      });
+      .then(([previewCredentials, mediumCredentials]) => ({
+        mediumImageKey: mediumCredentials.key,
+        previewImageKey: previewCredentials.key,
+      }));
   }
 
   async _uploadAsset(bytes: ArrayBuffer, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
@@ -166,7 +167,7 @@ export class AssetService {
   postAsset(
     assetData: Uint8Array,
     options: AssetUploadOptions,
-    xhrAccessorFunction?: Function
+    xhrAccessorFunction?: Function,
   ): Promise<UploadAssetResponse> {
     const BOUNDARY = 'frontier';
 
