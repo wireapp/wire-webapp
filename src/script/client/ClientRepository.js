@@ -478,7 +478,7 @@ export class ClientRepository {
     if (this.currentClient()) {
       if (this.isTemporaryClient()) {
         return this.deleteTemporaryClient().then(() =>
-          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true)
+          amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true),
         );
       }
 

@@ -28,7 +28,7 @@ const normalizedAuthTranslations = authTranslations.reduce(
     ...accumulator,
     [object.id]: object.defaultMessage,
   }),
-  {}
+  {},
 );
 
 const mergedTranslations = Object.assign({}, webappTranslations, normalizedAuthTranslations);

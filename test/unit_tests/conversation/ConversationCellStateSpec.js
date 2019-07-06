@@ -123,7 +123,7 @@ describe('ConversationCellState', () => {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
           description: `${t('conversationsSecondaryLineSummaryMentions')}, ${t(
-            'conversationsSecondaryLineSummaryMissedCalls'
+            'conversationsSecondaryLineSummaryMissedCalls',
           )}, ${t('conversationsSecondaryLineSummaryPings')}, ${t('conversationsSecondaryLineSummaryMessages')}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },

@@ -26,7 +26,10 @@ const testCode = 'src/script/**/*.test.ts';
 
 function getSpecs(specList) {
   if (specList) {
-    return specList.split(',').map(specPath => `test/unit_tests/${specPath}Spec.js`);
+    const list = specList.split(',');
+    const legacySpecs = list.map(specPath => `test/unit_tests/${specPath}Spec.js`);
+    const specs = list.map(specPath => `src/script/${specPath}.test.ts`);
+    return specs.concat(legacySpecs);
   }
   return ['test/unit_tests/**/*.js'].concat(testCode);
 }

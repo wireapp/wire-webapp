@@ -17,9 +17,14 @@
  *
  */
 
-class PhoneBook {
+export interface Card {
+  card_id: string;
+  contact: string[];
+}
+
+export class PhoneBook {
   self: string[];
-  cards: string[];
+  cards: Card[];
 
   /**
    * Construct a new Phone book.
@@ -29,5 +34,3 @@ class PhoneBook {
     this.cards = [];
   }
 }
-
-export {PhoneBook};

@@ -62,7 +62,7 @@ export class LegalHoldModalViewModel {
     public conversationRepository: ConversationRepository,
     public teamRepository: TeamRepository,
     public clientRepository: ClientRepository,
-    public cryptographyRepository: CryptographyRepository
+    public cryptographyRepository: CryptographyRepository,
   ) {
     this.isLoadingUsers = ko.observable(false);
     this.isVisible = ko.observable(false);
@@ -94,7 +94,7 @@ export class LegalHoldModalViewModel {
       this.requestError('');
       this.isLoadingRequest(false);
     };
-    this.disableSubmit = ko.pureComputed(() => this.passwordValue().length < 1);
+    this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
     amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
     amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
@@ -123,7 +123,7 @@ export class LegalHoldModalViewModel {
         fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
           selfUser.id,
           response.client.id,
-          response.last_prekey
+          response.last_prekey,
         );
         selfUser.hasPendingLegalHold(true);
       } else {
@@ -135,7 +135,7 @@ export class LegalHoldModalViewModel {
     this.isLoadingRequest(false);
     const formatedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
     this.requestFingerprint(
-      `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`
+      `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`,
     );
   };
 
@@ -198,7 +198,7 @@ export class LegalHoldModalViewModel {
     this.isSelfInfo(false);
     promiseProgress(
       conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)),
-      progress => this.progress(progress)
+      progress => this.progress(progress),
     )
       .then(() => this.conversationRepository.get_all_users_in_conversation(conversation.id))
       .then(allUsers => {

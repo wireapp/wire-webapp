@@ -38,7 +38,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 async function createEncodedCiphertext(
   preKey,
   text = 'Hello, World!',
-  receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity
+  receivingIdentity = TestFactory.cryptography_repository.cryptobox.identity,
 ) {
   const bobEngine = new MemoryEngine();
   await bobEngine.init('bob');
@@ -57,7 +57,7 @@ async function createEncodedCiphertext(
   const cipherText = await sender.encrypt(
     sessionId,
     GenericMessage.encode(genericMessage).finish(),
-    preKeyBundle.serialise()
+    preKeyBundle.serialise(),
   );
 
   return arrayToBase64(cipherText);
@@ -111,7 +111,7 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: createRandomUuid(), payload: [{}]})
+        Promise.resolve({id: createRandomUuid(), payload: [{}]}),
       );
 
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
@@ -121,7 +121,7 @@ describe('Event Repository', () => {
       });
 
       spyOn(TestFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
-        Promise.resolve(NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION)
+        Promise.resolve(NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION),
       );
     });
 
@@ -650,7 +650,7 @@ describe('Event Repository', () => {
       spyOn(TestFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
       spyOn(TestFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
       spyOn(TestFactory.event_service, 'updateEventAsUploadFailed').and.returnValue(
-        Promise.resolve(assetUploadFailedEvent)
+        Promise.resolve(assetUploadFailedEvent),
       );
 
       return TestFactory.event_repository.processEvent(assetUploadFailedEvent).then(savedEvent => {

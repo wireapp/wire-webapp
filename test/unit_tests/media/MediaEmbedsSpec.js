@@ -57,7 +57,7 @@ describe('MediaEmbeds', () => {
   const build_spotify_iframe = (link, partial_link) => {
     partial_link = partial_link.replace(/\//g, ':');
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
-      partial_link
+      partial_link,
     )}" frameborder="0"></iframe></div>`;
   };
 
@@ -76,7 +76,7 @@ describe('MediaEmbeds', () => {
         expect('https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8'.match(re_spotify)).not.toBeNull();
         expect('https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9'.match(re_spotify)).not.toBeNull();
         expect(
-          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(re_spotify)
+          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(re_spotify),
         ).not.toBeNull();
       });
 
@@ -91,7 +91,7 @@ describe('MediaEmbeds', () => {
       it('should match valid SoundCloud URLs', () => {
         expect('https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod'.match(re_soundcloud)).not.toBeNull();
         expect(
-          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud)
+          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud),
         ).not.toBeNull();
 
         expect('https://soundcloud.com/groups/playlist-digital-sintonia'.match(re_soundcloud)).not.toBeNull();

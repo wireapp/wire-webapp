@@ -68,7 +68,7 @@ interface State {
 
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-class _AccountForm extends React.PureComponent<CombinedProps, State> {
+class AccountForm extends React.PureComponent<CombinedProps, State> {
   private readonly inputs: {
     name: React.RefObject<HTMLInputElement>;
     email: React.RefObject<HTMLInputElement>;
@@ -167,7 +167,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType)
+              error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               throw error;
@@ -181,7 +181,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
     }
   };
 
-  render(): JSX.Element {
+  render() {
     const {
       isFetching,
       isPersonalFlow,
@@ -242,7 +242,7 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(
-                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder
+                isPersonalFlow ? accountFormStrings.emailPersonalPlaceholder : accountFormStrings.emailTeamPlaceholder,
               )}
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (event.key === 'Enter') {
@@ -332,23 +332,18 @@ class _AccountForm extends React.PureComponent<CombinedProps, State> {
   }
 }
 
-export const AccountForm = injectIntl(
+export default injectIntl(
   connect(
-    (state: RootState): ConnectedProps => {
-      return {
-        account: AuthSelector.getAccount(state),
-        authError: AuthSelector.getError(state),
-        isFetching: AuthSelector.isFetching(state),
-        isPersonalFlow: AuthSelector.isPersonalFlow(state),
-      };
-    },
-    (dispatch: ThunkDispatch): DispatchProps => {
-      return {
-        doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
-        pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) => {
-          return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData));
-        },
-      };
-    }
-  )(_AccountForm)
+    (state: RootState): ConnectedProps => ({
+      account: AuthSelector.getAccount(state),
+      authError: AuthSelector.getError(state),
+      isFetching: AuthSelector.isFetching(state),
+      isPersonalFlow: AuthSelector.isPersonalFlow(state),
+    }),
+    (dispatch: ThunkDispatch): DispatchProps => ({
+      doSendActivationCode: (email: string) => dispatch(ROOT_ACTIONS.userAction.doSendActivationCode(email)),
+      pushAccountRegistrationData: (registrationData: Partial<RegistrationDataState>) =>
+        dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(registrationData)),
+    }),
+  )(AccountForm),
 );

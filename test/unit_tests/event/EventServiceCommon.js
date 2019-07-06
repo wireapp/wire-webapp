@@ -94,15 +94,13 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(() => {
         const timestamp = 1479903546799;
-        messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
-          return {
-            conversation: conversationId,
-            time: new Date(timestamp + index).toISOString(),
-          };
-        });
+        messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => ({
+          conversation: conversationId,
+          time: new Date(timestamp + index).toISOString(),
+        }));
 
         return Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message))
+          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
         );
       });
 
@@ -185,13 +183,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(() => {
         const timestamp = new Date('2016-11-23T12:19:06.808Z').getTime();
-        events = [0, 1, 2, 3, 4, 5, 7, 6, 8, 9].map(index => {
-          return {
-            conversation: conversationId,
-            from: '123',
-            time: new Date(timestamp + index).toISOString(),
-          };
-        });
+        events = [0, 1, 2, 3, 4, 5, 7, 6, 8, 9].map(index => ({
+          conversation: conversationId,
+          from: '123',
+          time: new Date(timestamp + index).toISOString(),
+        }));
 
         return Promise.all(events.map(event => TestFactory.storage_service.save(eventStoreName, undefined, event)));
       });
@@ -561,7 +557,7 @@ window.testEventServiceClass = (testedServiceName, className) => {
 
       beforeEach(() => {
         return Promise.all(
-          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message))
+          messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
         ).then(ids => {
           primary_keys = ids;
         });

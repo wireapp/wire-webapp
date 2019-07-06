@@ -90,7 +90,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       userRepository.get_users_by_id(userIds).then(users => this.receiptUsers(users.sort(sortUsers)));
       const receiptTimes = receipts.reduce(
         (times, {userId, time}) => Object.assign(times, {[userId]: formatTime(time)}),
-        {}
+        {},
       );
       this.receiptTimes(receiptTimes);
     });

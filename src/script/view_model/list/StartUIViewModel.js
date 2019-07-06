@@ -156,7 +156,7 @@ class StartUIViewModel {
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
     this.showInviteMember = ko.pureComputed(
-      () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1
+      () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1,
     );
 
     this.showContacts = ko.pureComputed(() => this.contacts().length);

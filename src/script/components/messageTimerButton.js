@@ -62,7 +62,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
           click: () => this.conversationEntity().localMessageTimer(milliseconds),
           label: text,
         };
-      })
+      }),
     );
 
     Context.from(event, entries, 'message-timer-menu');

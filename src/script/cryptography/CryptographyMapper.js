@@ -447,7 +447,7 @@ export class CryptographyMapper {
         content: `${text.content}`,
         mentions: protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
         previews: protoLinkPreviews.map(protoLinkPreview =>
-          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())
+          arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
         ),
         quote: protoQuote && arrayToBase64(Quote.encode(protoQuote).finish()),
       },

@@ -273,6 +273,11 @@ export const downloadFile = (url, fileName, mimeType) => {
   }, 100);
 };
 
+/**
+ * @param {string} phoneNumber - The phone number
+ * @param {string} countryCode - The country code
+ * @returns {string} The formatted phone number
+ */
 export const phoneNumberToE164 = (phoneNumber, countryCode) => {
   return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
@@ -387,8 +392,8 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
       escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
-          hashedString
-        )
+          hashedString,
+        ),
       );
     const link = tokens[idx];
     const href = cleanString(link.attrGet('href'));
