@@ -1,0 +1,79 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {Logger, getLogger} from 'Util/Logger';
+
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageService} from './StorageService';
+
+export class StorageRepository {
+  private readonly AMPLIFY_STORE_NAME: string;
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+
+  static get CONFIG(): {CRYPTOGRAPHY_TABLES: string[]} {
+    return {
+      CRYPTOGRAPHY_TABLES: [
+        StorageSchemata.OBJECT_STORE.AMPLIFY,
+        StorageSchemata.OBJECT_STORE.CLIENTS,
+        StorageSchemata.OBJECT_STORE.KEYS,
+        StorageSchemata.OBJECT_STORE.SESSIONS,
+        StorageSchemata.OBJECT_STORE.PRE_KEYS,
+      ],
+    };
+  }
+
+  constructor(storageService: StorageService) {
+    this.storageService = storageService;
+    this.logger = getLogger('StorageRepository');
+    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
+  }
+
+  clearStores(): Promise<void> {
+    return this.storageService
+      .clearStores()
+      .then(() => this.logger.info(`Cleared database '${this.storageService.dbName}'`));
+  }
+
+  deleteCryptographyStores(): Promise<void> {
+    return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
+  }
+
+  deleteDatabase(): Promise<void> {
+    this.logger.warn(`Deleting database '${this.storageService.dbName}'`);
+    return this.storageService.deleteDatabase();
+  }
+
+  getValue<T>(primaryKey: string): Promise<T> {
+    return this.storageService.load(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
+      if (record && record.value) {
+        return record.value;
+      }
+      throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
+    });
+  }
+
+  saveValue<T>(primaryKey: string, value: T): Promise<string> {
+    return this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value: value});
+  }
+
+  terminate(reason: string): void {
+    this.storageService.terminate(reason);
+  }
+}
