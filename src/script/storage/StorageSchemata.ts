@@ -22,12 +22,8 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 
 interface DexieSchema {
   schema: Record<string, string>;
-  upgrade?: (transaction: DexieTransaction, database?: DexieInstance) => void;
+  upgrade?: (transaction: DexieTransaction, database?: Dexie) => void;
   version: number;
-}
-
-interface DexieInstance extends Dexie {
-  [index: string]: any;
 }
 
 type DexieTransaction = Record<string, Dexie.Table<any, any>>;
@@ -122,15 +118,15 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: DexieTransaction, database: DexieInstance) => {
+        upgrade: (transaction: DexieTransaction, database: Dexie) => {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATIONS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.CONVERSATIONS].update(key, {id: key});
+            database.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).update(key, {id: key});
           });
           transaction[StorageSchemata.OBJECT_STORE.SESSIONS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.SESSIONS].update(key, {id: key});
+            database.table(StorageSchemata.OBJECT_STORE.SESSIONS).update(key, {id: key});
           });
           transaction[StorageSchemata.OBJECT_STORE.PRE_KEYS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.PRE_KEYS].update(key, {id: key});
+            database.table(StorageSchemata.OBJECT_STORE.PRE_KEYS).update(key, {id: key});
           });
         },
         version: 6,
@@ -272,11 +268,11 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: DexieTransaction, database: DexieInstance) => {
+        upgrade: (transaction: DexieTransaction, database: Dexie) => {
           transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]
             .toCollection()
             .toArray()
-            .then(items => database[StorageSchemata.OBJECT_STORE.EVENTS].bulkPut(items));
+            .then(items => database.table(StorageSchemata.OBJECT_STORE.EVENTS).bulkPut(items));
         },
         version: 13,
       },
