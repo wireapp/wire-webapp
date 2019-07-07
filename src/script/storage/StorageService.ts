@@ -17,18 +17,32 @@
  *
  */
 
-import Dexie from 'dexie';
+import {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import Dexie from 'dexie';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 
 import {Config} from '../auth/config';
-import {StorageSchemata} from './StorageSchemata';
-import {StorageKey} from './StorageKey';
 import {ClientType} from '../client/ClientType';
+import {StorageKey} from './StorageKey';
+import {StorageSchemata} from './StorageSchemata';
+
+interface DatabaseListener {
+  callback: Function;
+  store: string;
+  type: string
+}
 
 export class StorageService {
+  private readonly logger: Logger;
+  private readonly engine: CRUDEngine;
+  public dbName?: string;
+  private userId?: string;
+  private dbListeners: DatabaseListener[];
+  private db: Dexie & {_dbSchema?: Object};
+
   static get CONFIG() {
     return {
       DEXIE_CRUD_EVENTS: {
@@ -68,12 +82,6 @@ export class StorageService {
 
     this.db = new Dexie(this.dbName);
 
-    this.db.on('blocked', event => {
-      if (event.dataLoss !== 'none') {
-        this.logger.error('Database is blocked', event);
-      }
-    });
-
     this._upgradeStores(this.db);
 
     return this.engine
@@ -84,18 +92,18 @@ export class StorageService {
         this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
         return this.dbName;
       })
-      .catch(error => {
+      .catch((error: Error) => {
         const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
         this.logger.error(logMessage, {error: error});
         throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
       });
   }
 
-  _initCrudHooks() {
+  _initCrudHooks(): void {
     const config = StorageService.CONFIG;
     const DEXIE_EVENTS = config.DEXIE_CRUD_EVENTS;
 
-    const callListener = (table, eventType, obj, updatedObj, transaction) => {
+    const callListener = (table: string, eventType: string, obj: Object, updatedObj: Object, transaction: Dexie.Transaction) => {
       transaction.on('complete', () => {
         this.dbListeners
           .filter(listener => listener.store === table && listener.type === eventType)
@@ -103,22 +111,22 @@ export class StorageService {
       });
     };
 
-    config.LISTENABLE_TABLES.forEach(table => {
-      this.db[table].hook(DEXIE_EVENTS.UPDATING, function(modifications, primaryKey, obj, transaction) {
+    config.LISTENABLE_TABLES.forEach((table: string) => {
+      this.db.table(table).hook('updating', function(modifications, primaryKey, obj, transaction) {
         this.onsuccess = updatedObj => callListener(table, DEXIE_EVENTS.UPDATING, obj, updatedObj, transaction);
       });
 
-      this.db[table].hook(DEXIE_EVENTS.DELETING, function(primaryKey, obj, transaction) {
+      this.db.table(table).hook('deleting', function(primaryKey, obj, transaction) {
         this.onsuccess = () => callListener(table, DEXIE_EVENTS.DELETING, obj, undefined, transaction);
       });
     });
   }
 
-  _upgradeStores(db) {
+  _upgradeStores(db: Dexie): void {
     StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionUpdate = db.version(version).stores(schema);
       if (upgrade) {
-        versionUpdate.upgrade(transaction => {
+        versionUpdate.upgrade((transaction: Dexie.Transaction) => {
           this.logger.warn(`Database upgrade to version '${version}'`);
           upgrade(transaction, db);
         });
@@ -126,12 +134,11 @@ export class StorageService {
     });
   }
 
-  // Hooks
-  addUpdatedListener(storeName, callback) {
+  addUpdatedListener(storeName: string, callback: Function): void {
     this.dbListeners.push({callback, store: storeName, type: StorageService.CONFIG.DEXIE_CRUD_EVENTS.UPDATING});
   }
 
-  addDeletedListener(storeName, callback) {
+  addDeletedListener(storeName: string, callback: Function): void {
     this.dbListeners.push({callback, store: storeName, type: StorageService.CONFIG.DEXIE_CRUD_EVENTS.DELETING});
   }
 
@@ -141,11 +148,11 @@ export class StorageService {
 
   /**
    * Clear all stores.
-   * @returns {Promise} Resolves when all stores have been cleared
+   * @returns Resolves when all stores have been cleared
    */
-  clearStores() {
+  clearStores(): Promise<void[]> {
     const deleteStorePromises = Object.keys(this.db._dbSchema)
-      // avoid clearing tables needed by third parties (dexie-observable for eg)
+    // avoid clearing tables needed by third parties (dexie-observable for eg)
       .filter(table => !table.startsWith('_'))
       .map(storeName => this.deleteStore(storeName));
     return Promise.all(deleteStorePromises);
@@ -154,19 +161,19 @@ export class StorageService {
   /**
    * Removes persisted data.
    *
-   * @param {string} storeName - Name of the object store
-   * @param {string} primaryKey - Primary key
-   * @returns {Promise} Resolves when the object is deleted
+   * @param storeName - Name of the object store
+   * @param primaryKey - Primary key
+   * @returns Resolves when the object is deleted
    */
-  delete(storeName, primaryKey) {
+  delete(storeName: string, primaryKey: string): Promise<string> {
     return this.engine.delete(storeName, primaryKey);
   }
 
   /**
    * Delete the IndexedDB with all its stores.
-   * @returns {Promise} Resolves if a database is found and cleared
+   * @returns Resolves if a database is found and cleared
    */
-  deleteDatabase() {
+  deleteDatabase(): Promise<boolean> {
     if (this.db) {
       return this.db
         .delete()
@@ -185,20 +192,20 @@ export class StorageService {
 
   /**
    * Delete a database store.
-   * @param {string} storeName - Name of database store to delete
-   * @returns {Promise} Resolves when the store has been deleted
+   * @param storeName - Name of database store to delete
+   * @returns Resolves when the store has been deleted
    */
-  deleteStore(storeName) {
+  deleteStore(storeName: string): Promise<void> {
     this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
-    return this.db[storeName].clear();
+    return this.db.table(storeName).clear();
   }
 
   /**
    * Delete multiple database stores.
-   * @param {Array<string>} storeNames - Names of database stores to delete
-   * @returns {Promise} Resolves when the stores have been deleted
+   * @param tring>} storeNames - Names of database stores to delete
+   * @returns Resolves when the stores have been deleted
    */
-  deleteStores(storeNames) {
+  deleteStores(storeNames: string[]): Promise<any> {
     const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
     return Promise.all(deleteStorePromises);
   }
@@ -206,11 +213,11 @@ export class StorageService {
   /**
    * Returns an array of all records for a given object store.
    *
-   * @param {string} storeName - Name of object store
-   * @returns {Promise} Resolves with the records from the object store
+   * @param storeName - Name of object store
+   * @returns Resolves with the records from the object store
    */
-  getAll(storeName) {
-    return this.db[storeName]
+  getAll<T>(storeName: string): Promise<T[]> {
+    return this.db.table(storeName)
       .toArray()
       .then(resultArray => resultArray.filter(result => result))
       .catch(error => {
@@ -220,23 +227,23 @@ export class StorageService {
   }
 
   /**
-   * @param {Array<string>} tableNames - Names of tables to get
-   * @returns {Array<Table>} Matching tables
+   * @param tableNames - Names of tables to get
+   * @returns Matching tables
    */
-  getTables(tableNames) {
-    return tableNames.map(tableName => this.db[tableName]);
+  getTables(tableNames: string[]): Dexie.Table<any, any>[] {
+    return tableNames.map(tableName => this.db.table(tableName));
   }
 
   /**
    * Loads persisted data via a promise.
    * @note If a key cannot be found, it resolves and returns "undefined".
    *
-   * @param {string} storeName - Name of object store
-   * @param {string} primaryKey - Primary key of object to be retrieved
-   * @returns {Promise} Resolves with the record matching the primary key
+   * @param storeName - Name of object store
+   * @param primaryKey - Primary key of object to be retrieved
+   * @returns Resolves with the record matching the primary key
    */
-  load(storeName, primaryKey) {
-    return this.db[storeName].get(primaryKey).catch(error => {
+  load<T>(storeName: string, primaryKey: string): Promise<T> {
+    return this.db.table(storeName).get(primaryKey).catch(error => {
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       throw error;
     });
@@ -245,17 +252,17 @@ export class StorageService {
   /**
    * Saves objects in the local database.
    *
-   * @param {string} storeName - Name of object store where to save the object
-   * @param {string} primaryKey - Primary key which should be used to store the object
-   * @param {Object} entity - Data to store in object store
-   * @returns {Promise} Resolves with the primary key of the persisted object
+   * @param storeName - Name of object store where to save the object
+   * @param primaryKey - Primary key which should be used to store the object
+   * @param entity - Data to store in object store
+   * @returns Resolves with the primary key of the persisted object
    */
-  save(storeName, primaryKey, entity) {
+  save<T>(storeName: string, primaryKey: string, entity: T) {
     if (!entity) {
       return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
     }
 
-    return this.db[storeName].put(entity, primaryKey).catch(error => {
+    return this.db.table(storeName).put(entity, primaryKey).catch(error => {
       this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
       throw error;
     });
@@ -264,10 +271,10 @@ export class StorageService {
   /**
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
-   * @param {string} [reason='unknown reason'] - Cause for the termination
-   * @returns {undefined} No return value
+   * @param [reason='unknown reason'] - Cause for the termination
+   * @returns No return value
    */
-  terminate(reason = 'unknown reason') {
+  terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.db.name}' because of '${reason}'.`);
     this.db.close();
   }
@@ -275,13 +282,13 @@ export class StorageService {
   /**
    * Update previously persisted data via a promise.
    *
-   * @param {string} storeName - Name of object store
-   * @param {string} primaryKey - Primary key of object to be updated
-   * @param {Object} changes - Object containing the key paths to each property you want to change
-   * @returns {Promise} Promise with the number of updated records (0 if no records were changed).
+   * @param storeName - Name of object store
+   * @param primaryKey - Primary key of object to be updated
+   * @param changes - Object containing the key paths to each property you want to change
+   * @returns Promise with the number of updated records (0 if no records were changed).
    */
-  update(storeName, primaryKey, changes) {
-    return this.db[storeName]
+  update(storeName: string, primaryKey: string, changes: Object): Promise<number> {
+    return this.db.table(storeName)
       .update(primaryKey, changes)
       .then(numberOfUpdates => {
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;

@@ -22,6 +22,8 @@ import {Logger, getLogger} from 'Util/Logger';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from './StorageService';
 
+type AmplifyRecord = {key: string; value: string};
+
 export class StorageRepository {
   private readonly AMPLIFY_STORE_NAME: string;
   private readonly logger: Logger;
@@ -55,13 +57,13 @@ export class StorageRepository {
     return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
   }
 
-  deleteDatabase(): Promise<void> {
+  deleteDatabase(): Promise<boolean> {
     this.logger.warn(`Deleting database '${this.storageService.dbName}'`);
     return this.storageService.deleteDatabase();
   }
 
-  getValue<T>(primaryKey: string): Promise<T> {
-    return this.storageService.load(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
+  getValue(primaryKey: string): Promise<string | AmplifyRecord> {
+    return this.storageService.load<AmplifyRecord>(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
       if (record && record.value) {
         return record.value;
       }
