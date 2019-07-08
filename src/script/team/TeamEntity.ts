@@ -18,6 +18,8 @@
  */
 
 import ko from 'knockout';
+import {base64ToArray} from 'Util/util';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
 export class TeamEntity {
@@ -35,5 +37,11 @@ export class TeamEntity {
     this.members = ko.observableArray([]);
     this.id = id;
     this.name = ko.observable('');
+  }
+
+  async previewIconResource(): Promise<string | void> {
+    if (this.icon && this.iconKey) {
+      return AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey)).generateUrl();
+    }
   }
 }
