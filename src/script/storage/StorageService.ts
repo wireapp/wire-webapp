@@ -105,7 +105,7 @@ export class StorageService {
       eventType: string,
       obj: Object,
       updatedObj: Object,
-      transaction: Dexie.Transaction,
+      transaction: Dexie.Transaction
     ) => {
       transaction.on('complete', () => {
         this.dbListeners
@@ -116,26 +116,28 @@ export class StorageService {
 
     const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
 
-    listenableTables.forEach((table: string): void => {
-      this.db
-        .table(table)
-        .hook('updating', function(
-          modifications: Object,
-          primaryKey: string,
-          obj: Object,
-          transaction: Dexie.Transaction,
-        ): void {
-          this.onsuccess = updatedObj =>
-            callListener(table, StorageService.DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
-        });
+    listenableTables.forEach(
+      (table: string): void => {
+        this.db
+          .table(table)
+          .hook('updating', function(
+            modifications: Object,
+            primaryKey: string,
+            obj: Object,
+            transaction: Dexie.Transaction
+          ): void {
+            this.onsuccess = updatedObj =>
+              callListener(table, StorageService.DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
+          });
 
-      this.db
-        .table(table)
-        .hook('deleting', function(primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
-          this.onsuccess = (): void =>
-            callListener(table, StorageService.DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
-        });
-    });
+        this.db
+          .table(table)
+          .hook('deleting', function(primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
+            this.onsuccess = (): void =>
+              callListener(table, StorageService.DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
+          });
+      }
+    );
   }
 
   _upgradeStores(db: Dexie): void {
@@ -217,15 +219,13 @@ export class StorageService {
    * @param storeName - Name of object store
    * @returns Resolves with the records from the object store
    */
-  getAll<T>(storeName: string): Promise<T[]> {
-    return this.db
-      .table(storeName)
-      .toArray()
-      .then(resultArray => resultArray.filter(result => result))
-      .catch(error => {
-        this.logger.error(`Failed to load objects from store '${storeName}'`, error);
-        throw error;
-      });
+  async getAll<T>(storeName: string): Promise<T[]> {
+    try {
+      return await this.engine.readAll(storeName);
+    } catch (error) {
+      this.logger.error(`Failed to load objects from store '${storeName}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -245,13 +245,10 @@ export class StorageService {
    * @returns Resolves with the record matching the primary key
    */
   load<T>(storeName: string, primaryKey: string): Promise<T> {
-    return this.db
-      .table(storeName)
-      .get(primaryKey)
-      .catch(error => {
-        this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
-        throw error;
-      });
+    return this.engine.read<T>(storeName, primaryKey).catch(error => {
+      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      throw error;
+    });
   }
 
   /**
@@ -262,18 +259,19 @@ export class StorageService {
    * @param entity - Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
-  save<T>(storeName: string, primaryKey: string, entity: T): Promise<T> {
+  async save<T>(storeName: string, primaryKey: string, entity: T): Promise<T> {
     if (!entity) {
       return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
     }
 
-    return this.db
-      .table(storeName)
-      .put(entity, primaryKey)
-      .catch(error => {
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
-        throw error;
-      });
+    try {
+      await this.engine.updateOrCreate(storeName, primaryKey, entity);
+    } catch (error) {
+      this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+      throw error;
+    }
+
+    return entity;
   }
 
   /**
