@@ -75,7 +75,7 @@ export class StorageService {
    * @param {string} userId - User ID
    * @returns {Promise} Resolves with the database name
    */
-  init(userId = this.userId): Promise<string> {
+  async init(userId = this.userId): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
@@ -86,19 +86,18 @@ export class StorageService {
 
     this._upgradeStores(this.db);
 
-    return this.engine
-      .initWithDb(this.db)
-      .then(() => this.db.open())
-      .then(() => {
-        this._initCrudHooks();
-        this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
-        return this.dbName;
-      })
-      .catch((error: Error) => {
-        const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
-        this.logger.error(logMessage, {error: error});
-        throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
-      });
+    await this.engine.initWithDb(this.db);
+    await this.db.open();
+
+    try {
+      this._initCrudHooks();
+      this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+      return this.dbName;
+    } catch (error) {
+      const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
+      this.logger.error(logMessage, {error: error});
+      throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
+    }
   }
 
   _initCrudHooks(): void {
