@@ -30,10 +30,12 @@ import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 
 interface DatabaseListener {
-  callback: Function;
+  callback: DatabaseListenerCallback;
   store: string;
   type: string;
 }
+
+type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
 
 export class StorageService {
   private readonly logger: Logger;
@@ -147,11 +149,11 @@ export class StorageService {
     });
   }
 
-  addUpdatedListener(storeName: string, callback: Function): void {
+  addUpdatedListener(storeName: string, callback: DatabaseListenerCallback): void {
     this.dbListeners.push({callback, store: storeName, type: StorageService.DEXIE_CRUD_EVENTS.UPDATING});
   }
 
-  addDeletedListener(storeName: string, callback: Function): void {
+  addDeletedListener(storeName: string, callback: DatabaseListenerCallback): void {
     this.dbListeners.push({callback, store: storeName, type: StorageService.DEXIE_CRUD_EVENTS.DELETING});
   }
 
