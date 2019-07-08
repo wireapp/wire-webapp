@@ -86,10 +86,9 @@ export class StorageService {
 
     this._upgradeStores(this.db);
 
-    await this.engine.initWithDb(this.db);
-    await this.db.open();
-
     try {
+      await this.engine.initWithDb(this.db);
+      await this.db.open();
       this._initCrudHooks();
       this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
       return this.dbName;
