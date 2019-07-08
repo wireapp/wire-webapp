@@ -18,7 +18,7 @@
  */
 
 import Dexie from 'dexie';
-import {IndexedDBEngine} from '@wireapp/store-engine';
+import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';

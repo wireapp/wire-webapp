@@ -228,189 +228,145 @@ export interface EnterGenericInvitationCreationFlowAction extends AppAction {
 }
 
 export class AuthActionCreator {
-  static startLogin = (): LoginStartAction => {
-    return {
-      type: AUTH_ACTION.LOGIN_START,
-    };
-  };
-  static successfulLogin = (): LoginSuccessAction => {
-    return {
-      type: AUTH_ACTION.LOGIN_SUCCESS,
-    };
-  };
-  static failedLogin = (error: Error): LoginFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.LOGIN_FAILED,
-    };
-  };
+  static startLogin = (): LoginStartAction => ({
+    type: AUTH_ACTION.LOGIN_START,
+  });
 
-  static startRegisterTeam = (): RegisterTeamStartAction => {
-    return {
-      type: AUTH_ACTION.REGISTER_TEAM_START,
-    };
-  };
-  static successfulRegisterTeam = (authData: RegisterData): RegisterTeamSuccessAction => {
-    return {
-      payload: authData,
-      type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
-    };
-  };
-  static failedRegisterTeam = (error: Error): RegisterTeamFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.REGISTER_TEAM_FAILED,
-    };
-  };
+  static successfulLogin = (): LoginSuccessAction => ({
+    type: AUTH_ACTION.LOGIN_SUCCESS,
+  });
 
-  static startRegisterPersonal = (): RegisterPersonalStartAction => {
-    return {
-      type: AUTH_ACTION.REGISTER_PERSONAL_START,
-    };
-  };
-  static successfulRegisterPersonal = (authData: RegisterData): RegisterPersonalSuccessAction => {
-    return {
-      payload: authData,
-      type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
-    };
-  };
-  static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
-    };
-  };
+  static failedLogin = (error: Error): LoginFailedAction => ({
+    error,
+    type: AUTH_ACTION.LOGIN_FAILED,
+  });
 
-  static startRegisterWireless = (): RegisterWirelessStartAction => {
-    return {
-      type: AUTH_ACTION.REGISTER_WIRELESS_START,
-    };
-  };
-  static successfulRegisterWireless = (authData: RegisterData): RegisterWirelessSuccessAction => {
-    return {
-      payload: authData,
-      type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
-    };
-  };
-  static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
-    };
-  };
+  static startRegisterTeam = (): RegisterTeamStartAction => ({
+    type: AUTH_ACTION.REGISTER_TEAM_START,
+  });
 
-  static startRegisterJoin = (): RegisterJoinStartAction => {
-    return {
-      type: AUTH_ACTION.REGISTER_JOIN_START,
-    };
-  };
-  static successfulRegisterJoin = (authData: RegisterData): RegisterJoinSuccessAction => {
-    return {
-      payload: authData,
-      type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
-    };
-  };
-  static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.REGISTER_JOIN_FAILED,
-    };
-  };
+  static successfulRegisterTeam = (authData: RegisterData): RegisterTeamSuccessAction => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_TEAM_SUCCESS,
+  });
 
-  static startRefresh = (): RefreshStartAction => {
-    return {
-      type: AUTH_ACTION.REFRESH_START,
-    };
-  };
-  static successfulRefresh = (): RefreshSuccessAction => {
-    return {
-      type: AUTH_ACTION.REFRESH_SUCCESS,
-    };
-  };
-  static failedRefresh = (error: Error): RefreshFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.REFRESH_FAILED,
-    };
-  };
+  static failedRegisterTeam = (error: Error): RegisterTeamFailedAction => ({
+    error,
+    type: AUTH_ACTION.REGISTER_TEAM_FAILED,
+  });
 
-  static startValidateLocalClient = (): ValidateClientStartAction => {
-    return {
-      type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
-    };
-  };
-  static successfulValidateLocalClient = (): ValidateClientSuccessAction => {
-    return {
-      type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
-    };
-  };
-  static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
-    };
-  };
+  static startRegisterPersonal = (): RegisterPersonalStartAction => ({
+    type: AUTH_ACTION.REGISTER_PERSONAL_START,
+  });
 
-  static startLogout = (): LogoutStartAction => {
-    return {
-      type: AUTH_ACTION.LOGOUT_START,
-    };
-  };
-  static successfulLogout = (): LogoutSuccessAction => {
-    return {
-      type: AUTH_ACTION.LOGOUT_SUCCESS,
-    };
-  };
-  static failedLogout = (error: Error): LogoutFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.LOGOUT_FAILED,
-    };
-  };
+  static successfulRegisterPersonal = (authData: RegisterData): RegisterPersonalSuccessAction => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_PERSONAL_SUCCESS,
+  });
 
-  static successfulSilentLogout = (): LogoutSilentSuccessAction => {
-    return {
-      type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
-    };
-  };
-  static failedSilentLogout = (error: Error): LogoutSilentFailedAction => {
-    return {
-      error,
-      type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
-    };
-  };
+  static failedRegisterPersonal = (error: Error): RegisterPersonalFailedAction => ({
+    error,
+    type: AUTH_ACTION.REGISTER_PERSONAL_FAILED,
+  });
 
-  static resetError = (): ResetAuthErrorsAction => {
-    return {
-      type: AUTH_ACTION.AUTH_RESET_ERROR,
-    };
-  };
+  static startRegisterWireless = (): RegisterWirelessStartAction => ({
+    type: AUTH_ACTION.REGISTER_WIRELESS_START,
+  });
 
-  static resetAccountData = (): ResetRegistrationDataAction => {
-    return {
-      type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
-    };
-  };
-  static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => {
-    return {
-      payload: accountData,
-      type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
-    };
-  };
+  static successfulRegisterWireless = (authData: RegisterData): RegisterWirelessSuccessAction => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_WIRELESS_SUCCESS,
+  });
 
-  static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => {
-    return {
-      type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
-    };
-  };
-  static enterPersonalCreationFlow = (): EnterPersonalCreationFlowAction => {
-    return {
-      type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
-    };
-  };
-  static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => {
-    return {
-      type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
-    };
-  };
+  static failedRegisterWireless = (error: Error): RegisterWirelessFailedAction => ({
+    error,
+    type: AUTH_ACTION.REGISTER_WIRELESS_FAILED,
+  });
+
+  static startRegisterJoin = (): RegisterJoinStartAction => ({
+    type: AUTH_ACTION.REGISTER_JOIN_START,
+  });
+
+  static successfulRegisterJoin = (authData: RegisterData): RegisterJoinSuccessAction => ({
+    payload: authData,
+    type: AUTH_ACTION.REGISTER_JOIN_SUCCESS,
+  });
+
+  static failedRegisterJoin = (error: Error): RegisterJoinFailedAction => ({
+    error,
+    type: AUTH_ACTION.REGISTER_JOIN_FAILED,
+  });
+
+  static startRefresh = (): RefreshStartAction => ({
+    type: AUTH_ACTION.REFRESH_START,
+  });
+
+  static successfulRefresh = (): RefreshSuccessAction => ({
+    type: AUTH_ACTION.REFRESH_SUCCESS,
+  });
+
+  static failedRefresh = (error: Error): RefreshFailedAction => ({
+    error,
+    type: AUTH_ACTION.REFRESH_FAILED,
+  });
+
+  static startValidateLocalClient = (): ValidateClientStartAction => ({
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
+  });
+
+  static successfulValidateLocalClient = (): ValidateClientSuccessAction => ({
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
+  });
+
+  static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => ({
+    error,
+    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
+  });
+
+  static startLogout = (): LogoutStartAction => ({
+    type: AUTH_ACTION.LOGOUT_START,
+  });
+
+  static successfulLogout = (): LogoutSuccessAction => ({
+    type: AUTH_ACTION.LOGOUT_SUCCESS,
+  });
+
+  static failedLogout = (error: Error): LogoutFailedAction => ({
+    error,
+    type: AUTH_ACTION.LOGOUT_FAILED,
+  });
+
+  static successfulSilentLogout = (): LogoutSilentSuccessAction => ({
+    type: AUTH_ACTION.SILENT_LOGOUT_SUCCESS,
+  });
+
+  static failedSilentLogout = (error: Error): LogoutSilentFailedAction => ({
+    error,
+    type: AUTH_ACTION.SILENT_LOGOUT_FAILED,
+  });
+
+  static resetError = (): ResetAuthErrorsAction => ({
+    type: AUTH_ACTION.AUTH_RESET_ERROR,
+  });
+
+  static resetAccountData = (): ResetRegistrationDataAction => ({
+    type: AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA,
+  });
+
+  static pushAccountRegistrationData = (accountData: Partial<RegistrationDataState>): PushRegistrationDataAction => ({
+    payload: accountData,
+    type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
+  });
+
+  static enterTeamCreationFlow = (): EnterTeamCreationFlowAction => ({
+    type: AUTH_ACTION.ENTER_TEAM_CREATION_FLOW,
+  });
+
+  static enterPersonalCreationFlow = (): EnterPersonalCreationFlowAction => ({
+    type: AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW,
+  });
+
+  static enterGenericInviteCreationFlow = (): EnterGenericInvitationCreationFlowAction => ({
+    type: AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW,
+  });
 }
