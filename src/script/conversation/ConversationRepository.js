@@ -2666,7 +2666,7 @@ export class ConversationRepository {
 
   _grantOutgoingMessage(eventInfoEntity, userIds) {
     const messageType = eventInfoEntity.getType();
-    const allowedMessageTypes = ['cleared', 'confirmation', 'deleted', 'lastRead'];
+    const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
       return Promise.resolve();
     }
