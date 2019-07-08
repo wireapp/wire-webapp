@@ -215,7 +215,7 @@ export class StorageService {
 
   /**
    * Delete multiple database stores.
-   * @param tring>} storeNames - Names of database stores to delete
+   * @param storeNames - Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
   deleteStores(storeNames: string[]): Promise<any> {
