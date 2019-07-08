@@ -1621,17 +1621,17 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.2.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.2.0.tgz#26c0898ef40b0226d2f4b7193f20f100ff36b628"
-  integrity sha512-gHTa7v0RRraYWYiTLg2DKCWW0HfPZdH+f/B3P3Veyu+r0h7b6ie2NDk1YyKqPAL+W4Jj/F0qjAkot5Sg7VgKwg==
+"@wireapp/react-ui-kit@7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.3.2.tgz#f68468bd57112449f042f662f18b596e946ac208"
+  integrity sha512-SleUrYueDexAkyIgEXA8ZwNpzOXTTJkxsUvmBhImlONnzDoxUeiJ7ZL97RwuKSxVb2w5yUJ/fFU2Qw0CdeY/5Q==
   dependencies:
     "@emotion/core" "10.0.14"
     "@types/color" "3.0.0"
-    bazinga64 "5.5.0"
+    bazinga64 "5.5.1"
     color "3.1.2"
     emotion-normalize "10.0.0"
-    react-transition-group "4.1.1"
+    react-transition-group "4.2.1"
 
 "@wireapp/store-engine-dexie@0.3.2":
   version "0.3.2"
@@ -2423,11 +2423,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bazinga64@5.5.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.0.tgz#3dc21c2cf25d345d15bcf95e488b403ab5b2edcd"
-  integrity sha512-Jhm1rG/FB6a6FO+QM9Ep9gOgrfYPonDhkhKfpD+RbfxY5mgS/CKvKxtHCdEPIoYxWs5c2lOFpBcZanUYIwn7FQ==
 
 bazinga64@5.5.1:
   version "5.5.1"
@@ -10056,10 +10051,10 @@ react-test-renderer@^16.0.0-0:
     react-is "^16.8.6"
     scheduler "^0.13.6"
 
-react-transition-group@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.1.1.tgz#16efe9ac8c68306f6bef59c7da5a96b4dfd9fb32"
-  integrity sha512-K/N1wqJ2GRP2yj3WBqEUYa0KV5fiaAWpUfU9SpHOHefeKvyrO+VrnMBML21M19QZoVbDZKmuQFHZYoMMi1xuJA==
+react-transition-group@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.1.tgz#61fc9e36568bff9a1fe4e60fae323c8a6dbc0680"
+  integrity sha512-IXrPr93VzCPupwm2O6n6C2kJIofJ/Rp5Ltihhm9UfE8lkuVX2ng/SUUl/oWjblybK9Fq2Io7LGa6maVqPB762Q==
   dependencies:
     "@babel/runtime" "^7.4.5"
     dom-helpers "^3.4.0"
