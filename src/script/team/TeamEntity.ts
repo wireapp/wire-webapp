@@ -42,8 +42,7 @@ export class TeamEntity {
 
   previewIconResource(): AssetRemoteData | void {
     if (this.icon && this.iconKey) {
-      const remotedata = AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey));
-      return remotedata;
+      return AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey));
     }
   }
 }
