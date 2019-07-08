@@ -192,6 +192,19 @@
     align-self: flex-start;
     margin-top: 12px;
   }
+
+  &__learn-more {
+    color: var(--accent-color);
+    cursor: pointer;
+    font-weight: @font-weight-bold;
+    text-transform: uppercase;
+
+    &::before {
+      display: inline-block;
+      margin: 0 4px;
+      content: '\00b7';
+    }
+  }
 }
 
 .message-header-label-sender {

@@ -31,21 +31,23 @@ function showModal(storageKey, title, message) {
     modals.showModal(
       ModalsViewModel.TYPE.OPTION,
       {
-        action: dontShowAgain => {
-          if (dontShowAgain) {
-            storeValue(storageKey, 'true');
-          }
-        },
+        hideSecondary: true,
         preventClose: true,
+        primaryAction: {
+          action: dontShowAgain => {
+            if (dontShowAgain) {
+              storeValue(storageKey, 'true');
+            }
+          },
+          text: t('modalAcknowledgeAction'),
+        },
         text: {
-          action: t('modalAcknowledgeAction'),
           message,
           option: t('modalAvailabilityDontShowAgain'),
-          secondary: '',
           title,
         },
       },
-      'availability'
+      'availability',
     );
   }
 }

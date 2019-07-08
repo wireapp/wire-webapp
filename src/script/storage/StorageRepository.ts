@@ -17,12 +17,19 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageService} from './StorageService';
+
+type AmplifyRecord = {key: string; value: string};
 
 export class StorageRepository {
-  static get CONFIG() {
+  private readonly AMPLIFY_STORE_NAME: string;
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+
+  static get CONFIG(): {CRYPTOGRAPHY_TABLES: string[]} {
     return {
       CRYPTOGRAPHY_TABLES: [
         StorageSchemata.OBJECT_STORE.AMPLIFY,
@@ -34,54 +41,29 @@ export class StorageRepository {
     };
   }
 
-  /**
-   * Construct an new Storage Repository.
-   * @param {StorageService} storageService - Service for all storage related interactions
-   */
-  constructor(storageService) {
+  constructor(storageService: StorageService) {
     this.storageService = storageService;
     this.logger = getLogger('StorageRepository');
-
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
-  /**
-   * Clear all database stores.
-   * @returns {Promise} Resolves when stores have been deleted
-   */
-  clearStores() {
+  clearStores(): Promise<void> {
     return this.storageService
       .clearStores()
       .then(() => this.logger.info(`Cleared database '${this.storageService.dbName}'`));
   }
 
-  /**
-   * Delete cryptography related information.
-   * @note Retain history but clean other information.
-   * @returns {Promise} Resolves when stores have been deleted
-   */
-  deleteCryptographyStores() {
+  deleteCryptographyStores(): Promise<void> {
     return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
   }
 
-  /**
-   * Delete everything from the database
-   * @note Nukes it - no way to recover data
-   * @returns {Promise} Resolves when database has been deleted
-   */
-  deleteDatabase() {
+  deleteDatabase(): Promise<boolean> {
     this.logger.warn(`Deleting database '${this.storageService.dbName}'`);
     return this.storageService.deleteDatabase();
   }
 
-  /**
-   * Get a value for a given primary key from the amplify value store.
-   *
-   * @param {string} primaryKey - Primary key to retrieve the object for
-   * @returns {Promise} Resolves with the retrieved value
-   */
-  getValue(primaryKey) {
-    return this.storageService.load(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
+  getValue(primaryKey: string): Promise<string | AmplifyRecord> {
+    return this.storageService.load<AmplifyRecord>(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
       if (record && record.value) {
         return record.value;
       }
@@ -89,23 +71,12 @@ export class StorageRepository {
     });
   }
 
-  /**
-   * Save a value in the amplify value store.
-   *
-   * @param {string} primaryKey - Primary key to save the object with
-   * @param {value} value - Object to be stored
-   * @returns {Promise} Resolves with the primary key
-   */
-  saveValue(primaryKey, value) {
-    return this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value: value});
+  async saveValue<T>(primaryKey: string, value: T): Promise<string> {
+    await this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value});
+    return primaryKey;
   }
 
-  /**
-   * Closes the database connection.
-   * @param {string} reason - Cause for the termination
-   * @returns {undefined} No return value
-   */
-  terminate(reason) {
+  terminate(reason: string): void {
     this.storageService.terminate(reason);
   }
 }

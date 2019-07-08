@@ -51,6 +51,8 @@ enum USER {
   CLIENT_REMOVE = 'user.client-remove',
   CONNECTION = 'user.connection',
   DELETE = 'user.delete',
+  LEGAL_HOLD_DISABLED = 'user.legalhold-disable',
+  LEGAL_HOLD_REQUEST = 'user.legalhold-request',
   PROPERTIES_DELETE = 'user.properties-delete',
   PROPERTIES_SET = 'user.properties-set',
   UPDATE = 'user.update',

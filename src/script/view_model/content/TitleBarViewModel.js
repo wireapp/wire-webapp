@@ -44,6 +44,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.logger = getLogger('z.viewModel.content.TitleBarViewModel');
 
     this.panelViewModel = mainViewModel.panel;
+    this.contentViewModel = contentViewModel;
 
     this.panelIsVisible = this.panelViewModel.isVisible;
 
@@ -143,7 +144,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       : amplify.publish(
           WebAppEvents.CONVERSATION.CREATE_GROUP,
           'conversation_details',
-          this.conversationEntity().firstUserEntity()
+          this.conversationEntity().firstUserEntity(),
         );
   }
 

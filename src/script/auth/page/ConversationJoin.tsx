@@ -201,7 +201,7 @@ class ConversationJoin extends React.Component<CombinedProps, State> {
             switch (error.label) {
               default: {
                 const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                  error.label.endsWith(errorType)
+                  error.label.endsWith(errorType),
                 );
                 if (!isValidationError) {
                   this.props.doLogout();
@@ -403,7 +403,7 @@ export default withRouter(
         doRegisterWireless: (registrationData: RegisterData, options: {shouldInitializeClient: boolean}) =>
           dispatch(ROOT_ACTIONS.authAction.doRegisterWireless(registrationData, options)),
         setLastEventDate: (date: Date) => dispatch(ROOT_ACTIONS.notificationAction.setLastEventDate(date)),
-      })
-    )(ConversationJoin)
-  )
+      }),
+    )(ConversationJoin),
+  ),
 );

@@ -80,7 +80,7 @@ export class CallingRepository {
     eventRepository,
     mediaRepository,
     serverTimeHandler,
-    userRepository
+    userRepository,
   ) {
     this.getConfig = this.getConfig.bind(this);
 
@@ -1068,19 +1068,21 @@ export class CallingRepository {
         }
 
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-          action: () => {
-            const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
-            amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
-            window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
-          },
           close: () => {
             const isIncomingCall = callState === CALL_STATE.INCOMING;
             if (isIncomingCall) {
               amplify.publish(WebAppEvents.CALL.STATE.REJECT, newCallId);
             }
           },
+          primaryAction: {
+            action: () => {
+              const terminationReason = TERMINATION_REASON.CONCURRENT_CALL;
+              amplify.publish(WebAppEvents.CALL.STATE.LEAVE, ongoingCallId, terminationReason);
+              window.setTimeout(resolve, TIME_IN_MILLIS.SECOND);
+            },
+            text: actionString,
+          },
           text: {
-            action: actionString,
             message: messageString,
             title: titleString,
           },

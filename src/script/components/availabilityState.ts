@@ -17,37 +17,41 @@
  *
  */
 
-import {AvailabilityType} from '../user/AvailabilityType';
-window.z = window.z || {};
-window.z.components = z.components || {};
+import ko from 'knockout';
 
-z.components.AvailabilityState = class AvailabilityState {
-  constructor(params) {
-    this.availability = params.availability;
-    this.label = params.label;
-    this.showArrow = params.showArrow || false;
-    this.theme = params.theme || false;
-    this.AvailabilityType = AvailabilityType;
-  }
-};
+import {AvailabilityType} from '../user/AvailabilityType';
+
+interface AvailabilityStateParams {
+  availability: () => AvailabilityType;
+  label: string;
+  showArrow?: boolean;
+  theme?: boolean;
+}
 
 ko.components.register('availability-state', {
   template: `
-      <!-- ko if: $data.availability() === AvailabilityType.AVAILABLE -->
+      <!-- ko if: isAvailable() -->
         <availability-available-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="available"></availability-available-icon>
       <!-- /ko -->
-      <!-- ko if: $data.availability() === AvailabilityType.AWAY -->
+      <!-- ko if: isAway() -->
         <availability-away-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="away"></availability-away-icon>
       <!-- /ko -->
-      <!-- ko if: $data.availability() === AvailabilityType.BUSY -->
+      <!-- ko if: isBusy() -->
         <availability-busy-icon class="availability-state-icon" data-uie-name="status-availability-icon" data-uie-value="busy"></availability-busy-icon>
       <!-- /ko -->
-      <!-- ko if: $data.label -->
-        <div class="availability-state-label" data-bind="css: {'accent-text': theme}, text: $data.label" data-uie-name="status-label"></div>
+      <!-- ko if: label -->
+        <div class="availability-state-label" data-bind="css: {'accent-text': theme}, text: label" data-uie-name="status-label"></div>
       <!-- /ko -->
-      <!-- ko if: $data.showArrow -->
+      <!-- ko if: showArrow -->
         <span class="availability-state-arrow"></span>
       <!-- /ko -->
         `,
-  viewModel: z.components.AvailabilityState,
+  viewModel: function({availability, label, showArrow = false, theme = false}: AvailabilityStateParams): void {
+    this.isAvailable = () => availability() === AvailabilityType.AVAILABLE;
+    this.isAway = () => availability() === AvailabilityType.AWAY;
+    this.isBusy = () => availability() === AvailabilityType.BUSY;
+    this.label = label;
+    this.showArrow = showArrow;
+    this.theme = theme;
+  },
 });

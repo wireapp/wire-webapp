@@ -40,7 +40,7 @@ describe('CallLogger', () => {
 
   it('ignore invalid IPv6 addresses', () => {
     expect(callLogger.safeGuard('65ed:5b64[]:ec1c:,,,:6569:2920:f0fd:5b64')).toBe(
-      '65ed:5b64[]:ec1c:,,,:6569:2920:f0fd:5b64'
+      '65ed:5b64[]:ec1c:,,,:6569:2920:f0fd:5b64',
     );
   });
 
@@ -180,7 +180,7 @@ a=ice-options:trickle
 a=sctpmap:5000 webrtc-datachannel 1024`;
 
     expect(callLogger.safeGuard(callLogger.obfuscateSdp(originalSdp)).trim()).toBe(
-      sdpTransform.write(sdpTransform.parse(obfuscatedSdp)).trim()
+      sdpTransform.write(sdpTransform.parse(obfuscatedSdp)).trim(),
     );
   });
 });

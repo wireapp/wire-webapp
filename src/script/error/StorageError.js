@@ -17,17 +17,18 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.StorageError = class StorageError extends z.error.BaseError {
+z.error.StorageError = class StorageError extends BaseError {
   constructor(type, message) {
     super('StorageError', type, message);
   }
 
   static get MESSAGE() {
     return {
-      DATA_STORE_NOT_FOUND: 'Data store not found',
       FAILED_TO_OPEN: 'Failed to open database',
       INVALID_TIME: 'Event time needs to be ISO 8601',
       INVALID_TIMESTAMP: 'Invalid timestamp',
@@ -42,7 +43,6 @@ z.error.StorageError = class StorageError extends z.error.BaseError {
 
   static get TYPE() {
     return {
-      DATA_STORE_NOT_FOUND: 'DATA_STORE_NOT_FOUND',
       FAILED_TO_OPEN: 'FAILED_TO_OPEN',
       INVALID_TIME: 'INVALID_TIME',
       INVALID_TIMESTAMP: 'INVALID_TIMESTAMP',

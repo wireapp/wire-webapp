@@ -132,6 +132,16 @@ class User {
       }
       return this.devices().every(client_et => client_et.meta.isVerified());
     });
+    this.isOnLegalHold = ko.pureComputed(() => {
+      return this.devices().some(client_et => client_et.isLegalHold());
+    });
+
+    const _hasPendingLegalHold = ko.observable(false);
+    this.hasPendingLegalHold = ko.pureComputed({
+      owner: this,
+      read: () => this.is_me && !this.isOnLegalHold() && _hasPendingLegalHold(),
+      write: value => _hasPendingLegalHold(value),
+    });
 
     this.availability = ko.observable(AvailabilityType.NONE);
 
@@ -204,7 +214,7 @@ class User {
     const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
     this.expirationIntervalId = window.setInterval(
       () => this._setRemainingExpirationTime(timestamp),
-      expirationInterval
+      expirationInterval,
     );
 
     window.setTimeout(() => {

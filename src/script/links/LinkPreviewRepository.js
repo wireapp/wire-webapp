@@ -186,7 +186,7 @@ class LinkPreviewRepository {
    */
   _uploadPreviewImage(dataUri) {
     return Promise.resolve(base64ToBlob(dataUri)).then(blob =>
-      this.assetService.uploadImageAsset(blob, {public: true})
+      this.assetService.uploadImageAsset(blob, {public: true}),
     );
   }
 }

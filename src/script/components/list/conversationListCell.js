@@ -23,6 +23,8 @@ import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon'
 import {MediaType} from '../../media/MediaType';
 import {generateCellState} from '../../conversation/ConversationCellState';
 
+import 'Components/availabilityState';
+
 class ConversationListCell {
   constructor({conversation, onJoinCall, is_selected = noop, click = noop}) {
     this.conversation = conversation;

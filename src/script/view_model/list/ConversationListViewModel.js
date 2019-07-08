@@ -28,6 +28,9 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 
+import 'Components/legalHoldDot';
+import 'Components/availabilityState';
+
 export class ConversationListViewModel {
   /**
    * View model for conversation list.
@@ -62,6 +65,8 @@ export class ConversationListViewModel {
     this.contentState = this.contentViewModel.state;
     this.selectedConversation = ko.observable();
 
+    this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
+    this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
     this.isTeam = this.teamRepository.isTeam;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 

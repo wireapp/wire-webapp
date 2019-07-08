@@ -18,6 +18,8 @@
  */
 import {noop} from 'Util/util';
 
+import 'Components/list/participantItem';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 

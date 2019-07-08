@@ -38,5 +38,5 @@ rl.question(
   answer => {
     rl.close();
     return answer === 'yes' ? uploadToCrowdin() : process.exit();
-  }
+  },
 );

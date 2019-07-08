@@ -24,6 +24,8 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {decryptAesAsset} from './AssetCrypto';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
+import {BackendClientError} from '../error/BackendClientError';
+
 export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 
 export interface AssetUrlDataVersion3 {
@@ -75,19 +77,19 @@ export class AssetRemoteData {
         return window.wire.app.service.asset.generateAssetUrlV3(
           this.urlData.assetKey,
           this.urlData.assetToken,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       case 2:
         return window.wire.app.service.asset.generateAssetUrlV2(
           this.urlData.assetId,
           this.urlData.conversationId,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       case 1:
         return window.wire.app.service.asset.generateAssetUrl(
           this.urlData.assetId,
           this.urlData.conversationId,
-          this.urlData.forceCaching
+          this.urlData.forceCaching,
         );
       default:
         throw Error('Cannot map URL data.');
@@ -99,7 +101,7 @@ export class AssetRemoteData {
     otrKey?: Uint8Array,
     sha256?: Uint8Array,
     assetToken?: string,
-    forceCaching: boolean = false
+    forceCaching: boolean = false,
   ): AssetRemoteData {
     return new AssetRemoteData(
       assetKey,
@@ -110,7 +112,7 @@ export class AssetRemoteData {
         version: 3,
       },
       otrKey,
-      sha256
+      sha256,
     );
   }
 
@@ -119,7 +121,7 @@ export class AssetRemoteData {
     assetId: string,
     otrKey: Uint8Array,
     sha256: Uint8Array,
-    forceCaching: boolean = false
+    forceCaching: boolean = false,
   ): AssetRemoteData {
     return new AssetRemoteData(
       `${conversationId}${assetId}`,
@@ -130,7 +132,7 @@ export class AssetRemoteData {
         version: 2,
       },
       otrKey,
-      sha256
+      sha256,
     );
   }
 
@@ -171,8 +173,8 @@ export class AssetRemoteData {
       .catch(error => {
         this.loadPromise = undefined;
         const errorMessage = (error && error.message) || '';
-        const isAssetNotFound = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.NOT_FOUND);
-        const isServerError = errorMessage.endsWith(z.error.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
+        const isAssetNotFound = errorMessage.endsWith(BackendClientError.STATUS_CODE.NOT_FOUND);
+        const isServerError = errorMessage.endsWith(BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR);
 
         const isExpectedError = isAssetNotFound || isServerError;
         if (!isExpectedError) {

@@ -17,10 +17,12 @@
  *
  */
 
+import {BaseError} from './BaseError';
+
 window.z = window.z || {};
 window.z.error = z.error || {};
 
-z.error.CryptographyError = class CryptographyError extends z.error.BaseError {
+z.error.CryptographyError = class CryptographyError extends BaseError {
   constructor(type, message) {
     super('CryptographyError', type, message);
   }

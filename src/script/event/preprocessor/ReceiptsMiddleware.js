@@ -22,6 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 export class ReceiptsMiddleware {
   /**
@@ -56,6 +57,9 @@ export class ReceiptsMiddleware {
           if (conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
+            event.data.legal_hold_status = conversation.hasLegalHold
+              ? LegalHoldStatus.ENABLED
+              : LegalHoldStatus.DISABLED;
           }
           return event;
         });
@@ -68,7 +72,7 @@ export class ReceiptsMiddleware {
             originalEvents.forEach(originalEvent => this._updateConfirmationStatus(originalEvent, event));
             this.logger.info(
               `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
-              originalEvents
+              originalEvents,
             );
           })
           .then(() => event);

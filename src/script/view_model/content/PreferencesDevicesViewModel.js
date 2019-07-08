@@ -23,6 +23,7 @@ import {formatTimestamp} from 'Util/TimeUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {ContentViewModel} from '../ContentViewModel';
+import {sortUserDevices} from 'Components/userDevices';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -47,7 +48,10 @@ z.viewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.activationDate = ko.observable();
     // all clients except the current client
     this.devices = ko.pureComputed(() => {
-      return this.clientRepository.clients().filter(clientEntity => clientEntity.id !== this.currentClient().id);
+      const clients = this.clientRepository
+        .clients()
+        .filter(clientEntity => clientEntity.id !== this.currentClient().id);
+      return sortUserDevices(clients);
     });
     this.localFingerprint = ko.observableArray([]);
     this.selfUser = this.userRepository.self;

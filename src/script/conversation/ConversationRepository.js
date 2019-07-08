@@ -34,6 +34,7 @@ import {
   MessageHide,
   Reaction,
   Text,
+  LegalHoldStatus,
 } from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -42,7 +43,7 @@ import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {t, Declension, joinNames} from 'Util/LocalizerUtil';
-import {getNextItem} from 'Util/ArrayUtil';
+import {getNextItem, getDifference} from 'Util/ArrayUtil';
 import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
@@ -97,6 +98,10 @@ import {MessageCategory} from '../message/MessageCategory';
 import {ReactionType} from '../message/ReactionType';
 import {Config} from '../auth/config';
 
+import {BaseError} from '../error/BaseError';
+import {BackendClientError} from '../error/BackendClientError';
+import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from './ConversationLegalHoldStateHandler';
+
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
   static get CONFIG() {
@@ -150,7 +155,7 @@ export class ConversationRepository {
     team_repository,
     user_repository,
     propertyRepository,
-    assetUploader
+    assetUploader,
   ) {
     this.eventRepository = eventRepository;
     this.eventService = eventRepository.eventService;
@@ -168,19 +173,20 @@ export class ConversationRepository {
     this.assetUploader = assetUploader;
     this.logger = getLogger('ConversationRepository');
 
-    this.conversationMapper = new ConversationMapper();
+    this.conversationMapper = new ConversationMapper(this);
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
-      this.serverTimeHandler
+      this.serverTimeHandler,
     );
+    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(this, this.serverTimeHandler);
     this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
       this.eventRepository,
       this.serverTimeHandler,
-      this.user_repository
+      this.user_repository,
     );
 
     this.active_conversation = ko.observable();
@@ -209,14 +215,14 @@ export class ConversationRepository {
     });
 
     this.filtered_conversations = ko.pureComputed(() => {
-      return this.conversations().filter(conversation_et => {
+      return this.conversations().filter(conversationEntity => {
         const states_to_filter = [ConnectionStatus.BLOCKED, ConnectionStatus.CANCELLED, ConnectionStatus.PENDING];
 
-        if (conversation_et.isSelf() || states_to_filter.includes(conversation_et.connection().status())) {
+        if (conversationEntity.isSelf() || states_to_filter.includes(conversationEntity.connection().status())) {
           return false;
         }
 
-        return !(conversation_et.is_cleared() && conversation_et.removed_from_conversation());
+        return !(conversationEntity.is_cleared() && conversationEntity.removed_from_conversation());
       });
     });
 
@@ -340,10 +346,14 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   cleanup_conversations() {
-    this.conversations().forEach(conversation_et => {
-      if (conversation_et.isGroup() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
-        this.conversation_service.delete_conversation_from_db(conversation_et.id);
-        this.delete_conversation(conversation_et.id);
+    this.conversations().forEach(conversationEntity => {
+      if (
+        conversationEntity.isGroup() &&
+        conversationEntity.is_cleared() &&
+        conversationEntity.removed_from_conversation()
+      ) {
+        this.conversation_service.delete_conversation_from_db(conversationEntity.id);
+        this.delete_conversation(conversationEntity.id);
       }
     });
   }
@@ -370,7 +380,7 @@ export class ConversationRepository {
         name: groupName,
         users: userIds,
       },
-      options
+      options,
     );
 
     if (this.team().id) {
@@ -438,15 +448,15 @@ export class ConversationRepository {
     return this.conversation_service
       .get_conversation_by_id(conversation_id)
       .then(response => {
-        const conversation_et = this.mapConversations(response);
+        const conversationEntity = this.mapConversations(response);
 
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
-        this.save_conversation(conversation_et);
+        this.save_conversation(conversationEntity);
 
-        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversation_et));
+        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
         delete this.fetching_conversations[conversation_id];
 
-        return conversation_et;
+        return conversationEntity;
       })
       .catch(() => {
         const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
@@ -525,7 +535,7 @@ export class ConversationRepository {
     conversationEntity,
     messageId,
     skipConversationMessages = false,
-    ensureUser = false
+    ensureUser = false,
   ) {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
     const messagePromise = messageEntity
@@ -709,29 +719,29 @@ export class ConversationRepository {
    * Get conversation unread events.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to start from
+   * @param {Conversation} conversationEntity - Conversation to start from
    * @returns {undefined} No return value
    */
-  _get_unread_events(conversation_et) {
-    const first_message = conversation_et.getFirstMessage();
-    const lower_bound = new Date(conversation_et.last_read_timestamp());
+  _get_unread_events(conversationEntity) {
+    const first_message = conversationEntity.getFirstMessage();
+    const lower_bound = new Date(conversationEntity.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
+      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
-      conversation_et.is_pending(true);
+      conversationEntity.is_pending(true);
 
       return this.eventService
-        .loadPrecedingEvents(conversation_et.id, lower_bound, upper_bound)
+        .loadPrecedingEvents(conversationEntity.id, lower_bound, upper_bound)
         .then(events => {
           if (events.length) {
-            this._addEventsToConversation(events, conversation_et);
+            this._addEventsToConversation(events, conversationEntity);
           }
-          conversation_et.is_pending(false);
+          conversationEntity.is_pending(false);
         })
         .catch(error => {
-          this.logger.info(`Could not load unread events for conversation: ${conversation_et.id}`, error);
+          this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
         });
     }
   }
@@ -742,8 +752,8 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get1To1Conversation(user_et).then(conversation_et =>
-      conversation_et.status(ConversationStatus.CURRENT_MEMBER)
+    this.get1To1Conversation(user_et).then(conversationEntity =>
+      conversationEntity.status(ConversationStatus.CURRENT_MEMBER),
     );
   }
 
@@ -809,7 +819,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   delete_conversation(conversation_id) {
-    this.conversations.remove(conversation_et => conversation_et.id === conversation_id);
+    this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
   }
 
   /**
@@ -822,8 +832,8 @@ export class ConversationRepository {
   }
 
   get_all_users_in_conversation(conversation_id) {
-    return this.get_conversation_by_id(conversation_id).then(conversation_et =>
-      [this.selfUser()].concat(conversation_et.participating_user_ets())
+    return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
+      [this.selfUser()].concat(conversationEntity.participating_user_ets()),
     );
   }
 
@@ -905,11 +915,11 @@ export class ConversationRepository {
   /**
    * Get the next unarchived conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to start from
+   * @param {Conversation} conversationEntity - Conversation to start from
    * @returns {Conversation} Next conversation
    */
-  get_next_conversation(conversation_et) {
-    return getNextItem(this.conversations_unarchived(), conversation_et);
+  get_next_conversation(conversationEntity) {
+    return getNextItem(this.conversations_unarchived(), conversationEntity);
   }
 
   /**
@@ -918,8 +928,8 @@ export class ConversationRepository {
    * @returns {Conversation} Most recent conversation
    */
   getMostRecentConversation(allConversations = false) {
-    const [conversation_et] = allConversations ? this.sorted_conversations() : this.conversations_unarchived();
-    return conversation_et;
+    const [conversationEntity] = allConversations ? this.sorted_conversations() : this.conversations_unarchived();
+    return conversationEntity;
   }
 
   /**
@@ -930,7 +940,7 @@ export class ConversationRepository {
     return this.conversation_service.get_active_conversations_from_db().then(conversation_ids => {
       return conversation_ids
         .map(conversation_id => this.find_conversation_by_id(conversation_id))
-        .filter(conversation_et => conversation_et);
+        .filter(conversationEntity => conversationEntity);
     });
   }
 
@@ -986,12 +996,12 @@ export class ConversationRepository {
 
   /**
    * Check whether conversation is currently displayed.
-   * @param {Conversation} conversation_et - Conversation to be saved
+   * @param {Conversation} conversationEntity - Conversation to be saved
    * @returns {boolean} Is the conversation active
    */
-  is_active_conversation(conversation_et) {
+  is_active_conversation(conversationEntity) {
     if (this.active_conversation()) {
-      return this.active_conversation().id === conversation_et.id;
+      return this.active_conversation().id === conversationEntity.id;
     }
   }
 
@@ -1008,9 +1018,9 @@ export class ConversationRepository {
     }
 
     return this.get_conversation_by_id(conversation_id)
-      .then(conversation_et => {
-        return this.get_message_in_conversation_by_id(conversation_et, message_id).then(
-          message_et => conversation_et.last_read_timestamp() >= message_et.timestamp()
+      .then(conversationEntity => {
+        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(
+          message_et => conversationEntity.last_read_timestamp() >= message_et.timestamp(),
         );
       })
       .catch(error => {
@@ -1069,9 +1079,9 @@ export class ConversationRepository {
           conversationEntity.type(ConversationType.ONE2ONE);
         }
 
-        this.updateParticipatingUserEntities(conversationEntity).then(updated_conversation_et => {
+        this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
           if (show_conversation) {
-            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updated_conversation_et);
+            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
           }
 
           this.conversations.notifySubscribers();
@@ -1118,7 +1128,7 @@ export class ConversationRepository {
   }
 
   map_guest_status_self() {
-    this.filtered_conversations().forEach(conversation_et => this._mapGuestStatusSelf(conversation_et));
+    this.filtered_conversations().forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
     if (this.isTeam()) {
       this.selfUser().inTeam(true);
@@ -1167,34 +1177,34 @@ export class ConversationRepository {
 
   /**
    * Save a conversation in the repository.
-   * @param {Conversation} conversation_et - Conversation to be saved in the repository
+   * @param {Conversation} conversationEntity - Conversation to be saved in the repository
    * @returns {Promise} Resolves when conversation was saved
    */
-  save_conversation(conversation_et) {
-    const conversationEntity = this.find_conversation_by_id(conversation_et.id);
-    if (!conversationEntity) {
-      this.conversations.push(conversation_et);
-      return this.save_conversation_state_in_db(conversation_et);
+  save_conversation(conversationEntity) {
+    const localEntity = this.find_conversation_by_id(conversationEntity.id);
+    if (!localEntity) {
+      this.conversations.push(conversationEntity);
+      return this.save_conversation_state_in_db(conversationEntity);
     }
-    return Promise.resolve(conversationEntity);
+    return Promise.resolve(localEntity);
   }
 
   /**
    * Persists a conversation state in the database.
-   * @param {Conversation} conversation_et - Conversation of which the state should be persisted
+   * @param {Conversation} conversationEntity - Conversation of which the state should be persisted
    * @returns {Promise} Resolves when conversation was saved
    */
-  save_conversation_state_in_db(conversation_et) {
-    return this.conversation_service.save_conversation_state_in_db(conversation_et);
+  save_conversation_state_in_db(conversationEntity) {
+    return this.conversation_service.save_conversation_state_in_db(conversationEntity);
   }
 
   /**
    * Save conversations in the repository.
-   * @param {Array<Conversation>} conversation_ets - Conversations to be saved in the repository
+   * @param {Array<Conversation>} conversationEntities - Conversations to be saved in the repository
    * @returns {undefined} No return value
    */
-  save_conversations(conversation_ets) {
-    koArrayPushAll(this.conversations, conversation_ets);
+  save_conversations(conversationEntities) {
+    koArrayPushAll(this.conversations, conversationEntities);
   }
 
   /**
@@ -1295,15 +1305,15 @@ export class ConversationRepository {
 
   _handleAddToConversationError(error, conversationEntity, userIds) {
     switch (error.label) {
-      case z.error.BackendClientError.LABEL.NOT_CONNECTED: {
+      case BackendClientError.LABEL.NOT_CONNECTED: {
         this._handleUsersNotConnected(userIds);
         break;
       }
 
-      case z.error.BackendClientError.LABEL.BAD_GATEWAY:
-      case z.error.BackendClientError.LABEL.SERVER_ERROR:
-      case z.error.BackendClientError.LABEL.SERVICE_DISABLED:
-      case z.error.BackendClientError.LABEL.TOO_MANY_BOTS: {
+      case BackendClientError.LABEL.BAD_GATEWAY:
+      case BackendClientError.LABEL.SERVER_ERROR:
+      case BackendClientError.LABEL.SERVICE_DISABLED:
+      case BackendClientError.LABEL.TOO_MANY_BOTS: {
         const messageText = t('modalServiceUnavailableMessage');
         const titleText = t('modalServiceUnavailableHeadline');
 
@@ -1311,7 +1321,7 @@ export class ConversationRepository {
         break;
       }
 
-      case z.error.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+      case BackendClientError.LABEL.TOO_MANY_MEMBERS: {
         this._handleTooManyMembersError(conversationEntity.getNumberOfParticipants());
         break;
       }
@@ -1328,27 +1338,27 @@ export class ConversationRepository {
    * @note According to spec we archive a conversation when we clear it.
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
-   * @param {Conversation} conversation_et - Conversation to clear
-   * @param {boolean} [leave_conversation=false] - Should we leave the conversation before clearing the content?
+   * @param {Conversation} conversationEntity - Conversation to clear
+   * @param {boolean} [leaveConversation=false] - Should we leave the conversation before clearing the content?
    * @returns {undefined} No return value
    */
-  clear_conversation(conversation_et, leave_conversation = false) {
-    const is_active_conversation = this.is_active_conversation(conversation_et);
-    const next_conversation_et = this.get_next_conversation(conversation_et);
+  clear_conversation(conversationEntity, leaveConversation = false) {
+    const isActiveConversation = this.is_active_conversation(conversationEntity);
+    const nextConversationEntity = this.get_next_conversation(conversationEntity);
 
-    if (leave_conversation) {
-      conversation_et.status(ConversationStatus.PAST_MEMBER);
+    if (leaveConversation) {
+      conversationEntity.status(ConversationStatus.PAST_MEMBER);
     }
 
-    this._updateClearedTimestamp(conversation_et);
-    this._clear_conversation(conversation_et);
+    this._updateClearedTimestamp(conversationEntity);
+    this._clear_conversation(conversationEntity);
 
-    if (leave_conversation) {
-      this.removeMember(conversation_et, this.selfUser().id);
+    if (leaveConversation) {
+      this.removeMember(conversationEntity, this.selfUser().id);
     }
 
-    if (is_active_conversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, next_conversation_et);
+    if (isActiveConversation) {
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
     }
   }
 
@@ -1428,12 +1438,12 @@ export class ConversationRepository {
   /**
    * Rename conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to rename
+   * @param {Conversation} conversationEntity - Conversation to rename
    * @param {string} name - New conversation name
    * @returns {Promise} Resolves when conversation was renamed
    */
-  renameConversation(conversation_et, name) {
-    return this.conversation_service.updateConversationName(conversation_et.id, name).then(response => {
+  renameConversation(conversationEntity, name) {
+    return this.conversation_service.updateConversationName(conversationEntity.id, name).then(response => {
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
         return response;
@@ -1545,12 +1555,12 @@ export class ConversationRepository {
    */
   setNotificationState(conversationEntity, notificationState) {
     if (!conversationEntity || notificationState === undefined) {
-      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.MISSING_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER));
     }
 
     const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
-      return Promise.reject(new z.error.ConversationError(z.error.BaseError.TYPE.INVALID_PARAMETER));
+      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER));
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -1636,7 +1646,7 @@ export class ConversationRepository {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
           this.logger.error(logMessage);
 
-          const isNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+          const isNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
           if (!isNotFound) {
             throw error;
           }
@@ -1666,25 +1676,25 @@ export class ConversationRepository {
    * Clears conversation content from view and the database.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity to delete
+   * @param {Conversation} conversationEntity - Conversation entity to delete
    * @param {number} [timestamp] - Optional timestamps for which messages to remove
    * @returns {undefined} No return value
    */
-  _clear_conversation(conversation_et, timestamp) {
-    this._deleteMessages(conversation_et, timestamp);
+  _clear_conversation(conversationEntity, timestamp) {
+    this._deleteMessages(conversationEntity, timestamp);
 
-    if (conversation_et.removed_from_conversation()) {
-      this.conversation_service.delete_conversation_from_db(conversation_et.id);
-      this.delete_conversation(conversation_et.id);
+    if (conversationEntity.removed_from_conversation()) {
+      this.conversation_service.delete_conversation_from_db(conversationEntity.id);
+      this.delete_conversation(conversationEntity.id);
     }
   }
 
   _handleConversationCreateError(error, userIds) {
     switch (error.label) {
-      case z.error.BackendClientError.LABEL.CLIENT_ERROR:
+      case BackendClientError.LABEL.CLIENT_ERROR:
         this._handleTooManyMembersError();
         break;
-      case z.error.BackendClientError.LABEL.NOT_CONNECTED:
+      case BackendClientError.LABEL.NOT_CONNECTED:
         this._handleUsersNotConnected(userIds);
         break;
       default:
@@ -1748,6 +1758,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+          legalHoldStatus: this.legalHoldStatus(conversationEntity),
           retention,
         };
 
@@ -1792,12 +1803,12 @@ export class ConversationRepository {
   /**
    * Send asset metadata message to specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation that should receive the file
+   * @param {Conversation} conversationEntity - Conversation that should receive the file
    * @param {File} file - File to send
    * @param {boolean} allowImageDetection - allow images to be treated as images (not files)
    * @returns {Promise} Resolves when the asset metadata was sent
    */
-  send_asset_metadata(conversation_et, file, allowImageDetection) {
+  send_asset_metadata(conversationEntity, file, allowImageDetection) {
     return AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
@@ -1817,7 +1828,8 @@ export class ConversationRepository {
 
         const protoAsset = new Asset({
           [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+          [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
         });
 
         return protoAsset;
@@ -1828,14 +1840,14 @@ export class ConversationRepository {
           messageId: createRandomUuid(),
         });
 
-        if (conversation_et.messageTimer()) {
-          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversation_et.messageTimer());
+        if (conversationEntity.messageTimer()) {
+          genericMessage = this._wrap_in_ephemeral_message(genericMessage, conversationEntity.messageTimer());
         }
 
-        return this._send_and_inject_generic_message(conversation_et, genericMessage);
+        return this._send_and_inject_generic_message(conversationEntity, genericMessage);
       })
       .catch(error => {
-        const log = `Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`;
+        const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
         this.logger.warn(log, error);
 
         if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -1862,6 +1874,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
+          legalHoldStatus: this.legalHoldStatus(conversationEntity),
           retention,
         };
 
@@ -1872,6 +1885,7 @@ export class ConversationRepository {
             const protoAsset = new Asset({
               [PROTO_MESSAGE_TYPE.ASSET_PREVIEW]: assetPreview,
               [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+              [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
             });
 
             const genericMessage = new GenericMessage({
@@ -1892,17 +1906,18 @@ export class ConversationRepository {
   /**
    * Send asset upload failed message to specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation that should receive the file
+   * @param {Conversation} conversationEntity - Conversation that should receive the file
    * @param {string} messageId - ID of the metadata message
    * @param {AssetUploadFailedReason} [reason=AssetUploadFailedReason.FAILED] - Cause for the failed upload (optional)
    * @returns {Promise} Resolves when the asset failure was sent
    */
-  send_asset_upload_failed(conversation_et, messageId, reason = AssetUploadFailedReason.FAILED) {
+  send_asset_upload_failed(conversationEntity, messageId, reason = AssetUploadFailedReason.FAILED) {
     const wasCancelled = reason === AssetUploadFailedReason.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
       [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation_et),
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
     });
 
     const generic_message = new GenericMessage({
@@ -1910,7 +1925,7 @@ export class ConversationRepository {
       messageId,
     });
 
-    return this._send_and_inject_generic_message(conversation_et, generic_message);
+    return this._send_and_inject_generic_message(conversationEntity, generic_message);
   }
 
   /**
@@ -2006,6 +2021,7 @@ export class ConversationRepository {
   sendKnock(conversationEntity) {
     const protoKnock = new Knock({
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
       hotKnock: false,
     });
 
@@ -2050,7 +2066,8 @@ export class ConversationRepository {
             mentionEntities,
             quoteEntity,
             [linkPreview],
-            this.expectReadReceipt(conversationEntity)
+            this.expectReadReceipt(conversationEntity),
+            this.legalHoldStatus(conversationEntity),
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
@@ -2096,6 +2113,7 @@ export class ConversationRepository {
     const protoLocation = new Location({
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       latitude,
+      legalHoldStatus: this.legalHoldStatus(conversationEntity),
       longitude,
       name,
       zoom,
@@ -2135,7 +2153,8 @@ export class ConversationRepository {
       mentionEntities,
       undefined,
       undefined,
-      this.expectReadReceipt(conversationEntity)
+      this.expectReadReceipt(conversationEntity),
+      this.legalHoldStatus(conversationEntity),
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
@@ -2158,16 +2177,16 @@ export class ConversationRepository {
   /**
    * Toggle like status of message.
    *
-   * @param {Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversationEntity - Conversation entity
    * @param {Message} message_et - Message to react to
    * @returns {undefined} No return value
    */
-  toggle_like(conversation_et, message_et) {
-    if (!conversation_et.removed_from_conversation()) {
+  toggle_like(conversationEntity, message_et) {
+    if (!conversationEntity.removed_from_conversation()) {
       const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
-      window.setTimeout(() => this.sendReaction(conversation_et, message_et, reaction), 100);
+      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
     }
   }
 
@@ -2241,7 +2260,8 @@ export class ConversationRepository {
       mentionEntities,
       quoteEntity,
       undefined,
-      this.expectReadReceipt(conversationEntity)
+      this.expectReadReceipt(conversationEntity),
+      this.legalHoldStatus(conversationEntity),
     );
     let genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
@@ -2277,8 +2297,16 @@ export class ConversationRepository {
       });
   }
 
-  _createTextProto(messageId, textMessage, mentionEntities, quoteEntity, linkPreviews, expectsReadConfirmation) {
-    const protoText = new Text({content: textMessage});
+  _createTextProto(
+    messageId,
+    textMessage,
+    mentionEntities,
+    quoteEntity,
+    linkPreviews,
+    expectsReadConfirmation,
+    legalHoldStatus,
+  ) {
+    const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
 
     if (mentionEntities && mentionEntities.length) {
       const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
@@ -2310,10 +2338,6 @@ export class ConversationRepository {
     if (linkPreviews && linkPreviews.length) {
       this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
       protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
-    }
-
-    if (expectsReadConfirmation) {
-      protoText[PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION] = expectsReadConfirmation;
     }
 
     return protoText;
@@ -2516,7 +2540,7 @@ export class ConversationRepository {
         });
       })
       .catch(error => {
-        const isRequestTooLarge = error.code === z.error.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        const isRequestTooLarge = error.code === BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
         if (isRequestTooLarge) {
           return this._sendExternalGenericMessage(eventInfoEntity);
         }
@@ -2555,7 +2579,7 @@ export class ConversationRepository {
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
       );
     }
 
@@ -2566,7 +2590,7 @@ export class ConversationRepository {
         return response;
       })
       .catch(error => {
-        const isUnknownClient = error.label === z.error.BackendClientError.LABEL.UNKNOWN_CLIENT;
+        const isUnknownClient = error.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
         if (isUnknownClient) {
           return this.client_repository.removeLocalClient();
         }
@@ -2587,11 +2611,57 @@ export class ConversationRepository {
           .then(() => {
             this.logger.info(
               `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
-              updatedPayload
+              updatedPayload,
             );
             return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
       });
+  }
+
+  async updateAllClients(conversation) {
+    const sender = this.client_repository.currentClient().id;
+    try {
+      await this.conversation_service.post_encrypted_message(conversation.id, {recipients: {}, sender});
+    } catch (error) {
+      if (error.missing) {
+        const remoteUserClients = error.missing;
+        const localUserClients = await this.create_recipients(conversation.id);
+        const selfId = this.selfUser().id;
+
+        const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
+          if (userId === selfId) {
+            return deleted;
+          }
+          const deletedClients = getDifference(remoteUserClients[userId], clients);
+          if (deletedClients.length) {
+            deleted[userId] = deletedClients;
+          }
+          return deleted;
+        }, {});
+
+        Object.entries(deletedUserClients).forEach(([userId, clients]) => {
+          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
+        });
+
+        const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
+          if (userId === selfId) {
+            return missing;
+          }
+          const missingClients = getDifference(localUserClients[userId] || [], clients);
+          if (missingClients.length) {
+            missing.push(userId);
+          }
+          return missing;
+        }, []);
+
+        await Promise.all(
+          missingUserIds.map(async userId => {
+            const clients = await this.user_repository.getClientsByUserId(userId, false);
+            await Promise.all(clients.map(client => this.user_repository.addClientToUser(userId, client)));
+          }),
+        );
+      }
+    }
   }
 
   _grantOutgoingMessage(eventInfoEntity, userIds) {
@@ -2600,7 +2670,11 @@ export class ConversationRepository {
     if (allowedMessageTypes.includes(messageType)) {
       return Promise.resolve();
     }
-
+    const message = eventInfoEntity.genericMessage;
+    if (message) {
+      const lhStatus = this.legalHoldStatus(this.find_conversation_by_id(eventInfoEntity.conversationId));
+      message[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = lhStatus;
+    }
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
@@ -2611,11 +2685,29 @@ export class ConversationRepository {
 
   grantMessage(eventInfoEntity, consentType, userIds) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
+      const legalHoldMessageTypes = [
+        GENERIC_MESSAGE_TYPE.ASSET,
+        GENERIC_MESSAGE_TYPE.EDITED,
+        GENERIC_MESSAGE_TYPE.IMAGE,
+        GENERIC_MESSAGE_TYPE.TEXT,
+      ];
+      const isLegalHoldMessageType =
+        eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
+      const needsLegalHoldApproval =
+        !this.selfUser().isOnLegalHold() && conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
-      if (!conversationDegraded) {
+      if (!conversationDegraded && !needsLegalHoldApproval) {
         return false;
+      }
+
+      if (!conversationDegraded) {
+        return showLegalHoldWarning(conversationEntity);
+      }
+
+      if (needsLegalHoldApproval) {
+        return showLegalHoldWarning(conversationEntity, true);
       }
 
       return new Promise((resolve, reject) => {
@@ -2685,20 +2777,21 @@ export class ConversationRepository {
             }
 
             amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-              action: () => {
-                sendAnyway = true;
-                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-
-                resolve(true);
-              },
               close: () => {
                 if (!sendAnyway) {
                   const errorType = z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
                   reject(new z.error.ConversationError(errorType));
                 }
               },
+              primaryAction: {
+                action: () => {
+                  sendAnyway = true;
+                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: actionString,
+              },
               text: {
-                action: actionString,
                 message: messageString,
                 title: titleString,
               },
@@ -2730,58 +2823,61 @@ export class ConversationRepository {
   /**
    * Post images to a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to post the images
+   * @param {Conversation} conversationEntity - Conversation to post the images
    * @param {Array|FileList} images - Images
    * @returns {undefined} No return value
    */
-  upload_images(conversation_et, images) {
-    this.upload_files(conversation_et, images, true);
+  upload_images(conversationEntity, images) {
+    this.upload_files(conversationEntity, images, true);
   }
 
   /**
    * Post files to a conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to post the files
+   * @param {Conversation} conversationEntity - Conversation to post the files
    * @param {Array|FileList} files - files
    * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {undefined} No return value
    */
-  upload_files(conversation_et, files, asImage) {
-    if (this._can_upload_assets_to_conversation(conversation_et)) {
-      Array.from(files).forEach(file => this.upload_file(conversation_et, file, asImage));
+  upload_files(conversationEntity, files, asImage) {
+    if (this._can_upload_assets_to_conversation(conversationEntity)) {
+      Array.from(files).forEach(file => this.upload_file(conversationEntity, file, asImage));
     }
   }
 
   /**
    * Post file to a conversation using v3
    *
-   * @param {Conversation} conversation_et - Conversation to post the file
+   * @param {Conversation} conversationEntity - Conversation to post the file
    * @param {Object} file - File object
    * @param {AssetType} [asImage=false] - whether or not the file should be treated as an image
    * @returns {Promise} Resolves when file was uploaded
    */
-  upload_file(conversation_et, file, asImage) {
+  upload_file(conversationEntity, file, asImage) {
     let message_id;
     const upload_started = Date.now();
 
-    return this.send_asset_metadata(conversation_et, file, asImage)
+    return this.send_asset_metadata(conversationEntity, file, asImage)
       .then(({id}) => {
         message_id = id;
-        return this.sendAssetPreview(conversation_et, file, message_id);
+        return this.sendAssetPreview(conversationEntity, file, message_id);
       })
-      .then(() => this.send_asset_remotedata(conversation_et, file, message_id, asImage))
+      .then(() => this.send_asset_remotedata(conversationEntity, file, message_id, asImage))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / TIME_IN_MILLIS.SECOND;
-        this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
+        this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${upload_duration}`);
       })
       .catch(error => {
         if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
         }
 
-        this.logger.error(`Failed to upload asset for conversation '${conversation_et.id}': ${error.message}`, error);
-        return this.get_message_in_conversation_by_id(conversation_et, message_id).then(message_et => {
-          this.send_asset_upload_failed(conversation_et, message_et.id);
+        this.logger.error(
+          `Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`,
+          error,
+        );
+        return this.get_message_in_conversation_by_id(conversationEntity, message_id).then(message_et => {
+          this.send_asset_upload_failed(conversationEntity, message_et.id);
           return this.update_message_as_upload_failed(message_et);
         });
       });
@@ -2824,7 +2920,7 @@ export class ConversationRepository {
         return this._delete_message_by_id(conversationEntity, messageId);
       })
       .catch(error => {
-        const isConversationNotFound = error.code === z.error.BackendClientError.STATUS_CODE.NOT_FOUND;
+        const isConversationNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
         if (isConversationNotFound) {
           this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
           return this.deleteMessage(conversationEntity, messageEntity);
@@ -2864,7 +2960,7 @@ export class ConversationRepository {
       .catch(error => {
         this.logger.info(
           `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
-          error
+          error,
         );
         throw error;
       });
@@ -2872,11 +2968,11 @@ export class ConversationRepository {
 
   /**
    * Can user upload assets to conversation.
-   * @param {Conversation} conversation_et - Conversation to check
+   * @param {Conversation} conversationEntity - Conversation to check
    * @returns {boolean} Can assets be uploaded
    */
-  _can_upload_assets_to_conversation(conversation_et) {
-    return !!conversation_et && !conversation_et.isRequest() && !conversation_et.removed_from_conversation();
+  _can_upload_assets_to_conversation(conversationEntity) {
+    return !!conversationEntity && !conversationEntity.isRequest() && !conversationEntity.removed_from_conversation();
   }
 
   //##############################################################################
@@ -3078,7 +3174,7 @@ export class ConversationRepository {
   _triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource) {
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
     const handlePromises = conversationEventHandlers.map(handler =>
-      handler.handleConversationEvent(conversationEntity, eventJson, eventSource)
+      handler.handleConversationEvent(conversationEntity, eventJson, eventSource),
     );
     return Promise.all(handlePromises).then(() => conversationEntity);
   }
@@ -3176,10 +3272,10 @@ export class ConversationRepository {
    */
   on_missed_events() {
     this.filtered_conversations()
-      .filter(conversation_et => !conversation_et.removed_from_conversation())
-      .forEach(conversation_et => {
+      .filter(conversationEntity => !conversationEntity.removed_from_conversation())
+      .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, currentTimestamp);
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
   }
@@ -3204,13 +3300,13 @@ export class ConversationRepository {
    * An asset was uploaded.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
+   * @param {Conversation} conversationEntity - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.asset-upload-complete' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_asset_upload_complete(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then(message_et => this.update_message_as_upload_complete(conversation_et, message_et, event_json))
+  _on_asset_upload_complete(conversationEntity, event_json) {
+    return this.get_message_in_conversation_by_id(conversationEntity, event_json.id)
+      .then(message_et => this.update_message_as_upload_complete(conversationEntity, message_et, event_json))
       .catch(error => {
         if (error.type !== z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
@@ -3532,7 +3628,7 @@ export class ConversationRepository {
       .catch(error => {
         this.logger.info(
           `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
-          error
+          error,
         );
         throw error;
       });
@@ -3695,13 +3791,13 @@ export class ConversationRepository {
    * Fetch all unread events and users of a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation fetch events and users for
+   * @param {Conversation} conversationEntity - Conversation fetch events and users for
    * @returns {undefined} No return value
    */
-  _fetch_users_and_events(conversation_et) {
-    if (!conversation_et.is_loaded() && !conversation_et.is_pending()) {
-      this.updateParticipatingUserEntities(conversation_et);
-      this._get_unread_events(conversation_et);
+  _fetch_users_and_events(conversationEntity) {
+    if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
+      this.updateParticipatingUserEntities(conversationEntity);
+      this._get_unread_events(conversationEntity);
     }
   }
 
@@ -3782,11 +3878,11 @@ export class ConversationRepository {
    * Delete message from UI and database. Primary key is used to delete message in database.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {Conversation} conversationEntity - Conversation that contains the message
    * @param {Message} message_et - Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message(conversation_et, message_et) {
+  _delete_message(conversationEntity, message_et) {
     return this.eventService.deleteEventByKey(message_et.primary_key);
   }
 
@@ -3794,12 +3890,12 @@ export class ConversationRepository {
    * Delete message from UI and database. Primary key is used to delete message in database.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {Conversation} conversationEntity - Conversation that contains the message
    * @param {string} message_id - ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message_by_id(conversation_et, message_id) {
-    return this.eventService.deleteEvent(conversation_et.id, message_id);
+  _delete_message_by_id(conversationEntity, message_id) {
+    return this.eventService.deleteEvent(conversationEntity.id, message_id);
   }
 
   /**
@@ -3875,21 +3971,25 @@ export class ConversationRepository {
     return false;
   }
 
+  legalHoldStatus(conversationEntity) {
+    return conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
+  }
+
   /**
    * Update asset in UI and DB as completed.
    *
-   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {Conversation} conversationEntity - Conversation that contains the message
    * @param {Message} message_et - Message to update
    * @param {Object} event_json - Uploaded asset event information
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_complete(conversation_et, message_et, event_json) {
+  update_message_as_upload_complete(conversationEntity, message_et, event_json) {
     const {id, key, otr_key, sha256, token} = event_json.data;
     const asset_et = message_et.get_first_asset();
 
     const resource = key
       ? AssetRemoteData.v3(key, otr_key, sha256, token)
-      : AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
+      : AssetRemoteData.v2(conversationEntity.id, id, otr_key, sha256);
 
     asset_et.original_resource(resource);
     asset_et.status(AssetTransferState.UPLOADED);

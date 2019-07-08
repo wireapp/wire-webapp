@@ -28,8 +28,6 @@ import {noop} from 'Util/util';
 import {WebAppEvents} from '../event/WebApp';
 
 const defaultContent = {
-  actionFn: noop,
-  actionText: '',
   checkboxLabel: '',
   closeFn: noop,
   currentType: null,
@@ -38,8 +36,8 @@ const defaultContent = {
   messageText: '',
   modalUie: '',
   onBgClick: noop,
-  secondaryFn: noop,
-  secondaryText: '',
+  primaryAction: {},
+  secondaryAction: [],
   titleText: '',
 };
 
@@ -50,17 +48,20 @@ const States = {
   READY: 'ModalState.READY',
 };
 
+const Types = {
+  ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
+  ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
+  ACKNOWLEDGE: 'modal-template-acknowledge',
+  CONFIRM: 'modal-template-confirm',
+  INPUT: 'modal-template-input',
+  MULTI_ACTIONS: 'modal-multi-actions',
+  OPTION: 'modal-template-option',
+  SESSION_RESET: 'modal-session-reset',
+};
+
 export class ModalsViewModel {
   static get TYPE() {
-    return {
-      ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
-      ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
-      ACKNOWLEDGE: 'modal-template-acknowledge',
-      CONFIRM: 'modal-template-confirm',
-      INPUT: 'modal-template-input',
-      OPTION: 'modal-template-option',
-      SESSION_RESET: 'modal-session-reset',
-    };
+    return Types;
   }
 
   constructor() {
@@ -115,14 +116,21 @@ export class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _showModal = (type, options = {}) => {
-    if (!Object.values(ModalsViewModel.TYPE).includes(type)) {
+    if (!Object.values(Types).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    const {action = noop, close = noop, data, preventClose = false, secondary = noop, text = {}} = options;
+    const {
+      close = noop,
+      data,
+      preventClose = false,
+      primaryAction,
+      secondaryAction,
+      hideSecondary,
+      showClose = false,
+      text = {},
+    } = options;
     const content = {
-      actionFn: action,
-      actionText: text.action,
       checkboxLabel: text.option,
       closeFn: close,
       currentType: type,
@@ -131,16 +139,17 @@ export class ModalsViewModel {
       messageText: text.message,
       modalUie: type,
       onBgClick: preventClose ? noop : this.hide,
-      secondaryFn: secondary,
-      secondaryText: text.secondary,
+      primaryAction,
+      secondaryAction,
+      showClose,
       titleText: text.title,
     };
 
     switch (type) {
-      case ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES:
+      case Types.ACCOUNT_NEW_DEVICES: {
         content.titleText = t('modalAccountNewDevicesHeadline');
-        content.actionText = t('modalAcknowledgeAction');
-        content.secondaryText = t('modalAccountNewDevicesSecondary');
+        content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
+        content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
         content.messageText = t('modalAccountNewDevicesMessage');
         const deviceList = data
           .map(device => {
@@ -151,60 +160,80 @@ export class ModalsViewModel {
           .join('');
         content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
         break;
-      case ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED:
-        content.actionText = t('modalAcknowledgeAction');
+      }
+      case Types.ACCOUNT_READ_RECEIPTS_CHANGED: {
+        content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
           : t('modalAccountReadReceiptsChangedOffHeadline');
         content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
-      case ModalsViewModel.TYPE.ACKNOWLEDGE:
-        content.actionText = text.action || t('modalAcknowledgeAction');
+      }
+      case Types.ACKNOWLEDGE: {
+        content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
         content.titleText = text.title || t('modalAcknowledgeHeadline');
         content.messageText = !text.htmlMessage && text.message;
         break;
-      case ModalsViewModel.TYPE.CONFIRM:
-        content.secondaryText = t('modalConfirmSecondary');
+      }
+      case Types.CONFIRM: {
+        content.secondaryAction = {...content.secondaryAction, text: t('modalConfirmSecondary')};
         break;
-      case ModalsViewModel.TYPE.INPUT:
-      case ModalsViewModel.TYPE.OPTION:
-        // if secondary text is an empty string, keep it that way
-        content.secondaryText = text.secondary !== undefined ? text.secondary : t('modalOptionSecondary');
+      }
+      case Types.INPUT:
+      case Types.OPTION: {
+        if (!hideSecondary) {
+          content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
+        }
         break;
-      case ModalsViewModel.TYPE.SESSION_RESET:
+      }
+      case Types.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
-        content.actionText = t('modalAcknowledgeAction');
+        content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         const supportLink = buildSupportUrl(z.config.SUPPORT.FORM.BUG);
         content.messageHtml = t(
           'modalSessionResetMessage',
           {},
-          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`}
+          {'/link': '</a>', link: `<a href="${supportLink}"rel="nofollow noopener noreferrer" target="_blank">`},
         );
+        break;
+      }
+      case Types.MULTI_ACTIONS: {
+        // no additional actions needed for now
+      }
+    }
+    if (content.secondaryAction) {
+      // force it into array format
+      const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
+      content.secondaryAction = [].concat(content.secondaryAction).map((action, index) => {
+        const uieName = uieNames[index] || 'do-remaining';
+        return {...action, uieName};
+      });
     }
     this.content(content);
     this.state(States.OPEN);
   };
 
-  hasInput = () => this.content().currentType === ModalsViewModel.TYPE.INPUT;
-  hasOption = () => this.content().currentType === ModalsViewModel.TYPE.OPTION;
+  hasInput = () => this.content().currentType === Types.INPUT;
+  hasOption = () => this.content().currentType === Types.OPTION;
+  hasMultipleSecondary = () => this.content().currentType === Types.MULTI_ACTIONS;
 
   confirm = () => {
-    if (this.content().currentType === ModalsViewModel.TYPE.OPTION) {
-      return this.content().actionFn(this.optionChecked());
+    const action = this.content().primaryAction.action;
+    if (typeof action === 'function') {
+      if (this.content().currentType === Types.OPTION) {
+        return action(this.optionChecked());
+      }
+      if (this.content().currentType === Types.INPUT) {
+        return action(this.inputValue());
+      }
+      action();
     }
-    if (this.content().currentType === ModalsViewModel.TYPE.INPUT) {
-      return this.content().actionFn(this.inputValue());
-    }
-    this.content().actionFn();
   };
 
-  doAction = () => {
-    this.confirm();
-    this.hide();
-  };
-
-  doSecondary = () => {
-    this.content().secondaryFn();
+  doAction = action => {
+    if (typeof action === 'function') {
+      action();
+    }
     this.hide();
   };
 

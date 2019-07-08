@@ -96,6 +96,9 @@ describe('ClientMismatchHandler', () => {
       spyOn(TestFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
       spyOn(TestFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
+        return Promise.resolve([{class: 'desktop', id: clientId}, {class: 'phone', id: '809fd276d6709474'}]);
+      });
 
       const timestamp = new Date(clientMismatch.time).getTime();
       const eventInfoEntity = new EventInfoEntity(undefined, conversationId);
@@ -106,12 +109,15 @@ describe('ClientMismatchHandler', () => {
           expect(TestFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
             conversationId,
             [unknownUserId],
-            timestamp - 1
+            timestamp - 1,
           );
         });
     });
 
     it('should add missing clients to the payload', () => {
+      spyOn(TestFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
+        return Promise.resolve([{class: 'desktop', id: clientId}, {class: 'phone', id: '809fd276d6709474'}]);
+      });
       spyOn(TestFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
       // TODO: Make this fake method available as a utility function for testing
       spyOn(TestFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {

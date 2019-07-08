@@ -17,6 +17,8 @@
  *
  */
 
+import {intersection} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
@@ -187,7 +189,7 @@ export class ConversationVerificationStateHandler {
         if (!conversationEntity.removed_from_conversation()) {
           const selfUserId = this.conversationRepository.selfUser().id;
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
-          const matchingUserIds = _.intersection(userIdsInConversation, userIds);
+          const matchingUserIds = intersection(userIdsInConversation, userIds);
 
           if (!!matchingUserIds.length) {
             return {conversationEntity, userIds: matchingUserIds};

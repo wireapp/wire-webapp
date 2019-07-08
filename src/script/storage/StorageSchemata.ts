@@ -16,16 +16,23 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {Dexie} from 'dexie';
 import {base64ToArray} from 'Util/util';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
+interface DexieSchema {
+  schema: Record<string, string>;
+  upgrade?: (transaction: Dexie.Transaction, database?: Dexie) => void;
+  version: number;
+}
+
 export class StorageSchemata {
-  static get OBJECT_STORE() {
+  static get OBJECT_STORE(): Record<string, string> {
     return {
       AMPLIFY: 'amplify',
       CLIENTS: 'clients',
-      CONVERSATION_EVENTS: 'conversation_events',
       CONVERSATIONS: 'conversations',
+      CONVERSATION_EVENTS: 'conversation_events',
       EVENTS: 'events',
       KEYS: 'keys',
       PRE_KEYS: 'prekeys',
@@ -34,12 +41,7 @@ export class StorageSchemata {
     };
   }
 
-  /**
-   * @see https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
-   * @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
-   * @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
-   */
-  static get SCHEMATA() {
+  static get SCHEMATA(): DexieSchema[] {
     return [
       {
         schema: {
@@ -85,10 +87,13 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction, db) => {
-          transaction[StorageSchemata.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
-            client.meta = {is_verified: true, primary_key: 'local_identity'};
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CLIENTS)
+            .toCollection()
+            .modify(client => {
+              client.meta = {is_verified: true, primary_key: 'local_identity'};
+            });
         },
         version: 4,
       },
@@ -114,16 +119,25 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction, database) => {
-          transaction[StorageSchemata.OBJECT_STORE.CONVERSATIONS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.CONVERSATIONS].update(key, {id: key});
-          });
-          transaction[StorageSchemata.OBJECT_STORE.SESSIONS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.SESSIONS].update(key, {id: key});
-          });
-          transaction[StorageSchemata.OBJECT_STORE.PRE_KEYS].toCollection().eachKey(key => {
-            database[StorageSchemata.OBJECT_STORE.PRE_KEYS].update(key, {id: key});
-          });
+        upgrade: (transaction: Dexie.Transaction, database: Dexie) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
+            .toCollection()
+            .eachKey(key => {
+              database.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).update(key, {id: key});
+            });
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.SESSIONS)
+            .toCollection()
+            .eachKey(key => {
+              database.table(StorageSchemata.OBJECT_STORE.SESSIONS).update(key, {id: key});
+            });
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.PRE_KEYS)
+            .toCollection()
+            .eachKey(key => {
+              database.table(StorageSchemata.OBJECT_STORE.PRE_KEYS).update(key, {id: key});
+            });
         },
         version: 6,
       },
@@ -137,14 +151,17 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
-          transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            const mappedEvent = event.mapped || event.raw;
-            delete event.mapped;
-            delete event.raw;
-            delete event.meta;
-            Object.assign(event, mappedEvent);
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
+            .toCollection()
+            .modify(event => {
+              const mappedEvent = event.mapped || event.raw;
+              delete event.mapped;
+              delete event.raw;
+              delete event.meta;
+              Object.assign(event, mappedEvent);
+            });
         },
         version: 7,
       },
@@ -158,13 +175,16 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
-          transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            const isTypeDeleteEveryWhere = event.type === 'conversation.delete-everywhere';
-            if (isTypeDeleteEveryWhere) {
-              event.time = new Date(event.time).toISOString();
-            }
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
+            .toCollection()
+            .modify(event => {
+              const isTypeDeleteEveryWhere = event.type === 'conversation.delete-everywhere';
+              if (isTypeDeleteEveryWhere) {
+                event.time = new Date(event.time).toISOString();
+              }
+            });
         },
         version: 8,
       },
@@ -191,10 +211,13 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
-          transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            event.category = categoryFromEvent(event);
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
+            .toCollection()
+            .modify(event => {
+              event.category = categoryFromEvent(event);
+            });
         },
         version: 10,
       },
@@ -209,19 +232,22 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
+        upgrade: (transaction: Dexie.Transaction) => {
           const localClientPrimaryKey = 'local_identity';
 
-          transaction[StorageSchemata.OBJECT_STORE.CLIENTS].toCollection().each((client, cursor) => {
-            const isExpectedMetaPrimaryKey = client.meta.primary_key === localClientPrimaryKey;
-            const isExpectedPrimaryKey = client.primary_key === localClientPrimaryKey;
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CLIENTS)
+            .toCollection()
+            .each((client, cursor) => {
+              const isExpectedMetaPrimaryKey = client.meta.primary_key === localClientPrimaryKey;
+              const isExpectedPrimaryKey = client.primary_key === localClientPrimaryKey;
 
-            const isExpectedClient = isExpectedMetaPrimaryKey && isExpectedPrimaryKey;
-            if (isExpectedClient) {
-              transaction[StorageSchemata.OBJECT_STORE.CLIENTS].delete(cursor.primaryKey);
-              transaction[StorageSchemata.OBJECT_STORE.CLIENTS].put(client, localClientPrimaryKey);
-            }
-          });
+              const isExpectedClient = isExpectedMetaPrimaryKey && isExpectedPrimaryKey;
+              if (isExpectedClient) {
+                transaction.table(StorageSchemata.OBJECT_STORE.CLIENTS).delete(cursor.primaryKey);
+                transaction.table(StorageSchemata.OBJECT_STORE.CLIENTS).put(client, localClientPrimaryKey);
+              }
+            });
         },
         version: 11,
       },
@@ -238,16 +264,25 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
-          transaction[StorageSchemata.OBJECT_STORE.KEYS].toCollection().modify(record => {
-            record.serialised = base64ToArray(record.serialised).buffer;
-          });
-          transaction[StorageSchemata.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
-            record.serialised = base64ToArray(record.serialised).buffer;
-          });
-          transaction[StorageSchemata.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
-            record.serialised = base64ToArray(record.serialised).buffer;
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.KEYS)
+            .toCollection()
+            .modify(record => {
+              record.serialised = base64ToArray(record.serialised).buffer;
+            });
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.PRE_KEYS)
+            .toCollection()
+            .modify(record => {
+              record.serialised = base64ToArray(record.serialised).buffer;
+            });
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.SESSIONS)
+            .toCollection()
+            .modify(record => {
+              record.serialised = base64ToArray(record.serialised).buffer;
+            });
         },
         version: 12,
       },
@@ -264,11 +299,12 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction, database) => {
-          transaction[StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]
+        upgrade: (transaction: Dexie.Transaction, database: Dexie) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
             .toArray()
-            .then(items => database[StorageSchemata.OBJECT_STORE.EVENTS].bulkPut(items));
+            .then(items => database.table(StorageSchemata.OBJECT_STORE.EVENTS).bulkPut(items));
         },
         version: 13,
       },
@@ -285,13 +321,16 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: transaction => {
-          transaction[StorageSchemata.OBJECT_STORE.EVENTS].toCollection().modify(event => {
-            const isTypeAssetMeta = event.type === 'conversation.asset-meta';
-            if (isTypeAssetMeta) {
-              event.type = 'conversation.asset-add';
-            }
-          });
+        upgrade: (transaction: Dexie.Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.EVENTS)
+            .toCollection()
+            .modify(event => {
+              const isTypeAssetMeta = event.type === 'conversation.asset-meta';
+              if (isTypeAssetMeta) {
+                event.type = 'conversation.asset-add';
+              }
+            });
         },
         version: 14,
       },

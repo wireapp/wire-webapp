@@ -186,7 +186,7 @@ export const formatSeconds = (duration: number): string => {
  * @param longFormat `true`, if output should have leading numbers
  * @returns Human readable format of a timestamp.
  */
-export const formatTimestamp = (timestamp: number, longFormat: boolean = true): string => {
+export const formatTimestamp = (timestamp: number | string, longFormat: boolean = true): string => {
   const time = moment(timestamp);
   let format = 'L (HH:mm:ss)';
 

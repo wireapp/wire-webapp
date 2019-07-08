@@ -174,7 +174,7 @@ class App {
       resolve(graph.SelfService),
       repositories.client,
       serverTimeHandler,
-      repositories.properties
+      repositories.properties,
     );
     repositories.connection = new ConnectionRepository(this.backendClient, repositories.user);
     repositories.event = new EventRepository(
@@ -184,7 +184,7 @@ class App {
       this.service.conversation,
       repositories.cryptography,
       serverTimeHandler,
-      repositories.user
+      repositories.user,
     );
     repositories.connect = new ConnectRepository(this.service.connect, repositories.properties);
     repositories.search = new SearchRepository(resolve(graph.BackendClient), repositories.user);
@@ -205,7 +205,7 @@ class App {
       repositories.team,
       repositories.user,
       repositories.properties,
-      resolve(graph.AssetUploader)
+      resolve(graph.AssetUploader),
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -214,7 +214,7 @@ class App {
     const readReceiptMiddleware = new ReceiptsMiddleware(
       this.service.event,
       repositories.user,
-      repositories.conversation
+      repositories.conversation,
     );
 
     repositories.event.setEventProcessMiddlewares([
@@ -227,7 +227,7 @@ class App {
       repositories.client,
       repositories.connection,
       repositories.conversation,
-      repositories.user
+      repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
       resolve(graph.BroadcastService),
@@ -235,7 +235,7 @@ class App {
       repositories.conversation,
       repositories.cryptography,
       resolve(graph.MessageSender),
-      repositories.user
+      repositories.user,
     );
     repositories.calling = new CallingRepository(
       resolve(graph.CallingService),
@@ -244,19 +244,19 @@ class App {
       repositories.event,
       repositories.media,
       serverTimeHandler,
-      repositories.user
+      repositories.user,
     );
     repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
-      repositories.team
+      repositories.team,
     );
     repositories.permission = resolve(graph.PermissionRepository);
     repositories.notification = new NotificationRepository(
       repositories.calling,
       repositories.conversation,
       resolve(graph.PermissionRepository),
-      repositories.user
+      repositories.user,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
     repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
@@ -455,7 +455,7 @@ class App {
     }
 
     this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
+      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
     );
     if (isReload) {
       const isSessionExpired = [
@@ -531,24 +531,25 @@ class App {
    * Initiate the self user by getting it from the backend.
    * @returns {Promise<User>} Resolves with the self user entity
    */
-  _initiateSelfUser() {
-    return this.repository.user.getSelf().then(userEntity => {
-      this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
+  async _initiateSelfUser() {
+    const userEntity = await this.repository.user.getSelf();
 
-      if (!userEntity.hasActivatedIdentity()) {
-        this.logger.info('User does not have an activated identity and seems to be a temporary guest');
+    this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
-        if (!userEntity.isTemporaryGuest()) {
-          throw new Error('User does not have an activated identity');
-        }
+    if (!userEntity.hasActivatedIdentity()) {
+      this.logger.info('User does not have an activated identity and seems to be a temporary guest');
+
+      if (!userEntity.isTemporaryGuest()) {
+        throw new Error('User does not have an activated identity');
       }
+    }
 
-      return this.service.storage
-        .init(userEntity.id)
-        .then(() => this.repository.client.init(userEntity))
-        .then(() => this.repository.properties.init(userEntity))
-        .then(() => this._checkUserInformation(userEntity));
-    });
+    await this.service.storage.init(userEntity.id);
+    await this.repository.client.init(userEntity);
+    await this.repository.properties.init(userEntity);
+    await this._checkUserInformation(userEntity);
+
+    return userEntity;
   }
 
   /**

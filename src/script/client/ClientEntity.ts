@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import ko from 'knockout';
 import {isString} from 'underscore';
 
@@ -30,7 +31,7 @@ export class ClientEntity {
   };
 
   address?: string;
-  class: string;
+  class: ClientClassification | '?';
   cookie?: string;
   id: string;
   isSelfClient: boolean;
@@ -44,7 +45,7 @@ export class ClientEntity {
   constructor(isSelfClient = false) {
     this.isSelfClient = isSelfClient;
 
-    this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
+    this.class = '?';
     this.id = '';
 
     if (this.isSelfClient) {
@@ -80,12 +81,21 @@ export class ClientEntity {
     return zeroPadding(this.id, 16).match(/.{1,2}/g);
   }
 
+  isLegalHold(): boolean {
+    return this.class === ClientClassification.LEGAL_HOLD;
+  }
+
   isPermanent(): boolean {
     return this.type === ClientType.PERMANENT;
   }
 
   isTemporary(): boolean {
     return this.type === ClientType.TEMPORARY;
+  }
+
+  getName(): string {
+    const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
+    return hasModel ? this.model : this.class.toUpperCase();
   }
 
   /**
@@ -95,10 +105,10 @@ export class ClientEntity {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 
-    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+    ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
 
     if (this.isSelfClient) {
-      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._removeDefaultValues(jsonObject, name));
+      ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this.removeDefaultValues(jsonObject, name));
     }
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
@@ -112,7 +122,7 @@ export class ClientEntity {
     return jsonObject;
   }
 
-  _removeDefaultValues(jsonObject: Record<string, any>, memberName: string): void {
+  private removeDefaultValues(jsonObject: Record<string, any>, memberName: string): void {
     if (jsonObject.hasOwnProperty(memberName)) {
       const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
       if (isDefaultValue) {

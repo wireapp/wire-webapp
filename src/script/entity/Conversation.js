@@ -38,6 +38,8 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
+import {LegalHoldMessage} from './message/LegalHoldMessage';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -158,14 +160,23 @@ export class Conversation {
     this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
-      const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-      const isInitialized = this.selfUser() && hasMappedUsers;
-      if (!isInitialized) {
+      if (!this._isInitialized()) {
         return undefined;
       }
 
-      const allUserEntities = [this.selfUser()].concat(this.participating_user_ets());
-      return allUserEntities.every(userEntity => userEntity.is_verified());
+      return this.allUserEntities.every(userEntity => userEntity.is_verified());
+    });
+
+    this.hasLegalHold = ko.pureComputed(() => {
+      if (!this._isInitialized()) {
+        return false;
+      }
+
+      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    });
+    this.needsLegalHoldApproval = ko.observable(this.hasLegalHold());
+    this.hasLegalHold.subscribe(hasLegalHold => {
+      this.needsLegalHoldApproval(hasLegalHold);
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
@@ -197,11 +208,36 @@ export class Conversation {
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko.pureComputed(() =>
-      this.messages_unordered().sort((message_a, message_b) => {
+    this.messages = ko.pureComputed(() => {
+      const orderedMessages = this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      })
-    );
+      });
+      if (!orderedMessages.length) {
+        return [];
+      }
+      let latestLegalHoldStatus = false;
+      const messages = [];
+      orderedMessages.forEach(message => {
+        if (typeof message.legalHoldStatus === 'undefined') {
+          return messages.push(message);
+        }
+        const legalHoldStatus = !!message.legalHoldStatus;
+        if (legalHoldStatus === latestLegalHoldStatus) {
+          return messages.push(message);
+        }
+        if (!message.isLegalHold()) {
+          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
+          legalHoldMessage.timestamp(message.timestamp() - 1);
+          messages.push(legalHoldMessage);
+        }
+        messages.push(message);
+        latestLegalHoldStatus = legalHoldStatus;
+      });
+      if (latestLegalHoldStatus !== this.hasLegalHold()) {
+        amplify.publish(VERIFY_LEGAL_HOLD, this, latestLegalHoldStatus);
+      }
+      return messages;
+    });
 
     this.hasAdditionalMessages = ko.observable(true);
 
@@ -320,6 +356,11 @@ export class Conversation {
     this._initSubscriptions();
   }
 
+  _isInitialized() {
+    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+    return this.selfUser() && hasMappedUsers;
+  }
+
   _initSubscriptions() {
     [
       this.archivedState,
@@ -339,6 +380,10 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => property.subscribe(this.persistState.bind(this)));
+  }
+
+  get allUserEntities() {
+    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   persistState() {
@@ -441,6 +486,17 @@ export class Conversation {
 
     koArrayPushAll(this.messages_unordered, message_ets);
   }
+
+  appendLegalHoldSystemMessage = (legalHoldStatus, timeStamp) => {
+    const lastMessage = this.getLastMessage();
+    if (lastMessage && lastMessage.isLegalHold() && lastMessage.isActive === legalHoldStatus) {
+      return;
+    }
+    const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
+    legalHoldMessage.timestamp(timeStamp);
+    legalHoldMessage.legalHoldStatus = legalHoldStatus;
+    this.messages_unordered.push(legalHoldMessage);
+  };
 
   getFirstUnreadSelfMention() {
     return this.unreadState()

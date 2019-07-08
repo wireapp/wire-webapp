@@ -173,7 +173,7 @@ describe('QuotedMessageMiddleware', () => {
       ];
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
       spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
-        Promise.resolve(replies)
+        Promise.resolve(replies),
       );
       spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
 
@@ -193,7 +193,7 @@ describe('QuotedMessageMiddleware', () => {
         jasmine.clock().tick();
 
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
-          jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})})
+          jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
         );
         jasmine.clock().uninstall();
       });
@@ -225,7 +225,7 @@ describe('QuotedMessageMiddleware', () => {
       ];
       spyOn(quotedMessageMiddleware.eventService, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
       spyOn(quotedMessageMiddleware.eventService, 'loadEventsReplyingToMessage').and.returnValue(
-        Promise.resolve(replies)
+        Promise.resolve(replies),
       );
       spyOn(quotedMessageMiddleware.eventService, 'replaceEvent').and.returnValue(Promise.resolve());
 
@@ -243,7 +243,7 @@ describe('QuotedMessageMiddleware', () => {
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({
             data: jasmine.objectContaining({quote: {error: {type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND}}}),
-          })
+          }),
         );
       });
     });

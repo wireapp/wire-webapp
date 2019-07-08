@@ -24,6 +24,7 @@ import {alias} from 'Util/util';
 import {Config} from '../auth/config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
+import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
@@ -78,9 +79,16 @@ export class ContentViewModel {
       repositories.conversation,
       repositories.search,
       repositories.team,
-      repositories.user
+      repositories.user,
     );
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
+    this.legalHoldModal = new LegalHoldModalViewModel(
+      repositories.user,
+      repositories.conversation,
+      repositories.team,
+      repositories.client,
+      repositories.cryptography,
+    );
     this.messageList = new MessageListViewModel(mainViewModel, this, repositories);
     this.titleBar = new z.viewModel.content.TitleBarViewModel(mainViewModel, this, repositories);
 
@@ -90,7 +98,7 @@ export class ContentViewModel {
     this.preferencesDeviceDetails = new z.viewModel.content.PreferencesDeviceDetailsViewModel(
       mainViewModel,
       this,
-      repositories
+      repositories,
     );
     this.preferencesDevices = new z.viewModel.content.PreferencesDevicesViewModel(mainViewModel, this, repositories);
     this.preferencesOptions = new z.viewModel.content.PreferencesOptionsViewModel(repositories);
@@ -133,7 +141,9 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-
+    if (repositories.team.supportsLegalHold()) {
+      this.legalHoldModal.showRequestModal();
+    }
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 

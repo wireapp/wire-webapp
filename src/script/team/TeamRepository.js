@@ -77,6 +77,8 @@ export class TeamRepository {
         .sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
     });
 
+    this.supportsLegalHold = ko.observable(false);
+
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
     this.teamSize.subscribe(teamSize => {
       amplify.publish(WebAppEvents.ANALYTICS.SUPER_PROPERTY, SuperProperty.TEAM.SIZE, teamSize);
@@ -313,14 +315,16 @@ export class TeamRepository {
         ...accumulator,
         [member.userId]: member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID,
       }),
-      this.memberRoles()
+      this.memberRoles(),
     );
 
     const memberInvites = memberArray.reduce(
       (accumulator, member) => ({...accumulator, [member.userId]: member.invitedBy}),
-      this.memberInviters()
+      this.memberInviters(),
     );
 
+    const supportsLegalHold = memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
+    this.supportsLegalHold(supportsLegalHold);
     this.memberRoles(memberRoles);
     this.memberInviters(memberInvites);
   }

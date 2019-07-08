@@ -167,7 +167,7 @@ export default injectIntl(
         doSetConsent: (consentType: ConsentType, value: number) =>
           dispatch(ROOT_ACTIONS.selfAction.doSetConsent(consentType, value)),
         doSetHandle: (handle: string) => dispatch(ROOT_ACTIONS.selfAction.setHandle(handle)),
-      })
-    )(ChooseHandle)
-  )
+      }),
+    )(ChooseHandle),
+  ),
 );
