@@ -72,7 +72,7 @@ export class StorageRepository {
   }
 
   async saveValue<T>(primaryKey: string, value: T): Promise<string> {
-    await this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value: value});
+    await this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value});
     return primaryKey;
   }
 
