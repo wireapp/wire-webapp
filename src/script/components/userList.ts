@@ -69,7 +69,7 @@ ko.components.register('user-list', {
   `,
   viewModel: function({
     click,
-    filter,
+    filter = ko.observable(''),
     selected: selectedUsers,
     searchRepository,
     teamRepository,
@@ -113,8 +113,8 @@ ko.components.register('user-list', {
     this.filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
       let resultUsers: User[] = userEntities();
-      let normalizedQuery = '';
-      if (typeof filter === 'function' && (normalizedQuery = SearchRepository.normalizeQuery(filter()))) {
+      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      if (normalizedQuery) {
         const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
         const trimmedQuery = filter().trim();
         const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
