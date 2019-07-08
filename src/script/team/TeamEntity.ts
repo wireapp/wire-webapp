@@ -29,6 +29,7 @@ export class TeamEntity {
   id?: string;
   members: ko.ObservableArray<TeamMemberEntity>;
   name: ko.Observable<string>;
+  previewIconResource: ko.Observable<AssetRemoteData>;
 
   constructor(id?: string) {
     this.creator = undefined;
@@ -37,11 +38,10 @@ export class TeamEntity {
     this.members = ko.observableArray([]);
     this.id = id;
     this.name = ko.observable('');
-  }
+    this.previewIconResource = ko.observable();
 
-  async previewIconResource(): Promise<string | void> {
     if (this.icon && this.iconKey) {
-      return AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey)).generateUrl();
+      this.previewIconResource(AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey)));
     }
   }
 }

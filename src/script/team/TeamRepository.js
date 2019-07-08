@@ -175,9 +175,11 @@ export class TeamRepository {
 
   sendAccountInfo() {
     if (Environment.desktop) {
+      const imageResource = this.isTeam()
+        ? this.team().previewIconResource()
+        : this.selfUser().previewPictureResource();
       return Promise.resolve()
-        .then(() => (this.isTeam() ? this.team().previewIconResource() : this.selfUser().previewPictureResource()))
-        .then(imageResource => {
+        .then(() => {
           if (imageResource) {
             return imageResource.load();
           }
