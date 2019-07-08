@@ -22,6 +22,7 @@ import CryptoJS from 'crypto-js';
 import {Logger, getLogger} from 'Util/Logger';
 import {encodeSha256Base64, phoneNumberToE164} from 'Util/util';
 
+import {BackendClientError} from '../error/BackendClientError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ConnectService} from './ConnectService';
 import {ConnectSource} from './ConnectSource';
@@ -157,7 +158,7 @@ export class ConnectRepository {
           case z.error.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:
-            if (error.code === z.error.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
+            if (error.code === BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
               this.logger.error(`Backend refused upload of '${source}' contacts: Endpoint used too frequent`, error);
             } else {
               this.logger.error(`Upload of '${source}' contacts failed`, error);

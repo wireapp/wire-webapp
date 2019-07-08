@@ -2693,7 +2693,8 @@ export class ConversationRepository {
       ];
       const isLegalHoldMessageType =
         eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
-      const needsLegalHoldApproval = conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
+      const needsLegalHoldApproval =
+        !this.selfUser().isOnLegalHold() && conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
