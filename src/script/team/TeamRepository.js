@@ -173,35 +173,30 @@ export class TeamRepository {
     }
   }
 
-  sendAccountInfo() {
+  async sendAccountInfo() {
     if (Environment.desktop) {
+      let imageDataUrl;
+
       const imageResource = this.isTeam()
         ? this.team().previewIconResource()
         : this.selfUser().previewPictureResource();
-      return Promise.resolve()
-        .then(() => {
-          if (imageResource) {
-            return imageResource.load();
-          }
-        })
-        .then(imageBlob => {
-          if (imageBlob) {
-            return loadDataUrl(imageBlob);
-          }
-        })
-        .then(imageDataUrl => {
-          const accountInfo = {
-            accentID: this.selfUser().accent_id(),
-            name: this.teamName(),
-            picture: imageDataUrl,
-            teamID: this.team().id,
-            teamRole: this.selfUser().teamRole(),
-            userID: this.selfUser().id,
-          };
 
-          this.logger.info('Publishing account info', accountInfo);
-          amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
-        });
+      if (imageResource) {
+        const imageBlob = await imageResource.load();
+        imageDataUrl = await loadDataUrl(imageBlob);
+      }
+
+      const accountInfo = {
+        accentID: this.selfUser().accent_id(),
+        name: this.teamName(),
+        picture: imageDataUrl,
+        teamID: this.team().id,
+        teamRole: this.selfUser().teamRole(),
+        userID: this.selfUser().id,
+      };
+
+      this.logger.info('Publishing account info', accountInfo);
+      amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
     }
   }
 
