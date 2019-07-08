@@ -37,13 +37,16 @@ interface DatabaseListener {
 
 type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
 
+// @see https://dexie.org/docs/Observable/Dexie.Observable
+type DexieObservable = {_dbSchema?: Object};
+
 export class StorageService {
   private readonly logger: Logger;
   private readonly engine: CRUDEngine;
   public dbName?: string;
   private userId?: string;
   private readonly dbListeners: DatabaseListener[];
-  private db: Dexie & {_dbSchema?: Object};
+  private db: Dexie & DexieObservable;
 
   static get DEXIE_CRUD_EVENTS(): Record<string, string> {
     return {
