@@ -21,6 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {HttpClient} from '../../http/';
+import {UpdateTeamData} from './UpdateTeamData';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
@@ -39,14 +40,11 @@ export class TeamAPI {
     return this.client.sendJSON(config).then(response => response.headers['location']);
   }
 
-  public async putTeam(team: TeamData): Promise<void> {
+  public async putTeam(teamId: string, teamData: UpdateTeamData): Promise<void> {
     const config: AxiosRequestConfig = {
-      data: {
-        icon: team.icon,
-        name: team.name,
-      },
+      data: teamData,
       method: 'put',
-      url: `${TeamAPI.URL.TEAMS}/${team.id}`,
+      url: `${TeamAPI.URL.TEAMS}/${teamId}`,
     };
 
     await this.client.sendJSON(config);
