@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.15.3...@wireapp/core@12.16.0) (2019-07-08)
+
+
+### Features
+
+* **api-client, core:** Update interfaces for team icons ([#2045](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2045)) ([f5c18f3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/f5c18f3))
+
+
+
+
+
 ## [12.15.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.15.2...@wireapp/core@12.15.3) (2019-07-05)
 
 
