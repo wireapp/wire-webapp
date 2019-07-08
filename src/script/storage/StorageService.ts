@@ -105,7 +105,7 @@ export class StorageService {
       eventType: string,
       obj: Object,
       updatedObj: Object,
-      transaction: Dexie.Transaction
+      transaction: Dexie.Transaction,
     ) => {
       transaction.on('complete', () => {
         this.dbListeners
@@ -116,28 +116,26 @@ export class StorageService {
 
     const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
 
-    listenableTables.forEach(
-      (table: string): void => {
-        this.db
-          .table(table)
-          .hook('updating', function(
-            modifications: Object,
-            primaryKey: string,
-            obj: Object,
-            transaction: Dexie.Transaction
-          ): void {
-            this.onsuccess = updatedObj =>
-              callListener(table, StorageService.DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
-          });
+    listenableTables.forEach((table: string): void => {
+      this.db
+        .table(table)
+        .hook('updating', function(
+          modifications: Object,
+          primaryKey: string,
+          obj: Object,
+          transaction: Dexie.Transaction,
+        ): void {
+          this.onsuccess = updatedObj =>
+            callListener(table, StorageService.DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
+        });
 
-        this.db
-          .table(table)
-          .hook('deleting', function(primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
-            this.onsuccess = (): void =>
-              callListener(table, StorageService.DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
-          });
-      }
-    );
+      this.db
+        .table(table)
+        .hook('deleting', function(primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
+          this.onsuccess = (): void =>
+            callListener(table, StorageService.DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
+        });
+    });
   }
 
   _upgradeStores(db: Dexie): void {
