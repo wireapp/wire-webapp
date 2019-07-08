@@ -185,35 +185,20 @@ export class StorageService {
     return this.engine.delete(storeName, primaryKey);
   }
 
-  /**
-   * Delete the IndexedDB with all its stores.
-   * @returns Resolves if a database is found and cleared
-   */
-  deleteDatabase(): Promise<boolean> {
-    if (this.db) {
-      return this.db
-        .delete()
-        .then(() => {
-          this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
-          return true;
-        })
-        .catch(error => {
-          this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
-          throw error;
-        });
+  async deleteDatabase(): Promise<boolean> {
+    try {
+      await this.engine.purge();
+      this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+    } catch (error) {
+      this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
+      throw error;
     }
-    this.logger.error(`IndexedDB '${this.dbName}' not found`);
     return Promise.resolve(true);
   }
 
-  /**
-   * Delete a database store.
-   * @param storeName - Name of database store to delete
-   * @returns Resolves when the store has been deleted
-   */
-  deleteStore(storeName: string): Promise<void> {
+  async deleteStore(storeName: string): Promise<void> {
     this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
-    return this.db.table(storeName).clear();
+    await this.engine.deleteAll(storeName);
   }
 
   /**
