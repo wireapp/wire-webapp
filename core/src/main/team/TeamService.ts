@@ -18,17 +18,24 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {MemberData, Members, NewTeamData, TeamChunkData, TeamData} from '@wireapp/api-client/dist/commonjs/team';
+import {
+  MemberData,
+  Members,
+  NewTeamData,
+  TeamChunkData,
+  TeamData,
+  UpdateTeamData,
+} from '@wireapp/api-client/dist/commonjs/team/';
 
 export class TeamService {
   constructor(private readonly apiClient: APIClient) {}
 
-  public addMember(teamId: string, member: MemberData): Promise<void> {
-    return this.apiClient.teams.member.api.postMembers(teamId, member);
+  public addMember(teamId: string, memberData: MemberData): Promise<void> {
+    return this.apiClient.teams.member.api.postMembers(teamId, memberData);
   }
 
-  public createTeam(team: NewTeamData): Promise<void> {
-    return this.apiClient.teams.team.api.postTeam(team);
+  public createTeam(teamData: NewTeamData): Promise<void> {
+    return this.apiClient.teams.team.api.postTeam(teamData);
   }
 
   public deleteTeam(teamId: string, password: string): Promise<void> {
@@ -51,11 +58,11 @@ export class TeamService {
     return this.apiClient.teams.member.api.deleteMember(teamId, userId, password);
   }
 
-  public updateMember(teamId: string, member: MemberData): Promise<void> {
-    return this.apiClient.teams.member.api.putMembers(teamId, member);
+  public updateMember(teamId: string, memberData: MemberData): Promise<void> {
+    return this.apiClient.teams.member.api.putMembers(teamId, memberData);
   }
 
-  public updateTeam(team: TeamData): Promise<void> {
-    return this.apiClient.teams.team.api.putTeam(team);
+  public updateTeam(teamId: string, teamData: UpdateTeamData): Promise<void> {
+    return this.apiClient.teams.team.api.putTeam(teamId, teamData);
   }
 }

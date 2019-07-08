@@ -22,3 +22,4 @@ export * from './TeamAPI';
 export * from './TeamChunkData';
 export * from './TeamData';
 export * from './TeamInfo';
+export * from './UpdateTeamData';
