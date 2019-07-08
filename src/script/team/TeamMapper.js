@@ -78,14 +78,16 @@ export class TeamMapper {
 
   updateMemberFromObject(memberData, memberEntity = new TeamMemberEntity()) {
     if (memberData) {
-      const {created_by, permissions, user} = memberData;
+      const {created_by, permissions, user, legalhold_status} = memberData;
       if (created_by) {
         memberEntity.invitedBy = created_by;
       }
       if (permissions) {
         memberEntity.permissions = permissions;
       }
-
+      if (legalhold_status) {
+        memberEntity.legalholdStatus = legalhold_status;
+      }
       if (user) {
         memberEntity.userId = user;
       }
