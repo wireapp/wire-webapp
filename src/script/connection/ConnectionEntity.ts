@@ -51,7 +51,7 @@ export class ConnectionEntity {
     this.isIncomingRequest = ko.pureComputed(() => this.status() === ConnectionStatus.PENDING);
     this.isOutgoingRequest = ko.pureComputed(() => this.status() === ConnectionStatus.SENT);
     this.isUnknown = ko.pureComputed(() =>
-      [ConnectionStatus.CANCELLED, ConnectionStatus.UNKNOWN].includes(this.status())
+      [ConnectionStatus.CANCELLED, ConnectionStatus.UNKNOWN].includes(this.status()),
     );
 
     this.isRequest = ko.pureComputed(() => this.isIncomingRequest() || this.isOutgoingRequest());

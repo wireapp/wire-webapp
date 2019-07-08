@@ -23,7 +23,7 @@ import {noop} from './util';
 
 export function promiseProgress<T>(
   promises: PromiseLike<T>[],
-  progressCallback: (progress: number) => void = noop
+  progressCallback: (progress: number) => void = noop,
 ): Promise<T[]> {
   let progress = 0;
   progressCallback(0);

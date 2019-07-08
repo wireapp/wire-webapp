@@ -130,7 +130,7 @@ export class ClientMismatchHandler {
             return this.userRepository.getClientsByUserId(userId, false).then(clients => {
               return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
             });
-          })
+          }),
         );
       })
       .then(() => {

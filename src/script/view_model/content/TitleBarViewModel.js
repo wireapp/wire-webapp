@@ -144,7 +144,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       : amplify.publish(
           WebAppEvents.CONVERSATION.CREATE_GROUP,
           'conversation_details',
-          this.conversationEntity().firstUserEntity()
+          this.conversationEntity().firstUserEntity(),
         );
   }
 

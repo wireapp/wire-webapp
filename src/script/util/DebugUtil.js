@@ -117,7 +117,7 @@ export class DebugUtil {
 
   haveISentThisMessageToMyOtherClients(
     messageId,
-    conversationId = this.conversationRepository.active_conversation().id
+    conversationId = this.conversationRepository.active_conversation().id,
   ) {
     let recipients = [];
 
@@ -247,7 +247,7 @@ export class DebugUtil {
           remoteUserId,
           remoteClientId,
           matchingNotifications,
-          lastNotification.id
+          lastNotification.id,
         );
       }
 

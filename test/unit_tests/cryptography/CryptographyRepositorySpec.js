@@ -77,7 +77,7 @@ describe('CryptographyRepository', () => {
             }
 
             resolve(prekey_map);
-          })
+          }),
       );
 
       const generic_message = new GenericMessage({
@@ -148,7 +148,7 @@ describe('CryptographyRepository', () => {
       const cipherText = await bob.encrypt(
         'session-with-alice',
         GenericMessage.encode(genericMessage).finish(),
-        aliceBundle.serialise()
+        aliceBundle.serialise(),
       );
       const encodedCipherText = arrayToBase64(cipherText);
 

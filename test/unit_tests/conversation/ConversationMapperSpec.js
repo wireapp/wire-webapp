@@ -384,7 +384,7 @@ describe('Conversation Mapper', () => {
 
       const [merged_conversation, merged_conversation_2] = conversation_mapper.mergeConversation(
         [local_data],
-        [remote_data, remote_data_2]
+        [remote_data, remote_data_2],
       );
 
       expect(merged_conversation.creator).toBe(remote_data.creator);

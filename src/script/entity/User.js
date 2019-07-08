@@ -214,7 +214,7 @@ class User {
     const expirationInterval = User.CONFIG.TEMPORARY_GUEST.EXPIRATION_INTERVAL;
     this.expirationIntervalId = window.setInterval(
       () => this._setRemainingExpirationTime(timestamp),
-      expirationInterval
+      expirationInterval,
     );
 
     window.setTimeout(() => {
