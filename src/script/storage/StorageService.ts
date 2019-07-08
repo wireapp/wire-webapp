@@ -95,7 +95,7 @@ export class StorageService {
       return this.dbName;
     } catch (error) {
       const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
-      this.logger.error(logMessage, {error: error});
+      this.logger.error(logMessage, {error});
       throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
     }
   }
