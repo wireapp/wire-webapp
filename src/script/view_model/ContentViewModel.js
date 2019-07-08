@@ -141,8 +141,9 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-    this.legalHoldModal.showRequestModal();
-
+    if (repositories.team.supportsLegalHold()) {
+      this.legalHoldModal.showRequestModal();
+    }
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
