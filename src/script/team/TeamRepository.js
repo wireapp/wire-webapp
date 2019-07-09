@@ -177,9 +177,7 @@ export class TeamRepository {
     if (Environment.desktop) {
       let imageDataUrl;
 
-      const imageResource = this.isTeam()
-        ? this.team().previewIconResource()
-        : this.selfUser().previewPictureResource();
+      const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
 
       if (imageResource) {
         const imageBlob = await imageResource.load();

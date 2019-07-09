@@ -18,14 +18,15 @@
  */
 
 import ko from 'knockout';
-import {base64ToArray} from 'Util/util';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
 export class TeamEntity {
   creator?: string;
+  /** Team icon (asset ID) */
   icon: string;
+  /** Team icon (asset key) */
   iconKey?: string;
   id?: string;
   members: ko.ObservableArray<TeamMemberEntity>;
@@ -40,9 +41,9 @@ export class TeamEntity {
     this.name = ko.observable('');
   }
 
-  previewIconResource(): AssetRemoteData | void {
-    if (this.icon && this.iconKey) {
-      return AssetRemoteData.v3(this.icon, base64ToArray(this.iconKey));
+  getIconResource(): AssetRemoteData | void {
+    if (this.icon) {
+      return AssetRemoteData.v3(this.icon);
     }
   }
 }
