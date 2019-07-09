@@ -168,12 +168,7 @@ ko.components.register('user-devices', {
     noPadding = false,
   }: UserDevicesParams): void {
     this.selfClient = clientRepository.currentClient;
-    this.clientEntities = ko.pureComputed(() => {
-      if (userEntity()) {
-        return sortUserDevices(userEntity().devices());
-      }
-      return undefined;
-    });
+    this.clientEntities = ko.observableArray();
     this.Config = Config;
     this.noPadding = noPadding;
 
@@ -196,6 +191,7 @@ ko.components.register('user-devices', {
     clientRepository
       .getClientsByUserId(userEntity().id)
       .then((clientEntities: ClientEntity[]) => {
+        this.clientEntities(sortUserDevices(clientEntities));
         const hasDevices = clientEntities.length > 0;
         const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
         this.deviceMode(deviceMode);
