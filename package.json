@@ -126,7 +126,7 @@
     "karma-jasmine": "2.0.1",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
-    "karma-webpack": "3.0.5",
+    "karma-webpack": "4.0.2",
     "less": "3.9.0",
     "lint-staged": "9.1.0",
     "load-grunt-tasks": "5.0.0",
