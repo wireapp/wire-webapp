@@ -23,10 +23,6 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {assetV3} from '../util/ValidationUtil';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
-export enum IconValue {
-  DEFAULT = 'default',
-}
-
 export class TeamEntity {
   creator?: string;
   /** Team icon (asset ID) */
