@@ -4408,17 +4408,18 @@ eslint-plugin-jasmine@2.10.1:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jasmine/-/eslint-plugin-jasmine-2.10.1.tgz#5733b709e751f4bc40e31e1c16989bd2cdfbec97"
   integrity sha1-VzO3CedR9LxA4x4cFpib0s377Jc=
 
-eslint-plugin-jsdoc@14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-14.0.0.tgz#a40b65b1b6176db1f9680fc054a7a4d22f7fe806"
-  integrity sha512-G+Lb7XnnfeZyYOFnZbLH/BsucDjEwggsD4DQJVfj1M9XOvSXv7v5fhvwXCBdWQXzyZ0uy28ilBRQ33dZSa9LjQ==
+eslint-plugin-jsdoc@15.3.1:
+  version "15.3.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-15.3.1.tgz#d220685b5b1d2f553527249c14f5e0ca60614961"
+  integrity sha512-de7EbMeIrw/dM4d9681Y19zuJQ+n/byXAnk7fTGAmtWaqItZr5XyZ6aeG4iMuUyZOFEvaT5zVDtgXNgXEivsGA==
   dependencies:
     comment-parser "^0.5.5"
     debug "^4.1.1"
     escape-regex-string "^1.0.6"
     flat-map-polyfill "^0.3.8"
-    jsdoctypeparser "4.0.0"
+    jsdoctypeparser "5.0.1"
     lodash "^4.17.11"
+    regextras "^0.6.1"
 
 eslint-plugin-no-unsanitized@3.0.2:
   version "3.0.2"
@@ -6882,10 +6883,10 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsdoctypeparser@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/jsdoctypeparser/-/jsdoctypeparser-4.0.0.tgz#f25e212ff8b0e3e9ed76627554392787cd524128"
-  integrity sha512-Bh6AW8eJ1bVdofhYUuqgFOVo0FE9qII+a+Go+juEnAfaDS5lZAiIqBAFm9gDu80OqBcQ1UI3v/8cP+3D5IGVww==
+jsdoctypeparser@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/jsdoctypeparser/-/jsdoctypeparser-5.0.1.tgz#0d6bc09bb8bebeca5a588fcd508228d2189409a3"
+  integrity sha512-dYwcK6TKzvq+ZKtbp4sbQSW9JMo6s+4YFfUs5D/K7bZsn3s1NhEhZ+jmIPzby0HbkbECBe+hNPEa6a+E21o94w==
 
 jsesc@^1.3.0:
   version "1.3.0"
@@ -10312,6 +10313,11 @@ regexpu-core@^4.5.4:
     regjsparser "^0.6.0"
     unicode-match-property-ecmascript "^1.0.4"
     unicode-match-property-value-ecmascript "^1.1.0"
+
+regextras@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/regextras/-/regextras-0.6.1.tgz#9689641bbb338e0ff7001a5c507c6a2008df7b36"
+  integrity sha512-EzIHww9xV2Kpqx+corS/I7OBmf2rZ0pKKJPsw5Dc+l6Zq1TslDmtRIP9maVn3UH+72MIXmn8zzDgP07ihQogUA==
 
 regjsgen@^0.5.0:
   version "0.5.0"
