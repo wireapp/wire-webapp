@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {assetV3} from '../util/ValidationUtil';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
 export enum IconValue {
@@ -46,7 +47,7 @@ export class TeamEntity {
   }
 
   getIconResource(): AssetRemoteData | void {
-    if (this.icon && this.icon !== IconValue.DEFAULT) {
+    if (this.icon && assetV3(this.icon)) {
       return AssetRemoteData.v3(this.icon);
     }
   }
