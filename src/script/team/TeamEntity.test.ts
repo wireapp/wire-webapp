@@ -17,11 +17,13 @@
  *
  */
 
-import {TeamEntity} from './TeamEntity';
+import {IconValue, TeamEntity} from './TeamEntity';
 
 describe('TeamEntity', () => {
   it('returns an icon resource', () => {
     const teamEntity = new TeamEntity();
+    teamEntity.icon = IconValue.DEFAULT;
+
     expect(teamEntity.getIconResource()).not.toBeDefined();
     teamEntity.icon = '3-1-e705c3f5-7b4b-4136-a09b-01614cb355a1';
     expect(teamEntity.getIconResource()).toBeDefined();
