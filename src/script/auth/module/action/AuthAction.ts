@@ -24,6 +24,7 @@ import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/erro
 
 import {noop} from 'Util/util';
 
+import {IconValue} from '../../../team/TeamEntity';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import {RegistrationDataState} from '../reducer/authReducer';
@@ -181,7 +182,7 @@ export class AuthAction {
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
       registration.email = registration.email.trim();
-      registration.team.icon = 'default';
+      registration.team.icon = IconValue.DEFAULT;
       registration.team.binding = true;
       // TODO: Fixed once core v6 is inside
       // @ts-ignore
