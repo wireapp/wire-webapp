@@ -43,8 +43,11 @@ export class TeamEntity {
   }
 
   getIconResource(): AssetRemoteData | void {
-    if (this.icon && assetV3(this.icon)) {
-      return AssetRemoteData.v3(this.icon);
+    if (this.icon) {
+      try {
+        assetV3(this.icon);
+        return AssetRemoteData.v3(this.icon);
+      } catch (error) {}
     }
   }
 }
