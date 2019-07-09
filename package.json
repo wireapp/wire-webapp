@@ -153,7 +153,7 @@
     "tslint-plugin-prettier": "2.0.1",
     "tslint-react": "4.0.0",
     "tslint-react-hooks": "2.1.1",
-    "typescript": "3.5.2",
+    "typescript": "3.5.3",
     "webpack": "4.35.0",
     "webpack-cli": "3.3.5",
     "webpack-dev-middleware": "3.7.0",
