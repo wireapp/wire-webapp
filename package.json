@@ -9,7 +9,7 @@
     "@emotion/core": "10.0.14",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "2.2.1",
-    "@wireapp/core": "12.15.2",
+    "@wireapp/core": "12.16.0",
     "@wireapp/protocol-messaging": "1.24.1",
     "@wireapp/react-ui-kit": "7.3.3",
     "@wireapp/store-engine-dexie": "0.3.2",
