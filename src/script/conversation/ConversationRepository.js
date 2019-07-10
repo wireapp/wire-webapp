@@ -759,13 +759,15 @@ export class ConversationRepository {
 
   /**
    * Update all conversations on app init.
-   * @returns {undefined} No return value
+   * @returns {Promise<Conversation[]>} No return value
    */
   updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
-    this.updateUnarchivedConversations();
-    this.sorted_conversations().map(conversationEntity => {
-      this.updateParticipatingUserEntities(conversationEntity, true);
+    return this.updateUnarchivedConversations().then(() => {
+      const updatePromises = this.sorted_conversations().map(conversationEntity => {
+        return this.updateParticipatingUserEntities(conversationEntity, true);
+      });
+      return Promise.all(updatePromises);
     });
   }
 
@@ -779,10 +781,10 @@ export class ConversationRepository {
 
   /**
    * Update users and events for all unarchived conversations.
-   * @returns {undefined} No return value
+   * @returns {Promise<Conversation[]>} No return value
    */
   updateUnarchivedConversations() {
-    this.updateConversations(this.conversations_unarchived());
+    return this.updateConversations(this.conversations_unarchived());
   }
 
   updateConversationFromBackend(conversationEntity) {
@@ -804,7 +806,7 @@ export class ConversationRepository {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = _.flatten(mapOfUserIds);
 
-    this.user_repository
+    return this.user_repository
       .get_users_by_id(userIds)
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
