@@ -217,13 +217,15 @@ export class StorageService {
    * @param storeName - Name of object store
    * @returns Resolves with the records from the object store
    */
-  async getAll<T>(storeName: string): Promise<T[]> {
-    try {
-      return await this.engine.readAll(storeName);
-    } catch (error) {
-      this.logger.error(`Failed to load objects from store '${storeName}'`, error);
-      throw error;
-    }
+  getAll<T>(storeName: string): Promise<T[]> {
+    return this.db
+      .table(storeName)
+      .toArray()
+      .then(resultArray => resultArray.filter(result => result))
+      .catch(error => {
+        this.logger.error(`Failed to load objects from store '${storeName}'`, error);
+        throw error;
+      });
   }
 
   /**
