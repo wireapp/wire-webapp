@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -26,7 +27,6 @@ import {compareTransliteration, startsWith, getFirstChar} from 'Util/StringUtil'
 
 import {ACCENT_ID} from '../config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 
@@ -143,7 +143,7 @@ class User {
       write: value => _hasPendingLegalHold(value),
     });
 
-    this.availability = ko.observable(AvailabilityType.NONE);
+    this.availability = ko.observable(Availability.Type.NONE);
 
     this.expirationRemaining = ko.observable(0);
     this.expirationText = ko.observable('');
