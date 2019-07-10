@@ -40,7 +40,6 @@ import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
-import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -573,10 +572,6 @@ export class EventMapper {
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
-  }
-
-  _mapEventLegalHold(isActive) {
-    return new LegalHoldMessage(isActive);
   }
 
   /**

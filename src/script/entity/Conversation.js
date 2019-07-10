@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -227,8 +226,8 @@ export class Conversation {
           return messages.push(message);
         }
         if (!message.isLegalHold()) {
-          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
-          legalHoldMessage.timestamp(message.timestamp() - 1);
+          const timestamp = message.timestamp() - 1;
+          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus, timestamp);
           messages.push(legalHoldMessage);
         }
         messages.push(message);
@@ -491,21 +490,20 @@ export class Conversation {
   /**
    * Insert a legal hold system message in the conversation.
    *
-   * @param {boolean} hasLegalHoldFlag - True, when legal hold is turned on
+   * @param {boolean} isActivationMessage - True, when legal hold is turned on
    * @param {number} timeStamp - Timestamp of system message creation
    * @returns {undefined} No return value
    */
-  appendLegalHoldSystemMessage = (hasLegalHoldFlag, timeStamp) => {
+  appendLegalHoldSystemMessage = (isActivationMessage, timeStamp) => {
     const lastMessage = this.getLastMessage();
-    if (lastMessage && lastMessage.isLegalHold() && lastMessage.isActive === hasLegalHoldFlag) {
+    const hasBeenAlreadyAppended = message => {
+      return message && message.isLegalHold() && message.isActivationMessage === isActivationMessage;
+    };
+    if (hasBeenAlreadyAppended(lastMessage)) {
       return;
     }
 
-    const legalHoldStatus = hasLegalHoldFlag ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
-
-    const legalHoldMessage = new LegalHoldMessage(hasLegalHoldFlag);
-    legalHoldMessage.timestamp(timeStamp);
-    legalHoldMessage.legalHoldStatus = legalHoldStatus;
+    const legalHoldMessage = new LegalHoldMessage(isActivationMessage, timeStamp);
 
     this.messages_unordered.push(legalHoldMessage);
   };
