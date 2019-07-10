@@ -158,10 +158,6 @@ export class CryptographyMapper {
       time: event.time,
     };
 
-    if (genericMessage[genericMessage.content].hasOwnProperty('legalHoldStatus')) {
-      genericContent.legal_hold_status = genericMessage[genericMessage.content].legalHoldStatus;
-    }
-
     return Object.assign(genericContent, specificContent);
   }
 
