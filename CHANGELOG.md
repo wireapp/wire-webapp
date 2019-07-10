@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.17.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.16.0...@wireapp/core@12.17.0) (2019-07-10)
+
+
+### Features
+
+* **core:** Fetch unencrypted image v3 assets ([#2051](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2051)) ([8c794d2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/8c794d2))
+
+
+
+
+
 # [12.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.15.3...@wireapp/core@12.16.0) (2019-07-08)
 
 
