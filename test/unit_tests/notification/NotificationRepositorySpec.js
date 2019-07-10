@@ -17,6 +17,8 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 import {Environment} from 'Util/Environment';
@@ -33,7 +35,6 @@ import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {NotificationPreference} from 'src/script/notification/NotificationPreference';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {BackendEvent} from 'src/script/event/Backend';
@@ -309,7 +310,7 @@ describe('NotificationRepository', () => {
     it('filters all notifications if user is "away"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
         return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => AvailabilityType.AWAY,
+          availability: () => Availability.Type.AWAY,
         });
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
@@ -326,7 +327,7 @@ describe('NotificationRepository', () => {
     it('filters content and ping messages when user is "busy"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
         return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => AvailabilityType.BUSY,
+          availability: () => Availability.Type.BUSY,
         });
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
@@ -347,7 +348,7 @@ describe('NotificationRepository', () => {
     it('it allows mentions and calls when user is "busy"', () => {
       spyOn(TestFactory.notification_repository, 'selfUser').and.callFake(() => {
         return Object.assign({}, TestFactory.user_repository.self(), {
-          availability: () => AvailabilityType.BUSY,
+          availability: () => Availability.Type.BUSY,
         });
       });
       TestFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);

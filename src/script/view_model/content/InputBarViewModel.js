@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -30,7 +31,6 @@ import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {AvailabilityType} from '../../user/AvailabilityType';
 
 import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
@@ -216,9 +216,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         const userEntity = this.conversationEntity().firstUserEntity();
         const name = userEntity.first_name();
         const availabilityStrings = {
-          [AvailabilityType.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
-          [AvailabilityType.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
-          [AvailabilityType.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
+          [Availability.Type.AVAILABLE]: t('tooltipConversationInputPlaceholderAvailable', name),
+          [Availability.Type.AWAY]: t('tooltipConversationInputPlaceholderAway', name),
+          [Availability.Type.BUSY]: t('tooltipConversationInputPlaceholderBusy', name),
         };
 
         return availabilityStrings[userEntity.availability()];
@@ -235,7 +235,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       if (this.conversationEntity() && this.conversationEntity().firstUserEntity()) {
         const isOne2OneConversation = this.conversationEntity().is1to1();
         const firstUserEntity = this.conversationEntity().firstUserEntity();
-        const availabilityIsNone = firstUserEntity.availability() === AvailabilityType.NONE;
+        const availabilityIsNone = firstUserEntity.availability() === Availability.Type.NONE;
         return this.selfUser().inTeam() && isOne2OneConversation && !availabilityIsNone;
       }
 

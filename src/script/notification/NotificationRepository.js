@@ -17,6 +17,8 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {t, Declension} from 'Util/LocalizerUtil';
 import {getFirstName} from 'Util/SanitizationUtil';
@@ -25,7 +27,6 @@ import {Environment} from 'Util/Environment';
 import {truncate} from 'Util/StringUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
-import {AvailabilityType} from '../user/AvailabilityType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionState} from './PermissionState';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
@@ -156,13 +157,13 @@ export class NotificationRepository {
    * @returns {Promise} Resolves when notification has been handled
    */
   notify(messageEntity, connectionEntity, conversationEntity) {
-    const isUserAway = this.selfUser().availability() === AvailabilityType.AWAY;
+    const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
 
     if (isUserAway) {
       return Promise.resolve();
     }
 
-    const isUserBusy = this.selfUser().availability() === AvailabilityType.BUSY;
+    const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
     const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 

@@ -37,7 +37,6 @@ import {
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
 import {createRandomUuid, arrayToBase64} from 'Util/util';
-import {AvailabilityType} from 'src/script/user/AvailabilityType';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
@@ -254,7 +253,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.availability).toBe(AvailabilityType.AVAILABLE);
+        expect(event_json.data.availability).toBe(Availability.Type.AVAILABLE);
       });
     });
 

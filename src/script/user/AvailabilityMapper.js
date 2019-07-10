@@ -21,8 +21,6 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {AvailabilityType} from './AvailabilityType';
-
 import {BaseError} from '../error/BaseError';
 
 const AVAILABILITY_VALUES = {
@@ -34,10 +32,10 @@ const AVAILABILITY_VALUES = {
 
 export const valueFromType = availabilityType => {
   const TYPE_VALUES = {
-    [AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
-    [AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
-    [AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
-    [AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
+    [Availability.Type.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+    [Availability.Type.AWAY]: AVAILABILITY_VALUES.AWAY,
+    [Availability.Type.BUSY]: AVAILABILITY_VALUES.BUSY,
+    [Availability.Type.NONE]: AVAILABILITY_VALUES.NONE,
   };
 
   const value = TYPE_VALUES[availabilityType];
@@ -49,10 +47,10 @@ export const valueFromType = availabilityType => {
 
 export const nameFromType = availabilityType => {
   const TYPE_STRINGS = {
-    [AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
-    [AvailabilityType.AWAY]: t('userAvailabilityAway'),
-    [AvailabilityType.BUSY]: t('userAvailabilityBusy'),
-    [AvailabilityType.NONE]: t('userAvailabilityNone'),
+    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+    [Availability.Type.AWAY]: t('userAvailabilityAway'),
+    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
+    [Availability.Type.NONE]: t('userAvailabilityNone'),
   };
 
   const string = TYPE_STRINGS[availabilityType];

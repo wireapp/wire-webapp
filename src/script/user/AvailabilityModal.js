@@ -17,10 +17,10 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {AvailabilityType} from './AvailabilityType';
 import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
 
 const initialKey = 'hide_initial_modal';
@@ -53,23 +53,23 @@ function showModal(storageKey, title, message) {
 }
 
 export function showAvailabilityModal(availability) {
-  if (availability !== AvailabilityType.NONE) {
+  if (availability !== Availability.Type.NONE) {
     storeValue(initialKey, 'true');
   }
   switch (availability) {
-    case AvailabilityType.AWAY: {
+    case Availability.Type.AWAY: {
       showModal('hide_away_modal', t('modalAvailabilityAwayTitle'), t('modalAvailabilityAwayMessage'));
       break;
     }
-    case AvailabilityType.BUSY: {
+    case Availability.Type.BUSY: {
       showModal('hide_busy_modal', t('modalAvailabilityBusyTitle'), t('modalAvailabilityBusyMessage'));
       break;
     }
-    case AvailabilityType.AVAILABLE: {
+    case Availability.Type.AVAILABLE: {
       showModal('hide_available_modal', t('modalAvailabilityAvailableTitle'), t('modalAvailabilityAvailableMessage'));
       break;
     }
-    case AvailabilityType.NONE: {
+    case Availability.Type.NONE: {
       showModal('hide_none_modal', t('modalAvailabilityNoneTitle'), t('modalAvailabilityNoneMessage'));
     }
   }
@@ -77,7 +77,7 @@ export function showAvailabilityModal(availability) {
 
 export function showInitialModal(availability) {
   const hideInitialModal = loadValue(initialKey);
-  if (!hideInitialModal && availability !== AvailabilityType.NONE) {
+  if (!hideInitialModal && availability !== Availability.Type.NONE) {
     showAvailabilityModal(availability);
   }
 }

@@ -17,6 +17,8 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {validateProfileImageResolution} from 'Util/util';
@@ -34,7 +36,6 @@ import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
 import {Config} from '../../auth/config';
-import {AvailabilityType} from '../../user/AvailabilityType';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
@@ -94,7 +95,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availabilityLabel = ko.pureComputed(() => {
       let label = nameFromType(this.availability());
 
-      const noStatusSet = this.availability() === AvailabilityType.NONE;
+      const noStatusSet = this.availability() === Availability.Type.NONE;
       if (noStatusSet) {
         label = t('preferencesAccountAvaibilityUnset');
       }
