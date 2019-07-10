@@ -270,18 +270,21 @@ export class EventMapper {
       }
     }
 
-    const {category, from, id, primary_key, time, type, version} = event;
+    const {category, data, from, id, primary_key, time, type, version} = event;
 
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
     messageEntity.fromClientId = event.from_client_id;
     messageEntity.id = id;
-    messageEntity.legalHoldStatus = event.legal_hold_status;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;
     messageEntity.version = version || 1;
+
+    if (data) {
+      messageEntity.legalHoldStatus = data.legal_hold_status;
+    }
 
     if (messageEntity.is_content() || messageEntity.is_ping()) {
       messageEntity.status(event.status || StatusType.SENT);
