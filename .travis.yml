@@ -83,7 +83,7 @@ deploy:
     bucket_name: wire-webapp-builds
     on:
       repo: wireapp/wire-webapp
-      branch: edge
+      branch: dev
       condition: $DISTRIBUTION = wire
 
   # Stage 2: https://wire-webapp-dev.zinfra.io/
