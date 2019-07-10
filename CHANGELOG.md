@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.14.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.14.1...@wireapp/api-client@5.14.2) (2019-07-10)
+
+
+### Bug Fixes
+
+* **api-client:** Merge MemberData interfaces ([#2058](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2058)) ([d318d4b](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d318d4b))
+
+
+
+
+
 ## [5.14.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.14.0...@wireapp/api-client@5.14.1) (2019-07-10)
 
 **Note:** Version bump only for package @wireapp/api-client
