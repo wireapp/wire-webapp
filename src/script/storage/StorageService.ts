@@ -244,13 +244,14 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  async load<T>(storeName: string, primaryKey: string): Promise<T> {
-    try {
-      return await this.engine.read<T>(storeName, primaryKey);
-    } catch (error) {
-      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
-      throw error;
-    }
+  load<T>(storeName: string, primaryKey: string): Promise<T> {
+    return this.db
+      .table(storeName)
+      .get(primaryKey)
+      .catch(error => {
+        this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+        throw error;
+      });
   }
 
   /**
