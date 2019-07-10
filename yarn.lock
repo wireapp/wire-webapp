@@ -1641,10 +1641,10 @@
     "@types/node" "~10"
     bro-fs "0.5.0"
 
-"@wireapp/tslint-config@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.2.0.tgz#9ac658e031bf4796770e939d233214a5b096da97"
-  integrity sha512-TZWfPvu5c1gz+cl6y68oxa8HhonxIs7ur4MkcWf/W9IGQeVO5vwn6nRsPVlbcVyKj/f6RcjoWdtlqV61elujQg==
+"@wireapp/tslint-config@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
+  integrity sha512-hPoEUTlnjJ38r/NDHMhfCgWQAue4Q3Zf8iWQeLKn/aOxUVQTEY1/oALplooKwoX/ei5KulBQveEu/foBQ2TYsw==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
