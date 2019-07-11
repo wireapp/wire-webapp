@@ -1611,16 +1611,16 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.3.3":
-  version "7.3.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.3.3.tgz#924a978491a74ceab12e92fe1615888e331ef720"
-  integrity sha512-Hr8jg/4PbBWAuitb2wmR55c72BymR3/IjhJCE61tHfOzRho3T/9zv2EuDXlNtFnF93LQIuZhDNezW6coAgpNvQ==
+"@wireapp/react-ui-kit@7.3.4":
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.3.4.tgz#ee44485e32dd26c274a01b88744b888ebb523dd0"
+  integrity sha512-JIK0SN25U6xhNJ4aeOSJKnUf6MOOQGvrn6Tme2lv9CqcwhTr5QeEWmBo/Pug1c3ot3mla8mX7kuvNyjr1GtWlQ==
   dependencies:
     "@emotion/core" "10.0.14"
     "@types/color" "3.0.0"
-    bazinga64 "5.5.1"
+    bazinga64 "5.5.2"
     color "3.1.2"
-    emotion-normalize "10.0.0"
+    emotion-normalize "10.1.0"
     react-transition-group "4.2.1"
 
 "@wireapp/store-engine-dexie@0.3.2":
@@ -2405,6 +2405,11 @@ bazinga64@5.5.1:
   version "5.5.1"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.1.tgz#3d6fac3269821ddfd5d2e90dd920553d9b55340f"
   integrity sha512-iTx1VzjapaAb59gp8U60bBzXxB3ij/SmKra6e2TyzKRhbaOoinLG/gOaXgmHy0tcoNhK+ohngYLWPzAPSFYnQg==
+
+bazinga64@5.5.2:
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.2.tgz#6b462baa970f0aa2454c75bd4a00e66ab5c374b5"
+  integrity sha512-glF709ZhUnP8i+cEIE3CJEia8nDQK6yYXw19INkb37U6MPHCMdFMK74hZwqNeEEIjI7YagpeRiaazYfuvvbN/w==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -4089,10 +4094,10 @@ emojis-list@^2.0.0:
   resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
   integrity sha1-TapNnbAPmBmIDHn6RXrlsJof04k=
 
-emotion-normalize@10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/emotion-normalize/-/emotion-normalize-10.0.0.tgz#863bd54928633e9cb1ea2600ed49be719709a749"
-  integrity sha512-hOTA1mjpm7Gipz7UUxpQ6S0gXJdTFT9W9veoVJpicvHqn4KQSlh5CZzBTQk2pB54D2jwKVb5wGk1SyKEi3e36w==
+emotion-normalize@10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/emotion-normalize/-/emotion-normalize-10.1.0.tgz#b4cfd2f7d37b9eafb3b0d5ee7dc4fbb83f18e68f"
+  integrity sha512-Z+rz3Eep8tUgtBKT13/rEpci+ZbCadRovEmILuLB9IEpq4FdNpXjm7MVeJqG4iBRGw4tKmIq06lYgjeC6oEnag==
 
 encodeurl@~1.0.2:
   version "1.0.2"
