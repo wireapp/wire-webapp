@@ -1510,22 +1510,6 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.3.2.tgz#bbc404098e16226348663bef10dba23cbc6da856"
   integrity sha512-2qHOph8lI7J7mkkp2g98zjRb+L8umCMkMUbz2yNkPro2fhELAwU+0ACQRAm8MaBOpv+YswNBYeWvDRv6IiJB+w==
 
-"@wireapp/commons@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.1.tgz#988bf343fab9d81235ed2ed9983f6e9c2dba9895"
-  integrity sha512-8RQFc80sWSOPgGCPVXDiqKWLVWjGN5JSnj+J82KzA5nE69HXdFcRe5gNXbrdcGRhh2Rtd25rnnc3O573RGJX5g==
-  dependencies:
-    "@types/ansi-regex" "4.0.0"
-    "@types/fs-extra" "8.0.0"
-    "@types/node" "~10"
-    "@types/platform" "1.3.2"
-    ansi-regex "4.1.0"
-    fs-extra "8.1.0"
-    logdown "3.2.8"
-    moment "2.24.0"
-    platform "1.3.5"
-    url-search-params-polyfill "7.0.0"
-
 "@wireapp/commons@2.2.2":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.2.tgz#da52541b78c94a96fc242927c232f99a510b46a2"
@@ -2426,11 +2410,6 @@ base@^0.11.1:
     isobject "^3.0.1"
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
-
-bazinga64@5.5.1:
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.1.tgz#3d6fac3269821ddfd5d2e90dd920553d9b55340f"
-  integrity sha512-iTx1VzjapaAb59gp8U60bBzXxB3ij/SmKra6e2TyzKRhbaOoinLG/gOaXgmHy0tcoNhK+ohngYLWPzAPSFYnQg==
 
 bazinga64@5.5.2:
   version "5.5.2"
