@@ -209,7 +209,7 @@ export class Conversation {
     this.messages = ko.pureComputed(() =>
       this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      })
+      }),
     );
 
     this.hasAdditionalMessages = ko.observable(true);
