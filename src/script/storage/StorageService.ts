@@ -193,7 +193,7 @@ export class StorageService {
       this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
       throw error;
     }
-    return Promise.resolve(true);
+    return true;
   }
 
   async deleteStore(storeName: string): Promise<void> {
