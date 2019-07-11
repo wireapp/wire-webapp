@@ -1631,16 +1631,6 @@
     "@wireapp/store-engine" "3.5.2"
     dexie "2.0.4"
 
-"@wireapp/store-engine@3.5.1":
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.5.1.tgz#9e2bf0ff22bf41c41e1703a70a94a7b2b17b55d4"
-  integrity sha512-U72/eX9gUNtJDqDeR/IjUx5C//T8osdJSxeQ6bVNCJOeNb9TT1xjGsIJiCV5POnGOvtcONrx85xrC2R991ogYA==
-  dependencies:
-    "@types/bro-fs" "0.4.2"
-    "@types/filesystem" "0.0.29"
-    "@types/node" "~10"
-    bro-fs "0.5.0"
-
 "@wireapp/store-engine@3.5.2":
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.5.2.tgz#a881f1247a0301f2445c16019e3da29f6428c50f"

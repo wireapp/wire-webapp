@@ -38,8 +38,6 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
-import {LegalHoldMessage} from './message/LegalHoldMessage';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -208,36 +206,11 @@ export class Conversation {
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko.pureComputed(() => {
-      const orderedMessages = this.messages_unordered().sort((message_a, message_b) => {
+    this.messages = ko.pureComputed(() =>
+      this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      });
-      if (!orderedMessages.length) {
-        return [];
-      }
-      let latestLegalHoldStatus = false;
-      const messages = [];
-      orderedMessages.forEach(message => {
-        if (typeof message.legalHoldStatus === 'undefined') {
-          return messages.push(message);
-        }
-        const legalHoldStatus = !!message.legalHoldStatus;
-        if (legalHoldStatus === latestLegalHoldStatus) {
-          return messages.push(message);
-        }
-        if (!message.isLegalHold()) {
-          const timestamp = message.timestamp() - 1;
-          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus, timestamp);
-          messages.push(legalHoldMessage);
-        }
-        messages.push(message);
-        latestLegalHoldStatus = legalHoldStatus;
-      });
-      if (latestLegalHoldStatus !== this.hasLegalHold()) {
-        amplify.publish(VERIFY_LEGAL_HOLD, this, latestLegalHoldStatus);
-      }
-      return messages;
-    });
+      }),
+    );
 
     this.hasAdditionalMessages = ko.observable(true);
 
@@ -494,19 +467,7 @@ export class Conversation {
    * @param {number} timeStamp - Timestamp of system message creation
    * @returns {undefined} No return value
    */
-  appendLegalHoldSystemMessage = (isActivationMessage, timeStamp) => {
-    const lastMessage = this.getLastMessage();
-    const hasBeenAlreadyAppended = message => {
-      return message && message.isLegalHold() && message.isActivationMessage === isActivationMessage;
-    };
-    if (hasBeenAlreadyAppended(lastMessage)) {
-      return;
-    }
-
-    const legalHoldMessage = new LegalHoldMessage(isActivationMessage, timeStamp);
-
-    this.messages_unordered.push(legalHoldMessage);
-  };
+  appendLegalHoldSystemMessage = (isActivationMessage, timeStamp) => {};
 
   getFirstUnreadSelfMention() {
     return this.unreadState()
