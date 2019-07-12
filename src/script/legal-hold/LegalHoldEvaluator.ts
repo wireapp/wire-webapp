@@ -19,13 +19,14 @@
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-export const hasMessageLegalHoldFlag = (mappedEvent: {
-  data: {
-    expects_read_confirmation?: boolean;
-    legal_hold_status?: number;
-  };
-}): boolean => {
-  switch (mappedEvent.data.legal_hold_status) {
+type MappedEventData = {
+  expects_read_confirmation?: boolean;
+  legal_hold_status?: LegalHoldStatus;
+};
+
+// @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
+export const hasMessageLegalHoldFlag = (data: MappedEventData): boolean => {
+  switch (data.legal_hold_status) {
     case LegalHoldStatus.DISABLED:
     case LegalHoldStatus.ENABLED:
       return true;
@@ -34,6 +35,9 @@ export const hasMessageLegalHoldFlag = (mappedEvent: {
   }
 };
 
-export const doesFlagMatchesLocalState = (messageFlag: LegalHoldStatus, localState: LegalHoldStatus): boolean => {
-  return messageFlag === localState;
+export const renderLegalHoldMessage = (data: MappedEventData, localState: LegalHoldStatus) => {
+  if (typeof data.legal_hold_status === 'number') {
+    return data.legal_hold_status !== localState;
+  }
+  return false;
 };

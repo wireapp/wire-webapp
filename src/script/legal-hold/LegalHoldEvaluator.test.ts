@@ -49,6 +49,14 @@ describe('LegalHoldEvaluator', () => {
         messageId: createRandomUuid(),
       });
 
+      let actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(true);
+
+      actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(true);
+    });
+
+    it('knows when a message is missing a legal hold flag', async () => {
       const legalHoldFlagMissing = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({
           hotKnock: false,
@@ -68,14 +76,26 @@ describe('LegalHoldEvaluator', () => {
         type: 'conversation.otr-message-add',
       };
 
-      let actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual)).toBe(true);
+      const actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(false);
+    });
+  });
 
-      actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual)).toBe(true);
+  describe('renderLegalHoldMessage', () => {
+    it('returns true when there is a state mismatch between message flag and conversation flag', () => {
+      const enabledOnMessage = {
+        legal_hold_status: LegalHoldStatus.ENABLED,
+      };
 
-      actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual)).toBe(false);
+      const disabledOnMessage = {
+        legal_hold_status: LegalHoldStatus.DISABLED,
+      };
+
+      expect(LegalHoldEvaluator.renderLegalHoldMessage(enabledOnMessage, LegalHoldStatus.ENABLED)).toBe(false);
+      expect(LegalHoldEvaluator.renderLegalHoldMessage(enabledOnMessage, LegalHoldStatus.DISABLED)).toBe(true);
+
+      expect(LegalHoldEvaluator.renderLegalHoldMessage(disabledOnMessage, LegalHoldStatus.ENABLED)).toBe(true);
+      expect(LegalHoldEvaluator.renderLegalHoldMessage(disabledOnMessage, LegalHoldStatus.DISABLED)).toBe(false);
     });
   });
 });
