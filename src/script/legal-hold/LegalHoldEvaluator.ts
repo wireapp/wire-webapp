@@ -24,7 +24,7 @@ export const hasMessageLegalHoldFlag = (mappedEvent: {
     expects_read_confirmation?: boolean;
     legal_hold_status?: number;
   };
-}) => {
+}): boolean => {
   switch (mappedEvent.data.legal_hold_status) {
     case LegalHoldStatus.DISABLED:
     case LegalHoldStatus.ENABLED:
@@ -32,4 +32,8 @@ export const hasMessageLegalHoldFlag = (mappedEvent: {
     default:
       return false;
   }
+};
+
+export const doesFlagMatchesLocalState = (messageFlag: LegalHoldStatus, localState: LegalHoldStatus): boolean => {
+  return messageFlag === localState;
 };

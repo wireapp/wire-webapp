@@ -1616,6 +1616,13 @@
   dependencies:
     protobufjs "6.8.8"
 
+"@wireapp/protocol-messaging@1.24.2":
+  version "1.24.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.2.tgz#a9c990943c8af74e2cc233fc96454f4c9424de6b"
+  integrity sha512-GX+ffTWSgNI5JLIaWfHPf6R8CkMSFqoquud7zQ2PRvIZWPIeXissQDWlmxQbqrJ9sKCD85+faEA2aFLs2vjENw==
+  dependencies:
+    protobufjs "6.8.8"
+
 "@wireapp/react-ui-kit@7.3.4":
   version "7.3.4"
   resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.3.4.tgz#ee44485e32dd26c274a01b88744b888ebb523dd0"
