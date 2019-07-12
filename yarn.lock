@@ -751,11 +751,12 @@
   version "8.0.1"
   resolved "https://codeload.github.com/necolas/normalize.css/tar.gz/fc091cce1534909334c1911709a39c22d406977b"
 
-"@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.1":
-  version "1.1.1"
-  resolved "https://codeload.github.com/wireapp/webapp-module-bubble/tar.gz/c4c5a47aefa135d33d88b90df139e4e195983b7d"
+"@bower_components/webapp-module-bubble@wireapp/webapp-module-bubble#1.1.2":
+  version "1.1.2"
+  uid "317f6753996a9ca6c715252145d84e31126d3db4"
+  resolved "https://codeload.github.com/wireapp/webapp-module-bubble/tar.gz/317f6753996a9ca6c715252145d84e31126d3db4"
   dependencies:
-    bower "1.8.2"
+    bower "1.8.8"
 
 "@bower_components/webapp-module-namespace@wireapp/webapp-module-namespace#1.0.2":
   version "1.0.2"
@@ -2496,10 +2497,10 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bower@1.8.2:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/bower/-/bower-1.8.2.tgz#adf53529c8d4af02ef24fb8d5341c1419d33e2f7"
-  integrity sha1-rfU1KcjUrwLvJPuNU0HBQZ0z4vc=
+bower@1.8.8:
+  version "1.8.8"
+  resolved "https://registry.yarnpkg.com/bower/-/bower-1.8.8.tgz#82544be34a33aeae7efb8bdf9905247b2cffa985"
+  integrity sha512-1SrJnXnkP9soITHptSO+ahx3QKp3cVzn8poI6ujqc5SeOkg5iqM1pK9H+DSc2OQ8SnO0jC/NG4Ur/UIwy7574A==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
