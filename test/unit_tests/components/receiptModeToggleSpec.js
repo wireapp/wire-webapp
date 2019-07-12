@@ -17,7 +17,7 @@
  *
  */
 
-import {instantiateComponent} from '../../api/knockoutHelpers';
+import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/receiptModeToggle';

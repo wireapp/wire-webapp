@@ -72,7 +72,7 @@ export class Conversation {
     this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]);
+    this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;

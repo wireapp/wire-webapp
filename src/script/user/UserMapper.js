@@ -81,6 +81,7 @@ export class UserMapper {
    * @param {User} userEntity - User entity that the info shall be mapped to
    * @param {Object} userData - User data
    * @returns {User} Mapped user entity
+   * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
   updateUserFromObject(userEntity, userData) {
     if (!userData) {
