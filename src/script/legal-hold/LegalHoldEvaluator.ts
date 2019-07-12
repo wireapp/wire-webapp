@@ -25,19 +25,13 @@ type MappedEventData = {
 };
 
 // @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
-export const hasMessageLegalHoldFlag = (data: MappedEventData): boolean => {
-  switch (data.legal_hold_status) {
-    case LegalHoldStatus.DISABLED:
-    case LegalHoldStatus.ENABLED:
-      return true;
-    default:
-      return false;
-  }
+export const hasMessageLegalHoldFlag = (messageData: MappedEventData): boolean => {
+  return messageData.legal_hold_status !== LegalHoldStatus.UNKNOWN;
 };
 
-export const renderLegalHoldMessage = (data: MappedEventData, localState: LegalHoldStatus) => {
-  if (typeof data.legal_hold_status === 'number') {
-    return data.legal_hold_status !== localState;
+export const renderLegalHoldMessage = (messageData: MappedEventData, localConversationState: LegalHoldStatus) => {
+  if (messageData.legal_hold_status !== LegalHoldStatus.UNKNOWN) {
+    return messageData.legal_hold_status !== localConversationState;
   }
   return false;
 };
