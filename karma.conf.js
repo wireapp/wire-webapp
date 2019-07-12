@@ -111,7 +111,7 @@ module.exports = function(config) {
         rules: [
           {
             exclude: /node_modules/,
-            include: path.resolve('src/script/'),
+            include: [path.resolve('src/script/'), path.resolve('test/helper/')],
             loader: 'babel-loader',
             test: /\.[tj]sx?$/,
           },
