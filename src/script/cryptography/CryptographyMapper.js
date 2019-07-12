@@ -49,7 +49,7 @@ export class CryptographyMapper {
    * Maps a generic message into an event in JSON.
    *
    * @param {GenericMessage} genericMessage - Received ProtoBuffer message
-   * @param {JSON} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {Object} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   mapGenericMessage(genericMessage, event) {
