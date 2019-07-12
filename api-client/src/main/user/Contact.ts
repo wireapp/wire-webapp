@@ -17,8 +17,10 @@
  *
  */
 
+import {AccentColor} from '@wireapp/commons';
+
 export interface Contact {
-  accent_id?: number;
+  accent_id?: AccentColor.AccentColorID;
   handle: string;
   id: string;
   name: string;
