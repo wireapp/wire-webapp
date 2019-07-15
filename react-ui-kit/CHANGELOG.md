@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.3.6...@wireapp/react-ui-kit@7.4.0) (2019-07-15)
+
+
+### Features
+
+* **react-ui-kit:** Icon shadows ([#2072](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2072)) ([8f9bcb4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/8f9bcb4))
+
+
+
+
+
 ## [7.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.3.5...@wireapp/react-ui-kit@7.3.6) (2019-07-15)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
