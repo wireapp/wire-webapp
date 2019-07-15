@@ -20,11 +20,11 @@
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {CALL, CONVERSATION, ClientEvent, USER} from '../event/Client';
+import {CONVERSATION, ClientEvent} from '../event/Client';
 
 export type MappedEvent = Record<string, any> & {
   data?: MappedEventData;
-  type: CALL | CONVERSATION | USER;
+  type: CONVERSATION;
 };
 
 type MappedEventData = {
@@ -48,9 +48,9 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 
 // @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
-  const isNotLegalHoldSystemMessage = mappedEvent.type !== ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE;
+  const isValidMessageType = [ClientEvent.CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type);
   const hasLegalHoldFlag = mappedEvent.data && mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
-  return isNotLegalHoldSystemMessage && hasLegalHoldFlag;
+  return isValidMessageType && hasLegalHoldFlag;
 };
 
 export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversationState: LegalHoldStatus): boolean => {
