@@ -1487,15 +1487,15 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@5.14.2":
-  version "5.14.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-5.14.2.tgz#711c345fb180bfaad659b47b3e426a58b3d0b1ba"
-  integrity sha512-U/d3h1B4PoNe9CFn4906RAdQmqqxG1WkqTySJbC9e30aQW7+dTFCE7IXgLip8HPHZih6GEUdwGsgxQwHtRg7Pg==
+"@wireapp/api-client@5.14.4":
+  version "5.14.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-5.14.4.tgz#3bda37e6b7491b414e6487afb79eb4456299f735"
+  integrity sha512-MQmwBO4Gy1ydN4p1grVJSmSu8kuT+NfKUXF7ewK8/vJsTws6JlBlOhdezOJ9LpN+DyuDRGMMbnhQNIPu+2PivQ==
   dependencies:
     "@types/node" "~10"
     "@types/spark-md5" "3.0.1"
     "@types/tough-cookie" "2.3.5"
-    "@wireapp/commons" "2.2.2"
+    "@wireapp/commons" "2.2.3"
     "@wireapp/priority-queue" "1.2.2"
     "@wireapp/store-engine" "3.5.2"
     axios "0.19.0"
@@ -1526,6 +1526,22 @@
     platform "1.3.5"
     url-search-params-polyfill "7.0.0"
 
+"@wireapp/commons@2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.3.tgz#cc609e7ff2140532a361b113fba0ccaff2c1c159"
+  integrity sha512-b8uW15oIWITpqCXwagp9K7dCcIiqYwKsxZf0AkJCszfAMiR6475kMGg85dQ/2rNv2FJLfKIG66erD+mEoicZBg==
+  dependencies:
+    "@types/ansi-regex" "4.0.0"
+    "@types/fs-extra" "8.0.0"
+    "@types/node" "~10"
+    "@types/platform" "1.3.2"
+    ansi-regex "4.1.0"
+    fs-extra "8.1.0"
+    logdown "3.2.8"
+    moment "2.24.0"
+    platform "1.3.5"
+    url-search-params-polyfill "7.0.0"
+
 "@wireapp/copy-config@0.8.2":
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.8.2.tgz#b46de53dd4d585f5fc363030e4b0b73d4c490f22"
@@ -1539,14 +1555,14 @@
     logdown "3.2.8"
     rimraf "2.6.3"
 
-"@wireapp/core@12.17.1":
-  version "12.17.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.1.tgz#71fbdacbe15ceb9b623cbfd9913826539397aff1"
-  integrity sha512-kZt2HQfBlHV2oTudHfZ/ilXkh3LmaezhMWc2Yqy8Fx6iUvlPr5KYu3v4JiI9tY/wqYs17w7dN7YIOllKoJ3OvQ==
+"@wireapp/core@12.17.3":
+  version "12.17.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.3.tgz#cf122d54cd0a4f1532bb53eec4ce480617bc26de"
+  integrity sha512-+QyBfsBTQPYolqYt32e5Qp3NfKGYaVWGmDSPYhLT2SwqPX3lLfg4xtxliX3WO9QBFnZJTgmuMxpaQXqVtvDf8w==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~10"
-    "@wireapp/api-client" "5.14.2"
+    "@wireapp/api-client" "5.14.4"
     "@wireapp/cryptobox" "11.4.2"
     "@wireapp/protocol-messaging" "1.24.1"
     "@wireapp/store-engine" "3.5.2"
