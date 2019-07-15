@@ -107,6 +107,45 @@ export const DemoIcons = () => (
       <TriangleIcon height={32} />
       <WireIcon width={32} />
     </div>
+
+    <Line />
+    <H1>Shadowed Icons</H1>
+    <div style={{display: 'grid', gridGap: 16, gridTemplateColumns: 'repeat(8, 1fr)'}}>
+      <AddPeopleIcon height={32} shadow />
+      <ArrowIcon direction="up" height={32} shadow />
+      <AttachmentIcon height={32} shadow />
+      <AudioVideoIcon height={32} shadow />
+      <CallIcon height={32} shadow />
+      <CamIcon width={32} shadow />
+      <CheckIcon width={32} shadow />
+      <DeviceIcon height={32} shadow />
+      <DownloadIcon height={32} shadow />
+      <EditIcon height={32} shadow />
+      <FileIcon height={32} shadow />
+      <GifIcon width={32} shadow />
+      <HangupIcon width={32} shadow />
+      <ImageIcon height={32} shadow />
+      <InviteIcon height={32} shadow />
+      <LeaveIcon height={32} shadow />
+      <MessageIcon height={32} shadow />
+      <MoreIcon height={32} shadow />
+      <MuteIcon height={32} shadow />
+      <OptionsIcon height={32} shadow />
+      <PingIcon height={32} shadow />
+      <PlaneIcon height={32} shadow />
+      <ProfileIcon height={32} shadow />
+      <RecordIcon width={32} shadow />
+      <RecordPendingIcon width={32} shadow />
+      <ScreenshareIcon width={32} shadow />
+      <ServicesIcon height={32} shadow />
+      <SettingsIcon height={32} shadow />
+      <SpeakerIcon height={32} shadow />
+      <TeamIcon height={32} shadow />
+      <TimedIcon height={32} shadow />
+      <TrashIcon height={32} shadow />
+      <TriangleIcon height={32} shadow />
+      <WireIcon width={32} shadow />
+    </div>
     <Line />
     <H1>Brand Icons</H1>
     <div style={{display: 'grid', gridGap: 16, gridTemplateColumns: 'repeat(9, 1fr)'}}>
