@@ -3036,24 +3036,46 @@ export class ConversationRepository {
         return conversationEntity;
       })
       .then(async conversationEntity => {
-        if (LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
-          const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldEnabled(
-            eventJson.conversation,
-            eventJson.from,
-            eventJson.time,
-          );
-
-          const localHoldStatus = conversationEntity.hasLegalHold()
-            ? LegalHoldStatus.ENABLED
-            : LegalHoldStatus.DISABLED;
-          const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
-
-          if (renderLegalHoldMessage) {
-            await this.eventRepository.injectEvent(legalHoldEvent);
-          }
-
+        if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
           return conversationEntity;
         }
+
+        const localHoldStatus = conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
+        const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
+
+        if (!renderLegalHoldMessage) {
+          return conversationEntity;
+        }
+
+        const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
+          eventJson.conversation,
+          eventJson.from,
+          eventJson.time,
+          eventJson.data.legal_hold_status,
+          true,
+        );
+        await this.eventRepository.injectEvent(legalHoldEvent);
+        await this.updateAllClients(conversationEntity);
+
+        const updatedLocalHoldStatus = conversationEntity.hasLegalHold()
+          ? LegalHoldStatus.ENABLED
+          : LegalHoldStatus.DISABLED;
+        const renderLocalLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(
+          eventJson,
+          updatedLocalHoldStatus,
+        );
+
+        if (!renderLocalLegalHoldMessage) {
+          return conversationEntity;
+        }
+        const localLegalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
+          eventJson.conversation,
+          eventJson.from,
+          eventJson.time,
+          localHoldStatus,
+          false,
+        );
+        await this.eventRepository.injectEvent(localLegalHoldEvent);
         return conversationEntity;
       })
       .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
