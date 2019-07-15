@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
+import React from 'react';
 import {COLOR} from '../Identity/colors';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
@@ -31,6 +32,7 @@ export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   height?: number;
   scale?: number;
   width?: number;
+  shadow?: boolean;
 }
 
 export const SVGIcon = ({
@@ -40,6 +42,7 @@ export const SVGIcon = ({
   width = null,
   height = null,
   color = COLOR.ICON,
+  shadow,
   children,
   ...props
 }: InternalSVGIconProps) => {
@@ -51,9 +54,26 @@ export const SVGIcon = ({
   }
   const newWidth = Math.ceil(realWidth * newScale);
   const newHeight = Math.ceil(realHeight * newScale);
+  const shadowId = shadow && Math.random().toString();
   return (
-    <svg fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} width={newWidth} height={newHeight} {...props}>
-      {children}
+    <svg
+      style={{overflow: 'visible'}}
+      fill={color}
+      viewBox={`0 0 ${realWidth} ${realHeight}`}
+      width={newWidth}
+      height={newHeight}
+      {...props}
+    >
+      {shadow && (
+        <defs>
+          <filter id={shadowId} x="-50%" y="-50%" width="200%" height="200%">
+            <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
+            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2.2" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+          </filter>
+        </defs>
+      )}
+      <g filter={shadow && `url(#${shadowId})`}>{children}</g>
     </svg>
   );
 };
