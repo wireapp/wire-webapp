@@ -25,9 +25,11 @@ import {
   AttachmentIcon,
   AudioVideoIcon,
   CallIcon,
+  CameraIcon,
   CamIcon,
   CheckIcon,
   ChromeIcon,
+  COLOR,
   Container,
   DeviceIcon,
   DownloadIcon,
@@ -77,6 +79,7 @@ export const DemoIcons = () => (
       <AttachmentIcon height={32} />
       <AudioVideoIcon height={32} />
       <CallIcon height={32} />
+      <CameraIcon width={32} />
       <CamIcon width={32} />
       <CheckIcon width={32} />
       <DeviceIcon height={32} />
@@ -111,40 +114,41 @@ export const DemoIcons = () => (
     <Line />
     <H1>Shadowed Icons</H1>
     <div style={{display: 'grid', gridGap: 16, gridTemplateColumns: 'repeat(8, 1fr)'}}>
-      <AddPeopleIcon height={32} shadow />
-      <ArrowIcon direction="up" height={32} shadow />
-      <AttachmentIcon height={32} shadow />
-      <AudioVideoIcon height={32} shadow />
-      <CallIcon height={32} shadow />
-      <CamIcon width={32} shadow />
-      <CheckIcon width={32} shadow />
-      <DeviceIcon height={32} shadow />
-      <DownloadIcon height={32} shadow />
-      <EditIcon height={32} shadow />
-      <FileIcon height={32} shadow />
-      <GifIcon width={32} shadow />
-      <HangupIcon width={32} shadow />
-      <ImageIcon height={32} shadow />
-      <InviteIcon height={32} shadow />
-      <LeaveIcon height={32} shadow />
-      <MessageIcon height={32} shadow />
-      <MoreIcon height={32} shadow />
-      <MuteIcon height={32} shadow />
-      <OptionsIcon height={32} shadow />
-      <PingIcon height={32} shadow />
-      <PlaneIcon height={32} shadow />
-      <ProfileIcon height={32} shadow />
-      <RecordIcon width={32} shadow />
-      <RecordPendingIcon width={32} shadow />
-      <ScreenshareIcon width={32} shadow />
-      <ServicesIcon height={32} shadow />
-      <SettingsIcon height={32} shadow />
-      <SpeakerIcon height={32} shadow />
-      <TeamIcon height={32} shadow />
-      <TimedIcon height={32} shadow />
-      <TrashIcon height={32} shadow />
-      <TriangleIcon height={32} shadow />
-      <WireIcon width={32} shadow />
+      <AddPeopleIcon height={32} shadow color={COLOR.WHITE} />
+      <ArrowIcon direction="up" height={32} shadow color={COLOR.WHITE} />
+      <AttachmentIcon height={32} shadow color={COLOR.WHITE} />
+      <AudioVideoIcon height={32} shadow color={COLOR.WHITE} />
+      <CallIcon height={32} shadow color={COLOR.WHITE} />
+      <CameraIcon width={32} shadow color={COLOR.WHITE} />
+      <CamIcon width={32} shadow color={COLOR.WHITE} />
+      <CheckIcon width={32} shadow color={COLOR.WHITE} />
+      <DeviceIcon height={32} shadow color={COLOR.WHITE} />
+      <DownloadIcon height={32} shadow color={COLOR.WHITE} />
+      <EditIcon height={32} shadow color={COLOR.WHITE} />
+      <FileIcon height={32} shadow color={COLOR.WHITE} />
+      <GifIcon width={32} shadow color={COLOR.WHITE} />
+      <HangupIcon width={32} shadow color={COLOR.WHITE} />
+      <ImageIcon height={32} shadow color={COLOR.WHITE} />
+      <InviteIcon height={32} shadow color={COLOR.WHITE} />
+      <LeaveIcon height={32} shadow color={COLOR.WHITE} />
+      <MessageIcon height={32} shadow color={COLOR.WHITE} />
+      <MoreIcon height={32} shadow color={COLOR.WHITE} />
+      <MuteIcon height={32} shadow color={COLOR.WHITE} />
+      <OptionsIcon height={32} shadow color={COLOR.WHITE} />
+      <PingIcon height={32} shadow color={COLOR.WHITE} />
+      <PlaneIcon height={32} shadow color={COLOR.WHITE} />
+      <ProfileIcon height={32} shadow color={COLOR.WHITE} />
+      <RecordIcon width={32} shadow color={COLOR.WHITE} />
+      <RecordPendingIcon width={32} shadow color={COLOR.WHITE} />
+      <ScreenshareIcon width={32} shadow color={COLOR.WHITE} />
+      <ServicesIcon height={32} shadow color={COLOR.WHITE} />
+      <SettingsIcon height={32} shadow color={COLOR.WHITE} />
+      <SpeakerIcon height={32} shadow color={COLOR.WHITE} />
+      <TeamIcon height={32} shadow color={COLOR.WHITE} />
+      <TimedIcon height={32} shadow color={COLOR.WHITE} />
+      <TrashIcon height={32} shadow color={COLOR.WHITE} />
+      <TriangleIcon height={32} shadow color={COLOR.WHITE} />
+      <WireIcon width={32} shadow color={COLOR.WHITE} />
     </div>
     <Line />
     <H1>Brand Icons</H1>

@@ -23,6 +23,7 @@ export * from './AttachmentIcon';
 export * from './AudioVideoIcon';
 export * from './CallIcon';
 export * from './CamIcon';
+export * from './CameraIcon';
 export * from './CheckIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';

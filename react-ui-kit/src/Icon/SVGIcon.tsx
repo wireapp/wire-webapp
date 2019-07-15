@@ -44,6 +44,7 @@ export const SVGIcon = ({
   color = COLOR.ICON,
   shadow,
   children,
+  style,
   ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
@@ -57,7 +58,7 @@ export const SVGIcon = ({
   const shadowId = shadow && Math.random().toString();
   return (
     <svg
-      style={{overflow: 'visible'}}
+      style={{...style, overflow: 'visible'}}
       fill={color}
       viewBox={`0 0 ${realWidth} ${realHeight}`}
       width={newWidth}
@@ -68,7 +69,7 @@ export const SVGIcon = ({
         <defs>
           <filter id={shadowId} x="-50%" y="-50%" width="200%" height="200%">
             <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
-            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2.2" />
+            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2.5" />
             <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
           </filter>
         </defs>
