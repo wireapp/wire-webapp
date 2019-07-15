@@ -141,27 +141,27 @@ z.conversation.EventBuilder = {
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
-  buildLegalHoldDisabled(conversationEntity, timestamp) {
+  buildLegalHoldDisabled(conversationId, userId, timestamp) {
     return {
-      conversation: conversationEntity.id,
+      conversation: conversationId,
       data: {
         legal_hold_status: LegalHoldStatus.DISABLED,
       },
-      from: conversationEntity.selfUser().id,
+      from: userId,
       id: createRandomUuid(),
-      time: conversationEntity.getPreviousISODate(timestamp),
+      time: new Date(new Date(timestamp) - 1).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
-  buildLegalHoldEnabled(conversationEntity, timestamp) {
+  buildLegalHoldEnabled(conversationId, userId, timestamp) {
     return {
-      conversation: conversationEntity.id,
+      conversation: conversationId,
       data: {
         legal_hold_status: LegalHoldStatus.ENABLED,
       },
-      from: conversationEntity.selfUser().id,
+      from: userId,
       id: createRandomUuid(),
-      time: conversationEntity.getPreviousISODate(timestamp),
+      time: new Date(new Date(timestamp) - 1).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },

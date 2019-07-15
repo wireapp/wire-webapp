@@ -36,6 +36,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 import {BackendClientError} from '../error/BackendClientError';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 export class EventRepository {
   static get CONFIG() {
@@ -628,6 +629,21 @@ export class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
+      .then(mappedEvent => {
+        if (
+          mappedEvent.type !== ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE &&
+          mappedEvent.data &&
+          mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN
+        ) {
+          const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldEnabled(
+            mappedEvent.conversation,
+            mappedEvent.from,
+            mappedEvent.time,
+          );
+          return this.injectEvent(legalHoldEvent).then(() => mappedEvent);
+        }
+        return mappedEvent;
+      })
       .then(mappedEvent => {
         return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
           // use reduce to resolve promises sequentially

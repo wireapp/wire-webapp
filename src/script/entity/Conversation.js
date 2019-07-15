@@ -484,11 +484,6 @@ export class Conversation {
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), currentTimestamp);
   }
 
-  getPreviousISODate(timestamp) {
-    const previousTimestamp = timestamp - 1;
-    return new Date(previousTimestamp).toISOString();
-  }
-
   get_next_iso_date(currentTimestamp) {
     if (!_.isNumber(currentTimestamp)) {
       currentTimestamp = Date.now();
