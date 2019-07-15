@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.17.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.3...@wireapp/core@12.17.4) (2019-07-15)
+
+
+### Bug Fixes
+
+* **core:** Set default legal hold status to 'unknown' ([#2071](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2071)) ([691efd0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/691efd0))
+
+
+
+
+
 ## [12.17.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.2...@wireapp/core@12.17.3) (2019-07-12)
 
 **Note:** Version bump only for package @wireapp/core
