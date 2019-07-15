@@ -85,7 +85,7 @@ export class TextContentBuilder {
     return this;
   }
 
-  public withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.DISABLED): TextContentBuilder {
+  public withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN): TextContentBuilder {
     if (typeof legalHoldStatus !== 'undefined') {
       this.content.legalHoldStatus = legalHoldStatus;
     }

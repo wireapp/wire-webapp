@@ -391,7 +391,7 @@ describe('ConversationService', () => {
         .withLegalHoldStatus()
         .build();
 
-      expect(firstMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.DISABLED);
+      expect(firstMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.UNKNOWN);
 
       const replyMessage = account.service.conversation.messageBuilder
         .createText(undefined, text)
