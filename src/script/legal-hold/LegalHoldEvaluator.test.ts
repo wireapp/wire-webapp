@@ -23,6 +23,7 @@ import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {ClientEvent} from '../event/Client';
+import {StatusType} from '../message/StatusType';
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 
 describe('LegalHoldEvaluator', () => {
@@ -112,8 +113,8 @@ describe('LegalHoldEvaluator', () => {
         conversation: createRandomUuid(),
         from: createRandomUuid(),
         id: createRandomUuid(),
-        status: 1,
-        time: '2019-07-15T14:16:55.404Z',
+        status: StatusType.SENDING,
+        time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 

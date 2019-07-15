@@ -181,7 +181,6 @@ class App {
       this.service.event,
       this.service.notification,
       this.service.webSocket,
-      this.service.conversation,
       repositories.cryptography,
       serverTimeHandler,
       repositories.user,

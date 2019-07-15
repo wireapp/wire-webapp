@@ -212,7 +212,6 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.event_service,
         TestFactory.notification_service,
         TestFactory.web_socket_service,
-        TestFactory.conversation_service,
         TestFactory.cryptography_repository,
         serverTimeHandler,
         TestFactory.user_repository,
