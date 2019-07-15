@@ -22,6 +22,7 @@ import {createRandomUuid} from 'Util/util';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {ClientEvent} from '../event/Client';
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 
 describe('LegalHoldEvaluator', () => {
@@ -49,11 +50,23 @@ describe('LegalHoldEvaluator', () => {
         messageId: createRandomUuid(),
       });
 
-      let actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(true);
+      const event: Object = {
+        conversation: createRandomUuid(),
+        data: {
+          recipient: 'd4c1a1838944deb1',
+          sender: '494fd7d7613e0358',
+          text: 'something-secure',
+        },
+        from: createRandomUuid(),
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      };
 
-      actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(true);
+      let mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
+
+      mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
 
     it('knows when a message is missing a legal hold flag', async () => {
@@ -73,29 +86,50 @@ describe('LegalHoldEvaluator', () => {
         },
         from: createRandomUuid(),
         time: new Date().toISOString(),
-        type: 'conversation.otr-message-add',
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const actual = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
-      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(actual.data)).toBe(false);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
+      expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(false);
     });
   });
 
   describe('renderLegalHoldMessage', () => {
     it('returns true when there is a state mismatch between message flag and conversation flag', () => {
       const enabledOnMessage = {
-        legal_hold_status: LegalHoldStatus.ENABLED,
+        data: {
+          legal_hold_status: LegalHoldStatus.ENABLED,
+        },
       };
 
       const disabledOnMessage = {
-        legal_hold_status: LegalHoldStatus.DISABLED,
+        data: {
+          legal_hold_status: LegalHoldStatus.DISABLED,
+        },
       };
 
-      expect(LegalHoldEvaluator.renderLegalHoldMessage(enabledOnMessage, LegalHoldStatus.ENABLED)).toBe(false);
-      expect(LegalHoldEvaluator.renderLegalHoldMessage(enabledOnMessage, LegalHoldStatus.DISABLED)).toBe(true);
+      const mappedEvent: LegalHoldEvaluator.MappedEvent = {
+        conversation: createRandomUuid(),
+        from: createRandomUuid(),
+        id: createRandomUuid(),
+        status: 1,
+        time: '2019-07-15T14:16:55.404Z',
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      };
 
-      expect(LegalHoldEvaluator.renderLegalHoldMessage(disabledOnMessage, LegalHoldStatus.ENABLED)).toBe(true);
-      expect(LegalHoldEvaluator.renderLegalHoldMessage(disabledOnMessage, LegalHoldStatus.DISABLED)).toBe(false);
+      expect(
+        LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...enabledOnMessage}, LegalHoldStatus.ENABLED),
+      ).toBe(false);
+      expect(
+        LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...enabledOnMessage}, LegalHoldStatus.DISABLED),
+      ).toBe(true);
+
+      expect(
+        LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...disabledOnMessage}, LegalHoldStatus.ENABLED),
+      ).toBe(true);
+      expect(
+        LegalHoldEvaluator.renderLegalHoldMessage({...mappedEvent, ...disabledOnMessage}, LegalHoldStatus.DISABLED),
+      ).toBe(false);
     });
   });
 });

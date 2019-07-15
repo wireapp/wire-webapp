@@ -17,11 +17,11 @@
  *
  */
 
-enum CALL {
+export enum CALL {
   E_CALL = 'call.e-call',
 }
 
-enum CONVERSATION {
+export enum CONVERSATION {
   ASSET_ADD = 'conversation.asset-add',
   CONFIRMATION = 'conversation.confirmation',
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',
@@ -43,7 +43,7 @@ enum CONVERSATION {
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
 }
 
-enum USER {
+export enum USER {
   AVAILABILITY = 'user.availability',
 }
 

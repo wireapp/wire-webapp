@@ -36,7 +36,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 import {BackendClientError} from '../error/BackendClientError';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {hasMessageLegalHoldFlag} from '../legal-hold/LegalHoldEvaluator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -630,11 +630,7 @@ export class EventRepository {
 
     return mapEvent
       .then(mappedEvent => {
-        if (
-          mappedEvent.type !== ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE &&
-          mappedEvent.data &&
-          mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN
-        ) {
+        if (hasMessageLegalHoldFlag(mappedEvent)) {
           const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldEnabled(
             mappedEvent.conversation,
             mappedEvent.from,
