@@ -101,6 +101,7 @@ import {Config} from '../auth/config';
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
 import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from '../legal-hold/ConversationLegalHoldStateHandler';
+import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -3034,6 +3035,27 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
+      .then(async conversationEntity => {
+        if (LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
+          const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldEnabled(
+            eventJson.conversation,
+            eventJson.from,
+            eventJson.time,
+          );
+
+          const localHoldStatus = conversationEntity.hasLegalHold()
+            ? LegalHoldStatus.ENABLED
+            : LegalHoldStatus.DISABLED;
+          const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
+
+          if (renderLegalHoldMessage) {
+            await this.eventRepository.injectEvent(legalHoldEvent);
+          }
+
+          return conversationEntity;
+        }
+        return conversationEntity;
+      })
       .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
@@ -3145,7 +3167,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         const isMessageEdit = !!eventJson.edited_time;
         if (isMessageEdit) {
-          // in case of an edition, the DB listner will take care of updating the local entity
+          // in case of an edition, the DB listener will take care of updating the local entity
           return {conversationEntity};
         }
         return this._addEventToConversation(conversationEntity, eventJson);

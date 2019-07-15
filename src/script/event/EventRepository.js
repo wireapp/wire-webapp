@@ -34,9 +34,7 @@ import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
-
 import {BackendClientError} from '../error/BackendClientError';
-import {hasMessageLegalHoldFlag} from '../legal-hold/LegalHoldEvaluator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -626,17 +624,6 @@ export class EventRepository {
       : Promise.resolve(event);
 
     return mapEvent
-      .then(mappedEvent => {
-        if (hasMessageLegalHoldFlag(mappedEvent)) {
-          const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldEnabled(
-            mappedEvent.conversation,
-            mappedEvent.from,
-            mappedEvent.time,
-          );
-          return this.injectEvent(legalHoldEvent).then(() => mappedEvent);
-        }
-        return mappedEvent;
-      })
       .then(mappedEvent => {
         return this.eventProcessMiddlewares.reduce((eventPromise, middleware) => {
           // use reduce to resolve promises sequentially
