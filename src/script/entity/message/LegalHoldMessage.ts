@@ -25,10 +25,13 @@ import {Message} from './Message';
  * Legal hold system message
  */
 export class LegalHoldMessage extends Message {
-  constructor(public isActivationMessage: boolean, timestamp: number) {
+  constructor(public legalHoldStatus: LegalHoldStatus, timestamp: number) {
     super();
-    this.legalHoldStatus = isActivationMessage ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
     this.super_type = SuperType.LEGALHOLD;
     this.timestamp(timestamp);
+  }
+
+  get isActivationMessage(): boolean {
+    return this.legalHoldStatus === LegalHoldStatus.ENABLED;
   }
 }
