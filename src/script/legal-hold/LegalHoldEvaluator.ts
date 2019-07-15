@@ -18,10 +18,26 @@
  */
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 
 type MappedEventData = {
   expects_read_confirmation?: boolean;
   legal_hold_status?: LegalHoldStatus;
+};
+
+export const isUserOnLegalHold = (user: User): boolean => {
+  return user.isOnLegalHold();
+};
+
+export const areSomeUsersOnLegalHold = (users: User[]): boolean => {
+  return users.some(isUserOnLegalHold);
+};
+
+export const isConversationOnLegalHold = (conversation: Conversation): boolean => {
+  const amIonLegalHold = isUserOnLegalHold(conversation.selfUser());
+  const areOthersOnLegalHold = areSomeUsersOnLegalHold(conversation.participating_user_ets());
+  return amIonLegalHold || areOthersOnLegalHold;
 };
 
 // @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
@@ -29,9 +45,26 @@ export const hasMessageLegalHoldFlag = (messageData: MappedEventData): boolean =
   return messageData.legal_hold_status !== LegalHoldStatus.UNKNOWN;
 };
 
-export const renderLegalHoldMessage = (messageData: MappedEventData, localConversationState: LegalHoldStatus) => {
+export const renderLegalHoldMessage = (
+  messageData: MappedEventData,
+  localConversationState: LegalHoldStatus,
+): boolean => {
   if (messageData.legal_hold_status !== LegalHoldStatus.UNKNOWN) {
     return messageData.legal_hold_status !== localConversationState;
   }
   return false;
+};
+
+export const haveMessagesChangedLegalHoldState = (
+  messageData: MappedEventData[],
+  localConversationState: LegalHoldStatus,
+): boolean => {
+  return messageData.some(
+    ({legal_hold_status}) =>
+      legal_hold_status !== LegalHoldStatus.UNKNOWN && legal_hold_status !== localConversationState,
+  );
+};
+
+export const getLegalHoldChangedComparator = (oldState: LegalHoldStatus): ((newState: LegalHoldStatus) => boolean) => {
+  return (newState: LegalHoldStatus) => oldState !== newState;
 };
