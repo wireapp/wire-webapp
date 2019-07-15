@@ -28,6 +28,7 @@ enum CONVERSATION {
   GROUP_CREATION = 'conversation.group-creation',
   INCOMING_MESSAGE_TOO_BIG = 'conversation.incoming-message-too-big',
   KNOCK = 'conversation.knock',
+  LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
   LOCATION = 'conversation.location',
   MESSAGE_ADD = 'conversation.message-add',
   MESSAGE_DELETE = 'conversation.message-delete',

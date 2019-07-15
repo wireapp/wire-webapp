@@ -49,7 +49,7 @@ export const renderLegalHoldMessage = (
   messageData: MappedEventData,
   localConversationState: LegalHoldStatus,
 ): boolean => {
-  if (messageData.legal_hold_status !== LegalHoldStatus.UNKNOWN) {
+  if (hasMessageLegalHoldFlag(messageData)) {
     return messageData.legal_hold_status !== localConversationState;
   }
   return false;

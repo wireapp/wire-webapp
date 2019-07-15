@@ -27,6 +27,7 @@ import {BackendEvent} from '../event/Backend';
 
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {StatusType} from '../message/StatusType';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
@@ -138,6 +139,30 @@ z.conversation.EventBuilder = {
       id: createRandomUuid(),
       time: time,
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
+    };
+  },
+  buildLegalHoldDisabled(conversationEntity, timestamp) {
+    return {
+      conversation: conversationEntity.id,
+      data: {
+        legal_hold_status: LegalHoldStatus.DISABLED,
+      },
+      from: conversationEntity.selfUser().id,
+      id: createRandomUuid(),
+      time: conversationEntity.getPreviousISODate(timestamp),
+      type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
+    };
+  },
+  buildLegalHoldEnabled(conversationEntity, timestamp) {
+    return {
+      conversation: conversationEntity.id,
+      data: {
+        legal_hold_status: LegalHoldStatus.ENABLED,
+      },
+      from: conversationEntity.selfUser().id,
+      id: createRandomUuid(),
+      time: conversationEntity.getPreviousISODate(timestamp),
+      type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
   buildMemberJoin(conversationEntity, sender, joiningUserIds, timestamp) {

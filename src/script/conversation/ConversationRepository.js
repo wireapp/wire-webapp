@@ -100,7 +100,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from './ConversationLegalHoldStateHandler';
+import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from '../legal-hold/ConversationLegalHoldStateHandler';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
