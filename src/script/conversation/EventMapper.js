@@ -382,7 +382,7 @@ export class EventMapper {
     return messageEntity;
   }
 
-  _mapLegalHoldUpdate({data, timestamp}) {
+  _mapEventLegalHoldUpdate({data, timestamp}) {
     return new LegalHoldMessage(data.legal_hold_status, timestamp);
   }
 
