@@ -28,13 +28,13 @@ import {
   GenericMessage,
   Knock,
   LastRead,
+  LegalHoldStatus,
   Location,
   MessageDelete,
   MessageEdit,
   MessageHide,
   Reaction,
   Text,
-  LegalHoldStatus,
 } from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -42,11 +42,11 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
-import {t, Declension, joinNames} from 'Util/LocalizerUtil';
-import {getNextItem, getDifference} from 'Util/ArrayUtil';
-import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
+import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {getDifference, getNextItem} from 'Util/ArrayUtil';
+import {arrayToBase64, createRandomUuid, koArrayPushAll, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
+import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith} from 'Util/StringUtil';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -100,7 +100,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from '../legal-hold/ConversationLegalHoldStateHandler';
+import {showLegalHoldWarning} from '../legal-hold/ConversationLegalHoldStateHandler';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 
 // Conversation repository for all conversation interactions with the conversation service
@@ -181,7 +181,6 @@ export class ConversationRepository {
       this.eventRepository,
       this.serverTimeHandler,
     );
-    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(this, this.serverTimeHandler);
     this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
@@ -2621,14 +2620,14 @@ export class ConversationRepository {
       });
   }
 
-  async updateAllClients(conversation) {
+  async updateAllClients(conversationEntity) {
     const sender = this.client_repository.currentClient().id;
     try {
-      await this.conversation_service.post_encrypted_message(conversation.id, {recipients: {}, sender});
+      await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (error) {
       if (error.missing) {
         const remoteUserClients = error.missing;
-        const localUserClients = await this.create_recipients(conversation.id);
+        const localUserClients = await this.create_recipients(conversationEntity.id);
         const selfId = this.selfUser().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
@@ -3035,30 +3034,7 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
-      .then(async conversationEntity => {
-        if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
-          return conversationEntity;
-        }
-
-        const localHoldStatus = conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
-        const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
-
-        if (!renderLegalHoldMessage) {
-          return conversationEntity;
-        }
-
-        const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
-          eventJson.conversation,
-          eventJson.from,
-          eventJson.time,
-          eventJson.data.legal_hold_status,
-          true,
-        );
-        await this.eventRepository.injectEvent(legalHoldEvent);
-        await this.updateAllClients(conversationEntity);
-
-        return conversationEntity;
-      })
+      .then(conversationEntity => this._checkLegalHoldStatus(conversationEntity, eventJson))
       .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
@@ -3115,6 +3091,47 @@ export class ConversationRepository {
         return this.addMissingMember(conversationEntity.id, [sender], timestamp).then(() => conversationEntity);
       }
     }
+
+    return conversationEntity;
+  }
+
+  async _checkLegalHoldStatus(conversationEntity, eventJson) {
+    if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
+      return conversationEntity;
+    }
+
+    const localHoldStatus = conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
+    const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
+
+    if (!renderLegalHoldMessage) {
+      return conversationEntity;
+    }
+
+    const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
+      eventJson.conversation,
+      eventJson.from,
+      eventJson.time,
+      eventJson.data.legal_hold_status,
+      true,
+    );
+    await this.eventRepository.injectEvent(legalHoldEvent);
+    conversationEntity.lhLocalState(eventJson.data.legal_hold_status);
+
+    const oldState = eventJson.data.legal_hold_status === LegalHoldStatus.ENABLED;
+    await this.updateAllClients(conversationEntity);
+    if (oldState === conversationEntity.hasLegalHold()) {
+      return conversationEntity;
+    }
+
+    const secondLegalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
+      eventJson.conversation,
+      eventJson.from,
+      eventJson.time,
+      conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED,
+      false,
+    );
+
+    await this.eventRepository.injectEvent(secondLegalHoldEvent);
 
     return conversationEntity;
   }

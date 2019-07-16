@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -164,6 +165,8 @@ export class Conversation {
 
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
+
+    this.lhLocalState = ko.observable(LegalHoldStatus.UNKNOWN);
 
     this.hasLegalHold = ko.pureComputed(() => {
       if (!this._isInitialized()) {
