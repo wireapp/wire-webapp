@@ -17,7 +17,7 @@
  *
  */
 
-import {GenericMessage, Knock, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Asset, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {createRandomUuid} from 'Util/util';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
@@ -36,9 +36,8 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message has legal hold enabled', async () => {
       const legalHoldFlagOn = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({
+        [GENERIC_MESSAGE_TYPE.ASSET]: new Asset({
           [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: LegalHoldStatus.ENABLED,
-          hotKnock: false,
         }),
         messageId: createRandomUuid(),
       });
@@ -52,7 +51,7 @@ describe('LegalHoldEvaluator', () => {
         },
         from: createRandomUuid(),
         time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
@@ -61,9 +60,8 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message has legal hold disabled', async () => {
       const legalHoldFlagOff = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({
+        [GENERIC_MESSAGE_TYPE.ASSET]: new Asset({
           [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: LegalHoldStatus.DISABLED,
-          hotKnock: false,
         }),
         messageId: createRandomUuid(),
       });
@@ -77,7 +75,7 @@ describe('LegalHoldEvaluator', () => {
         },
         from: createRandomUuid(),
         time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
@@ -86,9 +84,7 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message is missing a legal hold flag', async () => {
       const legalHoldFlagMissing = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({
-          hotKnock: false,
-        }),
+        [GENERIC_MESSAGE_TYPE.ASSET]: new Asset({}),
         messageId: createRandomUuid(),
       });
 
@@ -101,7 +97,7 @@ describe('LegalHoldEvaluator', () => {
         },
         from: createRandomUuid(),
         time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
       const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);

@@ -48,12 +48,14 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 
 // @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
-  // TODO: Add more message types here which can have legal hold status property
-  const isValidMessageType = [ClientEvent.CONVERSATION.KNOCK, ClientEvent.CONVERSATION.MESSAGE_ADD].includes(
-    mappedEvent.type,
-  );
+  // @see https://docs.google.com/spreadsheets/d/1viXE7IBzjJCILvsMH1U6WbcFa2ll_7lIlfJQvE5y6Zw/
+  const supportsLegalHoldFlag = [
+    ClientEvent.CONVERSATION.ASSET_ADD,
+    ClientEvent.CONVERSATION.LOCATION,
+    ClientEvent.CONVERSATION.MESSAGE_ADD,
+  ].includes(mappedEvent.type);
   const hasLegalHoldFlag = mappedEvent.data && mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
-  return isValidMessageType && hasLegalHoldFlag;
+  return supportsLegalHoldFlag && hasLegalHoldFlag;
 };
 
 export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversationState: LegalHoldStatus): boolean => {
@@ -61,18 +63,4 @@ export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversati
     return mappedEvent.data.legal_hold_status !== localConversationState;
   }
   return false;
-};
-
-export const haveMessagesChangedLegalHoldState = (
-  messageData: MappedEventData[],
-  localConversationState: LegalHoldStatus,
-): boolean => {
-  return messageData.some(
-    ({legal_hold_status}) =>
-      legal_hold_status !== LegalHoldStatus.UNKNOWN && legal_hold_status !== localConversationState,
-  );
-};
-
-export const getLegalHoldChangedComparator = (oldState: LegalHoldStatus): ((newState: LegalHoldStatus) => boolean) => {
-  return (newState: LegalHoldStatus) => oldState !== newState;
 };
