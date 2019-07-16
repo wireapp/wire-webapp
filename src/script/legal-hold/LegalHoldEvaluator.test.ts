@@ -26,7 +26,7 @@ import {ClientEvent} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 
-describe('LegalHoldEvaluator', () => {
+xdescribe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {
     let cryptographyMapper: CryptographyMapper;
 
