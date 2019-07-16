@@ -166,8 +166,6 @@ export class Conversation {
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
-    this.lhLocalState = ko.observable(LegalHoldStatus.UNKNOWN);
-
     this.hasLegalHold = ko.pureComputed(() => {
       if (!this._isInitialized()) {
         return false;
@@ -178,6 +176,9 @@ export class Conversation {
     this.needsLegalHoldApproval = ko.observable(this.hasLegalHold());
     this.hasLegalHold.subscribe(hasLegalHold => {
       this.needsLegalHoldApproval(hasLegalHold);
+    });
+    this.legalHoldStatus = ko.pureComputed(() => {
+      return this.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {

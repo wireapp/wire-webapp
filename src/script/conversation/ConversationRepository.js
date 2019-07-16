@@ -3100,38 +3100,45 @@ export class ConversationRepository {
       return conversationEntity;
     }
 
-    const localHoldStatus = conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
-    const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(eventJson, localHoldStatus);
+    const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(
+      eventJson,
+      conversationEntity.legalHoldStatus(),
+    );
 
     if (!renderLegalHoldMessage) {
       return conversationEntity;
     }
 
-    const legalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
-      eventJson.conversation,
-      eventJson.from,
-      eventJson.time,
-      eventJson.data.legal_hold_status,
+    const {
+      conversation: conversationId,
+      from: userId,
+      time: isoTimestamp,
+      data: {legal_hold_status: messageLegalHoldStatus},
+    } = eventJson;
+
+    const legalHoldUpdateBeforeMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+      conversationId,
+      userId,
+      isoTimestamp,
+      messageLegalHoldStatus,
       true,
     );
-    await this.eventRepository.injectEvent(legalHoldEvent);
-    conversationEntity.lhLocalState(eventJson.data.legal_hold_status);
+    await this.eventRepository.injectEvent(legalHoldUpdateBeforeMessage);
 
-    const oldState = eventJson.data.legal_hold_status === LegalHoldStatus.ENABLED;
     await this.updateAllClients(conversationEntity);
-    if (oldState === conversationEntity.hasLegalHold()) {
+    if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
     }
 
-    const secondLegalHoldEvent = z.conversation.EventBuilder.buildLegalHoldMessage(
-      eventJson.conversation,
-      eventJson.from,
-      eventJson.time,
-      conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED,
+    const legalHoldUpdateAfterMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+      conversationId,
+      userId,
+      isoTimestamp,
+      conversationEntity.legalHoldStatus(),
       false,
     );
 
-    await this.eventRepository.injectEvent(secondLegalHoldEvent);
+    await this.eventRepository.injectEvent(legalHoldUpdateAfterMessage);
 
     return conversationEntity;
   }
