@@ -22,10 +22,9 @@ import {PermissionsData} from './PermissionsData';
 
 export enum Role {
   ADMIN = 'admin',
-  PARTNER = 'partner',
+  EXTERNAL = 'external',
   MEMBER = 'member',
   OWNER = 'owner',
-  NONE = 'none',
 }
 
 export const roleToPermissions = (role: string): Permissions => {
@@ -49,14 +48,14 @@ export const roleToPermissions = (role: string): Permissions => {
     }
     case Role.MEMBER: {
       return combinePermissions([
-        roleToPermissions(Role.PARTNER),
+        roleToPermissions(Role.EXTERNAL),
         Permissions.ADD_CONVERSATION_MEMBER,
         Permissions.DELETE_CONVERSATION,
         Permissions.GET_MEMBER_PERMISSIONS,
         Permissions.REMOVE_CONVERSATION_MEMBER,
       ]);
     }
-    case Role.PARTNER: {
+    case Role.EXTERNAL: {
       return combinePermissions([Permissions.CREATE_CONVERSATION, Permissions.GET_TEAM_CONVERSATIONS]);
     }
     default: {
@@ -65,7 +64,7 @@ export const roleToPermissions = (role: string): Permissions => {
   }
 };
 
-export const permissionsToRole = (permissions: PermissionsData): Role => {
+export const permissionsToRole = (permissions: PermissionsData): Role | undefined => {
   if (hasPermissions(permissions.self, roleToPermissions(Role.OWNER))) {
     return Role.OWNER;
   }
@@ -75,14 +74,14 @@ export const permissionsToRole = (permissions: PermissionsData): Role => {
   if (hasPermissions(permissions.self, roleToPermissions(Role.MEMBER))) {
     return Role.MEMBER;
   }
-  if (hasPermissions(permissions.self, roleToPermissions(Role.PARTNER))) {
-    return Role.PARTNER;
+  if (hasPermissions(permissions.self, roleToPermissions(Role.EXTERNAL))) {
+    return Role.EXTERNAL;
   }
-  return Role.NONE;
+  return undefined;
 };
 
 export const isPartner = (permissions: PermissionsData): boolean => {
-  return !!(permissions && permissionsToRole(permissions) === Role.PARTNER);
+  return !!(permissions && permissionsToRole(permissions) === Role.EXTERNAL);
 };
 
 export const isMember = (permissions: PermissionsData): boolean => {
