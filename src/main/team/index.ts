@@ -26,4 +26,3 @@ export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
 export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './TeamError';
 
 export * from './identityprovider/';
-export * from './MemberRole';

@@ -105,12 +105,12 @@ describe('Role', () => {
       expect(isPartner({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(false);
     });
 
-    it('PARTNER is true', () => {
-      expect(isPartner({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(true);
+    it('EXTERNAL is true', () => {
+      expect(isPartner({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(true);
     });
 
-    it('NONE is false', () => {
-      expect(isPartner({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isPartner({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('0 is false', () => {
@@ -147,12 +147,12 @@ describe('Role', () => {
       expect(isMember({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(true);
     });
 
-    it('PARTNER is false', () => {
-      expect(isMember({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(false);
+    it('EXTERNAL is false', () => {
+      expect(isMember({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(false);
     });
 
-    it('NONE is false', () => {
-      expect(isMember({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isMember({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('0 is false', () => {
@@ -189,12 +189,12 @@ describe('Role', () => {
       expect(isAdmin({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(false);
     });
 
-    it('PARTNER is false', () => {
-      expect(isAdmin({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(false);
+    it('EXTERNAL is false', () => {
+      expect(isAdmin({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(false);
     });
 
-    it('NONE is false', () => {
-      expect(isAdmin({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isAdmin({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('0 is false', () => {
@@ -231,12 +231,12 @@ describe('Role', () => {
       expect(isOwner({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(false);
     });
 
-    it('PARTNER is false', () => {
-      expect(isOwner({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(false);
+    it('EXTERNAL is false', () => {
+      expect(isOwner({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(false);
     });
 
-    it('NONE is false', () => {
-      expect(isOwner({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isOwner({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('0 is false', () => {
@@ -273,16 +273,16 @@ describe('Role', () => {
       expect(isAtLeastPartner({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(true);
     });
 
-    it('PARTNER is true', () => {
-      expect(isAtLeastPartner({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(true);
+    it('EXTERNAL is true', () => {
+      expect(isAtLeastPartner({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(true);
     });
 
-    it('NONE is false', () => {
-      expect(isAtLeastPartner({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isAtLeastPartner({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('Unknown above is false', () => {
-      expect(isAtLeastPartner({self: roleToPermissions(Role.PARTNER) + 1234, copy: 0})).toBe(false);
+      expect(isAtLeastPartner({self: roleToPermissions(Role.EXTERNAL) + 1234, copy: 0})).toBe(false);
     });
 
     it('0 is false', () => {
@@ -319,12 +319,12 @@ describe('Role', () => {
       expect(isAtLeastMember({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(true);
     });
 
-    it('PARTNER is false', () => {
-      expect(isAtLeastMember({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(false);
+    it('EXTERNAL is false', () => {
+      expect(isAtLeastMember({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(false);
     });
 
-    it('NONE is false', () => {
-      expect(isAtLeastMember({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isAtLeastMember({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('Unknown above is false', () => {
@@ -365,12 +365,12 @@ describe('Role', () => {
       expect(isAtLeastAdmin({self: roleToPermissions(Role.MEMBER), copy: 0})).toBe(false);
     });
 
-    it('PARTNER is false', () => {
-      expect(isAtLeastAdmin({self: roleToPermissions(Role.PARTNER), copy: 0})).toBe(false);
+    it('EXTERNAL is false', () => {
+      expect(isAtLeastAdmin({self: roleToPermissions(Role.EXTERNAL), copy: 0})).toBe(false);
     });
 
-    it('NONE is false', () => {
-      expect(isAtLeastAdmin({self: roleToPermissions(Role.NONE), copy: 0})).toBe(false);
+    it('invalid is false', () => {
+      expect(isAtLeastAdmin({self: roleToPermissions('invalid'), copy: 0})).toBe(false);
     });
 
     it('Unknown above is false', () => {
