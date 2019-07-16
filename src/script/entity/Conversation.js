@@ -174,8 +174,21 @@ export class Conversation {
       return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
     });
 
+    this.blockLegalHoldMessage = false;
+
     this.legalHoldStatus = ko.pureComputed(() => {
       return this.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
+    });
+
+    this.legalHoldStatus.subscribe(legalHoldStatus => {
+      if (!this.blockLegalHoldMessage && this._isInitialized()) {
+        amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
+          conversationId: this.id,
+          legalHoldStatus,
+          timestamp: this.last_event_timestamp(),
+          userId: this.selfUser().id,
+        });
+      }
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {

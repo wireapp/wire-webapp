@@ -319,6 +319,7 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.unblocked_user.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage.bind(this));
 
     this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
     this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
@@ -2621,6 +2622,7 @@ export class ConversationRepository {
   }
 
   async updateAllClients(conversationEntity) {
+    conversationEntity.blockLegalHoldMessage = true;
     const sender = this.client_repository.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
@@ -2664,6 +2666,18 @@ export class ConversationRepository {
         );
       }
     }
+    conversationEntity.blockLegalHoldMessage = false;
+  }
+
+  async injectLegalHoldMessage({conversationId, userId, timestamp, legalHoldStatus, beforeTimestamp = false}) {
+    const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+      conversationId,
+      userId,
+      timestamp,
+      legalHoldStatus,
+      beforeTimestamp,
+    );
+    await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   }
 
   async _grantOutgoingMessage(eventInfoEntity, userIds) {
@@ -2686,15 +2700,13 @@ export class ConversationRepository {
 
     if (haveNewClientsChangeLegalHoldStatus) {
       const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-
-      const legalHoldUpdateBeforeMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+      await this.injectLegalHoldMessage({
+        beforeTimestamp: true,
         conversationId,
-        this.selfUser().id,
-        numericTimestamp,
-        updatedLocalLegalHoldStatus,
-        true,
-      );
-      await this.eventRepository.injectEvent(legalHoldUpdateBeforeMessage);
+        legalHoldStatus: updatedLocalLegalHoldStatus,
+        timestamp: numericTimestamp,
+        userId: this.selfUser().id,
+      });
     }
 
     const shouldShowLegalHoldWarning =
@@ -3130,34 +3142,31 @@ export class ConversationRepository {
 
     const {
       conversation: conversationId,
+      data: {legal_hold_status: messageLegalHoldStatus},
       from: userId,
       time: isoTimestamp,
-      data: {legal_hold_status: messageLegalHoldStatus},
     } = eventJson;
 
-    const legalHoldUpdateBeforeMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+    await this.injectLegalHoldMessage({
+      beforeTimestamp: true,
       conversationId,
+      legalHoldStatus: messageLegalHoldStatus,
+      timestamp: isoTimestamp,
       userId,
-      isoTimestamp,
-      messageLegalHoldStatus,
-      true,
-    );
-    await this.eventRepository.injectEvent(legalHoldUpdateBeforeMessage);
+    });
 
     await this.updateAllClients(conversationEntity);
+
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
     }
 
-    const legalHoldUpdateAfterMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+    await this.injectLegalHoldMessage({
       conversationId,
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
+      timestamp: isoTimestamp,
       userId,
-      isoTimestamp,
-      conversationEntity.legalHoldStatus(),
-      false,
-    );
-
-    await this.eventRepository.injectEvent(legalHoldUpdateAfterMessage);
+    });
 
     return conversationEntity;
   }
