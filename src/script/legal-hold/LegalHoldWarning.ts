@@ -48,7 +48,6 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
       preventClose: true,
       primaryAction: {
         action: () => {
-          conversationEntity.needsLegalHoldApproval(false);
           if (verifyDevices) {
             conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
           }

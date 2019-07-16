@@ -48,6 +48,7 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 
 // @see https://github.com/wearezeta/documentation/blob/master/topics/legal-hold/use-cases/009-receive-message.png
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
+  // TODO: Add more message types here which can have legal hold status property
   const isValidMessageType = [ClientEvent.CONVERSATION.KNOCK, ClientEvent.CONVERSATION.MESSAGE_ADD].includes(
     mappedEvent.type,
   );

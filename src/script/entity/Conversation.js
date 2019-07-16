@@ -173,10 +173,7 @@ export class Conversation {
 
       return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
     });
-    this.needsLegalHoldApproval = ko.observable(this.hasLegalHold());
-    this.hasLegalHold.subscribe(hasLegalHold => {
-      this.needsLegalHoldApproval(hasLegalHold);
-    });
+
     this.legalHoldStatus = ko.pureComputed(() => {
       return this.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
     });
@@ -463,15 +460,6 @@ export class Conversation {
 
     koArrayPushAll(this.messages_unordered, message_ets);
   }
-
-  /**
-   * Insert a legal hold system message in the conversation.
-   *
-   * @param {boolean} isActivationMessage - True, when legal hold is turned on
-   * @param {number} timeStamp - Timestamp of system message creation
-   * @returns {undefined} No return value
-   */
-  appendLegalHoldSystemMessage = (isActivationMessage, timeStamp) => {};
 
   getFirstUnreadSelfMention() {
     return this.unreadState()

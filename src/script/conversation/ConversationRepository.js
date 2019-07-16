@@ -100,7 +100,7 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {showLegalHoldWarning} from '../legal-hold/ConversationLegalHoldStateHandler';
+import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 
 // Conversation repository for all conversation interactions with the conversation service
@@ -1760,7 +1760,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-          legalHoldStatus: this.legalHoldStatus(conversationEntity),
+          legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
@@ -1831,7 +1831,7 @@ export class ConversationRepository {
         const protoAsset = new Asset({
           [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
           [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
         });
 
         return protoAsset;
@@ -1876,7 +1876,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-          legalHoldStatus: this.legalHoldStatus(conversationEntity),
+          legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
@@ -1919,7 +1919,7 @@ export class ConversationRepository {
     const protoAsset = new Asset({
       [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
     });
 
     const generic_message = new GenericMessage({
@@ -2023,7 +2023,7 @@ export class ConversationRepository {
   sendKnock(conversationEntity) {
     const protoKnock = new Knock({
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
       hotKnock: false,
     });
 
@@ -2069,7 +2069,7 @@ export class ConversationRepository {
             quoteEntity,
             [linkPreview],
             this.expectReadReceipt(conversationEntity),
-            this.legalHoldStatus(conversationEntity),
+            conversationEntity.legalHoldStatus(),
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
@@ -2115,7 +2115,7 @@ export class ConversationRepository {
     const protoLocation = new Location({
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       latitude,
-      legalHoldStatus: this.legalHoldStatus(conversationEntity),
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
       longitude,
       name,
       zoom,
@@ -2156,7 +2156,7 @@ export class ConversationRepository {
       undefined,
       undefined,
       this.expectReadReceipt(conversationEntity),
-      this.legalHoldStatus(conversationEntity),
+      conversationEntity.legalHoldStatus(),
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
@@ -2263,7 +2263,7 @@ export class ConversationRepository {
       quoteEntity,
       undefined,
       this.expectReadReceipt(conversationEntity),
-      this.legalHoldStatus(conversationEntity),
+      conversationEntity.legalHoldStatus(),
     );
     let genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
@@ -2666,26 +2666,49 @@ export class ConversationRepository {
     }
   }
 
-  _grantOutgoingMessage(eventInfoEntity, userIds) {
+  async _grantOutgoingMessage(eventInfoEntity, userIds) {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
       return Promise.resolve();
     }
-    const message = eventInfoEntity.genericMessage;
-    if (message) {
-      const lhStatus = this.legalHoldStatus(this.find_conversation_by_id(eventInfoEntity.conversationId));
-      message[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = lhStatus;
+
+    // Legal Hold
+    const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
+    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+    await this.updateAllClients(conversationEntity);
+    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+    const {genericMessage} = eventInfoEntity;
+    genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+    if (haveNewClientsChangeLegalHoldStatus) {
+      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+
+      const legalHoldUpdateBeforeMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+        conversationId,
+        this.selfUser().id,
+        numericTimestamp,
+        updatedLocalLegalHoldStatus,
+        true,
+      );
+      await this.eventRepository.injectEvent(legalHoldUpdateBeforeMessage);
     }
+
+    const shouldShowLegalHoldWarning =
+      haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
-  grantMessage(eventInfoEntity, consentType, userIds) {
+  grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
       const legalHoldMessageTypes = [
         GENERIC_MESSAGE_TYPE.ASSET,
@@ -2696,7 +2719,7 @@ export class ConversationRepository {
       const isLegalHoldMessageType =
         eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
       const needsLegalHoldApproval =
-        !this.selfUser().isOnLegalHold() && conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
+        !this.selfUser().isOnLegalHold() && shouldShowLegalHoldWarning && isLegalHoldMessageType;
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
@@ -2704,12 +2727,8 @@ export class ConversationRepository {
         return false;
       }
 
-      if (!conversationDegraded) {
-        return showLegalHoldWarning(conversationEntity);
-      }
-
       if (needsLegalHoldApproval) {
-        return showLegalHoldWarning(conversationEntity, true);
+        return showLegalHoldWarning(conversationEntity, conversationDegraded);
       }
 
       return new Promise((resolve, reject) => {
@@ -4021,10 +4040,6 @@ export class ConversationRepository {
     }
 
     return false;
-  }
-
-  legalHoldStatus(conversationEntity) {
-    return conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
   }
 
   /**
