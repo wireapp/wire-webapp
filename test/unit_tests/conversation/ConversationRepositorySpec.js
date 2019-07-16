@@ -1015,7 +1015,7 @@ describe('ConversationRepository', () => {
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
-          sentMessages.length,
+          sentMessages.length * 2,
         );
       });
     });
