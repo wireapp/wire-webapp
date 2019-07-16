@@ -148,7 +148,7 @@ z.conversation.EventBuilder = {
       },
       from: userId,
       id: createRandomUuid(),
-      time: new Date(new Date(timestamp) + (beforeMessage ? -1 : +1)).toISOString(),
+      time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
