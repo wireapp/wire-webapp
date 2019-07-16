@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.14.7...@wireapp/api-client@6.0.0) (2019-07-16)
+
+
+### Code Refactoring
+
+* **api-client:** Update Role & remove MemberRole ([#2079](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2079)) ([7a01a07](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/7a01a07))
+
+
+### BREAKING CHANGES
+
+* **api-client:** Removed MemberRole & removed NONE from Role
+
+
+
+
+
 ## [5.14.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@5.14.6...@wireapp/api-client@5.14.7) (2019-07-15)
 
 **Note:** Version bump only for package @wireapp/api-client
