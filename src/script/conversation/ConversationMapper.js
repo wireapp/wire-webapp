@@ -169,6 +169,7 @@ export class ConversationMapper {
         last_event_timestamp,
         last_read_timestamp,
         last_server_timestamp,
+        legal_hold_status,
         muted_timestamp,
         receipt_mode,
         status,
@@ -219,6 +220,10 @@ export class ConversationMapper {
 
       if (verification_state !== undefined) {
         conversationEntity.verification_state(verification_state);
+      }
+
+      if (legal_hold_status) {
+        conversationEntity.legalHoldStatus(legal_hold_status);
       }
 
       // Backend states

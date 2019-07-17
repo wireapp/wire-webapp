@@ -166,19 +166,15 @@ export class Conversation {
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
-    this.hasLegalHold = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
-        return false;
-      }
+    this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
-      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    this.hasLegalHold = ko.pureComputed(() => {
+      const hasLegalHold = this._isInitialized() && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      return hasLegalHold;
     });
 
     this.blockLegalHoldMessage = false;
-
-    this.legalHoldStatus = ko.pureComputed(() => {
-      return this.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
-    });
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
       if (!this.blockLegalHoldMessage && this._isInitialized()) {
@@ -777,6 +773,7 @@ export class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
+      legal_hold_status: this.legalHoldStatus(),
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
