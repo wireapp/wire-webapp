@@ -9,7 +9,7 @@
     "@types/karma": "3.0.3",
     "@types/node": "~10",
     "jasmine": "3.4.0",
-    "karma": "4.1.0",
+    "karma": "4.2.0",
     "karma-chrome-launcher": "3.0.0",
     "karma-jasmine": "2.0.1",
     "karma-typescript": "4.1.1",
