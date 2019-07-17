@@ -442,13 +442,16 @@ export class CallingRepository {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
-  private handleMediaStreamError(call: Call): void {
+  private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery): void {
     const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
     if (call && !validStateWithoutCamera.includes(call.state())) {
       this.leaveCall(call.conversationId);
     }
     if (call && call.state() !== CALL_STATE.ANSWERED) {
-      this.showNoCameraModal();
+      if (requestedStreams.camera) {
+        this.showNoCameraModal();
+      }
+      this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.STOPPED);
     }
   }
 
@@ -690,8 +693,8 @@ export class CallingRepository {
       .catch(error => {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
-        this.handleMediaStreamError(call);
-        return new MediaStream();
+        this.handleMediaStreamError(call, missingStreams);
+        return selfParticipant.getMediaStream();
       });
 
     return this.mediaStreamQuery;

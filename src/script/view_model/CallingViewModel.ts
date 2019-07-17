@@ -148,7 +148,7 @@ export class CallingViewModel {
               resolve();
             };
             this.mediaDevicesHandler.getScreenSources().then((sources: any[]) => {
-              if (false && sources.length === 1) {
+              if (sources.length === 1) {
                 return this.onChooseScreen(sources[0].id);
               }
               this.selectableScreens(sources);
@@ -189,7 +189,10 @@ export class CallingViewModel {
             return;
           }
           const audioId = `${participant.userId}-${stream.id}`;
-          if (participantsAudioElement[audioId]) {
+          if (
+            participantsAudioElement[audioId] &&
+            (participantsAudioElement[audioId].srcObject as MediaStream).active
+          ) {
             return;
           }
           const audioElement = new Audio();
@@ -217,6 +220,9 @@ export class CallingViewModel {
         return;
       }
       currentCallSubscription = ko.computed(() => {
+        if (call.state() === CALL_STATE.TERM_LOCAL) {
+          return audioRepository.play(AudioType.TALK_LATER);
+        }
         if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
           return;
         }
