@@ -73,7 +73,15 @@ export const DemoIcons = () => (
   <Container>
     <Line />
     <H1>Icons</H1>
-    <div style={{display: 'grid', gridGap: 16, gridTemplateColumns: 'repeat(8, 1fr)'}}>
+    <div
+      style={{
+        alignItems: 'center',
+        display: 'grid',
+        gridGap: 16,
+        gridTemplateColumns: 'repeat(8, 1fr)',
+        justifyItems: 'center',
+      }}
+    >
       <AddPeopleIcon height={32} />
       <ArrowIcon direction="up" height={32} />
       <AttachmentIcon height={32} />
@@ -113,7 +121,15 @@ export const DemoIcons = () => (
 
     <Line />
     <H1>Shadowed Icons</H1>
-    <div style={{display: 'grid', gridGap: 16, gridTemplateColumns: 'repeat(8, 1fr)'}}>
+    <div
+      style={{
+        alignItems: 'center',
+        display: 'grid',
+        gridGap: 16,
+        gridTemplateColumns: 'repeat(8, 1fr)',
+        justifyItems: 'center',
+      }}
+    >
       <AddPeopleIcon height={32} shadow color={COLOR.WHITE} />
       <ArrowIcon direction="up" height={32} shadow color={COLOR.WHITE} />
       <AttachmentIcon height={32} shadow color={COLOR.WHITE} />
