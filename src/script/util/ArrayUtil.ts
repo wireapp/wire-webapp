@@ -32,7 +32,8 @@ export const chunk = <T>(array: T[] | Float32Array, size: number) => {
  * @param array2 the array to compare with
  * @returns the array containing values in array2 that are not in array1
  */
-export const getDifference = <T>(array1: T[], array2: T[]) => array2.filter(element => !array1.includes(element));
+export const getDifference = <T>(array1: T[] = [], array2: T[] = []): T[] =>
+  array2.filter(element => !array1.includes(element));
 
 export const getNextItem = <T>(array: T[], currentItem: T) => {
   const currentIndex = array.indexOf(currentItem);
