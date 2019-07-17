@@ -39,6 +39,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -171,6 +172,9 @@ export class Conversation {
     this.hasLegalHold = ko.pureComputed(() => {
       const hasLegalHold = this._isInitialized() && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
       this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      if (!hasLegalHold) {
+        amplify.publish(HIDE_LEGAL_HOLD_MODAL);
+      }
       return hasLegalHold;
     });
 
