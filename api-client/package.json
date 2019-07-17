@@ -49,7 +49,7 @@
     "sinon-har-server": "0.3.0",
     "typescript": "3.5.3",
     "webpack": "4.35.3",
-    "webpack-cli": "3.3.5",
+    "webpack-cli": "3.3.6",
     "webpack-dev-server": "3.7.2",
     "ws": "7.1.0"
   },
