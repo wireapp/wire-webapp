@@ -510,11 +510,21 @@ export class Account extends EventEmitter {
         };
       }
       case GenericMessageType.ASSET: {
-        const {notUploaded, original, preview, status, uploaded} = genericMessage[GenericMessageType.ASSET];
+        const {
+          expectsReadConfirmation,
+          legalHoldStatus,
+          notUploaded,
+          original,
+          preview,
+          status,
+          uploaded,
+        } = genericMessage[GenericMessageType.ASSET];
         const isImage = !!uploaded && !!uploaded.assetId && !!original && !!original.image;
 
         const content: AssetContent = {
           abortReason: notUploaded,
+          expectsReadConfirmation,
+          legalHoldStatus,
           original,
           preview,
           status,
