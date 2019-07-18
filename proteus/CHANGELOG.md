@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.4...@wireapp/proteus@9.3.5) (2019-07-18)
+
+**Note:** Version bump only for package @wireapp/proteus
+
+
+
+
+
 ## [9.3.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.3...@wireapp/proteus@9.3.4) (2019-07-16)
 
 **Note:** Version bump only for package @wireapp/proteus
