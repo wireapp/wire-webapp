@@ -36,7 +36,7 @@ export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   truncate?: boolean;
 }
 
-export const filterTextProps = (props: Object) => {
+export const filterTextProps = (props: TextProps) => {
   return filterProps(props, [
     'block',
     'bold',

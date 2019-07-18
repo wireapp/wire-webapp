@@ -74,7 +74,7 @@ export const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefi
 };
 
 export const INPUT_CLASSNAME = 'input';
-const filterInputProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+const filterInputProps = (props: InputProps) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
 export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,

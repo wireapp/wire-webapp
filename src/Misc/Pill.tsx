@@ -75,7 +75,7 @@ export const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefine
   };
 };
 
-export const filterPillProps = (props: Object) => filterProps(props, ['active']);
+export const filterPillProps = (props: PillProps) => filterProps(props, ['active']);
 
 export const Pill = (props: PillProps) => (
   <span css={pillStyle(props)} data-uie-name="element-pill" data-uie-status={props.type} {...filterPillProps(props)} />

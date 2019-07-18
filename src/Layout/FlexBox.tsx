@@ -43,7 +43,7 @@ export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => ObjectInterpolation<un
   justifyContent: justify,
 });
 
-const filterFlexBoxProps = (props: Object) => filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
+const filterFlexBoxProps = (props: FlexBoxProps) => filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
 
 export const FlexBox: React.FC<FlexBoxProps> = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
   <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />

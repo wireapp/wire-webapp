@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
-import {inlineSVG} from '../util';
+import {filterProps, inlineSVG} from '../util';
 import {InputProps, inputStyle} from './Input';
 
 export interface SelectProps<T = HTMLSelectElement> extends InputProps<T> {
@@ -57,4 +57,6 @@ export const selectStyle: <T>(props: SelectProps<T>) => ObjectInterpolation<unde
   paddingRight: '30px',
 });
 
-export const Select = (props: SelectProps) => <select css={selectStyle(props)} {...props} />;
+const filterSelectProps = (props: SelectProps) => filterProps(props, ['markInvalid']);
+
+export const Select = (props: SelectProps) => <select css={selectStyle(props)} {...filterSelectProps(props)} />;

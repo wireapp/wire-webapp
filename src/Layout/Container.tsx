@@ -64,7 +64,7 @@ const containerStyle: <T>(props: ContainerProps<T>) => ObjectInterpolation<undef
       },
 });
 
-const filterContainerProps = (props: Object) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
+const filterContainerProps = (props: ContainerProps) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
 
 export const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
   <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />

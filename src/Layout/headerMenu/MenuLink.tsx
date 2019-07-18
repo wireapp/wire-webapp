@@ -68,6 +68,7 @@ export const menuLinkStyle: <T>(props: MenuLinkProps<T>) => ObjectInterpolation<
   padding: button ? '10px 16px' : undefined,
 });
 
-export const filterMenuLinkProps = (props: Object) => filterProps(filterLinkProps(props), ['button']);
+export const filterMenuLinkProps = (props: MenuLinkProps) =>
+  filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
 
 export const MenuLink = (props: MenuLinkProps) => <a css={menuLinkStyle(props)} {...filterMenuLinkProps(props)} />;

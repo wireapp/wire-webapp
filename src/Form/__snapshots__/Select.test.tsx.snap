@@ -189,7 +189,6 @@ exports[`"Select" renders as invalid 1`] = `
 
 <select
   className="emotion-0"
-  markInvalid={true}
 >
   <option>
     a
