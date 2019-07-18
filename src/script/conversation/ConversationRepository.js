@@ -174,7 +174,7 @@ export class ConversationRepository {
     this.assetUploader = assetUploader;
     this.logger = getLogger('ConversationRepository');
 
-    this.conversationMapper = new ConversationMapper(this);
+    this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,

@@ -17,14 +17,15 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
+import ko from 'knockout';
+import {Conversation} from '../entity/Conversation';
+import {BaseError} from '../error/BaseError';
 
 /**
  * @typedef {object} ConversationBackendData
@@ -89,18 +90,8 @@ import {ConversationStatus} from './ConversationStatus';
  * @property {string} provider
  */
 
-import ko from 'knockout';
-import {Conversation} from '../entity/Conversation';
-import {BaseError} from '../error/BaseError';
-
 // Conversation Mapper to convert all server side JSON conversation objects into core entities.
 export class ConversationMapper {
-  // Construct a new Conversation Mapper.
-  constructor(conversationRepository) {
-    this.logger = getLogger('ConversationMapper');
-    this.conversationRepository = conversationRepository;
-  }
-
   /**
    * Converts JSON conversations into conversation entities.
    *
