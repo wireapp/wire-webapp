@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 //@ts-check
 
 process.on('uncaughtException', (/** @type {Error & {code: number}} */ error) =>
@@ -9,13 +28,6 @@ process.on('unhandledRejection', (reason, promise) =>
 
 const path = require('path');
 const logdown = require('logdown');
-require('dotenv').config({path: path.join(__dirname, 'echo.env')});
-
-const logger = logdown('@wireapp/core/demo/echo.js', {
-  logger: console,
-  markdown: false,
-});
-logger.state.isEnabled = true;
 
 const {Account} = require('@wireapp/core');
 const {PayloadBundleType} = require('@wireapp/core/dist/conversation/');
@@ -25,6 +37,16 @@ const {ClientType} = require('@wireapp/api-client/dist/commonjs/client/ClientTyp
 const {ConnectionStatus} = require('@wireapp/api-client/dist/commonjs/connection/');
 const {CONVERSATION_TYPING} = require('@wireapp/api-client/dist/commonjs/event/');
 const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
+const {LegalHoldStatus} = require('@wireapp/protocol-messaging');
+const dotenv = require('dotenv');
+
+const logger = logdown('@wireapp/core/demo/echo.js', {
+  logger: console,
+  markdown: false,
+});
+logger.state.isEnabled = true;
+
+dotenv.config({path: path.join(__dirname, 'echo.env')});
 
 const assetOriginalCache = {};
 const messageIdCache = {};
@@ -70,7 +92,7 @@ const messageIdCache = {};
       additionalContent.push('(expecting read confirmation)');
     }
 
-    if (content.legalHoldStatus) {
+    if (content.legalHoldStatus === LegalHoldStatus.ENABLED) {
       additionalContent.push('(sent to legal hold)');
     }
 

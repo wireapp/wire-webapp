@@ -28,18 +28,18 @@ export type VideoMetaData = Asset.IVideoMetaData;
 export type Preview = Asset.IPreview;
 export type Original = Asset.IOriginal;
 
+export interface AssetBase {
+  expectsReadConfirmation?: boolean;
+  legalHoldStatus?: LegalHoldStatus;
+}
+
 // https://github.com/wireapp/generic-message-proto/blob/v1.20.0/proto/messages.proto#L201
-export interface AssetContent {
+export interface AssetContent extends AssetBase {
   abortReason?: AbortReason;
   original?: Original;
   preview?: Preview;
   status?: AssetTransferState;
   uploaded?: RemoteData;
-}
-
-export interface AssetBase {
-  expectsReadConfirmation?: boolean;
-  legalHoldStatus?: LegalHoldStatus;
 }
 
 export interface RemoteData extends Asset.IRemoteData {
