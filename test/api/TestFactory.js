@@ -160,6 +160,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       TestFactory.storage_service,
       TestFactory.cryptography_repository,
     );
+    TestFactory.client_service = TestFactory.client_repository.clientService;
     TestFactory.client_repository.init(user);
 
     const payload = {
