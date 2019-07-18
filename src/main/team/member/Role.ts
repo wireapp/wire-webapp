@@ -22,7 +22,7 @@ import {PermissionsData} from './PermissionsData';
 
 export enum Role {
   ADMIN = 'admin',
-  EXTERNAL = 'external',
+  EXTERNAL = 'partner',
   MEMBER = 'member',
   OWNER = 'owner',
 }
