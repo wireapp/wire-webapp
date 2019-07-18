@@ -63,5 +63,5 @@
     "test:node": "nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "12.17.8"
+  "version": "12.17.9"
 }

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.17.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.8...@wireapp/core@12.17.9) (2019-07-18)
+
+
+### Bug Fixes
+
+* **core:** Add LH status to asset mapping ([#2084](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2084)) ([79af053](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/79af053))
+
+
+
+
+
 ## [12.17.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.7...@wireapp/core@12.17.8) (2019-07-18)
 
 **Note:** Version bump only for package @wireapp/core
