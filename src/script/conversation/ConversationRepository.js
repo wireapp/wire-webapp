@@ -2730,17 +2730,19 @@ export class ConversationRepository {
       ];
       const isLegalHoldMessageType =
         eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
-      const needsLegalHoldApproval =
-        !this.selfUser().isOnLegalHold() && shouldShowLegalHoldWarning && isLegalHoldMessageType;
+
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
-      if (!conversationDegraded && !needsLegalHoldApproval) {
-        return false;
+      if (conversationEntity.needsLegalHoldApproval) {
+        conversationEntity.needsLegalHoldApproval = false;
+        return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      } else if (shouldShowLegalHoldWarning) {
+        conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
       }
 
-      if (needsLegalHoldApproval) {
-        return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      if (!conversationDegraded) {
+        return false;
       }
 
       return new Promise((resolve, reject) => {
