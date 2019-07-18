@@ -117,7 +117,7 @@ export class MediaDevicesHandler {
    */
   _initializeMediaDevices(): void {
     if (Environment.browser.supports.mediaDevices) {
-      this._refreshMediaDevices().then(() => {
+      this.refreshMediaDevices().then(() => {
         this._subscribeToObservables();
         this._subscribeToDevices();
       });
@@ -131,7 +131,7 @@ export class MediaDevicesHandler {
   _subscribeToDevices(): void {
     navigator.mediaDevices.ondevicechange = () => {
       this.logger.info('List of available MediaDevices has changed');
-      this._refreshMediaDevices();
+      this.refreshMediaDevices();
     };
   }
 
@@ -157,7 +157,7 @@ export class MediaDevicesHandler {
    * Update list of available MediaDevices.
    * @returns {Promise} Resolves with all MediaDevices when the list has been updated
    */
-  _refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
+  refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
     return navigator.mediaDevices
       .enumerateDevices()
       .catch(error => {

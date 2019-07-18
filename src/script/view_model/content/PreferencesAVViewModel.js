@@ -152,7 +152,7 @@ export class PreferencesAVViewModel {
       .requestMediaStream(requestAudio, requestVideo, false, false)
       .then(({stream}) => {
         // refresh devices list in order to display the labels (see https://stackoverflow.com/a/46659819/2745879)
-        this.devicesHandler.getMediaDevices();
+        this.devicesHandler.refreshMediaDevices();
         return stream;
       })
       .catch(error => {

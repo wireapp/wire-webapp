@@ -399,6 +399,9 @@ export class CallingRepository {
     this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING)
       .then(() => {
         const isVideoCall = callType === CALL_TYPE.VIDEO;
+        if (!isVideoCall) {
+          call.selfParticipant.releaseVideoStream();
+        }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
           this.wCall.answer(this.wUser, call.conversationId, callType, 0);
           const callVideoState = isVideoCall ? VIDEO_STATE.STARTED : VIDEO_STATE.STOPPED;
@@ -596,7 +599,7 @@ export class CallingRepository {
     const call = new Call(
       userId,
       conversationId,
-      CONV_TYPE.ONEONONE,
+      conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
     );

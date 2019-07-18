@@ -61,7 +61,7 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && this.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
+      return hasEntities ? this.conversationEntity().id === this.joinedCall().conversationId : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
@@ -76,10 +76,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       }
 
       return string || '';
-    });
-
-    this.hasOngoingCall = ko.computed(() => {
-      return this.hasCall() && this.joinedCall() ? this.joinedCall().isOngoing() : false;
     });
 
     this.showCallControls = ko.pureComputed(() => {

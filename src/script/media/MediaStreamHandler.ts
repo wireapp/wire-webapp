@@ -41,13 +41,7 @@ declare global {
 
 export class MediaStreamHandler {
   static get CONFIG(): any {
-    return {
-      MEDIA_TYPE: {
-        CONTAINS_AUDIO: [MediaType.AUDIO, MediaType.AUDIO_VIDEO],
-        CONTAINS_VIDEO: [MediaType.AUDIO_VIDEO, MediaType.VIDEO],
-      },
-      PERMISSION_HINT_DELAY: 200,
-    };
+    return {PERMISSION_HINT_DELAY: 200};
   }
 
   private readonly logger: any;
