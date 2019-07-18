@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.5.1...@wireapp/react-ui-kit@7.5.2) (2019-07-18)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Filter Checkbox & Select props ([#2083](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2083)) ([a52be18](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a52be18))
+
+
+
+
+
 ## [7.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.5.0...@wireapp/react-ui-kit@7.5.1) (2019-07-16)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
