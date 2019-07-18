@@ -33,7 +33,7 @@ const styledAppContainerStyle: <T>(props: StyledAppContainerProps<T>) => ObjectI
   background: backgroundColor,
 });
 
-const filterStyledAppContainerProps = (props: Object) => filterProps(props, ['backgroundColor']);
+const filterStyledAppContainerProps = (props: StyledAppContainerProps) => filterProps(props, ['backgroundColor']);
 
 const StyledAppContainer = (props: StyledAppContainerProps) => (
   <div css={styledAppContainerStyle(props)} {...filterStyledAppContainerProps(props)} />

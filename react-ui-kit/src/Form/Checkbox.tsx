@@ -22,12 +22,15 @@ import {jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {Text, TextProps, linkStyle, textStyle} from '../Text';
+import {filterProps} from '../util';
 import {INPUT_CLASSNAME, Input, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
   markInvalid?: boolean;
 }
+
+const filterStyledLabelProps = (props: StyledLabelProps) => filterProps(props, ['markInvalid']);
 
 const StyledLabel = (props: StyledLabelProps) => {
   const checkSvg =
@@ -58,7 +61,7 @@ const StyledLabel = (props: StyledLabelProps) => {
         display: 'flex',
         opacity: props.disabled ? 0.56 : 1,
       }}
-      {...props}
+      {...filterStyledLabelProps(props)}
     />
   );
 };
@@ -66,6 +69,8 @@ const StyledLabel = (props: StyledLabelProps) => {
 interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
 }
+
+const filterCheckboxProps = (props: CheckboxProps) => filterProps(props, ['markInvalid']);
 
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
@@ -90,7 +95,7 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
       }}
       disabled={disabled}
       ref={ref}
-      {...props}
+      {...filterCheckboxProps(props)}
     />
     <StyledLabel htmlFor={id} disabled={disabled} markInvalid={props.markInvalid}>
       {children}

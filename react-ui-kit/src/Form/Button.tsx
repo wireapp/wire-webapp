@@ -32,14 +32,6 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   loadingColor?: string;
 }
 
-export const filterButtonProps = (props: Object) => {
-  return filterProps(filterTextProps(props), ['backgroundColor', 'noCapital']);
-};
-
-const filterButtonLinkProps = (props: Object) => {
-  return filterProps(filterTextProps(props), ['backgroundColor', 'disabled', 'noCapital']);
-};
-
 export const buttonStyle: <T>(props: ButtonProps<T>) => ObjectInterpolation<undefined> = ({
   backgroundColor = COLOR.BLUE,
   block = false,
@@ -93,11 +85,23 @@ export const buttonLinkStyle: (props: ButtonProps<HTMLAnchorElement>) => ObjectI
   display: 'inline-flex !important',
 });
 
+export const filterButtonProps = (props: ButtonProps) => {
+  return filterProps(filterTextProps(props) as ButtonProps, ['backgroundColor', 'noCapital']);
+};
+
 export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
   <button css={buttonStyle(props)} {...filterButtonProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </button>
 );
+
+const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>) => {
+  return filterProps(filterTextProps(props) as ButtonProps<HTMLAnchorElement>, [
+    'backgroundColor',
+    'disabled',
+    'noCapital',
+  ]);
+};
 
 export const ButtonLink = ({
   children,

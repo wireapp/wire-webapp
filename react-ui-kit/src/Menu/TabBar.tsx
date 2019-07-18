@@ -33,9 +33,9 @@ const tabBarStyle: <T>(props: TabBarProps<T>) => ObjectInterpolation<undefined> 
   };
 };
 
-const filteredTabBarProps = (props: Object) => filterProps(props, []);
+const filteredTabBarProps = (props: TabBarProps) => filterProps(props, []);
 
-export const TabBar = ({children = null, ...props}: TabBarProps & React.HTMLProps<HTMLDivElement>) => (
+export const TabBar = ({children = null, ...props}: TabBarProps) => (
   <div css={tabBarStyle(props)} {...filteredTabBarProps(props)}>
     {children}
   </div>

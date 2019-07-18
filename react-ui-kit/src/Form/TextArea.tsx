@@ -74,7 +74,7 @@ export const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<
 };
 
 export const TEXTAREA_CLASSNAME = 'textarea';
-const filterTextAreaProps = (props: Object) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+const filterTextAreaProps = (props: TextAreaProps) => filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 
 export const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forwardRef<
   HTMLTextAreaElement,

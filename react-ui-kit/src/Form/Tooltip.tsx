@@ -75,8 +75,9 @@ const tooltipStyle: <T>(props: ToolTipProps<T>) => ObjectInterpolation<undefined
   position: 'relative',
 });
 
-const filterMenuLinkProps = (props: Object) => filterProps(props, ['bottom', 'disabled', 'left', 'light', 'right']);
+const filterTooltipProps = (props: ToolTipProps) =>
+  filterProps(props, ['bottom', 'disabled', 'left', 'light', 'right']);
 
 export const Tooltip = ({text = '', ...props}: ToolTipProps) => (
-  <div css={tooltipStyle(props)} data-text={text} {...filterMenuLinkProps(props)} />
+  <div css={tooltipStyle(props)} data-text={text} {...filterTooltipProps(props)} />
 );

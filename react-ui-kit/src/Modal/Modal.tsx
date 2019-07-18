@@ -52,7 +52,7 @@ const modalBodyStyle: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<undef
   },
 });
 
-const filterModalBodyProps = (props: Object) => filterProps(props, ['fullscreen']);
+const filterModalBodyProps = (props: ModalBodyProps) => filterProps(props, ['fullscreen']);
 
 const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyle(props)} {...filterModalBodyProps(props)} />;
 

@@ -59,7 +59,7 @@ export const linkStyle: <T>(props: LinkProps<T>) => ObjectInterpolation<undefine
   };
 };
 
-export const filterLinkProps = (props: Object) => filterProps(filterTextProps(props), ['component']);
+export const filterLinkProps = (props: LinkProps) => filterProps(filterTextProps(props) as LinkProps, ['component']);
 
 export const Link = ({component = 'a', ...props}: LinkProps) =>
   jsx(component, {css: linkStyle({component, ...props}), ...filterLinkProps(props)} as any, props.children);
