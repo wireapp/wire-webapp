@@ -2,7 +2,7 @@
   "dependencies": {
     "@babel/core": "7.5.4",
     "@babel/plugin-proposal-class-properties": "7.5.5",
-    "@babel/plugin-proposal-object-rest-spread": "7.5.4",
+    "@babel/plugin-proposal-object-rest-spread": "7.5.5",
     "@babel/preset-typescript": "7.3.3",
     "@types/sql.js": "1.0.1",
     "@wireapp/store-engine": "3.5.4",
