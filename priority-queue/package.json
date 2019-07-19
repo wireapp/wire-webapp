@@ -36,5 +36,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine"
   },
-  "version": "1.2.4"
+  "version": "1.2.5"
 }
