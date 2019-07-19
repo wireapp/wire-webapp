@@ -60,7 +60,13 @@ import {TextContentBuilder} from './TextContentBuilder';
 const UUID = require('pure-uuid');
 
 export class MessageBuilder {
-  constructor(private readonly apiClient: APIClient, private readonly assetService: AssetService) {}
+  private readonly apiClient: APIClient;
+  private readonly assetService: AssetService;
+
+  constructor(apiClient: APIClient, assetService: AssetService) {
+    this.apiClient = apiClient;
+    this.assetService = assetService;
+  }
 
   public createEditedText(
     conversationId: string,

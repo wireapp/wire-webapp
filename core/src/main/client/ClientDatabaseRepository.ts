@@ -62,40 +62,44 @@ export class ClientDatabaseRepository {
     return Promise.all(createClientTasks);
   }
 
-  public createLocalClient(client: RegisteredClient): Promise<MetaClient> {
+  public async createLocalClient(client: RegisteredClient): Promise<MetaClient> {
     const transformedClient = this.transformLocalClient(client);
-    return this.storeEngine
-      .create(ClientDatabaseRepository.STORES.CLIENTS, ClientDatabaseRepository.KEYS.LOCAL_IDENTITY, transformedClient)
-      .then(() => transformedClient);
+    await this.storeEngine.create(
+      ClientDatabaseRepository.STORES.CLIENTS,
+      ClientDatabaseRepository.KEYS.LOCAL_IDENTITY,
+      transformedClient,
+    );
+    return transformedClient;
   }
 
-  public updateLocalClient(client: RegisteredClient): Promise<MetaClient> {
+  public async updateLocalClient(client: RegisteredClient): Promise<MetaClient> {
     const transformedClient = this.transformLocalClient(client);
-    return this.storeEngine
-      .update(ClientDatabaseRepository.STORES.CLIENTS, ClientDatabaseRepository.KEYS.LOCAL_IDENTITY, transformedClient)
-      .then(() => transformedClient);
+    await this.storeEngine.update(
+      ClientDatabaseRepository.STORES.CLIENTS,
+      ClientDatabaseRepository.KEYS.LOCAL_IDENTITY,
+      transformedClient,
+    );
+    return transformedClient;
   }
 
-  public updateClient(userId: string, client: RegisteredClient): Promise<MetaClient> {
+  public async updateClient(userId: string, client: RegisteredClient): Promise<MetaClient> {
     const transformedClient = this.transformClient(userId, client);
-    return this.storeEngine
-      .update(
-        ClientDatabaseRepository.STORES.CLIENTS,
-        CryptographyService.constructSessionId(userId, client.id),
-        transformedClient,
-      )
-      .then(() => transformedClient);
+    await this.storeEngine.update(
+      ClientDatabaseRepository.STORES.CLIENTS,
+      CryptographyService.constructSessionId(userId, client.id),
+      transformedClient,
+    );
+    return transformedClient;
   }
 
-  public createClient(userId: string, client: RegisteredClient): Promise<MetaClient> {
+  public async createClient(userId: string, client: RegisteredClient): Promise<MetaClient> {
     const transformedClient = this.transformClient(userId, client);
-    return this.storeEngine
-      .create(
-        ClientDatabaseRepository.STORES.CLIENTS,
-        CryptographyService.constructSessionId(userId, client.id),
-        transformedClient,
-      )
-      .then(() => transformedClient);
+    await this.storeEngine.create(
+      ClientDatabaseRepository.STORES.CLIENTS,
+      CryptographyService.constructSessionId(userId, client.id),
+      transformedClient,
+    );
+    return transformedClient;
   }
 
   private transformClient(userId: string, client: RegisteredClient, verified: boolean = false): MetaClient {

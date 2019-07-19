@@ -144,23 +144,26 @@ export class Account extends EventEmitter {
     };
   }
 
-  public login(
+  public async login(
     loginData: LoginData,
     initClient: boolean = true,
     clientInfo?: ClientInfo,
   ): Promise<Context | undefined> {
-    return this.resetContext()
-      .then(() => this.init())
-      .then(() => LoginSanitizer.removeNonPrintableCharacters(loginData))
-      .then(() => this.apiClient.login(loginData))
-      .then(() => {
-        return initClient
-          ? this.initClient(loginData, clientInfo).then(() => this.apiClient.context)
-          : this.apiClient.context;
-      });
+    await this.resetContext();
+    await this.init();
+
+    LoginSanitizer.removeNonPrintableCharacters(loginData);
+
+    await this.apiClient.login(loginData);
+
+    if (initClient) {
+      await this.initClient(loginData, clientInfo);
+    }
+
+    return this.apiClient.context;
   }
 
-  public initClient(
+  public async initClient(
     loginData: LoginData,
     clientInfo?: ClientInfo,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
@@ -168,104 +171,103 @@ export class Account extends EventEmitter {
       throw new Error('Services are not set.');
     }
 
-    return this.loadAndValidateLocalClient()
-      .then(localClient => ({isNewClient: false, localClient}))
-      .catch(error => {
-        // There was no client so we need to "create" and "register" a client
-        const notFoundInDatabase =
-          error instanceof cryptobox.error.CryptoboxError ||
-          error.constructor.name === 'CryptoboxError' ||
-          error instanceof StoreEngineError.RecordNotFoundError ||
-          error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name;
-        const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
+    try {
+      const localClient = await this.loadAndValidateLocalClient();
+      return {isNewClient: false, localClient};
+    } catch (error) {
+      // There was no client so we need to "create" and "register" a client
+      const notFoundInDatabase =
+        error instanceof cryptobox.error.CryptoboxError ||
+        error.constructor.name === 'CryptoboxError' ||
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name;
+      const notFoundOnBackend = error.response && error.response.status === StatusCode.NOT_FOUND;
 
-        if (notFoundInDatabase) {
-          this.logger.log('Could not find valid client in database');
+      if (notFoundInDatabase) {
+        this.logger.log('Could not find valid client in database');
+        return this.registerClient(loginData, clientInfo);
+      }
+
+      if (notFoundOnBackend) {
+        this.logger.log('Could not find valid client on backend');
+        const client = await this.service!.client.getLocalClient();
+        const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
+        if (shouldDeleteWholeDatabase) {
+          this.logger.log('Last client was temporary - Deleting database');
+
+          await this.apiClient.config.store.purge();
+          await this.apiClient.init(loginData.clientType);
+
           return this.registerClient(loginData, clientInfo);
         }
-        if (notFoundOnBackend) {
-          this.logger.log('Could not find valid client on backend');
-          return this.service!.client.getLocalClient().then(client => {
-            const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
-            if (shouldDeleteWholeDatabase) {
-              this.logger.log('Last client was temporary - Deleting database');
-              return this.apiClient.config.store
-                .purge()
-                .then(() => this.apiClient.init(loginData.clientType))
-                .then(() => this.registerClient(loginData, clientInfo));
-            }
-            this.logger.log('Last client was permanent - Deleting cryptography stores');
-            return this.service!.cryptography.deleteCryptographyStores().then(() =>
-              this.registerClient(loginData, clientInfo),
-            );
-          });
-        }
-        throw error;
-      });
+
+        this.logger.log('Last client was permanent - Deleting cryptography stores');
+        await this.service!.cryptography.deleteCryptographyStores();
+        return this.registerClient(loginData, clientInfo);
+      }
+
+      throw error;
+    }
   }
 
-  public loadAndValidateLocalClient(): Promise<RegisteredClient> {
-    let loadedClient: RegisteredClient;
-    return this.service!.cryptography.initCryptobox()
-      .then(() => this.service!.client.getLocalClient())
-      .then(client => (loadedClient = client))
-      .then(() => this.apiClient.client.api.getClient(loadedClient.id))
-      .then(() => (this.apiClient.context!.clientId = loadedClient.id))
-      .then(() => this.service!.conversation.setClientID(loadedClient.id))
-      .then(() => loadedClient);
+  public async loadAndValidateLocalClient(): Promise<RegisteredClient> {
+    await this.service!.cryptography.initCryptobox();
+
+    const loadedClient = await this.service!.client.getLocalClient();
+    await this.apiClient.client.api.getClient(loadedClient.id);
+
+    this.apiClient.context!.clientId = loadedClient.id;
+    this.service!.conversation.setClientID(loadedClient.id);
+
+    return loadedClient;
   }
 
-  private registerClient(
+  private async registerClient(
     loginData: LoginData,
     clientInfo?: ClientInfo,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-    let registeredClient: RegisteredClient;
+    const registeredClient = await this.service.client.register(loginData, clientInfo);
+    this.logger.log('Client is created');
 
-    return this.service.client
-      .register(loginData, clientInfo)
-      .then((client: RegisteredClient) => (registeredClient = client))
-      .then(() => {
-        this.logger.log('Client is created');
-        this.apiClient.context!.clientId = registeredClient.id;
-        this.service!.conversation.setClientID(registeredClient.id);
-        return this.service!.notification.initializeNotificationStream(registeredClient.id);
-      })
-      .then(() => this.service!.client.synchronizeClients())
-      .then(() => ({isNewClient: true, localClient: registeredClient}));
+    this.apiClient.context!.clientId = registeredClient.id;
+    this.service!.conversation.setClientID(registeredClient.id);
+
+    await this.service!.notification.initializeNotificationStream(registeredClient.id);
+    await this.service!.client.synchronizeClients();
+
+    return {isNewClient: true, localClient: registeredClient};
   }
 
-  private resetContext(): Promise<void> {
-    return Promise.resolve().then(() => {
-      delete this.apiClient.context;
-      delete this.service;
-    });
+  private resetContext(): void {
+    delete this.apiClient.context;
+    delete this.service;
   }
 
-  public logout(): Promise<void> {
-    return this.apiClient.logout().then(() => this.resetContext());
+  public async logout(): Promise<void> {
+    await this.apiClient.logout();
+    await this.resetContext();
   }
 
-  public listen(notificationHandler?: Function): Promise<Account> {
+  public async listen(notificationHandler?: Function): Promise<Account> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set - Please login first');
     }
-    return Promise.resolve()
-      .then(() => {
-        this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
 
-        if (notificationHandler) {
-          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, (notification: IncomingNotification) => {
-            notificationHandler(notification);
-          });
-        } else {
-          this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, this.handleNotification.bind(this));
-        }
-        return this.apiClient.connect();
-      })
-      .then(() => this);
+    this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
+
+    if (notificationHandler) {
+      this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, (notification: IncomingNotification) => {
+        notificationHandler(notification);
+      });
+    } else {
+      this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, this.handleNotification.bind(this));
+    }
+
+    await this.apiClient.connect();
+    return this;
   }
 
   private async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundle> {
