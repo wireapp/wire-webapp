@@ -36,7 +36,7 @@ export class NotificationAPI {
    * Fetch the last notification.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/getLastNotification
    */
-  public getLastNotification(clientId?: string): Promise<Notification> {
+  public async getLastNotification(clientId?: string): Promise<Notification> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
@@ -45,14 +45,15 @@ export class NotificationAPI {
       url: `${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`,
     };
 
-    return this.client.sendJSON<Notification>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Notification>(config);
+    return response.data;
   }
 
   /**
    * Fetch notifications
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
-  public getNotifications(
+  public async getNotifications(
     clientId?: string,
     size: number = NOTIFICATION_SIZE_MAXIMUM,
     since?: Date,
@@ -69,14 +70,15 @@ export class NotificationAPI {
       url: NotificationAPI.URL.NOTIFICATION,
     };
 
-    return this.client.sendJSON<NotificationList>(config).then(response => response.data);
+    const response = await this.client.sendJSON<NotificationList>(config);
+    return response.data;
   }
 
   /**
    * Fetch a notification by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/getNotification
    */
-  public getNotification(
+  public async getNotification(
     notificationId: string,
     clientId?: string,
     cancelFallbackNotifications?: boolean,
@@ -90,6 +92,7 @@ export class NotificationAPI {
       url: `${NotificationAPI.URL.NOTIFICATION}/${notificationId}`,
     };
 
-    return this.client.sendJSON<Notification>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Notification>(config);
+    return response.data;
   }
 }

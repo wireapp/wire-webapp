@@ -33,7 +33,7 @@ export class ServiceAPI {
     WHITELISTED: 'whitelisted',
   };
 
-  public getServices(limit: number = 100): Promise<Services> {
+  public async getServices(limit: number = 100): Promise<Services> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
@@ -44,10 +44,11 @@ export class ServiceAPI {
       url: `/${ServiceAPI.URL.SERVICES}`,
     };
 
-    return this.client.sendJSON<Services>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Services>(config);
+    return response.data;
   }
 
-  public getTeamServices(teamId: string, limit: number = 100): Promise<Services> {
+  public async getTeamServices(teamId: string, limit: number = 100): Promise<Services> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
@@ -58,43 +59,48 @@ export class ServiceAPI {
       url: `${ServiceAPI.URL.TEAMS}/${teamId}/${ServiceAPI.URL.SERVICES}/${ServiceAPI.URL.WHITELISTED}`,
     };
 
-    return this.client.sendJSON<Services>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Services>(config);
+    return response.data;
   }
 
-  public getProvider(providerId: string): Promise<Provider> {
+  public async getProvider(providerId: string): Promise<Provider> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}`,
     };
 
-    return this.client.sendJSON<Provider>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Provider>(config);
+    return response.data;
   }
 
-  public getProviderServices(providerId: string): Promise<Services> {
+  public async getProviderServices(providerId: string): Promise<Services> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}/${ServiceAPI.URL.SERVICES}`,
     };
 
-    return this.client.sendJSON<Services>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Services>(config);
+    return response.data;
   }
 
-  public getService(providerId: string, serviceId: string): Promise<Service> {
+  public async getService(providerId: string, serviceId: string): Promise<Service> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ServiceAPI.URL.PROVIDERS}/${providerId}/${ServiceAPI.URL.SERVICES}/${serviceId}`,
     };
 
-    return this.client.sendJSON<Service>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Service>(config);
+    return response.data;
   }
 
-  public postServiceWhitelist(teamId: string, whitelistData: ServiceWhitelistData): Promise<Services> {
+  public async postServiceWhitelist(teamId: string, whitelistData: ServiceWhitelistData): Promise<Services> {
     const config: AxiosRequestConfig = {
       data: whitelistData,
       method: 'post',
       url: `${ServiceAPI.URL.TEAMS}/${teamId}/${ServiceAPI.URL.SERVICES}/${ServiceAPI.URL.WHITELIST}`,
     };
 
-    return this.client.sendJSON<Services>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Services>(config);
+    return response.data;
   }
 }

@@ -124,7 +124,7 @@ export class HttpClient extends EventEmitter {
         const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
         const networkError = new NetworkError(message);
         this.updateConnectionState(ConnectionState.DISCONNECTED);
-        return Promise.reject(networkError);
+        throw networkError;
       }
 
       if (response) {
@@ -137,12 +137,13 @@ export class HttpClient extends EventEmitter {
           const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
           const hasAccessToken = this.accessTokenStore && this.accessTokenStore.accessToken;
           if (isUnauthorized && hasAccessToken && firstTry) {
-            return this.refreshAccessToken().then(() => this._sendRequest<T>(config, tokenAsParam, false));
+            await this.refreshAccessToken();
+            return this._sendRequest<T>(config, tokenAsParam, false);
           }
         }
       }
 
-      return Promise.reject(error);
+      throw error;
     }
   }
 
@@ -160,7 +161,7 @@ export class HttpClient extends EventEmitter {
     return this.accessTokenStore.updateToken(accessToken);
   }
 
-  public postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
+  public async postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
     const config: AxiosRequestConfig = {
       headers: {},
       method: 'post',
@@ -174,7 +175,8 @@ export class HttpClient extends EventEmitter {
       )}`;
     }
 
-    return sendRequestWithCookie<AccessTokenData>(this, config, this.engine).then(response => response.data);
+    const response = await sendRequestWithCookie<AccessTokenData>(this, config, this.engine);
+    return response.data;
   }
 
   public sendRequest<T>(config: AxiosRequestConfig, tokenAsParam: boolean = false): Promise<AxiosResponse<T>> {

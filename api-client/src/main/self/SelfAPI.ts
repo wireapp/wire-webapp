@@ -83,26 +83,28 @@ export class SelfAPI {
    * Get your profile name.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/selfName
    */
-  public getName(): Promise<{name: string}> {
+  public async getName(): Promise<{name: string}> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.NAME}`,
     };
 
-    return this.client.sendJSON<{name: string}>(config).then(response => response.data);
+    const response = await this.client.sendJSON<{name: string}>(config);
+    return response.data;
   }
 
   /**
    * Get your consents.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/consent
    */
-  public getConsents(): Promise<{results: Consent[]}> {
+  public async getConsents(): Promise<{results: Consent[]}> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.CONSENT}`,
     };
 
-    return this.client.sendJSON<{results: Consent[]}>(config).then(response => response.data);
+    const response = await this.client.sendJSON<{results: Consent[]}>(config);
+    return response.data;
   }
 
   /**
@@ -123,26 +125,28 @@ export class SelfAPI {
    * Determine whether you are discoverable via /search/contacts.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getSearchableStatus
    */
-  public getSearchable(): Promise<SearchableStatus> {
+  public async getSearchable(): Promise<SearchableStatus> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SEARCHABLE}`,
     };
 
-    return this.client.sendJSON<SearchableStatus>(config).then(response => response.data);
+    const response = await this.client.sendJSON<SearchableStatus>(config);
+    return response.data;
   }
 
   /**
    * Get your profile
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/self
    */
-  public getSelf(): Promise<Self> {
+  public async getSelf(): Promise<Self> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: SelfAPI.URL.SELF,
     };
 
-    return this.client.sendJSON<Self>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Self>(config);
+    return response.data;
   }
 
   /**

@@ -34,13 +34,14 @@ export class ConnectionAPI {
    * @param userId The ID of the other user
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connection
    */
-  public getConnection(userId: string): Promise<Connection> {
+  public async getConnection(userId: string): Promise<Connection> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
     };
 
-    return this.client.sendJSON<Connection>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Connection>(config);
+    return response.data;
   }
 
   /**
@@ -49,7 +50,7 @@ export class ConnectionAPI {
    * @param connectionId The connection ID to start from
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connections
    */
-  public getConnections(connectionId?: string, limit = 100): Promise<UserConnectionList> {
+  public async getConnections(connectionId?: string, limit = 100): Promise<UserConnectionList> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
@@ -59,7 +60,8 @@ export class ConnectionAPI {
       url: ConnectionAPI.URL.CONNECTIONS,
     };
 
-    return this.client.sendJSON<UserConnectionList>(config).then(response => response.data);
+    const response = await this.client.sendJSON<UserConnectionList>(config);
+    return response.data;
   }
 
   /**
@@ -95,14 +97,15 @@ export class ConnectionAPI {
    * @param connectionRequestData: The connection request
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/createConnection
    */
-  public postConnection(connectionRequestData: ConnectionRequest): Promise<Connection> {
+  public async postConnection(connectionRequestData: ConnectionRequest): Promise<Connection> {
     const config: AxiosRequestConfig = {
       data: connectionRequestData,
       method: 'post',
       url: ConnectionAPI.URL.CONNECTIONS,
     };
 
-    return this.client.sendJSON<Connection>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Connection>(config);
+    return response.data;
   }
 
   /**
@@ -112,13 +115,14 @@ export class ConnectionAPI {
    * @param updatedConnection: The updated connection
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
-  public putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection> {
+  public async putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection> {
     const config: AxiosRequestConfig = {
       data: updatedConnection,
       method: 'put',
       url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
     };
 
-    return this.client.sendJSON<Connection>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Connection>(config);
+    return response.data;
   }
 }
