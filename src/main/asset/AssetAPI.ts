@@ -30,7 +30,7 @@ export class AssetAPI {
 
   constructor(private readonly client: HttpClient) {}
 
-  getAsset(assetId: string, token?: string | null): Promise<ArrayBuffer> {
+  async getAsset(assetId: string, token?: string | null): Promise<ArrayBuffer> {
     if (!isValidAssetId(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -50,10 +50,14 @@ export class AssetAPI {
       config.params.asset_token = token;
     }
 
-    return this.client.sendRequest<ArrayBuffer>(config, true).then(response => response.data);
+    const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+    return response.data;
   }
 
-  postAsset(asset: Uint8Array, options?: {public: boolean; retention: AssetRetentionPolicy}): Promise<AssetUploadData> {
+  async postAsset(
+    asset: Uint8Array,
+    options?: {public: boolean; retention: AssetRetentionPolicy},
+  ): Promise<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
     const metadata = JSON.stringify({
@@ -78,15 +82,14 @@ export class AssetAPI {
 
     const footer = `\r\n--${BOUNDARY}--\r\n`;
 
-    return this.client
-      .sendRequest<AssetUploadData>({
-        data: concatToBuffer(body, asset, footer),
-        headers: {
-          'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
-        },
-        method: 'post',
-        url: AssetAPI.ASSET_URL,
-      })
-      .then(response => response.data);
+    const response = await this.client.sendRequest<AssetUploadData>({
+      data: concatToBuffer(body, asset, footer),
+      headers: {
+        'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
+      },
+      method: 'post',
+      url: AssetAPI.ASSET_URL,
+    });
+    return response.data;
   }
 }

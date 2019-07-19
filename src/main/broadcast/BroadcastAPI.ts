@@ -35,7 +35,7 @@ export class BroadcastAPI {
    * @param messageData The message content
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
    */
-  public postBroadcastMessage(
+  public async postBroadcastMessage(
     clientId: string,
     messageData?: NewOTRMessage,
     params?: {
@@ -64,10 +64,10 @@ export class BroadcastAPI {
       url: BroadcastAPI.URL.BROADCAST,
     };
 
-    if (typeof messageData.recipients === 'object') {
-      return this.client.sendJSON<UserClients>(config).then(response => response.data);
-    }
-
-    return this.client.sendProtocolBuffer<UserClients>(config).then(response => response.data);
+    const response =
+      typeof messageData.recipients === 'object'
+        ? await this.client.sendJSON<UserClients>(config)
+        : await this.client.sendProtocolBuffer<UserClients>(config);
+    return response.data;
   }
 }

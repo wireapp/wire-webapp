@@ -30,22 +30,24 @@ export class MemberAPI {
     MEMBERS: 'members',
   };
 
-  public getMembers(teamId: string): Promise<Members> {
+  public async getMembers(teamId: string): Promise<Members> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}`,
     };
 
-    return this.client.sendJSON<Members>(config).then(response => response.data);
+    const response = await this.client.sendJSON<Members>(config);
+    return response.data;
   }
 
-  public getMember(teamId: string, userId: string): Promise<MemberData> {
+  public async getMember(teamId: string, userId: string): Promise<MemberData> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}/${userId}`,
     };
 
-    return this.client.sendJSON<MemberData>(config).then(response => response.data);
+    const response = await this.client.sendJSON<MemberData>(config);
+    return response.data;
   }
 
   public async deleteMember(teamId: string, userId: string, password: string): Promise<void> {

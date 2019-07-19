@@ -100,7 +100,7 @@ export class AuthAPI {
     await sendRequestWithCookie(this.client, config, this.engine);
   }
 
-  public postRegister(userAccount: RegisterData): Promise<User> {
+  public async postRegister(userAccount: RegisterData): Promise<User> {
     const config: AxiosRequestConfig = {
       data: userAccount,
       method: 'post',
@@ -108,7 +108,8 @@ export class AuthAPI {
       withCredentials: true,
     };
 
-    return this.client.sendJSON<User>(config).then(response => response.data);
+    const response = await this.client.sendJSON<User>(config);
+    return response.data;
   }
 
   public async headInitiateLogin(ssoCode: string): Promise<void> {

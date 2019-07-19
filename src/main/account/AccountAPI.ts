@@ -135,6 +135,7 @@ export class AccountAPI {
       url: `${AccountAPI.URL.CALLS}/${AccountAPI.URL.CALLS_CONFIG}/${AccountAPI.URL.CALLS_CONFIG_V2}`,
     };
 
-    return this.client.sendJSON<CallConfigData>(config).then(response => response.data);
+    const response = await this.client.sendJSON<CallConfigData>(config);
+    return response.data;
   }
 }

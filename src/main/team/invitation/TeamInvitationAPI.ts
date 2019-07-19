@@ -32,13 +32,14 @@ export class TeamInvitationAPI {
     INVITATIONS: 'invitations',
   };
 
-  public getInvitation(teamId: string, invitationId: string): Promise<TeamInvitation> {
+  public async getInvitation(teamId: string, invitationId: string): Promise<TeamInvitation> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}/${invitationId}`,
     };
 
-    return this.client.sendJSON<TeamInvitation>(config).then(response => response.data);
+    const response = await this.client.sendJSON<TeamInvitation>(config);
+    return response.data;
   }
 
   public async getAllInvitations(teamId: string): Promise<TeamInvitation[]> {
@@ -57,7 +58,7 @@ export class TeamInvitationAPI {
     return allInvitations;
   }
 
-  public getInvitations(
+  public async getInvitations(
     teamId: string,
     startEmail?: string,
     limit = TeamInvitationAPI.MAX_CHUNK_SIZE,
@@ -71,7 +72,8 @@ export class TeamInvitationAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}`,
     };
 
-    return this.client.sendJSON<TeamInvitationChunk>(config).then(response => response.data);
+    const response = await this.client.sendJSON<TeamInvitationChunk>(config);
+    return response.data;
   }
 
   public async deleteInvitation(teamId: string, invitationId: string): Promise<void> {
@@ -83,17 +85,18 @@ export class TeamInvitationAPI {
     await this.client.sendJSON(config);
   }
 
-  public postInvitation(teamId: string, invitation: NewTeamInvitation): Promise<TeamInvitation> {
+  public async postInvitation(teamId: string, invitation: NewTeamInvitation): Promise<TeamInvitation> {
     const config: AxiosRequestConfig = {
       data: invitation,
       method: 'post',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamInvitationAPI.URL.INVITATIONS}`,
     };
 
-    return this.client.sendJSON<TeamInvitation>(config).then(response => response.data);
+    const response = await this.client.sendJSON<TeamInvitation>(config);
+    return response.data;
   }
 
-  public getInvitationFromCode(invitationCode: string): Promise<TeamInvitation> {
+  public async getInvitationFromCode(invitationCode: string): Promise<TeamInvitation> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
@@ -102,6 +105,7 @@ export class TeamInvitationAPI {
       url: `${TeamAPI.URL.TEAMS}/${TeamInvitationAPI.URL.INVITATIONS}/${TeamInvitationAPI.URL.INFO}`,
     };
 
-    return this.client.sendJSON<TeamInvitation>(config).then(response => response.data);
+    const response = await this.client.sendJSON<TeamInvitation>(config);
+    return response.data;
   }
 }
