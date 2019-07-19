@@ -25,7 +25,13 @@ import {AvailabilityType, BroadcastService} from '../broadcast/';
 const UUID = require('pure-uuid');
 
 export class UserService {
-  constructor(private readonly apiClient: APIClient, private readonly broadcastService: BroadcastService) {}
+  private readonly apiClient: APIClient;
+  private readonly broadcastService: BroadcastService;
+
+  constructor(apiClient: APIClient, broadcastService: BroadcastService) {
+    this.apiClient = apiClient;
+    this.broadcastService = broadcastService;
+  }
 
   public async getUsers(userId: string): Promise<User>;
   public async getUsers(userIds: string[]): Promise<User[]>;

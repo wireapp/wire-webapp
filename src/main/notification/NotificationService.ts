@@ -24,52 +24,57 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 
 export class NotificationService {
+  private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
+  private readonly storeEngine: CRUDEngine;
 
-  constructor(private readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
+  constructor(apiClient: APIClient, storeEngine: CRUDEngine) {
+    this.apiClient = apiClient;
+    this.storeEngine = storeEngine;
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
   }
 
-  public initializeNotificationStream(clientId: string): Promise<string> {
-    return this.setLastEventDate(new Date(0))
-      .then(() => this.backend.getLastNotification(clientId))
-      .then(notification => this.setLastNotificationId(notification));
+  public async initializeNotificationStream(clientId: string): Promise<string> {
+    await this.setLastEventDate(new Date(0));
+    const notification = await this.backend.getLastNotification(clientId);
+    return this.setLastNotificationId(notification);
   }
 
-  public hasHistory(): Promise<boolean> {
-    return this.getNotificationEventList().then(notificationEvents => !!notificationEvents.length);
+  public async hasHistory(): Promise<boolean> {
+    const notificationEvents = await this.getNotificationEventList();
+    return !!notificationEvents.length;
   }
 
   public getNotificationEventList(): Promise<NotificationEvent[]> {
     return this.database.getNotificationEventList();
   }
 
-  public setLastEventDate(eventDate: Date): Promise<Date> {
-    return this.database
-      .getLastEventDate()
-      .then(databaseLastEventDate => {
-        if (eventDate > databaseLastEventDate) {
-          return this.database.updateLastEventDate(eventDate);
-        }
-        return databaseLastEventDate;
-      })
-      .catch(error => {
-        if (
-          error instanceof StoreEngineError.RecordNotFoundError ||
-          error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name
-        ) {
-          return this.database.createLastEventDate(eventDate);
-        }
-        throw error;
-      });
+  public async setLastEventDate(eventDate: Date): Promise<Date> {
+    try {
+      const databaseLastEventDate = await this.database.getLastEventDate();
+      if (eventDate > databaseLastEventDate) {
+        return this.database.updateLastEventDate(eventDate);
+      }
+      return databaseLastEventDate;
+    } catch (error) {
+      if (
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        error.constructor.name === StoreEngineError.RecordNotFoundError.constructor.name
+      ) {
+        return this.database.createLastEventDate(eventDate);
+      }
+      throw error;
+    }
   }
 
-  public setLastNotificationId(lastNotification: Notification): Promise<string> {
-    return this.database
-      .getLastNotificationId()
-      .then(() => this.database.updateLastNotificationId(lastNotification))
-      .catch(() => this.database.createLastNotificationId(lastNotification));
+  public async setLastNotificationId(lastNotification: Notification): Promise<string> {
+    try {
+      await this.database.getLastNotificationId();
+      return this.database.updateLastNotificationId(lastNotification);
+    } catch (error) {
+      return this.database.createLastNotificationId(lastNotification);
+    }
   }
 }

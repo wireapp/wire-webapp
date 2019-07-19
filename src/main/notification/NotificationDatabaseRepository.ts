@@ -30,6 +30,8 @@ export enum DatabaseKeys {
   PRIMARY_KEY_LAST_NOTIFICATION = 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
 }
 
+const STORE_AMPLIFY = CryptographyDatabaseRepository.STORES.AMPLIFY;
+
 export class NotificationDatabaseRepository {
   public static readonly STORES = DatabaseStores;
   public static readonly KEYS = DatabaseKeys;
@@ -40,61 +42,41 @@ export class NotificationDatabaseRepository {
     return this.storeEngine.readAll<NotificationEvent>(NotificationDatabaseRepository.STORES.EVENTS);
   }
 
-  public getLastEventDate(): Promise<Date> {
-    return this.storeEngine
-      .read<{value: string}>(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
-      )
-      .then(({value}) => new Date(value));
+  public async getLastEventDate(): Promise<Date> {
+    const {value} = await this.storeEngine.read<{
+      value: string;
+    }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT);
+    return new Date(value);
   }
 
-  public updateLastEventDate(eventDate: Date): Promise<Date> {
-    return this.storeEngine
-      .update(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
-        {value: eventDate.toISOString()},
-      )
-      .then(() => eventDate);
+  public async updateLastEventDate(eventDate: Date): Promise<Date> {
+    await this.storeEngine.update(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
+    return eventDate;
   }
 
-  public createLastEventDate(eventDate: Date): Promise<Date> {
-    return this.storeEngine
-      .create(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_EVENT,
-        {value: eventDate.toISOString()},
-      )
-      .then(() => eventDate);
+  public async createLastEventDate(eventDate: Date): Promise<Date> {
+    await this.storeEngine.create(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
+    return eventDate;
   }
 
-  public getLastNotificationId(): Promise<string> {
-    return this.storeEngine
-      .read<{value: string}>(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
-      )
-      .then(({value}) => value);
+  public async getLastNotificationId(): Promise<string> {
+    const {value} = await this.storeEngine.read<{
+      value: string;
+    }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION);
+    return value;
   }
 
-  public updateLastNotificationId(lastNotification: Notification): Promise<string> {
-    return this.storeEngine
-      .update(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
-        {value: lastNotification.id},
-      )
-      .then(() => lastNotification.id);
+  public async updateLastNotificationId(lastNotification: Notification): Promise<string> {
+    await this.storeEngine.update(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
+      value: lastNotification.id,
+    });
+    return lastNotification.id;
   }
 
-  public createLastNotificationId(lastNotification: Notification): Promise<string> {
-    return this.storeEngine
-      .create(
-        CryptographyDatabaseRepository.STORES.AMPLIFY,
-        NotificationDatabaseRepository.KEYS.PRIMARY_KEY_LAST_NOTIFICATION,
-        {value: lastNotification.id},
-      )
-      .then(() => lastNotification.id);
+  public async createLastNotificationId(lastNotification: Notification): Promise<string> {
+    await this.storeEngine.create(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
+      value: lastNotification.id,
+    });
+    return lastNotification.id;
   }
 }
