@@ -6,7 +6,7 @@
     "bro-fs": "0.5.0"
   },
   "devDependencies": {
-    "@types/jasmine": "3.3.13",
+    "@types/jasmine": "3.3.14",
     "@types/karma": "3.0.3",
     "jasmine": "3.4.0",
     "karma": "4.2.0",
