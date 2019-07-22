@@ -40,7 +40,6 @@ import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
-import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -270,18 +269,21 @@ export class EventMapper {
       }
     }
 
-    const {category, from, id, primary_key, time, type, version} = event;
+    const {category, data, from, id, primary_key, time, type, version} = event;
 
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
     messageEntity.fromClientId = event.from_client_id;
     messageEntity.id = id;
-    messageEntity.legalHoldStatus = event.legal_hold_status;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;
     messageEntity.version = version || 1;
+
+    if (data) {
+      messageEntity.legalHoldStatus = data.legal_hold_status;
+    }
 
     if (messageEntity.is_content() || messageEntity.is_ping()) {
       messageEntity.status(event.status || StatusType.SENT);
@@ -570,10 +572,6 @@ export class EventMapper {
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
-  }
-
-  _mapEventLegalHold(isActive) {
-    return new LegalHoldMessage(isActive);
   }
 
   /**

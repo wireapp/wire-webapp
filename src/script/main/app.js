@@ -382,6 +382,9 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
+        return this.repository.conversation.updateConversationsOnAppInit();
+      })
+      .then(() => {
         telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         loadingView.removeFromView();
@@ -389,7 +392,6 @@ class App {
         amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
         modals.ready();
         showInitialModal(this.repository.user.self().availability());
-        return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
         telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);

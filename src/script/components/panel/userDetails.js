@@ -17,7 +17,7 @@
  *
  */
 
-import {AvailabilityType} from '../../user/AvailabilityType';
+import {Availability} from '@wireapp/protocol-messaging';
 import {nameFromType} from '../../user/AvailabilityMapper';
 
 import 'Components/availabilityState';
@@ -69,7 +69,7 @@ ko.components.register('panel-user-details', {
       this.isVerified = params.hasOwnProperty('isVerified') ? params.isVerified : this.participant().is_verified;
       this.badge = params.badge;
       this.availabilityLabel = ko.pureComputed(() => {
-        const availabilitySetToNone = this.participant().availability() === AvailabilityType.NONE;
+        const availabilitySetToNone = this.participant().availability() === Availability.Type.NONE;
         if (!availabilitySetToNone) {
           return nameFromType(this.participant().availability());
         }

@@ -27,6 +27,7 @@ import {
   ImageAsset,
   Knock,
   LastRead,
+  LegalHoldStatus,
   Location,
   MessageDelete,
   MessageHide,
@@ -36,12 +37,12 @@ import {
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {createRandomUuid, arrayToBase64} from 'Util/util';
-import {AvailabilityType} from 'src/script/user/AvailabilityType';
+import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
 import {ReactionType} from 'src/script/message/ReactionType';
+import {PROTO_MESSAGE_TYPE} from '../../../src/script/cryptography/ProtoMessageType';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -254,7 +255,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.availability).toBe(AvailabilityType.AVAILABLE);
+        expect(event_json.data.availability).toBe(Availability.Type.AVAILABLE);
       });
     });
 
@@ -487,6 +488,34 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
       });
+    });
+
+    it('maps legal hold states for ping messages', async () => {
+      const expectedLegalHoldStatus = LegalHoldStatus.DISABLED;
+
+      const optimisticEvent = {
+        conversation: 'ecf815e4-ef9d-494c-827b-85214b9d694e',
+        data: {},
+        from: '90f56eae-ef65-4b49-9efb-2d6502721965',
+        status: 1,
+        time: '2019-07-10T15:08:24.751Z',
+        type: 'conversation.message-add',
+      };
+
+      const protoKnock = new Knock({
+        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: false,
+        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: expectedLegalHoldStatus,
+        hotKnock: false,
+      });
+
+      const genericMessage = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+        messageId: createRandomUuid(),
+      });
+
+      const mappedEvent = await mapper.mapGenericMessage(genericMessage, optimisticEvent);
+
+      expect(mappedEvent.data.legal_hold_status).toBe(expectedLegalHoldStatus);
     });
 
     it('resolves with a mapped last read message', () => {

@@ -417,7 +417,7 @@ export class UserRepository {
   /**
    * Track availability action.
    *
-   * @param {AvailabilityType} availability - Type of availability
+   * @param {Availability.Type} availability - Type of availability
    * @param {string} method - Method used for availability change
    * @returns {undefined} No return value
    */

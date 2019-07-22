@@ -69,7 +69,7 @@ ko.components.register('user-list', {
   `,
   viewModel: function({
     click,
-    filter,
+    filter = ko.observable(''),
     selected: selectedUsers,
     searchRepository,
     teamRepository,
@@ -112,28 +112,25 @@ ko.components.register('user-list', {
     // Filter all list items if a filter is provided
     this.filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = conversationRepository.connectedUsers();
-      let resultUsers = [];
-      if (typeof filter === 'function') {
-        const normalizedQuery = SearchRepository.normalizeQuery(filter());
-        if (normalizedQuery) {
-          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-          const trimmedQuery = filter().trim();
-          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-          const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
-          resultUsers = searchResults.filter(user => {
-            return (
-              connectedUsers.includes(user) ||
-              teamRepository.isSelfConnectedTo(user.id) ||
-              user.username() === normalizedQuery
-            );
-          });
-        }
+      let resultUsers: User[] = userEntities();
+      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      if (normalizedQuery) {
+        const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+        const trimmedQuery = filter().trim();
+        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+        const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+        const searchResults = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
+        resultUsers = searchResults.filter(
+          user =>
+            connectedUsers.includes(user) ||
+            teamRepository.isSelfConnectedTo(user.id) ||
+            user.username() === normalizedQuery,
+        );
+      } else {
+        resultUsers = userEntities().filter(
+          user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
+        );
       }
-      resultUsers = userEntities().filter(user => {
-        return connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id);
-      });
-
       // make sure the self user is the first one in the list
       const selfUser = resultUsers.filter(user => user.is_me);
       const otherUsers = resultUsers.filter(user => !user.is_me);
