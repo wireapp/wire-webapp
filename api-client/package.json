@@ -51,7 +51,7 @@
     "webpack": "4.36.1",
     "webpack-cli": "3.3.6",
     "webpack-dev-server": "3.7.2",
-    "ws": "7.1.0"
+    "ws": "7.1.1"
   },
   "description": "Wire API Client to send and receive data.",
   "files": [
