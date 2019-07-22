@@ -344,7 +344,7 @@ export class Conversation {
 
   _isInitialized() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-    return this.selfUser() && hasMappedUsers;
+    return Boolean(this.selfUser() && hasMappedUsers);
   }
 
   _initSubscriptions() {
