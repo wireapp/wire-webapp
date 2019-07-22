@@ -177,13 +177,17 @@ describe('ConversationRepository', () => {
         others: [conversationPartner.id],
         receipt_mode: null,
         status: 0,
-        team_id: 'a271656d-5e45-405c-babd-6d46be595568',
+        team_id: createRandomUuid(),
         type: 0,
       };
 
       const conversationEntity = new ConversationMapper().mapConversations([conversationData])[0];
-      conversationEntity.participating_user_ets([conversationPartner]);
+      TestFactory.user_repository.users.push(conversationPartner);
+      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.selfUser(TestFactory.user_repository.self());
 
+      expect(conversationEntity._isInitialized()).toBe(true);
+      expect(conversationEntity.hasLegalHold()).toBe(false);
       expect(conversationEntity.participating_user_ets().length).toBe(1);
 
       const eventJson = {
@@ -234,11 +238,14 @@ describe('ConversationRepository', () => {
         ]),
       );
 
-      spyOn(TestFactory.conversation_repository, 'injectLegalHoldMessage');
+      spyOn(TestFactory.conversation_repository, 'injectLegalHoldMessage').and.callFake(({legalHoldStatus}) => {
+        expect(legalHoldStatus).toBe(LegalHoldStatus.ENABLED);
+      });
+
       await TestFactory.conversation_repository.save_conversation(conversationEntity);
       await TestFactory.conversation_repository._checkLegalHoldStatus(conversationEntity, eventJson);
 
-      expect(TestFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(2);
+      expect(TestFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(1);
     });
   });
 
