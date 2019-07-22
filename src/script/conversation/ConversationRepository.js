@@ -2669,7 +2669,13 @@ export class ConversationRepository {
     conversationEntity.blockLegalHoldMessage = false;
   }
 
-  async injectLegalHoldMessage({conversationId, userId, timestamp, legalHoldStatus, beforeTimestamp = false}) {
+  async injectLegalHoldMessage({
+    conversationId,
+    userId,
+    timestamp = this.serverTimeHandler.toServerTimestamp(),
+    legalHoldStatus,
+    beforeTimestamp = false,
+  }) {
     const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
       conversationId,
       userId,
