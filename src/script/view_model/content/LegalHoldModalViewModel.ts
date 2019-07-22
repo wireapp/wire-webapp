@@ -30,6 +30,7 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
 import {BackendClientError} from '../../error/BackendClientError';
+import {WebAppEvents} from '../../event/WebApp';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
@@ -167,6 +168,7 @@ export class LegalHoldModalViewModel {
       this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
+      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.id);
     } catch ({code, message}) {
       switch (code) {
         case BackendClientError.STATUS_CODE.BAD_REQUEST: {
