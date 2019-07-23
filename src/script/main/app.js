@@ -316,6 +316,7 @@ class App {
     exposeWrapperGlobals();
 
     checkIndexedDb()
+      .then(() => this._registerPersistentStorage())
       .then(() => this._registerSingleInstance())
       .then(() => this._loadAccessToken())
       .then(() => {
@@ -601,6 +602,29 @@ class App {
     const getCachedToken = isLocalhost || isLoginRedirect;
 
     return getCachedToken ? this.repository.auth.getCachedAccessToken() : this.repository.auth.getAccessToken();
+  }
+  /**
+   * Register a persistent storage in Google Chrome.
+   * @see https://developers.google.com/web/updates/2016/06/persistent-storage
+   * @returns {Promise<boolean>} Resolves after trying to register the storage.
+   */
+  async _registerPersistentStorage() {
+    if (navigator && navigator.storage && navigator.storage.persist) {
+      try {
+        const granted = await navigator.storage.persist();
+
+        if (granted) {
+          this.logger.info('Storage will not be cleared except by explicit user action');
+          return true;
+        }
+
+        this.logger.info('Storage may be cleared by the UA under storage pressure.');
+        return false;
+      } catch (error) {
+        this.logger.error(error);
+        return false;
+      }
+    }
   }
 
   //##############################################################################
