@@ -858,7 +858,9 @@ describe('ConversationRepository', () => {
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
-        spyOn(TestFactory.conversation_repository, 'mapConversations').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'mapConversations').and.returnValue(
+          new Conversation(createRandomUuid()),
+        );
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
