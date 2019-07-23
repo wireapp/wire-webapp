@@ -19,7 +19,7 @@
 
 export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation/';
 export {LegalHoldAPI} from './legalhold/';
-export {MemberAPI, MemberData, Members, PermissionsData} from './member/';
+export {MemberAPI, MemberData, Members, Permissions, PermissionsData, Role} from './member/';
 export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo, UpdateTeamData} from './team/';
 export {PaymentAPI, PaymentData} from './payment/';
 export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
