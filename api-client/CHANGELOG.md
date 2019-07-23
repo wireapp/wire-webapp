@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.0.5...@wireapp/api-client@6.0.6) (2019-07-23)
+
+
+### Bug Fixes
+
+* **api-client:** Export missing member info ([#2106](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2106)) ([8a86c90](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8a86c90))
+
+
+
+
+
 ## [6.0.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.0.4...@wireapp/api-client@6.0.5) (2019-07-23)
 
 **Note:** Version bump only for package @wireapp/api-client
