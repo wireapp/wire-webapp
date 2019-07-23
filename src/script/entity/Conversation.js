@@ -173,7 +173,7 @@ export class Conversation {
       const hasLegalHold = this._isInitialized() && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
       this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       if (!hasLegalHold) {
-        amplify.publish(HIDE_LEGAL_HOLD_MODAL);
+        amplify.publish(HIDE_LEGAL_HOLD_MODAL, this.id);
       }
       return hasLegalHold;
     });
