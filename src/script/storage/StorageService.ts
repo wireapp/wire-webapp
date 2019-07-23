@@ -260,14 +260,18 @@ export class StorageService {
    * @param entity - Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
-  async save<T>(storeName: string, primaryKey: string, entity: T): Promise<string> {
+  async save<T>(storeName: string, primaryKey: string, entity: T | {key: string; value: T}): Promise<string> {
     if (!entity) {
       throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
     try {
-      const returnedKey = await this.db.table(storeName).put(entity, primaryKey);
-      return returnedKey;
+      if ('key' in entity && 'value' in entity) {
+        await this.engine.updateOrCreate(storeName, entity.key, entity.value);
+      } else {
+        await this.engine.updateOrCreate(storeName, primaryKey, entity);
+      }
+      return primaryKey;
     } catch (error) {
       this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
       throw error;
