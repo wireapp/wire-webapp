@@ -260,13 +260,14 @@ export class StorageService {
    * @param entity - Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
-  save<T>(storeName: string, primaryKey: string, entity: T): Promise<string> {
+  async save<T>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
+      throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
     try {
-      return this.db.table(storeName).put(entity, primaryKey);
+      const returnedKey = await this.db.table(storeName).put(entity, primaryKey);
+      return returnedKey;
     } catch (error) {
       this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
       throw error;
@@ -276,7 +277,7 @@ export class StorageService {
   /**
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
-   * @param [reason='unknown reason'] - Cause for the termination
+   * @param reason - Cause for the termination
    * @returns No return value
    */
   terminate(reason: string = 'unknown reason'): void {
