@@ -25,6 +25,8 @@ import {NotificationPreference} from '../notification/';
 import {Self} from '../self/';
 import {BackendEvent} from './BackendEvent';
 
+type UserID = string;
+
 export enum USER_EVENT {
   ACTIVATE = 'user.activate',
   CLIENT_ADD = 'user.client-add',
@@ -32,6 +34,8 @@ export enum USER_EVENT {
   CLIENT_REMOVE = 'user.client-remove',
   CONNECTION = 'user.connection',
   DELETE = 'user.delete',
+  LEGAL_HOLD_DISABLE = 'user.legalhold-disable',
+  LEGAL_HOLD_ENABLE = 'user.legalhold-enable',
   PROPERTIES_SET = 'user.properties-set',
   UPDATE = 'user.update',
 }
@@ -50,12 +54,22 @@ export interface UserClientAddEvent extends UserEvent {
   type: USER_EVENT.CLIENT_ADD;
 }
 
-export interface UserClientLegalHoldRequest extends UserEvent {
+export interface UserClientLegalHoldRequestEvent extends UserEvent {
   client_id: string;
   last_prekey: PreKey;
   requester: string;
   target_user: string;
   type: USER_EVENT.CLIENT_LEGAL_HOLD_REQUEST;
+}
+
+export interface UserLegalHoldEnableEvent extends UserEvent {
+  id: UserID;
+  type: USER_EVENT.LEGAL_HOLD_ENABLE;
+}
+
+export interface UserLegalHoldDisableEvent extends UserEvent {
+  id: UserID;
+  type: USER_EVENT.LEGAL_HOLD_DISABLE;
 }
 
 export interface UserClientRemoveEvent extends UserEvent {
