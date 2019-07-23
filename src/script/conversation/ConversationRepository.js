@@ -2672,7 +2672,7 @@ export class ConversationRepository {
   async injectLegalHoldMessage({
     conversationId,
     userId,
-    timestamp = this.serverTimeHandler.toServerTimestamp(),
+    timestamp = this.getLatestEventTimestamp(true),
     legalHoldStatus,
     beforeTimestamp = false,
   }) {
@@ -3412,36 +3412,33 @@ export class ConversationRepository {
    * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onCreate(eventJson, eventSource) {
+  async _onCreate(eventJson, eventSource) {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    try {
+      const existingConversationEntity = this.find_conversation_by_id(conversationId);
+      if (existingConversationEntity) {
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
+      }
 
-    return Promise.resolve(this.find_conversation_by_id(conversationId))
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp);
+      if (conversationEntity) {
+        if (conversationEntity.participating_user_ids().length) {
+          this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
-        return this.mapConversations(eventData, initialTimestamp);
-      })
-      .then(conversationEntity => this.updateParticipatingUserEntities(conversationEntity))
-      .then(conversationEntity => this.save_conversation(conversationEntity))
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          if (conversationEntity.participating_user_ids().length) {
-            this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
-          }
 
-          this.verificationStateHandler.onConversationCreate(conversationEntity);
-          return {conversationEntity};
-        }
-      })
-      .catch(error => {
-        const isNoChanges = error.type === z.error.ConversationError.TYPE.NO_CHANGES;
-        if (!isNoChanges) {
-          throw error;
-        }
-      });
+        this.verificationStateHandler.onConversationCreate(conversationEntity);
+      }
+      await this.updateParticipatingUserEntities(conversationEntity);
+      await this.save_conversation(conversationEntity);
+      return {conversationEntity};
+    } catch (error) {
+      const isNoChanges = error.type === z.error.ConversationError.TYPE.NO_CHANGES;
+      if (!isNoChanges) {
+        throw error;
+      }
+    }
   }
 
   _onGroupCreation(conversationEntity, eventJson) {

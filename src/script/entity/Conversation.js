@@ -185,6 +185,7 @@ export class Conversation {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationId: this.id,
           legalHoldStatus,
+          timestamp: new Date(new Date(this.last_event_timestamp()).valueOf() + 1),
           userId: this.selfUser().id,
         });
       }
