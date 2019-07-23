@@ -219,8 +219,8 @@ export class StorageService {
    */
   async getAll<T>(storeName: string): Promise<T[]> {
     try {
-      const resultArray = await this.db.table(storeName).toArray();
-      return resultArray.filter(result => result);
+      const resultArray = await this.engine.readAll<T>(storeName);
+      return resultArray.filter(Boolean);
     } catch (error) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
