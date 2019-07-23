@@ -17,7 +17,7 @@
  *
  */
 
-import {MemberRole, NewTeamInvitation} from '@wireapp/api-client/dist/commonjs/team';
+import {NewTeamInvitation, Role} from '@wireapp/api-client/dist/commonjs/team';
 import {ThunkAction} from '../reducer';
 import * as InviteSelector from '../selector/InviteSelector';
 import * as languageSelector from '../selector/LanguageSelector';
@@ -47,7 +47,7 @@ export class InvitationAction {
         email: invitationEmail,
         inviter_name: selfSelector.getSelfName(state),
         locale: languageSelector.getLanguage(state),
-        role: MemberRole.MEMBER,
+        role: Role.MEMBER,
       };
 
       const teamId = selfSelector.getSelfTeamId(state);
