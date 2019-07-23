@@ -387,11 +387,17 @@ export class UserRepository {
   }
 
   onLegalHoldRequestCanceled(eventJson) {
-    if (this.self().id !== eventJson.id) {
-      return;
+    if (this.self().id === eventJson.id) {
+      this.self().hasPendingLegalHold(false);
+      amplify.publish(HIDE_REQUEST_MODAL);
+    } else {
+      /**
+       * TODO:
+       * 1) Get User ID from event and check the clients of that user.
+       * 2) If there is a legal hold client, remove it (in memory and database).
+       * 3) Verify that the removed client is not in the db anymore and not assigned to the user entity.
+       */
     }
-    this.self().hasPendingLegalHold(false);
-    amplify.publish(HIDE_REQUEST_MODAL);
   }
 
   async onLegalHoldRequest(eventJson) {
