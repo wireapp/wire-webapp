@@ -31,14 +31,14 @@ interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
 }
 
 const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({size}) => {
-  const borderWidth = 2;
+  const borderWidth = 1;
   return {
     alignItems: 'start',
     backgroundColor: COLOR.GRAY_DARKEN_48,
     border: `${borderWidth}px solid ${COLOR.GRAY_DARKEN_48}`,
-    borderRadius: '10px',
+    borderRadius: '16%',
     display: 'grid',
-    gridGap: 2,
+    gridGap: borderWidth,
     gridTemplateColumns: 'repeat(2, 1fr)',
     justifyItems: 'center',
     minHeight: `${size + borderWidth * 2}px`,
