@@ -18,6 +18,7 @@
  */
 
 /* eslint-disable no-magic-numbers */
+
 const {APIClient} = require('@wireapp/api-client');
 const {Account} = require('@wireapp/core');
 const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
