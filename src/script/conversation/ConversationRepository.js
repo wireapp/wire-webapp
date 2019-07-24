@@ -2644,7 +2644,7 @@ export class ConversationRepository {
         }, {});
 
         await Promise.all(
-          Object.entries(deletedUserClients).map(async ([userId, clients]) =>
+          Object.entries(deletedUserClients).map(([userId, clients]) =>
             Promise.all(clients.map(clientId => this.user_repository.remove_client_from_user(userId, clientId))),
           ),
         );
