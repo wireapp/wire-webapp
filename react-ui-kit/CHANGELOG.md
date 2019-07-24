@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.7.0...@wireapp/react-ui-kit@7.8.0) (2019-07-24)
+
+
+### Features
+
+* **react-ui-kit:** Size in avatar optional ([#2121](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2121)) ([cef3084](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/cef3084))
+
+
+
+
+
 # [7.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.6.0...@wireapp/react-ui-kit@7.7.0) (2019-07-24)
 
 
