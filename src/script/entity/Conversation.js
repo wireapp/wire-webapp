@@ -170,8 +170,11 @@ export class Conversation {
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
-      const hasLegalHold = this._isInitialized() && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
-      this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      const isInitialized = this._isInitialized();
+      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      if (isInitialized) {
+        this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      }
       if (!hasLegalHold) {
         amplify.publish(HIDE_LEGAL_HOLD_MODAL, this.id);
       }
