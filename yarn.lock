@@ -1487,10 +1487,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@6.0.4":
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-6.0.4.tgz#7cfae9726fe94559dde1f92529068af571696b9f"
-  integrity sha512-oKD3VOiOO3gE58/3UMfGQumd0CvCLjKkVEhAUFasH2W5hBGINqftRqDXn5odAzX5aFdt0KpOEv+HxoJqBDhd2g==
+"@wireapp/api-client@6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-6.1.0.tgz#249589edbb6c9a6cda5309f34879e267c6f9aa68"
+  integrity sha512-h+Y7eYL24sbmS/uRI1bc/QMzFSJg8bvQFzgowWBb1QxtXdLQ7iwGOcfiYBSQhUWctujfHQvHCGdHs2jn58e4hA==
   dependencies:
     "@types/node" "~10"
     "@types/spark-md5" "3.0.1"
@@ -1555,15 +1555,15 @@
     logdown "3.2.8"
     rimraf "2.6.3"
 
-"@wireapp/core@12.17.12":
-  version "12.17.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.12.tgz#6d227ba9a21508ffbc4aafc8b977a1ce32a7fb93"
-  integrity sha512-NrNkzVteFutdiAch8Dy6/ISMR2rNlLUu1kd416rU2nKokpQj6NGXDOrklU0gkY/+fuWJ5rvchCXyKEWIcXBdhQ==
+"@wireapp/core@12.17.15":
+  version "12.17.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.15.tgz#c7e5a1129dcb33bfdbd95bad563ad6914aa91565"
+  integrity sha512-v2Jxxkw+vt+WkEVv2cecEdgTBnYFpIoMc1rBwDlooZtF7ZP+FYJfLpyAeapFC0+Y2D2zrElX06HxLrLaPar6uQ==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~10"
-    "@wireapp/api-client" "6.0.4"
-    "@wireapp/cryptobox" "11.4.6"
+    "@wireapp/api-client" "6.1.0"
+    "@wireapp/cryptobox" "11.4.7"
     "@wireapp/protocol-messaging" "1.24.2"
     "@wireapp/store-engine" "3.5.5"
     bazinga64 "5.5.6"
@@ -1572,15 +1572,15 @@
     protobufjs "6.8.8"
     pure-uuid "1.5.7"
 
-"@wireapp/cryptobox@11.4.6":
-  version "11.4.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-11.4.6.tgz#b8ad0c75632d241546262316420ca5108b46e5e2"
-  integrity sha512-/uo30L5JAzkgAKhPEIZA60enu7+MRVQfmeCA4Lgf3yEv4IY5OTs2ip+HYT86SuANYoqY2eoSJCY/fInojyGXzw==
+"@wireapp/cryptobox@11.4.7":
+  version "11.4.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-11.4.7.tgz#38c84e02a932dfac496cd5d8e274c918a3a7fe12"
+  integrity sha512-N9ahsb65cvnoROI2y8rTFnJ8KOz7arjUIWpRix2lzX62aN0/XmZfq1zpw9q0yvWYhT1SdDRoa0dl44RE1JYMiQ==
   dependencies:
     "@types/node" "~10"
     "@wireapp/lru-cache" "3.3.4"
     "@wireapp/priority-queue" "1.2.5"
-    "@wireapp/proteus" "9.3.6"
+    "@wireapp/proteus" "9.3.7"
     "@wireapp/store-engine" "3.5.5"
     bazinga64 "5.5.6"
     logdown "3.2.8"
@@ -1608,10 +1608,10 @@
     "@types/node" "~10"
     pure-uuid "1.5.7"
 
-"@wireapp/proteus@9.3.6":
-  version "9.3.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.3.6.tgz#92c124ecd9040df9f3fa46ea39a461d1a0ce1908"
-  integrity sha512-D7eefb2zV7uGD7oOIdtmqZ+gzpQ4gE38pAKsRxgylmNAxYIwAbrge+f/kmEq4IWZHAM6KrwZIkExsg6lMG7n9w==
+"@wireapp/proteus@9.3.7":
+  version "9.3.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.3.7.tgz#f0c9ec9c1c4d828dae4ef32f5d3c7642eeee9610"
+  integrity sha512-BVMrvl76COap01HrOZSwzu9OvhAXeUgjsS0JbvyZDhUYwQYMq7TMF3HP6kyQzKEp7Bik1FW592XYXAEsWPYc5A==
   dependencies:
     "@types/chai" "4.1.7"
     "@types/ed2curve" "0.2.2"
