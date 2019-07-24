@@ -44,16 +44,14 @@ class TestStore extends Proteus.session.PreKeyStore {
     this.prekeys = prekeys;
   }
 
-  load_prekey(prekey_id) {
-    const matches = this.prekeys.filter(prekey => prekey.key_id === prekey_id);
-    return Promise.resolve(matches[0]);
+  async load_prekey(prekey_id) {
+    return this.prekeys.find(prekey => prekey.key_id === prekey_id);
   }
 
-  delete_prekey(prekey_id) {
+  async delete_prekey(prekey_id) {
     const matches = this.prekeys.filter(prekey => prekey.key_id === prekey_id);
-    return Promise.resolve()
-      .then(() => delete matches[0])
-      .then(() => prekey_id);
+    delete matches[0];
+    return prekey_id;
   }
 }
 
@@ -89,7 +87,10 @@ describe('Session', () => {
 
   describe('Serialisation', () => {
     it('can be serialised and deserialised to/from CBOR', async () => {
-      const [alice_ident, bob_ident] = await Promise.all([0, 1].map(() => Proteus.keys.IdentityKeyPair.new()));
+      const [alice_ident, bob_ident] = await Promise.all([
+        Proteus.keys.IdentityKeyPair.new(),
+        Proteus.keys.IdentityKeyPair.new(),
+      ]);
       const bob_store = new TestStore(await Proteus.keys.PreKey.generate_prekeys(0, 10));
 
       const bob_prekey = await bob_store.load_prekey(0);
@@ -589,14 +590,12 @@ describe('Session', () => {
       expect(Object.keys(bob.session_states).length).toBe(1);
 
       await Promise.all(
-        Array.from({length: 1001}, () => {
-          return Promise.resolve().then(async () => {
-            const hello_bob2_plaintext = 'Hello Bob2!';
-            const hello_bob2_encrypted = await alice.encrypt(hello_bob2_plaintext);
-            const hello_bob2_decrypted = await bob.decrypt(bob_store, hello_bob2_encrypted);
-            expect(sodium.to_string(hello_bob2_decrypted)).toBe(hello_bob2_plaintext);
-            expect(Object.keys(bob.session_states).length).toBe(1);
-          });
+        Array.from({length: 1001}, async () => {
+          const hello_bob2_plaintext = 'Hello Bob2!';
+          const hello_bob2_encrypted = await alice.encrypt(hello_bob2_plaintext);
+          const hello_bob2_decrypted = await bob.decrypt(bob_store, hello_bob2_encrypted);
+          expect(sodium.to_string(hello_bob2_decrypted)).toBe(hello_bob2_plaintext);
+          expect(Object.keys(bob.session_states).length).toBe(1);
         }),
       );
     });

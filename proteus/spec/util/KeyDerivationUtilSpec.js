@@ -29,11 +29,16 @@ beforeAll(async () => {
 const convert_arg_type = type => {
   if (!type) {
     return new Uint8Array(0);
-  } else if (typeof type === 'string') {
+  }
+
+  if (typeof type === 'string') {
     return sodium.from_hex(type);
-  } else if (type instanceof Array) {
+  }
+
+  if (type instanceof Array) {
     return new Uint8Array(type);
   }
+
   return type;
 };
 

@@ -25,40 +25,8 @@ yarn add @wireapp/cbor
 ```typescript
 import * as CBOR from '@wireapp/cbor';
 
-const payload: Uint8Array = new Uint8Array([
-  255,
-  18,
-  15,
-  34,
-  210,
-  168,
-  165,
-  188,
-  81,
-  33,
-  34,
-  40,
-  73,
-  61,
-  149,
-  198,
-  154,
-  54,
-  128,
-  76,
-  191,
-  161,
-  58,
-  176,
-  45,
-  75,
-  1,
-  33,
-  80,
-  157,
-  28,
-  89,
-]);
+// prettier-ignore
+const payload: Uint8Array = new Uint8Array([255, 18, 15, 34, 210, 168, 165, 188, 81, 33, 34, 40, 73, 61, 149, 198, 154, 54, 128, 76, 191, 161, 58, 176, 45, 75, 1, 33, 80, 157, 28, 89]);
 
 // Encoding
 const encoder: CBOR.Encoder = new CBOR.Encoder();

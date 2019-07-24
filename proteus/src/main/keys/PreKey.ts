@@ -55,11 +55,17 @@ export class PreKey {
   static validate_pre_key_id(pre_key_id: number): void {
     if (pre_key_id === undefined) {
       throw new InputError.TypeError('PreKey ID is undefined.', InputError.CODE.CASE_404);
-    } else if (typeof pre_key_id === 'string') {
+    }
+
+    if (typeof pre_key_id === 'string') {
       throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a string.`, InputError.CODE.CASE_403);
-    } else if (pre_key_id % 1 !== 0) {
+    }
+
+    if (pre_key_id % 1 !== 0) {
       throw new InputError.TypeError(`PreKey ID "${pre_key_id}" is a floating-point number.`, InputError.CODE.CASE_403);
-    } else if (pre_key_id < 0 || pre_key_id > PreKey.MAX_PREKEY_ID) {
+    }
+
+    if (pre_key_id < 0 || pre_key_id > PreKey.MAX_PREKEY_ID) {
       const message = `PreKey ID (${pre_key_id}) must be between or equal to 0 and ${PreKey.MAX_PREKEY_ID}.`;
       throw new InputError.RangeError(message, InputError.CODE.CASE_400);
     }
@@ -78,10 +84,7 @@ export class PreKey {
     }
 
     return Promise.all(
-      new Array(size).fill(null).map(async (_, index) => {
-        const pk = await PreKey.new((start + index) % PreKey.MAX_PREKEY_ID);
-        return pk;
-      }),
+      Array.from({length: size}).map((_, index) => PreKey.new((start + index) % PreKey.MAX_PREKEY_ID)),
     );
   }
 
