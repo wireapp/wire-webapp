@@ -31,7 +31,7 @@ export interface AvatarProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   forceInitials?: boolean;
   isAvatarGridItem?: boolean;
   name: string;
-  size: number;
+  size?: number;
 }
 
 const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> = ({
@@ -39,7 +39,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
   forceInitials,
   borderColor,
   backgroundColor = COLOR.GRAY,
-  size,
+  size = 28,
   isAvatarGridItem,
 }) => {
   const BORDER_SIZE_LIMIT = 32;
