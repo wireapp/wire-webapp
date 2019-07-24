@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.5.3...@wireapp/react-ui-kit@7.6.0) (2019-07-24)
+
+
+### Features
+
+* **react-ui-kit:** AvatarGrid component ([#2109](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2109)) ([d6a9051](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d6a9051))
+
+
+
+
+
 ## [7.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.5.2...@wireapp/react-ui-kit@7.5.3) (2019-07-19)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
