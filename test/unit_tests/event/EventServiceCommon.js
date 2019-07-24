@@ -555,12 +555,11 @@ window.testEventServiceClass = (testedServiceName, className) => {
       ];
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      beforeEach(() => {
-        return Promise.all(
+      beforeEach(async () => {
+        const ids = await Promise.all(
           messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
-        ).then(ids => {
-          primary_keys = ids;
-        });
+        );
+        primary_keys = ids;
       });
 
       afterEach(() => {

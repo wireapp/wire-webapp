@@ -243,9 +243,10 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  load<T>(storeName: string, primaryKey: string): Promise<T> {
+  async load<T>(storeName: string, primaryKey: string): Promise<T> {
     try {
-      return this.db.table(storeName).get(primaryKey);
+      const record = await this.db.table(storeName).get(primaryKey);
+      return record;
     } catch (error) {
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       throw error;
@@ -266,16 +267,8 @@ export class StorageService {
     }
 
     try {
-      if ('key' in entity) {
-        primaryKey = entity.key;
-      }
-
-      if ('value' in entity) {
-        entity = entity.value;
-      }
-
-      await this.engine.updateOrCreate(storeName, primaryKey, entity);
-      return primaryKey;
+      const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
+      return newKey;
     } catch (error) {
       this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
       throw error;
