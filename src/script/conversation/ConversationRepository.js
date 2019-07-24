@@ -2670,14 +2670,20 @@ export class ConversationRepository {
   }
 
   async injectLegalHoldMessage({
+    conversationEntity,
     conversationId,
     userId,
-    timestamp = this.getLatestEventTimestamp(true),
+    timestamp,
     legalHoldStatus,
     beforeTimestamp = false,
   }) {
+    if (!timestamp) {
+      const conversation = conversationEntity || this.find_conversation_by_id(conversationId);
+      const servertime = this.serverTimeHandler.toServerTimestamp();
+      timestamp = conversation.get_latest_timestamp(servertime);
+    }
     const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
-      conversationId,
+      conversationId || conversationEntity.id,
       userId,
       timestamp,
       legalHoldStatus,

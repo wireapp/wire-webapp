@@ -183,9 +183,8 @@ export class Conversation {
     this.legalHoldStatus.subscribe(legalHoldStatus => {
       if (!this.blockLegalHoldMessage && this._isInitialized()) {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
-          conversationId: this.id,
+          conversationEntity: this,
           legalHoldStatus,
-          timestamp: new Date(new Date(this.last_event_timestamp()).valueOf() + 1),
           userId: this.selfUser().id,
         });
       }
