@@ -2643,9 +2643,11 @@ export class ConversationRepository {
           return deleted;
         }, {});
 
-        Object.entries(deletedUserClients).forEach(([userId, clients]) => {
-          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
-        });
+        await Promise.all(
+          Object.entries(deletedUserClients).map(async ([userId, clients]) =>
+            Promise.all(clients.map(clientId => this.user_repository.remove_client_from_user(userId, clientId))),
+          ),
+        );
 
         const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
           if (userId === selfId) {
