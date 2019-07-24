@@ -36,6 +36,12 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
+import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -43,8 +49,7 @@ import {File} from 'src/script/entity/message/File';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
-import {MessageCategory} from '../../../src/script/message/MessageCategory';
-import {ConversationMapper} from '../../../src/script/conversation/ConversationMapper';
+import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 
 describe('ConversationRepository', () => {
@@ -158,16 +163,16 @@ describe('ConversationRepository', () => {
 
   describe('_checkLegalHoldStatus', () => {
     it('injects legal hold system messages when user A discovers that user B is on legal hold when receiving a message from user B for the very first time', async () => {
-      const conversationId = createRandomUuid();
       const conversationPartner = UserGenerator.getRandomUser();
+      TestFactory.user_repository.users.push(conversationPartner);
 
-      const conversationData = {
+      const conversationJsonFromBackend = {
         accessModes: ['invite'],
         accessRole: 'activated',
         archived_state: false,
         archived_timestamp: 0,
         creator: conversationPartner.id,
-        id: conversationId,
+        id: createRandomUuid(),
         last_event_timestamp: 3,
         last_server_timestamp: 3,
         message_timer: null,
@@ -176,13 +181,12 @@ describe('ConversationRepository', () => {
         name: null,
         others: [conversationPartner.id],
         receipt_mode: null,
-        status: 0,
+        status: ConversationStatus.CURRENT_MEMBER,
         team_id: createRandomUuid(),
-        type: 0,
+        type: ConversationType.GROUP,
       };
 
-      const conversationEntity = new ConversationMapper().mapConversations([conversationData])[0];
-      TestFactory.user_repository.users.push(conversationPartner);
+      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromBackend])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(TestFactory.user_repository.self());
 
@@ -192,7 +196,7 @@ describe('ConversationRepository', () => {
 
       const eventJson = {
         category: MessageCategory.TEXT,
-        conversation: conversationId,
+        conversation: conversationEntity.id,
         data: {
           content: 'Decrypted message content',
           expects_read_confirmation: false,
@@ -246,6 +250,89 @@ describe('ConversationRepository', () => {
       await TestFactory.conversation_repository._checkLegalHoldStatus(conversationEntity, eventJson);
 
       expect(TestFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('updateAllClients', () => {
+    it('updates the conversation legal hold status on client changes of group participants', async () => {
+      const conversationPartner = UserGenerator.getRandomUser();
+      TestFactory.user_repository.users.push(conversationPartner);
+
+      const conversationJsonFromDb = {
+        accessModes: [ACCESS_MODE.INVITE, ACCESS_MODE.CODE],
+        accessRole: ACCESS_ROLE.NON_ACTIVATED,
+        archived_state: false,
+        archived_timestamp: 0,
+        cleared_timestamp: 0,
+        creator: conversationPartner.id,
+        ephemeral_timer: null,
+        global_message_timer: null,
+        id: createRandomUuid(),
+        is_guest: false,
+        is_managed: false,
+        last_event_timestamp: 1563965225224,
+        last_read_timestamp: 1563965225224,
+        last_server_timestamp: 1563965229043,
+        legal_hold_status: LegalHoldStatus.ENABLED,
+        message_timer: null,
+        muted_state: NOTIFICATION_STATE.MENTIONS_AND_REPLIES,
+        muted_timestamp: 0,
+        name: 'Test Group',
+        others: [conversationPartner.id],
+        receipt_mode: ReceiptMode.DELIVERY_AND_READ,
+        status: ConversationStatus.CURRENT_MEMBER,
+        team_id: createRandomUuid(),
+        type: ConversationType.GROUP,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+      };
+
+      // TODO: Fake clients and add them to conversation partner.
+      const clientsPayload = [
+        {
+          class: 'desktop',
+          id: '1e66e04948938c2c',
+        },
+        {
+          class: 'legalhold',
+          id: '53761bec3f10a6d9',
+        },
+        {
+          class: 'desktop',
+          id: 'a9c8c385737b14fe',
+        },
+      ];
+
+      // const clientEntities = new ClientMapper().mapClients(clientsPayload, false);
+      for (const clientPayload of clientsPayload) {
+        const wasClientAdded = await TestFactory.user_repository.addClientToUser(
+          conversationPartner.id,
+          clientPayload,
+          false,
+        );
+
+        expect(wasClientAdded).toBe(true);
+      }
+
+      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
+      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.selfUser(TestFactory.user_repository.self());
+
+      expect(conversationEntity.hasLegalHold()).toBe(true);
+
+      const missingClientsError = new Error();
+      missingClientsError.deleted = {};
+      missingClientsError.missing = {
+        [conversationPartner.id]: ['1e66e04948938c2c', 'a9c8c385737b14fe'],
+      };
+      missingClientsError.redundant = {};
+      missingClientsError.time = new Date().toISOString();
+
+      spyOn(TestFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+        Promise.reject(missingClientsError),
+      );
+
+      // TODO: Test "updateAllClients"
+      expect('a').toBe('a');
     });
   });
 
