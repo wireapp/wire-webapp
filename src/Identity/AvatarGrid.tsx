@@ -26,16 +26,22 @@ import {Avatar} from './Avatar';
 import {COLOR} from './colors';
 
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
-  items: AvatarProps[];
-  size: number;
+  items: (Omit<AvatarProps, 'borderColor' | 'size' | 'borderColor' | 'isAvatarGridItem'>)[];
+  size?: number;
+  backgroundColor?: string;
+  borderColor?: string;
 }
 
-const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({size}) => {
+const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({
+  size = 26,
+  backgroundColor = COLOR.GRAY_DARKEN_48,
+  borderColor = COLOR.GRAY_DARKEN_48,
+}) => {
   const borderWidth = 1;
   return {
     alignItems: 'start',
-    backgroundColor: COLOR.GRAY_DARKEN_48,
-    border: `${borderWidth}px solid ${COLOR.GRAY_DARKEN_48}`,
+    backgroundColor: backgroundColor,
+    border: `${borderWidth}px solid ${borderColor}`,
     borderRadius: '16%',
     display: 'grid',
     gridGap: borderWidth,
@@ -46,24 +52,25 @@ const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = 
   };
 };
 
-const filteredAvatarGridProps = (props: Props) => filterProps(props, []);
+const filteredAvatarGridProps = (props: Props) =>
+  filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size']);
 
 export const AvatarGrid = (props: Props) => {
-  const {size} = props;
-  const items = props.items.slice(0, 4);
-  const missing = 4 - items.length;
+  const {size, items} = props;
+  const slicedItems = items.slice(0, 4);
+  const missing = 4 - slicedItems.length;
   for (let index = 0; index < missing; index++) {
-    items.push(null);
+    slicedItems.push(null);
   }
   return (
     <div css={avatarGridStyle(props)} {...filteredAvatarGridProps(props)}>
-      {items.map(item =>
+      {slicedItems.map(item =>
         item ? (
           <Avatar
             key={Math.random().toString()}
             backgroundColor={item.backgroundColor || COLOR.GRAY_DARKEN_80}
             base64Image={item.base64Image}
-            borderColor={item.borderColor}
+            color={item.color}
             fetchImage={item.fetchImage}
             forceInitials={item.forceInitials}
             isAvatarGridItem

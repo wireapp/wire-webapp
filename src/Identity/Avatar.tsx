@@ -35,6 +35,7 @@ export interface AvatarProps<T = HTMLDivElement> extends React.HTMLProps<T> {
 }
 
 const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> = ({
+  color = COLOR.WHITE,
   base64Image,
   forceInitials,
   borderColor,
@@ -55,7 +56,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
     backgroundSize: 'cover',
     borderRadius: isAvatarGridItem ? '0' : '50%',
     boxShadow: isAvatarGridItem ? 'none' : `inset 0 0 0 ${borderWidth}px ${borderColor}`,
-    color: isAvatarGridItem ? borderColor : 'white',
+    color,
     display: 'flex',
     fontSize,
     fontWeight: isAvatarGridItem ? 700 : 300,
