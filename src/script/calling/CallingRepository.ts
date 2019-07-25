@@ -389,6 +389,14 @@ export class CallingRepository {
   toggleCamera(call: Call): void {
     const selfParticipant = call.selfParticipant;
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
+    if (call.state() === CALL_STATE.INCOMING) {
+      selfParticipant.videoState(newState);
+      if (newState === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream();
+      } else {
+        this.warmupMediaStreams(call, false, true);
+      }
+    }
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 

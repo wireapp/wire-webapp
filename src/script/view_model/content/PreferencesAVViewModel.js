@@ -150,7 +150,7 @@ export class PreferencesAVViewModel {
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     return this.streamHandler
       .requestMediaStream(requestAudio, requestVideo, false, false)
-      .then(({stream}) => {
+      .then(stream => {
         // refresh devices list in order to display the labels (see https://stackoverflow.com/a/46659819/2745879)
         this.devicesHandler.refreshMediaDevices();
         return stream;
