@@ -30,13 +30,13 @@ for (let index = 8; index < percent; index += 8) {
 
 function shade(color: ColorParam, amount = 0.08): string {
   return Color(color)
-    .mix(Color(BLACK), amount)
+    .mix(Color(BASE_COLOR.BLACK), amount)
     .toString();
 }
 
 function tint(color: ColorParam, amount: number): string {
   return Color(color)
-    .mix(Color(WHITE), amount)
+    .mix(Color(BASE_COLOR.WHITE), amount)
     .toString();
 }
 
@@ -46,15 +46,14 @@ function opaque(color: ColorParam, amount: number): string {
     .toString();
 }
 
-const BLACK = '#000';
-const WHITE = '#fff';
-
 const BASE_COLOR: Record<string, string> = {
+  BLACK: '#000',
   BLUE: '#2391d3',
   GRAY: '#bac8d1',
   GREEN: '#00c800',
   ORANGE: '#ff8900',
   RED: '#fb0807',
+  WHITE: '#fff',
   YELLOW: '#febf02',
 };
 
@@ -84,8 +83,8 @@ export const COLOR: any = {
   ...LIGHT_COLOR,
   ...OPAQUE_COLOR,
   ...COMPONENT_COLOR,
-  BLACK,
-  WHITE,
+  BLACK: BASE_COLOR.BLACK,
+  WHITE: BASE_COLOR.WHITE,
   opaque,
   shade,
 };
