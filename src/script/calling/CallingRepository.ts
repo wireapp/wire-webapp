@@ -223,8 +223,12 @@ export class CallingRepository {
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     return this.getMediaStream({audio, camera}, isGroup)
       .then(mediaStream => {
-        call.selfParticipant.updateMediaStream(mediaStream);
-        call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+        if (call.state() !== CALL_STATE.NONE) {
+          call.selfParticipant.updateMediaStream(mediaStream);
+          call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+        } else {
+          mediaStream.getTracks().forEach(track => track.stop());
+        }
         return true;
       })
       .catch(() => false);
