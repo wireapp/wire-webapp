@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.4.6...@wireapp/store-engine-bro-fs@0.5.0) (2019-07-25)
+
+
+### Features
+
+* **store-engine,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet:** Add generic for primary key ([#2120](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/issues/2120)) ([fc3adf8](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/commit/fc3adf8))
+
+
+
+
+
 ## [0.4.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.4.5...@wireapp/store-engine-bro-fs@0.4.6) (2019-07-24)
 
 **Note:** Version bump only for package @wireapp/store-engine-bro-fs

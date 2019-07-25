@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.3.8...@wireapp/store-engine-dexie@0.4.0) (2019-07-25)
+
+
+### Features
+
+* **store-engine,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet:** Add generic for primary key ([#2120](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2120)) ([fc3adf8](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/fc3adf8))
+
+
+
+
+
 ## [0.3.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.3.7...@wireapp/store-engine-dexie@0.3.8) (2019-07-24)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie

@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/bro-fs": "0.4.2",
-    "@wireapp/store-engine": "3.5.6",
+    "@wireapp/store-engine": "3.6.0",
     "bro-fs": "0.5.0"
   },
   "devDependencies": {
@@ -33,5 +33,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.4.6"
+  "version": "0.5.0"
 }
