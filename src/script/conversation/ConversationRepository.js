@@ -2683,6 +2683,9 @@ export class ConversationRepository {
     legalHoldStatus,
     beforeTimestamp = false,
   }) {
+    if (typeof legalHoldStatus === 'undefined') {
+      return;
+    }
     if (!timestamp) {
       const conversation = conversationEntity || this.find_conversation_by_id(conversationId);
       const servertime = this.serverTimeHandler.toServerTimestamp();
@@ -2705,10 +2708,12 @@ export class ConversationRepository {
       return Promise.resolve();
     }
 
+    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
+
     // Legal Hold
     const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
     const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-    await this.updateAllClients(conversationEntity);
+    await this.updateAllClients(conversationEntity, !isMessageEdit);
     const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
 
     const {genericMessage} = eventInfoEntity;
@@ -2716,7 +2721,7 @@ export class ConversationRepository {
 
     const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
 
-    if (haveNewClientsChangeLegalHoldStatus) {
+    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
       const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.injectLegalHoldMessage({
         beforeTimestamp: true,

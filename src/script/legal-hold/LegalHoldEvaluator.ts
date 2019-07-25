@@ -50,7 +50,10 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
   // @see https://docs.google.com/spreadsheets/d/1viXE7IBzjJCILvsMH1U6WbcFa2ll_7lIlfJQvE5y6Zw/
   const supportsLegalHoldFlag = [ClientEvent.CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type);
-  const hasLegalHoldFlag = mappedEvent.data && mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
+  const hasLegalHoldFlag =
+    mappedEvent.data &&
+    typeof mappedEvent.data.legal_hold_status !== 'undefined' &&
+    mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
   return supportsLegalHoldFlag && hasLegalHoldFlag;
 };
 
