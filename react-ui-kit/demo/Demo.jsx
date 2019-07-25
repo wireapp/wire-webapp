@@ -208,39 +208,39 @@ const Demo = () => {
             <AvatarGrid
               size={120}
               items={[
-                {borderColor: '#fb0807', name: 'Joe Doe'},
-                {borderColor: '#2085C2', name: 'Bon Jovi'},
-                {borderColor: '#EB7E00', name: 'Mick Jagger'},
-                {base64Image: avatarBase64, borderColor: '#EB7E00', name: 'Freddy Mercury'},
+                {color: '#fb0807', name: 'Joe Doe'},
+                {color: '#2085C2', name: 'Bon Jovi'},
+                {color: '#EB7E00', name: 'Mick Jagger'},
+                {base64Image: avatarBase64, color: '#EB7E00', name: 'Freddy Mercury'},
               ]}
             />
             <AvatarGrid
               size={120}
               items={[
-                {borderColor: '#fb0807', name: 'Joe Doe'},
-                {borderColor: '#2085C2', name: 'Bon Jovi'},
-                {borderColor: '#EB7E00', name: 'Mick Jagger'},
+                {color: '#fb0807', name: 'Joe Doe'},
+                {color: '#2085C2', name: 'Bon Jovi'},
+                {color: '#EB7E00', name: 'Mick Jagger'},
               ]}
             />
             <AvatarGrid
               size={64}
-              items={[{borderColor: '#EB7E00', name: 'Mick Jagger'}, {borderColor: '#359AD7', name: 'Freddy Mercury'}]}
+              items={[{color: '#EB7E00', name: 'Mick Jagger'}, {color: '#359AD7', name: 'Freddy Mercury'}]}
             />
-            <AvatarGrid size={64} items={[{borderColor: '#EB7E00', name: 'Mick Jagger'}]} />
+            <AvatarGrid size={64} items={[{color: '#EB7E00', name: 'Mick Jagger'}]} />
             <AvatarGrid
               size={32}
               items={[
-                {borderColor: '#fb0807', name: 'Joe Doe'},
-                {borderColor: '#2085C2', name: 'Bon Jovi'},
-                {borderColor: '#EB7E00', name: 'Mick Jagger'},
+                {color: '#fb0807', name: 'Joe Doe'},
+                {color: '#2085C2', name: 'Bon Jovi'},
+                {color: '#EB7E00', name: 'Mick Jagger'},
               ]}
             />
             <AvatarGrid
               size={24}
               items={[
-                {borderColor: '#fb0807', name: 'Joe Doe'},
-                {borderColor: '#2085C2', name: 'Bon Jovi'},
-                {borderColor: '#EB7E00', name: 'Mick Jagger'},
+                {color: '#fb0807', name: 'Joe Doe'},
+                {color: '#2085C2', name: 'Bon Jovi'},
+                {color: '#EB7E00', name: 'Mick Jagger'},
               ]}
             />
           </div>
