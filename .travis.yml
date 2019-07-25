@@ -39,6 +39,12 @@ cache:
 before_script:
   - npm rebuild node-sass
 
+script:
+  - |
+    if [ "$DISTRIBUTION" == "wire" ]; then
+      yarn test
+    fi
+
 after_script:
   - 'bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info'
 
