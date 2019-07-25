@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.4.0...@wireapp/store-engine-dexie@0.4.1) (2019-07-25)
+
+
+### Bug Fixes
+
+* **store-engine-bro-fs,store-engine-sqleet:** Unify error types ([#2131](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2131)) ([f56a6a2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/f56a6a2))
+
+
+
+
+
 # [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.3.8...@wireapp/store-engine-dexie@0.4.0) (2019-07-25)
 
 

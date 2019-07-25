@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.6.0...@wireapp/store-engine-sqleet@0.6.1) (2019-07-25)
+
+
+### Bug Fixes
+
+* **store-engine-bro-fs,store-engine-sqleet:** Unify error types ([#2131](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2131)) ([f56a6a2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/f56a6a2))
+
+
+
+
+
 # [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.5.8...@wireapp/store-engine-sqleet@0.6.0) (2019-07-25)
 
 
