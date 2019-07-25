@@ -593,6 +593,12 @@ export class CallingRepository {
     if (!conversationEntity) {
       return;
     }
+    const storedCall = this.findCall(conversationId);
+    if (storedCall) {
+      // A call that has been picked up by another device can still be in storage.
+      // When a second call arrives in the same conversation, we need to clean that call first
+      this.removeCall(storedCall);
+    }
     const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
