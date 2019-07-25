@@ -17,13 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
-import {
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-  UnsupportedError,
-} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import * as fs from 'bro-fs';
 
 export interface FileSystemEngineOptions {
@@ -48,7 +42,7 @@ export class FileSystemEngine implements CRUDEngine {
   async isSupported(): Promise<void> {
     if (typeof window === 'undefined' || !fs.isSupported()) {
       const message = `File and Directory Entries API is not available on your platform.`;
-      throw new UnsupportedError(message);
+      throw new StoreEngineError.UnsupportedError(message);
     }
   }
 
@@ -79,7 +73,7 @@ export class FileSystemEngine implements CRUDEngine {
       return primaryKey;
     } else {
       const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new RecordTypeError(message);
+      throw new StoreEngineError.RecordTypeError(message);
     }
   }
 
@@ -90,7 +84,7 @@ export class FileSystemEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     if (!entity) {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-      throw new RecordTypeError(message);
+      throw new StoreEngineError.RecordTypeError(message);
     }
 
     const filePath = this.createFilePath(tableName, primaryKey);
@@ -98,7 +92,7 @@ export class FileSystemEngine implements CRUDEngine {
 
     if (isExistent) {
       const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-      throw new RecordAlreadyExistsError(message);
+      throw new StoreEngineError.RecordAlreadyExistsError(message);
     } else {
       let data: string;
       try {
@@ -140,7 +134,7 @@ export class FileSystemEngine implements CRUDEngine {
       data = await fs.readFile(filePath, {type: 'Text'});
     } catch (error) {
       const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-      throw new RecordNotFoundError(message);
+      throw new StoreEngineError.RecordNotFoundError(message);
     }
 
     try {
@@ -212,7 +206,7 @@ export class FileSystemEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
-        if (error instanceof RecordNotFoundError) {
+        if (error instanceof StoreEngineError.RecordNotFoundError) {
           return this.create(tableName, primaryKey, changes);
         }
         throw error;

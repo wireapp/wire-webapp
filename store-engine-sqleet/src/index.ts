@@ -17,13 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
-import {
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-  UnsupportedError,
-} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import initSqlJs from 'sql.js';
 
 import {
@@ -180,7 +174,7 @@ export class SQLeetEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     if (!entity) {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-      throw new RecordTypeError(message);
+      throw new StoreEngineError.RecordTypeError(message);
     }
     const {columns, values} = this.buildValues(tableName, entity);
     const newValues = Object.keys(values).join(',');
@@ -197,7 +191,7 @@ export class SQLeetEngine implements CRUDEngine {
     } catch (error) {
       if (error.message.startsWith(`UNIQUE constraint failed: `)) {
         const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-        throw new RecordAlreadyExistsError(message);
+        throw new StoreEngineError.RecordAlreadyExistsError(message);
       } else {
         throw error;
       }
@@ -237,7 +231,7 @@ export class SQLeetEngine implements CRUDEngine {
 
     if (Object.keys(record).length === 0) {
       const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-      throw new RecordNotFoundError(message);
+      throw new StoreEngineError.RecordNotFoundError(message);
     }
 
     for (const column in record) {
@@ -303,7 +297,7 @@ export class SQLeetEngine implements CRUDEngine {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
-      const isRecordNotFound = error instanceof RecordNotFoundError;
+      const isRecordNotFound = error instanceof StoreEngineError.RecordNotFoundError;
       if (isRecordNotFound) {
         await this.create(tableName, primaryKey, changes);
       } else {
@@ -322,6 +316,6 @@ export class SQLeetEngine implements CRUDEngine {
         }
       }
     }
-    throw new UnsupportedError('WebAssembly is not supported.');
+    throw new StoreEngineError.UnsupportedError('WebAssembly is not supported.');
   }
 }

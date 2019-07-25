@@ -17,14 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
-import {
-  PathValidationError,
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-  UnsupportedError,
-} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -44,13 +37,13 @@ export class FileEngine implements CRUDEngine {
     const trustedRootDetails = FileEngine.path.parse(trustedRoot);
     if (trustedRootDetails.root === trustedRootDetails.dir && trustedRootDetails.base === '') {
       const message = `"${trustedRoot}" cannot be the root of the filesystem.`;
-      throw new PathValidationError(message);
+      throw new StoreEngineError.PathValidationError(message);
     }
 
     const unsafePath = FileEngine.path.resolve(trustedRoot, givenPath);
     if (unsafePath.startsWith(trustedRoot) === false) {
       const message = `Path traversal has been detected. Allowed path was "${trustedRoot}" but tested path "${givenPath}" attempted to reach "${unsafePath}"`;
-      throw new PathValidationError(message);
+      throw new StoreEngineError.PathValidationError(message);
     }
 
     return unsafePath;
@@ -63,7 +56,7 @@ export class FileEngine implements CRUDEngine {
 
     if (!isNodeOrElectron) {
       const message = `Node.js File System Module is not available on your platform.`;
-      throw new UnsupportedError(message);
+      throw new StoreEngineError.UnsupportedError(message);
     }
   }
 
@@ -104,13 +97,13 @@ export class FileEngine implements CRUDEngine {
           return primaryKey;
         } else if (error.code === 'EEXIST') {
           const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
-          throw new RecordAlreadyExistsError(message);
+          throw new StoreEngineError.RecordAlreadyExistsError(message);
         }
         throw error;
       }
     } else {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-      throw new RecordTypeError(message);
+      throw new StoreEngineError.RecordTypeError(message);
     }
   }
 
@@ -143,7 +136,7 @@ export class FileEngine implements CRUDEngine {
     } catch (error) {
       if (error.code === 'ENOENT') {
         const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-        throw new RecordNotFoundError(message);
+        throw new StoreEngineError.RecordNotFoundError(message);
       }
       throw error;
     }
@@ -192,7 +185,7 @@ export class FileEngine implements CRUDEngine {
       record += additions;
     } else {
       const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-      throw new RecordTypeError(message);
+      throw new StoreEngineError.RecordTypeError(message);
     }
     const updatedRecord = record;
     await fs.outputFile(file, updatedRecord);
@@ -222,7 +215,7 @@ export class FileEngine implements CRUDEngine {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
-      if (error instanceof RecordNotFoundError) {
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
         return this.create(tableName, primaryKey, changes);
       }
       throw error;

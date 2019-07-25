@@ -17,7 +17,10 @@
  *
  */
 
-import {PathValidationError} from '@wireapp/store-engine/dist/commonjs/engine/error';
+import fs from 'fs-extra';
+import path from 'path';
+
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
@@ -28,8 +31,7 @@ import {readAllSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllSpec'
 import {readSpec} from '@wireapp/store-engine/dist/commonjs/test/readSpec';
 import {updateOrCreateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateOrCreateSpec';
 import {updateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateSpec';
-import fs from 'fs-extra';
-import path from 'path';
+
 import {FileEngine} from './index';
 
 describe('FileEngine', () => {
@@ -55,7 +57,7 @@ describe('FileEngine', () => {
   describe('enforcePathRestrictions', () => {
     const enforcePathRestrictions = (givenTrustedRoot: string, givenPath: string) => () =>
       FileEngine.enforcePathRestrictions(givenTrustedRoot, givenPath);
-    const expectedError = PathValidationError;
+    const expectedError = StoreEngineError.PathValidationError;
     const unixFolder = '/home/marge/test/';
     const windowsFolder = 'C:\\Users\\bart\\Documents\\Database\\';
 
