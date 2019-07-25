@@ -11425,10 +11425,10 @@ stylehacks@^4.0.0:
     postcss "^7.0.0"
     postcss-selector-parser "^3.0.0"
 
-stylelint-config-idiomatic-order@7.0.2:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/stylelint-config-idiomatic-order/-/stylelint-config-idiomatic-order-7.0.2.tgz#e0fed3f2b08739f36e9b7e70c0c777ae17301206"
-  integrity sha512-0lE/LP1pvYLIVyltUdPoKoxq3NSx8uTOS7Ny15OZ9znod3dFN2/zsYaDCHILe+oL518AakzMbMiZbMDM65EQSw==
+stylelint-config-idiomatic-order@7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/stylelint-config-idiomatic-order/-/stylelint-config-idiomatic-order-7.0.3.tgz#07354f909997201179cb1b8640fbc4efc5525171"
+  integrity sha512-BrIwo3TjZAtwKcg42sgD+8WW5tdP78HrsfMSf+f1F1Sa0eB0AJfPUwHELySbP+5Or0WRjTZrHFMyQ4AMrRXT0Q==
   dependencies:
     stylelint "^10.0.1"
     stylelint-order "^3.0.0"
