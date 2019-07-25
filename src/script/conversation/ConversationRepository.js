@@ -2621,8 +2621,10 @@ export class ConversationRepository {
       });
   }
 
-  async updateAllClients(conversationEntity) {
-    conversationEntity.blockLegalHoldMessage = true;
+  async updateAllClients(conversationEntity, blockSystemMessage = true) {
+    if (blockSystemMessage) {
+      conversationEntity.blockLegalHoldMessage = true;
+    }
     const sender = this.client_repository.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
@@ -2668,7 +2670,9 @@ export class ConversationRepository {
         );
       }
     }
-    conversationEntity.blockLegalHoldMessage = false;
+    if (blockSystemMessage) {
+      conversationEntity.blockLegalHoldMessage = false;
+    }
   }
 
   async injectLegalHoldMessage({
