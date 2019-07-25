@@ -20,8 +20,10 @@
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import Dexie from 'dexie';
 
+type DexieObservable = {_dbSchema?: Object};
+
 export class IndexedDBEngine implements CRUDEngine {
-  private db: Dexie = new Dexie('');
+  private db: Dexie & DexieObservable = new Dexie('');
   public storeName = '';
 
   // Check if IndexedDB is accessible (which won't be the case when browsing with Firefox in private mode or being on
@@ -89,7 +91,11 @@ export class IndexedDBEngine implements CRUDEngine {
     return this.db ? this.db.delete() : Dexie.delete(this.storeName);
   }
 
-  private mapDatabaseError(error: Dexie.DexieError, tableName: string, primaryKey: string): Error {
+  private mapDatabaseError<PrimaryKey = string>(
+    error: Dexie.DexieError,
+    tableName: string,
+    primaryKey: PrimaryKey,
+  ): Error {
     const isAlreadyExisting = error instanceof Dexie.ConstraintError;
     /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
     const hasNotEnoughDiskSpace =
@@ -106,7 +112,11 @@ export class IndexedDBEngine implements CRUDEngine {
     }
   }
 
-  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+  public create<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (entity) {
       return this.db
         .table(tableName)
@@ -119,9 +129,10 @@ export class IndexedDBEngine implements CRUDEngine {
     return Promise.reject(new StoreEngineError.RecordTypeError(message));
   }
 
-  public delete(tableName: string, primaryKey: string): Promise<string> {
-    return Promise.resolve()
-      .then(() => this.db.table(tableName).delete(primaryKey))
+  public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
+    return this.db
+      .table(tableName)
+      .delete(primaryKey)
       .then(() => primaryKey);
   }
 
@@ -132,11 +143,14 @@ export class IndexedDBEngine implements CRUDEngine {
       .then(() => true);
   }
 
-  public read<T>(tableName: string, primaryKey: string): Promise<T> {
+  public read<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+  ): Promise<EntityType> {
     return this.db
-      .table(tableName)
+      .table<EntityType>(tableName)
       .get(primaryKey)
-      .then((record: T) => {
+      .then(record => {
         if (record) {
           return record;
         }
@@ -145,19 +159,19 @@ export class IndexedDBEngine implements CRUDEngine {
       });
   }
 
-  public readAll<T>(tableName: string): Promise<T[]> {
+  public readAll<EntityType>(tableName: string): Promise<EntityType[]> {
     return this.db.table(tableName).toArray();
   }
 
-  public async readAllPrimaryKeys(tableName: string): Promise<string[]> {
+  public async readAllPrimaryKeys<PrimaryKey = string>(tableName: string): Promise<PrimaryKey[]> {
     const keys = await this.db
-      .table(tableName)
+      .table<PrimaryKey>(tableName)
       .toCollection()
       .keys();
-    return keys.map(key => `${key}`);
+    return keys.map(key => (key as any) as PrimaryKey);
   }
 
-  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public update<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, changes: Object): Promise<PrimaryKey> {
     return this.db
       .table(tableName)
       .update(primaryKey, changes)
@@ -170,15 +184,23 @@ export class IndexedDBEngine implements CRUDEngine {
       });
   }
 
-  public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return this.db.table(tableName).put(changes, primaryKey);
+  public updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
+    return this.db.table<ChangesType, PrimaryKey>(tableName).put(changes, primaryKey);
   }
 
-  public append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  public append<PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    additions: string,
+  ): Promise<PrimaryKey> {
     return this.db
       .table(tableName)
       .get(primaryKey)
-      .then((record: any) => {
+      .then(record => {
         if (typeof record === 'string') {
           record += additions;
         } else {

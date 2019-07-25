@@ -148,7 +148,7 @@ describe('SQLeetEngine', () => {
 
       try {
         const entity = {'name\'"`': 'Otto'};
-        await engine.create<DBRecord>('users', '1', entity);
+        await engine.create('users', '1', entity);
         fail();
       } catch (error) {
         expect(error.message).toBe(
@@ -231,8 +231,8 @@ describe('SQLeetEngine', () => {
           name: SQLiteType.TEXT,
         },
       });
-      await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Otto'});
-      await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Lion'});
+      await engine.updateOrCreate('users', '1', {name: 'Otto'});
+      await engine.updateOrCreate('users', '1', {name: 'Lion'});
 
       const result = await engine.read<DBRecord>('users', '1');
       expect(result.name).toBe('Lion');
@@ -246,7 +246,7 @@ describe('SQLeetEngine', () => {
       });
 
       try {
-        await engine.updateOrCreate<DBRecord>('ffff', '1', {name: 'Otto'});
+        await engine.updateOrCreate('ffff', '1', {name: 'Otto'});
         fail();
       } catch (error) {
         expect(error.message).toBe('Table "ffff" does not exist.');
@@ -293,7 +293,7 @@ describe('SQLeetEngine', () => {
           name: SQLiteType.TEXT,
         },
       });
-      await engine.updateOrCreate<DBRecord>('users', '1', {name: 'Otto'});
+      await engine.updateOrCreate('users', '1', {name: 'Otto'});
       await engine.purge();
 
       try {

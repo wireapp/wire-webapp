@@ -65,12 +65,12 @@ export class FileSystemEngine implements CRUDEngine {
     return `${this.storeName}/${tableName}`;
   }
 
-  private createFilePath(tableName: string, primaryKey: string): string {
+  private createFilePath<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): string {
     const directory = this.createDirectoryPath(tableName);
     return `${directory}/${primaryKey}${this.config.fileExtension}`;
   }
 
-  async append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  async append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
     const filePath = this.createFilePath(tableName, primaryKey);
     const record = await this.read(tableName, primaryKey);
 
@@ -83,7 +83,11 @@ export class FileSystemEngine implements CRUDEngine {
     }
   }
 
-  async create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+  async create<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (!entity) {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
       throw new RecordTypeError(message);
@@ -107,7 +111,7 @@ export class FileSystemEngine implements CRUDEngine {
     }
   }
 
-  async delete(tableName: string, primaryKey: string): Promise<string> {
+  async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     const filePath = this.createFilePath(tableName, primaryKey);
     await fs.unlink(filePath);
     return primaryKey;
@@ -129,7 +133,7 @@ export class FileSystemEngine implements CRUDEngine {
     }
   }
 
-  async read<T>(tableName: string, primaryKey: string): Promise<T> {
+  async read<EntityType = Object, PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<EntityType> {
     const filePath = this.createFilePath(tableName, primaryKey);
     let data: string;
     try {
@@ -167,7 +171,7 @@ export class FileSystemEngine implements CRUDEngine {
       entries = [];
     }
 
-    const names = entries.map((entry: FileEntry) => entry.name);
+    const names = entries.map((entry: FileEntry) => `${entry.name}`);
 
     const primaryKeys: string[] = [];
 
@@ -179,7 +183,11 @@ export class FileSystemEngine implements CRUDEngine {
     return primaryKeys;
   }
 
-  update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     const filePath = this.createFilePath(tableName, primaryKey);
     return this.read(tableName, primaryKey)
       .then((record: any) => {
@@ -197,7 +205,11 @@ export class FileSystemEngine implements CRUDEngine {
     await fs.rmdir(this.storeName);
   }
 
-  updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
         if (error instanceof RecordNotFoundError) {

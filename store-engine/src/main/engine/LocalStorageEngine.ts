@@ -41,7 +41,7 @@ export class LocalStorageEngine implements CRUDEngine {
     window.localStorage.clear();
   }
 
-  private createKey(tableName: string, primaryKey: string): string {
+  private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): string {
     return `${this.createPrefix(tableName)}${primaryKey}`;
   }
 
@@ -49,7 +49,11 @@ export class LocalStorageEngine implements CRUDEngine {
     return `${this.storeName}@${tableName}@`;
   }
 
-  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+  public create<EntityType, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (entity) {
       const key: string = this.createKey(tableName, primaryKey);
       return this.read(tableName, primaryKey)
@@ -77,7 +81,7 @@ export class LocalStorageEngine implements CRUDEngine {
     return Promise.reject(new RecordTypeError(message));
   }
 
-  public delete(tableName: string, primaryKey: string): Promise<string> {
+  public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     return Promise.resolve().then(() => {
       const key: string = this.createKey(tableName, primaryKey);
       window.localStorage.removeItem(key);
@@ -97,7 +101,10 @@ export class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  public read<T>(tableName: string, primaryKey: string): Promise<T> {
+  public read<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+  ): Promise<EntityType> {
     return Promise.resolve().then(() => {
       const key = `${this.storeName}@${tableName}@${primaryKey}`;
       const record = window.localStorage.getItem(key);
@@ -140,7 +147,11 @@ export class LocalStorageEngine implements CRUDEngine {
     return Promise.resolve(primaryKeys);
   }
 
-  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     return this.read(tableName, primaryKey)
       .then(entity => {
         return {...entity, ...changes};
@@ -156,7 +167,11 @@ export class LocalStorageEngine implements CRUDEngine {
       });
   }
 
-  public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
         if (error instanceof RecordNotFoundError) {
@@ -167,7 +182,11 @@ export class LocalStorageEngine implements CRUDEngine {
       .then(() => primaryKey);
   }
 
-  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  public append<PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    additions: string,
+  ): Promise<PrimaryKey> {
     return this.read(tableName, primaryKey).then((record: any) => {
       if (typeof record === 'string') {
         record += additions;

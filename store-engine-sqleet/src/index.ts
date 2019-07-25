@@ -46,16 +46,20 @@ const zipObject = (props: any[], values: any[]) =>
 
 export class SQLeetEngine implements CRUDEngine {
   private db: any;
-  private readonly dbConfig: any;
   private rawDatabase: string | undefined;
+  private readonly schema: SQLiteDatabaseDefinition<Record<string, any>>;
+  private readonly encryptionKey: string;
+  private readonly dbConfig: any;
   public storeName = '';
 
   constructor(
     wasmLocation: Uint8Array | string,
-    private readonly schema: SQLiteDatabaseDefinition<Record<string, any>>,
-    private readonly encryptionKey: string,
+    schema: SQLiteDatabaseDefinition<Record<string, any>>,
+    encryptionKey: string,
     rawDatabase?: string,
   ) {
+    this.schema = schema;
+    this.encryptionKey = encryptionKey;
     this.dbConfig = {};
 
     if (typeof wasmLocation === 'string') {
@@ -69,7 +73,7 @@ export class SQLeetEngine implements CRUDEngine {
   }
 
   // TODO: Remove "append" functionality from "CRUDEngine" completely
-  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
     throw new Error('Method not implemented.');
   }
 
@@ -92,11 +96,13 @@ export class SQLeetEngine implements CRUDEngine {
     this.db.run(`PRAGMA \`key\`=${escape(this.encryptionKey)};`);
 
     // Create tables
-    let statement: string = '';
+    let statement = '';
+
     for (const tableName in this.schema) {
       const table = this.schema[tableName];
       statement += createTableIfNotExists(tableName, table);
     }
+
     this.db.run(statement);
 
     return this.db;
@@ -133,9 +139,9 @@ export class SQLeetEngine implements CRUDEngine {
     this.rawDatabase = undefined;
   }
 
-  private buildValues(
+  private buildValues<EntityType = Record<string, SQLiteType>>(
     tableName: string,
-    entities: Record<string, SQLiteType>,
+    entities: EntityType,
   ): {columns: Record<string, string>; values: Record<string, any>} {
     const table = this.schema[tableName];
     if (!table) {
@@ -148,7 +154,7 @@ export class SQLeetEngine implements CRUDEngine {
       if (typeof table[entity] !== 'string') {
         continue;
       }
-      let value = entities[entity];
+      let value: string | EntityType[Extract<keyof EntityType, string>] = entities[entity];
       // Stringify objects for the database
       if (table[entity] === SQLiteType.JSON) {
         value = JSON.stringify(value) as SQLiteType;
@@ -167,7 +173,11 @@ export class SQLeetEngine implements CRUDEngine {
     return {columns, values};
   }
 
-  async create<T>(tableName: string, primaryKey: string, entity: Record<string, any>): Promise<string> {
+  async create<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (!entity) {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
       throw new RecordTypeError(message);
@@ -195,7 +205,7 @@ export class SQLeetEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  async delete(tableName: string, primaryKey: string): Promise<string> {
+  async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     const escapedTableName = escape(tableName);
     const statement = `DELETE FROM ${escapedTableName} WHERE ${SQLeetEnginePrimaryKeyName}=@primaryKey;`;
     this.db.run(statement, {
@@ -211,7 +221,7 @@ export class SQLeetEngine implements CRUDEngine {
     return true;
   }
 
-  async read<T>(tableName: string, primaryKey: string): Promise<T> {
+  async read<EntityType = Object, PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<EntityType> {
     const table = this.schema[tableName];
     if (!table) {
       throw new Error(`Table "${tableName}" does not exist.`);
@@ -267,7 +277,11 @@ export class SQLeetEngine implements CRUDEngine {
     return [];
   }
 
-  async update(tableName: string, primaryKey: string, changes: Record<string, any>): Promise<string> {
+  async update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     await this.read(tableName, primaryKey);
     const {values, columns} = this.buildValues(tableName, changes);
     const escapedTableName = escape(tableName);
@@ -281,7 +295,11 @@ export class SQLeetEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  async updateOrCreate<T>(tableName: string, primaryKey: string, changes: Record<string, any>): Promise<string> {
+  async updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {

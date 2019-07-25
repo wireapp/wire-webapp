@@ -17,7 +17,6 @@
  *
  */
 
-import {CRUDEngine} from '../engine/CRUDEngine';
 import {RecordAlreadyExistsError} from '../engine/error';
 import {LocalStorageEngine} from '../engine/LocalStorageEngine';
 import {TransientStore} from './TransientStore';
@@ -26,7 +25,7 @@ describe('store.TransientStore', () => {
   const STORE_NAME = 'database-name';
   const TABLE_NAME = 'table-name';
 
-  let engine: CRUDEngine;
+  let engine: LocalStorageEngine;
   let store: TransientStore;
 
   beforeEach(async () => {
@@ -89,7 +88,7 @@ describe('store.TransientStore', () => {
       }
     });
 
-    it('returns a saved record with an "@" in it\'s primary key.', async () => {
+    it(`returns a saved record with an "@" in it's primary key.`, async () => {
       const primaryKey = '@access@tokens';
 
       await store.set(primaryKey, entity, ttl);

@@ -82,23 +82,25 @@ export class FileEngine implements CRUDEngine {
     return fs.remove(this.storeName);
   }
 
-  public async create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  public async create<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (entity) {
       const filePath = this.resolvePath(tableName, primaryKey);
+      let newEntity: EntityType | string = entity;
+
       if (typeof entity === 'object') {
-        try {
-          entity = JSON.stringify(entity);
-        } catch (error) {
-          entity = entity.toString();
-        }
+        newEntity = JSON.stringify(entity);
       }
 
       try {
-        await fs.writeFile(filePath, entity, {flag: 'wx'});
+        await fs.writeFile(filePath, newEntity, {flag: 'wx'});
         return primaryKey;
       } catch (error) {
         if (error.code === 'ENOENT') {
-          await fs.outputFile(filePath, entity);
+          await fs.outputFile(filePath, newEntity);
           return primaryKey;
         } else if (error.code === 'EEXIST') {
           const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
@@ -112,13 +114,13 @@ export class FileEngine implements CRUDEngine {
     }
   }
 
-  async delete(tableName: string, primaryKey: string): Promise<string> {
+  public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     const file = this.resolvePath(tableName, primaryKey);
     await fs.remove(file);
     return primaryKey;
   }
 
-  async deleteAll(tableName: string): Promise<boolean> {
+  public async deleteAll(tableName: string): Promise<boolean> {
     const directory = this.resolvePath(tableName);
 
     try {
@@ -129,7 +131,10 @@ export class FileEngine implements CRUDEngine {
     }
   }
 
-  async read<T>(tableName: string, primaryKey: string): Promise<T> {
+  public async read<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+  ): Promise<EntityType> {
     const file = await this.resolvePath(tableName, primaryKey);
     let data: any;
 
@@ -152,7 +157,7 @@ export class FileEngine implements CRUDEngine {
     return data;
   }
 
-  async readAll<T>(tableName: string): Promise<T[]> {
+  public async readAll<T>(tableName: string): Promise<T[]> {
     const directory = this.resolvePath(tableName);
     const files = await fs.readdir(directory);
     const recordNames = files.map(file => FileEngine.path.basename(file, FileEngine.path.extname(file)));
@@ -176,7 +181,11 @@ export class FileEngine implements CRUDEngine {
     return files.map(file => FileEngine.path.parse(file).name);
   }
 
-  public async append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  public async append<PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    additions: string,
+  ): Promise<PrimaryKey> {
     const file = this.resolvePath(tableName, primaryKey);
     let record = await this.read(tableName, primaryKey);
     if (typeof record === 'string') {
@@ -190,7 +199,11 @@ export class FileEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  public async update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public async update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     const file = this.resolvePath(tableName, primaryKey);
     let record = await this.read(tableName, primaryKey);
     if (typeof record === 'string') {
@@ -201,7 +214,11 @@ export class FileEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  public async updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public async updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
@@ -213,7 +230,7 @@ export class FileEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  private resolvePath(tableName: string, primaryKey = ''): string {
+  private resolvePath<PrimaryKey = string>(tableName: string, primaryKey?: PrimaryKey): string {
     const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
     const primaryKeyPath = FileEngine.enforcePathRestrictions(
       tableNamePath,

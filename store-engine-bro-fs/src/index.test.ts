@@ -17,7 +17,6 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
 import {appendSpec} from '@wireapp/store-engine/dist/commonjs/test/appendSpec';
 import {createSpec} from '@wireapp/store-engine/dist/commonjs/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/dist/commonjs/test/deleteAllSpec';
@@ -34,9 +33,9 @@ import {FileSystemEngine} from './index';
 describe('FileSystemEngine', () => {
   const STORE_NAME = 'store-name';
 
-  let engine: CRUDEngine;
+  let engine: FileSystemEngine;
 
-  async function initEngine(shouldCreateNewEngine = true): Promise<FileSystemEngine | CRUDEngine> {
+  async function initEngine(shouldCreateNewEngine = true): Promise<FileSystemEngine> {
     const storeEngine = shouldCreateNewEngine ? new FileSystemEngine() : engine;
     await storeEngine.init(STORE_NAME);
     return storeEngine;

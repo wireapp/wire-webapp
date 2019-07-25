@@ -46,7 +46,11 @@ export class MemoryEngine implements CRUDEngine {
     }
   }
 
-  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+  create<EntityType, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    entity: EntityType,
+  ): Promise<PrimaryKey> {
     if (entity) {
       this.prepareTable(tableName);
 
@@ -66,7 +70,7 @@ export class MemoryEngine implements CRUDEngine {
     return Promise.reject(new RecordTypeError(message));
   }
 
-  public delete(tableName: string, primaryKey: string): Promise<string> {
+  public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     this.prepareTable(tableName);
     return Promise.resolve().then(() => {
       delete this.stores[this.storeName][tableName][primaryKey];
@@ -81,7 +85,10 @@ export class MemoryEngine implements CRUDEngine {
     });
   }
 
-  public read<T>(tableName: string, primaryKey: string): Promise<T> {
+  public read<EntityType = Object, PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+  ): Promise<EntityType> {
     this.prepareTable(tableName);
     if (this.stores[this.storeName][tableName].hasOwnProperty(primaryKey)) {
       return Promise.resolve(this.stores[this.storeName][tableName][primaryKey]);
@@ -107,7 +114,11 @@ export class MemoryEngine implements CRUDEngine {
     return Promise.resolve(Object.keys(this.stores[this.storeName][tableName]));
   }
 
-  public async update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  public async update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     this.prepareTable(tableName);
     const entity: Object = await this.read(tableName, primaryKey);
     const updatedEntity: Object = {...entity, ...changes};
@@ -115,7 +126,11 @@ export class MemoryEngine implements CRUDEngine {
     return primaryKey;
   }
 
-  public updateOrCreate(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+  updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey> {
     this.prepareTable(tableName);
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
@@ -127,7 +142,7 @@ export class MemoryEngine implements CRUDEngine {
       .then(() => primaryKey);
   }
 
-  append(tableName: string, primaryKey: string, additions: string): Promise<string> {
+  append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
     this.prepareTable(tableName);
     return this.read(tableName, primaryKey).then((record: any) => {
       if (typeof record === 'string') {
