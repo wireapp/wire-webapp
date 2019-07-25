@@ -23,29 +23,38 @@ import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsH
 describe('MediaConstraintsHandler', () => {
   let constraintsHandler: MediaConstraintsHandler;
 
-  const availableDevices = {
+  const currentDevices = {
     audioInput: ko.observable(),
     audioOutput: ko.observable(),
     screenInput: ko.observable(),
     videoInput: ko.observable(),
   };
+  const availableDevices = {
+    audioInput: ko.observable([]),
+    audioOutput: ko.observable([]),
+    screenInput: ko.observable([]),
+    videoInput: ko.observable([]),
+  };
   beforeEach(() => {
-    availableDevices.audioInput('mic');
-    availableDevices.audioOutput('speaker');
-    availableDevices.videoInput('camera');
-    availableDevices.screenInput('screen1');
-    constraintsHandler = new MediaConstraintsHandler(availableDevices as any);
+    currentDevices.audioInput('mic');
+    currentDevices.audioOutput('speaker');
+    currentDevices.videoInput('camera');
+    currentDevices.screenInput('screen1');
+
+    availableDevices.audioInput([{deviceId: 'mic1'}, {deviceId: 'mic2'}, {deviceId: 'mic'}]);
+    constraintsHandler = new MediaConstraintsHandler(currentDevices as any, availableDevices as any);
   });
 
   describe('getMediaStreamConstraints', () => {
     it('returns devices id constraints if current devices are defined', () => {
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
-      expect(constraints.audio.deviceId.exact).toBe(availableDevices.audioInput());
-      expect(constraints.video.deviceId.exact).toBe(availableDevices.videoInput());
+      expect(constraints.audio.deviceId.exact[0]).toBe(currentDevices.audioInput());
+      expect(constraints.audio.deviceId.exact.length).toBe(availableDevices.audioInput().length);
+      expect(constraints.video.deviceId.exact).toBe(currentDevices.videoInput());
     });
 
     it('returns default constraints when current devices are not defined', () => {
-      Object.values(availableDevices).forEach(observable => {
+      Object.values(currentDevices).forEach(observable => {
         observable(MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID);
       });
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;

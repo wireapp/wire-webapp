@@ -28,7 +28,7 @@ import {MediaDeviceType} from './MediaDeviceType';
 
 type DeviceTypes = 'audioInput' | 'audioOutput' | 'screenInput' | 'videoInput';
 
-type Devices = Record<DeviceTypes, ko.ObservableArray<MediaDeviceInfo>>;
+export type Devices = Record<DeviceTypes, ko.ObservableArray<MediaDeviceInfo>>;
 type DeviceIds = Record<DeviceTypes, ko.Observable<string>>;
 export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
 export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
