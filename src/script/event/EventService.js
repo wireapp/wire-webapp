@@ -351,7 +351,7 @@ export class EventService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   deleteEventByKey(primaryKey) {
-    return this.storageService.db[this.EVENT_STORE_NAME].delete(primaryKey);
+    return this.storageService.engine.delete(this.EVENT_STORE_NAME, primaryKey);
   }
 
   /**

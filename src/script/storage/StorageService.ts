@@ -17,7 +17,6 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
@@ -42,7 +41,7 @@ type DexieObservable = {_dbSchema?: Object};
 
 export class StorageService {
   private readonly logger: Logger;
-  private readonly engine: CRUDEngine;
+  private readonly engine: IndexedDBEngine;
   public dbName?: string;
   private userId?: string;
   private readonly dbListeners: DatabaseListener[];
@@ -72,8 +71,8 @@ export class StorageService {
   /**
    * Initialize the IndexedDB for a user.
    *
-   * @param {string} userId - User ID
-   * @returns {Promise} Resolves with the database name
+   * @param userId - User ID
+   * @returns Resolves with the database name
    */
   async init(userId = this.userId): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
@@ -116,7 +115,7 @@ export class StorageService {
 
     const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
 
-    listenableTables.forEach((table: string): void => {
+    listenableTables.forEach(table => {
       this.db
         .table(table)
         .hook('updating', function(
@@ -185,35 +184,20 @@ export class StorageService {
     return this.engine.delete(storeName, primaryKey);
   }
 
-  /**
-   * Delete the IndexedDB with all its stores.
-   * @returns Resolves if a database is found and cleared
-   */
-  deleteDatabase(): Promise<boolean> {
-    if (this.db) {
-      return this.db
-        .delete()
-        .then(() => {
-          this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
-          return true;
-        })
-        .catch(error => {
-          this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
-          throw error;
-        });
+  async deleteDatabase(): Promise<boolean> {
+    try {
+      await this.engine.purge();
+      this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
+      throw error;
     }
-    this.logger.error(`IndexedDB '${this.dbName}' not found`);
-    return Promise.resolve(true);
   }
 
-  /**
-   * Delete a database store.
-   * @param storeName - Name of database store to delete
-   * @returns Resolves when the store has been deleted
-   */
-  deleteStore(storeName: string): Promise<void> {
+  async deleteStore(storeName: string): Promise<void> {
     this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
-    return this.db.table(storeName).clear();
+    await this.engine.deleteAll(storeName);
   }
 
   /**
@@ -221,9 +205,9 @@ export class StorageService {
    * @param storeNames - Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
-  deleteStores(storeNames: string[]): Promise<any> {
+  async deleteStores(storeNames: string[]): Promise<void> {
     const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
-    return Promise.all(deleteStorePromises);
+    await Promise.all(deleteStorePromises);
   }
 
   /**
@@ -232,15 +216,14 @@ export class StorageService {
    * @param storeName - Name of object store
    * @returns Resolves with the records from the object store
    */
-  getAll<T>(storeName: string): Promise<T[]> {
-    return this.db
-      .table(storeName)
-      .toArray()
-      .then(resultArray => resultArray.filter(result => result))
-      .catch(error => {
-        this.logger.error(`Failed to load objects from store '${storeName}'`, error);
-        throw error;
-      });
+  async getAll<T = Object>(storeName: string): Promise<T[]> {
+    try {
+      const resultArray = await this.engine.readAll<T>(storeName);
+      return resultArray.filter(Boolean);
+    } catch (error) {
+      this.logger.error(`Failed to load objects from store '${storeName}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -259,14 +242,14 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  load<T>(storeName: string, primaryKey: string): Promise<T> {
-    return this.db
-      .table(storeName)
-      .get(primaryKey)
-      .catch(error => {
-        this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
-        throw error;
-      });
+  async load<T = Object>(storeName: string, primaryKey: string): Promise<T> {
+    try {
+      const record = await this.db.table(storeName).get(primaryKey);
+      return record;
+    } catch (error) {
+      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      throw error;
+    }
   }
 
   /**
@@ -277,24 +260,24 @@ export class StorageService {
    * @param entity - Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
-  save<T>(storeName: string, primaryKey: string, entity: T): Promise<T> {
+  async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
-      return Promise.reject(new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA));
+      throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
-    return this.db
-      .table(storeName)
-      .put(entity, primaryKey)
-      .catch(error => {
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
-        throw error;
-      });
+    try {
+      const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
+      return newKey;
+    } catch (error) {
+      this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+      throw error;
+    }
   }
 
   /**
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
-   * @param [reason='unknown reason'] - Cause for the termination
+   * @param reason - Cause for the termination
    * @returns No return value
    */
   terminate(reason: string = 'unknown reason'): void {
@@ -310,18 +293,15 @@ export class StorageService {
    * @param changes - Object containing the key paths to each property you want to change
    * @returns Promise with the number of updated records (0 if no records were changed).
    */
-  update(storeName: string, primaryKey: string, changes: Object): Promise<number> {
-    return this.db
-      .table(storeName)
-      .update(primaryKey, changes)
-      .then(numberOfUpdates => {
-        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.info(logMessage, changes);
-        return numberOfUpdates;
-      })
-      .catch(error => {
-        this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
-        throw error;
-      });
+  async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
+    try {
+      const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
+      const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
+      this.logger.info(logMessage, changes);
+      return numberOfUpdates;
+    } catch (error) {
+      this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
+      throw error;
+    }
   }
 }
