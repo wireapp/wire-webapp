@@ -3452,11 +3452,10 @@ export class ConversationRepository {
         if (conversationEntity.participating_user_ids().length) {
           this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
-
+        await this.updateParticipatingUserEntities(conversationEntity);
         this.verificationStateHandler.onConversationCreate(conversationEntity);
+        await this.save_conversation(conversationEntity);
       }
-      await this.updateParticipatingUserEntities(conversationEntity);
-      await this.save_conversation(conversationEntity);
       return {conversationEntity};
     } catch (error) {
       const isNoChanges = error.type === z.error.ConversationError.TYPE.NO_CHANGES;
