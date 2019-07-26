@@ -17,7 +17,6 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
@@ -42,7 +41,7 @@ type DexieObservable = {_dbSchema?: Object};
 
 export class StorageService {
   private readonly logger: Logger;
-  private readonly engine: CRUDEngine;
+  private readonly engine: IndexedDBEngine;
   public dbName?: string;
   private userId?: string;
   private readonly dbListeners: DatabaseListener[];
@@ -206,9 +205,9 @@ export class StorageService {
    * @param storeNames - Names of database stores to delete
    * @returns Resolves when the stores have been deleted
    */
-  deleteStores(storeNames: string[]): Promise<any> {
+  async deleteStores(storeNames: string[]): Promise<void> {
     const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
-    return Promise.all(deleteStorePromises);
+    await Promise.all(deleteStorePromises);
   }
 
   /**
@@ -217,7 +216,7 @@ export class StorageService {
    * @param storeName - Name of object store
    * @returns Resolves with the records from the object store
    */
-  async getAll<T>(storeName: string): Promise<T[]> {
+  async getAll<T = Object>(storeName: string): Promise<T[]> {
     try {
       const resultArray = await this.engine.readAll<T>(storeName);
       return resultArray.filter(Boolean);
@@ -243,7 +242,7 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  async load<T>(storeName: string, primaryKey: string): Promise<T> {
+  async load<T = Object>(storeName: string, primaryKey: string): Promise<T> {
     try {
       const record = await this.db.table(storeName).get(primaryKey);
       return record;
@@ -261,7 +260,7 @@ export class StorageService {
    * @param entity - Data to store in object store
    * @returns Resolves with the primary key of the persisted object
    */
-  async save<T>(storeName: string, primaryKey: string, entity: T | {key?: string; value?: T}): Promise<string> {
+  async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
     if (!entity) {
       throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
@@ -294,7 +293,7 @@ export class StorageService {
    * @param changes - Object containing the key paths to each property you want to change
    * @returns Promise with the number of updated records (0 if no records were changed).
    */
-  async update(storeName: string, primaryKey: string, changes: Object): Promise<number> {
+  async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
       const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
       const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
