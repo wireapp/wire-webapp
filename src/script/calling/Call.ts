@@ -45,7 +45,7 @@ export class Call {
   ) {
     this.initiator = initiator;
     this.conversationId = conversationId;
-    this.state = ko.observable(CALL_STATE.NONE);
+    this.state = ko.observable(CALL_STATE.UNKNOWN);
     this.conversationType = conversationType;
     this.initialType = callType;
     this.selfParticipant = selfParticipant;

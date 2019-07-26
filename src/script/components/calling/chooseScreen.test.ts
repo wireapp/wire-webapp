@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {instantiateComponent} from '../../../../test/api/knockoutHelpers';
+import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
 import './chooseScreen';
 
 describe('chooseScreen', () => {
