@@ -18,6 +18,7 @@
  */
 
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
+import {error as StoreEngineError} from '@wireapp/store-engine/';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -244,10 +245,13 @@ export class StorageService {
    */
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T> {
     try {
-      const record = await this.db.table(storeName).get(primaryKey);
+      const record = await this.engine.read<T>(storeName, primaryKey);
       return record;
     } catch (error) {
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
+        return undefined;
+      }
       throw error;
     }
   }
