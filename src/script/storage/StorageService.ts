@@ -17,8 +17,8 @@
  *
  */
 
+import {error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
-import {error as StoreEngineError} from '@wireapp/store-engine/';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
