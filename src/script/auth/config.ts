@@ -29,14 +29,7 @@ class Configuration {
   readonly BRAND_NAME = window.wire.env.BRAND_NAME || 'Wire';
   readonly CALLING_PROTOCOL_VERSION = '3.0';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
-  readonly FEATURE = window.wire.env.FEATURE || {
-    CHECK_CONSENT: true,
-    ENABLE_ACCOUNT_REGISTRATION: true,
-    ENABLE_DEBUG: false,
-    ENABLE_PHONE_LOGIN: true,
-    ENABLE_SSO: false,
-    SHOW_LOADING_INFORMATION: false,
-  };
+  readonly FEATURE = window.wire.env.FEATURE;
   readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = window.wire.env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly NEW_PASSWORD_MINIMUM_LENGTH =

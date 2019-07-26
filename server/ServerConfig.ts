@@ -14,6 +14,7 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
+      PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
     MAX_GROUP_PARTICIPANTS: number;
