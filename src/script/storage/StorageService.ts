@@ -17,7 +17,7 @@
  *
  */
 
-import {error as StoreEngineError} from '@wireapp/store-engine';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
@@ -42,7 +42,7 @@ type DexieObservable = {_dbSchema?: Object};
 
 export class StorageService {
   private readonly logger: Logger;
-  private readonly engine: IndexedDBEngine;
+  private readonly engine: CRUDEngine;
   public dbName?: string;
   private userId?: string;
   private readonly dbListeners: DatabaseListener[];
