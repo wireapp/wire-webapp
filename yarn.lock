@@ -1259,10 +1259,10 @@
   dependencies:
     redux "^4.0.0"
 
-"@types/sdp-transform@2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.0.tgz#5078629ab539a38fb699549fe25427339dc52f29"
-  integrity sha512-RWVFLpqNsUbz085OanSNKAtk64G/e9Ol+t5a3QpCxkloidHYFk41vKtWIPmLcZS0Sm87L93S+MC8SL5S1LBPRA==
+"@types/sdp-transform@2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.1.tgz#380e61333191a2c650c435b3beac0668e3def486"
+  integrity sha512-uw4Y0ZQ34jSRYC5v6CiU6/8gixW/PODs+NauBnjzRSGRJBPPRyCc0qfKYjGWQUHMO2TXRaFwr15r+7ZuxEbyMQ==
 
 "@types/serve-static@*":
   version "1.13.2"
