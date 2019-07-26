@@ -248,10 +248,10 @@ export class StorageService {
       const record = await this.engine.read<T>(storeName, primaryKey);
       return record;
     } catch (error) {
-      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       if (error instanceof StoreEngineError.RecordNotFoundError) {
         return undefined;
       }
+      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       throw error;
     }
   }
