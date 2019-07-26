@@ -1646,18 +1646,28 @@
     emotion-normalize "10.1.0"
     react-transition-group "4.2.1"
 
-"@wireapp/store-engine-dexie@0.3.7":
-  version "0.3.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.3.7.tgz#71dd0882b584287e83ba804b1ac4f757e09ef281"
-  integrity sha512-fM/V3+aGT5XyCAhpBSwHLf3Mh+Bh4BI7uGoE8CClhu/tTzHJa8XlsXfOLzWSvCUY4iwqrSfmT8rQxjhWA4C2jQ==
+"@wireapp/store-engine-dexie@0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.4.1.tgz#5385440db2e6e10646c3be822f3dfa5614b46dcc"
+  integrity sha512-O9Sekn+s2qYrn9CztCXA6PURL4fr96EHgFEUik888oW9X8JHw54+LTFLS8V54H2CKYQzY0KsBM2346vrpDDfwQ==
   dependencies:
-    "@wireapp/store-engine" "3.5.5"
+    "@wireapp/store-engine" "3.6.0"
     dexie "2.0.4"
 
 "@wireapp/store-engine@3.5.5":
   version "3.5.5"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.5.5.tgz#6b216347be49f60eda6b2de36a7b1429bf602a15"
   integrity sha512-55wMM1SZBhGF/g0GRrsczDNkTwiLqW47McvgZpjruGuCw3U9djUOUab+VdrkCUhJjM1THJgB7YojXMsRdXtwVw==
+  dependencies:
+    "@types/bro-fs" "0.4.2"
+    "@types/filesystem" "0.0.29"
+    "@types/node" "~10"
+    bro-fs "0.5.0"
+
+"@wireapp/store-engine@3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.6.0.tgz#3507da2dc85ac20bc4d1d2e1e9a5789123ac2846"
+  integrity sha512-G7jQ6rp277L31BXgzNqha/3YG9UD3LljmDQXDeTTpvN/8eTdik+T7NZw0XT3Jrli+pkZsGkWWCbH3fsxN5pydA==
   dependencies:
     "@types/bro-fs" "0.4.2"
     "@types/filesystem" "0.0.29"
