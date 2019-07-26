@@ -254,7 +254,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('updateAllClients', () => {
-    it('updates the conversation legal hold status on client changes of group participants', async () => {
+    xit('updates the conversation legal hold status on client changes of group participants', async () => {
       const conversationPartner = UserGenerator.getRandomUser();
       TestFactory.user_repository.users.push(conversationPartner);
 
@@ -286,7 +286,6 @@ describe('ConversationRepository', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
       };
 
-      // TODO: Fake clients and add them to conversation partner.
       const clientsPayload = [
         {
           class: 'desktop',
@@ -302,7 +301,6 @@ describe('ConversationRepository', () => {
         },
       ];
 
-      // const clientEntities = new ClientMapper().mapClients(clientsPayload, false);
       for (const clientPayload of clientsPayload) {
         const wasClientAdded = await TestFactory.user_repository.addClientToUser(
           conversationPartner.id,
@@ -331,8 +329,14 @@ describe('ConversationRepository', () => {
         Promise.reject(missingClientsError),
       );
 
-      // TODO: Test "updateAllClients"
-      expect('a').toBe('a');
+      /**
+       * TODO:
+       * 0. Group conversation is on legal hold
+       * 1. Call "updateAllClients"
+       * 2. User A should discover (by sending a message) that there is no more legal hold
+       * 3. Legal hold flag on the message of User A should then change to "off" (that's the test case)
+       */
+      expect(conversationEntity.hasLegalHold()).toBe(false);
     });
   });
 
