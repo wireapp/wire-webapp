@@ -34,7 +34,6 @@ import {WebAppEvents} from './WebApp';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
-
 import {BackendClientError} from '../error/BackendClientError';
 
 export class EventRepository {
@@ -72,7 +71,6 @@ export class EventRepository {
    * @param {EventService} eventService - Service that handles interactions with events
    * @param {NotificationService} notificationService - Service handling the notification stream
    * @param {WebSocketService} webSocketService - Service that connects to WebSocket
-   * @param {ConversationService} conversationService - Service to handle conversation related tasks
    * @param {CryptographyRepository} cryptographyRepository - Repository for all cryptography interactions
    * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
    * @param {UserRepository} userRepository - Repository for all user interactions
@@ -81,7 +79,6 @@ export class EventRepository {
     eventService,
     notificationService,
     webSocketService,
-    conversationService,
     cryptographyRepository,
     serverTimeHandler,
     userRepository,
@@ -89,7 +86,6 @@ export class EventRepository {
     this.eventService = eventService;
     this.notificationService = notificationService;
     this.webSocketService = webSocketService;
-    this.conversationService = conversationService;
     this.cryptographyRepository = cryptographyRepository;
     this.serverTimeHandler = serverTimeHandler;
     this.userRepository = userRepository;

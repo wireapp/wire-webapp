@@ -19,34 +19,12 @@
 
 import {amplify} from 'amplify';
 import {t} from 'Util/LocalizerUtil';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {Conversation} from '../entity/Conversation';
 import {WebAppEvents} from '../event/WebApp';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
-import {ConversationRepository} from './ConversationRepository';
-import {ConversationVerificationState} from './ConversationVerificationState';
-
-export const VERIFY_LEGAL_HOLD = 'verifyLegalHold';
-
-export class ConversationLegalHoldStateHandler {
-  constructor(
-    private readonly conversationRepository: ConversationRepository,
-    private readonly serverTimeHandler: ServerTimeHandler,
-  ) {
-    amplify.subscribe(VERIFY_LEGAL_HOLD, this.verifyLegalHold);
-  }
-
-  verifyLegalHold = async (conversationEntity: Conversation, hasLegalHoldFlag: boolean) => {
-    await this.conversationRepository.updateAllClients(conversationEntity);
-    const hasLegalHold = conversationEntity.hasLegalHold();
-    if (hasLegalHoldFlag !== hasLegalHold) {
-      const timeStamp = conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1;
-      conversationEntity.appendLegalHoldSystemMessage(hasLegalHold, timeStamp);
-    }
-  };
-}
 
 export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDevices: boolean = false) => {
   return new Promise((resolve, reject) => {
@@ -70,7 +48,6 @@ export const showLegalHoldWarning = (conversationEntity: Conversation, verifyDev
       preventClose: true,
       primaryAction: {
         action: () => {
-          conversationEntity.needsLegalHoldApproval(false);
           if (verifyDevices) {
             conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
           }

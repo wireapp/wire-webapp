@@ -117,7 +117,6 @@ class AuthViewModel {
       eventService,
       this.notification_service,
       this.web_socket_service,
-      undefined,
       this.cryptography_repository,
       this.user_repository,
     );

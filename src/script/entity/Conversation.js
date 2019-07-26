@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -38,6 +39,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -72,7 +74,7 @@ export class Conversation {
     this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]);
+    this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
@@ -165,16 +167,30 @@ export class Conversation {
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
-    this.hasLegalHold = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
-        return false;
-      }
+    this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
-      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    this.hasLegalHold = ko.computed(() => {
+      const isInitialized = this._isInitialized();
+      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      if (isInitialized) {
+        this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      }
+      if (!hasLegalHold) {
+        amplify.publish(HIDE_LEGAL_HOLD_MODAL, this.id);
+      }
+      return hasLegalHold;
     });
-    this.needsLegalHoldApproval = ko.observable(this.hasLegalHold());
-    this.hasLegalHold.subscribe(hasLegalHold => {
-      this.needsLegalHoldApproval(hasLegalHold);
+
+    this.blockLegalHoldMessage = false;
+
+    this.legalHoldStatus.subscribe(legalHoldStatus => {
+      if (!this.blockLegalHoldMessage && this._isInitialized()) {
+        amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
+          conversationEntity: this,
+          legalHoldStatus,
+          userId: this.selfUser().id,
+        });
+      }
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
@@ -331,7 +347,7 @@ export class Conversation {
 
   _isInitialized() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-    return this.selfUser() && hasMappedUsers;
+    return Boolean(this.selfUser() && hasMappedUsers);
   }
 
   _initSubscriptions() {
@@ -459,15 +475,6 @@ export class Conversation {
 
     koArrayPushAll(this.messages_unordered, message_ets);
   }
-
-  /**
-   * Insert a legal hold system message in the conversation.
-   *
-   * @param {boolean} isActivationMessage - True, when legal hold is turned on
-   * @param {number} timeStamp - Timestamp of system message creation
-   * @returns {undefined} No return value
-   */
-  appendLegalHoldSystemMessage = (isActivationMessage, timeStamp) => {};
 
   getFirstUnreadSelfMention() {
     return this.unreadState()
@@ -772,6 +779,7 @@ export class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
+      legal_hold_status: this.legalHoldStatus(),
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),

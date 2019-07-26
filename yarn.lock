@@ -1090,6 +1090,11 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/faker@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-4.1.5.tgz#8f620f9c9a67150aa0a32b4e8a407da43fca61d4"
+  integrity sha512-YSDqoBEWYGdNk53xSkkb6REaUaVSlIjxIAGjj/nbLzlZOit7kUU+nA2zC2qQkIVO4MQ+3zl4Sz7aw+kbpHHHUQ==
+
 "@types/filesystem@*", "@types/filesystem@0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/filesystem/-/filesystem-0.0.29.tgz#ee3748eb5be140dcf980c3bd35f11aec5f7a3748"
@@ -1636,13 +1641,6 @@
     "@wireapp/cbor" "4.3.6"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.5"
-
-"@wireapp/protocol-messaging@1.24.1":
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.1.tgz#e29da795869515143e558357afc4df6bdd6fe0a0"
-  integrity sha512-BrZtB2Nij9vnwyox8mTP9EPfqWWnTq+CNElz7Yne+ZmVLvnekY7RAh9ad4DMMqDdKwOYIoyBJhxpB0/FlEiK4g==
-  dependencies:
-    protobufjs "6.8.8"
 
 "@wireapp/protocol-messaging@1.24.2":
   version "1.24.2"
@@ -4760,6 +4758,11 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
+
+faker@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
+  integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
 
 fast-deep-equal@^1.0.0:
   version "1.1.0"

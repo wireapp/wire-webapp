@@ -29,12 +29,13 @@ import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {t} from 'Util/LocalizerUtil';
-import {promiseProgress} from 'Util/PromiseUtil';
 import {BackendClientError} from '../../error/BackendClientError';
+import {WebAppEvents} from '../../event/WebApp';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
 export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.showLegalHoldModal';
+export const HIDE_LEGAL_HOLD_MODAL = 'LegalHold.hideLegalHoldModal';
 
 export class LegalHoldModalViewModel {
   isVisible: ko.Observable<boolean>;
@@ -45,17 +46,16 @@ export class LegalHoldModalViewModel {
   onClosed: () => void;
   userDevicesHistory: UserDevicesHistory;
   showDeviceList: () => boolean;
-  isLoadingUsers: ko.Observable<boolean>;
+  isLoading: ko.Observable<boolean>;
   showRequest: ko.Observable<boolean>;
   requestFingerprint: ko.Observable<string>;
   requestError: ko.Observable<string>;
   passwordValue: ko.Observable<string>;
-  progress: ko.Observable<number>;
   requiresPassword: ko.Observable<boolean>;
-  isLoadingRequest: ko.Observable<boolean>;
   isSendingApprove: ko.Observable<boolean>;
   skipShowUsers: ko.Observable<boolean>;
   disableSubmit: ko.PureComputed<boolean>;
+  conversationId: string;
 
   constructor(
     public userRepository: UserRepository,
@@ -64,7 +64,6 @@ export class LegalHoldModalViewModel {
     public clientRepository: ClientRepository,
     public cryptographyRepository: CryptographyRepository,
   ) {
-    this.isLoadingUsers = ko.observable(false);
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
     this.requestFingerprint = ko.observable('');
@@ -72,14 +71,14 @@ export class LegalHoldModalViewModel {
     this.users = ko.observable([]);
     this.devicesUser = ko.observable();
     this.userDevicesHistory = makeUserDevicesHistory();
-    this.progress = ko.observable(0);
     this.requiresPassword = ko.observable(true);
     this.passwordValue = ko.observable('');
     this.requestError = ko.observable('');
-    this.isLoadingRequest = ko.observable(false);
+    this.isLoading = ko.observable(false);
     this.isSendingApprove = ko.observable(false);
     this.skipShowUsers = ko.observable(false);
     this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
+    this.conversationId = null;
 
     this.onBgClick = () => {
       if (!this.showRequest()) {
@@ -92,19 +91,20 @@ export class LegalHoldModalViewModel {
       this.showRequest(false);
       this.passwordValue('');
       this.requestError('');
-      this.isLoadingRequest(false);
+      this.isLoading(false);
     };
     this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
     amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
     amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
     amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
+    amplify.subscribe(HIDE_LEGAL_HOLD_MODAL, this.hideLegalHoldModal);
   }
 
   showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
     this.showRequest(true);
     const setModalParams = (value: boolean) => {
       this.isVisible(value);
-      this.isLoadingRequest(value);
+      this.isLoading(value);
       this.showRequest(value);
     };
 
@@ -132,7 +132,7 @@ export class LegalHoldModalViewModel {
       }
     }
     this.isVisible(true);
-    this.isLoadingRequest(false);
+    this.isLoading(false);
     const formatedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
     this.requestFingerprint(
       `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formatedFingerprint}</span>`,
@@ -141,10 +141,18 @@ export class LegalHoldModalViewModel {
 
   hideModal = () => {
     this.isVisible(false);
+    this.conversationId = null;
   };
 
   closeRequest = () => {
     if (this.showRequest()) {
+      this.hideModal();
+    }
+  };
+
+  hideLegalHoldModal = (conversationId?: string) => {
+    const isCurrentConversation = conversationId && conversationId === this.conversationId;
+    if (!this.showRequest() && isCurrentConversation) {
       this.hideModal();
     }
   };
@@ -164,6 +172,7 @@ export class LegalHoldModalViewModel {
       this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
+      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.id);
     } catch ({code, message}) {
       switch (code) {
         case BackendClientError.STATUS_CODE.BAD_REQUEST: {
@@ -182,7 +191,7 @@ export class LegalHoldModalViewModel {
     }
   };
 
-  showUsers = (conversation?: Conversation) => {
+  showUsers = async (conversation?: Conversation) => {
     if (this.skipShowUsers()) {
       return this.skipShowUsers(false);
     }
@@ -190,25 +199,25 @@ export class LegalHoldModalViewModel {
     if (conversation === undefined) {
       this.users([this.userRepository.self()]);
       this.isSelfInfo(true);
-      this.isLoadingUsers(false);
+      this.isLoading(false);
       this.isVisible(true);
+      this.conversationId = 'self';
       return;
     }
     conversation = ko.unwrap(conversation);
     this.isSelfInfo(false);
-    promiseProgress(
-      conversation.participating_user_ids().map(id => this.clientRepository.getClientsByUserId(id)),
-      progress => this.progress(progress),
-    )
-      .then(() => this.conversationRepository.get_all_users_in_conversation(conversation.id))
-      .then(allUsers => {
-        const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
-        this.users(legalHoldUsers);
-        this.isLoadingUsers(false);
-      });
-
-    this.isLoadingUsers(true);
+    this.isLoading(true);
     this.isVisible(true);
+    await this.conversationRepository.updateAllClients(conversation, false);
+    const allUsers = await this.conversationRepository.get_all_users_in_conversation(conversation.id);
+    const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
+    if (!legalHoldUsers.length) {
+      this.isVisible(false);
+      return;
+    }
+    this.users(legalHoldUsers);
+    this.conversationId = conversation.id;
+    this.isLoading(false);
   };
 
   showUserDevices = (user: User) => {

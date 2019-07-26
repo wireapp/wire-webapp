@@ -40,6 +40,7 @@ import {StatusType} from '../message/StatusType';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {MentionEntity} from '../message/MentionEntity';
+import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -223,6 +224,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
+        messageEntity = this._mapEventLegalHoldUpdate(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LOCATION: {
         messageEntity = addMetadata(this._mapEventLocation(event), event);
         break;
@@ -374,6 +380,10 @@ export class EventMapper {
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
+  }
+
+  _mapEventLegalHoldUpdate({data, timestamp}) {
+    return new LegalHoldMessage(data.legal_hold_status, timestamp);
   }
 
   /**

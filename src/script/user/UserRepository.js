@@ -311,7 +311,7 @@ export class UserRepository {
    * @param {string} userId - ID of user
    * @param {Object} clientPayload - Payload of client which should be added to user
    * @param {boolean} publishClient - Publish new client
-   * @returns {Promise} Promise that resolves when a client and its session have been deleted
+   * @returns {Promise<boolean>} Promise that resolves with true, when a client has been added
    */
   addClientToUser(userId, clientPayload, publishClient = false) {
     return this.get_user_by_id(userId).then(userEntity => {
@@ -329,8 +329,11 @@ export class UserRepository {
           } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
+          return wasClientAdded;
         });
       }
+
+      return wasClientAdded;
     });
   }
 
@@ -387,11 +390,17 @@ export class UserRepository {
   }
 
   onLegalHoldRequestCanceled(eventJson) {
-    if (this.self().id !== eventJson.id) {
-      return;
+    if (this.self().id === eventJson.id) {
+      this.self().hasPendingLegalHold(false);
+      amplify.publish(HIDE_REQUEST_MODAL);
+    } else {
+      /**
+       * TODO:
+       * 1) Get User ID from event and check the clients of that user.
+       * 2) If there is a legal hold client, remove it (in memory and database).
+       * 3) Verify that the removed client is not in the db anymore and not assigned to the user entity.
+       */
     }
-    this.self().hasPendingLegalHold(false);
-    amplify.publish(HIDE_REQUEST_MODAL);
   }
 
   async onLegalHoldRequest(eventJson) {

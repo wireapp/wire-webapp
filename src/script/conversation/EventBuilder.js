@@ -140,6 +140,18 @@ z.conversation.EventBuilder = {
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
   },
+  buildLegalHoldMessage(conversationId, userId, timestamp, legalHoldStatus, beforeMessage) {
+    return {
+      conversation: conversationId,
+      data: {
+        legal_hold_status: legalHoldStatus,
+      },
+      from: userId,
+      id: createRandomUuid(),
+      time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
+      type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
+    };
+  },
   buildMemberJoin(conversationEntity, sender, joiningUserIds, timestamp) {
     timestamp = timestamp ? timestamp : conversationEntity.get_last_known_timestamp() + 1;
     const isoDate = new Date(timestamp).toISOString();

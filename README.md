@@ -51,13 +51,13 @@ where `specN` is the path to the spec to run relative to `test/unit_tests` and w
 
 #### Speed up testing for files fully migrated to the module system
 
-When a file (and all its dependencies) do not rely on **any** global dependency, then you can use the `--nolegacy` flag to run the tests on that single file.
+When a file (and all its dependencies) does not rely on **any** global dependency (i.e. `window.z.util`), then you can use the `--nolegacy` flag to run the tests on that single file:
 
 `yarn test:app --specs spec1 --nolegacy`
 
 The test should start very quickly (webpack won't have to resolve all the global dependencies).
 
-If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending, somehow, on, at least, one thing that should be on the global scope.
+If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending on at least one dependency from the global `window` namespace.
 
 **Example**
 

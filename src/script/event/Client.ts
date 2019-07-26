@@ -17,17 +17,18 @@
  *
  */
 
-enum CALL {
+export enum CALL {
   E_CALL = 'call.e-call',
 }
 
-enum CONVERSATION {
+export enum CONVERSATION {
   ASSET_ADD = 'conversation.asset-add',
   CONFIRMATION = 'conversation.confirmation',
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',
   GROUP_CREATION = 'conversation.group-creation',
   INCOMING_MESSAGE_TOO_BIG = 'conversation.incoming-message-too-big',
   KNOCK = 'conversation.knock',
+  LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
   LOCATION = 'conversation.location',
   MESSAGE_ADD = 'conversation.message-add',
   MESSAGE_DELETE = 'conversation.message-delete',
@@ -42,7 +43,7 @@ enum CONVERSATION {
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
 }
 
-enum USER {
+export enum USER {
   AVAILABILITY = 'user.availability',
 }
 
