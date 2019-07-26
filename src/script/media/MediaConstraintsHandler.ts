@@ -19,7 +19,7 @@
 
 import {isString} from 'underscore';
 import {Logger, getLogger} from 'Util/Logger';
-import {CurrentAvailableDeviceId, Devices} from './MediaDevicesHandler';
+import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
@@ -47,7 +47,6 @@ export enum ScreensharingMethods {
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
   private readonly currentDeviceId: CurrentAvailableDeviceId;
-  private readonly availableDevices: Devices;
 
   static get CONFIG(): Config {
     return {
@@ -100,10 +99,9 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(currentDeviceId: CurrentAvailableDeviceId, availableDevices: Devices) {
+  constructor(currentDeviceId: CurrentAvailableDeviceId) {
     this.logger = getLogger('MediaConstraintsHandler');
     this.currentDeviceId = currentDeviceId;
-    this.availableDevices = availableDevices;
   }
 
   getMediaStreamConstraints(
@@ -115,9 +113,7 @@ export class MediaConstraintsHandler {
     const mode = isGroup ? VIDEO_QUALITY_MODE.GROUP : VIDEO_QUALITY_MODE.MOBILE;
 
     return {
-      audio: requestAudio
-        ? this.getAudioStreamConstraints(currentDeviceId.audioInput(), this.availableDevices)
-        : undefined,
+      audio: requestAudio ? this.getAudioStreamConstraints(currentDeviceId.audioInput()) : undefined,
       video: requestVideo ? this.getVideoStreamConstraints(currentDeviceId.videoInput(), mode) : undefined,
     };
   }
@@ -155,21 +151,9 @@ export class MediaConstraintsHandler {
     return undefined;
   }
 
-  private getAudioStreamConstraints(
-    mediaDeviceId: string = '',
-    availableDevices: Devices,
-  ): MediaTrackConstraints | boolean {
+  private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints | boolean {
     const requireExactMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
-    if (!requireExactMediaDevice) {
-      return true;
-    }
-    // we give the browser a list of devices to use. It allows the browser to fallback to another device if the device being used is unplugged (only true for Chrome)
-    const otherDevices = availableDevices
-      .audioInput()
-      .map(device => device.deviceId)
-      .filter(deviceId => deviceId !== mediaDeviceId);
-    const orderedDeviceIds = [mediaDeviceId].concat(otherDevices);
-    return {deviceId: {exact: orderedDeviceIds}};
+    return requireExactMediaDevice ? {deviceId: {exact: mediaDeviceId}} : true;
   }
 
   private getVideoStreamConstraints(
