@@ -38,6 +38,13 @@ export class WindowHandler {
         promiseRejectionEvent.stopPropagation();
         return false;
       }
+      const isLegalHoldReject = error.type === z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
+      if (isLegalHoldReject) {
+        this.logger.log('User has canceled sending a message to a conversation under legal hold.');
+        promiseRejectionEvent.preventDefault();
+        promiseRejectionEvent.stopPropagation();
+        return false;
+      }
     });
   }
 }

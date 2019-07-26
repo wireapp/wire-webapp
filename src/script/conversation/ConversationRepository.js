@@ -1737,6 +1737,14 @@ export class ConversationRepository {
     });
   }
 
+  _isUserCancellationError(error) {
+    const errorTypes = [
+      z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+      z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+    ];
+    return errorTypes.includes(error.type);
+  }
+
   /**
    * Send a read receipt for the last message in a conversation.
    *
@@ -1853,7 +1861,7 @@ export class ConversationRepository {
         const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
         this.logger.warn(log, error);
 
-        if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (this._isUserCancellationError(error)) {
           throw error;
         }
       });
@@ -2008,7 +2016,7 @@ export class ConversationRepository {
         }
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           throw error;
         }
 
@@ -2038,7 +2046,7 @@ export class ConversationRepository {
     }
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage).catch(error => {
-      if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+      if (!this._isUserCancellationError(error)) {
         this.logger.error(`Error while sending knock: ${error.message}`, error);
         throw error;
       }
@@ -2170,7 +2178,7 @@ export class ConversationRepository {
         return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           this.logger.error(`Error while editing message: ${error.message}`, error);
           throw error;
         }
@@ -2293,7 +2301,7 @@ export class ConversationRepository {
         return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           this.logger.error(`Error while sending text message: ${error.message}`, error);
           throw error;
         }
@@ -2926,7 +2934,7 @@ export class ConversationRepository {
         this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${upload_duration}`);
       })
       .catch(error => {
-        if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (this._isUserCancellationError(error)) {
           throw error;
         }
 
