@@ -45,9 +45,7 @@ describe('when visiting the index page', () => {
       };
     });
 
-    afterAll(() => {
-      Config.FEATURE = {};
-    });
+    afterAll(() => (Config.FEATURE = {}));
 
     it('redirects to the login page', () => {
       wrapper = mountWithIntl(<Index />, mockStore(initialState));
@@ -63,9 +61,7 @@ describe('when visiting the index page', () => {
       };
     });
 
-    afterAll(() => {
-      Config.FEATURE = {};
-    });
+    afterAll(() => (Config.FEATURE = {}));
 
     it('shows the Wire logo', () => {
       wrapper = mountWithIntl(<Index />, mockStore(initialState));
