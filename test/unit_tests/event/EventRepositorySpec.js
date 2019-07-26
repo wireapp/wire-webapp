@@ -63,7 +63,7 @@ async function createEncodedCiphertext(
   return arrayToBase64(cipherText);
 }
 
-describe('Event Repository', () => {
+describe('EventRepository', () => {
   const test_factory = new TestFactory();
   let last_notification_id = undefined;
 

@@ -1642,13 +1642,6 @@
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.5"
 
-"@wireapp/protocol-messaging@1.24.1":
-  version "1.24.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.1.tgz#e29da795869515143e558357afc4df6bdd6fe0a0"
-  integrity sha512-BrZtB2Nij9vnwyox8mTP9EPfqWWnTq+CNElz7Yne+ZmVLvnekY7RAh9ad4DMMqDdKwOYIoyBJhxpB0/FlEiK4g==
-  dependencies:
-    protobufjs "6.8.8"
-
 "@wireapp/protocol-messaging@1.24.2":
   version "1.24.2"
   resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.24.2.tgz#a9c990943c8af74e2cc233fc96454f4c9424de6b"
