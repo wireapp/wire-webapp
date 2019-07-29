@@ -50,6 +50,7 @@ const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = 
     gridTemplateRows: 'repeat(2, 1fr)',
     height: `${size}px`,
     justifyItems: 'center',
+    minWidth: `${size}px`,
     overflow: 'hidden',
     width: `${size}px`,
   };
@@ -58,7 +59,7 @@ const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = 
 const filteredAvatarGridProps = (props: Props) =>
   filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
 
-export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE - borderWidth * 2, items, ...props}: Props) => {
+export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, ...props}: Props) => {
   const allProps = {borderWidth, size, items, ...props};
   const slicedItems = items.slice(0, 4);
   const missing = 4 - slicedItems.length;
