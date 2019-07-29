@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.31](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@4.2.30...@wireapp/travis-bot@4.2.31) (2019-07-29)
+
+**Note:** Version bump only for package @wireapp/travis-bot
+
+
+
+
+
 ## [4.2.30](https://github.com/wireapp/wire-web-packages/tree/master/packages/travis-bot/compare/@wireapp/travis-bot@4.2.29...@wireapp/travis-bot@4.2.30) (2019-07-29)
 
 **Note:** Version bump only for package @wireapp/travis-bot
