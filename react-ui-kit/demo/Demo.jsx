@@ -175,7 +175,6 @@ const Demo = () => {
           >
             <Avatar
               size={120}
-              fontSize={20}
               name={'Joe Do'}
               forceInitials={false}
               base64Image={avatarBase64}
@@ -184,7 +183,6 @@ const Demo = () => {
             />
             <Avatar
               size={120}
-              fontSize={20}
               name={'Jon Bon Jovi'}
               forceInitials={true}
               borderColor={'#fb0807'}
@@ -195,22 +193,21 @@ const Demo = () => {
             />
             <Avatar
               size={64}
-              fontSize={20}
               name={'Joe Do'}
               forceInitials={false}
               base64Image={avatarBase64}
               borderColor={'#fb0807'}
               backgroundColor={'#2085C2'}
             />
-            <Avatar size={64} fontSize={20} name={'Joe Do'} backgroundColor={'#2085C2'} />
-            <Avatar size={32} fontSize={20} name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
-            <Avatar size={24} fontSize={20} name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
+            <Avatar size={64} name={'Joe Do'} backgroundColor={'#2085C2'} />
+            <Avatar size={32} name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
+            <Avatar name={'Joe Do'} borderColor={'#fb0807'} backgroundColor={'#2085C2'} />
             <AvatarGrid
               size={120}
               items={[
-                {color: '#fb0807', name: 'Joe Doe'},
-                {color: '#2085C2', name: 'Bon Jovi'},
-                {color: '#EB7E00', name: 'Mick Jagger'},
+                {base64Image: avatarBase64, color: '#fb0807', name: 'Joe Doe'},
+                {base64Image: avatarBase64, color: '#2085C2', name: 'Bon Jovi'},
+                {base64Image: avatarBase64, color: '#EB7E00', name: 'Mick Jagger'},
                 {base64Image: avatarBase64, color: '#EB7E00', name: 'Freddy Mercury'},
               ]}
             />
@@ -218,7 +215,7 @@ const Demo = () => {
               size={120}
               items={[
                 {color: '#fb0807', name: 'Joe Doe'},
-                {color: '#2085C2', name: 'Bon Jovi'},
+                {base64Image: avatarBase64, color: '#2085C2', name: 'Bon Jovi'},
                 {color: '#EB7E00', name: 'Mick Jagger'},
               ]}
             />
@@ -236,10 +233,9 @@ const Demo = () => {
               ]}
             />
             <AvatarGrid
-              size={24}
               items={[
                 {color: '#fb0807', name: 'Joe Doe'},
-                {color: '#2085C2', name: 'Bon Jovi'},
+                {base64Image: avatarBase64, color: '#2085C2', name: 'Bon Jovi'},
                 {color: '#EB7E00', name: 'Mick Jagger'},
               ]}
             />

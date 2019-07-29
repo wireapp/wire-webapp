@@ -22,7 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
 import {AvatarProps} from '../Identity/';
 import {filterProps} from '../util';
-import {Avatar} from './Avatar';
+import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';
 import {COLOR} from './colors';
 
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
@@ -30,14 +30,15 @@ interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   size?: number;
   backgroundColor?: string;
   borderColor?: string;
+  borderWidth?: number;
 }
 
 const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({
-  size = 26,
+  borderWidth,
+  size,
   backgroundColor = COLOR.GRAY_DARKEN_48,
   borderColor = COLOR.GRAY_DARKEN_48,
 }) => {
-  const borderWidth = 1;
   return {
     alignItems: 'start',
     backgroundColor: backgroundColor,
@@ -46,24 +47,26 @@ const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = 
     display: 'grid',
     gridGap: borderWidth,
     gridTemplateColumns: 'repeat(2, 1fr)',
+    gridTemplateRows: 'repeat(2, 1fr)',
+    height: `${size}px`,
     justifyItems: 'center',
-    minHeight: `${size + borderWidth * 2}px`,
     overflow: 'hidden',
+    width: `${size}px`,
   };
 };
 
 const filteredAvatarGridProps = (props: Props) =>
-  filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size']);
+  filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
 
-export const AvatarGrid = (props: Props) => {
-  const {size, items} = props;
+export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE - borderWidth * 2, items, ...props}: Props) => {
+  const allProps = {borderWidth, size, items, ...props};
   const slicedItems = items.slice(0, 4);
   const missing = 4 - slicedItems.length;
   for (let index = 0; index < missing; index++) {
     slicedItems.push(null);
   }
   return (
-    <div css={avatarGridStyle(props)} {...filteredAvatarGridProps(props)}>
+    <div css={avatarGridStyle(allProps)} {...filteredAvatarGridProps(allProps)}>
       {slicedItems.map(item =>
         item ? (
           <Avatar
@@ -75,10 +78,17 @@ export const AvatarGrid = (props: Props) => {
             forceInitials={item.forceInitials}
             isAvatarGridItem
             name={item.name}
-            size={size / 2}
+            size={size / 2 - borderWidth}
+            style={{width: '100%', height: '100%'}}
           />
         ) : (
-          <div css={{backgroundColor: COLOR.GRAY_DARKEN_80, width: size / 2, height: size / 2}} />
+          <div
+            css={{
+              backgroundColor: COLOR.GRAY_DARKEN_80,
+              height: '100%',
+              width: '100%',
+            }}
+          />
         ),
       )}
     </div>

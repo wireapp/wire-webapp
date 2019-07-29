@@ -23,6 +23,8 @@ import React, {useEffect, useRef} from 'react';
 import {filterProps} from '../util';
 import {COLOR} from './colors';
 
+export const DEFAULT_AVATAR_SIZE = 28;
+
 export interface AvatarProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;
   base64Image?: string;
@@ -40,7 +42,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
   forceInitials,
   borderColor,
   backgroundColor = COLOR.GRAY,
-  size = 28,
+  size = DEFAULT_AVATAR_SIZE,
   isAvatarGridItem,
 }) => {
   const BORDER_SIZE_LIMIT = 32;
@@ -60,11 +62,9 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
     display: 'flex',
     fontSize,
     fontWeight: isAvatarGridItem ? 700 : 300,
+    height: `${size}px`,
     justifyContent: 'center',
-    maxHeight: `${size}px`,
-    maxWidth: `${size}px`,
-    minHeight: `${size}px`,
-    minWidth: `${size}px`,
+    width: `${size}px`,
   };
 };
 
