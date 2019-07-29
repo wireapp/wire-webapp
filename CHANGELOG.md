@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.8.3...@wireapp/react-ui-kit@7.8.4) (2019-07-29)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Remove AvatarGrid size calculation & add minWidth ([0695ec2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/0695ec2))
+
+
+
+
+
 ## [7.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.8.2...@wireapp/react-ui-kit@7.8.3) (2019-07-29)
 
 
