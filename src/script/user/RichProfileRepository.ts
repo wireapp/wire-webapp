@@ -17,19 +17,25 @@
  *
  */
 
+import {Logger} from '../util/Logger';
+import {BackendClient} from '../service/BackendClient';
+
 export class RichProfileRepository {
+  readonly logger: Logger;
+  private readonly backendClient: BackendClient;
+
   static get URL() {
     return {
       RICH_INFO: '/users/:id/rich-info',
     };
   }
 
-  constructor(backendClient, logger) {
+  constructor(backendClient: BackendClient, logger: Logger) {
     this.backendClient = backendClient;
     this.logger = logger;
   }
 
-  getUserRichProfile(userId) {
+  getUserRichProfile(userId: string) {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: RichProfileRepository.URL.RICH_INFO.replace(':id', userId),

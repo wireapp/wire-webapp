@@ -24,8 +24,8 @@ const linkify = new Linkify();
 
 /**
  * Check if the text contains only one link
- * @param {string} text - Text to parse
- * @returns {boolean} Text contains only a link
+ * @param text - Text to parse
+ * @returns Text contains only a link
  */
 export const containsOnlyLink = (text: string): boolean => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
@@ -35,8 +35,8 @@ export const containsOnlyLink = (text: string): boolean => {
 
 /**
  * Get first link and link offset for given text.
- * @param {string} text - Text to parse
- * @returns {Object} Containing link and its offset
+ * @param text - Text to parse
+ * @returns Containing link and its offset
  */
 export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | void => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');

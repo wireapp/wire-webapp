@@ -51,8 +51,8 @@ export const serverTimeHandler: ServerTimeHandler = {
 
   /**
    * Converts a local timestamp to a server timestamp.
-   * @param {number} [localTimestamp = Date.now()] - the local timestamp to convert
-   * @returns {number} serverTimestamp - the timestamp adjusted with the client/server time shift
+   * @param localTimestamp - the local timestamp to convert
+   * @returns serverTimestamp - the timestamp adjusted with the client/server time shift
    */
   toServerTimestamp(localTimestamp = Date.now()): number {
     return localTimestamp - this.getTimeOffset();
@@ -60,8 +60,8 @@ export const serverTimeHandler: ServerTimeHandler = {
 
   /**
    * Converts a server timestamp to a local timestamp.
-   * @param {number} [serverTimestamp = Date.now()] - the server timestamp to convert
-   * @returns {number} localTimestamp - the timestamp adjusted with the client/server time shift
+   * @param serverTimestamp - the server timestamp to convert
+   * @returns localTimestamp - the timestamp adjusted with the client/server time shift
    */
   toLocalTimestamp(serverTimestamp = Date.now()): number {
     return serverTimestamp + this.getTimeOffset();
