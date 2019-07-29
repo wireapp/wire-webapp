@@ -18,10 +18,10 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
-import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalsViewModel, modals} from '../view_model/ModalsViewModel';
 
 const initialKey = 'hide_initial_modal';
 

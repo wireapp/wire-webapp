@@ -35,7 +35,7 @@ enum TEAM_FEATURES {
   GET_TEAM_CONVERSATIONS = 1 << 10,
   DELETE_TEAM = 1 << 11,
   SET_MEMBER_PERMISSIONS = 1 << 12,
-};
+}
 
 enum PUBLIC_FEATURES {
   CREATE_GROUP_CONVERSATION = 1 << 13,
@@ -47,7 +47,7 @@ enum PUBLIC_FEATURES {
   INVITE_TEAM_MEMBERS = 1 << 19,
   CHAT_WITH_SERVICES = 1 << 20,
   SEARCH_UNCONNECTED_USERS = 1 << 21,
-};
+}
 // tslint:enable:object-literal-sort-keys
 
 export const FEATURES: typeof TEAM_FEATURES & typeof PUBLIC_FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
@@ -132,16 +132,18 @@ export enum ROLE {
   PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
   NONE = 'z.team.TeamRole.ROLE.NONE',
   INVALID = 'z.team.TeamRole.ROLE.INVALID',
-};
+}
 // tslint:enable:object-literal-sort-keys
 
-export function roleFromTeamPermissions(permissions: {self: number}) {
+export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
   if (!permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
   const detectedRole = Object.values(ROLE)
+    // necessary to extract only the actual values from a TS enum
+    .filter(value => typeof value === 'string')
     .filter(role => !invalidRoles.includes(role))
     .find(role => hasPermissionForRole(permissions.self, role));
 
@@ -157,15 +159,18 @@ export function roleFromTeamPermissions(permissions: {self: number}) {
  * @returns helpers
  */
 export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
-  return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>((helpers, [featureKey, featureValue]: [string, number]) => {
-    const camelCasedFeature = featureKey
-      .toLowerCase()
-      .split('_')
-      .map(capitalizeFirstChar)
-      .join('');
-    helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
-    return helpers;
-  }, {});
+  return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
+    (helpers, [featureKey, featureValue]: [string, number]) => {
+      const camelCasedFeature = featureKey
+        .toLowerCase()
+        .split('_')
+        .map(capitalizeFirstChar)
+        .join('');
+      helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
+      return helpers;
+    },
+    {},
+  );
 }
 
 export function hasAccessToFeature(feature: number, role: ROLE): boolean {

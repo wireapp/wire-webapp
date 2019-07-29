@@ -17,13 +17,14 @@
  *
  */
 
-import {Logger} from '../util/Logger';
 import {BackendClient} from '../service/BackendClient';
+import {Logger} from '../util/Logger';
 
 export class RichProfileRepository {
   readonly logger: Logger;
   private readonly backendClient: BackendClient;
 
+  // tslint:disable-next-line:typedef
   static get URL() {
     return {
       RICH_INFO: '/users/:id/rich-info',
@@ -35,7 +36,7 @@ export class RichProfileRepository {
     this.logger = logger;
   }
 
-  getUserRichProfile(userId: string) {
+  getUserRichProfile(userId: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: RichProfileRepository.URL.RICH_INFO.replace(':id', userId),
