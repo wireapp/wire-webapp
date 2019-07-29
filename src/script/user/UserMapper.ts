@@ -84,9 +84,9 @@ export class UserMapper {
    * @returns Mapped user entity
    * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: any): User | void {
+  updateUserFromObject(userEntity: User, userData: any): User | undefined {
     if (!userData) {
-      return;
+      return undefined;
     }
 
     // We are trying to update non-matching users

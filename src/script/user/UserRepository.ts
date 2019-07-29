@@ -709,7 +709,7 @@ export class UserRepository {
       )
       .then(userEntity => {
         if (this.isTeam()) {
-          this.mapGuestStatus([userEntity || undefined]);
+          this.mapGuestStatus([userEntity]);
         }
       });
   }
