@@ -22,8 +22,9 @@ import moment from 'moment';
 import {t} from 'Util/LocalizerUtil';
 
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
+export class DeleteMessage extends Message {
   constructor() {
     super();
 
@@ -34,4 +35,4 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
       return t('conversationDeleteTimestamp', moment(this.deleted_timestamp).format('LT'));
     };
   }
-};
+}

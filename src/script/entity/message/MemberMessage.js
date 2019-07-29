@@ -25,12 +25,10 @@ import {User} from '../User';
 import {ClientEvent} from '../../event/Client';
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
 import {SuperType} from '../../message/SuperType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
+export class MemberMessage extends SystemMessage {
   static get CONFIG() {
     return {
       MAX_USERS_VISIBLE: 17,
@@ -296,4 +294,4 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   guestCount() {
     return this.joinedUserEntities().filter(user => user.isGuest()).length;
   }
-};
+}

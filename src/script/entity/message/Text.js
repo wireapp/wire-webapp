@@ -37,7 +37,7 @@ export class Text extends Asset {
     // Array of MentionEntity instances
     this.mentions = ko.observableArray();
 
-    // Array of z.entity.LinkPreview instances
+    // Array of LinkPreview instances
     this.previews = ko.observableArray();
 
     this.should_render_text = ko.pureComputed(() => {
@@ -59,7 +59,3 @@ export class Text extends Asset {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
 }
-
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-z.entity.Text = Text;

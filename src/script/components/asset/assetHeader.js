@@ -28,7 +28,7 @@ class AssetHeader {
   /**
    * Construct a new asset header.
    * @param {Object} params - Component parameters
-   * @param {z.entity.Message} params.message - Message entity
+   * @param {Message} params.message - Message entity
    */
   constructor(params) {
     this.message_et = params.message;

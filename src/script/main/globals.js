@@ -95,20 +95,6 @@ import groupAvatarGlobal from 'Components/list/groupAvatar.js';
 import userDetailsGlobal from 'Components/panel/userDetails.js';
 import serviceDetailsGlobal from 'Components/panel/serviceDetails.js';
 import MessageCategorizationGlobal from '../message/MessageCategorization.js';
-import TextGlobal from '../entity/message/Text.js';
-import LocationGlobal from '../entity/message/Location.js';
-import MessageGlobal from '../entity/message/Message.js';
-import DeleteMessageGlobal from '../entity/message/DeleteMessage.js';
-import SystemMessageGlobal from '../entity/message/SystemMessage.js';
-import MemberMessageGlobal from '../entity/message/MemberMessage.js';
-import MissedMessageGlobal from '../entity/message/MissedMessage.js';
-import ContentMessageGlobal from '../entity/message/ContentMessage.js';
-import MessageTimerUpdateMessageGlobal from '../entity/message/MessageTimerUpdateMessage.js';
-import RenameMessageGlobal from '../entity/message/RenameMessage.js';
-import PingMessageGlobal from '../entity/message/PingMessage.js';
-import CallMessageGlobal from '../entity/message/CallMessage.js';
-import DecryptErrorMessageGlobal from '../entity/message/DecryptErrorMessage.js';
-import VerificationMessageGlobal from '../entity/message/VerificationMessage.js';
 /* eslint-enable no-unused-vars */
 
 window.amplify = amplify;

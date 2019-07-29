@@ -20,7 +20,7 @@
 /**
  * Checks if two arrays with mentions contain different values.
  *
- * @param {z.entity.Message} originalMessageEntity - Message entity
+ * @param {Message} originalMessageEntity - Message entity
  * @param {Array<MentionEntity>} [updatedMentions] - Updated mentions
  * @returns {boolean} Are the mentions different from each other
  */
@@ -39,7 +39,7 @@ export function areMentionsDifferent(originalMessageEntity, updatedMentions) {
 /**
  * Checks if a given text is different from an already existing text on the message entity.
  *
- * @param {z.entity.Message} originalMessageEntity - Message entity
+ * @param {Message} originalMessageEntity - Message entity
  * @param {string} textMessage - Message to compare with
  * @returns {boolean} Are text the same
  */
