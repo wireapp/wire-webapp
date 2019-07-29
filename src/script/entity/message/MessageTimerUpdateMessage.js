@@ -22,12 +22,10 @@ import {formatDuration} from 'Util/TimeUtil';
 
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
 import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.entity.SystemMessage {
+export class MessageTimerUpdateMessage extends SystemMessage {
   constructor(messageTimer) {
     super();
 
@@ -47,4 +45,4 @@ z.entity.MessageTimerUpdateMessage = class MessageTimerUpdateMessage extends z.e
       return this.user().is_me ? t('conversationResetTimerYou') : t('conversationResetTimer');
     });
   }
-};
+}

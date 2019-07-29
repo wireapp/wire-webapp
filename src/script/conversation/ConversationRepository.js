@@ -59,6 +59,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 
 import {Conversation} from '../entity/Conversation';
+import {Message} from '../entity/message/Message';
 
 import * as trackingHelpers from '../tracking/Helpers';
 
@@ -2143,7 +2144,7 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
-   * @param {z.entity.Message} originalMessageEntity - Original message entity
+   * @param {Message} originalMessageEntity - Original message entity
    * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
@@ -3925,7 +3926,7 @@ export class ConversationRepository {
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
       return this.user_repository.get_user_by_id(from).then(userEntity => {
-        const reactionMessageEntity = new z.entity.Message(messageEntity.id, SuperType.REACTION);
+        const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
         return {conversationEntity, messageEntity: reactionMessageEntity};

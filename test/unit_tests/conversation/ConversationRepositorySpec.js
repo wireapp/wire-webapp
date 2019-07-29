@@ -25,6 +25,8 @@ import {createRandomUuid} from 'Util/util';
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {Message} from 'src/script/entity/message/Message';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
@@ -122,7 +124,7 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new File();
         file_et.status(AssetTransferState.UPLOADING);
-        message_et = new z.entity.ContentMessage(createRandomUuid());
+        message_et = new ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
         conversation_et.add_message(message_et);
 
@@ -349,7 +351,7 @@ describe('ConversationRepository', () => {
     it('should not delete other users messages', done => {
       const user_et = new User();
       user_et.is_me = false;
-      const message_to_delete_et = new z.entity.Message(createRandomUuid());
+      const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
       conversation_et.add_message(message_to_delete_et);
 
@@ -367,7 +369,7 @@ describe('ConversationRepository', () => {
       spyOn(TestFactory.event_service, 'deleteEvent');
       const userEntity = new User();
       userEntity.is_me = true;
-      const messageEntityToDelete = new z.entity.Message();
+      const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
       conversation_et.add_message(messageEntityToDelete);
@@ -1027,7 +1029,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         conversation_et = _generate_conversation(ConversationType.GROUP);
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          message_et = new z.entity.Message(createRandomUuid());
+          message_et = new Message(createRandomUuid());
           message_et.from = TestFactory.user_repository.self().id;
           conversation_et.add_message(message_et);
 
@@ -1142,7 +1144,7 @@ describe('ConversationRepository', () => {
         conversation_et = _generate_conversation(ConversationType.GROUP);
 
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          const messageToHideEt = new z.entity.Message(createRandomUuid());
+          const messageToHideEt = new Message(createRandomUuid());
           conversation_et.add_message(messageToHideEt);
 
           messageId = messageToHideEt.id;
@@ -1305,7 +1307,7 @@ describe('ConversationRepository', () => {
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
       spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
-        Promise.resolve(new z.entity.Message()),
+        Promise.resolve(new Message()),
       );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
