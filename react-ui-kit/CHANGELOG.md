@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.8.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.8.2...@wireapp/react-ui-kit@7.8.3) (2019-07-29)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Set default Avatar & AvatarGrid size ([#2129](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2129)) ([baffc6c](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/baffc6c))
+
+
+
+
+
 ## [7.8.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.8.1...@wireapp/react-ui-kit@7.8.2) (2019-07-25)
 
 
