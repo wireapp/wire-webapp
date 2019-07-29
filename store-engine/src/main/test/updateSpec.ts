@@ -23,8 +23,8 @@ import {RecordNotFoundError} from '../engine/error';
 const TABLE_NAME = 'the-simpsons';
 
 interface DomainEntity {
-  name: string;
   age: number;
+  name: string;
   size: {
     height: number;
     width: number;

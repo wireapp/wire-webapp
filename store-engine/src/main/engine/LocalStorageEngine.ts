@@ -24,29 +24,24 @@ import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, Unsuppor
 export class LocalStorageEngine implements CRUDEngine {
   public storeName = '';
 
-  public async isSupported(): Promise<void> {
-    if (!isBrowser() || !window.localStorage) {
-      const message = `LocalStorage is not available on your platform.`;
-      throw new UnsupportedError(message);
-    }
-  }
+  public append<PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    additions: string,
+  ): Promise<PrimaryKey> {
+    return this.read(tableName, primaryKey).then((record: any) => {
+      if (typeof record === 'string') {
+        record += additions;
+      } else {
+        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+        throw new RecordTypeError(message);
+      }
 
-  public async init(storeName: string): Promise<Storage> {
-    await this.isSupported();
-    this.storeName = storeName;
-    return window.localStorage;
-  }
+      const key: string = this.createKey(tableName, primaryKey);
+      window.localStorage.setItem(key, record);
 
-  public async purge(): Promise<void> {
-    window.localStorage.clear();
-  }
-
-  private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): string {
-    return `${this.createPrefix(tableName)}${primaryKey}`;
-  }
-
-  private createPrefix(tableName: string): string {
-    return `${this.storeName}@${tableName}@`;
+      return primaryKey;
+    });
   }
 
   public create<EntityType, PrimaryKey = string>(
@@ -99,6 +94,23 @@ export class LocalStorageEngine implements CRUDEngine {
       });
       return true;
     });
+  }
+
+  public async init(storeName: string): Promise<Storage> {
+    await this.isSupported();
+    this.storeName = storeName;
+    return window.localStorage;
+  }
+
+  public async isSupported(): Promise<void> {
+    if (!isBrowser() || !window.localStorage) {
+      const message = `LocalStorage is not available on your platform.`;
+      throw new UnsupportedError(message);
+    }
+  }
+
+  public async purge(): Promise<void> {
+    window.localStorage.clear();
   }
 
   public read<EntityType = Object, PrimaryKey = string>(
@@ -182,23 +194,11 @@ export class LocalStorageEngine implements CRUDEngine {
       .then(() => primaryKey);
   }
 
-  public append<PrimaryKey = string>(
-    tableName: string,
-    primaryKey: PrimaryKey,
-    additions: string,
-  ): Promise<PrimaryKey> {
-    return this.read(tableName, primaryKey).then((record: any) => {
-      if (typeof record === 'string') {
-        record += additions;
-      } else {
-        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-        throw new RecordTypeError(message);
-      }
+  private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): string {
+    return `${this.createPrefix(tableName)}${primaryKey}`;
+  }
 
-      const key: string = this.createKey(tableName, primaryKey);
-      window.localStorage.setItem(key, record);
-
-      return primaryKey;
-    });
+  private createPrefix(tableName: string): string {
+    return `${this.storeName}@${tableName}@`;
   }
 }

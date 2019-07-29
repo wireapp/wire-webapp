@@ -31,21 +31,6 @@ export interface CRUDEngine {
   append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey>;
 
   /**
-   * Initializes the store engine. This needs to be done prior to operating with it.
-   * @param storeName - Name of the store
-   * @param settings - Database-specific settings
-   * @returns Resolves with the underlying (unwrapped) instance of a database.
-   * @throws {UnsupportedError} Error when feature is not available on targeted platform.
-   */
-  init(storeName: string, ...settings: any[]): Promise<any>;
-
-  /**
-   * Deletes the store.
-   * @returns Resolves if store got deleted.
-   */
-  purge(): Promise<void>;
-
-  /**
    * Creates a record by its primary key within a table.
    * @param tableName - Table name
    * @param primaryKey - Primary key to be used to store the record
@@ -72,6 +57,27 @@ export interface CRUDEngine {
    * @returns Resolves with `true`, if all records have been removed.
    */
   deleteAll(tableName: string): Promise<boolean>;
+
+  /**
+   * Initializes the store engine. This needs to be done prior to operating with it.
+   * @param storeName - Name of the store
+   * @param settings - Database-specific settings
+   * @returns Resolves with the underlying (unwrapped) instance of a database.
+   * @throws {UnsupportedError} Error when feature is not available on targeted platform.
+   */
+  init(storeName: string, ...settings: any[]): Promise<any>;
+
+  /**
+   * Checks wether the engine is supported in the current environment.
+   * @returns Resolves if supported, rejects if unsupported.
+   */
+  isSupported(): Promise<void>;
+
+  /**
+   * Deletes the store.
+   * @returns Resolves if store got deleted.
+   */
+  purge(): Promise<void>;
 
   /**
    * Finds a record by its primary key within a table.
@@ -122,10 +128,4 @@ export interface CRUDEngine {
     primaryKey: PrimaryKey,
     changes: ChangesType,
   ): Promise<PrimaryKey>;
-
-  /**
-   * Checks wether the engine is supported in the current environment.
-   * @returns Resolves if supported, rejects if unsupported.
-   */
-  isSupported(): Promise<void>;
 }
