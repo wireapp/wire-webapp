@@ -4,7 +4,7 @@
     "dexie": "2.0.4"
   },
   "devDependencies": {
-    "@types/jasmine": "3.3.15",
+    "@types/jasmine": "3.3.16",
     "@types/karma": "3.0.3",
     "@types/node": "~10",
     "jasmine": "3.4.0",
