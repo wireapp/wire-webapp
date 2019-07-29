@@ -85,7 +85,6 @@ export class UserRepository {
   private readonly logger: Logger;
   private readonly number_of_contacts: ko.PureComputed<number>;
   private readonly propertyRepository: PropertiesRepository;
-  private readonly self: ko.Observable<User>;
   private readonly selfService: SelfService;
   private readonly teamMembers: ko.ObservableArray<User>;
   private readonly teamUsers: ko.ObservableArray<User>;
@@ -96,6 +95,7 @@ export class UserRepository {
   readonly connect_requests: ko.PureComputed<User[]>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly isTemporaryGuest: ko.PureComputed<boolean>;
+  readonly self: ko.Observable<User>;
 
   // tslint:disable-next-line:typedef
   static get CONFIG() {
