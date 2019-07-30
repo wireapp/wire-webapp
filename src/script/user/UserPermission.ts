@@ -40,7 +40,14 @@ const TEAM_FEATURES = {
   SET_MEMBER_PERMISSIONS: 1 << 12,
 };
 
-// Start counting the public features after the team features.
+/*
+ * While the values for team features are set by the backend,
+ * the public features are set by the webapp.
+ * To avoid duplications, the values for the public features
+ * need to be higher than the values for team features.
+ * Additionally, we also don't want to change them manually
+ * every time there is a new team feature.
+ */
 let bitsCounter = Object.keys(TEAM_FEATURES).length - 1;
 
 const PUBLIC_FEATURES = {
