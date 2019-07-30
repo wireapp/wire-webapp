@@ -135,6 +135,7 @@ export class UserMapper {
       if (this.serverTimeHandler.timeOffset() !== undefined) {
         setAdjustedTimestamp();
       } else {
+        // TODO: Find a way to type `subscribe_once` or export the function.
         (this.serverTimeHandler.timeOffset as any).subscribe_once(setAdjustedTimestamp);
       }
     }
