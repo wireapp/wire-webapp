@@ -53,7 +53,7 @@ const PUBLIC_FEATURES = {
 };
 // tslint:enable:object-literal-sort-keys
 
-export const FEATURES: typeof TEAM_FEATURES & typeof PUBLIC_FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
+export const FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
 
 function teamPermissionsForRole(teamRole: ROLE): number {
   switch (teamRole) {
