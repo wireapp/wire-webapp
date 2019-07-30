@@ -6,7 +6,7 @@
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@emotion/core": "10.0.14",
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "5.1.17",
+    "@wireapp/avs": "5.1.18",
     "@wireapp/commons": "2.2.8",
     "@wireapp/core": "12.17.42",
     "@wireapp/protocol-messaging": "1.24.2",
