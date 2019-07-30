@@ -1469,8 +1469,8 @@ export const COUNTRY_CODES: CountryCode[] = [
 
 /**
  * Get the country code matching to an ISO name
- * @param {number} countryCode - Country code
- * @returns {string} Returns the ISO standard country name of the most populated country with the matching country code
+ * @param countryCode - Country code
+ * @returns Returns the ISO standard country name of the most populated country with the matching country code
  */
 export const getCountryByCode = (countryCode: string): string | void => {
   const parsedCode = parseInt(countryCode, 10);
@@ -1484,8 +1484,8 @@ export const getCountryByCode = (countryCode: string): string | void => {
 
 /**
  * Get the country code matching an ISO name
- * @param {string} isoName - ISO standard country name
- * @returns {number} Matching country code
+ * @param isoName - ISO standard country name
+ * @returns Matching country code
  */
 export const getCountryCode = (isoName: string): number | void => {
   const country = COUNTRY_CODES.find(({iso}) => iso === isoName);

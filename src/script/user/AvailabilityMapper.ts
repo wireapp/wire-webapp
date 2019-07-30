@@ -23,14 +23,14 @@ import {t} from 'Util/LocalizerUtil';
 
 import {BaseError} from '../error/BaseError';
 
-const AVAILABILITY_VALUES = {
+const AVAILABILITY_VALUES: Record<keyof typeof Availability.Type, string> = {
   AVAILABLE: 'available',
   AWAY: 'away',
   BUSY: 'busy',
   NONE: 'none',
 };
 
-export const valueFromType = availabilityType => {
+export const valueFromType = (availabilityType: Availability.Type): string => {
   const TYPE_VALUES = {
     [Availability.Type.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
     [Availability.Type.AWAY]: AVAILABILITY_VALUES.AWAY,
@@ -45,7 +45,7 @@ export const valueFromType = availabilityType => {
   throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
-export const nameFromType = availabilityType => {
+export const nameFromType = (availabilityType: Availability.Type) => {
   const TYPE_STRINGS = {
     [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
     [Availability.Type.AWAY]: t('userAvailabilityAway'),
@@ -60,7 +60,7 @@ export const nameFromType = availabilityType => {
   throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
-export const protoFromType = availabilityType => {
-  const typeValue = valueFromType(availabilityType).toUpperCase();
+export const protoFromType = (availabilityType: Availability.Type) => {
+  const typeValue = valueFromType(availabilityType).toUpperCase() as keyof typeof Availability.Type;
   return Availability.Type[typeValue];
 };
