@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.5.3...@wireapp/store-engine-bro-fs@0.5.4) (2019-07-30)
+
+
+### Bug Fixes
+
+* **api-client,bazinga64,cbor,proteus,store-engine,store-engine-bro-fs:** Don't return immediately in a try-catch block ([#2140](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/issues/2140)) ([83cbf86](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/commit/83cbf86))
+
+
+
+
+
 ## [0.5.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.5.2...@wireapp/store-engine-bro-fs@0.5.3) (2019-07-29)
 
 **Note:** Version bump only for package @wireapp/store-engine-bro-fs

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.6.2...@wireapp/store-engine@3.6.3) (2019-07-30)
+
+
+### Bug Fixes
+
+* **api-client,bazinga64,cbor,proteus,store-engine,store-engine-bro-fs:** Don't return immediately in a try-catch block ([#2140](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2140)) ([83cbf86](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/83cbf86))
+
+
+
+
+
 ## [3.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.6.1...@wireapp/store-engine@3.6.2) (2019-07-29)
 
 **Note:** Version bump only for package @wireapp/store-engine

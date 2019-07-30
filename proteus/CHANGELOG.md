@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.3.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.10...@wireapp/proteus@9.3.11) (2019-07-30)
+
+
+### Bug Fixes
+
+* **api-client,bazinga64,cbor,proteus,store-engine,store-engine-bro-fs:** Don't return immediately in a try-catch block ([#2140](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/2140)) ([83cbf86](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/83cbf86))
+
+
+
+
+
 ## [9.3.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.9...@wireapp/proteus@9.3.10) (2019-07-29)
 
 **Note:** Version bump only for package @wireapp/proteus
