@@ -35,7 +35,7 @@ describe('RichProfileRepository', () => {
 
       return richProfileRepository.getUserRichProfile(userId).then(richProfile => {
         expect(richProfileRepository.backendClient.sendRequest).toHaveBeenCalledTimes(1);
-        expect(richProfile).toBeDefined();
+        expect(richProfile).toBe(response);
       });
     });
   });

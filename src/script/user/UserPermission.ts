@@ -40,16 +40,19 @@ const TEAM_FEATURES = {
   SET_MEMBER_PERMISSIONS: 1 << 12,
 };
 
+// Start counting the public features after the team features.
+let bitsCounter = Object.keys(TEAM_FEATURES).length - 1;
+
 const PUBLIC_FEATURES = {
-  CREATE_GROUP_CONVERSATION: 1 << 13,
-  CREATE_GUEST_ROOM: 1 << 14,
-  UPDATE_CONVERSATION_SETTINGS: 1 << 15,
-  UPDATE_GROUP_PARTICIPANTS: 1 << 16,
-  MANAGE_SERVICES: 1 << 17,
-  MANAGE_TEAM: 1 << 18,
-  INVITE_TEAM_MEMBERS: 1 << 19,
-  CHAT_WITH_SERVICES: 1 << 20,
-  SEARCH_UNCONNECTED_USERS: 1 << 21,
+  CREATE_GROUP_CONVERSATION: 1 << bitsCounter++,
+  CREATE_GUEST_ROOM: 1 << bitsCounter++,
+  UPDATE_CONVERSATION_SETTINGS: 1 << bitsCounter++,
+  UPDATE_GROUP_PARTICIPANTS: 1 << bitsCounter++,
+  MANAGE_SERVICES: 1 << bitsCounter++,
+  MANAGE_TEAM: 1 << bitsCounter++,
+  INVITE_TEAM_MEMBERS: 1 << bitsCounter++,
+  CHAT_WITH_SERVICES: 1 << bitsCounter++,
+  SEARCH_UNCONNECTED_USERS: 1 << bitsCounter++,
 };
 // tslint:enable:object-literal-sort-keys
 
