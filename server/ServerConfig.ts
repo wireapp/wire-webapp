@@ -10,6 +10,7 @@ export interface ServerConfig {
     ENVIRONMENT: string;
     FEATURE: {
       CHECK_CONSENT: boolean;
+      DEFAULT_LOGIN_TEMPORARY_DEVICE: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_PHONE_LOGIN: boolean;
