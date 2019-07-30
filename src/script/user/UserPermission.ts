@@ -20,6 +20,9 @@
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 // tslint:disable:object-literal-sort-keys
+/**
+ * Enum for various team permissions.
+ */
 const TEAM_FEATURES = {
   NONE: 0,
   CREATE_CONVERSATION: 1 << 0,
