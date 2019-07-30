@@ -26,7 +26,6 @@ import {base64ToArray} from 'Util/util';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {MediumImage} from '../entity/message/MediumImage';
-import {CallMessage} from '../entity/message/CallMessage';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';

@@ -22,7 +22,6 @@ import {t} from 'Util/LocalizerUtil';
 import {Message} from './Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
-import {Message} from './Message';
 
 export class CallMessage extends Message {
   constructor(type, reason = undefined, duration = 0) {
