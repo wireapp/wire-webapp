@@ -122,7 +122,8 @@ export class LocalStorageEngine implements CRUDEngine {
       const record = window.localStorage.getItem(key);
       if (record) {
         try {
-          return JSON.parse(record);
+          const parsed = JSON.parse(record);
+          return parsed;
         } catch (error) {
           return record;
         }

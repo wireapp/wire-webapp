@@ -23,7 +23,8 @@ export interface ParameterlessConstructor<T> {
 
 export function new_instance<T>(proposedClass: ParameterlessConstructor<T>): T {
   try {
-    return new proposedClass();
+    const newClass = new proposedClass();
+    return newClass;
   } catch (error) {
     return error._instance;
   }

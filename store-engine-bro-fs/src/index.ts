@@ -138,7 +138,8 @@ export class FileSystemEngine implements CRUDEngine {
     }
 
     try {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      return parsed;
     } catch (error) {
       return data as any;
     }

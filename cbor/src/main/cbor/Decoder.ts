@@ -487,7 +487,8 @@ export class Decoder {
 
   public optional<T>(closure: () => T): T | null | undefined {
     try {
-      return closure();
+      const result = closure();
+      return result;
     } catch (error) {
       if (error instanceof DecodeError && error.extra) {
         const type = error.extra[0];

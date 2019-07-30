@@ -22,7 +22,8 @@ import {UnsupportedInputError} from './UnsupportedInputError';
 export class Converter {
   public static arrayBufferViewToStringUTF8(arrayBufferView: Uint8Array): string {
     try {
-      return this.arrayBufferViewToString(arrayBufferView);
+      const string = this.arrayBufferViewToString(arrayBufferView);
+      return string;
     } catch (error) {
       if (typeof window === 'object' && 'TextDecoder' in window) {
         return new TextDecoder('utf-8').decode(arrayBufferView);
