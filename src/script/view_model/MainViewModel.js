@@ -24,6 +24,7 @@ import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
+import {AppLockViewModel} from './content/AppLockViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -72,6 +73,8 @@ export class MainViewModel {
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
+
+    this.applock = new AppLockViewModel();
 
     this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
