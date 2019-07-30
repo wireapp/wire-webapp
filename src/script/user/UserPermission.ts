@@ -153,7 +153,7 @@ export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
 /**
  * Will generate a bunch of helper functions that can be consumed to know what features this role has access to.
  * The function generated will have the following format:
- *   can<camel cased feature name>: () => boolean
+ *   `can<camel cased feature name>: () => boolean`
  *
  * @param boundRole - Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
  * @returns helpers

@@ -36,8 +36,6 @@ const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${random
 
 /**
  * Validates that a character can be used for a handle.
- * @param character - Character candidate
- * @returns `true`, if character can be used for a handle.
  */
 export const validateCharacter = (character: string): boolean => {
   const isAlphaNumeric = /[a-z0-9_]/.test(character);
@@ -47,9 +45,6 @@ export const validateCharacter = (character: string): boolean => {
 
 /**
  * Appends random digits from 1 to 9 to the end of the string.
- * @param handle - Input
- * @param additionalNumbers - number of digits to append
- * @returns String appended with random digits.
  */
 export const appendRandomDigits = (handle: string, additionalNumbers?: number): string => {
   const randomDigits = Array.from({length: additionalNumbers}, () => getRandomNumber(1, 8));
@@ -58,8 +53,6 @@ export const appendRandomDigits = (handle: string, additionalNumbers?: number): 
 
 /**
  * Creates a handle based on the users name.
- * @param name - User name
- * @returns User handle
  */
 export const normalizeName = (name: string): string =>
   getSlug(name)
@@ -69,8 +62,6 @@ export const normalizeName = (name: string): string =>
 
 /**
  * Validates that an input is a valid handle.
- * @param handle - Character candidate
- * @returns `true`, if handle is valid.
  */
 export const validateHandle = (handle: string = ''): boolean => {
   if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
@@ -81,9 +72,6 @@ export const validateHandle = (handle: string = ''): boolean => {
 
 /**
  * Creates variations of the given handle by appending random digits.
- * @param handle - Input
- * @param numberOfVariations - Number of variants that should be generated
- * @return Handle variations
  */
 export const generateHandleVariations = (handle: string, numberOfVariations: number = 5): string[] => {
   return Array.from({length: numberOfVariations}, (element, index) => {
@@ -94,8 +82,6 @@ export const generateHandleVariations = (handle: string, numberOfVariations: num
 
 /**
  * Create a set of suggestions based on the name.
- * @param  name - Name to create suggestions for
- * @returns Username suggestions
  */
 export const createSuggestions = (name: string): string[] => {
   const normalizedName = normalizeName(name);

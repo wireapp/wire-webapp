@@ -31,7 +31,6 @@ export class UserMapper {
 
   /**
    * Construct a new User Mapper.
-   * @class UserMapper
    * @param serverTimeHandler - Handles time shift between server and client
    */
   constructor(serverTimeHandler: ServerTimeHandler) {
@@ -39,19 +38,10 @@ export class UserMapper {
     this.serverTimeHandler = serverTimeHandler;
   }
 
-  /**
-   * Converts JSON user into user entity.
-   * @returns Mapped user entity
-   */
   mapUserFromJson(userData: Object): User | void {
     return this.updateUserFromObject(new User(), userData);
   }
 
-  /**
-   * Converts JSON self user into user entity.
-   * @param userData - User data
-   * @returns Mapped user entity
-   */
   mapSelfUserFromJson(userData: any): User {
     const userEntity = this.updateUserFromObject(new User(), userData) as any;
     userEntity.is_me = true;
@@ -66,7 +56,6 @@ export class UserMapper {
   /**
    * Convert multiple JSON users into user entities.
    * @note Return an empty array in any case to prevent crashes.
-   *
    * @returns Mapped user entities
    */
   mapUsersFromJson(usersData: Object[]): (void | User)[] {
@@ -81,7 +70,6 @@ export class UserMapper {
    * Maps JSON user into a blank user entity or updates an existing one.
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
    * @param userEntity - User entity that the info shall be mapped to
-   * @returns Mapped user entity
    * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
   updateUserFromObject(userEntity: User, userData: any): User | undefined {

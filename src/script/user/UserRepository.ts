@@ -109,16 +109,6 @@ export class UserRepository {
     };
   }
 
-  /**
-   * Construct a new User repository.
-   * @class UserRepository
-   * @param user_service - Backend REST API user service implementation
-   * @param asset_service - Backend REST API asset service implementation
-   * @param selfService - Backend REST API self service implementation
-   * @param client_repository - Repository for all client interactions
-   * @param serverTimeHandler - Handles time shift between server and client
-   * @param propertyRepository - Handles account level properties
-   */
   constructor(
     user_service: UserService,
     asset_service: AssetService,
@@ -181,9 +171,6 @@ export class UserRepository {
 
   /**
    * Listener for incoming user events.
-   *
-   * @param eventJson - JSON data for event
-   * @param source - Source of event
    */
   on_user_event(eventJson: any, source: keyof typeof EventRepository.SOURCE): void {
     const type = eventJson.type;
@@ -247,9 +234,6 @@ export class UserRepository {
 
   /**
    * Retrieves meta information about all the clients of a given user.
-   * @param userId - User ID to retrieve client information for
-   * @param updateClients - Automatically update the clients
-   * @returns Resolves with an array of client entities
    */
   getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[]> {
     return this.client_repository.getClientsByUserId(userId, updateClients);
@@ -257,8 +241,6 @@ export class UserRepository {
 
   /**
    * Persists a conversation state in the database.
-   * @param userEntity - User which should be persisted
-   * @returns Resolves when user was saved
    */
   saveUserInDb(userEntity: User): Promise<User> {
     return this.user_service.saveUserInDb(userEntity);
@@ -266,7 +248,6 @@ export class UserRepository {
 
   /**
    * Event to delete the matching user.
-   * @param id - User ID of deleted user
    */
   user_delete({id}: {id: string}): void {
     // @todo Add user deletion cases for other users
@@ -293,8 +274,6 @@ export class UserRepository {
 
   /**
    * Event to update the matching user.
-   * @param user - Update user info
-   * @returns Resolves with the updated user entity
    */
   user_update({user}: {user: UserUpdate}): Promise<User> {
     const is_self_user = user.id === this.self().id;
@@ -312,8 +291,6 @@ export class UserRepository {
 
   /**
    * Update users matching the given connections.
-   * @param connectionEntities - Connection entities
-   * @returns Resolves when all connections have been updated
    */
   updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
@@ -353,9 +330,6 @@ export class UserRepository {
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
    *
-   * @param userId - ID of user
-   * @param clientPayload - Payload of client which should be added to user
-   * @param publishClient - Publish new client
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
@@ -384,9 +358,6 @@ export class UserRepository {
 
   /**
    * Removes a stored client and the session connected with it.
-   * @param user_id - ID of user
-   * @param client_id - ID of client to be deleted
-   * @returns Resolves when a client and its session have been deleted
    */
   remove_client_from_user(user_id: string, client_id: string): Promise<void> {
     return this.client_repository
@@ -400,8 +371,6 @@ export class UserRepository {
 
   /**
    * Update clients for given user.
-   * @param user_id - ID of user
-   * @param client_ets - Clients which should get updated
    */
   update_clients_from_user(user_id: string, client_ets: ClientEntity[]): void {
     this.get_user_by_id(user_id).then(user_et => {
@@ -438,7 +407,7 @@ export class UserRepository {
       this.self().hasPendingLegalHold(false);
       amplify.publish(HIDE_REQUEST_MODAL);
     } else {
-      /**
+      /*
        * TODO:
        * 1) Get User ID from event and check the clients of that user.
        * 2) If there is a legal hold client, remove it (in memory and database).
@@ -470,12 +439,11 @@ export class UserRepository {
   /**
    * Track availability action.
    *
-   * @param availability - Type of availability
    * @param method - Method used for availability change
    */
   _trackAvailability(availability: Availability.Type, method: string): void {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
-      method: method,
+      method,
       status: valueFromType(availability),
     });
   }
@@ -493,7 +461,6 @@ export class UserRepository {
 
   /**
    * Get a user from the backend.
-   * @returns Resolves with the user entity
    */
   _fetchUserById(userId: string): Promise<User> {
     return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
@@ -501,7 +468,6 @@ export class UserRepository {
 
   /**
    * Get users from the backend.
-   * @returns Resolves with an array of user entities
    */
   fetchUsersById(userIds: string[] = []): Promise<User[]> {
     userIds = userIds.filter(userId => !!userId);
@@ -547,7 +513,6 @@ export class UserRepository {
 
   /**
    * Find a local user.
-   * @returns matching user entity if found. Undefined else
    */
   findUserById(userId: string): User | undefined {
     return this.users().find(userEntity => userEntity.id === userId);
@@ -555,7 +520,6 @@ export class UserRepository {
 
   /**
    * Get self user from backend.
-   * @returns Resolves with the self user entity
    */
   getSelf(): Promise<User> {
     return this.selfService
@@ -575,8 +539,6 @@ export class UserRepository {
   /**
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
-   *
-   * @param userData - user data from the backend
    */
   _upgradePictureAsset<T extends UserUpdate>(userData: T): T {
     const hasPicture = userData.picture.length;
@@ -597,8 +559,6 @@ export class UserRepository {
 
   /**
    * Check for user locally and fetch it from the server otherwise.
-   * @param user_id - User ID
-   * @returns Resolves with the matching user entity
    */
   get_user_by_id(user_id: string): Promise<User> {
     const user = this.findUserById(user_id);
@@ -627,7 +587,6 @@ export class UserRepository {
   /**
    * Check for users locally and fetch them from the server otherwise.
    * @param offline - Should we only look for cached contacts
-   * @returns Resolves with an array of users
    */
   get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
     if (!user_ids.length) {
@@ -654,8 +613,6 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param user_id - User entity or user ID
-   * @returns Is the user the logged in user
    */
   is_me(user_id: User | string): boolean {
     if (typeof user_id !== 'string') {
@@ -666,9 +623,7 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param user_et - User entity or user ID
-   * @param is_me - True, if self user
-   * @returns Resolves with the user entity
+   * @param is_me - `true` if self user
    */
   save_user(user_et: User, is_me: boolean = false): User {
     const user = this.findUserById(user_et.id);
@@ -684,7 +639,6 @@ export class UserRepository {
 
   /**
    * Save multiple users at once.
-   * @param user_ets - Array of user entities to be stored
    * @returns Resolves with users passed as parameter
    */
   save_users(user_ets: User[]): User[] {
@@ -695,8 +649,6 @@ export class UserRepository {
 
   /**
    * Update a local user from the backend by ID.
-   * @param userId - User ID
-   * @returns Resolves when user was updated
    */
   updateUserById(userId: string): Promise<void> {
     const getLocalUser = () => {
@@ -716,8 +668,6 @@ export class UserRepository {
 
   /**
    * Add user entities for suspended users.
-   * @param userIds - Requested user IDs
-   * @param userEntities - User entities returned by backend
    * @returns User entities
    */
   private _add_suspended_users(userIds: string[], userEntities: User[]): User[] {
@@ -736,8 +686,6 @@ export class UserRepository {
 
   /**
    * Change the accent color.
-   * @param accent_id - New accent color
-   * @returns Resolves when accent color was changed
    */
   change_accent_color(accent_id: typeof ACCENT_ID): Promise<User> {
     return this.selfService.putSelf({accent_id}).then(() => this.user_update({user: {accent_id, id: this.self().id}}));
@@ -745,8 +693,6 @@ export class UserRepository {
 
   /**
    * Change name.
-   * @param name - New name
-   * @returns Resolves when the name was changed
    */
   change_name(name: string): Promise<User> {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
@@ -758,7 +704,6 @@ export class UserRepository {
 
   /**
    * Whether the user needs to set a username.
-   * @returns `true` if username should be changed.
    */
   shouldChangeUsername(): boolean {
     return this.should_set_username;
@@ -790,8 +735,6 @@ export class UserRepository {
 
   /**
    * Change username.
-   * @param username - New username
-   * @returns Resolves when the username was changed
    */
   change_username(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
@@ -825,7 +768,6 @@ export class UserRepository {
 
   /**
    * Verify a username against the backend.
-   * @param username - New user name
    * @returns Username which is not taken.
    */
   verify_username(username: string): Promise<string> {
@@ -850,8 +792,6 @@ export class UserRepository {
 
   /**
    * Change the profile image.
-   * @param picture - New user picture
-   * @returns Resolves when the picture was updated
    */
   change_picture(picture: Blob): Promise<User> {
     return this.asset_service
@@ -871,7 +811,7 @@ export class UserRepository {
   }
 
   /**
-   * Set users default profile image.
+   * Set the user's default profile image.
    */
   set_default_picture(): Promise<User> {
     return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));

@@ -39,12 +39,6 @@ export class UserService {
     };
   }
 
-  /**
-   * Construct a new User Service.
-   * @class UserService
-   * @param backendClient - Client for the API calls
-   * @param storageService - Service for all storage interactions
-   */
   constructor(backendClient: BackendClient, storageService: StorageService) {
     this.backendClient = backendClient;
     this.logger = getLogger('UserService');
@@ -86,9 +80,6 @@ export class UserService {
    * Check if a username exists.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
-   *
-   * @param username - Username
-   * @returns Resolves with backend response.
    */
   checkUserHandle(username: string): Promise<void> {
     return this.backendClient.sendRequest({
@@ -109,10 +100,6 @@ export class UserService {
    *
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
-   *
-   * @param usernames - List of usernames
-   * @param amount - amount of usernames to return
-   * @returns Resolves with backend response.
    */
   checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
     return this.backendClient.sendJson({
@@ -130,9 +117,6 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
-   *
-   * @param userIds - ID of users to be fetched
-   * @returns Resolves with backend response.
    */
   getUsers(userIds: string[]): Promise<User[]> {
     const chunkSize = 50;
@@ -155,9 +139,6 @@ export class UserService {
    * Get a user by ID.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
-   *
-   * @param userId - User ID
-   * @returns Resolves with backend response.
    */
   getUser(userId: string): Promise<User> {
     return this.backendClient.sendRequest({
