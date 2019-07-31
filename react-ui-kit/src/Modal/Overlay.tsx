@@ -23,6 +23,7 @@ import React from 'react';
 import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
 import {QueryKeys, media} from '../mediaQueries';
+import {noop} from '../util';
 
 export type OverlayWrapperProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
@@ -79,11 +80,13 @@ export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => Ob
 
 export const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
 
-export type OverlayProps<T = HTMLDivElement> = React.HTMLProps<T>;
+export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+  onBackgroundClick?: () => void;
+}
 
-export const Overlay = ({children = null, ...props}: OverlayProps) => (
+export const Overlay = ({onBackgroundClick = noop, children = null, ...props}: OverlayProps) => (
   <OverlayWrapper {...props} data-uie-name="modal">
     <OverlayContent>{children}</OverlayContent>
-    <OverlayBackground data-uie-name="overlay-background" />
+    <OverlayBackground onClick={onBackgroundClick} data-uie-name="overlay-background" />
   </OverlayWrapper>
 );
