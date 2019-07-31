@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.9.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.9.0...@wireapp/react-ui-kit@7.9.1) (2019-07-31)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Fix min width for Avatar ([#2144](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2144)) ([f96ea38](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f96ea38))
+
+
+
+
+
 # [7.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.8.5...@wireapp/react-ui-kit@7.9.0) (2019-07-31)
 
 
