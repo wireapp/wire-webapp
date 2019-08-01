@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.6.3...@wireapp/store-engine@3.7.0) (2019-08-01)
+
+
+### Features
+
+* **store-engine:** Add initWithObject to MemoryEngine ([#2148](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2148)) ([ee5ec2b](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/ee5ec2b))
+
+
+
+
+
 ## [3.6.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.6.2...@wireapp/store-engine@3.6.3) (2019-07-30)
 
 
