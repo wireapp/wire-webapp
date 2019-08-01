@@ -22,7 +22,7 @@
     "@babel/core": "7.5.5",
     "@babel/preset-react": "7.0.0",
     "@types/jasmine": "3.3.16",
-    "@types/react": "16.8.23",
+    "@types/react": "16.8.24",
     "@types/react-dom": "16.8.5",
     "@types/ws": "6.0.1",
     "@wireapp/react-ui-kit": "7.9.1",
