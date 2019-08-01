@@ -92,7 +92,7 @@ class PropertiesRepository {
 
   /**
    * Get the current preference for a property type.
-   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to get
+   * @param {string} propertiesType - Type of preference to get
    * @returns {*} Preference value
    */
   getPreference(propertiesType) {
@@ -170,7 +170,7 @@ class PropertiesRepository {
   /**
    * Save property setting.
    *
-   * @param {PROPERTIES_TYPE} propertiesType - Type of preference to update
+   * @param {string} propertiesType - Type of preference to update
    * @param {*} updatedPreference - New property setting
    * @returns {undefined} No return value
    */

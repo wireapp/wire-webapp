@@ -24,6 +24,11 @@
   display: flex;
   min-width: @screen-md-min;
   background-color: var(--app-bg);
+  transition: filter 0.3s;
+
+  &.blurred {
+    filter: blur(10px);
+  }
 
   .left-column {
     position: relative;

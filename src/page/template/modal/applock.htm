@@ -1,3 +1,45 @@
-<div id="applock" data-bind="with: $root.applock">
-  
+<div id="applock">
+  <modal params="isShown: isVisible()" data-uie-name="applock-modal">
+    <div class="modal__header">
+      <div class="modal__header__title" data-bind="text: headerText()" data-uie-name="applock-modal-header"></div>
+    </div>
+    <div class="modal__body">
+      <!-- ko if: isSetupScreen() -->
+      <form data-bind="submit: onSetCode">
+        <div class="modal__text">You will use it when your app gets locked.</div>
+        <input class="modal__input" type="password" />
+        <input class="modal__input" type="password" />
+        <div class="modal-option-text text-background">
+          Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character:
+        </div>
+        <div class="modal__buttons">
+          <button
+            type="submit"
+            class="modal__button modal__button--primary modal__button--full"
+            data-uie-name="do-action"
+          >
+            Accept
+          </button>
+        </div>
+      </form>
+      <!-- /ko -->
+      <!-- ko if: isLockScreen() -->
+      <div class="modal__text">Please enter your Application lock password to Unlock the application</div>
+      <input class="modal__input" type="password" />
+      <button
+      type="submit"
+      class="modal__button modal__button--primary modal__button--full"
+      data-uie-name="do-action"
+    >
+      Unlock
+    </button>
+      <!-- /ko -->
+      <!-- ko if: isForgotScreen() -->
+      <!-- /ko -->
+      <!-- ko if: isWipeConfirmScreen() -->
+      <!-- /ko -->
+      <!-- ko if: isWipePasswordScreen() -->
+      <!-- /ko -->
+    </div>
+  </modal>
 </div>

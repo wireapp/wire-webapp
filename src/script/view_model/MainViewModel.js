@@ -74,7 +74,7 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
-    this.applock = new AppLockViewModel();
+    this.applock = new AppLockViewModel(repositories.properties);
 
     this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
