@@ -1602,7 +1602,7 @@ class AuthViewModel {
 
   _register_client(autoLogin) {
     return this.cryptography_repository
-      .createCryptobox(this.storageService.db)
+      .createCryptobox(this.service.storage.db || this.service.storage.objectDb, this.service.storage.dbName)
       .then(() => this.client_repository.registerClient(autoLogin ? undefined : this.password()))
       .then(clientObservable => {
         this.event_repository.currentClient = clientObservable;

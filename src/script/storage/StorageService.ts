@@ -17,13 +17,14 @@
  *
  */
 
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 
+import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
 import {StorageKey} from './StorageKey';
@@ -41,12 +42,14 @@ type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void
 type DexieObservable = {_dbSchema?: Object};
 
 export class StorageService {
-  private readonly logger: Logger;
-  private readonly engine: CRUDEngine;
-  public dbName?: string;
-  private userId?: string;
+  public db?: Dexie & DexieObservable;
+  public objectDb?: MemoryStore;
   private readonly dbListeners: DatabaseListener[];
-  private db: Dexie & DexieObservable;
+  private readonly engine: CRUDEngine;
+  private readonly logger: Logger;
+  private readonly isTemporaryAndNonPersistant: boolean;
+  private userId?: string;
+  public dbName?: string;
 
   static get DEXIE_CRUD_EVENTS(): Record<string, string> {
     return {
@@ -57,10 +60,14 @@ export class StorageService {
 
   constructor() {
     this.logger = getLogger('StorageService');
-    this.engine = new IndexedDBEngine();
 
     this.dbName = undefined;
     this.userId = undefined;
+
+    this.isTemporaryAndNonPersistant =
+      loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+
+    this.engine = this.isTemporaryAndNonPersistant ? new MemoryEngine() : new IndexedDBEngine();
 
     this.dbListeners = [];
   }
@@ -83,20 +90,44 @@ export class StorageService {
     this.dbName = `wire@${Config.ENVIRONMENT}@${userId}@${clientType}`;
 
     this.db = new Dexie(this.dbName);
-
     this._upgradeStores(this.db);
 
     try {
-      await this.engine.initWithDb(this.db);
-      await this.db.open();
-      this._initCrudHooks();
-      this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+      if (this.isTemporaryAndNonPersistant) {
+        await this.moveDexieToMemory();
+        this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
+      } else {
+        await this.engine.initWithDb(this.db);
+        await this.db.open();
+        this._initCrudHooks();
+        this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+      }
       return this.dbName;
     } catch (error) {
       const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
       this.logger.error(logMessage, {error});
       throw new z.error.StorageError(z.error.StorageError.TYPE.FAILED_TO_OPEN);
     }
+  }
+
+  private async moveDexieToMemory(): Promise<void> {
+    const objectDb: MemoryStore = {};
+
+    for (const table of this.db.tables as Dexie.Table<Record<string, any>, string>[]) {
+      const keys = await table.toCollection().keys();
+      objectDb[table.name] = {};
+      for (const key of keys.map(key => key.toString())) {
+        objectDb[table.name][key] = await table.get(key);
+      }
+    }
+
+    await this.engine.initWithObject(this.dbName, objectDb);
+    this.objectDb = objectDb;
+
+    await this.db.delete();
+    await this.db.close();
+
+    this.db = undefined;
   }
 
   _initCrudHooks(): void {
@@ -138,7 +169,7 @@ export class StorageService {
     });
   }
 
-  _upgradeStores(db: Dexie): void {
+  private _upgradeStores(db: Dexie): void {
     StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionUpdate = db.version(version).stores(schema);
       if (upgrade) {
@@ -166,11 +197,13 @@ export class StorageService {
    * Clear all stores.
    * @returns Resolves when all stores have been cleared
    */
-  clearStores(): Promise<void[]> {
-    const deleteStorePromises = Object.keys(this.db._dbSchema)
-      // avoid clearing tables needed by third parties (dexie-observable for eg)
-      .filter(table => !table.startsWith('_'))
-      .map(storeName => this.deleteStore(storeName));
+  async clearStores(): Promise<void[]> {
+    const deleteStorePromises = this.isTemporaryAndNonPersistant
+      ? [this.engine.purge()]
+      : Object.keys(this.db._dbSchema)
+          // avoid clearing tables needed by third parties (dexie-observable for eg)
+          .filter(table => !table.startsWith('_'))
+          .map(storeName => this.deleteStore(storeName));
     return Promise.all(deleteStorePromises);
   }
 
@@ -229,7 +262,7 @@ export class StorageService {
 
   /**
    * @param tableNames - Names of tables to get
-   * @returns Matching tables
+   * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
     return tableNames.map(tableName => this.db.table(tableName));
@@ -285,8 +318,10 @@ export class StorageService {
    * @returns No return value
    */
   terminate(reason: string = 'unknown reason'): void {
-    this.logger.info(`Closing database connection with '${this.db.name}' because of '${reason}'.`);
-    this.db.close();
+    this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
+    if (!this.isTemporaryAndNonPersistant) {
+      this.db.close();
+    }
   }
 
   /**
@@ -299,10 +334,15 @@ export class StorageService {
    */
   async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
-      const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
-      const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-      this.logger.info(logMessage, changes);
-      return numberOfUpdates;
+      if (this.isTemporaryAndNonPersistant) {
+        await this.engine.update(storeName, primaryKey, changes);
+        return 1;
+      } else {
+        const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
+        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
+        this.logger.info(logMessage, changes);
+        return numberOfUpdates;
+      }
     } catch (error) {
       this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
       throw error;
