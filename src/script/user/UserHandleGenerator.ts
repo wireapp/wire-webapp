@@ -19,8 +19,8 @@
 
 import getSlug from 'speakingurl';
 
-import {getRandomNumber} from 'Util/NumberUtil';
 import {randomElement} from 'Util/ArrayUtil';
+import {getRandomNumber} from 'Util/NumberUtil';
 
 const MIN_HANDLE_LENGTH = 2;
 const MAX_HANDLE_LENGTH = 21;
@@ -36,10 +36,8 @@ const getRandomWordCombination = () => `${randomElement(RANDOM_WORDS_1)}${random
 
 /**
  * Validates that a character can be used for a handle.
- * @param {string} character - Character candidate
- * @returns {boolean} True, if character can be used for a handle.
  */
-export const validateCharacter = character => {
+export const validateCharacter = (character: string): boolean => {
   const isAlphaNumeric = /[a-z0-9_]/.test(character);
   const isString = typeof character === 'string' && character.length === 1;
   return isAlphaNumeric && isString;
@@ -47,21 +45,16 @@ export const validateCharacter = character => {
 
 /**
  * Appends random digits from 1 to 9 to the end of the string.
- * @param {string} handle - Input
- * @param {number} additionalNumbers - number of digits to append
- * @returns {string} String appended with random digits.
  */
-export const appendRandomDigits = (handle, additionalNumbers) => {
+export const appendRandomDigits = (handle: string, additionalNumbers?: number): string => {
   const randomDigits = Array.from({length: additionalNumbers}, () => getRandomNumber(1, 8));
   return `${handle}${randomDigits.join('')}`;
 };
 
 /**
  * Creates a handle based on the users name.
- * @param {string} name - User name
- * @returns {string} User handle
  */
-export const normalizeName = name =>
+export const normalizeName = (name: string): string =>
   getSlug(name)
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, '')
@@ -69,10 +62,8 @@ export const normalizeName = name =>
 
 /**
  * Validates that an input is a valid handle.
- * @param {string} handle - Character candidate
- * @returns {boolean} True, if handle is valid.
  */
-export const validateHandle = (handle = '') => {
+export const validateHandle = (handle: string = ''): boolean => {
   if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
     return false;
   }
@@ -81,11 +72,8 @@ export const validateHandle = (handle = '') => {
 
 /**
  * Creates variations of the given handle by appending random digits.
- * @param {string} handle - Input
- * @param {number} [numberOfVariations=5] - Number of variants that should be generated
- * @returns {Array<string>} Handle variations
  */
-export const generateHandleVariations = (handle, numberOfVariations = 5) => {
+export const generateHandleVariations = (handle: string, numberOfVariations: number = 5): string[] => {
   return Array.from({length: numberOfVariations}, (element, index) => {
     const value = index + 1;
     return appendRandomDigits(handle.slice(0, MAX_HANDLE_LENGTH - value), value);
@@ -94,10 +82,8 @@ export const generateHandleVariations = (handle, numberOfVariations = 5) => {
 
 /**
  * Create a set of suggestions based on the name.
- * @param {string} name - Name to create suggestions for
- * @returns {Array<string>} Username suggestions
  */
-export const createSuggestions = name => {
+export const createSuggestions = (name: string): string[] => {
   const normalizedName = normalizeName(name);
   const randomName = getRandomWordCombination();
   const suggestions = [];

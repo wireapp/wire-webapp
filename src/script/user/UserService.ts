@@ -17,12 +17,21 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
+import {chunk, flatten, uniquify} from 'Util/ArrayUtil';
+import {User} from '../entity/User';
+import {BackendClient} from '../service/BackendClient';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {uniquify, chunk, flatten} from 'Util/ArrayUtil';
+import {StorageService} from '../storage/StorageService';
 
 export class UserService {
+  private readonly backendClient: BackendClient;
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+  private readonly USER_STORE_NAME: string;
+
+  // tslint:disable-next-line:typedef
   static get URL() {
     return {
       PASSWORD_RESET: '/password-reset',
@@ -30,13 +39,7 @@ export class UserService {
     };
   }
 
-  /**
-   * Construct a new User Service.
-   * @class UserService
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {StorageService} storageService - Service for all storage interactions
-   */
-  constructor(backendClient, storageService) {
+  constructor(backendClient: BackendClient, storageService: StorageService) {
     this.backendClient = backendClient;
     this.logger = getLogger('UserService');
     this.storageService = storageService;
@@ -50,18 +53,18 @@ export class UserService {
 
   /**
    * Loads user states from the local database.
-   * @returns {Promise} Resolves with all the stored user states
+   * @todo There might be more keys which are returned by this function
+   * @returns Resolves with all the stored user states
    */
-  loadUserFromDb() {
+  loadUserFromDb(): Promise<{availability: number; id: string}[]> {
     return this.storageService.getAll(this.USER_STORE_NAME);
   }
 
   /**
    * Saves a user entity in the local database.
-   * @param {User} userEntity - User entity
-   * @returns {Promise} Resolves with the conversation entity
+   * @returns Resolves with the conversation entity
    */
-  saveUserInDb(userEntity) {
+  saveUserInDb(userEntity: User): Promise<User> {
     const userData = userEntity.serialize();
 
     return this.storageService.save(this.USER_STORE_NAME, userEntity.id, userData).then(primaryKey => {
@@ -78,18 +81,15 @@ export class UserService {
    * Check if a username exists.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
-   *
-   * @param {string} username - Username
-   * @returns {Promise} Resolves with backend response.
    */
-  checkUserHandle(username) {
+  checkUserHandle(username: string): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'HEAD',
       url: `${UserService.URL.USERS}/handles/${username}`,
     });
   }
 
-  getUserByHandle(username) {
+  getUserByHandle(username: string): Promise<{user: User}> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/handles/${username}`,
@@ -101,12 +101,8 @@ export class UserService {
    *
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
-   *
-   * @param {array} usernames - List of usernames
-   * @param {number} amount - amount of usernames to return
-   * @returns {Promise} Resolves with backend response.
    */
-  checkUserHandles(usernames, amount = 1) {
+  checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
     return this.backendClient.sendJson({
       data: {
         handles: usernames,
@@ -122,22 +118,20 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
-   *
-   * @param {Array<string>} userIds - ID of users to be fetched
-   * @returns {Promise} Resolves with backend response.
    */
-  getUsers(userIds) {
+  getUsers(userIds: string[]): Promise<User[]> {
     const chunkSize = 50;
     const uniqueUserIds = uniquify(userIds);
     const idChunks = chunk(uniqueUserIds, chunkSize);
     const idLists = idChunks.map(idChunk => idChunk.join(','));
     return Promise.all(
-      idLists.map(ids =>
-        this.backendClient.sendRequest({
-          data: {ids},
-          type: 'GET',
-          url: UserService.URL.USERS,
-        }),
+      idLists.map(
+        ids =>
+          this.backendClient.sendRequest({
+            data: {ids},
+            type: 'GET',
+            url: UserService.URL.USERS,
+          }) as Promise<User[]>,
       ),
     ).then(flatten);
   }
@@ -146,11 +140,8 @@ export class UserService {
    * Get a user by ID.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
-   *
-   * @param {string} userId - User ID
-   * @returns {Promise} Resolves with backend response.
    */
-  getUser(userId) {
+  getUser(userId: string): Promise<User> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${UserService.URL.USERS}/${userId}`,

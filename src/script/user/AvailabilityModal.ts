@@ -18,14 +18,14 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
-import {modals, ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalsViewModel, modals} from '../view_model/ModalsViewModel';
 
 const initialKey = 'hide_initial_modal';
 
-function showModal(storageKey, title, message) {
+function showModal(storageKey: string, title: string, message: string): void {
   const hideModal = loadValue(storageKey);
   if (!hideModal) {
     modals.showModal(
@@ -34,7 +34,7 @@ function showModal(storageKey, title, message) {
         hideSecondary: true,
         preventClose: true,
         primaryAction: {
-          action: dontShowAgain => {
+          action: (dontShowAgain?: boolean) => {
             if (dontShowAgain) {
               storeValue(storageKey, 'true');
             }
@@ -52,7 +52,7 @@ function showModal(storageKey, title, message) {
   }
 }
 
-export function showAvailabilityModal(availability) {
+export function showAvailabilityModal(availability: Availability.Type): void {
   if (availability !== Availability.Type.NONE) {
     storeValue(initialKey, 'true');
   }
@@ -75,7 +75,7 @@ export function showAvailabilityModal(availability) {
   }
 }
 
-export function showInitialModal(availability) {
+export function showInitialModal(availability: Availability.Type): void {
   const hideInitialModal = loadValue(initialKey);
   if (!hideInitialModal && availability !== Availability.Type.NONE) {
     showAvailabilityModal(availability);

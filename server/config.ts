@@ -128,6 +128,7 @@ const config: ServerConfig = {
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
+      DEFAULT_LOGIN_TEMPORARY_DEVICE: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_DEVICE == 'true' ? true : false,
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION == 'false' ? false : true,
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true' ? true : false,
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN == 'false' ? false : true,
