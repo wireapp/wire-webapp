@@ -19,7 +19,6 @@ exports[`"Label" renders 1`] = `
 `;
 
 exports[`"LabelLink" renders 1`] = `
-a.emotion-0,
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -35,16 +34,12 @@ a.emotion-0,
   transition: all 0.24s;
 }
 
-a.emotion-0:hover,
 .emotion-0:hover {
   color: rgb(44,47,50);
 }
 
-a.emotion-0:visited,
 .emotion-0:visited,
-a.emotion-0:link,
 .emotion-0:link,
-a.emotion-0:active,
 .emotion-0:active {
   color: rgb(52,56,59);
 }

@@ -23,5 +23,4 @@ import {Link} from './Link';
 
 describe('"Link"', () => {
   it('renders', () => matchComponent(<Link>Link</Link>));
-  it('renders with component', () => matchComponent(<Link component="h1">Link</Link>));
 });
