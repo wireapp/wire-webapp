@@ -220,7 +220,7 @@ export class UserRepository {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
             const mappingPromises = users.map(user => {
-              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability()));
+              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
             });
 
             return Promise.all(mappingPromises);

@@ -53,9 +53,10 @@ export class UserService {
 
   /**
    * Loads user states from the local database.
+   * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<User[]> {
+  loadUserFromDb(): Promise<{availability: number; id: string}[]> {
     return this.storageService.getAll(this.USER_STORE_NAME);
   }
 
