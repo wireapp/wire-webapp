@@ -144,14 +144,6 @@ export const DemoInputs = () => {
           </Text>
         </Column>
       </Columns>
-      <Columns>
-        <Column>Link with custom component</Column>
-        <Column>
-          <Link component={Button} color={COLOR.GREEN}>
-            CustomLink
-          </Link>
-        </Column>
-      </Columns>
 
       <H2>ErrorMessage</H2>
       <Line />

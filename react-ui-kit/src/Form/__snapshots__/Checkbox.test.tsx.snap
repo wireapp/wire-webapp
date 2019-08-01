@@ -83,7 +83,6 @@ input:focus + .emotion-1::before {
   width: 16px;
 }
 
-a.emotion-1 a,
 .emotion-1 a {
   color: rgb(52,56,59);
   display: inline;
@@ -99,16 +98,12 @@ a.emotion-1 a,
   transition: all 0.24s;
 }
 
-a.emotion-1 a:hover,
 .emotion-1 a:hover {
   color: rgb(44,47,50);
 }
 
-a.emotion-1 a:visited,
 .emotion-1 a:visited,
-a.emotion-1 a:link,
 .emotion-1 a:link,
-a.emotion-1 a:active,
 .emotion-1 a:active {
   color: rgb(52,56,59);
 }
@@ -221,7 +216,6 @@ input:focus + .emotion-1::before {
   width: 16px;
 }
 
-a.emotion-1 a,
 .emotion-1 a {
   color: rgb(52,56,59);
   display: inline;
@@ -237,16 +231,12 @@ a.emotion-1 a,
   transition: all 0.24s;
 }
 
-a.emotion-1 a:hover,
 .emotion-1 a:hover {
   color: rgb(44,47,50);
 }
 
-a.emotion-1 a:visited,
 .emotion-1 a:visited,
-a.emotion-1 a:link,
 .emotion-1 a:link,
-a.emotion-1 a:active,
 .emotion-1 a:active {
   color: rgb(52,56,59);
 }
@@ -359,7 +349,6 @@ input:focus + .emotion-1::before {
   width: 16px;
 }
 
-a.emotion-1 a,
 .emotion-1 a {
   color: rgb(52,56,59);
   display: inline;
@@ -375,16 +364,12 @@ a.emotion-1 a,
   transition: all 0.24s;
 }
 
-a.emotion-1 a:hover,
 .emotion-1 a:hover {
   color: rgb(44,47,50);
 }
 
-a.emotion-1 a:visited,
 .emotion-1 a:visited,
-a.emotion-1 a:link,
 .emotion-1 a:link,
-a.emotion-1 a:active,
 .emotion-1 a:active {
   color: rgb(52,56,59);
 }
