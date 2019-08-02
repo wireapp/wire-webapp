@@ -191,9 +191,9 @@ const Demo = () => {
               forceInitials={true}
               borderColor={'#fb0807'}
               backgroundColor={'#2085C2'}
-              fetchImage={() => {
+              fetchImage={useCallback(() => {
                 console.info('Trying to fetch asset');
-              }}
+              }, [])}
             />
             <Avatar
               size={64}
@@ -209,11 +209,16 @@ const Demo = () => {
             <AvatarGrid
               size={120}
               items={[
-                {base64Image: avatarBase64, color: '#fb0807', name: 'Joe Doe'},
-                {base64Image: avatarBase64, color: '#2085C2', name: 'Bon Jovi'},
-                {base64Image: avatarBase64, color: '#EB7E00', name: 'Mick Jagger'},
-                {base64Image: avatarBase64, color: '#EB7E00', name: 'Freddy Mercury'},
+                {base64Image: imageData, color: '#fb0807', name: 'Joe Doe'},
+                {base64Image: imageData, color: '#2085C2', name: 'Bon Jovi'},
+                {base64Image: imageData, color: '#EB7E00', name: 'Mick Jagger'},
+                {base64Image: imageData, color: '#EB7E00', name: 'Freddy Mercury'},
               ]}
+              fetchImages={useCallback(() => {
+                setTimeout(() => {
+                  setImageData(avatarBase64);
+                }, FETCH_IMAGE_TIMEOUT_MS);
+              }, [])}
             />
             <AvatarGrid
               size={120}
@@ -253,7 +258,26 @@ const Demo = () => {
               base64Image={imageData}
               borderColor={'#fb0807'}
               backgroundColor={'#2085C2'}
-              fetchImage={useCallback(() => setTimeout(() => setImageData(avatarBase64), FETCH_IMAGE_TIMEOUT_MS), [])}
+              fetchImage={useCallback(() => {
+                setImageData(null);
+                setTimeout(() => {
+                  setImageData(avatarBase64);
+                }, FETCH_IMAGE_TIMEOUT_MS);
+              }, [])}
+            />
+            <AvatarGrid
+              size={120}
+              items={[
+                {base64Image: imageData, color: '#fb0807', name: 'Joe Doe'},
+                {base64Image: imageData, color: '#2085C2', name: 'Bon Jovi'},
+                {base64Image: imageData, color: '#EB7E00', name: 'Mick Jagger'},
+                {base64Image: imageData, color: '#EB7E00', name: 'Freddy Mercury'},
+              ]}
+              fetchImages={useCallback(() => {
+                setTimeout(() => {
+                  setImageData(avatarBase64);
+                }, FETCH_IMAGE_TIMEOUT_MS);
+              }, [])}
             />
           </RenderHarness>
         </Container>

@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import Color from 'color';
-import {COLOR} from '../Identity';
+import {COLOR} from '../Identity/colors';
 import {defaultTransition} from '../Identity/motions';
 import {filterProps} from '../util';
 import {TextProps, filterTextProps, textStyle} from './Text';

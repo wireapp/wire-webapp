@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {matchComponent} from '../test/testUtil';
-import {Lead, Paragraph} from './Paragraph';
+import {Lead, Paragraph} from '../Text';
 
 describe('"Paragraph"', () => {
   it('renders', () => matchComponent(<Paragraph>Paragraph</Paragraph>));

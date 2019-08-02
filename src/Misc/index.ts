@@ -17,6 +17,7 @@
  *
  */
 
+export * from './IsInViewport';
 export * from './Loading';
 export * from './Pagination';
 export * from './Pill';
