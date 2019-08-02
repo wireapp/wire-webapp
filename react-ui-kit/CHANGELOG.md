@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.9.3...@wireapp/react-ui-kit@7.10.0) (2019-08-02)
+
+
+### Features
+
+* **react-ui-kit:** Add IsInViewport component ([#2152](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2152)) ([d435779](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/d435779))
+
+
+
+
+
 ## [7.9.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.9.2...@wireapp/react-ui-kit@7.9.3) (2019-08-01)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
