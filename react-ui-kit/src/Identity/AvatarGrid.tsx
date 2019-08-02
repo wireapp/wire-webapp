@@ -21,16 +21,18 @@
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
 import {AvatarProps} from '../Identity/';
+import {IsInViewport} from '../Misc/';
 import {filterProps} from '../util';
 import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';
 import {COLOR} from './colors';
 
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
-  items: (Omit<AvatarProps, 'borderColor' | 'size' | 'borderColor' | 'isAvatarGridItem'>)[];
+  items: (Omit<AvatarProps, 'borderColor' | 'size' | 'borderColor' | 'isAvatarGridItem' | 'fetchImage'>)[];
   size?: number;
   backgroundColor?: string;
   borderColor?: string;
   borderWidth?: number;
+  fetchImages?: () => void;
 }
 
 const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({
@@ -59,7 +61,7 @@ const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = 
 const filteredAvatarGridProps = (props: Props) =>
   filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
 
-export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, ...props}: Props) => {
+export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, fetchImages, ...props}: Props) => {
   const allProps = {borderWidth, size, items, ...props};
   const slicedItems = items.slice(0, 4);
   const missing = 4 - slicedItems.length;
@@ -67,7 +69,12 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
     slicedItems.push(null);
   }
   return (
-    <div css={avatarGridStyle(allProps)} {...filteredAvatarGridProps(allProps)}>
+    <IsInViewport
+      checkViewportOnce
+      onEnterViewport={fetchImages}
+      css={avatarGridStyle(allProps)}
+      {...filteredAvatarGridProps(allProps)}
+    >
       {slicedItems.map(item =>
         item ? (
           <Avatar
@@ -75,7 +82,6 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
             backgroundColor={item.backgroundColor || COLOR.GRAY_DARKEN_80}
             base64Image={item.base64Image}
             color={item.color}
-            fetchImage={item.fetchImage}
             forceInitials={item.forceInitials}
             isAvatarGridItem
             name={item.name}
@@ -92,6 +98,6 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
           />
         ),
       )}
-    </div>
+    </IsInViewport>
   );
 };

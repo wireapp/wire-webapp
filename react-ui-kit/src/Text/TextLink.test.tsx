@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {matchComponent} from '../test/testUtil';
-import {TextLink} from './TextLink';
+import {TextLink} from '../Text';
 
 describe('"TextLink"', () => {
   it('renders', () => matchComponent(<TextLink>TextLink</TextLink>));

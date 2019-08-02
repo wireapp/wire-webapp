@@ -2,11 +2,9 @@
   "compilerOptions": {
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
-    "noEmitOnError": false,
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "outDir": "dist",
     "rootDir": "src",
     "strict": false
