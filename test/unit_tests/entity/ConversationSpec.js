@@ -25,7 +25,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {PingMessage} from 'src/script/entity/message/PingMessage';
-import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {User} from 'src/script/entity/User';
 import {Text} from 'src/script/entity/message/Text';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';

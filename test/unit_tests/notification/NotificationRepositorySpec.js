@@ -29,7 +29,6 @@ import 'src/script/localization/Localizer';
 import {Conversation} from 'src/script/entity/Conversation';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {User} from 'src/script/entity/User';
-import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {Location} from 'src/script/entity/message/Location';

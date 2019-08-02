@@ -38,7 +38,7 @@ describe('CallingRepository', () => {
   const selfUser = new User(genUUID());
   const clientId = genUUID();
 
-  beforeEach(() => {
+  beforeAll(() => {
     return testFactory.exposeCallingActors().then(injectedCallingRepository => {
       callingRepository = injectedCallingRepository;
       return callingRepository.initAvs(selfUser, clientId).then(avsApi => {
@@ -49,6 +49,10 @@ describe('CallingRepository', () => {
   });
 
   afterEach(() => {
+    callingRepository.activeCalls([]);
+  });
+
+  afterAll(() => {
     return wCall && wCall.destroy(wUser);
   });
 

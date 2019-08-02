@@ -225,7 +225,9 @@ export class CallingRepository {
       .then(mediaStream => {
         if (call.state() !== CALL_STATE.NONE) {
           call.selfParticipant.updateMediaStream(mediaStream);
-          call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+          if (camera) {
+            call.selfParticipant.videoState(VIDEO_STATE.STARTED);
+          }
         } else {
           mediaStream.getTracks().forEach(track => track.stop());
         }
@@ -342,11 +344,12 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
-  toggleState(mediaType: MediaType, conversationEntity: any = this.conversationRepository.active_conversation()): void {
+  toggleState(withVideo: boolean): void {
+    const conversationEntity: any = this.conversationRepository.active_conversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      const callType = this.callTypeFromMediaType(mediaType);
+      const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       return isActiveCall
         ? this.leaveCall(conversationEntity.id)
         : this.startCall(conversationEntity.id, isGroupCall, callType) && undefined;
@@ -372,9 +375,6 @@ export class CallingRepository {
         return loadPreviewPromise.then(success => {
           if (success) {
             this.wCall.start(this.wUser, conversationId, callType, conversationType, 0);
-            if (callType === CALL_TYPE.VIDEO) {
-              this.wCall.setVideoSendState(this.wUser, conversationId, VIDEO_STATE.STARTED);
-            }
           } else {
             this.showNoCameraModal();
             this.removeCall(call);
@@ -416,8 +416,6 @@ export class CallingRepository {
         }
         return this.warmupMediaStreams(call, true, isVideoCall).then(() => {
           this.wCall.answer(this.wUser, call.conversationId, callType, 0);
-          const callVideoState = isVideoCall ? VIDEO_STATE.STARTED : VIDEO_STATE.STOPPED;
-          this.wCall.setVideoSendState(this.wUser, call.conversationId, callVideoState);
         });
       })
       .catch(() => {
@@ -440,18 +438,6 @@ export class CallingRepository {
   private readonly setAvsVersion = (version: number) => {
     this.avsVersion = version;
   };
-
-  private callTypeFromMediaType(mediaType: MediaType): CALL_TYPE {
-    const types: Record<MediaType, CALL_TYPE> = {
-      [MediaType.AUDIO]: CALL_TYPE.NORMAL,
-      [MediaType.AUDIO_VIDEO]: CALL_TYPE.VIDEO,
-      [MediaType.SCREEN]: CALL_TYPE.VIDEO,
-      [MediaType.VIDEO]: CALL_TYPE.VIDEO,
-      [MediaType.NONE]: CALL_TYPE.NORMAL,
-    };
-
-    return types[mediaType] || CALL_TYPE.NORMAL;
-  }
 
   private getMediaStream({audio, camera, screen}: MediaStreamQuery, isGroup: boolean): Promise<MediaStream> {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
