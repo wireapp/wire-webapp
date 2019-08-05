@@ -1512,7 +1512,7 @@ class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db))
+      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db || this.storageService.dbObject))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
