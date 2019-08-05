@@ -616,11 +616,11 @@ describe('Markdown for code snippets', () => {
     expect(renderMessage('This is ```code```.')).toEqual('This is <code>code</code>.');
   });
 
-  it('doesn’t render code within a code span', () => {
+  it(`doesn't render code within a code span`, () => {
     expect(renderMessage('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
   });
 
-  it('doesn’t render links within code blocks', () => {
+  it(`doesn't render links within code blocks`, () => {
     const expected =
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>\n  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>\n<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>\n</code></pre>';
 

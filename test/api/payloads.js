@@ -65,7 +65,7 @@ window.entities = {
     to: '7025598b-ffac-4993-8a81-af3f35b7147f',
     from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
     last_update: '2015-01-07T16:08:36.537Z',
-    message: 'Hi Jane Doe,\nLet’s connect.\nJohn Doe',
+    message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
   },
   conversation: {
     creator: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
