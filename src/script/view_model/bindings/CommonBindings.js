@@ -129,7 +129,7 @@ ko.bindingHandlers.ignore_drop_file = {
 };
 
 /**
- * Indicate that the current binding loop should not try to bind this element’s children.
+ * Indicate that the current binding loop should not try to bind this element's children.
  * @see http://www.knockmeout.net/2012/05/quick-tip-skip-binding.html
  */
 ko.bindingHandlers.stopBinding = {
