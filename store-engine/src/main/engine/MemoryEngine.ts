@@ -25,6 +25,7 @@ export type MemoryStore = Record<string, Record<string, any>>;
 export class MemoryEngine implements CRUDEngine {
   public storeName = '';
   private readonly stores: MemoryStore = {};
+  private autoIncrementedPrimaryKey: number = 1;
 
   append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
     this.prepareTable(tableName);
@@ -148,6 +149,9 @@ export class MemoryEngine implements CRUDEngine {
     changes: ChangesType,
   ): Promise<PrimaryKey> {
     this.prepareTable(tableName);
+    if (primaryKey === undefined) {
+      primaryKey = (<unknown>this.autoIncrementedPrimaryKey) as PrimaryKey;
+    }
     return this.update(tableName, primaryKey, changes)
       .catch(error => {
         if (error instanceof RecordNotFoundError) {
@@ -155,7 +159,10 @@ export class MemoryEngine implements CRUDEngine {
         }
         throw error;
       })
-      .then(() => primaryKey);
+      .then(() => {
+        this.autoIncrementedPrimaryKey += 1;
+        return primaryKey;
+      });
   }
 
   private prepareTable(tableName: string): void {
