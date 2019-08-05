@@ -171,37 +171,36 @@ window.TestFactory = class TestFactory {
    * @returns {Promise<EventRepository>} The event repository.
    */
   async exposeEventActors() {
-    return this.exposeCryptographyActors()
-      .then(() => this.exposeUserActors())
-      .then(() => {
-        TestFactory.web_socket_service = new WebSocketService(
-          resolveDependency(graph.BackendClient),
-          TestFactory.storage_service,
-        );
-        TestFactory.event_service = new EventService(TestFactory.storage_service);
-        TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
-        TestFactory.notification_service = new NotificationService(
-          resolveDependency(graph.BackendClient),
-          TestFactory.storage_service,
-        );
-        TestFactory.conversation_service = new ConversationService(
-          resolveDependency(graph.BackendClient),
-          TestFactory.event_service,
-          TestFactory.storage_service,
-        );
+    await this.exposeCryptographyActors();
+    await this.exposeUserActors();
 
-        TestFactory.event_repository = new EventRepository(
-          TestFactory.event_service,
-          TestFactory.notification_service,
-          TestFactory.web_socket_service,
-          TestFactory.cryptography_repository,
-          serverTimeHandler,
-          TestFactory.user_repository,
-        );
-        TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
+    TestFactory.web_socket_service = new WebSocketService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_service,
+    );
+    TestFactory.event_service = new EventService(TestFactory.storage_service);
+    TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
+    TestFactory.notification_service = new NotificationService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_service,
+    );
+    TestFactory.conversation_service = new ConversationService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.event_service,
+      TestFactory.storage_service,
+    );
 
-        return TestFactory.event_repository;
-      });
+    TestFactory.event_repository = new EventRepository(
+      TestFactory.event_service,
+      TestFactory.notification_service,
+      TestFactory.web_socket_service,
+      TestFactory.cryptography_repository,
+      serverTimeHandler,
+      TestFactory.user_repository,
+    );
+    TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
+
+    return TestFactory.event_repository;
   }
 
   /**
