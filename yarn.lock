@@ -1536,10 +1536,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.3.6.tgz#187417ce8e5f7b00e9e547ba31ff62c9a4ff9229"
   integrity sha512-PlbY7CB41nUWL6HDHQb0DkCecYZec9N/DRgKMSADrpCSJeTkVHAsgC4C6euYl+XG/euLYHmKdwa0pZVnvQy6jw==
 
-"@wireapp/commons@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.2.tgz#da52541b78c94a96fc242927c232f99a510b46a2"
-  integrity sha512-xbRTkt4nClPqqXMjthoaEoETy1y0odUs6faTca7RJx/PuA2l0sPZz4tx/dYhOmyiCf1fDLe8BDRV6NRzzXn72Q==
+"@wireapp/commons@2.2.7":
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.7.tgz#e36ff6a92737529d73b1c93ee0bba2619edbc100"
+  integrity sha512-5l4D8Hx1M9xKigJPDnQsywaUv2UTySzmE6Y3RHEH6KckDgPhl3Qe6jybZH4bcl4PljsxK7NDohb7+FLZoy7BqQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/fs-extra" "8.0.0"
@@ -1552,10 +1552,10 @@
     platform "1.3.5"
     url-search-params-polyfill "7.0.0"
 
-"@wireapp/commons@2.2.7":
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.7.tgz#e36ff6a92737529d73b1c93ee0bba2619edbc100"
-  integrity sha512-5l4D8Hx1M9xKigJPDnQsywaUv2UTySzmE6Y3RHEH6KckDgPhl3Qe6jybZH4bcl4PljsxK7NDohb7+FLZoy7BqQ==
+"@wireapp/commons@2.2.8":
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.8.tgz#da7f6a84a95220f740c4aba0671dfd47e125aac4"
+  integrity sha512-PUzwxZZntf7X8W2hTEPYbZUD3DY21/yH/sC4FXVsg1n+hH06s3qi+CI8+p04ZfkfH0WQ7VnVVkEpoUU4FkD75w==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/fs-extra" "8.0.0"
