@@ -81,7 +81,7 @@ const Demo = () => {
         <MenuLink href="#">test1</MenuLink>
         <MenuLink href="#">test2</MenuLink>
         <HeaderSubMenu
-          caption={'Drowdown1'}
+          caption={'Dropdown1'}
           isOpen={showFirstDropdown}
           onMouseLeave={isDesktop ? () => setShowFirstDropdown(false) : undefined}
           onMouseOver={() => {
@@ -101,7 +101,7 @@ const Demo = () => {
           <MenuLink noWrap>{'File sharing & productivity1'}</MenuLink>
         </HeaderSubMenu>
         <HeaderSubMenu
-          caption={'Drowdown2'}
+          caption={'Dropdown2'}
           isOpen={showSecondDropdown}
           onMouseLeave={isDesktop ? () => setShowSecondDropdown(false) : undefined}
           onMouseOver={() => {
