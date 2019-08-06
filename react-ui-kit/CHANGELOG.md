@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.10.1...@wireapp/react-ui-kit@7.11.0) (2019-08-06)
+
+
+### Features
+
+* **react-ui-kit:** Themes ([#2158](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2158)) ([e5f5d69](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e5f5d69))
+
+
+
+
+
 ## [7.10.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.10.0...@wireapp/react-ui-kit@7.10.1) (2019-08-05)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
