@@ -34,6 +34,11 @@ enum APPLOCK_STATES {
   WIPE_PASSWORD = 'applock.wipe-password',
 }
 
+enum APPLOCK_STORAGE {
+  CODE = 'applock_code',
+  SALT = 'applock_salt',
+}
+
 export class AppLockViewModel {
   timeOutId: number;
   timeOut: number;
@@ -101,9 +106,17 @@ export class AppLockViewModel {
     }
   }
 
-  getCode = () => this.localStorage.getItem('applock_code');
-  hashCode = (code: string) => murmurhash3(code, 42).toString(16);
-  setCode = (code: string) => this.localStorage.setItem('applock_code', this.hashCode(code));
+  getCode = () => this.localStorage.getItem(APPLOCK_STORAGE.CODE);
+  hashCode = (code: string) => {
+    const seed = parseInt(this.localStorage.getItem(APPLOCK_STORAGE.SALT), 16);
+    return murmurhash3(code, seed).toString(16);
+  };
+
+  setCode = (code: string) => {
+    const seed = Math.trunc(Math.random() * 1024);
+    this.localStorage.setItem(APPLOCK_STORAGE.SALT, seed.toString(16));
+    this.localStorage.setItem(APPLOCK_STORAGE.CODE, this.hashCode(code));
+  };
 
   onClosed = () => this.state(APPLOCK_STATES.NONE);
 
@@ -153,7 +166,8 @@ export class AppLockViewModel {
     try {
       this.isLoading(true);
       await this.authService.validatePassword(password);
-      this.localStorage.removeItem('applock_code');
+      this.localStorage.removeItem(APPLOCK_STORAGE.CODE);
+      this.localStorage.removeItem(APPLOCK_STORAGE.SALT);
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       this.isVisible(false);
     } catch ({code, message}) {
