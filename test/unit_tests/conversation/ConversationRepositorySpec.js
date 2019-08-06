@@ -256,7 +256,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('updateAllClients', () => {
-    xit('updates the conversation legal hold status on client changes of group participants', async () => {
+    it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
       const conversationPartner = UserGenerator.getRandomUser();
       TestFactory.user_repository.users.push(conversationPartner);
 
@@ -316,14 +316,17 @@ describe('ConversationRepository', () => {
       const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(TestFactory.user_repository.self());
-
+      // Legal hold status is "on" because our conversation partner has a legal hold client
       expect(conversationEntity.hasLegalHold()).toBe(true);
 
+      await TestFactory.conversation_repository.save_conversation(conversationEntity);
+
       const missingClientsError = new Error();
-      missingClientsError.deleted = {};
-      missingClientsError.missing = {
-        [conversationPartner.id]: ['1e66e04948938c2c', 'a9c8c385737b14fe'],
+      missingClientsError.deleted = {
+        // Legal hold client got removed
+        [conversationPartner.id]: ['53761bec3f10a6d9'],
       };
+      missingClientsError.missing = {};
       missingClientsError.redundant = {};
       missingClientsError.time = new Date().toISOString();
 
@@ -331,13 +334,11 @@ describe('ConversationRepository', () => {
         Promise.reject(missingClientsError),
       );
 
-      /**
-       * TODO:
-       * 0. Group conversation is on legal hold
-       * 1. Call "updateAllClients"
-       * 2. User A should discover (by sending a message) that there is no more legal hold
-       * 3. Legal hold flag on the message of User A should then change to "off" (that's the test case)
-       */
+      spyOn(TestFactory.client_repository, 'removeClient').and.returnValue(Promise.resolve());
+
+      // Start client discovery of conversation participants
+      await TestFactory.conversation_repository.updateAllClients(conversationEntity);
+
       expect(conversationEntity.hasLegalHold()).toBe(false);
     });
   });

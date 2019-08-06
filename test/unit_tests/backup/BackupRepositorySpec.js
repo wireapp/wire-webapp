@@ -149,7 +149,7 @@ describe('BackupRepository', () => {
   });
 
   describe('importHistory', () => {
-    it('fails if metadata doesn´t match', () => {
+    it(`fails if metadata doesn't match`, () => {
       const tests = [
         {
           expectedError: z.backup.DifferentAccountError,
