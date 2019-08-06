@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Lead, Paragraph} from '../Text';
 
 describe('"Paragraph"', () => {
   it('renders', () => matchComponent(<Paragraph>Paragraph</Paragraph>));
+  it('renders (dark theme)', () => matchComponent(<Paragraph>Paragraph</Paragraph>, THEME_ID.DARK));
 });
 
 describe('"Lead"', () => {
   it('renders', () => matchComponent(<Lead>Lead</Lead>));
+  it('renders (dark theme)', () => matchComponent(<Lead>Lead</Lead>, THEME_ID.DARK));
 });

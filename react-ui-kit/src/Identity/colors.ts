@@ -87,4 +87,5 @@ export const COLOR: any = {
   WHITE: BASE_COLOR.WHITE,
   opaque,
   shade,
+  tint,
 };

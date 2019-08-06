@@ -39,9 +39,9 @@ const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrap
 
 const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
-    css={{
+    css={theme => ({
       animation: `${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL}`,
-      backgroundColor: '#fff',
+      backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
       boxShadow: '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
       display: 'flex',
       flexDirection: 'column',
@@ -55,7 +55,7 @@ const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => (
       [media[QueryKeys.TABLET_DOWN]]: {
         width: '100%',
       },
-    }}
+    })}
     {...props}
   />
 );
@@ -106,15 +106,15 @@ export type MenuItemProps<T = HTMLLIElement> = React.HTMLProps<T>;
 
 export const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
   <li
-    css={{
+    css={theme => ({
       alignItems: 'center',
-      color: COLOR.TEXT,
+      color: theme.general.color,
       cursor: 'pointer',
       display: 'flex',
       height: '56px',
       listStyleType: 'none',
       maxWidth: '100%',
-    }}
+    })}
     {...props}
   >
     {children}

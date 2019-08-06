@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React, {useEffect, useState} from 'react';
+import {Theme} from '../Layout';
 import {noop} from '../util';
 import {InputProps, inputStyle} from './Input';
 
@@ -35,8 +36,11 @@ const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
 
 type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
 
-const digitInputStyle: <T>(props: DigitInputProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...inputStyle(props),
+const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  props,
+) => ({
+  ...inputStyle(theme, props),
   '& + &': {
     marginLeft: '19px',
   },
@@ -50,7 +54,7 @@ const digitInputStyle: <T>(props: DigitInputProps<T>) => ObjectInterpolation<und
 const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   DigitInputProps<HTMLInputElement>
->((props, ref) => <input ref={ref} css={digitInputStyle(props)} {...props} />);
+>((props, ref) => <input ref={ref} css={theme => digitInputStyle(theme, props)} {...props} />);
 
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;

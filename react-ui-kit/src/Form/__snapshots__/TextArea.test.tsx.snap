@@ -1,6 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"TextArea" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   background: #fff;
   border: none;
@@ -11,6 +17,7 @@ exports[`"TextArea" renders 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -40,16 +47,26 @@ exports[`"TextArea" renders 1`] = `
   box-shadow: none;
 }
 
-<textarea
-  className="textarea emotion-0"
+<div
+  className="emotion-1"
 >
-  TextArea
-</textarea>
+  <textarea
+    className="textarea emotion-0"
+  >
+    TextArea
+  </textarea>
+</div>
 `;
 
 exports[`"TextArea" renders as disabled 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
-  background: rgb(240,240,240);
+  background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: none;
@@ -58,6 +75,7 @@ exports[`"TextArea" renders as disabled 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 0.56;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -87,15 +105,25 @@ exports[`"TextArea" renders as disabled 1`] = `
   box-shadow: none;
 }
 
-<textarea
-  className="textarea emotion-0"
-  disabled={true}
+<div
+  className="emotion-1"
 >
-  TextArea
-</textarea>
+  <textarea
+    className="textarea emotion-0"
+    disabled={true}
+  >
+    TextArea
+  </textarea>
+</div>
 `;
 
 exports[`"TextArea" renders as invalid 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   background: #fff;
   border: none;
@@ -106,6 +134,7 @@ exports[`"TextArea" renders as invalid 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -131,14 +160,24 @@ exports[`"TextArea" renders as invalid 1`] = `
   text-transform: uppercase;
 }
 
-<textarea
-  className="textarea emotion-0"
+<div
+  className="emotion-1"
 >
-  TextArea
-</textarea>
+  <textarea
+    className="textarea emotion-0"
+  >
+    TextArea
+  </textarea>
+</div>
 `;
 
 exports[`"TextArea" renders with placeholderTextTransform 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   background: #fff;
   border: none;
@@ -149,6 +188,7 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 1;
   outline: none;
   padding: 16px 16px;
   resize: none;
@@ -178,10 +218,14 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   box-shadow: none;
 }
 
-<textarea
-  className="textarea emotion-0"
-  placeholder="TextArea"
+<div
+  className="emotion-1"
 >
-  TextArea
-</textarea>
+  <textarea
+    className="textarea emotion-0"
+    placeholder="TextArea"
+  >
+    TextArea
+  </textarea>
+</div>
 `;

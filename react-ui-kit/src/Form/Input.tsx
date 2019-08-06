@@ -22,6 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {TextTransformProperty} from 'csstype';
 import React from 'react';
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {TextProps} from '../Text';
 import {filterProps} from '../util';
 
@@ -30,13 +31,12 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   placeholderTextTransform?: TextTransformProperty;
 }
 
-export const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefined> = ({
-  markInvalid = false,
-  placeholderTextTransform = 'uppercase',
-  disabled = false,
-}) => {
+export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {markInvalid = false, placeholderTextTransform = 'uppercase', disabled = false},
+) => {
   const placeholderStyle = {
-    color: COLOR.GRAY_DARKEN_24,
+    color: theme.Input.placeholderColor,
     fontSize: '11px',
     textTransform: placeholderTextTransform,
   };
@@ -57,16 +57,17 @@ export const inputStyle: <T>(props: InputProps<T>) => ObjectInterpolation<undefi
           boxShadow: 'none',
         }
       : {},
-    background: disabled ? COLOR.shade(COLOR.WHITE, 0.06) : COLOR.WHITE,
+    background: theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
     boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
     caretColor: COLOR.BLUE,
-    color: COLOR.TEXT,
+    color: theme.general.color,
     fontWeight: 300,
     height: '56px',
     lineHeight: '24px',
     margin: '0 0 16px',
+    opacity: disabled ? 0.56 : 1,
     outline: 'none',
     padding: '0 16px',
     width: '100%',
@@ -80,5 +81,11 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   InputProps<HTMLInputElement>
 >(({type, ...props}, ref) => (
-  <input className={INPUT_CLASSNAME} css={inputStyle(props)} ref={ref} type={type} {...filterInputProps(props)} />
+  <input
+    className={INPUT_CLASSNAME}
+    css={theme => inputStyle(theme, props)}
+    ref={ref}
+    type={type}
+    {...filterInputProps(props)}
+  />
 ));

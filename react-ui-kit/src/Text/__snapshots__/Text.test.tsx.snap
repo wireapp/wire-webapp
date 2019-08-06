@@ -1,6 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`"Text" renders (dark theme) 1`] = `
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-0 {
+  color: #fff;
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-1"
+>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
+`;
+
 exports[`"Text" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -11,14 +45,24 @@ exports[`"Text" renders 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders as block 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: block;
@@ -29,14 +73,24 @@ exports[`"Text" renders as block 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders bold 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -47,14 +101,24 @@ exports[`"Text" renders bold 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders centered 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -65,14 +129,24 @@ exports[`"Text" renders centered 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders light 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -83,14 +157,24 @@ exports[`"Text" renders light 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders muted 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -101,14 +185,24 @@ exports[`"Text" renders muted 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders no wrap 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -120,14 +214,24 @@ exports[`"Text" renders no wrap 1`] = `
   white-space: nowrap;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders with color 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: #2391d3;
   display: inline;
@@ -138,14 +242,24 @@ exports[`"Text" renders with color 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders with size 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -156,14 +270,24 @@ exports[`"Text" renders with size 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders with textTransform 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -174,14 +298,24 @@ exports[`"Text" renders with textTransform 1`] = `
   text-transform: uppercase;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Text
-</span>
+  <span
+    className="emotion-0"
+  >
+    Text
+  </span>
+</div>
 `;
 
 exports[`"Text" renders with truncation 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -192,14 +326,24 @@ exports[`"Text" renders with truncation 1`] = `
   text-transform: uppercase;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-</span>
+  <span
+    className="emotion-0"
+  >
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  </span>
+</div>
 `;
 
 exports[`Utility components renders Bold 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -210,14 +354,24 @@ exports[`Utility components renders Bold 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Bold
-</span>
+  <span
+    className="emotion-0"
+  >
+    Bold
+  </span>
+</div>
 `;
 
 exports[`Utility components renders Large 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -228,14 +382,24 @@ exports[`Utility components renders Large 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Large
-</span>
+  <span
+    className="emotion-0"
+  >
+    Large
+  </span>
+</div>
 `;
 
 exports[`Utility components renders Muted 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -246,14 +410,24 @@ exports[`Utility components renders Muted 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Muted
-</span>
+  <span
+    className="emotion-0"
+  >
+    Muted
+  </span>
+</div>
 `;
 
 exports[`Utility components renders Small 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -264,14 +438,24 @@ exports[`Utility components renders Small 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Small
-</span>
+  <span
+    className="emotion-0"
+  >
+    Small
+  </span>
+</div>
 `;
 
 exports[`Utility components renders Uppercase 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -282,9 +466,13 @@ exports[`Utility components renders Uppercase 1`] = `
   text-transform: uppercase;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Uppercase
-</span>
+  <span
+    className="emotion-0"
+  >
+    Uppercase
+  </span>
+</div>
 `;

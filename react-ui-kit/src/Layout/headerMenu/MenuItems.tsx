@@ -19,17 +19,20 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
-import {COLOR} from '../../Identity';
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
+import {Theme} from '../Theme';
 
 export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-export const menuItemsStyle: <T>(props: MenuItemsProps<T>) => ObjectInterpolation<undefined> = props => ({
+export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  props,
+) => ({
   [media[QueryKeys.TABLET_DOWN]]: {
-    backgroundColor: COLOR.WHITE,
+    backgroundColor: theme.general.backgroundColor,
     bottom: 0,
     display: 'flex',
     left: 0,
@@ -45,4 +48,6 @@ export const menuItemsStyle: <T>(props: MenuItemsProps<T>) => ObjectInterpolatio
 
 const filterMenuItemProps = (props: MenuItemsProps) => filterProps(props, ['open']);
 
-export const MenuItems = (props: MenuItemsProps) => <div css={menuItemsStyle(props)} {...filterMenuItemProps(props)} />;
+export const MenuItems = (props: MenuItemsProps) => (
+  <div css={theme => menuItemsStyle(theme, props)} {...filterMenuItemProps(props)} />
+);

@@ -19,10 +19,12 @@
 
 import React from 'react';
 import {COLOR} from '../Identity';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Line} from './Line';
 
 describe('"Line"', () => {
   it('renders', () => matchComponent(<Line>Line</Line>));
+  it('renders (dark theme)', () => matchComponent(<Line>Line</Line>, THEME_ID.DARK));
   it('renders with color', () => matchComponent(<Line color={COLOR.RED}>Line</Line>));
 });

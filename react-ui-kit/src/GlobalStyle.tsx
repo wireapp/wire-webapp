@@ -20,15 +20,16 @@
 /** @jsx jsx */
 import {Global, ObjectInterpolation, css, jsx} from '@emotion/core';
 import emotionNormalize from 'emotion-normalize';
-import {COLOR} from './Identity/colors';
+import {withTheme} from 'emotion-theming';
+import {Theme} from './Layout';
 import {textLinkStyle} from './Text/TextLink';
 
-const globalStyles: () => ObjectInterpolation<undefined> = () => ({
+const globalStyles: (theme: Theme) => ObjectInterpolation<undefined> = theme => ({
   '*': {
     boxSizing: 'border-box',
   },
   a: {
-    ...textLinkStyle({}),
+    ...textLinkStyle(theme, {}),
   },
   'b, strong': {
     fontWeight: 600,
@@ -36,7 +37,7 @@ const globalStyles: () => ObjectInterpolation<undefined> = () => ({
   body: {
     MozOsxFontSmoothing: 'grayscale',
     WebkitFontSmoothing: 'antialiased',
-    color: COLOR.TEXT,
+    color: theme.general.color,
     display: 'flex',
     flexDirection: 'column',
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
@@ -49,11 +50,11 @@ const globalStyles: () => ObjectInterpolation<undefined> = () => ({
   },
 });
 
-const globalStyle = css`
+const globalStyle = (theme: Theme) => css`
   ${emotionNormalize}
-  ${globalStyles()}
+  ${globalStyles(theme)}
 `;
 
-export const GlobalStyle = () => {
-  return <Global styles={globalStyle} />;
-};
+export const GlobalStyle = withTheme(({theme}) => {
+  return <Global styles={globalStyle(theme)} />;
+});

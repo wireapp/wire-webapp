@@ -19,31 +19,32 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
+import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
 export type ParagraphProps<T = HTMLParagraphElement> = TextProps<T>;
 
-export const paragraphStyle: <T>(props: ParagraphProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  ...props
-}) => ({
-  ...textStyle({block, ...props}),
+export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, ...props},
+) => ({
+  ...textStyle(theme, {block, ...props}),
   marginBottom: '16px',
   marginTop: 0,
 });
 
-export const Paragraph = (props: ParagraphProps) => <p css={paragraphStyle(props)} {...filterTextProps(props)} />;
+export const Paragraph = (props: ParagraphProps) => (
+  <p css={theme => paragraphStyle(theme, props)} {...filterTextProps(props)} />
+);
 
 export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
 
-export const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  center = true,
-  fontSize = '24px',
-  ...props
-}) => ({
-  ...textStyle({block, center, fontSize, ...props}),
+export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, center = true, fontSize = '24px', ...props},
+) => ({
+  ...textStyle(theme, {block, center, fontSize, ...props}),
   marginBottom: '56px',
   marginTop: 0,
   [media[QueryKeys.MOBILE]]: {
@@ -51,4 +52,4 @@ export const leadStyle: <T>(props: LeadProps<T>) => ObjectInterpolation<undefine
   },
 });
 
-export const Lead = (props: LeadProps) => <p css={leadStyle(props)} {...filterTextProps(props)} />;
+export const Lead = (props: LeadProps) => <p css={theme => leadStyle(theme, props)} {...filterTextProps(props)} />;

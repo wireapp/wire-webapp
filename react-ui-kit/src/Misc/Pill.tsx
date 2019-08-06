@@ -22,6 +22,7 @@ import {ObjectInterpolation, jsx, keyframes} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {DURATION, EASE} from '../Identity/motions';
+import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
 export interface PillProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
@@ -35,14 +36,14 @@ export enum PILL_TYPE {
   warning = 'WARNING',
 }
 
-export const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefined> = ({
-  active = false,
-  type = null,
-}) => {
+export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {active = false, type = null},
+) => {
   const backgroundColors = {
-    [PILL_TYPE.error]: COLOR.RED_OPAQUE_16,
-    [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_16,
-    [PILL_TYPE.warning]: COLOR.YELLOW_OPAQUE_16,
+    [PILL_TYPE.error]: COLOR.RED_OPAQUE_32,
+    [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_32,
+    [PILL_TYPE.warning]: COLOR.YELLOW_OPAQUE_32,
   };
   const backgroundColor = active ? '#eee' : type ? backgroundColors[type] : 'transparent';
   const pillAnimation = keyframes`
@@ -63,6 +64,7 @@ export const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefine
     animation: `${pillAnimation} ${DURATION.DEFAULT}ms ${EASE.QUART}`,
     backgroundColor,
     borderRadius: '160px',
+    color: active ? COLOR.TEXT : theme.general.color,
     cursor: active ? 'default' : undefined,
     display: 'inline-block',
     fontSize: '12px',
@@ -78,5 +80,10 @@ export const pillStyle: <T>(props: PillProps<T>) => ObjectInterpolation<undefine
 export const filterPillProps = (props: PillProps) => filterProps(props, ['active']);
 
 export const Pill = (props: PillProps) => (
-  <span css={pillStyle(props)} data-uie-name="element-pill" data-uie-status={props.type} {...filterPillProps(props)} />
+  <span
+    css={theme => pillStyle(theme, props)}
+    data-uie-name="element-pill"
+    data-uie-status={props.type}
+    {...filterPillProps(props)}
+  />
 );

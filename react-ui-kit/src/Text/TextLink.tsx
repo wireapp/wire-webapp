@@ -20,20 +20,18 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity/colors';
+import {Theme} from '../Layout';
 import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
-export const textLinkStyle: <T>(props: TextLinkProps<T>) => ObjectInterpolation<undefined> = ({
-  color = COLOR.BLUE,
-  fontSize = '16px',
-  bold = false,
-  textTransform = 'none',
-  ...props
-}) => ({
-  ...linkStyle({color, fontSize, bold, textTransform, ...props}),
+export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {color = COLOR.BLUE, fontSize = '16px', bold = false, textTransform = 'none', ...props},
+) => ({
+  ...linkStyle(theme, {color, fontSize, bold, textTransform, ...props}),
 });
 
 export const TextLink = (props: TextLinkProps<HTMLAnchorElement>) => (
-  <a css={textLinkStyle(props)} {...filterLinkProps(props)} />
+  <a css={theme => textLinkStyle(theme, props)} {...filterLinkProps(props)} />
 );

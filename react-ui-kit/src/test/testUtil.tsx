@@ -17,7 +17,9 @@
  *
  */
 
+import React from 'react';
 import renderer from 'react-test-renderer';
+import {StyledApp, THEME_ID} from '../Layout';
 
-export const matchComponent = (component: JSX.Element) =>
-  (expect as any)(renderer.create(component).toJSON()).toMatchSnapshot();
+export const matchComponent = (component: JSX.Element, themeId = THEME_ID.LIGHT) =>
+  (expect as any)(renderer.create(<StyledApp themeId={themeId}>{component}</StyledApp>).toJSON()).toMatchSnapshot();

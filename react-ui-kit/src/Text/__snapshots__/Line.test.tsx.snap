@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`"Line" renders 1`] = `
+exports[`"Line" renders (dark theme) 1`] = `
 .emotion-0 {
   border: none;
   border-bottom: 1px solid rgb(236,240,242);
@@ -8,14 +8,55 @@ exports[`"Line" renders 1`] = `
   margin-top: 16px;
 }
 
-<hr
-  className="emotion-0"
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+<div
+  className="emotion-1"
 >
-  Line
-</hr>
+  <hr
+    className="emotion-0"
+  >
+    Line
+  </hr>
+</div>
+`;
+
+exports[`"Line" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-0 {
+  border: none;
+  border-bottom: 1px solid rgb(236,240,242);
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+<div
+  className="emotion-1"
+>
+  <hr
+    className="emotion-0"
+  >
+    Line
+  </hr>
+</div>
 `;
 
 exports[`"Line" renders with color 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   border: none;
   border-bottom: 1px solid #fb0807;
@@ -23,10 +64,14 @@ exports[`"Line" renders with color 1`] = `
   margin-top: 16px;
 }
 
-<hr
-  className="emotion-0"
-  color="#fb0807"
+<div
+  className="emotion-1"
 >
-  Line
-</hr>
+  <hr
+    className="emotion-0"
+    color="#fb0807"
+  >
+    Line
+  </hr>
+</div>
 `;

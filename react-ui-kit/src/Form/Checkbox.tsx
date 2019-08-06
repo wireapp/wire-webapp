@@ -37,7 +37,7 @@ const StyledLabel = (props: StyledLabelProps) => {
     '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
   return (
     <label
-      css={{
+      css={theme => ({
         [`${INPUT_CLASSNAME}:checked + &::before`]: {
           background: `#000 url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
         },
@@ -45,7 +45,7 @@ const StyledLabel = (props: StyledLabelProps) => {
           borderColor: COLOR.BLUE,
         },
         '&::before': {
-          border: props.markInvalid ? `2px solid ${COLOR.RED}` : '2px solid rgba(0, 0, 0, 0.4)',
+          border: props.markInvalid ? `2px solid ${COLOR.RED}` : `2px solid ${theme.general.color}`,
           borderRadius: '4px',
           boxSizing: 'border-box',
           content: '""',
@@ -56,11 +56,11 @@ const StyledLabel = (props: StyledLabelProps) => {
           width: '16px',
         },
         a: {
-          ...linkStyle({}),
+          ...linkStyle(theme, {}),
         },
         display: 'flex',
         opacity: props.disabled ? 0.56 : 1,
-      }}
+      })}
       {...filterStyledLabelProps(props)}
     />
   );
@@ -113,8 +113,8 @@ export const CheckboxLabel = ({
   ...props
 }: CheckboxLabelProps) => (
   <Text
-    css={{
-      ...textStyle({
+    css={theme => ({
+      ...textStyle(theme, {
         bold,
         color,
         fontSize,
@@ -125,7 +125,7 @@ export const CheckboxLabel = ({
         color: COLOR.LINK,
         textDecoration: 'none',
       },
-    }}
+    })}
     {...props}
   />
 );

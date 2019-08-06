@@ -18,9 +18,9 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
-import {COLOR} from '../Identity/colors';
+import {Theme} from '../Layout';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
   realWidth: number;
@@ -35,16 +35,22 @@ export interface SVGIconProps<T = SVGSVGElement> extends React.SVGProps<T> {
   shadow?: boolean;
 }
 
+const svgIconStyle: <T>(theme: Theme, props: SVGIconProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {color = theme.general.color},
+) => ({
+  fill: color,
+  overflow: 'visible',
+});
+
 export const SVGIcon = ({
   realWidth,
   realHeight,
   scale = 1,
   width = null,
   height = null,
-  color = COLOR.ICON,
   shadow,
   children,
-  style,
   ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
@@ -58,8 +64,7 @@ export const SVGIcon = ({
   const shadowId = shadow && Math.random().toString();
   return (
     <svg
-      style={{...style, overflow: 'visible'}}
-      fill={color}
+      css={theme => svgIconStyle(theme, props)}
       viewBox={`0 0 ${realWidth} ${realHeight}`}
       width={newWidth}
       height={newHeight}

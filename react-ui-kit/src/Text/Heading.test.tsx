@@ -18,11 +18,13 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Heading} from './Heading';
 
 describe('"Heading"', () => {
   it('renders H1', () => matchComponent(<Heading>H1</Heading>));
+  it('renders H! (dark theme)', () => matchComponent(<Heading>H1</Heading>, THEME_ID.DARK));
   it('renders H1', () => matchComponent(<Heading level="1">H1</Heading>));
   it('renders H2', () => matchComponent(<Heading level="2">H2</Heading>));
   it('renders H3', () => matchComponent(<Heading level="3">H3</Heading>));

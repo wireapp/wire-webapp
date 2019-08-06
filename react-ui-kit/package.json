@@ -5,6 +5,7 @@
     "bazinga64": "5.5.10",
     "color": "3.1.2",
     "emotion-normalize": "10.1.0",
+    "emotion-theming": "10.0.14",
     "react-transition-group": "4.2.2"
   },
   "devDependencies": {

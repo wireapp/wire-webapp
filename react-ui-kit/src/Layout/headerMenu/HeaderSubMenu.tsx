@@ -22,15 +22,17 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR, Opacity, Slide, YAxisMovement} from '../../Identity';
 import {DURATION} from '../../Identity/motions';
 import {QUERY} from '../../mediaQueries';
+import {Theme} from '../Theme';
 import {MenuSubLink} from './MenuSubLink';
 
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
 const desktopStyledHeaderSubMenuStyle: (
+  theme: Theme,
   props: DesktopStyledHeaderSubMenuProps,
-) => ObjectInterpolation<undefined> = props => ({
+) => ObjectInterpolation<undefined> = (theme, props) => ({
   alignItems: 'left',
-  backgroundColor: 'white',
+  backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
   borderRadius: '8px',
   boxShadow: '0 8px 24px 0 rgba(0, 0, 0, 0.16)',
   display: 'flex',
@@ -40,7 +42,7 @@ const desktopStyledHeaderSubMenuStyle: (
   padding: '8px 8px',
   span: {
     '&:hover': {
-      backgroundColor: COLOR.GRAY_LIGHTEN_72,
+      backgroundColor: theme.general.backgroundColor,
       borderRadius: '4px',
     },
     alignItems: 'center',
@@ -56,7 +58,11 @@ const desktopStyledHeaderSubMenuStyle: (
 export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
 export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
-  <div className={DESKTOP_HEADER_SUB_MENU_CLASSNAME} css={desktopStyledHeaderSubMenuStyle(props)} {...props} />
+  <div
+    className={DESKTOP_HEADER_SUB_MENU_CLASSNAME}
+    css={theme => desktopStyledHeaderSubMenuStyle(theme, props)}
+    {...props}
+  />
 );
 
 export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends React.HTMLProps<T> {

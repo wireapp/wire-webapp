@@ -1,6 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Select" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(52%2C%2056%2C%2059)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
   border: none;
@@ -12,6 +18,7 @@ exports[`"Select" renders 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 1;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -54,21 +61,31 @@ exports[`"Select" renders 1`] = `
   color: #bac8d1;
 }
 
-<select
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  <option>
-    a
-  </option>
-  <option>
-    b
-  </option>
-</select>
+  <select
+    className="emotion-0"
+  >
+    <option>
+      a
+    </option>
+    <option>
+      b
+    </option>
+  </select>
+</div>
 `;
 
 exports[`"Select" renders as disabled 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
-  background: rgb(240,240,240);
+  background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: none;
@@ -78,6 +95,7 @@ exports[`"Select" renders as disabled 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 0.56;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -120,20 +138,30 @@ exports[`"Select" renders as disabled 1`] = `
   color: #bac8d1;
 }
 
-<select
-  className="emotion-0"
-  disabled={true}
+<div
+  className="emotion-1"
 >
-  <option>
-    a
-  </option>
-  <option>
-    b
-  </option>
-</select>
+  <select
+    className="emotion-0"
+    disabled={true}
+  >
+    <option>
+      a
+    </option>
+    <option>
+      b
+    </option>
+  </select>
+</div>
 `;
 
 exports[`"Select" renders as invalid 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(52%2C%2056%2C%2059)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
   border: none;
@@ -145,6 +173,7 @@ exports[`"Select" renders as invalid 1`] = `
   height: 56px;
   line-height: 24px;
   margin: 0 0 16px;
+  opacity: 1;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -187,14 +216,18 @@ exports[`"Select" renders as invalid 1`] = `
   color: #bac8d1;
 }
 
-<select
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  <option>
-    a
-  </option>
-  <option>
-    b
-  </option>
-</select>
+  <select
+    className="emotion-0"
+  >
+    <option>
+      a
+    </option>
+    <option>
+      b
+    </option>
+  </select>
+</div>
 `;
