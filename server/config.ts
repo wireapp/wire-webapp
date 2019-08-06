@@ -127,6 +127,7 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
+      APPLOCK_TIMEOUT: process.env.FEATURE_APPLOCK_TIMEOUT ? Number(process.env.FEATURE_APPLOCK_TIMEOUT) : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT == 'false' ? false : true,
       DEFAULT_LOGIN_TEMPORARY_DEVICE: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_DEVICE == 'true' ? true : false,
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION == 'false' ? false : true,

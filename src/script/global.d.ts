@@ -41,6 +41,7 @@ declare global {
         BRAND_NAME: string;
         ENVIRONMENT: string;
         FEATURE: {
+          APPLOCK_TIMEOUT: number;
           CHECK_CONSENT: boolean;
           DEFAULT_LOGIN_TEMPORARY_DEVICE: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;

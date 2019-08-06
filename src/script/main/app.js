@@ -96,6 +96,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
 
 class App {
   static get CONFIG() {
@@ -386,6 +387,8 @@ class App {
       .then(() => {
         telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
+        this.applock = new AppLockViewModel(this.repository.auth.authService, this.logout);
+
         loadingView.removeFromView();
         telemetry.report();
         amplify.publish(WebAppEvents.LIFECYCLE.LOADED);

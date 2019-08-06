@@ -1,5 +1,5 @@
 <div id="applock">
-  <modal params="isShown: isVisible()" data-uie-name="applock-modal">
+  <modal params="isShown: isVisible(), onClosed: onClosed, showLoading: isLoading()" data-uie-name="applock-modal">
     <div class="modal__header">
       <div class="modal__header__title" data-bind="text: headerText()" data-uie-name="applock-modal-header"></div>
     </div>
@@ -7,14 +7,23 @@
       <!-- ko if: isSetupScreen() -->
       <form data-bind="submit: onSetCode">
         <div class="modal__text">You will use it when your app gets locked.</div>
-        <input class="modal__input" type="password" />
-        <input class="modal__input" type="password" />
-        <div class="modal-option-text text-background">
+        <input
+          class="modal__input"
+          type="password"
+          data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}"
+        />
+        <input
+          class="modal__input modal__input--validate"
+          type="password"
+          data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}"
+        />
+        <div class="modal__info text-background">
           Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character:
         </div>
         <div class="modal__buttons">
           <button
             type="submit"
+            data-bind="enable: isSetupPasswordBValid"
             class="modal__button modal__button--primary modal__button--full"
             data-uie-name="do-action"
           >
@@ -24,21 +33,71 @@
       </form>
       <!-- /ko -->
       <!-- ko if: isLockScreen() -->
-      <div class="modal__text">Please enter your Application lock password to Unlock the application</div>
-      <input class="modal__input" type="password" />
-      <button
-      type="submit"
-      class="modal__button modal__button--primary modal__button--full"
-      data-uie-name="do-action"
-    >
-      Unlock
-    </button>
+      <form data-bind="submit: onUnlock">
+        <div class="modal__text">Please enter your Application lock password to Unlock the application</div>
+        <input class="modal__input" type="password" data-bind="event: {'keydown': clearUnlockError}" />
+        <div style="display: flex">
+          <div style="flex-grow: 1" class="modal__input__error " data-bind="text: unlockError()"></div>
+          <div class="modal__cta modal__cta--input" data-bind="click: onClickForgot">Forgot lock password?</div>
+        </div>
+        <div class="modal__buttons">
+          <button
+            type="submit"
+            class="modal__button modal__button--primary modal__button--full"
+            data-uie-name="do-action"
+          >
+            Unlock
+          </button>
+        </div>
+      </form>
       <!-- /ko -->
       <!-- ko if: isForgotScreen() -->
+      <div class="modal__text">
+        If you forgot your passphrase there is no recovery. The only thing you can do is to wipe the database.
+      </div>
+      <div class="modal__cta" data-bind="click: onClickWipe">Wipe the database?</div>
+      <div class="modal__buttons">
+        <button
+          data-bind="click: onGoBack"
+          class="modal__button modal__button--secondary modal__button--full"
+          data-uie-name="do-go-back"
+        >
+          Go Back
+        </button>
+      </div>
+
       <!-- /ko -->
       <!-- ko if: isWipeConfirmScreen() -->
+      <div class="modal__text">
+        The process of wiping the database means you will lose all data and messages on this device. After the process
+        is finished you can add this device from scratch.
+      </div>
+      <div class="modal__buttons">
+        <button data-bind="click: onGoBack" class="modal__button modal__button--secondary" data-uie-name="do-go-back">
+          Dismiss
+        </button>
+        <button
+          data-bind="click: onClickWipeConfirm"
+          class="modal__button modal__button--primary modal__button--alert"
+          data-uie-name="do-action"
+        >
+          Wipe database
+        </button>
+      </div>
       <!-- /ko -->
       <!-- ko if: isWipePasswordScreen() -->
+      <form data-bind="submit: onWipeDatabase">
+        <input class="modal__input" type="password" data-bind="event: {'keydown': clearWipeError}" />
+        <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()"></div>
+        <div class="modal__buttons">
+          <button data-bind="click: onGoBack" class="modal__button modal__button--secondary" data-uie-name="do-go-back">
+            Dismiss
+          </button>
+          <button type="submit" class="modal__button modal__button--primary" data-uie-name="do-action">
+            Accept
+          </button>
+        </div>
+      </form>
       <!-- /ko -->
     </div>
   </modal>

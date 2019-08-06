@@ -41,13 +41,8 @@ enum PROPERTIES {
   VERSION = 'version',
 }
 
-enum APPLOCK {
-  CODE = 'applock_code',
-}
-
 const PROPERTIES_TYPE = {
   ...PROPERTIES,
-  APPLOCK,
   CONTACT_IMPORT,
   EMOJI,
   INTERFACE,

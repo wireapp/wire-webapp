@@ -16,10 +16,14 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {ValidationUtil} from '@wireapp/commons';
+import {amplify} from 'amplify';
 import ko from 'knockout';
+import {murmurhash3} from 'Util/util';
+import {AuthService} from '../../auth/AuthService';
+import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {config} from '../../config';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {WebAppEvents} from '../../event/WebApp';
 
 enum APPLOCK_STATES {
   NONE = 'applock.none',
@@ -34,31 +38,35 @@ export class AppLockViewModel {
   timeOutId: number;
   timeOut: number;
   code: string;
-  propertiesRepository: PropertiesRepository;
   state: ko.Observable<APPLOCK_STATES>;
-  isVisible: ko.PureComputed<boolean>;
+  isVisible: ko.Observable<boolean>;
   headerText: ko.PureComputed<string>;
+  localStorage: Storage;
+  setupPasswordA: ko.Observable<string>;
+  setupPasswordB: ko.Observable<string>;
+  passwordRegex: RegExp;
+  isSetupPasswordAValid: ko.PureComputed<boolean>;
+  isSetupPasswordBValid: ko.PureComputed<boolean>;
+  unlockError: ko.Observable<string>;
+  authService: AuthService;
+  wipeError: ko.Observable<string>;
+  isLoading: ko.Observable<boolean>;
 
-  constructor(propertiesRepository: PropertiesRepository) {
+  constructor(authService: AuthService) {
+    this.authService = authService;
     this.state = ko.observable(APPLOCK_STATES.NONE);
-    this.isVisible = ko.pureComputed(() => this.state() !== APPLOCK_STATES.NONE);
+    this.isVisible = ko.observable(false);
+    this.isLoading = ko.observable(false);
     ko.applyBindings(this, document.getElementById('applock'));
 
-    const timeOut = config.FEATURE.APP_LOCK_TIMEOUT;
-    if (!Number.isInteger(timeOut)) {
-      return;
-    }
+    const timeOut = config.FEATURE.APPLOCK_TIMEOUT;
 
     this.isVisible.subscribe(isVisible => {
       document.querySelector('#app').classList.toggle('blurred', isVisible);
     });
 
-    this.propertiesRepository = propertiesRepository;
-    if (!this.loadCode()) {
-      this.showAppLock();
-    }
+    this.localStorage = window.localStorage;
     this.timeOut = timeOut;
-    document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
     this.timeOutId = 0;
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
@@ -76,9 +84,28 @@ export class AppLockViewModel {
           return '';
       }
     });
+    this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(8));
+    this.setupPasswordA = ko.observable('');
+    this.setupPasswordB = ko.observable('');
+    this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPasswordA()));
+    this.isSetupPasswordBValid = ko.pureComputed(
+      () => this.passwordRegex.test(this.setupPasswordB()) && this.setupPasswordB() === this.setupPasswordA(),
+    );
+    this.unlockError = ko.observable('');
+    this.wipeError = ko.observable('');
+    if (Number.isInteger(timeOut)) {
+      if (!this.getCode()) {
+        this.showAppLock();
+      }
+      document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+    }
   }
 
-  loadCode = () => this.propertiesRepository.getPreference(PROPERTIES_TYPE.APPLOCK.CODE);
+  getCode = () => this.localStorage.getItem('applock_code');
+  hashCode = (code: string) => murmurhash3(code, 42).toString(16);
+  setCode = (code: string) => this.localStorage.setItem('applock_code', this.hashCode(code));
+
+  onClosed = () => this.state(APPLOCK_STATES.NONE);
 
   handleVisibilityChange = () => {
     window.clearTimeout(this.timeOutId);
@@ -89,21 +116,52 @@ export class AppLockViewModel {
   };
 
   showAppLock = () => {
-    this.state(this.loadCode() ? APPLOCK_STATES.LOCKED : APPLOCK_STATES.SETUP);
+    this.state(this.getCode() ? APPLOCK_STATES.LOCKED : APPLOCK_STATES.SETUP);
+    this.isVisible(true);
   };
 
-  onEnterCode = (enteredCode: string) => {
-    if (enteredCode === this.loadCode()) {
-      this.state(APPLOCK_STATES.NONE);
+  onUnlock = (form: HTMLFormElement) => {
+    const enteredCode = (<HTMLInputElement>form[0]).value;
+    if (this.hashCode(enteredCode) === this.getCode()) {
+      this.isVisible(false);
       return;
     }
+    this.unlockError('Wrong Passphrase');
   };
 
   onSetCode = (form: HTMLFormElement) => {
     const firstCode = (<HTMLInputElement>form[0]).value;
     const secondCode = (<HTMLInputElement>form[1]).value;
     if (firstCode === secondCode) {
-      this.propertiesRepository.savePreference(PROPERTIES_TYPE.APPLOCK.CODE, firstCode);
+      this.setCode(firstCode);
+      this.isVisible(false);
+    }
+  };
+
+  clearUnlockError = () => {
+    this.unlockError('');
+    return true;
+  };
+
+  clearWipeError = () => {
+    this.wipeError('');
+    return true;
+  };
+
+  onWipeDatabase = async (form: HTMLFormElement) => {
+    const password = (<HTMLInputElement>form[0]).value;
+    try {
+      this.isLoading(true);
+      await this.authService.validatePassword(password);
+      this.localStorage.removeItem('applock_code');
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
+      this.isVisible(false);
+    } catch ({code, message}) {
+      this.isLoading(false);
+      if ([400, 401, 403].includes(code)) {
+        return this.wipeError('Wrong password');
+      }
+      this.wipeError(message);
     }
   };
 
