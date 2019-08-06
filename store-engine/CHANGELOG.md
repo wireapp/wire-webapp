@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.8.0...@wireapp/store-engine@3.8.1) (2019-08-06)
+
+
+### Bug Fixes
+
+* **store-engine:** Primary key should only increment on creation ([#2161](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2161)) ([da77f88](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/da77f88))
+
+
+
+
+
 # [3.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.7.0...@wireapp/store-engine@3.8.0) (2019-08-05)
 
 
