@@ -1,6 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`"Label" renders (dark theme) 1`] = `
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-0 {
+  color: #fff;
+  display: inline;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-1"
+>
+  <span
+    className="emotion-0"
+  >
+    Label
+  </span>
+</div>
+`;
+
 exports[`"Label" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -11,14 +45,67 @@ exports[`"Label" renders 1`] = `
   text-transform: none;
 }
 
-<span
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  Label
-</span>
+  <span
+    className="emotion-0"
+  >
+    Label
+  </span>
+</div>
+`;
+
+exports[`"LabelLink" renders (dark theme) 1`] = `
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-0 {
+  color: #fff;
+  display: inline;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+.emotion-0:hover {
+  color: rgb(214,214,214);
+}
+
+.emotion-0:visited,
+.emotion-0:link,
+.emotion-0:active {
+  color: #fff;
+}
+
+<div
+  className="emotion-1"
+>
+  <a
+    className="emotion-0"
+  >
+    LabelLink
+  </a>
+</div>
 `;
 
 exports[`"LabelLink" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
 .emotion-0 {
   color: rgb(52,56,59);
   display: inline;
@@ -44,9 +131,13 @@ exports[`"LabelLink" renders 1`] = `
   color: rgb(52,56,59);
 }
 
-<a
-  className="emotion-0"
+<div
+  className="emotion-1"
 >
-  LabelLink
-</a>
+  <a
+    className="emotion-0"
+  >
+    LabelLink
+  </a>
+</div>
 `;

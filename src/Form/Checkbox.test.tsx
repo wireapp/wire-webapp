@@ -18,11 +18,13 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Checkbox, CheckboxLabel} from './Checkbox';
 
 describe('"Checkbox"', () => {
   it('renders', () => matchComponent(<Checkbox id="1">Check</Checkbox>));
+  it('renders (dark theme)', () => matchComponent(<Checkbox id="1">>Checkbox</Checkbox>, THEME_ID.DARK));
   it('renders as invalid', () =>
     matchComponent(
       <Checkbox id="1" markInvalid>

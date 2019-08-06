@@ -20,28 +20,34 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {GlobalStyle} from '../GlobalStyle';
-import {COLOR} from '../Identity';
 import {filterProps} from '../util';
+import {THEME_ID, Theme, ThemeProvider} from './Theme';
 
 export interface StyledAppContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;
+  themeId?: THEME_ID;
 }
 
-const styledAppContainerStyle: <T>(props: StyledAppContainerProps<T>) => ObjectInterpolation<undefined> = ({
-  backgroundColor = COLOR.GRAY_LIGHTEN_88,
-}) => ({
+const styledAppContainerStyle: <T>(
+  theme: Theme,
+  props: StyledAppContainerProps<T>,
+) => ObjectInterpolation<undefined> = (theme, {backgroundColor = theme.general.backgroundColor}) => ({
   background: backgroundColor,
+  transition: 'background 0.15s',
 });
 
-const filterStyledAppContainerProps = (props: StyledAppContainerProps) => filterProps(props, ['backgroundColor']);
+const filterStyledAppContainerProps = (props: StyledAppContainerProps) =>
+  filterProps(props, ['backgroundColor', 'themeId']);
 
 const StyledAppContainer = (props: StyledAppContainerProps) => (
-  <div css={styledAppContainerStyle(props)} {...filterStyledAppContainerProps(props)} />
+  <div css={theme => styledAppContainerStyle(theme, props)} {...filterStyledAppContainerProps(props)} />
 );
 
-export const StyledApp = ({children, ...props}) => (
-  <StyledAppContainer {...props}>
-    <GlobalStyle />
-    {children}
-  </StyledAppContainer>
+export const StyledApp = ({themeId = THEME_ID.LIGHT, children, ...props}) => (
+  <ThemeProvider themeId={themeId}>
+    <StyledAppContainer {...props}>
+      <GlobalStyle />
+      {children}
+    </StyledAppContainer>
+  </ThemeProvider>
 );

@@ -44,7 +44,7 @@ export const DemoModals = () => {
       <Line />
       <H1>Modals</H1>
       {isModalOpen && (
-        <Modal onClose={() => this.setIsModalOpen(false)}>
+        <Modal onClose={() => setIsModalOpen(false)}>
           <H2 style={{margin: 0}}>Normal Modal</H2>
           <Paragraph>
             <Text block>Normal Modal</Text>

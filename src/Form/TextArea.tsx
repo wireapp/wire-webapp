@@ -22,6 +22,7 @@ import {ObjectInterpolation, jsx} from '@emotion/core';
 import {TextTransformProperty} from 'csstype';
 import React from 'react';
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {TextProps} from '../Text';
 import {filterProps} from '../util';
 
@@ -30,13 +31,12 @@ export interface TextAreaProps<T = HTMLTextAreaElement> extends TextProps<T> {
   placeholderTextTransform?: TextTransformProperty;
 }
 
-export const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<undefined> = ({
-  markInvalid = false,
-  placeholderTextTransform = 'uppercase',
-  disabled = false,
-}) => {
+export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {markInvalid = false, placeholderTextTransform = 'uppercase', disabled = false},
+) => {
   const placeholderStyle = {
-    color: COLOR.GRAY_DARKEN_24,
+    color: theme.Input.placeholderColor,
     fontSize: '11px',
     textTransform: placeholderTextTransform,
   };
@@ -57,15 +57,16 @@ export const textAreaStyle: <T>(props: TextAreaProps<T>) => ObjectInterpolation<
           boxShadow: 'none',
         }
       : {},
-    background: disabled ? COLOR.shade(COLOR.WHITE, 0.06) : COLOR.WHITE,
+    background: theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
     boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
     caretColor: COLOR.BLUE,
-    color: COLOR.TEXT,
+    color: theme.general.color,
     fontWeight: 300,
     lineHeight: '24px',
     margin: '0 0 16px',
+    opacity: disabled ? 0.56 : 1,
     outline: 'none',
     padding: '16px 16px',
     resize: 'none',
@@ -80,5 +81,10 @@ export const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forw
   HTMLTextAreaElement,
   TextAreaProps<HTMLTextAreaElement>
 >((props, ref) => (
-  <textarea className={TEXTAREA_CLASSNAME} css={textAreaStyle(props)} ref={ref} {...filterTextAreaProps(props)} />
+  <textarea
+    className={TEXTAREA_CLASSNAME}
+    css={theme => textAreaStyle(theme, props)}
+    ref={ref}
+    {...filterTextAreaProps(props)}
+  />
 ));

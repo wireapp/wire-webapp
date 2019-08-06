@@ -18,9 +18,11 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {TextLink} from '../Text';
 
 describe('"TextLink"', () => {
   it('renders', () => matchComponent(<TextLink>TextLink</TextLink>));
+  it('renders (dark theme)', () => matchComponent(<TextLink>TextLink</TextLink>, THEME_ID.DARK));
 });

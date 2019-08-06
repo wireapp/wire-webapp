@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {TextTransformProperty} from 'csstype';
-import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
 export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
@@ -51,18 +51,21 @@ export const filterTextProps = (props: TextProps) => {
   ]);
 };
 
-export const textStyle: <T>(props: TextProps<T>) => ObjectInterpolation<undefined> = ({
-  block = false,
-  bold = false,
-  center = false,
-  color = COLOR.TEXT,
-  fontSize = '16px',
-  light = false,
-  muted = false,
-  noWrap = false,
-  textTransform = 'none',
-  truncate = false,
-}) => ({
+export const textStyle: <T>(theme: Theme, props: TextProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {
+    block = false,
+    bold = false,
+    center = false,
+    color = theme.general.color,
+    fontSize = '16px',
+    light = false,
+    muted = false,
+    noWrap = false,
+    textTransform = 'none',
+    truncate = false,
+  },
+) => ({
   color: color,
   display: block ? 'block' : 'inline',
   fontSize: fontSize,
@@ -75,7 +78,7 @@ export const textStyle: <T>(props: TextProps<T>) => ObjectInterpolation<undefine
   whiteSpace: noWrap ? 'nowrap' : undefined,
 });
 
-export const Text = (props: TextProps) => <span css={textStyle(props)} {...filterTextProps(props)} />;
+export const Text = (props: TextProps) => <span css={theme => textStyle(theme, props)} {...filterTextProps(props)} />;
 
 export const Bold = (props: TextProps) => <Text bold {...props} />;
 export const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;

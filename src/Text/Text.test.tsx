@@ -19,11 +19,14 @@
 
 import React from 'react';
 import {COLOR} from '../Identity';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Bold, Large, Muted, Small, Text, Uppercase} from './Text';
 
 describe('"Text"', () => {
   it('renders', () => matchComponent(<Text>Text</Text>));
+  it('renders (dark theme)', () => matchComponent(<Text>Text</Text>, THEME_ID.DARK));
+
   it('renders as block', () => matchComponent(<Text block>Text</Text>));
   it('renders bold', () => matchComponent(<Text bold>Text</Text>));
   it('renders light', () => matchComponent(<Text light>Text</Text>));

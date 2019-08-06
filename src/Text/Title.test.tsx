@@ -18,9 +18,11 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Title} from './Title';
 
 describe('"Title"', () => {
   it('renders', () => matchComponent(<Title>Title</Title>));
+  it('renders (dark theme)', () => matchComponent(<Title>Title</Title>, THEME_ID.DARK));
 });

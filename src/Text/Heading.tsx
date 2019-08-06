@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
-import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
@@ -27,15 +27,11 @@ interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 
-export const h1Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  color = COLOR.TEXT,
-  level = '1',
-  noWrap = false,
-  textTransform = 'none',
-  ...props
-}) => ({
-  ...textStyle({block, color, noWrap, textTransform, ...props}),
+export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, color = theme.general.color, level = '1', noWrap = false, textTransform = 'none', ...props},
+) => ({
+  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: '48px',
   fontWeight: 300,
   lineHeight: '56px',
@@ -48,16 +44,13 @@ export const h1Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefin
   },
 });
 
-export const H1 = (props: HeadingProps) => <h1 css={h1Style(props)} {...filterTextProps(props)} />;
+export const H1 = (props: HeadingProps) => <h1 css={theme => h1Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h2Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  color = COLOR.TEXT,
-  noWrap = false,
-  textTransform = 'none',
-  ...props
-}) => ({
-  ...textStyle({block, color, noWrap, textTransform, ...props}),
+export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
+) => ({
+  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: '24px',
   fontWeight: 700,
   lineHeight: '32px',
@@ -71,38 +64,32 @@ export const h2Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefin
   },
 });
 
-export const H2 = (props: HeadingProps) => <h2 css={h2Style(props)} {...filterTextProps(props)} />;
+export const H2 = (props: HeadingProps) => <h2 css={theme => h2Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h3Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  color = COLOR.TEXT,
-  noWrap = false,
-  textTransform = 'none',
-  ...props
-}) => ({
-  ...textStyle({block, color, noWrap, textTransform, ...props}),
+export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
+) => ({
+  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: '16px',
   fontWeight: 600,
   marginBottom: '16px',
 });
 
-export const H3 = (props: HeadingProps) => <h3 css={h3Style(props)} {...filterTextProps(props)} />;
+export const H3 = (props: HeadingProps) => <h3 css={theme => h3Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h4Style: <T>(props: HeadingProps<T>) => ObjectInterpolation<undefined> = ({
-  block = true,
-  color = COLOR.TEXT,
-  noWrap = false,
-  textTransform = 'none',
-  ...props
-}) => ({
-  ...textStyle({block, color, noWrap, textTransform, ...props}),
+export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
+) => ({
+  ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: '11px',
   fontWeight: 300,
   marginBottom: '5px',
   marginTop: '20px',
 });
 
-export const H4 = (props: HeadingProps) => <h3 css={h4Style(props)} {...filterTextProps(props)} />;
+export const H4 = (props: HeadingProps) => <h3 css={theme => h4Style(theme, props)} {...filterTextProps(props)} />;
 
 export const Heading = ({level, ...props}: HeadingProps) => {
   switch (level) {

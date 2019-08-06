@@ -23,6 +23,7 @@ import React from 'react';
 import {CloseIcon} from '../Icon';
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps, noop} from '../util';
 import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';
@@ -31,30 +32,35 @@ export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   fullscreen?: boolean;
 }
 
-const modalBodyStyle: <T>(props: ModalBodyProps<T>) => ObjectInterpolation<undefined> = props => ({
+const modalBodyStyle: <T>(theme: Theme, props: ModalBodyProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {fullscreen = false},
+) => ({
   alignItems: 'center',
-  backgroundColor: COLOR.GRAY_LIGHTEN_88,
-  borderRadius: props.fullscreen ? 0 : '8px',
-  bottom: props.fullscreen ? 0 : undefined,
-  boxShadow: props.fullscreen ? 'none' : '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
+  backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
+  borderRadius: fullscreen ? 0 : '8px',
+  bottom: fullscreen ? 0 : undefined,
+  boxShadow: fullscreen ? 'none' : '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: props.fullscreen ? 'center' : 'space-between',
-  left: props.fullscreen ? 0 : undefined,
+  justifyContent: fullscreen ? 'center' : 'space-between',
+  left: fullscreen ? 0 : undefined,
   margin: 'auto',
-  position: props.fullscreen ? 'fixed' : 'relative',
-  right: props.fullscreen ? 0 : undefined,
-  top: props.fullscreen ? 0 : undefined,
+  position: fullscreen ? 'fixed' : 'relative',
+  right: fullscreen ? 0 : undefined,
+  top: fullscreen ? 0 : undefined,
   transform: 'translate3d(0, 0, 0)',
   zIndex: 9999,
   [media[QueryKeys.TABLET_DOWN]]: {
-    width: props.fullscreen ? 'initial' : '100%',
+    width: fullscreen ? 'initial' : '100%',
   },
 });
 
 const filterModalBodyProps = (props: ModalBodyProps) => filterProps(props, ['fullscreen']);
 
-const ModalBody = (props: ModalBodyProps) => <div css={modalBodyStyle(props)} {...filterModalBodyProps(props)} />;
+const ModalBody = (props: ModalBodyProps) => (
+  <div css={theme => modalBodyStyle(theme, props)} {...filterModalBodyProps(props)} />
+);
 
 const ModalClose = (props: SVGIconProps<SVGSVGElement>) => (
   <CloseIcon

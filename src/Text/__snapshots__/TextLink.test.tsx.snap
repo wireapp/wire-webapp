@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`"TextLink" renders 1`] = `
+exports[`"TextLink" renders (dark theme) 1`] = `
 .emotion-0 {
   color: #2391d3;
   display: inline;
@@ -26,9 +26,62 @@ exports[`"TextLink" renders 1`] = `
   color: #2391d3;
 }
 
-<a
-  className="emotion-0"
+.emotion-1 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+<div
+  className="emotion-1"
 >
-  TextLink
-</a>
+  <a
+    className="emotion-0"
+  >
+    TextLink
+  </a>
+</div>
+`;
+
+exports[`"TextLink" renders 1`] = `
+.emotion-1 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-0 {
+  color: #2391d3;
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+.emotion-0:hover {
+  color: rgb(29,122,177);
+}
+
+.emotion-0:visited,
+.emotion-0:link,
+.emotion-0:active {
+  color: #2391d3;
+}
+
+<div
+  className="emotion-1"
+>
+  <a
+    className="emotion-0"
+  >
+    TextLink
+  </a>
+</div>
 `;

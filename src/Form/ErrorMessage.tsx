@@ -20,24 +20,23 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {Text, TextProps, linkStyle, textStyle} from '../Text';
 
 type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const errorMessageStyle: <T>(props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = ({
-  bold = true,
-  center = true,
-  color = COLOR.RED,
-  fontSize = '11px',
-  textTransform = 'uppercase',
-  ...props
-}) => ({
-  ...textStyle({bold, center, color, fontSize, textTransform, ...props}),
+export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  {bold = true, center = true, color = COLOR.RED, fontSize = '11px', textTransform = 'uppercase', ...props},
+) => ({
+  ...textStyle(theme, {bold, center, color, fontSize, textTransform, ...props}),
   a: {
-    ...linkStyle({bold, fontSize, textTransform}),
+    ...linkStyle(theme, {bold, fontSize, textTransform}),
   },
   display: 'block',
   marginBottom: '12px',
 });
 
-export const ErrorMessage = (props: ErrorMessageProps) => <Text css={errorMessageStyle(props)} {...props} />;
+export const ErrorMessage = (props: ErrorMessageProps) => (
+  <Text css={theme => errorMessageStyle(theme, props)} {...props} />
+);

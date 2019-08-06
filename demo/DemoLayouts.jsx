@@ -39,7 +39,7 @@ const ColumnsStyle = {
 };
 
 const ColumnStyle = {
-  backgroundColor: COLOR.GRAY_LIGHTEN_72,
+  backgroundColor: COLOR.GRAY_LIGHTEN_32,
   border: `1px solid ${COLOR.GRAY_LIGHTEN_24}`,
 };
 

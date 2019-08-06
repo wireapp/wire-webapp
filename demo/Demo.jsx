@@ -20,6 +20,7 @@
 import {
   Avatar,
   AvatarGrid,
+  Button,
   COLOR,
   Container,
   ContainerXS,
@@ -39,6 +40,7 @@ import {
   QUERY,
   Small,
   StyledApp,
+  THEME_ID,
   Tooltip,
 } from '@wireapp/react-ui-kit';
 import React, {useCallback, useState} from 'react';
@@ -60,12 +62,15 @@ const Demo = () => {
   const [showFirstDropdown, setShowFirstDropdown] = useState(false);
   const [showSecondDropdown, setShowSecondDropdown] = useState(false);
   const [imageData, setImageData] = useState(null);
+  const [theme, setTheme] = useState(THEME_ID.LIGHT);
   // eslint-disable-next-line no-magic-numbers
   const paginatedList = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16], [17, 18]];
   const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
 
+  const toggleTheme = () => setTheme(theme === THEME_ID.LIGHT ? THEME_ID.DARK : THEME_ID.LIGHT);
+
   return (
-    <StyledApp>
+    <StyledApp themeId={theme}>
       <Helmet
         meta={[
           {
@@ -126,6 +131,9 @@ const Demo = () => {
       </HeaderMenu>
 
       <Content>
+        <div style={{bottom: 8, position: 'fixed', right: 8, zIndex: 10000}}>
+          <Button onClick={useCallback(toggleTheme)}>{'Toggle Theme'}</Button>
+        </div>
         <Container style={{alignItems: 'center', display: 'flex', justifyContent: 'space-around'}}>
           <Tooltip light right text="This is our logo with a whole bunch of text in here">
             <Logo scale={3} color={COLOR.BLUE} />

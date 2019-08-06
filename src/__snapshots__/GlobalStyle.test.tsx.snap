@@ -1,3 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`"GlobalStyle" renders 1`] = `null`;
+exports[`"GlobalStyle" renders 1`] = `
+.emotion-0 {
+  background: rgb(247,248,250);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+<div
+  className="emotion-0"
+/>
+`;

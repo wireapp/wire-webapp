@@ -24,17 +24,21 @@ import {COLOR} from '../../Identity';
 import {defaultTransition} from '../../Identity/motions';
 import {QueryKeys, media} from '../../mediaQueries';
 import {TextProps, textStyle} from '../../Text';
+import {Theme} from '../Theme';
 
 type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 
-export const menuSubLinkStyle: <T>(props: MenuSubLinkProps<T>) => ObjectInterpolation<undefined> = props => ({
-  ...textStyle(props),
+export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => ObjectInterpolation<undefined> = (
+  theme,
+  props,
+) => ({
+  ...textStyle(theme, props),
   '&:hover': {
-    color: Color(COLOR.LINK)
+    color: Color(theme.general.color)
       .mix(Color(COLOR.BLACK), 0.16)
       .toString(),
   },
-  color: COLOR.LINK,
+  color: theme.general.color,
   cursor: 'pointer',
   fontWeight: 600,
   textDecoration: 'none',
@@ -61,4 +65,6 @@ export const menuSubLinkStyle: <T>(props: MenuSubLinkProps<T>) => ObjectInterpol
   },
 });
 
-export const MenuSubLink = (props: MenuSubLinkProps) => <div css={menuSubLinkStyle(props)} {...props} />;
+export const MenuSubLink = (props: MenuSubLinkProps) => (
+  <div css={theme => menuSubLinkStyle(theme, props)} {...props} />
+);

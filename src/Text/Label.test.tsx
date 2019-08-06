@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
+import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Label, LabelLink} from './Label';
 
 describe('"Label"', () => {
   it('renders', () => matchComponent(<Label>Label</Label>));
+  it('renders (dark theme)', () => matchComponent(<Label>Label</Label>, THEME_ID.DARK));
 });
 
 describe('"LabelLink"', () => {
   it('renders', () => matchComponent(<LabelLink>LabelLink</LabelLink>));
+  it('renders (dark theme)', () => matchComponent(<LabelLink>LabelLink</LabelLink>, THEME_ID.DARK));
 });
