@@ -22,7 +22,6 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../../http';
 import {IdentityProvider} from './IdentityProvider';
 import {IdentityProviders} from './IdentityProviders';
-import {NewIdentityProviderMetadataURL} from './NewIdentityProviderMetadataURL';
 
 export class IdentityProviderAPI {
   constructor(private readonly client: HttpClient) {}
@@ -62,17 +61,14 @@ export class IdentityProviderAPI {
     await this.client.sendJSON(config);
   }
 
-  public async postIdentityProvider(identityData: string | NewIdentityProviderMetadataURL): Promise<IdentityProvider> {
+  public async postIdentityProvider(identityData: string): Promise<IdentityProvider> {
     const config: AxiosRequestConfig = {
       data: identityData,
       method: 'post',
       url: `${IdentityProviderAPI.URL.PROVIDER}`,
     };
 
-    const isURLObject = typeof identityData !== 'string';
-    const response = isURLObject
-      ? await this.client.sendJSON<IdentityProvider>(config)
-      : await this.client.sendXML<IdentityProvider>(config);
+    const response = await this.client.sendXML<IdentityProvider>(config);
     return response.data;
   }
 

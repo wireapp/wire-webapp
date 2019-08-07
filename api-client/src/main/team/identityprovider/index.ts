@@ -20,4 +20,3 @@
 export * from './IdentityProvider';
 export * from './IdentityProviderAPI';
 export * from './IdentityProviders';
-export * from './NewIdentityProviderMetadataURL';
