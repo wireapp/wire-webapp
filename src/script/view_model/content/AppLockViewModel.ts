@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {ValidationUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -25,7 +26,7 @@ import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {config} from '../../config';
 import {WebAppEvents} from '../../event/WebApp';
 
-enum APPLOCK_STATES {
+enum APPLOCK_STATE {
   NONE = 'applock.none',
   SETUP = 'applock.setup',
   LOCKED = 'applock.locked',
@@ -40,30 +41,27 @@ enum APPLOCK_STORAGE {
 }
 
 export class AppLockViewModel {
-  timeOutId: number;
-  timeOut: number;
-  code: string;
-  state: ko.Observable<APPLOCK_STATES>;
-  isVisible: ko.Observable<boolean>;
+  appObserver: MutationObserver;
+  authService: AuthService;
   headerText: ko.PureComputed<string>;
-  localStorage: Storage;
-  setupPasswordA: ko.Observable<string>;
-  setupPasswordB: ko.Observable<string>;
-  passwordRegex: RegExp;
+  isLoading: ko.Observable<boolean>;
   isSetupPasswordAValid: ko.PureComputed<boolean>;
   isSetupPasswordBValid: ko.PureComputed<boolean>;
-  unlockError: ko.Observable<string>;
-  authService: AuthService;
-  wipeError: ko.Observable<string>;
-  isLoading: ko.Observable<boolean>;
-  appElement: any;
+  isVisible: ko.Observable<boolean>;
+  localStorage: Storage;
   modalObserver: MutationObserver;
-  appObserver: MutationObserver;
-  childNodes: Node[];
+  passwordRegex: RegExp;
+  setupPasswordA: ko.Observable<string>;
+  setupPasswordB: ko.Observable<string>;
+  state: ko.Observable<APPLOCK_STATE>;
+  timeOut: number;
+  timeOutId: number;
+  unlockError: ko.Observable<string>;
+  wipeError: ko.Observable<string>;
 
   constructor(authService: AuthService) {
     this.authService = authService;
-    this.state = ko.observable(APPLOCK_STATES.NONE);
+    this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
     this.isVisible = ko.observable(false);
     this.isLoading = ko.observable(false);
@@ -79,15 +77,15 @@ export class AppLockViewModel {
     this.timeOutId = 0;
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
-        case APPLOCK_STATES.SETUP:
+        case APPLOCK_STATE.SETUP:
           return 'Set Application lock password';
-        case APPLOCK_STATES.LOCKED:
+        case APPLOCK_STATE.LOCKED:
           return 'Application is locked due to inactivity.';
-        case APPLOCK_STATES.FORGOT:
+        case APPLOCK_STATE.FORGOT:
           return 'Don’t know your Application lock password?';
-        case APPLOCK_STATES.WIPE_CONFIRM:
+        case APPLOCK_STATE.WIPE_CONFIRM:
           return 'Do you really want to Wipe the database?';
-        case APPLOCK_STATES.WIPE_PASSWORD:
+        case APPLOCK_STATE.WIPE_PASSWORD:
           return 'Enter your password to wipe database';
         default:
           return '';
@@ -138,7 +136,7 @@ export class AppLockViewModel {
     this.localStorage.setItem(APPLOCK_STORAGE.CODE, this.hashCode(code));
   };
 
-  onClosed = () => this.state(APPLOCK_STATES.NONE);
+  onClosed = () => this.state(APPLOCK_STATE.NONE);
 
   startObserver = () => {
     afterRender(() => {
@@ -164,7 +162,7 @@ export class AppLockViewModel {
   };
 
   showAppLock = () => {
-    this.state(this.getCode() ? APPLOCK_STATES.LOCKED : APPLOCK_STATES.SETUP);
+    this.state(this.getCode() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     this.isVisible(true);
   };
 
@@ -216,14 +214,14 @@ export class AppLockViewModel {
     }
   };
 
-  onGoBack = () => this.state(APPLOCK_STATES.LOCKED);
-  onClickForgot = () => this.state(APPLOCK_STATES.FORGOT);
-  onClickWipe = () => this.state(APPLOCK_STATES.WIPE_CONFIRM);
-  onClickWipeConfirm = () => this.state(APPLOCK_STATES.WIPE_PASSWORD);
+  onGoBack = () => this.state(APPLOCK_STATE.LOCKED);
+  onClickForgot = () => this.state(APPLOCK_STATE.FORGOT);
+  onClickWipe = () => this.state(APPLOCK_STATE.WIPE_CONFIRM);
+  onClickWipeConfirm = () => this.state(APPLOCK_STATE.WIPE_PASSWORD);
 
-  isSetupScreen = () => this.state() === APPLOCK_STATES.SETUP;
-  isLockScreen = () => this.state() === APPLOCK_STATES.LOCKED;
-  isForgotScreen = () => this.state() === APPLOCK_STATES.FORGOT;
-  isWipeConfirmScreen = () => this.state() === APPLOCK_STATES.WIPE_CONFIRM;
-  isWipePasswordScreen = () => this.state() === APPLOCK_STATES.WIPE_PASSWORD;
+  isSetupScreen = () => this.state() === APPLOCK_STATE.SETUP;
+  isLockScreen = () => this.state() === APPLOCK_STATE.LOCKED;
+  isForgotScreen = () => this.state() === APPLOCK_STATE.FORGOT;
+  isWipeConfirmScreen = () => this.state() === APPLOCK_STATE.WIPE_CONFIRM;
+  isWipePasswordScreen = () => this.state() === APPLOCK_STATE.WIPE_PASSWORD;
 }
