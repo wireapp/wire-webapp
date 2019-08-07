@@ -38,6 +38,7 @@ import {SelfAPI} from './self/';
 import {retrieveCookie} from './shims/node/cookie';
 import {WebSocketClient, WebSocketTopic} from './tcp/';
 import {
+  FeatureAPI,
   IdentityProviderAPI,
   LegalHoldAPI,
   MemberAPI,
@@ -75,6 +76,7 @@ export class APIClient extends EventEmitter {
   public notification: {api: NotificationAPI};
   public self: {api: SelfAPI};
   public teams: {
+    feature: {api: FeatureAPI};
     identityProvider: {api: IdentityProviderAPI};
     invitation: {api: TeamInvitationAPI};
     legalhold: {api: LegalHoldAPI};
@@ -150,6 +152,9 @@ export class APIClient extends EventEmitter {
     };
 
     this.teams = {
+      feature: {
+        api: new FeatureAPI(this.transport.http),
+      },
       identityProvider: {
         api: new IdentityProviderAPI(this.transport.http),
       },
