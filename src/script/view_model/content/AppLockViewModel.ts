@@ -19,7 +19,7 @@
 import {ValidationUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {murmurhash3} from 'Util/util';
+import {afterRender, murmurhash3} from 'Util/util';
 import {AuthService} from '../../auth/AuthService';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {config} from '../../config';
@@ -56,18 +56,22 @@ export class AppLockViewModel {
   authService: AuthService;
   wipeError: ko.Observable<string>;
   isLoading: ko.Observable<boolean>;
+  appElement: any;
+  modalObserver: MutationObserver;
+  appObserver: MutationObserver;
+  childNodes: Node[];
 
   constructor(authService: AuthService) {
     this.authService = authService;
     this.state = ko.observable(APPLOCK_STATES.NONE);
+    this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
     this.isVisible = ko.observable(false);
     this.isLoading = ko.observable(false);
     ko.applyBindings(this, document.getElementById('applock'));
 
     const timeOut = config.FEATURE.APPLOCK_TIMEOUT;
-
     this.isVisible.subscribe(isVisible => {
-      document.querySelector('#app').classList.toggle('blurred', isVisible);
+      (<HTMLDivElement>document.querySelector('#app')).style.filter = isVisible ? 'blur(100px)' : '';
     });
 
     this.localStorage = window.localStorage;
@@ -98,6 +102,22 @@ export class AppLockViewModel {
     );
     this.unlockError = ko.observable('');
     this.wipeError = ko.observable('');
+    this.appObserver = new MutationObserver(mutationRecords => {
+      const [{attributeName}] = mutationRecords;
+      if (attributeName === 'style') {
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
+      }
+    });
+    this.modalObserver = new MutationObserver(mutationRecords => {
+      const isApplockAffected = mutationRecords.some(({removedNodes}) =>
+        Array.from(removedNodes).some(
+          (removedNode: HTMLElement) => removedNode.dataset && removedNode.dataset.uieName === 'applock-modal',
+        ),
+      );
+      if (isApplockAffected) {
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
+      }
+    });
     if (Number.isInteger(timeOut)) {
       if (!this.getCode()) {
         this.showAppLock();
@@ -120,6 +140,21 @@ export class AppLockViewModel {
 
   onClosed = () => this.state(APPLOCK_STATES.NONE);
 
+  startObserver = () => {
+    afterRender(() => {
+      this.modalObserver.observe(document.querySelector('#wire-main'), {
+        childList: true,
+        subtree: true,
+      });
+      this.appObserver.observe(document.querySelector('#app'), {attributes: true});
+    });
+  };
+
+  stopObserver = () => {
+    this.modalObserver.disconnect();
+    this.appObserver.disconnect();
+  };
+
   handleVisibilityChange = () => {
     window.clearTimeout(this.timeOutId);
     const isHidden = document.visibilityState === 'hidden';
@@ -136,6 +171,7 @@ export class AppLockViewModel {
   onUnlock = (form: HTMLFormElement) => {
     const enteredCode = (<HTMLInputElement>form[0]).value;
     if (this.hashCode(enteredCode) === this.getCode()) {
+      this.stopObserver();
       this.isVisible(false);
       return;
     }
@@ -162,6 +198,7 @@ export class AppLockViewModel {
   };
 
   onWipeDatabase = async (form: HTMLFormElement) => {
+    this.stopObserver();
     const password = (<HTMLInputElement>form[0]).value;
     try {
       this.isLoading(true);

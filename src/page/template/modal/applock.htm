@@ -5,7 +5,7 @@
     </div>
     <div class="modal__body">
       <!-- ko if: isSetupScreen() -->
-      <form data-bind="submit: onSetCode">
+      <form data-bind="submit: onSetCode, template: {afterRender: startObserver}">
         <div class="modal__text">You will use it when your app gets locked.</div>
         <input
           class="modal__input"
@@ -32,8 +32,9 @@
         </div>
       </form>
       <!-- /ko -->
+
       <!-- ko if: isLockScreen() -->
-      <form data-bind="submit: onUnlock">
+      <form data-bind="submit: onUnlock, template: {afterRender: startObserver}">
         <div class="modal__text">Please enter your Application lock password to Unlock the application</div>
         <input class="modal__input" type="password" data-bind="event: {'keydown': clearUnlockError}" />
         <div style="display: flex">
@@ -51,42 +52,48 @@
         </div>
       </form>
       <!-- /ko -->
-      <!-- ko if: isForgotScreen() -->
-      <div class="modal__text">
-        If you forgot your passphrase there is no recovery. The only thing you can do is to wipe the database.
-      </div>
-      <div class="modal__cta" data-bind="click: onClickWipe">Wipe the database?</div>
-      <div class="modal__buttons">
-        <button
-          data-bind="click: onGoBack"
-          class="modal__button modal__button--secondary modal__button--full"
-          data-uie-name="do-go-back"
-        >
-          Go Back
-        </button>
-      </div>
 
+      <!-- ko if: isForgotScreen() -->
+      <div data-bind="template: {afterRender: startObserver}">
+        <div class="modal__text">
+          If you forgot your passphrase there is no recovery. The only thing you can do is to wipe the database.
+        </div>
+        <div class="modal__cta" data-bind="click: onClickWipe">Wipe the database?</div>
+        <div class="modal__buttons">
+          <button
+            data-bind="click: onGoBack"
+            class="modal__button modal__button--secondary modal__button--full"
+            data-uie-name="do-go-back"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
       <!-- /ko -->
+
       <!-- ko if: isWipeConfirmScreen() -->
-      <div class="modal__text">
-        The process of wiping the database means you will lose all data and messages on this device. After the process
-        is finished you can add this device from scratch.
-      </div>
-      <div class="modal__buttons">
-        <button data-bind="click: onGoBack" class="modal__button modal__button--secondary" data-uie-name="do-go-back">
-          Dismiss
-        </button>
-        <button
-          data-bind="click: onClickWipeConfirm"
-          class="modal__button modal__button--primary modal__button--alert"
-          data-uie-name="do-action"
-        >
-          Wipe database
-        </button>
+      <div data-bind="template: {afterRender: startObserver}">
+        <div class="modal__text">
+          The process of wiping the database means you will lose all data and messages on this device. After the process
+          is finished you can add this device from scratch.
+        </div>
+        <div class="modal__buttons">
+          <button data-bind="click: onGoBack" class="modal__button modal__button--secondary" data-uie-name="do-go-back">
+            Dismiss
+          </button>
+          <button
+            data-bind="click: onClickWipeConfirm"
+            class="modal__button modal__button--primary modal__button--alert"
+            data-uie-name="do-action"
+          >
+            Wipe database
+          </button>
+        </div>
       </div>
       <!-- /ko -->
+
       <!-- ko if: isWipePasswordScreen() -->
-      <form data-bind="submit: onWipeDatabase">
+      <form data-bind="submit: onWipeDatabase, template: {afterRender: startObserver}">
         <input class="modal__input" type="password" data-bind="event: {'keydown': clearWipeError}" />
         <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()"></div>
         <div class="modal__buttons">
