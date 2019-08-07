@@ -37,6 +37,7 @@ const globalStyles: (theme: Theme) => ObjectInterpolation<undefined> = theme => 
   body: {
     MozOsxFontSmoothing: 'grayscale',
     WebkitFontSmoothing: 'antialiased',
+    background: theme.general.backgroundColor,
     color: theme.general.color,
     display: 'flex',
     flexDirection: 'column',
@@ -44,6 +45,11 @@ const globalStyles: (theme: Theme) => ObjectInterpolation<undefined> = theme => 
     fontWeight: 300,
     lineHeight: 1.5,
     minHeight: '100vh',
+    transition: 'background 0.15s',
+  },
+  html: {
+    background: theme.general.backgroundColor,
+    transition: 'background 0.15s',
   },
   p: {
     marginTop: 0,
