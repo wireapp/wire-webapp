@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.8.1...@wireapp/store-engine@3.9.0) (2019-08-07)
+
+
+### Features
+
+* **store-engine,store-engine-bro-fs,store-engine-dexie,store-engine-fs,store-engine-sqleet:** Auto-increment primary keys ([#2163](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2163)) ([0d02747](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/0d02747))
+
+
+
+
+
 ## [3.8.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.8.0...@wireapp/store-engine@3.8.1) (2019-08-06)
 
 
