@@ -37,12 +37,21 @@ describe('IndexedDBEngine', () => {
 
   let engine: IndexedDBEngine;
 
-  async function initEngine(shouldCreateNewEngine = true): Promise<IndexedDBEngine> {
+  async function initEngine(
+    shouldCreateNewEngine: boolean = true,
+    useInLineKeys: boolean = false,
+  ): Promise<IndexedDBEngine> {
     const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
     const db: Dexie = await storeEngine.init(STORE_NAME);
-    db.version(1).stores({
+    let schema = {
       'the-simpsons': ', firstName, lastName',
-    });
+    };
+    if (useInLineKeys) {
+      schema = {
+        'the-simpsons': '++id, firstName, lastName',
+      };
+    }
+    db.version(1).stores(schema);
     await db.open();
     return storeEngine;
   }
@@ -54,9 +63,9 @@ describe('IndexedDBEngine', () => {
   afterEach(done => {
     if (engine && engine['db']) {
       engine['db'].close();
-      const deleteRequest = window.indexedDB.deleteDatabase(STORE_NAME);
-      deleteRequest.onsuccess = () => done();
     }
+    const deleteRequest = window.indexedDB.deleteDatabase(STORE_NAME);
+    deleteRequest.onsuccess = () => done();
   });
 
   describe('init', () => {
@@ -124,7 +133,7 @@ describe('IndexedDBEngine', () => {
     });
   });
 
-  describe('readAllPrimaryKeys', () => {
+  describe('readAllPrimaryKeys', async () => {
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
@@ -167,7 +176,8 @@ describe('IndexedDBEngine', () => {
     });
   });
 
-  describe('updateOrCreate', () => {
+  describe('updateOrCreate', async () => {
+    engine = await initEngine(true, false);
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });

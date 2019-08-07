@@ -39,6 +39,7 @@ const zipObject = (props: any[], values: any[]) =>
   props.reduce((prev, prop, i) => ({...prev, ...{[prop]: values[i]}}), {});
 
 export class SQLeetEngine implements CRUDEngine {
+  private autoIncrementedPrimaryKey: number = 1;
   private db: any;
   private rawDatabase: string | undefined;
   private readonly schema: SQLiteDatabaseDefinition<Record<string, any>>;
@@ -176,6 +177,10 @@ export class SQLeetEngine implements CRUDEngine {
       const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
       throw new StoreEngineError.RecordTypeError(message);
     }
+    if (primaryKey === undefined) {
+      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      this.autoIncrementedPrimaryKey += 1;
+    }
     const {columns, values} = this.buildValues(tableName, entity);
     const newValues = Object.keys(values).join(',');
     const escapedTableName = escape(tableName);
@@ -299,7 +304,7 @@ export class SQLeetEngine implements CRUDEngine {
     } catch (error) {
       const isRecordNotFound = error instanceof StoreEngineError.RecordNotFoundError;
       if (isRecordNotFound) {
-        await this.create(tableName, primaryKey, changes);
+        return this.create(tableName, primaryKey, changes);
       } else {
         throw error;
       }

@@ -134,31 +134,6 @@ describe('MemoryEngine', () => {
     Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
-
-    it('automatically creates primary keys if no primary key is given', async () => {
-      type PrimaryKey = number | undefined;
-
-      type EntityType = {name: string};
-
-      const TABLE_NAME = 'animals';
-
-      const firstAnimal = {
-        name: 'Ape',
-      };
-
-      const secondAnimal = {
-        name: 'Bear',
-      };
-
-      let primaryKey = await engine.updateOrCreate<PrimaryKey, EntityType>(TABLE_NAME, undefined, firstAnimal);
-      expect(primaryKey).toBe(1);
-
-      primaryKey = await engine.updateOrCreate<PrimaryKey, EntityType>(TABLE_NAME, undefined, secondAnimal);
-      expect(primaryKey).toBe(2);
-
-      const persistedRecords = await engine.readAll(TABLE_NAME);
-      expect(persistedRecords.length).toBe(2);
-    });
   });
 
   describe('update', () => {

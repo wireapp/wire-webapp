@@ -24,6 +24,8 @@ import path from 'path';
 export class FileEngine implements CRUDEngine {
   [index: string]: any;
 
+  private autoIncrementedPrimaryKey: number = 1;
+
   public storeName = '';
   public options: {fileExtension: string} = {
     fileExtension: '.dat',
@@ -81,6 +83,11 @@ export class FileEngine implements CRUDEngine {
     entity: EntityType,
   ): Promise<PrimaryKey> {
     if (entity) {
+      if (primaryKey === undefined) {
+        primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+        this.autoIncrementedPrimaryKey += 1;
+      }
+
       const filePath = this.resolvePath(tableName, primaryKey);
       let newEntity: EntityType | string = entity;
 
@@ -197,11 +204,16 @@ export class FileEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     changes: ChangesType,
   ): Promise<PrimaryKey> {
+    if (primaryKey === undefined) {
+      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      this.autoIncrementedPrimaryKey += 1;
+    }
     const file = this.resolvePath(tableName, primaryKey);
     let record = await this.read(tableName, primaryKey);
     if (typeof record === 'string') {
       record = JSON.parse(record);
     }
+    // TODO: Apply deep merge!
     const updatedRecord = JSON.stringify({...record, ...changes});
     await fs.outputFile(file, updatedRecord);
     return primaryKey;

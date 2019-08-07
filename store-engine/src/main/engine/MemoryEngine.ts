@@ -51,6 +51,7 @@ export class MemoryEngine implements CRUDEngine {
 
       if (primaryKey === undefined) {
         primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+        this.autoIncrementedPrimaryKey += 1;
       }
 
       const record = this.stores[this.storeName][tableName][primaryKey];
@@ -62,7 +63,6 @@ export class MemoryEngine implements CRUDEngine {
       }
 
       this.stores[this.storeName][tableName][primaryKey] = entity;
-      this.autoIncrementedPrimaryKey += 1;
 
       return Promise.resolve(primaryKey);
     }

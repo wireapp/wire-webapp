@@ -22,6 +22,7 @@ import {isBrowser} from './EnvironmentUtil';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError, UnsupportedError} from './error/';
 
 export class LocalStorageEngine implements CRUDEngine {
+  private autoIncrementedPrimaryKey: number = 1;
   public storeName = '';
 
   public append<PrimaryKey = string>(
@@ -37,8 +38,8 @@ export class LocalStorageEngine implements CRUDEngine {
         throw new RecordTypeError(message);
       }
 
-      const key: string = this.createKey(tableName, primaryKey);
-      window.localStorage.setItem(key, record);
+      const key = this.createKey<PrimaryKey>(tableName, primaryKey);
+      window.localStorage.setItem(`${key}`, record);
 
       return primaryKey;
     });
@@ -50,7 +51,7 @@ export class LocalStorageEngine implements CRUDEngine {
     entity: EntityType,
   ): Promise<PrimaryKey> {
     if (entity) {
-      const key: string = this.createKey(tableName, primaryKey);
+      const internalPrimaryKey = this.createKey<PrimaryKey>(tableName, primaryKey);
       return this.read(tableName, primaryKey)
         .catch(error => {
           if (error instanceof RecordNotFoundError) {
@@ -64,10 +65,15 @@ export class LocalStorageEngine implements CRUDEngine {
             throw new RecordAlreadyExistsError(message);
           } else {
             if (typeof record === 'string') {
-              window.localStorage.setItem(key, String(entity));
+              window.localStorage.setItem(`${internalPrimaryKey}`, String(entity));
             } else {
-              window.localStorage.setItem(key, JSON.stringify(entity));
+              window.localStorage.setItem(`${internalPrimaryKey}`, JSON.stringify(entity));
             }
+
+            if (typeof internalPrimaryKey === 'string') {
+              return (<unknown>internalPrimaryKey.replace(this.createPrefix(tableName), '')) as PrimaryKey;
+            }
+
             return primaryKey;
           }
         });
@@ -78,8 +84,8 @@ export class LocalStorageEngine implements CRUDEngine {
 
   public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     return Promise.resolve().then(() => {
-      const key: string = this.createKey(tableName, primaryKey);
-      window.localStorage.removeItem(key);
+      const key = this.createKey<PrimaryKey>(tableName, primaryKey);
+      window.localStorage.removeItem(`${key}`);
       return primaryKey;
     });
   }
@@ -192,11 +198,15 @@ export class LocalStorageEngine implements CRUDEngine {
         }
         throw error;
       })
-      .then(() => primaryKey);
+      .then(internalPrimaryKey => internalPrimaryKey);
   }
 
-  private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): string {
-    return `${this.createPrefix(tableName)}${primaryKey}`;
+  private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): PrimaryKey {
+    if (primaryKey === undefined) {
+      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      this.autoIncrementedPrimaryKey += 1;
+    }
+    return (`${this.createPrefix(tableName)}${primaryKey}` as unknown) as PrimaryKey;
   }
 
   private createPrefix(tableName: string): string {
