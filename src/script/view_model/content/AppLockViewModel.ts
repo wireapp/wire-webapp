@@ -38,6 +38,7 @@ enum APPLOCK_STATE {
 enum APPLOCK_STORAGE {
   CODE = 'applock_code',
   SALT = 'applock_salt',
+  IS_LOCKED = 'applock_islocked',
 }
 
 export class AppLockViewModel {
@@ -61,6 +62,7 @@ export class AppLockViewModel {
 
   constructor(authService: AuthService) {
     this.authService = authService;
+    this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
     this.isVisible = ko.observable(false);
@@ -72,7 +74,6 @@ export class AppLockViewModel {
       (<HTMLDivElement>document.querySelector('#app')).style.filter = isVisible ? 'blur(100px)' : '';
     });
 
-    this.localStorage = window.localStorage;
     this.timeOut = timeOut;
     this.timeOutId = 0;
     this.headerText = ko.pureComputed(() => {
@@ -117,12 +118,16 @@ export class AppLockViewModel {
       }
     });
     if (Number.isInteger(timeOut)) {
-      if (!this.getCode()) {
+      if (!this.getCode() || this.getIsLocked()) {
         this.showAppLock();
       }
       document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
     }
   }
+
+  getIsLocked = (): boolean => this.localStorage.getItem(APPLOCK_STORAGE.IS_LOCKED) === 'true';
+  setIsLocked = (isLocked: boolean) =>
+    this.localStorage.setItem(APPLOCK_STORAGE.IS_LOCKED, isLocked ? 'true' : 'false');
 
   getCode = () => this.localStorage.getItem(APPLOCK_STORAGE.CODE);
   hashCode = (code: string) => {
@@ -138,7 +143,16 @@ export class AppLockViewModel {
 
   onClosed = () => this.state(APPLOCK_STATE.NONE);
 
+  handleStorageEvent = ({key, oldValue}: StorageEvent) => {
+    if (key === APPLOCK_STORAGE.IS_LOCKED) {
+      if (oldValue === 'true') {
+        this.setIsLocked(true);
+      }
+    }
+  };
+
   startObserver = () => {
+    window.addEventListener('storage', this.handleStorageEvent);
     afterRender(() => {
       this.modalObserver.observe(document.querySelector('#wire-main'), {
         childList: true,
@@ -149,6 +163,7 @@ export class AppLockViewModel {
   };
 
   stopObserver = () => {
+    window.removeEventListener('storage', this.handleStorageEvent);
     this.modalObserver.disconnect();
     this.appObserver.disconnect();
   };
@@ -162,7 +177,9 @@ export class AppLockViewModel {
   };
 
   showAppLock = () => {
-    this.state(this.getCode() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    const hasCode = !!this.getCode();
+    this.state(hasCode ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    this.setIsLocked(hasCode);
     this.isVisible(true);
   };
 
@@ -170,6 +187,7 @@ export class AppLockViewModel {
     const enteredCode = (<HTMLInputElement>form[0]).value;
     if (this.hashCode(enteredCode) === this.getCode()) {
       this.stopObserver();
+      this.setIsLocked(false);
       this.isVisible(false);
       return;
     }
@@ -180,6 +198,7 @@ export class AppLockViewModel {
     const firstCode = (<HTMLInputElement>form[0]).value;
     const secondCode = (<HTMLInputElement>form[1]).value;
     if (firstCode === secondCode) {
+      this.stopObserver();
       this.setCode(firstCode);
       this.isVisible(false);
     }
@@ -203,6 +222,7 @@ export class AppLockViewModel {
       await this.authService.validatePassword(password);
       this.localStorage.removeItem(APPLOCK_STORAGE.CODE);
       this.localStorage.removeItem(APPLOCK_STORAGE.SALT);
+      this.localStorage.removeItem(APPLOCK_STORAGE.IS_LOCKED);
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       this.isVisible(false);
     } catch ({code, message}) {
