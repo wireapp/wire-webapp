@@ -17,19 +17,19 @@
  *
  */
 
+import {CRUDEngine, MemoryEngine} from '../engine';
 import {RecordAlreadyExistsError} from '../engine/error';
-import {LocalStorageEngine} from '../engine/LocalStorageEngine';
 import {TransientStore} from './TransientStore';
 
 describe('store.TransientStore', () => {
   const STORE_NAME = 'database-name';
   const TABLE_NAME = 'table-name';
 
-  let engine: LocalStorageEngine;
+  let engine: CRUDEngine;
   let store: TransientStore;
 
   beforeEach(async () => {
-    engine = new LocalStorageEngine();
+    engine = new MemoryEngine();
     await engine.init(STORE_NAME);
 
     store = new TransientStore(engine);
@@ -106,34 +106,6 @@ describe('store.TransientStore', () => {
 
       const bundle = await store.get(primaryKey);
       expect(bundle).toBeUndefined();
-    });
-  });
-
-  describe('init', () => {
-    it('initially reads data from persistent storage.', async () => {
-      const timeLapse = 2;
-
-      const items = [
-        {
-          expires: timeLapse * Date.now(),
-          payload: {token: '123'},
-        },
-        {
-          expires: timeLapse * Date.now(),
-          payload: {token: 'a2c'},
-        },
-        {
-          expires: timeLapse * Date.now(),
-          payload: {token: 'abc'},
-        },
-      ];
-
-      for (const item of items) {
-        window.localStorage.setItem(`${STORE_NAME}@${TABLE_NAME}@${item.payload.token}`, JSON.stringify(item));
-      }
-
-      const bundles = await store.init(TABLE_NAME);
-      expect(bundles.length).toBe(items.length);
     });
   });
 
