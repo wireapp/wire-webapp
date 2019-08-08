@@ -123,6 +123,7 @@ export class AppLockViewModel {
         this.showAppLock();
       }
       document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+      this.startPassphraseObserver();
     }
   }
 
@@ -138,8 +139,10 @@ export class AppLockViewModel {
 
   setCode = (code: string) => {
     const seed = Math.trunc(Math.random() * 1024);
+    this.stopPassphraseObserver();
     this.localStorage.setItem(APPLOCK_STORAGE.SALT, seed.toString(16));
     this.localStorage.setItem(APPLOCK_STORAGE.CODE, this.hashCode(code));
+    this.startPassphraseObserver();
   };
 
   onClosed = () => this.state(APPLOCK_STATE.NONE);
@@ -151,6 +154,18 @@ export class AppLockViewModel {
       }
     }
   };
+
+  handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
+    if (key === APPLOCK_STORAGE.CODE) {
+      this.localStorage.setItem(APPLOCK_STORAGE.CODE, oldValue);
+    }
+    if (key === APPLOCK_STORAGE.SALT) {
+      this.localStorage.setItem(APPLOCK_STORAGE.SALT, oldValue);
+    }
+  };
+
+  startPassphraseObserver = () => window.addEventListener('storage', this.handlePassphraseStorageEvent);
+  stopPassphraseObserver = () => window.removeEventListener('storage', this.handlePassphraseStorageEvent);
 
   startObserver = () => {
     window.addEventListener('storage', this.handleStorageEvent);
