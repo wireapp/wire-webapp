@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.7.0...@wireapp/store-engine-bro-fs@0.7.1) (2019-08-08)
+
+**Note:** Version bump only for package @wireapp/store-engine-bro-fs
+
+
+
+
+
 # [0.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.6.1...@wireapp/store-engine-bro-fs@0.7.0) (2019-08-08)
 
 
