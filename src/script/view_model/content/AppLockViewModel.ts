@@ -20,6 +20,7 @@
 import {ValidationUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {t} from 'Util/LocalizerUtil';
 import {afterRender, murmurhash3} from 'Util/util';
 import {AuthService} from '../../auth/AuthService';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
@@ -79,15 +80,15 @@ export class AppLockViewModel {
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
         case APPLOCK_STATE.SETUP:
-          return 'Set Application lock password';
+          return t('modalAppLockSetupTitle');
         case APPLOCK_STATE.LOCKED:
-          return 'Application is locked due to inactivity.';
+          return t('modalAppLockLockedTitle');
         case APPLOCK_STATE.FORGOT:
-          return 'Don’t know your Application lock password?';
+          return t('modalAppLockForgotTitle');
         case APPLOCK_STATE.WIPE_CONFIRM:
-          return 'Do you really want to Wipe the database?';
+          return t('modalAppLockWipeConfirmTitle');
         case APPLOCK_STATE.WIPE_PASSWORD:
-          return 'Enter your password to wipe database';
+          return t('modalAppLockWipePasswordTitle');
         default:
           return '';
       }
@@ -191,7 +192,7 @@ export class AppLockViewModel {
       this.isVisible(false);
       return;
     }
-    this.unlockError('Wrong Passphrase');
+    this.unlockError(t('modalAppLockLockedError'));
   };
 
   onSetCode = (form: HTMLFormElement) => {
@@ -228,7 +229,7 @@ export class AppLockViewModel {
     } catch ({code, message}) {
       this.isLoading(false);
       if ([400, 401, 403].includes(code)) {
-        return this.wipeError('Wrong password');
+        return this.wipeError(t('modalAppLockWipePasswordError'));
       }
       this.wipeError(message);
     }
