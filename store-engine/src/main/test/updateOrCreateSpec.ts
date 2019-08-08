@@ -26,7 +26,7 @@ interface DomainEntity {
 }
 
 export const updateOrCreateSpec = {
-  'automatically creates primary keys if no primary key is given.': async (engine: CRUDEngine) => {
+  'automatically creates primary keys as integers if no primary key is given.': async (engine: CRUDEngine) => {
     type PrimaryKey = number | undefined;
 
     const first = {
@@ -38,10 +38,10 @@ export const updateOrCreateSpec = {
     };
 
     const firstPrimaryKey = await engine.updateOrCreate<PrimaryKey, DomainEntity>(TABLE_NAME, undefined, first);
-    expect(firstPrimaryKey).toBeDefined();
+    expect(firstPrimaryKey).toBe(1);
 
     const secondPrimaryKey = await engine.updateOrCreate<PrimaryKey, DomainEntity>(TABLE_NAME, undefined, second);
-    expect(secondPrimaryKey).not.toBe(firstPrimaryKey);
+    expect(secondPrimaryKey).toBe(2);
 
     const persistedRecords = await engine.readAll(TABLE_NAME);
     expect(persistedRecords.length).toBe(2);

@@ -204,10 +204,6 @@ export class FileEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     changes: ChangesType,
   ): Promise<PrimaryKey> {
-    if (primaryKey === undefined) {
-      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
-      this.autoIncrementedPrimaryKey += 1;
-    }
     const file = this.resolvePath(tableName, primaryKey);
     let record = await this.read(tableName, primaryKey);
     if (typeof record === 'string') {
@@ -227,9 +223,13 @@ export class FileEngine implements CRUDEngine {
     try {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
+      const doesNotExist = error instanceof StoreEngineError.RecordNotFoundError;
+      const doesNotExistAndHasNoPrimaryKey = error.code === 'EISDIR' && primaryKey === undefined;
+
+      if (doesNotExist || doesNotExistAndHasNoPrimaryKey) {
         return this.create(tableName, primaryKey, changes);
       }
+
       throw error;
     }
     return primaryKey;
