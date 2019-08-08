@@ -289,6 +289,10 @@ export class StorageService {
     }
   }
 
+  async readAllPrimaryKeys(storeName: string): Promise<string[]> {
+    return this.engine.readAllPrimaryKeys(storeName);
+  }
+
   /**
    * Saves objects in the local database.
    *

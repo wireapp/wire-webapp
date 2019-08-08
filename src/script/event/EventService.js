@@ -435,8 +435,8 @@ export class EventService {
     const primaryKeys = await this.storageService.readAllPrimaryKeys(this.EVENT_STORE_NAME);
 
     for (const primaryKey of primaryKeys) {
-      const record = await this.storageService.load(primaryKey);
-      if (record.id === eventId && record.conversation === conversationId) {
+      const record = await this.storageService.load(this.EVENT_STORE_NAME, primaryKey);
+      if (record && record.id === eventId && record.conversation === conversationId) {
         await this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
         deletedRecords++;
       }
@@ -475,8 +475,8 @@ export class EventService {
     const primaryKeys = await this.storageService.readAllPrimaryKeys(this.EVENT_STORE_NAME);
 
     for (const primaryKey of primaryKeys) {
-      const record = await this.storageService.load(primaryKey);
-      if (record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+      const record = await this.storageService.load(this.EVENT_STORE_NAME, primaryKey);
+      if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
         await this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
         deletedRecords++;
       }
