@@ -25,7 +25,7 @@
     "ts-node": "8.3.0",
     "typescript": "3.5.3"
   },
-  "description": "",
+  "description": "Store Engine implementation for SQLite 3 (WebAssembly) with encryption.",
   "files": [
     "dist"
   ],

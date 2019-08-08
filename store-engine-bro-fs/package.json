@@ -17,7 +17,7 @@
     "ts-node": "8.3.0",
     "typescript": "3.5.3"
   },
-  "description": "Store Engine wrapper for the browser's File and Directory Entries API.",
+  "description": "Store Engine implementation for the browser's File and Directory Entries API.",
   "files": [
     "dist"
   ],

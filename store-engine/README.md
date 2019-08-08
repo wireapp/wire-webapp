@@ -8,13 +8,18 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ## Store Engine
 
-This package provides an interface to operate with various storage technologies in a uniform manner. There is a `MemoryEngine` which serves as an example.
+The Store Engine is an interface which can be used to implement various storage technologies in a uniform manner. There is a `MemoryEngine` which serves as an example. Additional implementations can be found in separate packages.
 
-Additional storage engines can be found in separate packages such as:
+**Popular implementations**
 
-- [FileEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs)
-- [FileSystemEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs)
-- [IndexedDBEngine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie)
+| Store Engine | Description |
+| :-- | :-- |
+| [store-engine](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine) | Implementation for in-memory. |
+| [store-engine-bro-fs](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs) | Implementation for the browser's [File and Directory Entries API](https://developer.mozilla.org/docs/Web/API/File_and_Directory_Entries_API). |
+| [store-engine-dexie](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie) | Implementation for the browser's [IndexedDB](https://developer.mozilla.org/docs/IndexedDB). |
+| [store-engine-fs](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs) | Implementation for Node.js' [File System](https://nodejs.org/api/fs.html). |
+| [store-engine-sqleet](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet) | Implementation for [SQLite 3](https://github.com/kripken/sql.js) (WebAssembly) with [encryption](https://github.com/resilar/sqleet). |
+| [store-engine-web-storage](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage) | Implementation for the browser's [Web Storage API](https://developer.mozilla.org/docs/Web/API/Web_Storage_API). |
 
 ### Motivation
 
@@ -26,27 +31,8 @@ Nowadays there are more and more storage possibilities and developers must be fa
 
 ```javascript
 const {MemoryEngine} = require('@wireapp/store-engine');
-const engine = new MemoryEngine('my-database');
-```
-
-#### Transient store
-
-As a bonus to the store engine, we built a transient store which deletes data after a specified [TTL](https://en.wikipedia.org/wiki/Time_to_live):
-
-```javascript
-const {Store, MemoryEngine} = require('@wireapp/store-engine');
-
-const engine = new MemoryEngine('my-favorite-actors');
-const store = new Store.TransientStore(engine);
-
-const ttl = 1000;
-
-store
-  .init('the-simpsons')
-  .then(() => store.set('bart', {name: 'Bart Simpson'}, ttl))
-  .then(transientBundle => {
-    console.log(`The record of "${transientBundle.payload.name}" will expires in "${transientBundle.expires}"ms.`);
-  });
+const engine = new MemoryEngine();
+await engine.init('my-database-name');
 ```
 
 ### API
@@ -109,7 +95,7 @@ engine.read(TABLE_NAME, PRIMARY_KEY).then(record => {
 
 ```javascript
 engine.readAll(TABLE_NAME).then(records => {
-  console.log(`There are "${record.length}" Simpsons in our database.`);
+  console.log(`There are "${records.length}" Simpsons in our database.`);
 });
 ```
 
@@ -129,4 +115,27 @@ engine.update(TABLE_NAME, PRIMARY_KEY, {brother: 'Bart Simpson'}).then((primaryK
 }).then((updatedRecord) => {
   console.log(`The brother of "${updatedRecord.name}" is "${updatedRecord.brother}".`):
 })
+```
+
+### Transient store
+
+The Store Engine interface also provides a transient store which deletes data after a specified [TTL](https://en.wikipedia.org/wiki/Time_to_live).
+
+**Example**
+
+```javascript
+const {Store} = require('@wireapp/store-engine');
+const {WebStorageEngine} = require('@wireapp/store-engine-web-storage');
+
+const engine = new WebStorageEngine();
+const store = new Store.TransientStore(engine);
+
+(async () => {
+  const ttl = 1000;
+
+  await engine.init('my-database-name');
+  await store.init('the-simpsons');
+  const transientBundle = await store.set('bart', {name: 'Bart Simpson'}, ttl);
+  console.log(`The record of "${transientBundle.payload.name}" will expire in "${transientBundle.expires}"ms.`);
+})();
 ```
