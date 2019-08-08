@@ -269,9 +269,10 @@ export class EventService {
    * @param {Object} event - JSON event to be stored
    * @returns {Promise<Event>} Resolves with the stored record
    */
-  saveEvent(event) {
+  async saveEvent(event) {
     event.category = categoryFromEvent(event);
-    return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
+    event.primary_key = await this.storageService.save(this.EVENT_STORE_NAME, undefined, event);
+    return event;
   }
 
   /**
