@@ -41,6 +41,11 @@ type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void
 // @see https://dexie.org/docs/Observable/Dexie.Observable
 type DexieObservable = {_dbSchema?: Object};
 
+enum DEXIE_CRUD_EVENTS {
+  DELETING = 'deleting',
+  UPDATING = 'updating',
+}
+
 export class StorageService {
   public db?: Dexie & DexieObservable;
   public objectDb?: MemoryStore;
@@ -51,11 +56,8 @@ export class StorageService {
   private userId?: string;
   public dbName?: string;
 
-  static get DEXIE_CRUD_EVENTS(): Record<string, string> {
-    return {
-      DELETING: 'deleting',
-      UPDATING: 'updating',
-    };
+  static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENTS {
+    return DEXIE_CRUD_EVENTS;
   }
 
   constructor() {
@@ -150,21 +152,23 @@ export class StorageService {
     listenableTables.forEach(table => {
       this.db
         .table(table)
-        .hook('updating', function(
+        .hook(DEXIE_CRUD_EVENTS.UPDATING, function(
           modifications: Object,
           primaryKey: string,
           obj: Object,
           transaction: Dexie.Transaction,
         ): void {
-          this.onsuccess = updatedObj =>
-            callListener(table, StorageService.DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
+          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
         });
 
       this.db
         .table(table)
-        .hook('deleting', function(primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
-          this.onsuccess = (): void =>
-            callListener(table, StorageService.DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
+        .hook(DEXIE_CRUD_EVENTS.DELETING, function(
+          primaryKey: string,
+          obj: Object,
+          transaction: Dexie.Transaction,
+        ): void {
+          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
         });
     });
   }
@@ -182,11 +186,11 @@ export class StorageService {
   }
 
   addUpdatedListener(storeName: string, callback: DatabaseListenerCallback): void {
-    this.dbListeners.push({callback, store: storeName, type: StorageService.DEXIE_CRUD_EVENTS.UPDATING});
+    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENTS.UPDATING});
   }
 
   addDeletedListener(storeName: string, callback: DatabaseListenerCallback): void {
-    this.dbListeners.push({callback, store: storeName, type: StorageService.DEXIE_CRUD_EVENTS.DELETING});
+    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENTS.DELETING});
   }
 
   //##############################################################################
@@ -242,6 +246,54 @@ export class StorageService {
   async deleteStores(storeNames: string[]): Promise<void> {
     const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
     await Promise.all(deleteStorePromises);
+  }
+
+  async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
+    if (this.isTemporaryAndNonPersistant) {
+      let deletedRecords = 0;
+      const primaryKeys = await this.readAllPrimaryKeys(storeName);
+
+      for (const primaryKey of primaryKeys) {
+        const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
+        if (record && record.id === eventId && record.conversation === conversationId) {
+          await this.delete(storeName, primaryKey);
+          deletedRecords++;
+        }
+      }
+
+      return deletedRecords;
+    }
+
+    return this.db
+      .table(storeName)
+      .where('id')
+      .equals(eventId)
+      .and(record => record.conversation === conversationId)
+      .delete();
+  }
+
+  async deleteEventsByDate(storeName: string, conversationId: string, isoDate: string): Promise<number> {
+    if (this.isTemporaryAndNonPersistant) {
+      let deletedRecords = 0;
+      const primaryKeys = await this.readAllPrimaryKeys(storeName);
+
+      for (const primaryKey of primaryKeys) {
+        const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
+        if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+          await this.delete(storeName, primaryKey);
+          deletedRecords++;
+        }
+      }
+
+      return deletedRecords;
+    }
+
+    return this.db
+      .table(storeName)
+      .where('conversation')
+      .equals(conversationId)
+      .filter(record => !isoDate || isoDate >= record.time)
+      .delete();
   }
 
   /**

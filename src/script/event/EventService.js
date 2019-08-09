@@ -427,28 +427,7 @@ export class EventService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   async deleteEvent(conversationId, eventId) {
-    if (this.storageService.db) {
-      const deleted = await this.storageService.db
-        .table(this.EVENT_STORE_NAME)
-        .where('id')
-        .equals(eventId)
-        .and(record => record.conversation === conversationId)
-        .delete();
-      return deleted;
-    }
-
-    let deletedRecords = 0;
-    const primaryKeys = await this.storageService.readAllPrimaryKeys(this.EVENT_STORE_NAME);
-
-    for (const primaryKey of primaryKeys) {
-      const record = await this.storageService.load(this.EVENT_STORE_NAME, primaryKey);
-      if (record && record.id === eventId && record.conversation === conversationId) {
-        await this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
-        deletedRecords++;
-      }
-    }
-
-    return deletedRecords;
+    return this.storageService.deleteEventInConversation(this.EVENT_STORE_NAME, conversationId, eventId);
   }
 
   /**
@@ -469,26 +448,6 @@ export class EventService {
    * @returns {Promise} Resolves when the events was deleted
    */
   async deleteEvents(conversationId, isoDate) {
-    if (this.storageService.db) {
-      return this.storageService.db
-        .table(this.EVENT_STORE_NAME)
-        .where('conversation')
-        .equals(conversationId)
-        .filter(record => !isoDate || isoDate >= record.time)
-        .delete();
-    }
-
-    let deletedRecords = 0;
-    const primaryKeys = await this.storageService.readAllPrimaryKeys(this.EVENT_STORE_NAME);
-
-    for (const primaryKey of primaryKeys) {
-      const record = await this.storageService.load(this.EVENT_STORE_NAME, primaryKey);
-      if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
-        await this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
-        deletedRecords++;
-      }
-    }
-
-    return deletedRecords;
+    return this.storageService.deleteEventsByDate(this.EVENT_STORE_NAME, conversationId, isoDate);
   }
 }
