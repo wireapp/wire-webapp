@@ -33,7 +33,7 @@ import {StorageSchemata} from './StorageSchemata';
 interface DatabaseListener {
   callback: DatabaseListenerCallback;
   store: string;
-  type: string;
+  type: DEXIE_CRUD_EVENT;
 }
 
 type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
@@ -41,7 +41,7 @@ type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void
 // @see https://dexie.org/docs/Observable/Dexie.Observable
 type DexieObservable = {_dbSchema?: Object};
 
-enum DEXIE_CRUD_EVENTS {
+enum DEXIE_CRUD_EVENT {
   DELETING = 'deleting',
   UPDATING = 'updating',
 }
@@ -56,8 +56,8 @@ export class StorageService {
   private userId?: string;
   public dbName?: string;
 
-  static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENTS {
-    return DEXIE_CRUD_EVENTS;
+  static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENT {
+    return DEXIE_CRUD_EVENT;
   }
 
   constructor() {
@@ -152,23 +152,23 @@ export class StorageService {
     listenableTables.forEach(table => {
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENTS.UPDATING, function(
+        .hook(DEXIE_CRUD_EVENT.UPDATING, function(
           modifications: Object,
           primaryKey: string,
           obj: Object,
           transaction: Dexie.Transaction,
         ): void {
-          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENTS.UPDATING, obj, updatedObj, transaction);
+          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
         });
 
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENTS.DELETING, function(
+        .hook(DEXIE_CRUD_EVENT.DELETING, function(
           primaryKey: string,
           obj: Object,
           transaction: Dexie.Transaction,
         ): void {
-          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENTS.DELETING, obj, undefined, transaction);
+          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
         });
     });
   }
@@ -186,11 +186,11 @@ export class StorageService {
   }
 
   addUpdatedListener(storeName: string, callback: DatabaseListenerCallback): void {
-    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENTS.UPDATING});
+    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENT.UPDATING});
   }
 
   addDeletedListener(storeName: string, callback: DatabaseListenerCallback): void {
-    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENTS.DELETING});
+    this.dbListeners.push({callback, store: storeName, type: DEXIE_CRUD_EVENT.DELETING});
   }
 
   //##############################################################################
@@ -218,7 +218,18 @@ export class StorageService {
    * @param primaryKey - Primary key
    * @returns Resolves when the object is deleted
    */
-  delete(storeName: string, primaryKey: string): Promise<string> {
+  async delete(storeName: string, primaryKey: string): Promise<string> {
+    if (this.isTemporaryAndNonPersistant) {
+      const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
+      const deletedKey = await this.engine.delete(storeName, primaryKey);
+
+      this.dbListeners
+        .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.DELETING)
+        .forEach(dbListener => dbListener.callback({obj: undefined, oldObj: oldRecord}));
+
+      return deletedKey;
+    }
+
     return this.engine.delete(storeName, primaryKey);
   }
 
@@ -358,12 +369,26 @@ export class StorageService {
       throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
-    try {
-      const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
-      return newKey;
-    } catch (error) {
-      this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
-      throw error;
+    if (this.isTemporaryAndNonPersistant) {
+      try {
+        const newKey = await this.engine.create(storeName, primaryKey, entity);
+        return newKey;
+      } catch (error) {
+        if (error instanceof StoreEngineError.RecordAlreadyExistsError) {
+          await this.update(storeName, primaryKey, entity);
+          return primaryKey;
+        }
+        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        throw error;
+      }
+    } else {
+      try {
+        const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
+        return newKey;
+      } catch (error) {
+        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        throw error;
+      }
     }
   }
 
@@ -391,7 +416,14 @@ export class StorageService {
   async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
       if (this.isTemporaryAndNonPersistant) {
+        const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
         await this.engine.update(storeName, primaryKey, changes);
+        const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
+
+        this.dbListeners
+          .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.UPDATING)
+          .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));
+
         return 1;
       } else {
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
