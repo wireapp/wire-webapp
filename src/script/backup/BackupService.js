@@ -66,7 +66,7 @@ export class BackupService {
     const isEventsTable = tableName === this.EVENTS_STORE_NAME;
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     if (this.storageService.db) {
-      await this.storageService.db[tableName].bulkPut(entities, primaryKeys);
+      await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);
     } else {
       for (const entity of entities) {
         await this.storageService.save(tableName, entity.id, entity);

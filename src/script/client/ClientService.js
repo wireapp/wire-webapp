@@ -161,7 +161,8 @@ export class ClientService {
     let clientRecord;
 
     if (this.storageService.db) {
-      clientRecord = await this.storageService.db[this.CLIENT_STORE_NAME]
+      clientRecord = await this.storageService.db
+        .table(this.CLIENT_STORE_NAME)
         .where('meta.primary_key')
         .equals(primaryKey)
         .first();

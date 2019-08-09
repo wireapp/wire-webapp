@@ -37,7 +37,8 @@ export class EventServiceNoCompound extends EventService {
     let events;
 
     if (this.storageService.db) {
-      events = await this.storageService.db[this.EVENT_STORE_NAME]
+      events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('conversation')
         .equals(conversationId)
         .sortBy('time');
@@ -70,7 +71,8 @@ export class EventServiceNoCompound extends EventService {
     }
 
     if (this.storageService.db) {
-      return this.storageService.db[this.EVENT_STORE_NAME]
+      return this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('conversation')
         .equals(conversationId)
         .and(record => {

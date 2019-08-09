@@ -423,7 +423,8 @@ export class ConversationService {
     let events;
 
     if (this.storageService.db) {
-      events = await this.storageService.db[this.EVENT_STORE_NAME]
+      events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('time')
         .aboveOrEqual(min_date.toISOString())
         .toArray();
@@ -461,7 +462,7 @@ export class ConversationService {
   async save_conversations_in_db(conversations) {
     if (this.storageService.db) {
       const keys = conversations.map(conversation => conversation.id);
-      await this.storageService.db[this.CONVERSATION_STORE_NAME].bulkPut(conversations, keys);
+      await this.storageService.db.table(this.CONVERSATION_STORE_NAME).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {
         await this.storageService.save(this.CONVERSATION_STORE_NAME, conversation.id, conversation);

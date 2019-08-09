@@ -55,7 +55,8 @@ export class EventService {
 
     try {
       if (this.storageService.db) {
-        const events = await this.storageService.db[this.EVENT_STORE_NAME]
+        const events = await this.storageService.db
+          .table(this.EVENT_STORE_NAME)
           .where('id')
           .anyOf(eventIds)
           .filter(record => record.conversation === conversationId)
@@ -91,7 +92,8 @@ export class EventService {
 
     try {
       if (this.storageService.db) {
-        const entry = await this.storageService.db[this.EVENT_STORE_NAME]
+        const entry = await this.storageService.db
+          .table(this.EVENT_STORE_NAME)
           .where('id')
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
@@ -121,7 +123,8 @@ export class EventService {
    */
   async loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
     if (this.storageService.db) {
-      const events = await this.storageService.db[this.EVENT_STORE_NAME]
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
         .sortBy('time');
@@ -139,7 +142,8 @@ export class EventService {
 
   async loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
     if (this.storageService.db) {
-      const events = await this.storageService.db[this.EVENT_STORE_NAME]
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
         .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
@@ -238,7 +242,8 @@ export class EventService {
     }
 
     if (this.storageService.db) {
-      const events = await this.storageService.db[this.EVENT_STORE_NAME]
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('[conversation+time]')
         .between(
           [conversationId, fromDate.toISOString()],
@@ -423,7 +428,8 @@ export class EventService {
    */
   async deleteEvent(conversationId, eventId) {
     if (this.storageService.db) {
-      const deleted = await this.storageService.db[this.EVENT_STORE_NAME]
+      const deleted = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('id')
         .equals(eventId)
         .and(record => record.conversation === conversationId)
@@ -464,7 +470,8 @@ export class EventService {
    */
   async deleteEvents(conversationId, isoDate) {
     if (this.storageService.db) {
-      return this.storageService.db[this.EVENT_STORE_NAME]
+      return this.storageService.db
+        .table(this.EVENT_STORE_NAME)
         .where('conversation')
         .equals(conversationId)
         .filter(record => !isoDate || isoDate >= record.time)
