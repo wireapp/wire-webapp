@@ -49,10 +49,11 @@ enum DEXIE_CRUD_EVENT {
 export class StorageService {
   public db?: Dexie & DexieObservable;
   public objectDb?: MemoryStore;
+  private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
+  private readonly isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
-  private readonly isTemporaryAndNonPersistant: boolean;
   private userId?: string;
   public dbName?: string;
 
@@ -66,10 +67,11 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistant =
+    this.isTemporaryAndNonPersistent =
       loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
 
-    this.engine = this.isTemporaryAndNonPersistant ? new MemoryEngine() : new IndexedDBEngine();
+    this.engine = this.isTemporaryAndNonPersistent ? new MemoryEngine() : new IndexedDBEngine();
+    this.hasHookSupport = this.engine instanceof IndexedDBEngine;
 
     this.dbListeners = [];
   }
@@ -95,7 +97,7 @@ export class StorageService {
     this._upgradeStores(this.db);
 
     try {
-      if (this.isTemporaryAndNonPersistant) {
+      if (this.isTemporaryAndNonPersistent) {
         await this.moveDexieToMemory();
         this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
       } else {
@@ -202,21 +204,13 @@ export class StorageService {
    * @returns Resolves when all stores have been cleared
    */
   async clearStores(): Promise<void[]> {
-    const deleteStorePromises = this.isTemporaryAndNonPersistant
+    const deleteStorePromises = this.isTemporaryAndNonPersistent
       ? [this.engine.purge()]
       : Object.keys(this.db._dbSchema)
           // avoid clearing tables needed by third parties (dexie-observable for eg)
           .filter(table => !table.startsWith('_'))
           .map(storeName => this.deleteStore(storeName));
     return Promise.all(deleteStorePromises);
-  }
-
-  /**
-   * Checks if the underlying database supports native hooks to signal / emit database record updates to the app.
-   * @returns True, when the engine has native support for database hooks.
-   */
-  private hasDatabaseHookSupport(): boolean {
-    return this.engine instanceof IndexedDBEngine;
   }
 
   /**
@@ -227,16 +221,14 @@ export class StorageService {
    * @returns Resolves when the object is deleted
    */
   async delete(storeName: string, primaryKey: string): Promise<string> {
-    if (this.hasDatabaseHookSupport()) {
+    if (this.hasHookSupport) {
       return this.engine.delete(storeName, primaryKey);
     }
 
     const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
     const deletedKey = await this.engine.delete(storeName, primaryKey);
 
-    this.dbListeners
-      .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.DELETING)
-      .forEach(dbListener => dbListener.callback({obj: undefined, oldObj: oldRecord}));
+    this.notifyListeners(storeName, DEXIE_CRUD_EVENT.DELETING, undefined, oldRecord);
 
     return deletedKey;
   }
@@ -268,7 +260,7 @@ export class StorageService {
   }
 
   async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
-    if (this.isTemporaryAndNonPersistant) {
+    if (this.isTemporaryAndNonPersistent) {
       let deletedRecords = 0;
       const primaryKeys = await this.readAllPrimaryKeys(storeName);
 
@@ -292,7 +284,7 @@ export class StorageService {
   }
 
   async deleteEventsByDate(storeName: string, conversationId: string, isoDate: string): Promise<number> {
-    if (this.isTemporaryAndNonPersistant) {
+    if (this.isTemporaryAndNonPersistent) {
       let deletedRecords = 0;
       const primaryKeys = await this.readAllPrimaryKeys(storeName);
 
@@ -377,7 +369,7 @@ export class StorageService {
       throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
-    if (this.isTemporaryAndNonPersistant) {
+    if (this.isTemporaryAndNonPersistent) {
       try {
         const newKey = await this.engine.create(storeName, primaryKey, entity);
         return newKey;
@@ -408,9 +400,15 @@ export class StorageService {
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
-    if (!this.isTemporaryAndNonPersistant) {
+    if (!this.isTemporaryAndNonPersistent) {
       this.db.close();
     }
+  }
+
+  private notifyListeners(storeName: string, eventType: DEXIE_CRUD_EVENT, oldRecord: any, newRecord: any): void {
+    this.dbListeners
+      .filter(dbListener => dbListener.store === storeName && dbListener.type === eventType)
+      .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));
   }
 
   /**
@@ -423,7 +421,7 @@ export class StorageService {
    */
   async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
-      if (this.hasDatabaseHookSupport()) {
+      if (this.hasHookSupport) {
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
         this.logger.info(logMessage, changes);
@@ -433,9 +431,7 @@ export class StorageService {
         await this.engine.update(storeName, primaryKey, changes);
         const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
 
-        this.dbListeners
-          .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.UPDATING)
-          .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));
+        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, newRecord, oldRecord);
 
         return 1;
       }
