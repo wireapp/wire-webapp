@@ -212,6 +212,14 @@ export class StorageService {
   }
 
   /**
+   * Checks if the underlying database supports native hooks to signal / emit database record updates to the app.
+   * @returns True, when the engine has native support for database hooks.
+   */
+  private hasDatabaseHookSupport(): boolean {
+    return this.engine instanceof IndexedDBEngine;
+  }
+
+  /**
    * Removes persisted data.
    *
    * @param storeName - Name of the object store
@@ -219,18 +227,18 @@ export class StorageService {
    * @returns Resolves when the object is deleted
    */
   async delete(storeName: string, primaryKey: string): Promise<string> {
-    if (this.isTemporaryAndNonPersistant) {
-      const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
-      const deletedKey = await this.engine.delete(storeName, primaryKey);
-
-      this.dbListeners
-        .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.DELETING)
-        .forEach(dbListener => dbListener.callback({obj: undefined, oldObj: oldRecord}));
-
-      return deletedKey;
+    if (this.hasDatabaseHookSupport()) {
+      return this.engine.delete(storeName, primaryKey);
     }
 
-    return this.engine.delete(storeName, primaryKey);
+    const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
+    const deletedKey = await this.engine.delete(storeName, primaryKey);
+
+    this.dbListeners
+      .filter(dbListener => dbListener.store === storeName && dbListener.type === DEXIE_CRUD_EVENT.DELETING)
+      .forEach(dbListener => dbListener.callback({obj: undefined, oldObj: oldRecord}));
+
+    return deletedKey;
   }
 
   async deleteDatabase(): Promise<boolean> {
@@ -415,7 +423,12 @@ export class StorageService {
    */
   async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
-      if (this.isTemporaryAndNonPersistant) {
+      if (this.hasDatabaseHookSupport()) {
+        const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
+        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
+        this.logger.info(logMessage, changes);
+        return numberOfUpdates;
+      } else {
         const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
         await this.engine.update(storeName, primaryKey, changes);
         const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
@@ -425,11 +438,6 @@ export class StorageService {
           .forEach(dbListener => dbListener.callback({obj: newRecord, oldObj: oldRecord}));
 
         return 1;
-      } else {
-        const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
-        const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
-        this.logger.info(logMessage, changes);
-        return numberOfUpdates;
       }
     } catch (error) {
       this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
