@@ -42,7 +42,7 @@
     "nock": "10.0.6",
     "optimist": "0.6.1",
     "react": "16.8.6",
-    "react-dom": "16.8.6",
+    "react-dom": "16.9.0",
     "react-hot-loader": "4.12.10",
     "rimraf": "2.6.3",
     "sinon": "7.4.0",
