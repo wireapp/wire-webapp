@@ -771,6 +771,16 @@
     "@emotion/utils" "0.11.2"
     "@emotion/weak-memoize" "0.2.3"
 
+"@emotion/cache@^10.0.15":
+  version "10.0.15"
+  resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.15.tgz#b81767b48015aae2689c60373992145c67b8de02"
+  integrity sha512-8VthgeKhlGeTXSW1JN7I14AnAaiFPbOrqNqg3dPoGCZ3bnMjkrmRU0zrx0BtBw9esBaPaQgDB9y0tVgAGT2Mrg==
+  dependencies:
+    "@emotion/sheet" "0.9.3"
+    "@emotion/stylis" "0.8.4"
+    "@emotion/utils" "0.11.2"
+    "@emotion/weak-memoize" "0.2.3"
+
 "@emotion/core@10.0.14":
   version "10.0.14"
   resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.14.tgz#cac5c334b278d5b7688cfff39e460a5b50abb71c"
@@ -780,6 +790,18 @@
     "@emotion/cache" "^10.0.14"
     "@emotion/css" "^10.0.14"
     "@emotion/serialize" "^0.11.8"
+    "@emotion/sheet" "0.9.3"
+    "@emotion/utils" "0.11.2"
+
+"@emotion/core@10.0.15":
+  version "10.0.15"
+  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.15.tgz#b8489d85d64b45bd03abdb8a3d9639ba8a0328d0"
+  integrity sha512-VHwwl3k/ddMfQOHYgOJryXOs2rGJ5AfKLQGm5AVolNonnr6tkmDI4nzIMNaPpveoXVs7sP0OrF24UunIPxveQw==
+  dependencies:
+    "@babel/runtime" "^7.4.3"
+    "@emotion/cache" "^10.0.15"
+    "@emotion/css" "^10.0.14"
+    "@emotion/serialize" "^0.11.9"
     "@emotion/sheet" "0.9.3"
     "@emotion/utils" "0.11.2"
 
@@ -806,6 +828,17 @@
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@emotion/serialize/-/serialize-0.11.8.tgz#e41dcf7029e45286a3e0cf922933e670fe05402c"
   integrity sha512-Qb6Us2Yk1ZW8SOYH6s5z7qzXXb2iHwVeqc6FjXtac0vvxC416ki0eTtHNw4Q5smoyxdyZh3519NKGrQvvvrZ/Q==
+  dependencies:
+    "@emotion/hash" "0.7.2"
+    "@emotion/memoize" "0.7.2"
+    "@emotion/unitless" "0.7.4"
+    "@emotion/utils" "0.11.2"
+    csstype "^2.5.7"
+
+"@emotion/serialize@^0.11.9":
+  version "0.11.9"
+  resolved "https://registry.yarnpkg.com/@emotion/serialize/-/serialize-0.11.9.tgz#123e0f51d2dee9693fae1057bd7fc27b021d6868"
+  integrity sha512-/Cn4V81z3ZyFiDQRw8nhGFaHkxHtmCSSBUit4vgTuLA1BqxfJUYiqSq97tq/vV8z9LfIoqs6a9v6QrUFWZpK7A==
   dependencies:
     "@emotion/hash" "0.7.2"
     "@emotion/memoize" "0.7.2"
@@ -1618,17 +1651,18 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.8.0":
-  version "7.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.8.0.tgz#1d877e092eef55453e6a879dcf2e427a15f1c502"
-  integrity sha512-dbD9/xZeXtnyrkNsIgz2O0KAQt+8LvETWzKCtMbc0z67p1lzC3zGE78v65nyCud8MqvcORmYtC7b4wXaRX95/A==
+"@wireapp/react-ui-kit@7.11.1":
+  version "7.11.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.11.1.tgz#1d40cdf954337853534ca6e157511d627c25f724"
+  integrity sha512-GTC4kWA1BAjEGwjOFux7rRCZHYCB2I6l6eBsgpS6L/KQjn8nMvPtjrC/+m73onWTxN2ZPtnL4YPojoMlTaGbKg==
   dependencies:
-    "@emotion/core" "10.0.14"
+    "@emotion/core" "10.0.15"
     "@types/color" "3.0.0"
-    bazinga64 "5.5.7"
+    bazinga64 "5.5.10"
     color "3.1.2"
     emotion-normalize "10.1.0"
-    react-transition-group "4.2.1"
+    emotion-theming "10.0.14"
+    react-transition-group "4.2.2"
 
 "@wireapp/store-engine-dexie@0.5.3":
   version "0.5.3"
@@ -2417,11 +2451,6 @@ bazinga64@5.5.10:
   version "5.5.10"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.10.tgz#9b507b94364e44ef706c1fff2ccc04565d416759"
   integrity sha512-kDiZQa/OrIVLcLepek9bgD0KDFVY9PRWjTA2Bx2QSHnG7p+xVZXoehTpxAXMpb4gGDoMw6OBQN4G2an7dlXzfA==
-
-bazinga64@5.5.7:
-  version "5.5.7"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.7.tgz#818d0140e19f60ce0ac41af7b1542616c0744bd8"
-  integrity sha512-wFilBMRYZZp0L2JcXpEBV0yM2S7DN8Vceq3CRJC1A/PAsGIXWzpqaxSQYW8mcXmdW3auG7kBE9sB5OV34y6R2Q==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -4136,6 +4165,15 @@ emotion-normalize@10.1.0:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/emotion-normalize/-/emotion-normalize-10.1.0.tgz#b4cfd2f7d37b9eafb3b0d5ee7dc4fbb83f18e68f"
   integrity sha512-Z+rz3Eep8tUgtBKT13/rEpci+ZbCadRovEmILuLB9IEpq4FdNpXjm7MVeJqG4iBRGw4tKmIq06lYgjeC6oEnag==
+
+emotion-theming@10.0.14:
+  version "10.0.14"
+  resolved "https://registry.yarnpkg.com/emotion-theming/-/emotion-theming-10.0.14.tgz#e548d388493d07bedbb0d9d3bbe221766174b1f4"
+  integrity sha512-zMGhPSYz48AAR6DYjQVaZHeO42cYKPq4VyB1XjxzgR62/NmO99679fx8qDDB1QZVYGkRWZtsOe+zJE/e30XdbA==
+  dependencies:
+    "@babel/runtime" "^7.4.3"
+    "@emotion/weak-memoize" "0.2.3"
+    hoist-non-react-statics "^3.3.0"
 
 encodeurl@~1.0.2:
   version "1.0.2"
@@ -10078,10 +10116,10 @@ react-test-renderer@^16.0.0-0:
     react-is "^16.8.6"
     scheduler "^0.13.6"
 
-react-transition-group@4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.1.tgz#61fc9e36568bff9a1fe4e60fae323c8a6dbc0680"
-  integrity sha512-IXrPr93VzCPupwm2O6n6C2kJIofJ/Rp5Ltihhm9UfE8lkuVX2ng/SUUl/oWjblybK9Fq2Io7LGa6maVqPB762Q==
+react-transition-group@4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.2.tgz#8b5252410180c27fd7eebf50b185256b41799b16"
+  integrity sha512-uP0tjqewtvjb7kGZFpZYPoD/NlVZmIgts9eTt1w35pAaEApPxQGv94lD3VkqyXf2aMqrSGwhs6EV/DLaoKbLSw==
   dependencies:
     "@babel/runtime" "^7.4.5"
     dom-helpers "^3.4.0"
