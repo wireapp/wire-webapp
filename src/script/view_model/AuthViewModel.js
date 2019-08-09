@@ -1512,7 +1512,7 @@ class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db))
+      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db || this.storageService.dbObject))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.error.UserError.TYPE.USER_MISSING_EMAIL;
@@ -1602,7 +1602,7 @@ class AuthViewModel {
 
   _register_client(autoLogin) {
     return this.cryptography_repository
-      .createCryptobox(this.storageService.db)
+      .createCryptobox(this.service.storage.db || this.service.storage.objectDb, this.service.storage.dbName)
       .then(() => this.client_repository.registerClient(autoLogin ? undefined : this.password()))
       .then(clientObservable => {
         this.event_repository.currentClient = clientObservable;
