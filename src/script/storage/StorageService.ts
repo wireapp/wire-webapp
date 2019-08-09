@@ -244,6 +244,54 @@ export class StorageService {
     await Promise.all(deleteStorePromises);
   }
 
+  async deleteEventInConversation(storeName: string, conversationId: string, eventId: string): Promise<number> {
+    if (this.isTemporaryAndNonPersistant) {
+      let deletedRecords = 0;
+      const primaryKeys = await this.readAllPrimaryKeys(storeName);
+
+      for (const primaryKey of primaryKeys) {
+        const record = await this.load<{conversation: string; id: string; time: number}>(storeName, primaryKey);
+        if (record && record.id === eventId && record.conversation === conversationId) {
+          await this.delete(storeName, primaryKey);
+          deletedRecords++;
+        }
+      }
+
+      return deletedRecords;
+    }
+
+    return this.db
+      .table(storeName)
+      .where('id')
+      .equals(eventId)
+      .and(record => record.conversation === conversationId)
+      .delete();
+  }
+
+  async deleteEventsByDate(storeName: string, conversationId: string, isoDate: string): Promise<number> {
+    if (this.isTemporaryAndNonPersistant) {
+      let deletedRecords = 0;
+      const primaryKeys = await this.readAllPrimaryKeys(storeName);
+
+      for (const primaryKey of primaryKeys) {
+        const record = await this.load<{conversation: string; time: string}>(storeName, primaryKey);
+        if (record && record.conversation === conversationId && (!isoDate || isoDate >= record.time)) {
+          await this.delete(storeName, primaryKey);
+          deletedRecords++;
+        }
+      }
+
+      return deletedRecords;
+    }
+
+    return this.db
+      .table(storeName)
+      .where('conversation')
+      .equals(conversationId)
+      .filter(record => !isoDate || isoDate >= record.time)
+      .delete();
+  }
+
   /**
    * Returns an array of all records for a given object store.
    *
