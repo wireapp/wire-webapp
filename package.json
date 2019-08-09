@@ -1,6 +1,4 @@
 {
-  "name": "wire-webapp",
-  "license": "GPL-3.0",
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
@@ -9,11 +7,11 @@
     "@emotion/core": "10.0.14",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "2.2.8",
-    "@wireapp/core": "12.17.37",
+    "@wireapp/core": "12.17.40",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/react-ui-kit": "7.8.0",
-    "@wireapp/store-engine-dexie": "0.5.0",
-    "@wireapp/store-engine": "3.9.0",
+    "@wireapp/store-engine": "3.9.3",
+    "@wireapp/store-engine-dexie": "0.5.3",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.9",
     "crypto-js": "3.1.9-1",
@@ -165,7 +163,28 @@
   "engines": {
     "yarn": ">= 1.0.0"
   },
+  "exportsOverride": {
+    "@bower_components/normalize-css": {
+      "css": "normalize.css"
+    },
+    "@bower_components/webapp-module-bubble": {
+      "js": "dist/script/*.js",
+      "less": "app/style/webapp-module-bubble.less"
+    },
+    "@bower_components/webapp-module-namespace": {
+      "js": "js/*.js"
+    },
+    "@bower_components/wire-theme": {
+      "less": "app/style/{wire-theme,variables,input}.less"
+    }
+  },
+  "license": "GPL-3.0",
   "lint-staged": {
+    "*.less": [
+      "prettier --write",
+      "stylelint --fix",
+      "git add"
+    ],
     "*.{js,jsx}": [
       "eslint --fix",
       "git add"
@@ -174,31 +193,33 @@
       "prettier --write",
       "git add"
     ],
-    "*.less": [
-      "prettier --write",
-      "stylelint --fix",
-      "git add"
-    ],
-    "src/script/**/*.tsx": [
-      "tslint --config tslint.react.json --project tsconfig.json --fix",
+    "server/**/*.ts": [
+      "tslint --config server/tslint.json",
       "git add"
     ],
     "src/script/**/*.ts": [
       "tslint --config tslint.json --project tsconfig.json --fix",
       "git add"
     ],
-    "server/**/*.ts": [
-      "tslint --config server/tslint.json",
+    "src/script/**/*.tsx": [
+      "tslint --config tslint.react.json --project tsconfig.json --fix",
       "git add"
     ]
   },
+  "name": "wire-webapp",
   "prettier": "@wireapp/prettier-config",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp.git"
+  },
   "scripts": {
+    "build:prod": "yarn build:server && grunt build_prod",
     "build:server": "cd server && yarn build",
+    "build:style": "node ./bin/less.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "bundle:test": "webpack --config webpack.config.test.js",
-    "build:prod": "yarn build:server && grunt build_prod",
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
@@ -222,35 +243,14 @@
     "start": "yarn build:server && grunt build && concurrently \"yarn start:server:dev\" \"grunt watch\"",
     "start:server:dev": "cross-env NODE_ENV=development node ./server/dist/index.js",
     "stylelint": "prettier --ignore-path .gitignore --write \"**/*.less\" && stylelint --ignore-path .gitignore \"**/*.less\"",
-    "build:style": "node ./bin/less.js",
     "test": "yarn test:types && yarn lint && yarn test:server && yarn test:auth && yarn test:app",
     "test:app": "node --max-old-space-size=4096 ./node_modules/karma/bin/karma start karma.conf.js",
     "test:auth": "yarn bundle:test && karma start karma.conf.react.js",
     "test:server": "cd server && yarn test",
     "test:types": "tsc --noEmit",
-    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "yarn bundle:prod && node ./bin/translations_normalize.js",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'"
+    "translate:upload": "yarn translate:merge && node ./bin/translations_upload.js"
   },
-  "version": "0.1.0",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wireapp/wire-webapp.git"
-  },
-  "exportsOverride": {
-    "@bower_components/normalize-css": {
-      "css": "normalize.css"
-    },
-    "@bower_components/webapp-module-bubble": {
-      "js": "dist/script/*.js",
-      "less": "app/style/webapp-module-bubble.less"
-    },
-    "@bower_components/webapp-module-namespace": {
-      "js": "js/*.js"
-    },
-    "@bower_components/wire-theme": {
-      "less": "app/style/{wire-theme,variables,input}.less"
-    }
-  }
+  "version": "0.1.0"
 }
