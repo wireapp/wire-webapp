@@ -387,7 +387,7 @@ class App {
       .then(() => {
         telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
-        this.applock = new AppLockViewModel(this.repository.auth.authService, this.logout);
+        this.applock = new AppLockViewModel(this.repository.auth.authService, this.repository.user.self);
 
         loadingView.removeFromView();
         telemetry.report();

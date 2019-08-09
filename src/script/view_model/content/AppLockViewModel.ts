@@ -25,6 +25,7 @@ import {afterRender, murmurhash3} from 'Util/util';
 import {AuthService} from '../../auth/AuthService';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {config} from '../../config';
+import {User} from '../../entity/User';
 import {WebAppEvents} from '../../event/WebApp';
 
 enum APPLOCK_STATE {
@@ -60,19 +61,29 @@ export class AppLockViewModel {
   timeOutId: number;
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
+  storageKeyCode: ko.PureComputed<string>;
+  storageKeySalt: ko.PureComputed<string>;
+  storageKeyIsLocked: ko.PureComputed<string>;
 
-  constructor(authService: AuthService) {
+  constructor(authService: AuthService, selfUser: ko.Observable<User>) {
     this.authService = authService;
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
     this.isVisible = ko.observable(false);
     this.isLoading = ko.observable(false);
+    this.storageKeyCode = ko.pureComputed(() => `${APPLOCK_STORAGE.CODE}_${selfUser().id}`);
+    this.storageKeySalt = ko.pureComputed(() => `${APPLOCK_STORAGE.SALT}_${selfUser().id}`);
+    this.storageKeyIsLocked = ko.pureComputed(() => `${APPLOCK_STORAGE.IS_LOCKED}_${selfUser().id}`);
     ko.applyBindings(this, document.getElementById('applock'));
 
     const timeOut = config.FEATURE.APPLOCK_TIMEOUT;
     this.isVisible.subscribe(isVisible => {
-      (<HTMLDivElement>document.querySelector('#app')).style.filter = isVisible ? 'blur(100px)' : '';
+      (<HTMLDivElement>document.querySelector('#app')).style.setProperty(
+        'filter',
+        isVisible ? 'blur(100px)' : '',
+        'important',
+      );
     });
 
     this.timeOut = timeOut;
@@ -127,28 +138,28 @@ export class AppLockViewModel {
     }
   }
 
-  getIsLocked = (): boolean => this.localStorage.getItem(APPLOCK_STORAGE.IS_LOCKED) === 'true';
+  getIsLocked = (): boolean => this.localStorage.getItem(this.storageKeyIsLocked()) === 'true';
   setIsLocked = (isLocked: boolean) =>
-    this.localStorage.setItem(APPLOCK_STORAGE.IS_LOCKED, isLocked ? 'true' : 'false');
+    this.localStorage.setItem(this.storageKeyIsLocked(), isLocked ? 'true' : 'false');
 
-  getCode = () => this.localStorage.getItem(APPLOCK_STORAGE.CODE);
+  getCode = () => this.localStorage.getItem(this.storageKeyCode());
   hashCode = (code: string) => {
-    const seed = parseInt(this.localStorage.getItem(APPLOCK_STORAGE.SALT), 16);
+    const seed = parseInt(this.localStorage.getItem(this.storageKeySalt()), 16);
     return murmurhash3(code, seed).toString(16);
   };
 
   setCode = (code: string) => {
     const seed = Math.trunc(Math.random() * 1024);
     this.stopPassphraseObserver();
-    this.localStorage.setItem(APPLOCK_STORAGE.SALT, seed.toString(16));
-    this.localStorage.setItem(APPLOCK_STORAGE.CODE, this.hashCode(code));
+    this.localStorage.setItem(this.storageKeySalt(), seed.toString(16));
+    this.localStorage.setItem(this.storageKeyCode(), this.hashCode(code));
     this.startPassphraseObserver();
   };
 
   onClosed = () => this.state(APPLOCK_STATE.NONE);
 
   handleStorageEvent = ({key, oldValue}: StorageEvent) => {
-    if (key === APPLOCK_STORAGE.IS_LOCKED) {
+    if (key === this.storageKeyIsLocked()) {
       if (oldValue === 'true') {
         this.setIsLocked(true);
       }
@@ -156,11 +167,11 @@ export class AppLockViewModel {
   };
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
-    if (key === APPLOCK_STORAGE.CODE) {
-      this.localStorage.setItem(APPLOCK_STORAGE.CODE, oldValue);
+    if (key === this.storageKeyCode()) {
+      this.localStorage.setItem(this.storageKeyCode(), oldValue);
     }
-    if (key === APPLOCK_STORAGE.SALT) {
-      this.localStorage.setItem(APPLOCK_STORAGE.SALT, oldValue);
+    if (key === this.storageKeySalt()) {
+      this.localStorage.setItem(this.storageKeySalt(), oldValue);
     }
   };
 
@@ -236,9 +247,9 @@ export class AppLockViewModel {
     try {
       this.isLoading(true);
       await this.authService.validatePassword(password);
-      this.localStorage.removeItem(APPLOCK_STORAGE.CODE);
-      this.localStorage.removeItem(APPLOCK_STORAGE.SALT);
-      this.localStorage.removeItem(APPLOCK_STORAGE.IS_LOCKED);
+      this.localStorage.removeItem(this.storageKeyCode());
+      this.localStorage.removeItem(this.storageKeySalt());
+      this.localStorage.removeItem(this.storageKeyIsLocked());
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       this.isVisible(false);
     } catch ({code, message}) {
