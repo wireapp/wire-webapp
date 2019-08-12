@@ -142,7 +142,7 @@
     "react-hot-loader": "4.12.10",
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "1.5.3",
-    "sinon": "7.3.2",
+    "sinon": "7.4.1",
     "stylelint": "10.1.0",
     "stylelint-config-idiomatic-order": "7.0.3",
     "stylelint-config-prettier": "5.2.0",
