@@ -27,7 +27,7 @@ import {RouteComponentProps, withRouter} from 'react-router';
 import {getLogger} from 'Util/Logger';
 
 import {verifyStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';

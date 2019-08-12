@@ -28,7 +28,7 @@ import {getLogger} from 'Util/Logger';
 
 import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
