@@ -55,11 +55,11 @@ export class AppLockViewModel {
   setupPasswordA: ko.Observable<string>;
   setupPasswordB: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
+  storageKey: ko.PureComputed<string>;
   timeOut: number;
   timeOutId: number;
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
-  storageKey: ko.PureComputed<string>;
 
   constructor(authService: AuthService, selfUser: ko.Observable<User>) {
     this.authService = authService;
