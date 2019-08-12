@@ -43,7 +43,7 @@ import {noop} from 'Util/util';
 
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import RouterLink from '../component/RouterLink';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 import {Config} from '../config';

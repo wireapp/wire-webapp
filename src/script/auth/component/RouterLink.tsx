@@ -28,4 +28,4 @@ const RRLink: any = RouterDOM.Link;
 
 const RouterLink = (props: RouterLinkProps) => <RRLink css={theme => linkStyle(theme, props)} {...props} />;
 
-export {RouterLink};
+export default RouterLink;

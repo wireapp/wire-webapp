@@ -37,7 +37,7 @@ import {InjectedIntlProps, injectIntl} from 'react-intl';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';

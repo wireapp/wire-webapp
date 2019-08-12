@@ -52,7 +52,7 @@ import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/Validation
 
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import {RouterLink} from '../component/RouterLink';
+import RouterLink from '../component/RouterLink';
 import {Config} from '../config';
 import {externalRoute as EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
