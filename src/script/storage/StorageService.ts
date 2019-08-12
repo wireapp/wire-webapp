@@ -228,7 +228,7 @@ export class StorageService {
     const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
     const deletedKey = await this.engine.delete(storeName, primaryKey);
 
-    this.notifyListeners(storeName, DEXIE_CRUD_EVENT.DELETING, undefined, oldRecord);
+    this.notifyListeners(storeName, DEXIE_CRUD_EVENT.DELETING, oldRecord, undefined);
 
     return deletedKey;
   }
@@ -431,7 +431,7 @@ export class StorageService {
         await this.engine.update(storeName, primaryKey, changes);
         const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
 
-        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, newRecord, oldRecord);
+        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
 
         return 1;
       }
