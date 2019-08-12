@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.7.3...@wireapp/store-engine-sqleet@0.7.4) (2019-08-12)
+
+
+### Bug Fixes
+
+* **store-engine,store-engine-sqleet:** Verify that strings and objects can be saved ([#2175](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2175)) ([f363f04](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/f363f04))
+
+
+
+
+
 ## [0.7.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.7.2...@wireapp/store-engine-sqleet@0.7.3) (2019-08-08)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet

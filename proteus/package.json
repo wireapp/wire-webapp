@@ -35,5 +35,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "jasmine"
   },
-  "version": "9.3.12"
+  "version": "9.3.13"
 }
