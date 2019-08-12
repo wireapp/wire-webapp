@@ -182,6 +182,9 @@
 
     <!-- ko if: isActivatedAccount() && !Environment.desktop -->
       <section class="preferences-section">
+        <!-- ko if: optionResetAppLock -->
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: t('prefenrencesAccountResetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
+        <!-- /ko -->
         <div class="preferences-link accent-text" data-bind="click: clickOnLogout, text: t('preferencesAccountLogOut')" data-uie-name="do-logout"></div>
       </section>
     <!-- /ko -->

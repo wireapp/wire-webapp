@@ -42,6 +42,7 @@
             <div
               class="modal__cta modal__cta--input"
               data-bind="click: onClickForgot, text: t('modalAppLockLockedForgotCTA')"
+              data-uie-name="go-forgot-passphrase"
             ></div>
           </div>
           <div class="modal__buttons">
@@ -58,13 +59,12 @@
       <!-- ko if: isForgotScreen() -->
         <div data-bind="template: {afterRender: startObserver}">
           <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')"></div>
-          <div class="modal__cta" data-bind="click: onClickWipe, text: t('modalAppLockForgotWipeCTA')"></div>
+          <div class="modal__cta" data-bind="click: onClickWipe, text: t('modalAppLockForgotWipeCTA')" data-uie-name="go-wipe-database"></div>
           <div class="modal__buttons">
             <button
-              data-bind="click: onGoBack"
+              data-bind="click: onGoBack, text: t('modalAppLockForgotGoBackButton')"
               class="modal__button modal__button--secondary modal__button--full"
               data-uie-name="do-go-back"
-              data-bind="text: t('modalAppLockForgotGoBackButton')"
             ></button>
           </div>
         </div>
@@ -80,10 +80,9 @@
               data-uie-name="do-go-back"
             ></button>
             <button
-              data-bind="click: onClickWipeConfirm"
+              data-bind="click: onClickWipeConfirm, text: t('modalAppLockWipeConfirmConfirmButton')"
               class="modal__button modal__button--primary modal__button--alert"
               data-uie-name="do-action"
-              data-bind="text: t('modalAppLockWipeConfirmConfirmButton')"
             ></button>
           </div>
         </div>
@@ -99,6 +98,7 @@
           <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()"></div>
           <div class="modal__buttons">
             <button
+              type="button"
               data-bind="click: onGoBack, text: t('modalAppLockWipePasswordGoBackButton')"
               class="modal__button modal__button--secondary"
               data-uie-name="do-go-back"
