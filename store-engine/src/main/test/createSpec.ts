@@ -17,22 +17,14 @@
  *
  */
 
+// tslint:disable:object-literal-sort-keys
+
 import {CRUDEngine} from '../engine';
 import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
 
 const TABLE_NAME = 'the-simpsons';
 
 export const createSpec = {
-  'creates a serialized database record.': async (engine: CRUDEngine) => {
-    const PRIMARY_KEY = 'primary-key';
-
-    const entity = {
-      some: 'value',
-    };
-
-    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
-    expect(primaryKey).toEqual(PRIMARY_KEY);
-  },
   "doesn't save empty values.": async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';
 
@@ -56,6 +48,39 @@ export const createSpec = {
     } catch (error) {
       expect(error).toEqual(jasmine.any(RecordTypeError));
     }
+  },
+  'saves strings.': async (engine: CRUDEngine) => {
+    const PRIMARY_KEY = 'primary-key';
+
+    const entity = 'value';
+
+    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    expect(primaryKey).toEqual(PRIMARY_KEY);
+
+    const record = await engine.read(TABLE_NAME, PRIMARY_KEY);
+    expect(record).toEqual(entity);
+  },
+  'saves strings and objects in the same table.': async (engine: CRUDEngine) => {
+    await engine.create(TABLE_NAME, 'primary-key-1', 'hello-world');
+    const firstRecord = await engine.read(TABLE_NAME, 'primary-key-1');
+    expect(firstRecord).toBe('hello-world');
+
+    await engine.create(TABLE_NAME, 'primary-key-2', {hello: 'world'});
+    const secondRecord = await engine.read(TABLE_NAME, 'primary-key-2');
+    expect(secondRecord).toEqual({hello: 'world'});
+  },
+  'saves objects.': async (engine: CRUDEngine) => {
+    const PRIMARY_KEY = 'primary-key';
+
+    const entity = {
+      some: 'value',
+    };
+
+    const primaryKey = await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
+    expect(primaryKey).toEqual(PRIMARY_KEY);
+
+    const record = await engine.read(TABLE_NAME, PRIMARY_KEY);
+    expect(record).toEqual(entity);
   },
   'throws an error when attempting to overwrite a record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';

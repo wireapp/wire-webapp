@@ -119,9 +119,7 @@ describe('SQLeetEngine', () => {
     Object.entries(createSpec).map(([description, testFunction]) => {
       it(description, async () => {
         const engine = await initEngine({
-          'the-simpsons': {
-            some: SQLiteType.TEXT,
-          },
+          'the-simpsons': SQLiteType.JSON_OR_TEXT,
         });
 
         await testFunction(engine);

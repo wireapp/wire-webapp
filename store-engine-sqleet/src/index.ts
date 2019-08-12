@@ -21,8 +21,11 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import initSqlJs from 'sql.js';
 
 import {
+  RESERVED_COLUMN,
   SQLeetEnginePrimaryKeyName,
   SQLiteDatabaseDefinition,
+  SQLiteDatabaseSingleColumnDefinition,
+  SQLiteTableDefinition,
   SQLiteType,
   createTableIfNotExists,
   escape,
@@ -30,6 +33,7 @@ import {
   getFormattedColumnsFromTableName,
   getProtectedColumnReferences,
   hashColumnName,
+  isSingleColumnTable,
 } from './SchemaConverter';
 
 declare const WebAssembly: any;
@@ -42,18 +46,27 @@ export class SQLeetEngine implements CRUDEngine {
   private autoIncrementedPrimaryKey: number = 1;
   private db: any;
   private rawDatabase: string | undefined;
-  private readonly schema: SQLiteDatabaseDefinition<Record<string, any>>;
+  private readonly schema: SQLiteDatabaseDefinition<Record<string, any>> = {};
   private readonly encryptionKey: string;
   private readonly dbConfig: any;
   public storeName = '';
 
   constructor(
     wasmLocation: Uint8Array | string,
-    schema: SQLiteDatabaseDefinition<Record<string, any>>,
+    providedSchema: SQLiteDatabaseSingleColumnDefinition | SQLiteDatabaseDefinition<Record<string, any>>,
     encryptionKey: string,
     rawDatabase?: string,
   ) {
-    this.schema = schema;
+    // Map single column to SQL entity
+    for (const tableName in providedSchema) {
+      const entity = providedSchema[tableName];
+      const isSingleColumnTable = typeof entity === 'string';
+      // tslint:disable-next-line: no-object-literal-type-assertion
+      this.schema[tableName] = isSingleColumnTable
+        ? {[RESERVED_COLUMN]: entity as SQLiteType}
+        : (entity as SQLiteTableDefinition<string>);
+    }
+
     this.encryptionKey = encryptionKey;
     this.dbConfig = {};
 
@@ -136,12 +149,19 @@ export class SQLeetEngine implements CRUDEngine {
 
   private buildValues<EntityType = Record<string, SQLiteType>>(
     tableName: string,
-    entities: EntityType,
+    providedEntities: EntityType | SQLiteType,
   ): {columns: Record<string, string>; values: Record<string, any>} {
     const table = this.schema[tableName];
     if (!table) {
       throw new Error(`Table "${tableName}" does not exist.`);
     }
+
+    // If the table contains the single magic column then convert it
+    // tslint:disable-next-line: no-object-literal-type-assertion
+    const entities = isSingleColumnTable(table)
+      ? ({[RESERVED_COLUMN]: providedEntities} as any)
+      : (providedEntities as EntityType);
+
     const columns: Record<string, string> = {};
     const values: Record<string, any> = {};
     for (const entity in entities) {
@@ -151,7 +171,10 @@ export class SQLeetEngine implements CRUDEngine {
       }
       let value: string | EntityType[Extract<keyof EntityType, string>] = entities[entity];
       // Stringify objects for the database
-      if (table[entity] === SQLiteType.JSON) {
+      if (
+        table[entity] === SQLiteType.JSON ||
+        (table[entity] === SQLiteType.JSON_OR_TEXT && typeof value === 'object')
+      ) {
         value = JSON.stringify(value) as SQLiteType;
       }
       const reference = `@${hashColumnName(entity)}`;
@@ -242,7 +265,15 @@ export class SQLeetEngine implements CRUDEngine {
     for (const column in record) {
       if (table[column] === SQLiteType.JSON) {
         record[column] = JSON.parse(record[column]);
+      } else if (table[column] === SQLiteType.JSON_OR_TEXT) {
+        try {
+          record[column] = JSON.parse(record[column]);
+        } catch (error) {}
       }
+    }
+
+    if (isSingleColumnTable(table)) {
+      return record[RESERVED_COLUMN];
     }
 
     return record;

@@ -20,6 +20,7 @@
 const uint32 = require('uint32');
 
 export const SQLeetEnginePrimaryKeyName: string = '`key`';
+export const RESERVED_COLUMN = '__single_column_value';
 
 export enum SQLiteType {
   BOOLEAN = 'boolean',
@@ -27,13 +28,16 @@ export enum SQLiteType {
   INTEGER = 'integer',
   // See https://stackoverflow.com/a/8417411
   JSON = 'json',
+  JSON_OR_TEXT = 'json_or_text',
   REAL = 'real',
   TEXT = 'text',
 }
 
 export type SQLiteTableDefinition<T> = Partial<Record<keyof T, SQLiteType>>;
+export type SQLiteTableSingleColumnDefinition = Record<string, SQLiteType>;
 
 export type SQLiteDatabaseDefinition<T> = Record<string, SQLiteTableDefinition<T>>;
+export type SQLiteDatabaseSingleColumnDefinition = Record<string, SQLiteType>;
 
 export const escape = (value: string, delimiter: string = '`') => {
   return `${delimiter}${value.replace(new RegExp(delimiter, 'g'), `\\${delimiter}`)}${delimiter}`;
@@ -85,4 +89,8 @@ export function hashColumnName(column: string): number {
   hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
 
   return hash;
+}
+
+export function isSingleColumnTable(table: Partial<Record<string, SQLiteType>>): boolean {
+  return typeof table[RESERVED_COLUMN] === 'string';
 }
