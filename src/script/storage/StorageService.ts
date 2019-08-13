@@ -25,6 +25,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
 import {StorageKey} from './StorageKey';
@@ -67,8 +68,7 @@ export class StorageService {
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent =
-      loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
 
     this.engine = this.isTemporaryAndNonPersistent ? new MemoryEngine() : new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;

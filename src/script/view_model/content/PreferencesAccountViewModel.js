@@ -21,14 +21,13 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {validateProfileImageResolution} from 'Util/util';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
-import {KEY, isKey} from 'Util/KeyboardUtil';
+import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {loadValue} from 'Util/StorageUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
-import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
+import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -45,7 +44,6 @@ import {WebAppEvents} from '../../event/WebApp';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
-import {StorageKey} from '../../storage/StorageKey';
 import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/availabilityState';
@@ -130,8 +128,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
-    this.isTemporaryAndNonPersistant = () =>
-      loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+    this.isTemporaryAndNonPersistant = isTemporaryClientAndNonPersistent;
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 

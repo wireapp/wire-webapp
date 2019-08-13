@@ -66,11 +66,12 @@ import {ClientType} from '../client/ClientType';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 import {BackendClientError} from '../error/BackendClientError';
+import {FORWARDED_QUERY_KEYS} from '../auth/route';
 
 class AuthViewModel {
   static get CONFIG() {
     return {
-      FORWARDED_URL_PARAMETERS: [URLParameter.ENVIRONMENT, URLParameter.LOCALE, URLParameter.TRACKING],
+      FORWARDED_URL_PARAMETERS: FORWARDED_QUERY_KEYS,
       RESET_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }

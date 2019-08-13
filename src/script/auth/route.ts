@@ -27,11 +27,17 @@ export const QUERY_KEY = {
   LANGUAGE: 'hl',
   LOCALE: 'hl',
   LOGOUT_REASON: 'reason',
+  PERSIST_TEMPORARY_CLIENTS: 'persist_temporary_clients',
   PWA_AWARE: 'pwa_aware',
   TRACKING: 'tracking',
 };
 
-export const FORWARDED_QUERY_KEYS = [QUERY_KEY.ENVIRONMENT, QUERY_KEY.LOCALE, QUERY_KEY.TRACKING];
+export const FORWARDED_QUERY_KEYS = [
+  QUERY_KEY.ENVIRONMENT,
+  QUERY_KEY.LOCALE,
+  QUERY_KEY.PERSIST_TEMPORARY_CLIENTS,
+  QUERY_KEY.TRACKING,
+];
 
 export const LOGOUT_REASON = {
   ACCOUNT_REMOVED: 'deleted',
