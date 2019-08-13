@@ -37,7 +37,7 @@ import {QUERY_KEY} from '../auth/route';
 export const isTemporaryClientAndNonPersistent = () => {
   const enableTransientTemporaryClients =
     URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
-    Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+    (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
   return loadValue(StorageKey.AUTH.PERSIST) === false && enableTransientTemporaryClients;
 };
 
