@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,10 @@
  *
  */
 
-import * as ArrayUtil from './ArrayUtil';
-import * as ClassUtil from './ClassUtil';
-import * as KeyDerivationUtil from './KeyDerivationUtil';
-import * as MemoryUtil from './MemoryUtil';
-import * as RandomUtil from './RandomUtil';
-import * as WASMUtil from './WASMUtil';
+import * as sodium from 'libsodium-wrappers-sumo';
 
-export {ArrayUtil, ClassUtil, KeyDerivationUtil, MemoryUtil, RandomUtil, WASMUtil};
+export const isUsingWASM = async () => {
+  await sodium.ready;
+  const rawLibsodium = (sodium as any).libsodium;
+  return Boolean(rawLibsodium.usesWasm) || Boolean(rawLibsodium.useBackupModule);
+};

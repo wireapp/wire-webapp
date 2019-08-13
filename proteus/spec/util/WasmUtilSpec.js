@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,15 @@
  *
  */
 
-import * as ArrayUtil from './ArrayUtil';
-import * as ClassUtil from './ClassUtil';
-import * as KeyDerivationUtil from './KeyDerivationUtil';
-import * as MemoryUtil from './MemoryUtil';
-import * as RandomUtil from './RandomUtil';
-import * as WASMUtil from './WASMUtil';
+const Proteus = require('@wireapp/proteus');
 
-export {ArrayUtil, ClassUtil, KeyDerivationUtil, MemoryUtil, RandomUtil, WASMUtil};
+describe('WASMUtil', () => {
+  describe('isUsingWASM', () => {
+    it('reports if the target environment supports WebAssembly', async () => {
+      // To test the other way round, we would need to start Node.js
+      // with the flag `--noexpose_wasm`.
+      const isUsingWASM = await Proteus.util.WASMUtil.isUsingWASM();
+      expect(isUsingWASM).toBe(true);
+    });
+  });
+});
