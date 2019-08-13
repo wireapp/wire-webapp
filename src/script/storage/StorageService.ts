@@ -374,7 +374,6 @@ export class StorageService {
     if (isOutdatedRequest) {
       this.logger.warn(
         `Could not update or create '${primaryKey}' in store '${storeName}' because database connection was already closed (which is expected behaviour when a self user just got deleted).`,
-        error,
       );
       return primaryKey;
     }
