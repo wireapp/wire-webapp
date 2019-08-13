@@ -17,6 +17,7 @@
  *
  */
 
+// TODO: Deprecated. Should be replaced with "QUERY_KEY" from "src/script/auth/route.ts"
 export enum URLParameter {
   ENVIRONMENT = 'env',
   LOCALE = 'hl',

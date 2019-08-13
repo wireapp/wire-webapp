@@ -24,16 +24,13 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
-import {loadValue} from 'Util/StorageUtil';
+import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
-import {StorageKey} from '../storage/StorageKey';
 import {EventName} from '../tracking/EventName';
 import {ClientEntity} from '../client/ClientEntity';
-import {Config} from '../auth/config';
 
 import {BackendClientError} from '../error/BackendClientError';
 
@@ -109,10 +106,7 @@ export class CryptographyRepository {
   async _init(database, databaseName = database.name) {
     let storeEngine;
 
-    const isTemporaryAndNonPersistant =
-      loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
-
-    if (isTemporaryAndNonPersistant) {
+    if (isTemporaryClientAndNonPersistent()) {
       this.logger.info(`Initializing Cryptobox with in-memory database '${databaseName}'...`);
       storeEngine = new MemoryEngine();
       await storeEngine.initWithObject(databaseName, database);
