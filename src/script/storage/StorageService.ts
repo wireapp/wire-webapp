@@ -370,6 +370,15 @@ export class StorageService {
       throw new z.error.StorageError(z.error.StorageError.TYPE.NO_DATA);
     }
 
+    const isOutdatedRequest = !this.dbName && primaryKey;
+    if (isOutdatedRequest) {
+      this.logger.warn(
+        `Could not update or create '${primaryKey}' in store '${storeName}' because database connection was already closed (which is expected behaviour when a self user just got deleted).`,
+        error,
+      );
+      return primaryKey;
+    }
+
     if (this.isTemporaryAndNonPersistent) {
       try {
         const newKey = await this.engine.create(storeName, primaryKey, entity);
