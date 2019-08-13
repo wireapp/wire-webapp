@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.13...@wireapp/proteus@9.4.0) (2019-08-13)
+
+
+### Features
+
+* **proteus:** Add WASMUtil ([#2193](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/2193)) ([ed15708](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/ed15708))
+
+
+
+
+
 ## [9.3.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.3.12...@wireapp/proteus@9.3.13) (2019-08-12)
 
 **Note:** Version bump only for package @wireapp/proteus
