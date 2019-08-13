@@ -196,9 +196,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
         TestFactory.storage_service.clearStores();
       });
 
-      it('fails if the upperbound is not a Date', () => {
+      it('fails if the upperbound is not a Date', async () => {
         try {
-          TestFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
+          await TestFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
           fail('should have thrown');
         } catch (error) {
           expect(error.message).toContain("must be of type 'Date'");

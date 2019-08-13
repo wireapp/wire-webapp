@@ -333,7 +333,10 @@ class App {
         telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
+        return this.repository.cryptography.loadCryptobox(
+          this.service.storage.db || this.service.storage.objectDb,
+          this.service.storage.dbName,
+        );
       })
       .then(() => {
         loadingView.updateProgress(10);

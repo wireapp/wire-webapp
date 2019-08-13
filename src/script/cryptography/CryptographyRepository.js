@@ -17,14 +17,14 @@
  *
  */
 
-import {error as StoreEngineError} from '@wireapp/store-engine';
+import {error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {Cryptobox, version as cryptoboxVersion} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {base64ToArray, arrayToBase64, zeroPadding} from 'Util/util';
+import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
@@ -62,20 +62,22 @@ export class CryptographyRepository {
 
   /**
    * Initializes the repository by loading an existing Cryptobox.
-   * @param {Object} database - Database object
+   * @param {Dexie | MemoryStore} database - Dexie or MemoryStore
+   * @param {string} [databaseName] - The database name
    * @returns {Promise} Resolves after initialization
    */
-  createCryptobox(database) {
-    return this._init(database).then(() => this.cryptobox.create());
+  createCryptobox(database, databaseName = database.name) {
+    return this._init(database, databaseName).then(() => this.cryptobox.create());
   }
 
   /**
    * Initializes the repository by creating a new Cryptobox.
-   * @param {Object} database - Database object
+   * @param {Dexie | MemoryStore} database - Dexie or MemoryStore
+   * @param {string} [databaseName] - The database name
    * @returns {Promise} Resolves after initialization
    */
-  loadCryptobox(database) {
-    return this._init(database).then(() => this.cryptobox.load());
+  loadCryptobox(database, databaseName = database.name) {
+    return this._init(database, databaseName).then(() => this.cryptobox.load());
   }
 
   resetCryptobox(clientEntity) {
@@ -97,29 +99,35 @@ export class CryptographyRepository {
    * Initialize the repository.
    *
    * @private
-   * @param {Object} database - Dexie instance
+   * @param {Dexie | MemoryStore} database - Dexie instance or MemoryStore
+   * @param {string} [databaseName] - The database name
    * @returns {Promise} Resolves after initialization
    */
-  _init(database) {
-    return Promise.resolve().then(() => {
-      this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
-      const storeEngine = new IndexedDBEngine();
-      storeEngine.initWithDb(database);
-      this.cryptobox = new Cryptobox(storeEngine, 10);
+  async _init(database, databaseName = database.name) {
+    let storeEngine;
 
-      this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, preKeys => {
-        const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
+    if (isTemporaryClientAndNonPersistent()) {
+      this.logger.info(`Initializing Cryptobox with in-memory database '${databaseName}'...`);
+      storeEngine = new MemoryEngine();
+      await storeEngine.initWithObject(databaseName, database);
+    } else {
+      this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
+      storeEngine = new IndexedDBEngine();
+      await storeEngine.initWithDb(database);
+    }
+    this.cryptobox = new Cryptobox(storeEngine, 10);
 
-        this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
-        return this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys).then(() => {
-          this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
-        });
-      });
+    this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
+      const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
 
-      this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
-        const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
-        amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
-      });
+      this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
+      await this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys);
+      this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
+    });
+
+    this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
+      const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
+      amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true);
     });
   }
 

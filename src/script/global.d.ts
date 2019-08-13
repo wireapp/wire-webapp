@@ -43,7 +43,7 @@ declare global {
         FEATURE: {
           APPLOCK_TIMEOUT: number;
           CHECK_CONSENT: boolean;
-          DEFAULT_LOGIN_TEMPORARY_DEVICE: boolean;
+          DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_PHONE_LOGIN: boolean;

@@ -22,16 +22,30 @@ import UUID from 'uuidjs';
 import hljs from 'highlightjs';
 import CryptoJS from 'crypto-js';
 import MarkdownIt from 'markdown-it';
+import 'phoneformat.js';
 
-import {escapeString} from 'Util/SanitizationUtil';
-
-/* eslint-disable no-unused-vars */
-import PhoneFormatGlobal from 'phoneformat.js';
+import {escapeString} from './SanitizationUtil';
 import {replaceInRange} from './StringUtil';
+import {loadValue} from './StorageUtil';
 import {Environment} from './Environment';
-/* eslint-enable no-unused-vars */
+
+import {Config} from '../auth/config';
+import {StorageKey} from '../storage/StorageKey';
+import * as URLUtil from '../auth/util/urlUtil';
+import {QUERY_KEY} from '../auth/route';
+
+export const isTemporaryClientAndNonPersistent = () => {
+  const enableTransientTemporaryClients =
+    URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
+    (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
+  return loadValue(StorageKey.AUTH.PERSIST) === false && enableTransientTemporaryClients;
+};
 
 export const checkIndexedDb = () => {
+  if (isTemporaryClientAndNonPersistent()) {
+    return Promise.resolve();
+  }
+
   if (!Environment.browser.supports.indexedDb) {
     const errorType = Environment.browser.edge
       ? z.error.AuthError.TYPE.PRIVATE_MODE

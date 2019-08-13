@@ -33,16 +33,33 @@ export class EventServiceNoCompound extends EventService {
    * @param {MessageCategory} category - Will be used as lower bound
    * @returns {Promise} Resolves with matching events
    */
-  loadEventsWithCategory(conversationId, category) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversationId)
-      .sortBy('time')
-      .then(records => records.filter(record => record.category >= category));
+  async loadEventsWithCategory(conversationId, category) {
+    let events;
+
+    if (this.storageService.db) {
+      events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where('conversation')
+        .equals(conversationId)
+        .sortBy('time');
+    } else {
+      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      events = records.filter(record => record.conversation === conversationId).sort((a, b) => a.time - b.time);
+    }
+
+    return events.filter(record => record.category >= category);
   }
 
-  _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
+  async _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
     const {includeFrom, includeTo} = includes;
+
+    const fromCompareFunction = includeFrom
+      ? (date, timestamp) => timestamp >= date
+      : (date, timestamp) => timestamp > date;
+    const toCompareFunction = includeTo
+      ? (date, timestamp) => timestamp <= date
+      : (date, timestamp) => timestamp < date;
+
     if (!_.isDate(toDate) || !_.isDate(fromDate)) {
       const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
       throw new Error(errorMessage);
@@ -53,15 +70,29 @@ export class EventServiceNoCompound extends EventService {
       throw new Error(errorMessage);
     }
 
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversationId)
-      .and(record => {
+    if (this.storageService.db) {
+      return this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where('conversation')
+        .equals(conversationId)
+        .and(record => {
+          const timestamp = new Date(record.time).getTime();
+          return fromCompareFunction(fromDate, timestamp) && toCompareFunction(toDate, timestamp);
+        })
+        .limit(limit);
+    }
+
+    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    return records
+      .filter(record => {
         const timestamp = new Date(record.time).getTime();
-        const fromCompareFunction = includeFrom ? date => timestamp >= date : date => timestamp > date;
-        const toCompareFunction = includeTo ? date => timestamp <= date : date => timestamp < date;
-        return fromCompareFunction(fromDate) && toCompareFunction(toDate);
+        return (
+          record.conversation === conversationId &&
+          fromCompareFunction(fromDate, timestamp) &&
+          toCompareFunction(toDate, timestamp)
+        );
       })
-      .limit(limit);
+      .sort((a, b) => a.conversation - b.conversation)
+      .slice(0, limit);
   }
 }

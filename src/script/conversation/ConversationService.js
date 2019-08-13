@@ -416,27 +416,34 @@ export class ConversationService {
    * Get active conversations from database.
    * @returns {Promise} Resolves with active conversations
    */
-  get_active_conversations_from_db() {
+  async get_active_conversations_from_db() {
     const min_date = new Date();
     min_date.setDate(min_date.getDate() - 30);
 
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('time')
-      .aboveOrEqual(min_date.toISOString())
-      .toArray()
-      .then(events => {
-        const conversations = events.reduce((accumulated, event) => {
-          if (accumulated[event.conversation]) {
-            accumulated[event.conversation] = accumulated[event.conversation] + 1;
-          } else {
-            accumulated[event.conversation] = 1;
-          }
+    let events;
 
-          return accumulated;
-        }, {});
+    if (this.storageService.db) {
+      events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where('time')
+        .aboveOrEqual(min_date.toISOString())
+        .toArray();
+    } else {
+      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      events = records.filter(record => record.time >= min_date.toISOString()).sort((a, b) => a.time - b.time);
+    }
 
-        return Object.keys(conversations).sort((id_a, id_b) => conversations[id_b] - conversations[id_a]);
-      });
+    const conversations = events.reduce((accumulated, event) => {
+      if (accumulated[event.conversation]) {
+        accumulated[event.conversation] = accumulated[event.conversation] + 1;
+      } else {
+        accumulated[event.conversation] = 1;
+      }
+
+      return accumulated;
+    }, {});
+
+    return Object.keys(conversations).sort((id_a, id_b) => conversations[id_b] - conversations[id_a]);
   }
 
   /**
@@ -452,9 +459,17 @@ export class ConversationService {
    * @param {Array<Conversation>} conversations - Conversation entity
    * @returns {Promise<Array>} Resolves with a list of conversation records
    */
-  save_conversations_in_db(conversations) {
-    const keys = conversations.map(conversation => conversation.id);
-    return this.storageService.db[this.CONVERSATION_STORE_NAME].bulkPut(conversations, keys).then(() => conversations);
+  async save_conversations_in_db(conversations) {
+    if (this.storageService.db) {
+      const keys = conversations.map(conversation => conversation.id);
+      await this.storageService.db.table(this.CONVERSATION_STORE_NAME).bulkPut(conversations, keys);
+    } else {
+      for (const conversation of conversations) {
+        await this.storageService.save(this.CONVERSATION_STORE_NAME, conversation.id, conversation);
+      }
+    }
+
+    return conversations;
   }
 
   /**
