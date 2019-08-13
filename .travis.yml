@@ -2,6 +2,9 @@
 sudo: required
 dist: xenial
 
+addons:
+  chrome: stable
+
 # https://docs.travis-ci.com/user/encryption-keys/
 env:
   global:

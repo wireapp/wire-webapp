@@ -273,7 +273,7 @@ describe('e2e audio call', () => {
   beforeEach(() => {
     joinedCallSub = client.joinedCall.subscribe(call => {
       if (call) {
-        return setTimeout(onCallConnected, 100);
+        return setTimeout(onCallConnected, 200);
       }
     });
     activeCallsSub = client.activeCalls.subscribe(calls => {
