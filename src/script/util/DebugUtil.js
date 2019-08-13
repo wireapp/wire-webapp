@@ -20,6 +20,7 @@
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
+import {util as ProteusUtil} from '@wireapp/proteus';
 
 import {getLogger} from 'Util/Logger';
 
@@ -295,6 +296,13 @@ export class DebugUtil {
         session: resolveArray[2],
       });
     });
+  }
+
+  /**
+   * @returns {Promise<boolean>} `true` if libsodium is using WebAssembly
+   */
+  isLibsodiumUsingWASM() {
+    return ProteusUtil.WASMUtil.isUsingWASM();
   }
 
   /**
