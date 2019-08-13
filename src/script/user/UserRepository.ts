@@ -255,7 +255,7 @@ export class UserRepository {
     if (is_self_user) {
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-      }, 50);
+      }, 100);
     }
   }
 
