@@ -253,6 +253,7 @@ export class UserRepository {
     // @todo Add user deletion cases for other users
     const is_self_user = id === this.self().id;
     if (is_self_user) {
+      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations. That's why we added a timeout, to leave some time for the database to finish running reads/writes before the database connection gets closed and the database gets deleted.
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);

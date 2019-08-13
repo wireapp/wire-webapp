@@ -237,6 +237,7 @@ export class StorageService {
     try {
       await this.engine.purge();
       this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+      this.dbName = undefined;
       return true;
     } catch (error) {
       this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
@@ -378,7 +379,7 @@ export class StorageService {
           await this.update(storeName, primaryKey, entity);
           return primaryKey;
         }
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
     } else {
@@ -386,7 +387,7 @@ export class StorageService {
         const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
         return newKey;
       } catch (error) {
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
     }
