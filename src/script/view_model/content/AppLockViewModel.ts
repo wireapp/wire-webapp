@@ -22,9 +22,9 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender, murmurhash3} from 'Util/util';
-import {AuthService} from '../../auth/AuthService';
+import {Config} from '../../auth/config';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {config} from '../../config';
+import {ClientRepository} from '../../client/ClientRepository';
 import {User} from '../../entity/User';
 import {WebAppEvents} from '../../event/WebApp';
 
@@ -39,11 +39,10 @@ enum APPLOCK_STATE {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-export const isAppLockEnabled = () => Number.isInteger(config.FEATURE.APPLOCK_TIMEOUT);
+export const isAppLockEnabled = () => Number.isInteger(Config.FEATURE.APPLOCK_TIMEOUT);
 
 export class AppLockViewModel {
   appObserver: MutationObserver;
-  authService: AuthService;
   headerText: ko.PureComputed<string>;
   isLoading: ko.Observable<boolean>;
   isSetupPasswordAValid: ko.PureComputed<boolean>;
@@ -61,8 +60,7 @@ export class AppLockViewModel {
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
 
-  constructor(authService: AuthService, selfUser: ko.Observable<User>) {
-    this.authService = authService;
+  constructor(private readonly clientRepository: ClientRepository, selfUser: ko.Observable<User>) {
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
@@ -79,7 +77,7 @@ export class AppLockViewModel {
       );
     });
 
-    this.timeOut = config.FEATURE.APPLOCK_TIMEOUT * 1000;
+    this.timeOut = Config.FEATURE.APPLOCK_TIMEOUT * 1000;
     this.timeOutId = 0;
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
@@ -112,13 +110,9 @@ export class AppLockViewModel {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
       }
     });
-    this.modalObserver = new MutationObserver(mutationRecords => {
-      const isApplockAffected = mutationRecords.some(({removedNodes}) =>
-        Array.from(removedNodes).some(
-          (removedNode: HTMLElement) => removedNode.dataset && removedNode.dataset.uieName === 'applock-modal',
-        ),
-      );
-      if (isApplockAffected) {
+    this.modalObserver = new MutationObserver(() => {
+      const modalInDOM = document.querySelector('[data-uie-name="applock-modal"]');
+      if (!modalInDOM) {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED);
       }
     });
@@ -200,11 +194,15 @@ export class AppLockViewModel {
   };
 
   onSetCode = (form: HTMLFormElement) => {
-    const firstCode = (<HTMLInputElement>form[0]).value;
-    const secondCode = (<HTMLInputElement>form[1]).value;
+    const input1 = <HTMLInputElement>form[0];
+    const input2 = <HTMLInputElement>form[1];
+    const firstCode = input1.value;
+    const secondCode = input2.value;
     if (firstCode === secondCode) {
       this.stopObserver();
       this.setCode(firstCode);
+      input1.value = '';
+      input2.value = '';
       this.isVisible(false);
     }
   };
@@ -224,10 +222,10 @@ export class AppLockViewModel {
     const password = (<HTMLInputElement>form[0]).value;
     try {
       this.isLoading(true);
-      await this.authService.validatePassword(password);
+      const currentClientId = this.clientRepository.currentClient().id;
+      await this.clientRepository.clientService.deleteClient(currentClientId, password);
       this.localStorage.removeItem(this.storageKey());
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-      this.isVisible(false);
     } catch ({code, message}) {
       this.isLoading(false);
       if ([400, 401, 403].includes(code)) {
