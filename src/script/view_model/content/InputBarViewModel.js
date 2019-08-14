@@ -24,7 +24,7 @@ import {getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {formatBytes, afterRender, renderMessage} from 'Util/util';
+import {afterRender, formatBytes, isTemporaryClientAndNonPersistent, renderMessage} from 'Util/util';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
 import {trimEnd, trimStart} from 'Util/StringUtil';
@@ -57,6 +57,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
+      INPUT_STORE_NAME: 'user_input',
       PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
@@ -84,6 +85,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.eventRepository = repositories.event;
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
+    this.storageRepository = repositories.storage;
     this.userRepository = repositories.user;
     this.logger = getLogger('z.viewModel.content.InputBarViewModel');
 
@@ -278,9 +280,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
-    this.draftMessage.subscribe(message => {
+    this.draftMessage.subscribe(async message => {
       if (this.conversationEntity()) {
-        this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
+        await this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
       }
     });
 
@@ -306,7 +308,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.updateSelectionState();
   }
 
-  loadInitialStateForConversation(conversationEntity) {
+  async loadInitialStateForConversation(conversationEntity) {
     this.conversationHasFocus(true);
     this.pastedFile(null);
     this.cancelMessageEditing();
@@ -314,7 +316,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.endMentionFlow();
 
     if (conversationEntity) {
-      const previousSessionData = this._loadDraftState(conversationEntity);
+      const previousSessionData = await this._loadDraftState(conversationEntity);
       this.input(previousSessionData.text);
       this.currentMentions(previousSessionData.mentions);
 
@@ -328,12 +330,36 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  _saveDraftState(conversationEntity, text, mentions, reply) {
+  /**
+   * @param {string} storageKey - The primary key for the data
+   * @returns {Promise<any>} The loaded data
+   */
+  async _loadValue(storageKey) {
+    const data = isTemporaryClientAndNonPersistent()
+      ? await this.storageRepository.storageService.load(InputBarViewModel.CONFIG.INPUT_STORE_NAME, storageKey)
+      : loadValue(storageKey);
+    return data;
+  }
+
+  /**
+   * @param {string} storageKey - The primary key for the data
+   * @param {any} data - The data to save
+   * @returns {Promise<void>} No return value
+   */
+  async _storeValue(storageKey, data) {
+    if (isTemporaryClientAndNonPersistent()) {
+      await this.storageRepository.storageService.save(InputBarViewModel.CONFIG.INPUT_STORE_NAME, storageKey, data);
+    } else {
+      storeValue(storageKey, data);
+    }
+  }
+
+  async _saveDraftState(conversationEntity, text, mentions, reply) {
     if (!this.isEditing()) {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      storeValue(storageKey, {mentions, reply, text});
+      await this._storeValue(storageKey, {mentions, reply, text});
     }
   }
 
@@ -341,9 +367,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
   }
 
-  _loadDraftState(conversationEntity) {
+  async _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = loadValue(storageKey);
+    const storageValue = await this._loadValue(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};
