@@ -20,7 +20,7 @@
 import {ValidationUtil} from '@wireapp/commons';
 import * as UUID from 'uuid/v4';
 
-class Configuration {
+export class Configuration {
   readonly APP_BASE = window.wire.env.APP_BASE || 'https://app.wire.com';
   readonly APP_NAME = window.wire.env.APP_NAME || 'Webapp';
   readonly APP_INSTANCE_ID = UUID();

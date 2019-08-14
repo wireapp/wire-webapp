@@ -23,7 +23,9 @@ import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender, murmurhash3} from 'Util/util';
 import {Config} from '../../auth/config';
+import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {getURLParameter} from '../../auth/util/urlUtil';
 import {ClientRepository} from '../../client/ClientRepository';
 import {User} from '../../entity/User';
 import {WebAppEvents} from '../../event/WebApp';
@@ -39,7 +41,28 @@ enum APPLOCK_STATE {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-export const isAppLockEnabled = () => Number.isInteger(Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT);
+const getTimeOut = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
+  const queryTimeout = parseInt(getURLParameter(queryName), 10);
+  const configTimeout = Config.FEATURE && Config.FEATURE[configName];
+  if (isNaN(queryTimeout) && isNaN(configTimeout)) {
+    return null;
+  }
+  if (isNaN(queryTimeout)) {
+    return configTimeout;
+  }
+  if (isNaN(configTimeout)) {
+    return queryTimeout;
+  }
+  return Math.min(queryTimeout, configTimeout);
+};
+
+const getUnfocusAppLockTimeOut = () => getTimeOut(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+const getScheduledAppLockTimeOut = () => getTimeOut(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
+
+const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeOut() !== null;
+const isScheduledAppLockEnabled = () => getScheduledAppLockTimeOut() !== null;
+
+export const isAppLockEnabled = () => isUnfocusAppLockEnabled() || isScheduledAppLockEnabled();
 
 export class AppLockViewModel {
   appObserver: MutationObserver;
@@ -124,7 +147,9 @@ export class AppLockViewModel {
     });
     if (isAppLockEnabled()) {
       this.showAppLock();
-      document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+      if (isUnfocusAppLockEnabled()) {
+        document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+      }
       this.startPassphraseObserver();
     }
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, this.changePassphrase);
@@ -178,13 +203,15 @@ export class AppLockViewModel {
     window.clearTimeout(this.unfocusTimeOutId);
     const isHidden = document.visibilityState === 'hidden';
     if (isHidden) {
-      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, this.unfocusTimeOut);
+      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOut());
     }
   };
 
   startScheduledTimeout = () => {
-    window.clearTimeout(this.scheduledTimeOutId);
-    this.scheduledTimeOutId = window.setTimeout(this.showAppLock, this.scheduledTimeOut);
+    if (isScheduledAppLockEnabled()) {
+      window.clearTimeout(this.scheduledTimeOutId);
+      this.scheduledTimeOutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeOut());
+    }
   };
 
   showAppLock = () => {
