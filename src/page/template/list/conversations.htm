@@ -7,8 +7,8 @@
                           params="availability: selfAvailability, label: selfUserName">
       </availability-state>
       <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
-        <legal-hold-dot style="margin: 0 16px 0 auto" 
-                        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()" 
+        <legal-hold-dot style="margin: 0 16px 0 auto"
+                        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
                         data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
         </legal-hold-dot>
       <!-- /ko -->
@@ -35,7 +35,7 @@
           <div class="conversation-list-cell-left">
             <!-- ko if: connectRequests().length === 1 -->
               <div class="avatar-halo">
-                <participant-avatar params="participant: connectRequests()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+                <participant-avatar params="participant: connectRequests()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
               </div>
             <!-- /ko -->
 

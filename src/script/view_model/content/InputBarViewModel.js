@@ -31,6 +31,7 @@ import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
+import {ParticipantAvatar} from '../../components/participantAvatar';
 
 import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';
@@ -85,6 +86,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     this.conversationRepository = repositories.conversation;
     this.searchRepository = repositories.search;
     this.userRepository = repositories.user;
+    this.ParticipantAvatar = ParticipantAvatar;
     this.logger = getLogger('z.viewModel.content.InputBarViewModel');
 
     this.conversationEntity = this.conversationRepository.active_conversation;

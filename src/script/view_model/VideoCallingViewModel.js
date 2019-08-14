@@ -27,6 +27,7 @@ import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {MediaType} from '../media/MediaType';
 import {MediaDeviceType} from '../media/MediaDeviceType';
 import {WebAppEvents} from '../event/WebApp';
+import {ParticipantAvatar} from '../components/participantAvatar';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -51,6 +52,7 @@ z.viewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.mediaRepository = repositories.media;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.contentViewModel = mainViewModel.content;
     this.multitasking = this.contentViewModel.multitasking;

@@ -22,6 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {ParticipantAvatar} from '../../components/participantAvatar';
 
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
@@ -50,6 +51,7 @@ export class ConversationListViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.contentViewModel = mainViewModel.content;
     this.listViewModel = listViewModel;

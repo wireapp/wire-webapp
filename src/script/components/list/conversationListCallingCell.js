@@ -24,6 +24,7 @@ import {afterRender} from 'Util/util';
 import {PermissionState} from '../../notification/PermissionState';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {MediaType} from '../../media/MediaType';
+import {ParticipantAvatar} from '../participantAvatar';
 import {WebAppEvents} from '../../event/WebApp';
 
 import 'Components/list/participantItem';
@@ -38,6 +39,7 @@ class ConversationListCallingCell {
     this.multitasking = params.multitasking;
     this.temporaryUserStyle = params.temporaryUserStyle;
     this.videoGridRepository = params.videoGridRepository;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.calls = this.callingRepository.calls;
     this.call = this.conversation.call;
@@ -174,7 +176,7 @@ ko.components.register('conversation-list-calling-cell', {
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
           <!-- ko if: !conversation.isGroup() && conversationParticipants().length -->
-            <participant-avatar params="participant: conversationParticipants()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: conversationParticipants()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
         </div>
       <!-- /ko -->
