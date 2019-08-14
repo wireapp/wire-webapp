@@ -20,6 +20,7 @@
 import {resetStoreValue} from 'Util/StorageUtil';
 
 import {StorageKey} from '../storage/StorageKey';
+import { amplify } from 'amplify';
 
 /**
  * Cache repository for local storage interactions using amplify.
@@ -29,18 +30,20 @@ import {StorageKey} from '../storage/StorageKey';
  *
  */
 export class CacheRepository {
-  constructor(logger) {
-    this.logger = logger;
+  async clearCacheStorage(): Promise<boolean[]> {
+    const keyList = await window.caches.keys();
+    return Promise.all(keyList.map(key => caches.delete(key)));
   }
 
   /**
    * Deletes cached data.
    *
    * @param {boolean} [keepConversationInput=false] - Should conversation input be kept
-   * @param {Array<string>} [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
+   * @param {Array<string>} [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from
+   *   the cache
    * @returns {Array<string>} Keys which have been deleted from the cache
    */
-  clearCache(keepConversationInput = false, protectedKeyPatterns = [StorageKey.AUTH.SHOW_LOGIN]) {
+  clearLocalStorage(keepConversationInput = false, protectedKeyPatterns = [StorageKey.AUTH.SHOW_LOGIN]): string[] {
     const deletedKeys = [];
 
     if (keepConversationInput) {

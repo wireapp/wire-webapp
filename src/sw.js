@@ -18,10 +18,8 @@
  */
 
 (global => {
-  'use strict';
-
-  importScripts('/worker/sw-toolbox.js');
-  importScripts('/worker/lru-cache-strategy.js');
+  self.importScripts('/worker/sw-toolbox.js');
+  self.importScripts('/worker/lru-cache-strategy.js');
 
   const ASSET_CACHE_MAX_ITEMS = 1000;
   const CACHE_VERSION = 2;
@@ -43,15 +41,15 @@
     const expectedCacheNames = Object.values(CURRENT_CACHES);
 
     return event.waitUntil(
-      caches.keys().then(cacheNames => {
+      window.caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (!expectedCacheNames.includes(cacheName)) {
-              return caches.delete(cacheName);
+              return window.caches.delete(cacheName);
             }
-          })
+          }),
         ).then(() => global.clients.claim());
-      })
+      }),
     );
   });
 })(self);

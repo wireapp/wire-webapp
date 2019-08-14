@@ -745,19 +745,19 @@ class App {
           }
         });
 
-        // Clear localStorage
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        resolve(graph.CacheRepository).clearLocalStorage(keepConversationInput, keysToKeep);
       }
 
-      // Clear IndexedDB
-      const clearDataPromise = clearData
+      const clearPersistentStorage = clearData
         ? this.repository.storage
             .deleteDatabase()
             .catch(error => this.logger.error('Failed to delete database before logout', error))
         : Promise.resolve();
 
-      return clearDataPromise.then(() => _redirectToLogin());
+      const clearCacheStorage = clearData ? resolve(graph.CacheRepository).clearCacheStorage() : Promise.resovle();
+
+      return Promise.all([clearPersistentStorage, clearCacheStorage]).then(() => _redirectToLogin());
     };
 
     const _logoutOnBackend = () => {
