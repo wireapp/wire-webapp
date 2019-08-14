@@ -28,6 +28,7 @@ export class CacheRepository {
     ASSETS: `asset: 'asset-cache-v2`,
   };
 
+  // Caution! When refactoring this code, make sure that it works in an "beforeunload" scenario!
   static async clearCacheStorage(): Promise<boolean> {
     return window.caches.delete(CacheRepository.CACHE_KEY.ASSETS);
   }
