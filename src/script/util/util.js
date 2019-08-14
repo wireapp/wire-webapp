@@ -31,12 +31,18 @@ import {Environment} from './Environment';
 
 import {Config} from '../auth/config';
 import {StorageKey} from '../storage/StorageKey';
+import * as URLUtil from '../auth/util/urlUtil';
+import {QUERY_KEY} from '../auth/route';
+
+export const isTemporaryClientAndNonPersistent = () => {
+  const enableTransientTemporaryClients =
+    URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
+    (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
+  return loadValue(StorageKey.AUTH.PERSIST) === false && enableTransientTemporaryClients;
+};
 
 export const checkIndexedDb = () => {
-  const isTemporaryAndNonPersistant =
-    loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
-
-  if (isTemporaryAndNonPersistant) {
+  if (isTemporaryClientAndNonPersistent()) {
     return Promise.resolve();
   }
 

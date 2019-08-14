@@ -22,9 +22,10 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../auth/config';
 import {ClientType} from '../client/ClientType';
 import {StorageKey} from './StorageKey';
@@ -61,14 +62,20 @@ export class StorageService {
     return DEXIE_CRUD_EVENT;
   }
 
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
+    return {
+      SIMPLE_STORE_NAME: 'simple_store',
+    };
+  }
+
   constructor() {
     this.logger = getLogger('StorageService');
 
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.isTemporaryAndNonPersistent =
-      loadValue(StorageKey.AUTH.PERSIST) === false && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false;
+    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent();
 
     this.engine = this.isTemporaryAndNonPersistent ? new MemoryEngine() : new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
@@ -228,7 +235,7 @@ export class StorageService {
     const oldRecord = await this.engine.read<unknown>(storeName, primaryKey);
     const deletedKey = await this.engine.delete(storeName, primaryKey);
 
-    this.notifyListeners(storeName, DEXIE_CRUD_EVENT.DELETING, undefined, oldRecord);
+    this.notifyListeners(storeName, DEXIE_CRUD_EVENT.DELETING, oldRecord, undefined);
 
     return deletedKey;
   }
@@ -237,6 +244,7 @@ export class StorageService {
     try {
       await this.engine.purge();
       this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+      this.dbName = undefined;
       return true;
     } catch (error) {
       this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
@@ -352,6 +360,15 @@ export class StorageService {
     }
   }
 
+  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T> {
+    if (this.isTemporaryAndNonPersistent) {
+      const record = await this.engine.read<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
+      return record;
+    }
+
+    return loadValue(primaryKey);
+  }
+
   async readAllPrimaryKeys(storeName: string): Promise<string[]> {
     return this.engine.readAllPrimaryKeys(storeName);
   }
@@ -378,7 +395,7 @@ export class StorageService {
           await this.update(storeName, primaryKey, entity);
           return primaryKey;
         }
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
     } else {
@@ -386,9 +403,17 @@ export class StorageService {
         const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
         return newKey;
       } catch (error) {
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
+    }
+  }
+
+  async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
+    if (this.isTemporaryAndNonPersistent) {
+      await this.engine.updateOrCreate(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey, entity);
+    } else {
+      storeValue(primaryKey, entity);
     }
   }
 
@@ -431,7 +456,7 @@ export class StorageService {
         await this.engine.update(storeName, primaryKey, changes);
         const newRecord = await this.engine.read<unknown>(storeName, primaryKey);
 
-        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, newRecord, oldRecord);
+        this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
 
         return 1;
       }

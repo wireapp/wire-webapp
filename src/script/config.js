@@ -31,6 +31,7 @@ export const ACCENT_ID = {
   YELLOW: 3,
 };
 
+// TODO: Deprecated. Should be replaced with "src/script/auth/config.ts".
 export const config = {
   FEATURE: {
     CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
@@ -39,7 +40,6 @@ export const config = {
     ENABLE_DEBUG: env.FEATURE && env.FEATURE.ENABLE_DEBUG,
     ENABLE_PHONE_LOGIN: env.FEATURE && env.FEATURE.ENABLE_PHONE_LOGIN,
     ENABLE_SSO: env.FEATURE && env.FEATURE.ENABLE_SSO,
-    PERSIST_TEMPORARY_CLIENTS: env.FEATURE && env.FEATURE.PERSIST_TEMPORARY_CLIENTS,
     SHOW_LOADING_INFORMATION: env.FEATURE && env.FEATURE.SHOW_LOADING_INFORMATION,
   },
 

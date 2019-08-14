@@ -29,7 +29,8 @@ export class StorageRepository {
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  static get CONFIG(): {CRYPTOGRAPHY_TABLES: string[]} {
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
     return {
       CRYPTOGRAPHY_TABLES: [
         StorageSchemata.OBJECT_STORE.AMPLIFY,

@@ -66,11 +66,12 @@ import {ClientType} from '../client/ClientType';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 import {BackendClientError} from '../error/BackendClientError';
+import {FORWARDED_QUERY_KEYS} from '../auth/route';
 
 class AuthViewModel {
   static get CONFIG() {
     return {
-      FORWARDED_URL_PARAMETERS: [URLParameter.ENVIRONMENT, URLParameter.LOCALE, URLParameter.TRACKING],
+      FORWARDED_URL_PARAMETERS: FORWARDED_QUERY_KEYS,
       RESET_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }
@@ -1602,7 +1603,7 @@ class AuthViewModel {
 
   _register_client(autoLogin) {
     return this.cryptography_repository
-      .createCryptobox(this.service.storage.db || this.service.storage.objectDb, this.service.storage.dbName)
+      .createCryptobox(this.storageService.db || this.storageService.objectDb, this.storageService.dbName)
       .then(() => this.client_repository.registerClient(autoLogin ? undefined : this.password()))
       .then(clientObservable => {
         this.event_repository.currentClient = clientObservable;

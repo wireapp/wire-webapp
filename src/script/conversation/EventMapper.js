@@ -126,14 +126,14 @@ export class EventMapper {
   updateMessageEvent(originalEntity, event) {
     const {id, data: eventData, edited_time: editedTime} = event;
 
+    if (eventData.quote) {
+      const {message_id: messageId, user_id: userId, error} = eventData.quote;
+      originalEntity.quote(new QuoteEntity({error, messageId, userId}));
+    }
+
     if (id !== originalEntity.id && originalEntity.has_asset_text()) {
       originalEntity.assets.removeAll();
       originalEntity.assets.push(this._mapAssetText(eventData));
-
-      if (eventData.quote) {
-        const {message_id: messageId, user_id: userId, error} = eventData.quote;
-        originalEntity.quote(new QuoteEntity({error, messageId, userId}));
-      }
     } else if (originalEntity.get_first_asset) {
       const asset = originalEntity.get_first_asset();
       if (eventData.status && asset.status) {
