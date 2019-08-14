@@ -347,7 +347,7 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  async load<T = Object>(storeName: string, primaryKey: string): Promise<T> {
+  async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
       const record = await this.engine.read<T>(storeName, primaryKey);
       return record;
@@ -360,10 +360,9 @@ export class StorageService {
     }
   }
 
-  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T> {
+  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T | undefined> {
     if (this.isTemporaryAndNonPersistent) {
-      const record = await this.engine.read<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
-      return record;
+      return this.load<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
     }
 
     return loadValue(primaryKey);
