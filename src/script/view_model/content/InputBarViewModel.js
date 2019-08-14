@@ -278,9 +278,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     });
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation.bind(this));
-    this.draftMessage.subscribe(async message => {
+    this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
-        await this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
+        this._saveDraftState(this.conversationEntity(), message.text, message.mentions, message.reply);
       }
     });
 
