@@ -22,7 +22,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
@@ -60,6 +60,13 @@ export class StorageService {
 
   static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENT {
     return DEXIE_CRUD_EVENT;
+  }
+
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
+    return {
+      SIMPLE_STORE_NAME: 'simple_store',
+    };
   }
 
   constructor() {
@@ -353,6 +360,15 @@ export class StorageService {
     }
   }
 
+  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T> {
+    if (this.isTemporaryAndNonPersistent) {
+      const record = await this.engine.read<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
+      return record;
+    }
+
+    return loadValue(primaryKey);
+  }
+
   async readAllPrimaryKeys(storeName: string): Promise<string[]> {
     return this.engine.readAllPrimaryKeys(storeName);
   }
@@ -390,6 +406,14 @@ export class StorageService {
         this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
+    }
+  }
+
+  async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
+    if (this.isTemporaryAndNonPersistent) {
+      await this.engine.updateOrCreate(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey, entity);
+    } else {
+      storeValue(primaryKey, entity);
     }
   }
 
