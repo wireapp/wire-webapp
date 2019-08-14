@@ -22,7 +22,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
@@ -353,6 +353,15 @@ export class StorageService {
     }
   }
 
+  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T> {
+    if (this.isTemporaryAndNonPersistent) {
+      const record = await this.engine.read<T>('simple_storage', primaryKey);
+      return record;
+    }
+
+    return loadValue(primaryKey);
+  }
+
   async readAllPrimaryKeys(storeName: string): Promise<string[]> {
     return this.engine.readAllPrimaryKeys(storeName);
   }
@@ -363,6 +372,7 @@ export class StorageService {
    * @param storeName - Name of object store where to save the object
    * @param primaryKey - Primary key which should be used to store the object
    * @param entity - Data to store in object store
+   * @param simpleStorage - Save data to the simple storage (localStorage or memory)
    * @returns Resolves with the primary key of the persisted object
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
@@ -390,6 +400,14 @@ export class StorageService {
         this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
+    }
+  }
+
+  async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
+    if (this.isTemporaryAndNonPersistent) {
+      await this.engine.updateOrCreate('simple_storage', primaryKey, entity);
+    } else {
+      storeValue(primaryKey, entity);
     }
   }
 

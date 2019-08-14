@@ -21,10 +21,9 @@ import moment from 'moment';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {afterRender, formatBytes, isTemporaryClientAndNonPersistent, renderMessage} from 'Util/util';
+import {afterRender, formatBytes, renderMessage} from 'Util/util';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
 import {trimEnd, trimStart} from 'Util/StringUtil';
@@ -330,36 +329,12 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     }
   }
 
-  /**
-   * @param {string} storageKey - The primary key for the data
-   * @returns {Promise<any>} The loaded data
-   */
-  async _loadValue(storageKey) {
-    const data = isTemporaryClientAndNonPersistent()
-      ? await this.storageRepository.storageService.load(InputBarViewModel.CONFIG.INPUT_STORE_NAME, storageKey)
-      : loadValue(storageKey);
-    return data;
-  }
-
-  /**
-   * @param {string} storageKey - The primary key for the data
-   * @param {any} data - The data to save
-   * @returns {Promise<void>} No return value
-   */
-  async _storeValue(storageKey, data) {
-    if (isTemporaryClientAndNonPersistent()) {
-      await this.storageRepository.storageService.save(InputBarViewModel.CONFIG.INPUT_STORE_NAME, storageKey, data);
-    } else {
-      storeValue(storageKey, data);
-    }
-  }
-
   async _saveDraftState(conversationEntity, text, mentions, reply) {
     if (!this.isEditing()) {
       // we only save state for newly written messages
       reply = reply && reply.id ? {messageId: reply.id} : {};
       const storageKey = this._generateStorageKey(conversationEntity);
-      await this._storeValue(storageKey, {mentions, reply, text});
+      await this.storageRepository.storageService.saveToSimpleStorage(storageKey, {mentions, reply, text});
     }
   }
 
@@ -369,7 +344,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   async _loadDraftState(conversationEntity) {
     const storageKey = this._generateStorageKey(conversationEntity);
-    const storageValue = await this._loadValue(storageKey);
+    const storageValue = await this.storageRepository.storageService.loadFromSimpleStorage(storageKey);
 
     if (typeof storageValue === 'undefined') {
       return {mentions: [], reply: {}, text: ''};
