@@ -18,7 +18,7 @@
  */
 
 import * as React from 'react';
-import {mockStore, mountWithIntl} from '../util/TestUtil';
+import {mockStore, mountComponent} from '../util/TestUtil';
 import Login from './Login';
 import {Config} from '../config';
 
@@ -56,7 +56,7 @@ describe('when visiting the login page', () => {
 
     it('the back button is hidden', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
-      wrapper = mountWithIntl(<Login />, mockStore(initialState));
+      wrapper = mountComponent(<Login />, mockStore(initialState));
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
       expect(backButton().exists()).toBe(false);
@@ -74,7 +74,7 @@ describe('when visiting the login page', () => {
 
     it('the back button is shown', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
-      wrapper = mountWithIntl(<Login />, mockStore(initialState));
+      wrapper = mountComponent(<Login />, mockStore(initialState));
 
       expect(backButton().exists()).toBe(true);
     });
