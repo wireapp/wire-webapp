@@ -22,7 +22,7 @@ import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -677,7 +677,11 @@ class App {
       this.repository.calling.leaveCallOnUnload();
 
       if (this.repository.user.isActivatedAccount()) {
-        this.repository.storage.terminate('window.onunload');
+        if (isTemporaryClientAndNonPersistent()) {
+          this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
+        } else {
+          this.repository.storage.terminate('window.onunload');
+        }
       } else {
         this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();
@@ -745,11 +749,12 @@ class App {
         resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
-      // Clear IndexedDB
+      // Clear IndexedDB & localStorage
       const clearDataPromise = clearData
         ? this.repository.storage
             .deleteDatabase()
             .catch(error => this.logger.error('Failed to delete database before logout', error))
+            .then(() => window.localStorage.clear())
         : Promise.resolve();
 
       return clearDataPromise.then(() => _redirectToLogin());
