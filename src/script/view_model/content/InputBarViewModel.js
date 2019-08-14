@@ -56,7 +56,6 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       IMAGE: {
         FILE_TYPES: ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
-      INPUT_STORE_NAME: 'user_input',
       PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
     };
   }

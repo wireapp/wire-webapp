@@ -62,6 +62,13 @@ export class StorageService {
     return DEXIE_CRUD_EVENT;
   }
 
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
+    return {
+      SIMPLE_STORE_NAME: 'simple_store',
+    };
+  }
+
   constructor() {
     this.logger = getLogger('StorageService');
 
@@ -355,7 +362,7 @@ export class StorageService {
 
   async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T> {
     if (this.isTemporaryAndNonPersistent) {
-      const record = await this.engine.read<T>('simple_storage', primaryKey);
+      const record = await this.engine.read<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
       return record;
     }
 
@@ -404,7 +411,7 @@ export class StorageService {
 
   async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
     if (this.isTemporaryAndNonPersistent) {
-      await this.engine.updateOrCreate('simple_storage', primaryKey, entity);
+      await this.engine.updateOrCreate(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey, entity);
     } else {
       storeValue(primaryKey, entity);
     }
