@@ -746,7 +746,7 @@ class App {
         });
 
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        const deletedKeys = await CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
+        const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
         this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
 
