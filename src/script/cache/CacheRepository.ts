@@ -17,33 +17,30 @@
  *
  */
 
+import {amplify} from 'amplify';
 import {resetStoreValue} from 'Util/StorageUtil';
 
 import {StorageKey} from '../storage/StorageKey';
-import { amplify } from 'amplify';
 
-/**
- * Cache repository for local storage interactions using amplify.
- *
- * @todo We have to come up with a smart solution to handle "amplify.store quota exceeded"
- *  This happened when doing "@cache_repository.set_entity user_et"
- *
- */
 export class CacheRepository {
-  async clearCacheStorage(): Promise<boolean[]> {
+  static async clearCacheStorage(): Promise<string[]> {
     const keyList = await window.caches.keys();
-    return Promise.all(keyList.map(key => caches.delete(key)));
+    await Promise.all(keyList.map(key => window.caches.delete(key)));
+    return keyList;
   }
 
   /**
    * Deletes cached data.
    *
-   * @param {boolean} [keepConversationInput=false] - Should conversation input be kept
-   * @param {Array<string>} [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from
+   * @param [keepConversationInput=false] - Should conversation input be kept
+   * @param [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from
    *   the cache
-   * @returns {Array<string>} Keys which have been deleted from the cache
+   * @returns Keys which have been deleted from the cache
    */
-  clearLocalStorage(keepConversationInput = false, protectedKeyPatterns = [StorageKey.AUTH.SHOW_LOGIN]): string[] {
+  static clearLocalStorage(
+    keepConversationInput: boolean = false,
+    protectedKeyPatterns: string[] = [StorageKey.AUTH.SHOW_LOGIN],
+  ): string[] {
     const deletedKeys = [];
 
     if (keepConversationInput) {

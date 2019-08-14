@@ -236,17 +236,17 @@ export class StorageService {
   async deleteDatabase(): Promise<boolean> {
     try {
       await this.engine.purge();
-      this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+      this.logger.info(`Deleting database '${this.dbName}' successful`);
       this.dbName = undefined;
       return true;
     } catch (error) {
-      this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
+      this.logger.error(`Deleting database '${this.dbName}' failed`);
       throw error;
     }
   }
 
   async deleteStore(storeName: string): Promise<void> {
-    this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
+    this.logger.info(`Deleting object store '${storeName}' in database '${this.dbName}'`);
     await this.engine.deleteAll(storeName);
   }
 
