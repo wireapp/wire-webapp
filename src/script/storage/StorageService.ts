@@ -372,7 +372,6 @@ export class StorageService {
    * @param storeName - Name of object store where to save the object
    * @param primaryKey - Primary key which should be used to store the object
    * @param entity - Data to store in object store
-   * @param simpleStorage - Save data to the simple storage (localStorage or memory)
    * @returns Resolves with the primary key of the persisted object
    */
   async save<T = Object>(storeName: string, primaryKey: string, entity: T): Promise<string> {
