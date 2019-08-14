@@ -25,7 +25,6 @@ import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
 import {BackupService} from '../backup/BackupService';
 import {BroadcastService} from '../broadcast/BroadcastService';
-import {CacheRepository} from '../cache/CacheRepository';
 import {CallingService} from '../calling/CallingService';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
@@ -54,7 +53,6 @@ dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
 dependencies.set(BroadcastService, {dependencies: [BackendClient], name: 'BroadcastService'});
-dependencies.set(CacheRepository, {dependencies: [], name: 'CacheRepository'});
 dependencies.set(CallingService, {dependencies: [BackendClient], name: 'CallingService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
@@ -81,7 +79,6 @@ export {
   BackendClient,
   BackupService,
   BroadcastService,
-  CacheRepository,
   CallingService,
   GiphyRepository,
   GiphyService,

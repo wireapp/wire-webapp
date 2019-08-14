@@ -96,6 +96,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {CacheRepository} from '../cache/CacheRepository';
 
 class App {
   static get CONFIG() {
@@ -718,7 +719,7 @@ class App {
       this._redirectToLogin(signOutReason);
     };
 
-    const _logout = () => {
+    const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
@@ -730,7 +731,6 @@ class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      // @todo remove on next iteration
       const selfUser = this.repository.user.self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
@@ -745,19 +745,23 @@ class App {
           }
         });
 
-        // Clear localStorage
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
+        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
 
-      // Clear IndexedDB
-      const clearDataPromise = clearData
-        ? this.repository.storage
-            .deleteDatabase()
-            .catch(error => this.logger.error('Failed to delete database before logout', error))
-        : Promise.resolve();
+      if (clearData) {
+        // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
+        CacheRepository.clearCacheStorage();
 
-      return clearDataPromise.then(() => _redirectToLogin());
+        try {
+          await this.repository.storage.deleteDatabase();
+        } catch (error) {
+          this.logger.error('Failed to delete database before logout', error);
+        }
+      }
+
+      return _redirectToLogin();
     };
 
     const _logoutOnBackend = () => {
