@@ -10,12 +10,12 @@
           <input
             class="modal__input"
             type="password"
-            data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder')}"
+            data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
           />
           <input
             class="modal__input modal__input--validate"
             type="password"
-            data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder')}"
+            data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
           />
           <div class="modal__info text-background" data-bind="text: t('modalAppLockSetupInfo')"></div>
           <div class="modal__buttons">

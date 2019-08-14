@@ -39,7 +39,7 @@ enum APPLOCK_STATE {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-export const isAppLockEnabled = () => Number.isInteger(Config.FEATURE.APPLOCK_TIMEOUT);
+export const isAppLockEnabled = () => Number.isInteger(Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT);
 
 export class AppLockViewModel {
   appObserver: MutationObserver;
@@ -51,12 +51,14 @@ export class AppLockViewModel {
   localStorage: Storage;
   modalObserver: MutationObserver;
   passwordRegex: RegExp;
+  scheduledTimeOut: number;
+  scheduledTimeOutId: number;
   setupPasswordA: ko.Observable<string>;
   setupPasswordB: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
   storageKey: ko.PureComputed<string>;
-  timeOut: number;
-  timeOutId: number;
+  unfocusTimeOut: number;
+  unfocusTimeOutId: number;
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
 
@@ -77,8 +79,12 @@ export class AppLockViewModel {
       );
     });
 
-    this.timeOut = Config.FEATURE.APPLOCK_TIMEOUT * 1000;
-    this.timeOutId = 0;
+    this.unfocusTimeOut = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
+    this.unfocusTimeOutId = 0;
+
+    this.scheduledTimeOut = Config.FEATURE.APPLOCK_SCHEDULED_TIMEOUT * 1000;
+    this.scheduledTimeOutId = 0;
+
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
         case APPLOCK_STATE.SETUP:
@@ -169,11 +175,16 @@ export class AppLockViewModel {
   };
 
   handleVisibilityChange = () => {
-    window.clearTimeout(this.timeOutId);
+    window.clearTimeout(this.unfocusTimeOutId);
     const isHidden = document.visibilityState === 'hidden';
     if (isHidden) {
-      this.timeOutId = window.setTimeout(this.showAppLock, this.timeOut);
+      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, this.unfocusTimeOut);
     }
+  };
+
+  startScheduledTimeout = () => {
+    window.clearTimeout(this.scheduledTimeOutId);
+    this.scheduledTimeOutId = window.setTimeout(this.showAppLock, this.scheduledTimeOut);
   };
 
   showAppLock = () => {
@@ -188,6 +199,7 @@ export class AppLockViewModel {
     if (this.hashCode(enteredCode, salt) === this.getCode()) {
       this.stopObserver();
       this.isVisible(false);
+      this.startScheduledTimeout();
       return;
     }
     this.unlockError(t('modalAppLockLockedError'));
@@ -204,6 +216,7 @@ export class AppLockViewModel {
       input1.value = '';
       input2.value = '';
       this.isVisible(false);
+      this.startScheduledTimeout();
     }
   };
 

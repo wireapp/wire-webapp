@@ -9,7 +9,8 @@ export interface ServerConfig {
     BRAND_NAME: string;
     ENVIRONMENT: string;
     FEATURE: {
-      APPLOCK_TIMEOUT: number;
+      APPLOCK_SCHEDULED_TIMEOUT: number;
+      APPLOCK_UNFOCUS_TIMEOUT: number;
       CHECK_CONSENT: boolean;
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
