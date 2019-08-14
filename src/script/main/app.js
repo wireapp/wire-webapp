@@ -751,14 +751,14 @@ class App {
       }
 
       if (clearData) {
+        // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
+        CacheRepository.clearCacheStorage();
+
         try {
           await this.repository.storage.deleteDatabase();
         } catch (error) {
           this.logger.error('Failed to delete database before logout', error);
         }
-
-        const deletedKeys = await CacheRepository.clearCacheStorage();
-        this.logger.info(`Deleted "${deletedKeys.length}" keys from CacheStorage.`, deletedKeys);
       }
 
       return _redirectToLogin();

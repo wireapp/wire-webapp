@@ -23,10 +23,13 @@ import {resetStoreValue} from 'Util/StorageUtil';
 import {StorageKey} from '../storage/StorageKey';
 
 export class CacheRepository {
-  static async clearCacheStorage(): Promise<string[]> {
-    const keyList = await window.caches.keys();
-    await Promise.all(keyList.map(key => window.caches.delete(key)));
-    return keyList;
+  public static CACHE_KEY = {
+    // Redefine name from "sw.js"
+    ASSETS: `asset: 'asset-cache-v2`,
+  };
+
+  static async clearCacheStorage(): Promise<boolean> {
+    return window.caches.delete(CacheRepository.CACHE_KEY.ASSETS);
   }
 
   /**
