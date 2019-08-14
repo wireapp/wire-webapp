@@ -36,7 +36,7 @@ export class CacheRepository {
   /**
    * Deletes cached data.
    *
-   * @param [keepConversationInput=false] - Should conversation input be kept
+   * @param keepConversationInput - Should conversation input be kept
    * @param protectedKeyPatterns - Keys which should NOT be deleted from
    *   the cache
    * @returns Keys which have been deleted from the cache
