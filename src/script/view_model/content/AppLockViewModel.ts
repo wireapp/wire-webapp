@@ -20,8 +20,9 @@
 import {ValidationUtil} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import sodium from 'libsodium-wrappers-sumo';
 import {t} from 'Util/LocalizerUtil';
-import {afterRender, murmurhash3} from 'Util/util';
+import {afterRender} from 'Util/util';
 import {Config} from '../../auth/config';
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
@@ -155,21 +156,17 @@ export class AppLockViewModel {
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, this.changePassphrase);
   }
 
-  getStored = () => JSON.parse(this.localStorage.getItem(this.storageKey())) || {};
-  getSalt = () => parseInt(this.getStored()['salt'], 16);
-  getCode = () => this.getStored()['code'];
-  hashCode = (code: string, salt: number) => murmurhash3(code, salt).toString(16);
+  getStored = () => this.localStorage.getItem(this.storageKey());
 
-  setCode = (code: string) => {
-    const seed = Math.trunc(Math.random() * 1024);
+  setCode = async (code: string) => {
     this.stopPassphraseObserver();
-    this.localStorage.setItem(
-      this.storageKey(),
-      JSON.stringify({
-        code: this.hashCode(code, seed),
-        salt: seed.toString(16),
-      }),
+    await sodium.ready;
+    const hashed = sodium.crypto_pwhash_str(
+      code,
+      sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+      sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
     );
+    this.localStorage.setItem(this.storageKey(), hashed);
     this.startPassphraseObserver();
   };
 
@@ -215,15 +212,16 @@ export class AppLockViewModel {
   };
 
   showAppLock = () => {
-    const hasCode = !!this.getCode();
+    const hasCode = !!this.getStored();
     this.state(hasCode ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     this.isVisible(true);
   };
 
-  onUnlock = (form: HTMLFormElement) => {
+  onUnlock = async (form: HTMLFormElement) => {
     const enteredCode = (<HTMLInputElement>form[0]).value;
-    const salt = this.getSalt();
-    if (this.hashCode(enteredCode, salt) === this.getCode()) {
+    const hashedCode = this.getStored();
+    await sodium.ready;
+    if (sodium.crypto_pwhash_str_verify(hashedCode, enteredCode)) {
       this.stopObserver();
       this.isVisible(false);
       this.startScheduledTimeout();
