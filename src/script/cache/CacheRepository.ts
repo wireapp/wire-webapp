@@ -37,7 +37,7 @@ export class CacheRepository {
    * Deletes cached data.
    *
    * @param [keepConversationInput=false] - Should conversation input be kept
-   * @param [protectedKeyPatterns=[StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from
+   * @param protectedKeyPatterns - Keys which should NOT be deleted from
    *   the cache
    * @returns Keys which have been deleted from the cache
    */
