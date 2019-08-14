@@ -745,16 +745,16 @@ class App {
           }
         });
 
+        // Clear localStorage
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
         resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
       }
 
-      // Clear IndexedDB & localStorage
+      // Clear IndexedDB
       const clearDataPromise = clearData
         ? this.repository.storage
             .deleteDatabase()
             .catch(error => this.logger.error('Failed to delete database before logout', error))
-            .then(() => window.localStorage.clear())
         : Promise.resolve();
 
       return clearDataPromise.then(() => _redirectToLogin());
