@@ -479,6 +479,9 @@ class App {
 
       if (isAccessTokenError || isInvalidClient) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
+        if (isTemporaryClientAndNonPersistent()) {
+          return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+        }
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
