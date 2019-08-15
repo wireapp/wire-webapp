@@ -19,16 +19,15 @@
 
 import {createRandomUuid} from 'Util/util';
 
-import {resolve, graph} from './../../api/testResolver';
 import {StorageKey} from 'src/script/storage/StorageKey';
+import {CacheRepository} from 'src/script/cache/CacheRepository';
 
 describe('CacheRepository', () => {
-  const cache_repository = resolve(graph.CacheRepository);
   const TEMP_KEY = 'should_be_deleted';
 
-  describe('clearCache', () => {
+  describe('clearLocalStorage', () => {
     beforeEach(() => {
-      cache_repository.clearCache();
+      CacheRepository.clearLocalStorage();
 
       const conversationInputKey = `${StorageKey.CONVERSATION.INPUT}|${createRandomUuid()}`;
       amplify.store(conversationInputKey, {mentions: [], reply: {}, text: 'test'});
@@ -37,13 +36,13 @@ describe('CacheRepository', () => {
     });
 
     it('deletes cached keys', () => {
-      const deleted_keys = cache_repository.clearCache(false);
+      const deleted_keys = CacheRepository.clearLocalStorage(false);
 
       expect(deleted_keys.length).toBe(2);
     });
 
     it('preserves cached conversation inputs while deleting other keys', () => {
-      const deleted_keys = cache_repository.clearCache(true);
+      const deleted_keys = CacheRepository.clearLocalStorage(true);
 
       expect(deleted_keys.length).toBe(1);
       expect(deleted_keys[0]).toBe(TEMP_KEY);

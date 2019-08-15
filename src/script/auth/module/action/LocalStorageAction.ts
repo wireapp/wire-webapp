@@ -20,6 +20,7 @@
 import {ThunkAction} from '../reducer';
 import {LocalStorageActionCreator} from './creator/';
 
+// TODO: Old implementation. Can be merged with "StorageKey" from "src/script/storage/StorageKey.ts"
 export const LocalStorageKey = {
   AUTH: {
     ACCESS_TOKEN: {

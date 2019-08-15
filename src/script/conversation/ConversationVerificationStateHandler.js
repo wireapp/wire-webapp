@@ -151,7 +151,8 @@ export class ConversationVerificationStateHandler {
    * @returns {boolean} True if state changed
    */
   _checkChangeToDegraded(conversationEntity, userIds, type) {
-    const isConversationDegraded = this._willChangeToDegraded(conversationEntity);
+    const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
+    const isConversationDegraded = this._willChangeToDegraded(conversationEntity, shouldShowDegradationWarning);
     if (isConversationDegraded) {
       /**
        * TEMPORARY DEBUGGING FIX:
@@ -204,9 +205,10 @@ export class ConversationVerificationStateHandler {
    *
    * @private
    * @param {Conversation} conversationEntity - Conversation entity to evaluate
+   * @param {boolean} shouldShowDegradationWarning - Should a modal warn about the degradation?
    * @returns {boolean} Conversation changing to degraded
    */
-  _willChangeToDegraded(conversationEntity) {
+  _willChangeToDegraded(conversationEntity, shouldShowDegradationWarning = true) {
     const state = conversationEntity.verification_state();
     const isDegraded = state === ConversationVerificationState.DEGRADED;
     if (isDegraded) {
@@ -217,7 +219,11 @@ export class ConversationVerificationStateHandler {
     const isStateVerified = state === ConversationVerificationState.VERIFIED;
     const isConversationUnverified = conversationEntity.is_verified() === false;
     if (isStateVerified && isConversationUnverified) {
-      conversationEntity.verification_state(ConversationVerificationState.DEGRADED);
+      conversationEntity.verification_state(
+        shouldShowDegradationWarning
+          ? ConversationVerificationState.DEGRADED
+          : ConversationVerificationState.UNVERIFIED,
+      );
       this.logger.log(`Verification of conversation '${conversationEntity.id}' changed to degraded`);
       return true;
     }

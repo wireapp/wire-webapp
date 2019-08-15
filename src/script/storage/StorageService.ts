@@ -22,7 +22,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MemoryStore} from '@wireapp/store-engine/dist/commonjs/engine';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
@@ -60,6 +60,13 @@ export class StorageService {
 
   static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENT {
     return DEXIE_CRUD_EVENT;
+  }
+
+  // tslint:disable-next-line:typedef
+  static get CONFIG() {
+    return {
+      SIMPLE_STORE_NAME: 'simple_store',
+    };
   }
 
   constructor() {
@@ -236,16 +243,17 @@ export class StorageService {
   async deleteDatabase(): Promise<boolean> {
     try {
       await this.engine.purge();
-      this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
+      this.logger.info(`Deleting database '${this.dbName}' successful`);
+      this.dbName = undefined;
       return true;
     } catch (error) {
-      this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
+      this.logger.error(`Deleting database '${this.dbName}' failed`);
       throw error;
     }
   }
 
   async deleteStore(storeName: string): Promise<void> {
-    this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
+    this.logger.info(`Deleting object store '${storeName}' in database '${this.dbName}'`);
     await this.engine.deleteAll(storeName);
   }
 
@@ -339,7 +347,7 @@ export class StorageService {
    * @param primaryKey - Primary key of object to be retrieved
    * @returns Resolves with the record matching the primary key
    */
-  async load<T = Object>(storeName: string, primaryKey: string): Promise<T> {
+  async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
       const record = await this.engine.read<T>(storeName, primaryKey);
       return record;
@@ -350,6 +358,14 @@ export class StorageService {
       this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       throw error;
     }
+  }
+
+  async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T | undefined> {
+    if (this.isTemporaryAndNonPersistent) {
+      return this.load<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
+    }
+
+    return loadValue(primaryKey);
   }
 
   async readAllPrimaryKeys(storeName: string): Promise<string[]> {
@@ -378,7 +394,7 @@ export class StorageService {
           await this.update(storeName, primaryKey, entity);
           return primaryKey;
         }
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
     } else {
@@ -386,9 +402,17 @@ export class StorageService {
         const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
         return newKey;
       } catch (error) {
-        this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
+        this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       }
+    }
+  }
+
+  async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
+    if (this.isTemporaryAndNonPersistent) {
+      await this.engine.updateOrCreate(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey, entity);
+    } else {
+      storeValue(primaryKey, entity);
     }
   }
 
