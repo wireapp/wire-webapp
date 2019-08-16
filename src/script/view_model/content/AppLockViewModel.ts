@@ -31,7 +31,7 @@ import {ClientRepository} from '../../client/ClientRepository';
 import {User} from '../../entity/User';
 import {WebAppEvents} from '../../event/WebApp';
 
-enum APPLOCK_STATE {
+export enum APPLOCK_STATE {
   NONE = 'applock.none',
   SETUP = 'applock.setup',
   LOCKED = 'applock.locked',
@@ -231,14 +231,14 @@ export class AppLockViewModel {
     this.unlockError(t('modalAppLockLockedError'));
   };
 
-  onSetCode = (form: HTMLFormElement) => {
+  onSetCode = async (form: HTMLFormElement) => {
     const input1 = <HTMLInputElement>form[0];
     const input2 = <HTMLInputElement>form[1];
     const firstCode = input1.value;
     const secondCode = input2.value;
     if (firstCode === secondCode) {
       this.stopObserver();
-      this.setCode(firstCode);
+      await this.setCode(firstCode);
       input1.value = '';
       input2.value = '';
       this.isVisible(false);
