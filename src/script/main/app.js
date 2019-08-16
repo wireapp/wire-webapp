@@ -469,8 +469,7 @@ class App {
       ];
 
       if (isSessionExpired.includes(type)) {
-        this.logger.error(`Session expired on page reload: ${message}`, error);
-        Raygun.send(new Error('Session expired on page reload', error));
+        this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
