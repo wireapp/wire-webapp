@@ -477,7 +477,11 @@ class App {
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (isAccessTokenError || isInvalidClient) {
+      if (isInvalidClient) {
+        return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+      }
+
+      if (isAccessTokenError) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
