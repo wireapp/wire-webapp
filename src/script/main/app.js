@@ -477,7 +477,7 @@ class App {
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isInvalidClient) {
-        return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       if (isAccessTokenError) {
