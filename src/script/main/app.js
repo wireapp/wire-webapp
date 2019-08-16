@@ -486,7 +486,7 @@ class App {
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
+        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
       }
     }
 
