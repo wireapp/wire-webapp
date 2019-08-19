@@ -472,20 +472,23 @@ class App {
       ];
 
       if (isSessionExpired.includes(type)) {
-        this.logger.error(`Session expired on page reload: ${message}`, error);
-        Raygun.send(new Error('Session expired on page reload', error));
+        this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (isAccessTokenError || isInvalidClient) {
+      if (isInvalidClient) {
+        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+      }
+
+      if (isAccessTokenError) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
+        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
       }
     }
 
