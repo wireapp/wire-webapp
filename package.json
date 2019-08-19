@@ -4,7 +4,7 @@
     "@bower_components/normalize-css": "necolas/normalize.css#8.0.1",
     "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@emotion/core": "10.0.14",
+    "@emotion/core": "10.0.16",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/commons": "2.2.8",
     "@wireapp/core": "12.17.42",
