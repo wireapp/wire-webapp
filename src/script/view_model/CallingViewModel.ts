@@ -76,7 +76,7 @@ export class CallingViewModel {
     this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
-      const sounds: any = {
+      const sounds: Partial<Record<CALL_STATE, AudioType>> = {
         [CALL_STATE.INCOMING]: AudioType.INCOMING_CALL,
         [CALL_STATE.OUTGOING]: AudioType.OUTGOING_CALL,
       };
