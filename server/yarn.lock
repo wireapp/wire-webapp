@@ -305,10 +305,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@wireapp/commons@2.2.8":
-  version "2.2.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.8.tgz#da7f6a84a95220f740c4aba0671dfd47e125aac4"
-  integrity sha512-PUzwxZZntf7X8W2hTEPYbZUD3DY21/yH/sC4FXVsg1n+hH06s3qi+CI8+p04ZfkfH0WQ7VnVVkEpoUU4FkD75w==
+"@wireapp/commons@2.2.9":
+  version "2.2.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-2.2.9.tgz#4fc5906f65acc9a745c94d54c1fb7009ca0e91dd"
+  integrity sha512-0QTY4BnCFbU0YGsQDjI3/65aJ7YC2F6Y+pk1VG4LFTlzDhRyS8PAliPpfV72e8PW3/hopgmoBb1YwfP9vT0sdQ==
   dependencies:
     "@types/ansi-regex" "4.0.0"
     "@types/fs-extra" "8.0.0"
