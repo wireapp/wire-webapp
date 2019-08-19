@@ -41,12 +41,7 @@ export class EventTrackingRepository {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
-        DISABLED_EVENTS: [
-          EventName.CALLING.FAILED_REQUEST,
-          EventName.CALLING.FAILED_REQUESTING_MEDIA,
-          EventName.CALLING.FAILED_RTC,
-          EventName.TELEMETRY.APP_INITIALIZATION,
-        ],
+        DISABLED_EVENTS: [EventName.TELEMETRY.APP_INITIALIZATION],
       },
     };
   }

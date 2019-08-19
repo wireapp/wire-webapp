@@ -84,8 +84,27 @@
       </div>
     </div>
     #include('detail-view.htm')
-    #include('video-calling.htm')
     #include('warning.htm')
     #include('modals.htm')
+  <!-- /ko -->
+  <!-- ko using: calling -->
+    <!-- ko foreach: {data: activeCalls, as: 'call', noChildContext: true} -->
+      <!-- ko if: isOngoing(call) && !multitasking.isMinimized() && hasVideos(call) -->
+        <fullscreen-video-call params="
+          videoGrid: getVideoGrid(call),
+          call: call,
+          conversation: getConversationById(call.conversationId),
+          multitasking: multitasking,
+          canShareScreen: callingRepository.supportsScreenSharing,
+          callActions: callActions,
+          mediaDevicesHandler: mediaDevicesHandler,
+          isMuted: callingRepository.isMuted,
+          isChoosingScreen: isChoosingScreen">
+       </fullscreen-video-call>
+      <!-- /ko -->
+      <!-- ko if: isChoosingScreen() -->
+        <choose-screen params="cancel: onCancelScreenSelection, choose: onChooseScreen, screens: selectableScreens()"></choose-screen>
+      <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </div>

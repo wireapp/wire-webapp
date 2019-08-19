@@ -172,19 +172,6 @@ const _getStateAlert = {
   },
 };
 
-const _getStateCall = {
-  description: conversationEntity => {
-    const creatorName = conversationEntity.call().creatingUser.first_name();
-    return t('conversationsSecondaryLineIncomingCall', creatorName);
-  },
-  icon: () => ConversationStatusIcon.NONE,
-  match: conversationEntity => {
-    return conversationEntity.call()
-      ? conversationEntity.call().canJoinState() && !conversationEntity.call().selfUserJoined()
-      : false;
-  },
-};
-
 const _getStateDefault = {
   description: () => '',
   icon: () => ConversationStatusIcon.NONE,
@@ -377,7 +364,6 @@ const _getStateUserName = {
 
 export const generateCellState = conversationEntity => {
   const states = [
-    _getStateCall,
     _getStateRemoved,
     _getStateMuted,
     _getStateAlert,

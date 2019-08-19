@@ -487,7 +487,7 @@ const callTemplate = `
       <!-- ko if: message.was_completed() -->
         <div class="svg-green"><pickup-icon></pickup-icon></div>
       <!-- /ko -->
-      <!-- ko if: message.was_missed() -->
+      <!-- ko if: !message.was_completed() -->
         <div class="svg-red"><hangup-icon></hangup-icon></div>
       <!-- /ko -->
     </div>
