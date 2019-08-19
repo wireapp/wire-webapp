@@ -19,7 +19,7 @@
     "@wireapp/commons": "2.2.9",
     "commander": "3.0.0",
     "cross-env": "5.2.0",
-    "dotenv": "8.0.0",
+    "dotenv": "8.1.0",
     "faker": "4.1.0",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.4.0",
