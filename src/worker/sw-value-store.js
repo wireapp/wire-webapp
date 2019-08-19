@@ -41,7 +41,7 @@ function keepAlive() {
     const client = event.ports[0];
     const action = actions[event.data.action];
     if (!action) {
-      console.error(`Action '${event.data.action}' doesn't exist in valueStoreSw`);
+      console.error(`Action '${event.data.action}' doesn't exist in value store service worker`);
       return;
     }
     const value = action(event.data.params);
