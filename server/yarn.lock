@@ -218,10 +218,10 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express-sitemap-xml@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.0.2.tgz#a1ca6d5461c619334f4b8b5014bc705e4b4abd5c"
-  integrity sha512-r20xJUfga1srqg8MRr9VGG7FqwpAffeZtJnd4HjAbWJ5+w7CVNUsCCWL2S/4Stlnw3kZRpdEjH2Fu8bPHM2h7g==
+"@types/express-sitemap-xml@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.0.3.tgz#c2dc158061ffbff684f3358c92b1f8ce0b0d6d7f"
+  integrity sha512-02wzI5c1TGeytcub8GRgsOGKtoz/1L8tfyNMy8fdPINH4S9slSpsImH35q6xxL1SfqR2tEs3XgVmiO4+zUEtKg==
   dependencies:
     "@types/express" "*"
 
