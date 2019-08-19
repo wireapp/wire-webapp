@@ -21,7 +21,7 @@ import {Config} from '../auth/config';
 
 /**
  * The value store util allows storing a single value across page navigation.
- * This value will never be stored on the disk, which makes it a good candidate for storing cryptographic key.
+ * This value will never be stored on the disk, which makes it a good candidate for storing cryptographic key material.
  * There are no guarantees regarding the time the value will stay in memory. Should not be used as a reliable store.
  * Main use case is to pass on a value from a page to another page.
  */
@@ -55,8 +55,8 @@ function sendMessage(worker: ServiceWorker, action: any): Promise<any> {
     };
     try {
       worker.postMessage(action, [messageChannel.port2]);
-    } catch (err) {
-      reject(err);
+    } catch (error) {
+      reject(error);
     }
   });
 }
