@@ -40,7 +40,6 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
-import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {ConnectService} from '../connect/ConnectService';
 import {ConnectRepository} from '../connect/ConnectRepository';
@@ -239,13 +238,11 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.CallingService),
-      repositories.client,
+      resolve(graph.BackendClient),
       repositories.conversation,
       repositories.event,
-      repositories.media,
+      repositories.media.streamHandler,
       serverTimeHandler,
-      repositories.user,
     );
     repositories.integration = new IntegrationRepository(
       this.service.integration,
@@ -260,7 +257,6 @@ class App {
       repositories.user,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
-    repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }
@@ -328,6 +324,11 @@ class App {
         loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
         telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
+      })
+      .then(clientEntity => {
+        const selfUser = this.repository.user.self();
+        this.repository.calling.initAvs(selfUser, clientEntity.id);
+        return clientEntity;
       })
       .then(clientEntity => {
         loadingView.updateProgress(7.5, t('initValidatedClient'));
@@ -407,6 +408,7 @@ class App {
         }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
+        this.repository.calling.setReady();
         this.logger.info('App fully loaded');
       })
       .catch(error => this._appInitFailure(error, isReload));
@@ -643,7 +645,7 @@ class App {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
 
-    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
+    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
@@ -681,7 +683,7 @@ class App {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
-      this.repository.calling.leaveCallOnUnload();
+      this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
         if (isTemporaryClientAndNonPersistent()) {

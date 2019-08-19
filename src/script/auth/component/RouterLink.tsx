@@ -17,12 +17,15 @@
  *
  */
 
-import {Link, LinkProps as UILinkProps} from '@wireapp/react-ui-kit';
-import React from 'react';
-import {Link as RRLink, LinkProps as RouterLinkProps} from 'react-router-dom';
+/** @jsx jsx */
+import {jsx} from '@emotion/core';
+import {LinkProps, linkStyle} from '@wireapp/react-ui-kit';
+import * as RouterDOM from 'react-router-dom';
 
-interface LinkProps extends UILinkProps, RouterLinkProps {}
+interface RouterLinkProps extends RouterDOM.LinkProps, LinkProps {}
 
-const RouterLink = (props: LinkProps) => <Link component={RRLink} {...props} />;
+const RRLink: any = RouterDOM.Link;
+
+const RouterLink = (props: RouterLinkProps) => <RRLink css={theme => linkStyle(theme, props)} {...props} />;
 
 export default RouterLink;

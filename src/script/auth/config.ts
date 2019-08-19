@@ -27,7 +27,6 @@ export class Configuration {
   readonly BACKEND_REST = window.wire.env.BACKEND_REST || 'https://prod-nginz-https.wire.com';
   readonly BACKEND_WS = window.wire.env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
   readonly BRAND_NAME = window.wire.env.BRAND_NAME || 'Wire';
-  readonly CALLING_PROTOCOL_VERSION = '3.0';
   readonly ENVIRONMENT = window.wire.env.ENVIRONMENT || 'production';
   readonly FEATURE = window.wire.env.FEATURE;
   readonly MAX_GROUP_PARTICIPANTS = window.wire.env.MAX_GROUP_PARTICIPANTS || 500;

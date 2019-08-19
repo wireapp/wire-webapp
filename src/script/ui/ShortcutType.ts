@@ -20,9 +20,6 @@
 export enum ShortcutType {
   ADD_PEOPLE = 'add_people',
   ARCHIVE = 'archive',
-  CALL_MUTE = 'mute_call',
-  CALL_REJECT = 'reject',
-  DEBUG = 'debug',
   NEXT = 'next',
   NOTIFICATIONS = 'notifications',
   PEOPLE = 'people',

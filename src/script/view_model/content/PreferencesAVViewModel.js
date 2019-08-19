@@ -21,12 +21,11 @@ import {getLogger} from 'Util/Logger';
 import {Environment} from 'Util/Environment';
 import {Config} from '../../auth/config';
 import {MediaType} from '../../media/MediaType';
+import {MediaError} from '../../error/MediaError';
 
-window.z = window.z || {};
-window.z.viewModel = z.viewModel || {};
-window.z.viewModel.content = z.viewModel.content || {};
+const noop = () => {};
 
-z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
+export class PreferencesAVViewModel {
   static get CONFIG() {
     return {
       AUDIO_METER: {
@@ -38,43 +37,36 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     };
   }
 
-  constructor(mainViewModel, contentViewModel, repositories) {
-    this.initiateDevices = this.initiateDevices.bind(this);
-    this.releaseDevices = this.releaseDevices.bind(this);
+  constructor(mediaRepository, userRepository, callbacks) {
+    this.willChangeMediaSource = callbacks.willChangeMediaSource || noop;
+    this.mediaSourceChanged = callbacks.mediaSourceChanged || noop;
 
-    this.logger = getLogger('z.viewModel.content.PreferencesAVViewModel');
+    this.logger = getLogger('PreferencesAVViewModel');
 
-    this.mediaRepository = repositories.media;
-    this.userRepository = repositories.user;
-    this.callingRepository = repositories.calling;
+    this.userRepository = userRepository;
 
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
-    this.devicesHandler = this.mediaRepository.devicesHandler;
+    this.devicesHandler = mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.availableDevices;
     this.currentDeviceId = this.devicesHandler.currentDeviceId;
     this.deviceSupport = this.devicesHandler.deviceSupport;
 
     const updateStream = mediaType => {
-      const hasActiveStreams = this.streamHandler.localMediaStream() || this.mediaStream();
-      if (!hasActiveStreams) {
-        // if there is no active call or the preferences is not showing any streams, we do not need to request a new stream
-        return;
-      }
-      const currentCallMediaStream = this.streamHandler.localMediaStream();
-      // release first the current call's tracks and the preferences' tracks (Firefox doesn't allow to request another mic if one is already active)
-      if (currentCallMediaStream) {
-        this.streamHandler.releaseTracksFromStream(currentCallMediaStream, mediaType);
-      }
+      this._releaseAudioMeter();
+      const needsStreamUpdate = this.willChangeMediaSource(mediaType);
       if (this.mediaStream()) {
         this.streamHandler.releaseTracksFromStream(this.mediaStream(), mediaType);
+      }
+      if (!needsStreamUpdate && !this.mediaStream()) {
+        return;
       }
 
       return this._getMediaStream(mediaType).then(stream => {
         if (!stream) {
           return this.mediaStream(undefined);
         }
-        this.streamHandler.changeMediaStream(stream, mediaType);
+        this.mediaSourceChanged(stream, mediaType);
         if (this.mediaStream()) {
           stream.getTracks().forEach(track => {
             this.mediaStream().addTrack(track);
@@ -82,30 +74,21 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
         } else {
           stream.getTracks().forEach(track => track.stop());
         }
+        this._initiateAudioMeter(this.mediaStream());
       });
     };
 
     this.currentDeviceId.audioInput.subscribe(() => updateStream(MediaType.AUDIO));
     this.currentDeviceId.videoInput.subscribe(() => updateStream(MediaType.VIDEO));
 
-    this.constraintsHandler = this.mediaRepository.constraintsHandler;
-    this.streamHandler = this.mediaRepository.streamHandler;
+    this.constraintsHandler = mediaRepository.constraintsHandler;
+    this.streamHandler = mediaRepository.streamHandler;
     this.mediaStream = ko.observable();
 
     this.isVisible = false;
 
     const selfUser = this.userRepository.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
-
-    this.mediaStream.subscribe(mediaStream => {
-      if (this.audioInterval) {
-        this._releaseAudioMeter();
-      }
-
-      if (this.isVisible && mediaStream) {
-        this._initiateAudioMeter(mediaStream);
-      }
-    });
 
     this.audioContext = undefined;
     this.audioInterval = undefined;
@@ -165,21 +148,17 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     const supportsAudio = this.deviceSupport.audioInput();
     const requestAudio = supportsAudio && [MediaType.AUDIO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
     const requestVideo = supportsVideo && [MediaType.VIDEO, MediaType.AUDIO_VIDEO].includes(requestedMediaType);
-    return this.constraintsHandler
-      .getMediaStreamConstraints(requestAudio, requestVideo)
-      .then(streamConstraints => this.streamHandler.requestMediaStream(requestedMediaType, streamConstraints))
-      .then(({stream}) => {
+    return this.streamHandler
+      .requestMediaStream(requestAudio, requestVideo, false, false)
+      .then(stream => {
         // refresh devices list in order to display the labels (see https://stackoverflow.com/a/46659819/2745879)
-        this.devicesHandler.getMediaDevices();
+        this.devicesHandler.refreshMediaDevices();
         return stream;
       })
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
 
-        const expectedErrors = [
-          z.error.MediaError.TYPE.MEDIA_STREAM_DEVICE,
-          z.error.MediaError.TYPE.MEDIA_STREAM_PERMISSION,
-        ];
+        const expectedErrors = [MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.TYPE.MEDIA_STREAM_PERMISSION];
 
         const isExpectedError = expectedErrors.includes(error.type);
         if (isExpectedError) {
@@ -200,7 +179,10 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    */
   _initiateAudioMeter(mediaStream) {
     this.logger.info('Initiating new audio meter', mediaStream);
-    this.audioContext = this.mediaRepository.getAudioContext();
+    if (!window.AudioContext || !window.AudioContext.prototype.createMediaStreamSource) {
+      this.logger.warn('AudioContext is not supported, no volume indicator can be generated');
+    }
+    this.audioContext = new window.AudioContext();
 
     const audioAnalyser = this.audioContext.createAnalyser();
     audioAnalyser.fftSize = PreferencesAVViewModel.CONFIG.AUDIO_METER.FFT_SIZE;
@@ -229,8 +211,20 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   _releaseAudioMeter() {
     window.clearInterval(this.audioInterval);
     this.audioInterval = undefined;
+
+    if (this.audioContext) {
+      this.audioContext
+        .close()
+        .then(() => {
+          this.logger.info('Closed existing AudioContext', this.audioContext);
+          this.audioContext = undefined;
+        })
+        .catch(this.logger.error);
+    }
+
     if (this.audioSource) {
       this.audioSource.disconnect();
+      this.audioSource = undefined;
     }
   }
 
@@ -241,4 +235,4 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     }
     this.permissionDenied(false);
   }
-};
+}

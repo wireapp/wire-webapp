@@ -24,6 +24,7 @@ import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals} from './ModalsViewModel';
 import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
+import {CallingViewModel} from './CallingViewModel';
 
 export class MainViewModel {
   static get CONFIG() {
@@ -63,6 +64,12 @@ export class MainViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
+    this.multitasking = {
+      autoMinimize: ko.observable(true),
+      isMinimized: ko.observable(false),
+      resetMinimize: ko.observable(false),
+    };
+
     this.selfUser = this.userRepository.self;
 
     this.isPanelOpen = ko.observable(false);
@@ -70,15 +77,22 @@ export class MainViewModel {
     this.actions = new z.viewModel.ActionsViewModel(this, repositories);
 
     this.panel = new z.viewModel.PanelViewModel(this, repositories);
+    this.calling = new CallingViewModel(
+      repositories.calling,
+      repositories.conversation,
+      repositories.audio,
+      repositories.media.devicesHandler,
+      repositories.media.streamHandler,
+      repositories.permission,
+      this.multitasking,
+    );
     this.content = new ContentViewModel(this, repositories);
     this.list = new z.viewModel.ListViewModel(this, repositories);
 
     this.modals = modals;
     this.lightbox = new z.viewModel.ImageDetailViewViewModel(this, repositories);
-    this.shortcuts = new z.viewModel.ShortcutsViewModel(this, repositories);
     this.title = new WindowTitleViewModel(this, repositories);
     this.favicon = new z.viewModel.FaviconViewModel(window.amplify);
-    this.videoCalling = new z.viewModel.VideoCallingViewModel(this, repositories);
     this.warnings = new WarningsViewModel();
 
     this.mainClasses = ko.pureComputed(() => {

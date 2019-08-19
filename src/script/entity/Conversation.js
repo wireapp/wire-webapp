@@ -235,12 +235,6 @@ export class Conversation {
       .extend({trackArrayChanges: true});
 
     // Calling
-    this.call = ko.observable(undefined);
-    this.hasLocalCall = ko.pureComputed(() => !!this.call() && !this.call().isOngoingOnAnotherClient());
-
-    this.hasActiveCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().isActiveState() : false));
-    this.hasJoinableCall = ko.pureComputed(() => (this.hasLocalCall() ? this.call().canJoinState() : false));
-
     this.unreadState = ko.pureComputed(() => {
       const unreadState = {
         allEvents: [],
@@ -260,7 +254,7 @@ export class Conversation {
             break;
           }
 
-          const isMissedCall = messageEntity.is_call() && messageEntity.was_missed();
+          const isMissedCall = messageEntity.is_call() && !messageEntity.was_completed();
           const isPing = messageEntity.is_ping();
           const isMessage = messageEntity.is_content();
           const isSelfMentioned = isMessage && this.selfUser() && messageEntity.isUserMentioned(this.selfUser().id);
@@ -763,7 +757,7 @@ export class Conversation {
       return false;
     }
 
-    return this.call() && this.call().isRemoteVideoCall();
+    return true;
   }
 
   serialize() {

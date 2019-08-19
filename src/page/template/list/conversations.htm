@@ -17,13 +17,22 @@
       <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>
     <!-- /ko -->
   </div>
-  <!-- ko if: showCalls() -->
-    <!-- ko foreach: callConversations -->
-      <conversation-list-calling-cell
-        data-bind="link_to: $parent.getConversationUrl($data), attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.display_name}"
-        params="conversation: $data, callingRepository: $parent.callingRepository, permissionRepository: $parent.permissionRepository, multitasking: $parent.multitasking, videoGridRepository: $parent.videoGridRepository"
-        data-uie-name="item-call">
-      </conversation-list-calling-cell>
+  <!-- ko using: callingViewModel -->
+    <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
+      <!-- ko if: !activeCall.reason() -->
+        <conversation-list-calling-cell
+          data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
+          params="
+            call: activeCall,
+            videoGrid: getVideoGrid(activeCall),
+            conversation: getConversationById(activeCall.conversationId),
+            multitasking: multitasking,
+            callingRepository: callingRepository,
+            callActions: callActions,
+            hasAccessToCamera: hasAccessToCamera()"
+          data-uie-name="item-call">
+        </conversation-list-calling-cell>
+      <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
   <div class="left-list-center">
@@ -56,11 +65,11 @@
         </li>
       <!-- /ko -->
 
-      <!-- ko foreach: unarchivedConversations -->
+      <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
         <conversation-list-cell
-          data-bind="link_to: $parent.getConversationUrl($data), event: {'contextmenu': $parent.listViewModel.onContextMenu}"
+          data-bind="link_to: getConversationUrl(conversation), event: {'contextmenu': listViewModel.onContextMenu}"
           data-uie-name="item-conversation"
-          params="click: $parent.listViewModel.onContextMenu, conversation: $data, is_selected: $parent.isSelectedConversation, onJoinCall: $parent.onJoinCall">
+          params="click: listViewModel.onContextMenu, conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
         </conversation-list-cell>
       <!-- /ko -->
     </ul>

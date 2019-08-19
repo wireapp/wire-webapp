@@ -18,8 +18,8 @@
  */
 /* eslint-disable */
 
-import {resolve, graph} from '../../api/testResolver';
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
+import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
 describe('MediaDevicesHandler', () => {
   const screens = [{id: 'screen1', name: 'Screen 1'}, {id: 'screen2', name: 'Screen 2'}];
@@ -27,47 +27,76 @@ describe('MediaDevicesHandler', () => {
     {deviceId: 'camera1', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 1'},
     {deviceId: 'camera2', kind: MediaDeviceType.VIDEO_INPUT, label: 'Camera 2'},
   ];
-  let devicesHandler;
+  const mics = [
+    {deviceId: 'mic1', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 1'},
+    {deviceId: 'mic2', kind: MediaDeviceType.AUDIO_INPUT, label: 'Mic 2'},
+  ];
+  const speakers = [
+    {deviceId: 'speaker1', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 1'},
+    {deviceId: 'speaker2', kind: MediaDeviceType.AUDIO_OUTPUT, label: 'Speaker 2'},
+  ];
 
   beforeEach(() => {
-    devicesHandler = resolve(graph.MediaRepository).devicesHandler;
-    spyOn(devicesHandler, 'getScreenSources').and.callFake(() => {
-      devicesHandler.availableDevices.screenInput(screens);
-      return Promise.resolve();
-    });
-    spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(Promise.resolve(cameras));
+    spyOn(navigator.mediaDevices, 'enumerateDevices').and.returnValue(
+      Promise.resolve(cameras.concat(mics).concat(speakers))
+    );
   });
 
-  describe('toggleNextScreen', () => {
-    it('returns second screen if the first is currently selected', () => {
-      devicesHandler.currentDeviceId.screenInput(screens[0].id);
-      devicesHandler.currentDeviceIndex.screenInput(0);
-      return devicesHandler.toggleNextScreen().then(() => {
-        expect(devicesHandler.currentDeviceId.screenInput()).toEqual(screens[1].id);
-      });
-    });
-    it('returns first screen if the second is currently selected', () => {
-      devicesHandler.currentDeviceId.screenInput(screens[1].id);
-      devicesHandler.currentDeviceIndex.screenInput(1);
-      return devicesHandler.toggleNextScreen().then(() => {
-        expect(devicesHandler.currentDeviceId.screenInput()).toEqual(screens[0].id);
+  describe('constructor', () => {
+    it('loads available devices and listens to input devices changes', done => {
+      const devicesHandler = new MediaDevicesHandler();
+      setTimeout(() => {
+        expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(1);
+        expect(devicesHandler.availableDevices.videoInput()).toEqual(cameras);
+        expect(devicesHandler.availableDevices.audioInput()).toEqual(mics);
+        expect(devicesHandler.availableDevices.audioOutput()).toEqual(speakers);
+
+        const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
+        navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
+        navigator.mediaDevices.ondevicechange();
+
+        setTimeout(() => {
+          expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);
+          expect(devicesHandler.availableDevices.videoInput()).toEqual(newCameras);
+          expect(devicesHandler.availableDevices.audioInput()).toEqual([]);
+          expect(devicesHandler.availableDevices.audioOutput()).toEqual([]);
+          done();
+        });
       });
     });
   });
 
-  describe('toggleNextCamera', () => {
-    it('returns second camera if the first is currently selected', () => {
-      devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
-      devicesHandler.currentDeviceIndex.videoInput(0);
-      return devicesHandler.toggleNextCamera().then(() => {
-        expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[1].deviceId);
-      });
-    });
-    it('returns first camera if the second is currently selected', () => {
-      devicesHandler.currentDeviceId.videoInput(cameras[1].deviceId);
-      devicesHandler.currentDeviceIndex.videoInput(1);
-      return devicesHandler.toggleNextCamera().then(() => {
-        expect(devicesHandler.currentDeviceId.videoInput()).toEqual(cameras[0].deviceId);
+  describe('currentAvailableDeviceId', () => {
+    it('only exposes available device', done => {
+      const devicesHandler = new MediaDevicesHandler();
+      setTimeout(() => {
+        devicesHandler.currentDeviceId.videoInput(cameras[0].deviceId);
+
+        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(cameras[0].deviceId);
+
+        devicesHandler.currentDeviceId.videoInput('inexistant-id');
+        expect(devicesHandler.currentAvailableDeviceId.videoInput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.videoInput
+        );
+
+        devicesHandler.currentDeviceId.audioInput(mics[0].deviceId);
+
+        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(mics[0].deviceId);
+
+        devicesHandler.currentDeviceId.audioInput('inexistant-id');
+        expect(devicesHandler.currentAvailableDeviceId.audioInput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioInput
+        );
+
+        devicesHandler.currentDeviceId.audioOutput(speakers[0].deviceId);
+
+        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(speakers[0].deviceId);
+
+        devicesHandler.currentDeviceId.audioOutput('inexistant-id');
+        expect(devicesHandler.currentAvailableDeviceId.audioOutput()).toBe(
+          MediaDevicesHandler.CONFIG.DEFAULT_DEVICE.audioOutput
+        );
+        done();
       });
     });
   });
