@@ -18,6 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
+import {StyledApp} from '@wireapp/react-ui-kit';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {mount} from 'enzyme';
 import * as React from 'react';
@@ -62,8 +63,7 @@ export const withIntl = (component: React.ReactNode) => (
   </IntlProvider>
 );
 
-export const mountWithIntl = (component: React.ReactNode, store: Store<RootState>) =>
-  mount(withStore(withIntl(component), store));
+export const withTheme = (component: React.ReactNode) => <StyledApp>{component}</StyledApp>;
 
-export const mountWithStore = (component: React.ReactNode, store: Store<RootState>) =>
-  mount(withStore(component, store));
+export const mountComponent = (component: React.ReactNode, store: Store<RootState>) =>
+  mount(withTheme(withStore(withIntl(component), store)));
