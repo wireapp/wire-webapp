@@ -18,7 +18,7 @@
  */
 
 import * as React from 'react';
-import {mockStore, mountWithIntl} from '../util/TestUtil';
+import {mockStore, mountComponent} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
@@ -63,14 +63,14 @@ describe('when entering a team name', () => {
 
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
 
       expect(teamNameInput().props().required).toBe(true);
       expect(doNextButton().props().disabled).toBe(true);
     });
 
     it('is enabled when the minimum amount of characters is entered', done => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
 
       expect(doNextButton().props().disabled).toBe(true);
@@ -83,7 +83,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled if previous submit with same value failed', done => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
       const expectedValidTeamName = 'My Team';
 
@@ -105,7 +105,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled when prefilled with too few characters', done => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
       wrapper.setProps({teamName: ''});
 
       expect(doNextButton().props().disabled).toBe(true);
@@ -115,7 +115,7 @@ describe('when entering a team name', () => {
 
   describe('an error message', () => {
     it('appears if too few characters are entered', done => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
@@ -131,7 +131,7 @@ describe('when entering a team name', () => {
     });
 
     it('appears when input gets trimmed', done => {
-      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      wrapper = mountComponent(<TeamName />, mockStore(initialState));
       const actualTeamName = '  ';
       const expectedTeamName = '  ';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';

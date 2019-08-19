@@ -2,6 +2,9 @@
 sudo: required
 dist: xenial
 
+addons:
+  chrome: stable
+
 # https://docs.travis-ci.com/user/encryption-keys/
 env:
   global:
@@ -54,7 +57,7 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 after_success:
-  - if [[ "${TRAVIS_BRANCH}" =~ ^(dev|edge)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
+  - if [[ "${TRAVIS_BRANCH}" =~ ^(dev|edge|master)$ ]] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then yarn build:prod; fi
   - |
     if [[ "${TRAVIS_TAG}" =~ .*-staging.* ]]; then
       yarn build:prod

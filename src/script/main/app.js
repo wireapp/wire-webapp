@@ -40,7 +40,6 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
-import {VideoGridRepository} from '../calling/VideoGridRepository';
 import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {ConnectService} from '../connect/ConnectService';
 import {ConnectRepository} from '../connect/ConnectRepository';
@@ -96,6 +95,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {CacheRepository} from '../cache/CacheRepository';
 
 class App {
   static get CONFIG() {
@@ -237,13 +237,11 @@ class App {
       repositories.user,
     );
     repositories.calling = new CallingRepository(
-      resolve(graph.CallingService),
-      repositories.client,
+      resolve(graph.BackendClient),
       repositories.conversation,
       repositories.event,
-      repositories.media,
+      repositories.media.streamHandler,
       serverTimeHandler,
-      repositories.user,
     );
     repositories.integration = new IntegrationRepository(
       this.service.integration,
@@ -258,7 +256,6 @@ class App {
       repositories.user,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
-    repositories.videoGrid = new VideoGridRepository(repositories.calling, repositories.media);
 
     return repositories;
   }
@@ -326,6 +323,11 @@ class App {
         loadingView.updateProgress(5, t('initReceivedSelfUser', this.repository.user.self().first_name()));
         telemetry.time_step(AppInitTimingsStep.RECEIVED_SELF_USER);
         return this._initiateSelfUserClients();
+      })
+      .then(clientEntity => {
+        const selfUser = this.repository.user.self();
+        this.repository.calling.initAvs(selfUser, clientEntity.id);
+        return clientEntity;
       })
       .then(clientEntity => {
         loadingView.updateProgress(7.5, t('initValidatedClient'));
@@ -403,6 +405,7 @@ class App {
         }
         this.repository.audio.init(true);
         this.repository.conversation.cleanup_conversations();
+        this.repository.calling.setReady();
         this.logger.info('App fully loaded');
       })
       .catch(error => this._appInitFailure(error, isReload));
@@ -468,20 +471,23 @@ class App {
       ];
 
       if (isSessionExpired.includes(type)) {
-        this.logger.error(`Session expired on page reload: ${message}`, error);
-        Raygun.send(new Error('Session expired on page reload', error));
+        this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (isAccessTokenError || isInvalidClient) {
+      if (isInvalidClient) {
+        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+      }
+
+      if (isAccessTokenError) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
+        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
       }
     }
 
@@ -636,7 +642,7 @@ class App {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
 
-    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.content.multitasking);
+    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
@@ -674,7 +680,7 @@ class App {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
-      this.repository.calling.leaveCallOnUnload();
+      this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
         if (isTemporaryClientAndNonPersistent()) {
@@ -718,7 +724,7 @@ class App {
       this._redirectToLogin(signOutReason);
     };
 
-    const _logout = () => {
+    const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
@@ -730,7 +736,6 @@ class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      // @todo remove on next iteration
       const selfUser = this.repository.user.self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
@@ -745,19 +750,23 @@ class App {
           }
         });
 
-        // Clear localStorage
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
+        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
 
-      // Clear IndexedDB
-      const clearDataPromise = clearData
-        ? this.repository.storage
-            .deleteDatabase()
-            .catch(error => this.logger.error('Failed to delete database before logout', error))
-        : Promise.resolve();
+      if (clearData) {
+        // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
+        CacheRepository.clearCacheStorage();
 
-      return clearDataPromise.then(() => _redirectToLogin());
+        try {
+          await this.repository.storage.deleteDatabase();
+        } catch (error) {
+          this.logger.error('Failed to delete database before logout', error);
+        }
+      }
+
+      return _redirectToLogin();
     };
 
     const _logoutOnBackend = () => {

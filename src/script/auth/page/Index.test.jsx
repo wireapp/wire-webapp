@@ -18,7 +18,7 @@
  */
 
 import * as React from 'react';
-import {mockStore, mountWithIntl} from '../util/TestUtil';
+import {mockStore, mountComponent} from '../util/TestUtil';
 import Index from './Index';
 import {Config} from '../config';
 
@@ -48,7 +48,7 @@ describe('when visiting the index page', () => {
     afterAll(() => (Config.FEATURE = {}));
 
     it('redirects to the login page', () => {
-      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+      wrapper = mountComponent(<Index />, mockStore(initialState));
 
       expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
     });
@@ -64,25 +64,25 @@ describe('when visiting the index page', () => {
     afterAll(() => (Config.FEATURE = {}));
 
     it('shows the Wire logo', () => {
-      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+      wrapper = mountComponent(<Index />, mockStore(initialState));
 
       expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
     });
 
     it('shows an option to create a private account', () => {
-      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+      wrapper = mountComponent(<Index />, mockStore(initialState));
 
       expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
     });
 
     it('shows an option to create a team', () => {
-      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+      wrapper = mountComponent(<Index />, mockStore(initialState));
 
       expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
     });
 
     it('shows an option to login', () => {
-      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+      wrapper = mountComponent(<Index />, mockStore(initialState));
 
       expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
     });

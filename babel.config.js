@@ -16,6 +16,7 @@ module.exports = {
         '@babel/preset-react',
         '@babel/preset-typescript',
         ['@babel/preset-env', {...presetEnvConfig, ...{modules: 'commonjs'}}],
+        '@emotion/babel-preset-css-prop',
       ],
     },
   },
@@ -29,5 +30,10 @@ module.exports = {
     ],
     '@babel/plugin-syntax-dynamic-import',
   ],
-  presets: ['@babel/preset-react', '@babel/preset-typescript', ['@babel/preset-env', presetEnvConfig]],
+  presets: [
+    '@babel/preset-react',
+    '@babel/preset-typescript',
+    ['@babel/preset-env', presetEnvConfig],
+    '@emotion/babel-preset-css-prop',
+  ],
 };

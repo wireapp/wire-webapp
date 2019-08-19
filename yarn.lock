@@ -554,7 +554,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-syntax-jsx" "^7.2.0"
 
-"@babel/plugin-transform-react-jsx@^7.0.0":
+"@babel/plugin-transform-react-jsx@^7.0.0", "@babel/plugin-transform-react-jsx@^7.1.6":
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-react-jsx/-/plugin-transform-react-jsx-7.3.0.tgz#f2cab99026631c767e2745a5368b331cfe8f5290"
   integrity sha512-a/+aRb7R06WcKvQLOu4/TpjKOdvVEKRLWFpKcNuHhiREPgGRB4TQJxq07+EZLS8LFVYpfq1a5lDUnuMdcCpBKg==
@@ -761,25 +761,42 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@emotion/cache@^10.0.14":
+"@emotion/babel-plugin-jsx-pragmatic@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@emotion/babel-plugin-jsx-pragmatic/-/babel-plugin-jsx-pragmatic-0.1.3.tgz#e06489b00bda80304e7198be76f448dd267df397"
+  integrity sha512-zbxpcKoAX9IMRfJqT2EnYL29AGlJyn+1VPoZW73BJslRDJbzgo2RYJIxR3Hg48kifv/TduIkpMH3L3wU/7yP8g==
+  dependencies:
+    "@babel/plugin-syntax-jsx" "^7.2.0"
+
+"@emotion/babel-preset-css-prop@10.0.14":
   version "10.0.14"
-  resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.14.tgz#56093cff025c04b0330bdd92afe8335ed326dd18"
-  integrity sha512-HNGEwWnPlNyy/WPXBXzbjzkzeZFV657Z99/xq2xs5yinJHbMfi3ioCvBJ6Y8Zc8DQzO9F5jDmVXJB41Ytx3QMw==
+  resolved "https://registry.yarnpkg.com/@emotion/babel-preset-css-prop/-/babel-preset-css-prop-10.0.14.tgz#2b8508c4e8218b9ef239f9351e0e7bf137a32fbc"
+  integrity sha512-gfjnldUq+5u1/S6UMqFE4fPrcWDlcxDIArZeYKk4hhSDb3IToMKfbezNTk52Dp7SMlb0Y22Co0ReBz4dh1IdhQ==
+  dependencies:
+    "@babel/plugin-transform-react-jsx" "^7.1.6"
+    "@babel/runtime" "^7.4.3"
+    "@emotion/babel-plugin-jsx-pragmatic" "^0.1.3"
+    babel-plugin-emotion "^10.0.14"
+
+"@emotion/cache@^10.0.15":
+  version "10.0.15"
+  resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.15.tgz#b81767b48015aae2689c60373992145c67b8de02"
+  integrity sha512-8VthgeKhlGeTXSW1JN7I14AnAaiFPbOrqNqg3dPoGCZ3bnMjkrmRU0zrx0BtBw9esBaPaQgDB9y0tVgAGT2Mrg==
   dependencies:
     "@emotion/sheet" "0.9.3"
     "@emotion/stylis" "0.8.4"
     "@emotion/utils" "0.11.2"
     "@emotion/weak-memoize" "0.2.3"
 
-"@emotion/core@10.0.14":
-  version "10.0.14"
-  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.14.tgz#cac5c334b278d5b7688cfff39e460a5b50abb71c"
-  integrity sha512-G9FbyxLm3lSnPfLDcag8fcOQBKui/ueXmWOhV+LuEQg9HrqExuWnWaO6gm6S5rNe+AMcqLXVljf8pYgAdFLNSg==
+"@emotion/core@10.0.15":
+  version "10.0.15"
+  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.15.tgz#b8489d85d64b45bd03abdb8a3d9639ba8a0328d0"
+  integrity sha512-VHwwl3k/ddMfQOHYgOJryXOs2rGJ5AfKLQGm5AVolNonnr6tkmDI4nzIMNaPpveoXVs7sP0OrF24UunIPxveQw==
   dependencies:
     "@babel/runtime" "^7.4.3"
-    "@emotion/cache" "^10.0.14"
+    "@emotion/cache" "^10.0.15"
     "@emotion/css" "^10.0.14"
-    "@emotion/serialize" "^0.11.8"
+    "@emotion/serialize" "^0.11.9"
     "@emotion/sheet" "0.9.3"
     "@emotion/utils" "0.11.2"
 
@@ -813,6 +830,17 @@
     "@emotion/utils" "0.11.2"
     csstype "^2.5.7"
 
+"@emotion/serialize@^0.11.9":
+  version "0.11.9"
+  resolved "https://registry.yarnpkg.com/@emotion/serialize/-/serialize-0.11.9.tgz#123e0f51d2dee9693fae1057bd7fc27b021d6868"
+  integrity sha512-/Cn4V81z3ZyFiDQRw8nhGFaHkxHtmCSSBUit4vgTuLA1BqxfJUYiqSq97tq/vV8z9LfIoqs6a9v6QrUFWZpK7A==
+  dependencies:
+    "@emotion/hash" "0.7.2"
+    "@emotion/memoize" "0.7.2"
+    "@emotion/unitless" "0.7.4"
+    "@emotion/utils" "0.11.2"
+    csstype "^2.5.7"
+
 "@emotion/sheet@0.9.3":
   version "0.9.3"
   resolved "https://registry.yarnpkg.com/@emotion/sheet/-/sheet-0.9.3.tgz#689f135ecf87d3c650ed0c4f5ddcbe579883564a"
@@ -837,6 +865,16 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.3.tgz#dfa0c92efe44a1d1a7974fb49ffeb40ef2da5a27"
   integrity sha512-zVgvPwGK7c1aVdUVc9Qv7SqepOGRDrqCw7KZPSZziWGxSlbII3gmvGLPzLX4d0n0BMbamBacUrN22zOMyFFEkQ==
+
+"@hot-loader/react-dom@16.9.0":
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-16.9.0.tgz#7782cec9d78172f3e4c86a317ba7a73bd0271acd"
+  integrity sha512-MsOdCBB7c5YNyB4iDDct+tS7AihvYyfwZVV+z/QnbTjPgxH98kqIDXO92nU7tLXp0OtYFErHZfcWjtszP/572w==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.15.0"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -1512,6 +1550,11 @@
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
 
+"@wireapp/avs@5.1.28":
+  version "5.1.28"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.28.tgz#316e184b4c94613044e7fec4565cff26828d77de"
+  integrity sha512-xABj0vfgVvuLmFnxk5eILNJdLwTCnsQZUsdE4cDZtlVXcO1FQRgA1YM9Gw2sNnxJZWitGfO0TOEpiurLwB1Mog==
+
 "@wireapp/cbor@4.3.9":
   version "4.3.9"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.3.9.tgz#67fdf73c6bb14e693b7dc7d3bfb05b320344d4ac"
@@ -1634,17 +1677,18 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/react-ui-kit@7.8.0":
-  version "7.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.8.0.tgz#1d877e092eef55453e6a879dcf2e427a15f1c502"
-  integrity sha512-dbD9/xZeXtnyrkNsIgz2O0KAQt+8LvETWzKCtMbc0z67p1lzC3zGE78v65nyCud8MqvcORmYtC7b4wXaRX95/A==
+"@wireapp/react-ui-kit@7.11.2":
+  version "7.11.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.11.2.tgz#b2cc9282e692b1e55a7c56c273b53d7fd2aec960"
+  integrity sha512-r4onWoW5k6s9XSh/lsDxroYl8qPuHUEBIPvC5V6nCiGtc7HThcErF7ebLgUNZB8T2HawyBWSt+OvphszR/nsbw==
   dependencies:
-    "@emotion/core" "10.0.14"
+    "@emotion/core" "10.0.15"
     "@types/color" "3.0.0"
-    bazinga64 "5.5.7"
+    bazinga64 "5.5.11"
     color "3.1.2"
     emotion-normalize "10.1.0"
-    react-transition-group "4.2.1"
+    emotion-theming "10.0.14"
+    react-transition-group "4.2.2"
 
 "@wireapp/store-engine-dexie@0.5.4":
   version "0.5.4"
@@ -2434,10 +2478,10 @@ bazinga64@5.5.11:
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.11.tgz#aa82aaf71c525cf54b6305a1e1686ab0a1cadeda"
   integrity sha512-kzeoGJubuupc+B4P4deF8iSPiP81JR9u/+Fl+AhVS/p/xBa38f+Pq1NqYpLfNXBMTcslK2VvW9tzkyKIE2kODw==
 
-bazinga64@5.5.7:
-  version "5.5.7"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.7.tgz#818d0140e19f60ce0ac41af7b1542616c0744bd8"
-  integrity sha512-wFilBMRYZZp0L2JcXpEBV0yM2S7DN8Vceq3CRJC1A/PAsGIXWzpqaxSQYW8mcXmdW3auG7kBE9sB5OV34y6R2Q==
+bazinga64@5.5.11:
+  version "5.5.11"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.5.11.tgz#aa82aaf71c525cf54b6305a1e1686ab0a1cadeda"
+  integrity sha512-kzeoGJubuupc+B4P4deF8iSPiP81JR9u/+Fl+AhVS/p/xBa38f+Pq1NqYpLfNXBMTcslK2VvW9tzkyKIE2kODw==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -4152,6 +4196,15 @@ emotion-normalize@10.1.0:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/emotion-normalize/-/emotion-normalize-10.1.0.tgz#b4cfd2f7d37b9eafb3b0d5ee7dc4fbb83f18e68f"
   integrity sha512-Z+rz3Eep8tUgtBKT13/rEpci+ZbCadRovEmILuLB9IEpq4FdNpXjm7MVeJqG4iBRGw4tKmIq06lYgjeC6oEnag==
+
+emotion-theming@10.0.14:
+  version "10.0.14"
+  resolved "https://registry.yarnpkg.com/emotion-theming/-/emotion-theming-10.0.14.tgz#e548d388493d07bedbb0d9d3bbe221766174b1f4"
+  integrity sha512-zMGhPSYz48AAR6DYjQVaZHeO42cYKPq4VyB1XjxzgR62/NmO99679fx8qDDB1QZVYGkRWZtsOe+zJE/e30XdbA==
+  dependencies:
+    "@babel/runtime" "^7.4.3"
+    "@emotion/weak-memoize" "0.2.3"
+    hoist-non-react-statics "^3.3.0"
 
 encodeurl@~1.0.2:
   version "1.0.2"
@@ -10094,10 +10147,10 @@ react-test-renderer@^16.0.0-0:
     react-is "^16.8.6"
     scheduler "^0.13.6"
 
-react-transition-group@4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.1.tgz#61fc9e36568bff9a1fe4e60fae323c8a6dbc0680"
-  integrity sha512-IXrPr93VzCPupwm2O6n6C2kJIofJ/Rp5Ltihhm9UfE8lkuVX2ng/SUUl/oWjblybK9Fq2Io7LGa6maVqPB762Q==
+react-transition-group@4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.2.tgz#8b5252410180c27fd7eebf50b185256b41799b16"
+  integrity sha512-uP0tjqewtvjb7kGZFpZYPoD/NlVZmIgts9eTt1w35pAaEApPxQGv94lD3VkqyXf2aMqrSGwhs6EV/DLaoKbLSw==
   dependencies:
     "@babel/runtime" "^7.4.5"
     dom-helpers "^3.4.0"
@@ -10773,6 +10826,14 @@ scheduler@^0.13.6:
   version "0.13.6"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
   integrity sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
+scheduler@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.15.0.tgz#6bfcf80ff850b280fed4aeecc6513bc0b4f17f8e"
+  integrity sha512-xAefmSfN6jqAa7Kuq7LIJY0bwAPG3xlCj0HMEBQk1lxYiDKZscY2xJ5U/61ZTrYbmNQbXa+gc7czPkVo11tnCg==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

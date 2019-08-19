@@ -21,8 +21,9 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
+
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {MediaType} from '../../media/MediaType';
 import {WebAppEvents} from '../../event/WebApp';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -34,16 +35,17 @@ window.z.viewModel.content = z.viewModel.content || {};
 
 // Parent: ContentViewModel
 z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
-  constructor(mainViewModel, contentViewModel, repositories) {
+  constructor(callingViewModel, panelViewModel, contentViewModel, repositories) {
     this.addedToView = this.addedToView.bind(this);
 
+    this.callingViewModel = callingViewModel;
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.multitasking = contentViewModel.multitasking;
     this.logger = getLogger('z.viewModel.content.TitleBarViewModel');
 
-    this.panelViewModel = mainViewModel.panel;
+    this.panelViewModel = panelViewModel;
     this.contentViewModel = contentViewModel;
 
     this.panelIsVisible = this.panelViewModel.isVisible;
@@ -55,12 +57,11 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.selfStreamState = this.callingRepository.selfStreamState;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && this.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.joinedCall().id : false;
+      return hasEntities ? this.conversationEntity().id === this.joinedCall().conversationId : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
@@ -75,10 +76,6 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
       }
 
       return string || '';
-    });
-
-    this.hasOngoingCall = ko.computed(() => {
-      return this.hasCall() && this.joinedCall() ? this.joinedCall().isOngoing() : false;
     });
 
     this.showCallControls = ko.pureComputed(() => {
@@ -116,16 +113,21 @@ z.viewModel.content.TitleBarViewModel = class TitleBarViewModel {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   }
 
-  clickOnCallButton() {
-    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO);
+  startAudioCall(conversationEntity) {
+    this._startCall(conversationEntity, CALL_TYPE.NORMAL);
+  }
+
+  startVideoCall(conversationEntity) {
+    this._startCall(conversationEntity, CALL_TYPE.VIDEO);
+  }
+
+  _startCall(conversationEntity, callType) {
+    const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+    this.callingRepository.startCall(conversationEntity.id, convType, callType);
   }
 
   clickOnDetails() {
     this.showDetails();
-  }
-
-  clickOnVideoButton() {
-    amplify.publish(WebAppEvents.CALL.STATE.TOGGLE, MediaType.AUDIO_VIDEO);
   }
 
   clickOnCollectionButton() {

@@ -314,12 +314,11 @@ window.TestFactory = class TestFactory {
   async exposeCallingActors() {
     await this.exposeConversationActors();
     TestFactory.calling_repository = new CallingRepository(
-      resolveDependency(graph.CallingService),
-      TestFactory.client_repository,
+      resolveDependency(graph.BackendClient),
       TestFactory.conversation_repository,
       TestFactory.event_repository,
-      resolveDependency(graph.MediaRepository),
-      TestFactory.user_repository,
+      resolveDependency(graph.MediaRepository).streamHandler,
+      serverTimeHandler,
     );
 
     return TestFactory.calling_repository;
