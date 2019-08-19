@@ -31,7 +31,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
    * Construct a new link preview asset.
    *
    * @param {Object} params - Component parameters
-   * @param {z.entity.Message} params.message - Message entity
+   * @param {Message} params.message - Message entity
    * @param {Object} componentInfo - Component information
    */
   constructor(params, componentInfo) {

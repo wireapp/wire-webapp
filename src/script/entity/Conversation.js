@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -38,8 +39,7 @@ import {WebAppEvents} from '../event/WebApp';
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {VERIFY_LEGAL_HOLD} from '../conversation/ConversationLegalHoldStateHandler';
-import {LegalHoldMessage} from './message/LegalHoldMessage';
+import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 
 export class Conversation {
   static get TIMESTAMP_TYPE() {
@@ -74,7 +74,7 @@ export class Conversation {
     this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]);
+    this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
@@ -167,16 +167,30 @@ export class Conversation {
       return this.allUserEntities.every(userEntity => userEntity.is_verified());
     });
 
-    this.hasLegalHold = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
-        return false;
-      }
+    this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
-      return this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+    this.hasLegalHold = ko.computed(() => {
+      const isInitialized = this._isInitialized();
+      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      if (isInitialized) {
+        this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
+      }
+      if (!hasLegalHold) {
+        amplify.publish(HIDE_LEGAL_HOLD_MODAL, this.id);
+      }
+      return hasLegalHold;
     });
-    this.needsLegalHoldApproval = ko.observable(this.hasLegalHold());
-    this.hasLegalHold.subscribe(hasLegalHold => {
-      this.needsLegalHoldApproval(hasLegalHold);
+
+    this.blockLegalHoldMessage = false;
+
+    this.legalHoldStatus.subscribe(legalHoldStatus => {
+      if (!this.blockLegalHoldMessage && this._isInitialized()) {
+        amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
+          conversationEntity: this,
+          legalHoldStatus,
+          userId: this.selfUser().id,
+        });
+      }
     });
 
     this.showNotificationsEverything = ko.pureComputed(() => {
@@ -208,36 +222,11 @@ export class Conversation {
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko.pureComputed(() => {
-      const orderedMessages = this.messages_unordered().sort((message_a, message_b) => {
+    this.messages = ko.pureComputed(() =>
+      this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      });
-      if (!orderedMessages.length) {
-        return [];
-      }
-      let latestLegalHoldStatus = false;
-      const messages = [];
-      orderedMessages.forEach(message => {
-        if (typeof message.legalHoldStatus === 'undefined') {
-          return messages.push(message);
-        }
-        const legalHoldStatus = !!message.legalHoldStatus;
-        if (legalHoldStatus === latestLegalHoldStatus) {
-          return messages.push(message);
-        }
-        if (!message.isLegalHold()) {
-          const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
-          legalHoldMessage.timestamp(message.timestamp() - 1);
-          messages.push(legalHoldMessage);
-        }
-        messages.push(message);
-        latestLegalHoldStatus = legalHoldStatus;
-      });
-      if (latestLegalHoldStatus !== this.hasLegalHold()) {
-        amplify.publish(VERIFY_LEGAL_HOLD, this, latestLegalHoldStatus);
-      }
-      return messages;
-    });
+      }),
+    );
 
     this.hasAdditionalMessages = ko.observable(true);
 
@@ -358,7 +347,7 @@ export class Conversation {
 
   _isInitialized() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-    return this.selfUser() && hasMappedUsers;
+    return Boolean(this.selfUser() && hasMappedUsers);
   }
 
   _initSubscriptions() {
@@ -447,8 +436,8 @@ export class Conversation {
 
   /**
    * Adds a single message to the conversation.
-   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation.
-   * @returns {z.entity.Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
+   * @param {Message} messageEntity - Message entity to be added to the conversation.
+   * @returns {Message | undefined} replacedEntity - If a message was replaced in the conversation, returns the original message
    */
   add_message(messageEntity) {
     if (messageEntity) {
@@ -468,7 +457,7 @@ export class Conversation {
 
   /**
    * Adds multiple messages to the conversation.
-   * @param {Array<z.entity.Message>} message_ets - Array of message entities to be added to the conversation
+   * @param {Array<Message>} message_ets - Array of message entities to be added to the conversation
    * @returns {undefined} No return value
    */
   add_messages(message_ets) {
@@ -486,17 +475,6 @@ export class Conversation {
 
     koArrayPushAll(this.messages_unordered, message_ets);
   }
-
-  appendLegalHoldSystemMessage = (legalHoldStatus, timeStamp) => {
-    const lastMessage = this.getLastMessage();
-    if (lastMessage && lastMessage.isLegalHold() && lastMessage.isActive === legalHoldStatus) {
-      return;
-    }
-    const legalHoldMessage = new LegalHoldMessage(legalHoldStatus);
-    legalHoldMessage.timestamp(timeStamp);
-    legalHoldMessage.legalHoldStatus = legalHoldStatus;
-    this.messages_unordered.push(legalHoldMessage);
-  };
 
   getFirstUnreadSelfMention() {
     return this.unreadState()
@@ -547,7 +525,7 @@ export class Conversation {
 
   /**
    * Prepends messages with new batch of messages.
-   * @param {Array<z.entity.Message>} message_ets - Array of messages to be added to conversation
+   * @param {Array<Message>} message_ets - Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
@@ -612,8 +590,8 @@ export class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {z.entity.Message} messageEntity - Message entity to be added to the conversation
-   * @returns {z.entity.Message|undefined} Message if it is not a duplicate
+   * @param {Message} messageEntity - Message entity to be added to the conversation
+   * @returns {Message|undefined} Message if it is not a duplicate
    */
   _checkForDuplicate(messageEntity) {
     if (messageEntity) {
@@ -651,7 +629,7 @@ export class Conversation {
    * Update information about conversation activity from single message.
    *
    * @private
-   * @param {z.entity.Message} message_et - Message to be added to conversation
+   * @param {Message} message_et - Message to be added to conversation
    * @returns {undefined} No return value
    */
   update_timestamps(message_et) {
@@ -673,7 +651,7 @@ export class Conversation {
 
   /**
    * Get all messages.
-   * @returns {Array<z.entity.Message>} Array of all message in the conversation
+   * @returns {Array<Message>} Array of all message in the conversation
    */
   get_all_messages() {
     return this.messages();
@@ -681,7 +659,7 @@ export class Conversation {
 
   /**
    * Get the first message of the conversation.
-   * @returns {z.entity.Message|undefined} First message entity or undefined
+   * @returns {Message|undefined} First message entity or undefined
    */
   getFirstMessage() {
     return this.messages()[0];
@@ -689,7 +667,7 @@ export class Conversation {
 
   /**
    * Get the last message of the conversation.
-   * @returns {z.entity.Message|undefined} Last message entity or undefined
+   * @returns {Message|undefined} Last message entity or undefined
    */
   getLastMessage() {
     return this.messages()[this.messages().length - 1];
@@ -697,8 +675,8 @@ export class Conversation {
 
   /**
    * Get the message before a given message.
-   * @param {z.entity.Message} message_et - Message to look up from
-   * @returns {z.entity.Message | undefined} Previous message
+   * @param {Message} message_et - Message to look up from
+   * @returns {Message | undefined} Previous message
    */
   get_previous_message(message_et) {
     const messages_visible = this.messages_visible();
@@ -710,7 +688,7 @@ export class Conversation {
 
   /**
    * Get the last text message that was added by self user.
-   * @returns {z.entity.Message} Last message edited
+   * @returns {Message} Last message edited
    */
   get_last_editable_message() {
     const messages = this.messages();
@@ -724,7 +702,7 @@ export class Conversation {
 
   /**
    * Get the last delivered message.
-   * @returns {z.entity.Message} Last delivered message
+   * @returns {Message} Last delivered message
    */
   getLastDeliveredMessage() {
     return this.messages()
@@ -741,7 +719,7 @@ export class Conversation {
    * Only lookup in the loaded message list which is a limited view of all the messages in DB.
    *
    * @param {string} messageId - ID of message to be retrieved
-   * @returns {z.entity.Message|undefined} Message with ID or undefined
+   * @returns {Message|undefined} Message with ID or undefined
    */
   getMessage(messageId) {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
@@ -801,6 +779,7 @@ export class Conversation {
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
+      legal_hold_status: this.legalHoldStatus(),
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),

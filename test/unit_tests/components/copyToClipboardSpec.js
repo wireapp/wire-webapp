@@ -19,7 +19,7 @@
 
 import 'src/script/components/copyToClipboard';
 
-import {instantiateComponent} from '../../api/knockoutHelpers';
+import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 describe('copy-to-clipboard', () => {
   const params = {text: () => 'Text goes here'};

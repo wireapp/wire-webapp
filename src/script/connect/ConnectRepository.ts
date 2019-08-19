@@ -87,7 +87,7 @@ export class ConnectRepository {
 
   /**
    * Retrieve a user's macOS address book contacts.
-   * @returns {Promise} Resolves with the user's address book contacts that match on Wire
+   * @returns Resolves with the user's address book contacts that match on Wire
    */
   private _getMacosContacts(): Promise<PhoneBook> {
     return this._parseMacosContacts();

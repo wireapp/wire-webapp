@@ -20,10 +20,7 @@
 import {Asset} from './Asset';
 import {AssetType} from '../../assets/AssetType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.Location = class Location extends Asset {
+export class Location extends Asset {
   constructor() {
     super();
 
@@ -33,4 +30,4 @@ z.entity.Location = class Location extends Asset {
     this.type = AssetType.LOCATION;
     this.zoom = '';
   }
-};
+}

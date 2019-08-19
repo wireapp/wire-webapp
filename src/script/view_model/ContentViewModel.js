@@ -179,7 +179,7 @@ export class ContentViewModel {
    *
    * @param {Conversation|string} conversation - Conversation entity or conversation ID
    * @param {Object} options - State to open conversation in
-   * @param {z.entity.Message} [options.exposeMessage] - Scroll to message and highlight it
+   * @param {Message} [options.exposeMessage] - Scroll to message and highlight it
    * @param {boolean} [options.openFirstSelfMention=false] - Open first self mention instead of passed message
    * @param {boolean} [options.openNotificationSettings=false] - Open notification settings of conversation
    * @returns {undefined} No return value

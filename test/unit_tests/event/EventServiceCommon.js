@@ -196,9 +196,9 @@ window.testEventServiceClass = (testedServiceName, className) => {
         TestFactory.storage_service.clearStores();
       });
 
-      it('fails if the upperbound is not a Date', () => {
+      it('fails if the upperbound is not a Date', async () => {
         try {
-          TestFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
+          await TestFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
           fail('should have thrown');
         } catch (error) {
           expect(error.message).toContain("must be of type 'Date'");
@@ -549,18 +549,17 @@ window.testEventServiceClass = (testedServiceName, className) => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const messages = [
-      {"conversation":conversationId,"id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
-      {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-      {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-    ];
+        {"conversation":conversationId,"id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
+        {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
+        {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
+      ];
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      beforeEach(() => {
-        return Promise.all(
+      beforeEach(async () => {
+        const ids = await Promise.all(
           messages.map(message => TestFactory.storage_service.save(eventStoreName, undefined, message)),
-        ).then(ids => {
-          primary_keys = ids;
-        });
+        );
+        primary_keys = ids;
       });
 
       afterEach(() => {

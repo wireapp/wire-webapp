@@ -17,7 +17,7 @@
  *
  */
 
-import {instantiateComponent} from '../../../api/knockoutHelpers';
+import {instantiateComponent} from '../../../helper/knockoutHelpers';
 import UUID from 'uuidjs';
 import {resolve, graph} from '../../../api/testResolver';
 

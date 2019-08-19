@@ -54,7 +54,7 @@ export class AssetRemoteData {
 
   public readonly downloadProgress: ko.Observable<number>;
   private readonly identifier?: string;
-  private loadPromise: Promise<void | Blob> | undefined;
+  private loadPromise?: Promise<void | Blob>;
   private readonly logger: Logger;
   private readonly otrKey?: Uint8Array;
   private readonly sha256?: Uint8Array;

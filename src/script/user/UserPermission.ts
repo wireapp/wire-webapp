@@ -19,28 +19,36 @@
 
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-let bitsCounter = 0;
-
-/* eslint-disable sort-keys */
+// tslint:disable:object-literal-sort-keys
 /**
- * Enum for different team permissions.
+ * Enum for various team permissions.
  */
 const TEAM_FEATURES = {
   NONE: 0,
-  CREATE_CONVERSATION: 1 << bitsCounter++,
-  DELETE_CONVERSATION: 1 << bitsCounter++,
-  ADD_TEAM_MEMBER: 1 << bitsCounter++,
-  REMOVE_TEAM_MEMBER: 1 << bitsCounter++,
-  ADD_CONVERSATION_MEMBER: 1 << bitsCounter++,
-  REMOVE_CONVERSATION_MEMBER: 1 << bitsCounter++,
-  GET_BILLING: 1 << bitsCounter++,
-  SET_BILLING: 1 << bitsCounter++,
-  SET_TEAM_DATA: 1 << bitsCounter++,
-  GET_MEMBER_PERMISSIONS: 1 << bitsCounter++,
-  GET_TEAM_CONVERSATIONS: 1 << bitsCounter++,
-  DELETE_TEAM: 1 << bitsCounter++,
-  SET_MEMBER_PERMISSIONS: 1 << bitsCounter++,
+  CREATE_CONVERSATION: 1 << 0,
+  DELETE_CONVERSATION: 1 << 1,
+  ADD_TEAM_MEMBER: 1 << 2,
+  REMOVE_TEAM_MEMBER: 1 << 3,
+  ADD_CONVERSATION_MEMBER: 1 << 4,
+  REMOVE_CONVERSATION_MEMBER: 1 << 5,
+  GET_BILLING: 1 << 6,
+  SET_BILLING: 1 << 7,
+  SET_TEAM_DATA: 1 << 8,
+  GET_MEMBER_PERMISSIONS: 1 << 9,
+  GET_TEAM_CONVERSATIONS: 1 << 10,
+  DELETE_TEAM: 1 << 11,
+  SET_MEMBER_PERMISSIONS: 1 << 12,
 };
+
+/*
+ * While the values for team features are set by the backend,
+ * the public features are set by the webapp.
+ * To avoid duplications, the values for the public features
+ * need to be higher than the values for team features.
+ * Additionally, we also don't want to change them manually
+ * every time there is a new team feature.
+ */
+let bitsCounter = Object.keys(TEAM_FEATURES).length - 1;
 
 const PUBLIC_FEATURES = {
   CREATE_GROUP_CONVERSATION: 1 << bitsCounter++,
@@ -53,11 +61,11 @@ const PUBLIC_FEATURES = {
   CHAT_WITH_SERVICES: 1 << bitsCounter++,
   SEARCH_UNCONNECTED_USERS: 1 << bitsCounter++,
 };
-/* eslint-enable sort-keys */
+// tslint:enable:object-literal-sort-keys
 
-export const FEATURES = Object.assign({}, TEAM_FEATURES, PUBLIC_FEATURES);
+export const FEATURES = {...TEAM_FEATURES, ...PUBLIC_FEATURES};
 
-function teamPermissionsForRole(teamRole) {
+function teamPermissionsForRole(teamRole: ROLE): number {
   switch (teamRole) {
     case ROLE.OWNER: {
       return combinePermissions([
@@ -94,7 +102,7 @@ function teamPermissionsForRole(teamRole) {
   }
 }
 
-function publicPermissionsForRole(role) {
+function publicPermissionsForRole(role: ROLE): number {
   switch (role) {
     case ROLE.OWNER:
       return combinePermissions([publicPermissionsForRole(ROLE.ADMIN), PUBLIC_FEATURES.INVITE_TEAM_MEMBERS]);
@@ -120,34 +128,35 @@ function publicPermissionsForRole(role) {
       ]);
     case ROLE.PARTNER:
       return 0;
-
     default:
       return 0;
   }
 }
 
-/* eslint-disable sort-keys */
+// tslint:disable:object-literal-sort-keys
 /**
  * Object describing all the roles of a team member
  * This object needs to be sorted from the highest priority to the lowest
  */
-export const ROLE = {
-  OWNER: 'z.team.TeamRole.ROLE.OWNER',
-  ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
-  MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
-  PARTNER: 'z.team.TeamRole.ROLE.PARTNER',
-  NONE: 'z.team.TeamRole.ROLE.NONE',
-  INVALID: 'z.team.TeamRole.ROLE.INVALID',
-};
-/* eslint-enable sort-keys */
+export enum ROLE {
+  OWNER = 'z.team.TeamRole.ROLE.OWNER',
+  ADMIN = 'z.team.TeamRole.ROLE.ADMIN',
+  MEMBER = 'z.team.TeamRole.ROLE.MEMBER',
+  PARTNER = 'z.team.TeamRole.ROLE.PARTNER',
+  NONE = 'z.team.TeamRole.ROLE.NONE',
+  INVALID = 'z.team.TeamRole.ROLE.INVALID',
+}
+// tslint:enable:object-literal-sort-keys
 
-export function roleFromTeamPermissions(permissions) {
+export function roleFromTeamPermissions(permissions: {self: number}): ROLE {
   if (!permissions) {
     throw new z.error.TeamError(z.error.TeamError.TYPE.NO_PERMISSIONS);
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
   const detectedRole = Object.values(ROLE)
+    // necessary to extract only the actual values from a TS enum
+    .filter(value => typeof value === 'string')
     .filter(role => !invalidRoles.includes(role))
     .find(role => hasPermissionForRole(permissions.self, role));
 
@@ -157,38 +166,40 @@ export function roleFromTeamPermissions(permissions) {
 /**
  * Will generate a bunch of helper functions that can be consumed to know what features this role has access to.
  * The function generated will have the following format:
- *   can<camel cased feature name>: () => boolean
+ *   `can<camel cased feature name>: () => boolean`
  *
- * @param {ROLE} boundRole - Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
- * @returns {Object<Function>} helpers
+ * @param boundRole - Default role that will be used by default in every helper. Can be overriden by passing a role when calling the helper
+ * @returns helpers
  */
-export function generatePermissionHelpers(boundRole = ROLE.NONE) {
-  return Object.entries(FEATURES).reduce((helpers, [featureKey, featureValue]) => {
-    const camelCasedFeature = featureKey
-      .toLowerCase()
-      .split('_')
-      .map(capitalizeFirstChar)
-      .join('');
-    return Object.assign(helpers, {
-      [`can${camelCasedFeature}`]: (role = boundRole) => hasAccessToFeature(featureValue, role),
-    });
-  }, {});
+export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
+  return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
+    (helpers, [featureKey, featureValue]: [string, number]) => {
+      const camelCasedFeature = featureKey
+        .toLowerCase()
+        .split('_')
+        .map(capitalizeFirstChar)
+        .join('');
+      helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
+      return helpers;
+    },
+    {},
+  );
 }
 
-export function hasAccessToFeature(feature, role) {
+export function hasAccessToFeature(feature: number, role: ROLE): boolean {
   const permissions = combinePermissions([teamPermissionsForRole(role), publicPermissionsForRole(role)]);
   return !!(feature & permissions);
 }
 
-function combinePermissions(permissions) {
+function combinePermissions(permissions: number[]): number {
   return permissions.reduce((acc, permission) => acc | permission, 0);
 }
 
-function hasPermissions(memberPermissions, expectedPermissions) {
+function hasPermissions(memberPermissions: number, expectedPermissions: number): boolean {
   return Number.isSafeInteger(memberPermissions) && (memberPermissions & expectedPermissions) === expectedPermissions;
 }
 
-function hasPermissionForRole(memberPermissions, role) {
+function hasPermissionForRole(memberPermissions: number, role: ROLE): boolean {
   const rolePermissions = teamPermissionsForRole(role);
   return hasPermissions(memberPermissions, rolePermissions);
 }

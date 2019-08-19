@@ -223,7 +223,6 @@ export class WebSocketService {
         this.logger.warn('Ping interval check failed');
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
       }
-      this.logger.info('Sending ping to WebSocket');
       this.hasAlreadySentUnansweredPing = true;
       return this.socket.send('ping');
     }

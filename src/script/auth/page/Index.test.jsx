@@ -39,36 +39,52 @@ describe('when visiting the index page', () => {
   };
 
   describe('and the account registration is disabled', () => {
+    beforeAll(() => {
+      Config.FEATURE = {
+        ENABLE_ACCOUNT_REGISTRATION: false,
+      };
+    });
+
+    afterAll(() => (Config.FEATURE = {}));
+
     it('redirects to the login page', () => {
-      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountWithIntl(<Index />, mockStore(initialState));
-      Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
 
       expect(wrapper.find('[data-uie-name="redirect-login"]').exists()).toBe(true);
     });
   });
 
-  it('shows the Wire logo', () => {
-    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+  describe('and the account registration is enabled', () => {
+    beforeAll(() => {
+      Config.FEATURE = {
+        ENABLE_ACCOUNT_REGISTRATION: true,
+      };
+    });
 
-    expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
-  });
+    afterAll(() => (Config.FEATURE = {}));
 
-  it('shows an option to create a private account', () => {
-    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+    it('shows the Wire logo', () => {
+      wrapper = mountWithIntl(<Index />, mockStore(initialState));
 
-    expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
-  });
+      expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
+    });
 
-  it('shows an option to create a team', () => {
-    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+    it('shows an option to create a private account', () => {
+      wrapper = mountWithIntl(<Index />, mockStore(initialState));
 
-    expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
-  });
+      expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+    });
 
-  it('shows an option to login', () => {
-    wrapper = mountWithIntl(<Index />, mockStore(initialState));
+    it('shows an option to create a team', () => {
+      wrapper = mountWithIntl(<Index />, mockStore(initialState));
 
-    expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
+      expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+    });
+
+    it('shows an option to login', () => {
+      wrapper = mountWithIntl(<Index />, mockStore(initialState));
+
+      expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
+    });
   });
 });

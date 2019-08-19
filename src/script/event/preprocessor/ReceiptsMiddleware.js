@@ -22,7 +22,6 @@ import {getLogger} from 'Util/Logger';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 export class ReceiptsMiddleware {
   /**
@@ -42,7 +41,7 @@ export class ReceiptsMiddleware {
   }
 
   /**
-   * Handles incoming confirmation events.
+   * Handles incoming (and injected outgoing) events.
    *
    * @param {Object} event - event in the DB format
    * @returns {Promise<Object>} event - the original event
@@ -57,9 +56,6 @@ export class ReceiptsMiddleware {
           if (conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
-            event.data.legal_hold_status = conversation.hasLegalHold
-              ? LegalHoldStatus.ENABLED
-              : LegalHoldStatus.DISABLED;
           }
           return event;
         });
@@ -84,13 +80,16 @@ export class ReceiptsMiddleware {
     }
   }
 
+  isMyMessage(originalEvent) {
+    return this.userRepository.self() && this.userRepository.self().id === originalEvent.from;
+  }
+
   _updateConfirmationStatus(originalEvent, confirmationEvent) {
     const status = confirmationEvent.data.status;
     const currentReceipts = originalEvent.read_receipts || [];
 
-    const isMyMessage = this.userRepository.self() && this.userRepository.self().id === originalEvent.from;
     // I shouldn't receive this read receipt
-    if (!isMyMessage) {
+    if (!this.isMyMessage(originalEvent)) {
       return;
     }
 

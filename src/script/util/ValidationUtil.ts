@@ -100,7 +100,7 @@ export const legacyAsset = (assetId: string, conversationId: string) => {
 export const assetRetentionPolicy = (policyId: number | string) =>
   policyId > 0 && policyId < Object.keys(AssetRetentionPolicy).length + 1;
 
-export const assetV3 = (assetKey: string, assetToken: string) => {
+export const assetV3 = (assetKey: string, assetToken?: string) => {
   if (!assetKey) {
     throw new ValidationUtilError('Asset key not defined');
   }

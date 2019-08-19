@@ -45,7 +45,10 @@ export class BackupService {
   }
 
   getDatabaseVersion() {
-    return this.storageService.db.verno;
+    if (this.storageService.db) {
+      return this.storageService.db.verno;
+    }
+    return 1;
   }
 
   getHistoryCount() {
@@ -58,10 +61,16 @@ export class BackupService {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
-  importEntities(tableName, entities) {
+  async importEntities(tableName, entities) {
     // We don't want to set the primaryKey for the events table
     const isEventsTable = tableName === this.EVENTS_STORE_NAME;
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
-    return this.storageService.db[tableName].bulkPut(entities, primaryKeys);
+    if (this.storageService.db) {
+      await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);
+    } else {
+      for (const entity of entities) {
+        await this.storageService.save(tableName, entity.id, entity);
+      }
+    }
   }
 }

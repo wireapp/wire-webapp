@@ -22,6 +22,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {Text} from 'src/script/entity/message/Text';
+import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
@@ -74,12 +77,12 @@ describe('ConversationCellState', () => {
 
     conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-    const contentMessage = new z.entity.ContentMessage();
-    const text = new z.entity.Text('id', 'Hello there');
+    const contentMessage = new ContentMessage();
+    const text = new Text('id', 'Hello there');
     contentMessage.unsafeSenderName = () => 'Felix';
     contentMessage.assets([text]);
 
-    const pingMessage = new z.entity.PingMessage();
+    const pingMessage = new PingMessage();
 
     const tests = [
       {

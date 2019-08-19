@@ -18,14 +18,12 @@
  */
 
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
+export class MissedMessage extends Message {
   constructor() {
     super();
     this.super_type = SuperType.MISSED;
     this.affect_order(false);
   }
-};
+}

@@ -1,5 +1,5 @@
 <div class="legal-hold-modal" data-bind="with: $root.legalHoldModal">
-  <modal params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed, showLoading: isLoadingRequest()" data-uie-name="legal-hold-modal">
+  <modal params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed, showLoading: isLoading() " data-uie-name="legal-hold-modal">
     <div class="modal__header">
       <!-- ko if: showRequest() -->
         <div class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></div>
@@ -43,21 +43,16 @@
         <!-- ko ifnot: devicesUser() -->
           <legal-hold-dot class="legal-hold-modal__logo" params="large: true" data-uie-name="status-modal-legal-hold-icon"></legal-hold-dot>
           <div class="legal-hold-modal__headline" data-bind="text: t('legalHoldHeadline')" data-uie-name="status-modal-title"></div>
-          <!-- ko if: isLoadingUsers() -->
-            <loading-bar params="progress: progress() * 100"></loading-bar>
-          <!-- /ko -->
-          <!-- ko ifnot: isLoadingUsers() -->
-            <p
-              class="legal-hold-modal__info"
-              data-bind="html: isSelfInfo ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
-              data-uie-name="status-modal-text"
-            ></p>
-            <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
+          <p
+            class="legal-hold-modal__info"
+            data-bind="html: isSelfInfo() ? t('legalHoldDescriptionSelf'): t('legalHoldDescriptionOthers')"
+            data-uie-name="status-modal-text"
+          ></p>
+          <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 
-            <user-list
-              params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
-            ></user-list>
-          <!-- /ko -->
+          <user-list
+            params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
+          ></user-list>
         <!-- /ko -->
         <!-- ko if: devicesUser() -->
           <user-devices

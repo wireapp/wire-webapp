@@ -18,7 +18,7 @@
  */
 
 import {initRouterBindings} from 'src/script/router/routerBindings';
-import {bindHtml} from '../../api/knockoutHelpers';
+import {bindHtml} from '../../helper/knockoutHelpers';
 
 describe('routerBindings', () => {
   let mockRouter;

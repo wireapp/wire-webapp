@@ -31,9 +31,11 @@ export const ACCENT_ID = {
   YELLOW: 3,
 };
 
+// TODO: Deprecated. Should be replaced with "src/script/auth/config.ts".
 export const config = {
   FEATURE: {
     CHECK_CONSENT: env.FEATURE && env.FEATURE.CHECK_CONSENT,
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: env.FEATURE && env.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT,
     ENABLE_ACCOUNT_REGISTRATION: env.FEATURE && env.FEATURE.ENABLE_ACCOUNT_REGISTRATION,
     ENABLE_DEBUG: env.FEATURE && env.FEATURE.ENABLE_DEBUG,
     ENABLE_PHONE_LOGIN: env.FEATURE && env.FEATURE.ENABLE_PHONE_LOGIN,
@@ -44,10 +46,10 @@ export const config = {
   // 10 seconds until phone code expires
   LOGIN_CODE_EXPIRATION: 10 * 60,
 
-  // 25 megabyte upload limit for personal use
+  // 25 megabyte upload limit for personal use (private users & guests)
   MAXIMUM_ASSET_FILE_SIZE_PERSONAL: 25 * 1024 * 1024,
 
-  // 100 megabyte upload limit for organizations
+  // 100 megabyte upload limit for organizations (team members)
   MAXIMUM_ASSET_FILE_SIZE_TEAM: 100 * 1024 * 1024,
 
   // 15 megabyte image upload limit

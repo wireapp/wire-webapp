@@ -17,15 +17,17 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {validateProfileImageResolution} from 'Util/util';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {Environment} from 'Util/Environment';
-import {KEY, isKey} from 'Util/KeyboardUtil';
+import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
-import {getCreateTeamUrl, getManageTeamUrl, URL_PATH, getAccountPagesUrl} from '../../externalRoute';
+import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 import {ReceiptMode} from '../../conversation/ReceiptMode';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -34,7 +36,6 @@ import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {User} from '../../entity/User';
 
 import {Config} from '../../auth/config';
-import {AvailabilityType} from '../../user/AvailabilityType';
 import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
@@ -94,7 +95,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availabilityLabel = ko.pureComputed(() => {
       let label = nameFromType(this.availability());
 
-      const noStatusSet = this.availability() === AvailabilityType.NONE;
+      const noStatusSet = this.availability() === Availability.Type.NONE;
       if (noStatusSet) {
         label = t('preferencesAccountAvaibilityUnset');
       }
@@ -127,6 +128,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
+    this.isTemporaryAndNonPersistant = isTemporaryClientAndNonPersistent;
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 

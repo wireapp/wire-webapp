@@ -17,6 +17,7 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getRandomNumber} from 'Util/NumberUtil';
 
@@ -30,7 +31,6 @@ import {CallSetupTimings} from '../../telemetry/calling/CallSetupTimings';
 
 import {CallMessageBuilder} from '../CallMessageBuilder';
 import {SDPMapper} from '../SDPMapper';
-import {AvailabilityType} from '../../user/AvailabilityType';
 import {MediaType} from '../../media/MediaType';
 import {ParticipantEntity} from './ParticipantEntity';
 import {AudioType} from '../../audio/AudioType';
@@ -215,7 +215,7 @@ export class CallEntity {
         const isUnansweredState = CALL_STATE_GROUP.UNANSWERED.includes(state);
         if (isUnansweredState) {
           const isIncomingCall = state === CALL_STATE.INCOMING;
-          const isUserAway = this.selfUser.availability() === AvailabilityType.AWAY;
+          const isUserAway = this.selfUser.availability() === Availability.Type.AWAY;
           const dontPlaySound = isIncomingCall && isUserAway;
           if (!dontPlaySound) {
             this._onStateStartRinging(isIncomingCall);

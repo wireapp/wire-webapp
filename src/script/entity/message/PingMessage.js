@@ -20,11 +20,9 @@
 import {t} from 'Util/LocalizerUtil';
 
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.PingMessage = class PingMessage extends z.entity.Message {
+export class PingMessage extends Message {
   constructor() {
     super();
     this.super_type = SuperType.PING;
@@ -40,4 +38,4 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
       return css_classes;
     });
   }
-};
+}

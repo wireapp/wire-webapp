@@ -20,6 +20,7 @@
 import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
+import {util as ProteusUtil} from '@wireapp/proteus';
 
 import {getLogger} from 'Util/Logger';
 
@@ -109,10 +110,13 @@ export class DebugUtil {
   }
 
   getLastMessagesFromDatabase(amount = 10, conversationId = this.conversationRepository.active_conversation().id) {
-    return this.storageRepository.storageService.db.events.toArray(records => {
-      const messages = records.filter(events => events.conversation === conversationId);
-      return messages.slice(amount * -1).reverse();
-    });
+    if (this.storageService.db) {
+      return this.storageRepository.storageService.db.events.toArray(records => {
+        const messages = records.filter(events => events.conversation === conversationId);
+        return messages.slice(amount * -1).reverse();
+      });
+    }
+    return [];
   }
 
   haveISentThisMessageToMyOtherClients(
@@ -292,6 +296,13 @@ export class DebugUtil {
         session: resolveArray[2],
       });
     });
+  }
+
+  /**
+   * @returns {Promise<boolean>} `true` if libsodium is using WebAssembly
+   */
+  isLibsodiumUsingWASM() {
+    return ProteusUtil.WASMUtil.isUsingWASM();
   }
 
   /**

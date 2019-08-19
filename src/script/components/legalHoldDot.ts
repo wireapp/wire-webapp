@@ -47,16 +47,19 @@ ko.components.register('legal-hold-dot', {
     this.isPending = isPending;
     this.isInteractive = !!legalHoldModal;
 
-    this.onClick = (data: any, event: MouseEvent) => {
+    this.onClick = (data: any, event: MouseEvent): void => {
       event.stopPropagation();
       if (this.isInteractive) {
         if (isPending()) {
-          return legalHoldModal.showRequestModal(true);
+          legalHoldModal.showRequestModal(true);
+          return;
         }
         if (conversation) {
-          return legalHoldModal.showUsers(conversation);
+          legalHoldModal.showUsers(conversation);
+          return;
         }
-        return legalHoldModal.showUsers();
+        legalHoldModal.showUsers();
+        return;
       }
     };
   },

@@ -183,9 +183,7 @@ export class AuthAction {
       registration.email = registration.email.trim();
       registration.team.icon = 'default';
       registration.team.binding = true;
-      // TODO: Fixed once core v6 is inside
-      // @ts-ignore
-      registration.team['currency'] = currentCurrency();
+      registration.team.currency = currentCurrency();
       registration.team.name = registration.team.name.trim();
 
       dispatch(AuthActionCreator.startRegisterTeam());

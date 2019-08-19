@@ -55,6 +55,7 @@ class PropertiesRepository {
     this.properties = new WebappProperties();
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
+    /** @type {ko.Observable<ConsentValue | boolean>} */
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
 

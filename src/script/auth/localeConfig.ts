@@ -17,12 +17,12 @@
  *
  */
 
+import {SupportedCurrency} from '@wireapp/api-client/dist/commonjs/team/payment';
 import {QUERY_KEY} from './route';
 import {supportedLocales as Locales} from './supportedLocales';
 import {getURLParameter} from './util/urlUtil';
 
-// TODO: Use "Currency.EUR" here once core v6 is in.
-export const DEFAULT_CURRENCY = 'EUR';
+export const DEFAULT_CURRENCY = SupportedCurrency.EUR;
 export const DEFAULT_LANGUAGE = 'en-US';
 
 function getLocale(): string {
@@ -33,8 +33,8 @@ export function currentLanguage(): string {
   return mapLanguage(getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
 }
 
-export function currentCurrency(): string {
-  return getURLParameter(QUERY_KEY.CURRENCY).toUpperCase() || DEFAULT_CURRENCY;
+export function currentCurrency(): SupportedCurrency {
+  return (getURLParameter(QUERY_KEY.CURRENCY).toUpperCase() as SupportedCurrency) || DEFAULT_CURRENCY;
 }
 
 export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {

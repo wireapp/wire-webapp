@@ -120,7 +120,7 @@ class Login extends React.Component<CombinedProps, State> {
     isValidLink: true,
     logoutReason: null,
     password: '',
-    persist: true,
+    persist: !Config.FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT,
     validInputs: {
       email: true,
       password: true,

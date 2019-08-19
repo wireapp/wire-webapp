@@ -23,7 +23,6 @@ import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
-import {AvailabilityType} from '../user/AvailabilityType';
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
@@ -50,7 +49,7 @@ export class CryptographyMapper {
    * Maps a generic message into an event in JSON.
    *
    * @param {GenericMessage} genericMessage - Received ProtoBuffer message
-   * @param {JSON} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
+   * @param {Object} event - Event of BackendEvent.CONVERSATION.OTR-ASSET-ADD or BackendEvent.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   mapGenericMessage(genericMessage, event) {
@@ -158,10 +157,6 @@ export class CryptographyMapper {
       time: event.time,
     };
 
-    if (genericMessage[genericMessage.content].hasOwnProperty('legalHoldStatus')) {
-      genericContent.legal_hold_status = genericMessage[genericMessage.content].legalHoldStatus;
-    }
-
     return Object.assign(genericContent, specificContent);
   }
 
@@ -234,23 +229,21 @@ export class CryptographyMapper {
   }
 
   _mapAvailability(availability) {
+    const knownAvailabilityTypes = [
+      Availability.Type.NONE,
+      Availability.Type.AVAILABLE,
+      Availability.Type.AWAY,
+      Availability.Type.BUSY,
+    ];
+
+    if (!knownAvailabilityTypes.includes(availability.type)) {
+      const message = 'Unhandled availability type';
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+    }
+
     return {
       data: {
-        availability: (() => {
-          switch (availability.type) {
-            case Availability.Type.NONE:
-              return AvailabilityType.NONE;
-            case Availability.Type.AVAILABLE:
-              return AvailabilityType.AVAILABLE;
-            case Availability.Type.AWAY:
-              return AvailabilityType.AWAY;
-            case Availability.Type.BUSY:
-              return AvailabilityType.BUSY;
-            default:
-              const message = 'Unhandled availability type';
-              throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
-          }
-        })(),
+        availability: availability.type,
       },
       type: ClientEvent.USER.AVAILABILITY,
     };

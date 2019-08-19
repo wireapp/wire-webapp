@@ -81,7 +81,7 @@ export class GiphyService {
 
   /**
    * Search GIFs for a word or phrase.
-   * @returns {Promise} Resolves with matches
+   * @returns Resolves with matches
    */
   getSearch(options: GiphySearchOptions): Promise<GiphyResult<GiphyGif[]>> {
     return this.backendClient.sendRequest({

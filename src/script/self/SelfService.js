@@ -65,7 +65,7 @@ export class SelfService {
 
   /**
    * Get your consents.
-   * @returns {Promise} Promise that will resolve with the consents user has given
+   * @returns {Promise<ConsentValue>} Promise that will resolve with the consents user has given
    */
   getSelfConsent() {
     return this.backendClient

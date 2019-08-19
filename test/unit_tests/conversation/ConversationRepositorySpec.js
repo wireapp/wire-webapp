@@ -17,7 +17,7 @@
  *
  */
 
-import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 
 import {createRandomUuid} from 'Util/util';
@@ -25,6 +25,8 @@ import {createRandomUuid} from 'Util/util';
 import {backendConfig} from '../../api/testResolver';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {Message} from 'src/script/entity/message/Message';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {BackendEvent} from 'src/script/event/Backend';
@@ -36,6 +38,12 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {ACCESS_ROLE} from 'src/script/conversation/AccessRole';
+import {ACCESS_MODE} from 'src/script/conversation/AccessMode';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {ReceiptMode} from 'src/script/conversation/ReceiptMode';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -43,6 +51,8 @@ import {File} from 'src/script/entity/message/File';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConnectionStatus} from 'src/script/connection/ConnectionStatus';
+import {MessageCategory} from 'src/script/message/MessageCategory';
+import {UserGenerator} from '../../helper/UserGenerator';
 
 describe('ConversationRepository', () => {
   const test_factory = new TestFactory();
@@ -114,7 +124,7 @@ describe('ConversationRepository', () => {
       return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
         const file_et = new File();
         file_et.status(AssetTransferState.UPLOADING);
-        message_et = new z.entity.ContentMessage(createRandomUuid());
+        message_et = new ContentMessage(createRandomUuid());
         message_et.assets.push(file_et);
         conversation_et.add_message(message_et);
 
@@ -153,6 +163,186 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('_checkLegalHoldStatus', () => {
+    it('injects legal hold system messages when user A discovers that user B is on legal hold when receiving a message from user B for the very first time', async () => {
+      const conversationPartner = UserGenerator.getRandomUser();
+      TestFactory.user_repository.users.push(conversationPartner);
+
+      const conversationJsonFromBackend = {
+        accessModes: ['invite'],
+        accessRole: 'activated',
+        archived_state: false,
+        archived_timestamp: 0,
+        creator: conversationPartner.id,
+        id: createRandomUuid(),
+        last_event_timestamp: 3,
+        last_server_timestamp: 3,
+        message_timer: null,
+        muted_state: false,
+        muted_timestamp: 0,
+        name: null,
+        others: [conversationPartner.id],
+        receipt_mode: null,
+        status: ConversationStatus.CURRENT_MEMBER,
+        team_id: createRandomUuid(),
+        type: ConversationType.GROUP,
+      };
+
+      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromBackend])[0];
+      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.selfUser(TestFactory.user_repository.self());
+
+      expect(conversationEntity._isInitialized()).toBe(true);
+      expect(conversationEntity.hasLegalHold()).toBe(false);
+      expect(conversationEntity.participating_user_ets().length).toBe(1);
+
+      const eventJson = {
+        category: MessageCategory.TEXT,
+        conversation: conversationEntity.id,
+        data: {
+          content: 'Decrypted message content',
+          expects_read_confirmation: false,
+          legal_hold_status: LegalHoldStatus.ENABLED,
+          mentions: [],
+          previews: [],
+          quote: null,
+        },
+        from: conversationPartner.id,
+        from_client_id: 'd9c78d7f6b18b0b3',
+        id: createRandomUuid(),
+        primary_key: 3,
+        time: new Date().toISOString(),
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      };
+
+      const missingClientsError = new Error();
+      missingClientsError.deleted = {};
+      missingClientsError.missing = {
+        [conversationPartner.id]: ['1e66e04948938c2c', '53761bec3f10a6d9', 'a9c8c385737b14fe'],
+      };
+      missingClientsError.redundant = {};
+      missingClientsError.time = new Date().toISOString();
+
+      spyOn(TestFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+        Promise.reject(missingClientsError),
+      );
+
+      spyOn(TestFactory.client_service, 'getClientsByUserId').and.returnValue(
+        Promise.resolve([
+          {
+            class: 'desktop',
+            id: '1e66e04948938c2c',
+          },
+          {
+            class: 'legalhold',
+            id: '53761bec3f10a6d9',
+          },
+          {
+            class: 'desktop',
+            id: 'a9c8c385737b14fe',
+          },
+        ]),
+      );
+
+      spyOn(TestFactory.conversation_repository, 'injectLegalHoldMessage').and.callFake(({legalHoldStatus}) => {
+        expect(legalHoldStatus).toBe(LegalHoldStatus.ENABLED);
+      });
+
+      await TestFactory.conversation_repository.save_conversation(conversationEntity);
+      await TestFactory.conversation_repository._checkLegalHoldStatus(conversationEntity, eventJson);
+
+      expect(TestFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('updateAllClients', () => {
+    it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
+      const conversationPartner = UserGenerator.getRandomUser();
+      TestFactory.user_repository.users.push(conversationPartner);
+
+      const conversationJsonFromDb = {
+        accessModes: [ACCESS_MODE.INVITE, ACCESS_MODE.CODE],
+        accessRole: ACCESS_ROLE.NON_ACTIVATED,
+        archived_state: false,
+        archived_timestamp: 0,
+        cleared_timestamp: 0,
+        creator: conversationPartner.id,
+        ephemeral_timer: null,
+        global_message_timer: null,
+        id: createRandomUuid(),
+        is_guest: false,
+        is_managed: false,
+        last_event_timestamp: 1563965225224,
+        last_read_timestamp: 1563965225224,
+        last_server_timestamp: 1563965229043,
+        legal_hold_status: LegalHoldStatus.ENABLED,
+        message_timer: null,
+        muted_state: NOTIFICATION_STATE.MENTIONS_AND_REPLIES,
+        muted_timestamp: 0,
+        name: 'Test Group',
+        others: [conversationPartner.id],
+        receipt_mode: ReceiptMode.DELIVERY_AND_READ,
+        status: ConversationStatus.CURRENT_MEMBER,
+        team_id: createRandomUuid(),
+        type: ConversationType.GROUP,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+      };
+
+      const clientsPayload = [
+        {
+          class: 'desktop',
+          id: '1e66e04948938c2c',
+        },
+        {
+          class: 'legalhold',
+          id: '53761bec3f10a6d9',
+        },
+        {
+          class: 'desktop',
+          id: 'a9c8c385737b14fe',
+        },
+      ];
+
+      for (const clientPayload of clientsPayload) {
+        const wasClientAdded = await TestFactory.user_repository.addClientToUser(
+          conversationPartner.id,
+          clientPayload,
+          false,
+        );
+
+        expect(wasClientAdded).toBe(true);
+      }
+
+      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
+      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.selfUser(TestFactory.user_repository.self());
+      // Legal hold status is "on" because our conversation partner has a legal hold client
+      expect(conversationEntity.hasLegalHold()).toBe(true);
+
+      await TestFactory.conversation_repository.save_conversation(conversationEntity);
+
+      const missingClientsError = new Error();
+      missingClientsError.deleted = {
+        // Legal hold client got removed
+        [conversationPartner.id]: ['53761bec3f10a6d9'],
+      };
+      missingClientsError.missing = {};
+      missingClientsError.redundant = {};
+      missingClientsError.time = new Date().toISOString();
+
+      spyOn(TestFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+        Promise.reject(missingClientsError),
+      );
+
+      spyOn(TestFactory.client_repository, 'removeClient').and.returnValue(Promise.resolve());
+
+      // Start client discovery of conversation participants
+      await TestFactory.conversation_repository.updateAllClients(conversationEntity);
+
+      expect(conversationEntity.hasLegalHold()).toBe(false);
+    });
+  });
+
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
       conversation_et = _generate_conversation(ConversationType.GROUP);
@@ -162,7 +352,7 @@ describe('ConversationRepository', () => {
     it('should not delete other users messages', done => {
       const user_et = new User();
       user_et.is_me = false;
-      const message_to_delete_et = new z.entity.Message(createRandomUuid());
+      const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
       conversation_et.add_message(message_to_delete_et);
 
@@ -180,7 +370,7 @@ describe('ConversationRepository', () => {
       spyOn(TestFactory.event_service, 'deleteEvent');
       const userEntity = new User();
       userEntity.is_me = true;
-      const messageEntityToDelete = new z.entity.Message();
+      const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
       conversation_et.add_message(messageEntityToDelete);
@@ -261,7 +451,31 @@ describe('ConversationRepository', () => {
     it('finds an existing 1:1 conversation within a team', () => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const team1to1Conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
+      const team1to1Conversation = {
+        'access': ['invite'],
+        'creator': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+        'members': {
+          'self': {
+            'hidden_ref': null,
+            'status': 0,
+            'service': null,
+            'otr_muted_ref': null,
+            'status_time': '1970-01-01T00:00:00.000Z',
+            'hidden': false,
+            'status_ref': '0.0',
+            'id': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+            'otr_archived': false,
+            'otr_muted': false,
+            'otr_archived_ref': null,
+          }, 'others': [{'status': 0, 'id': 'f718410c-3833-479d-bd80-a5df03f38414'}],
+        },
+        'name': null,
+        'team': 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
+        'id': '04ab891e-ccf1-4dba-9d74-bacec64b5b1e',
+        'type': 0,
+        'last_event_time': '1970-01-01T00:00:00.000Z',
+        'last_event': '0.0',
+      };
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
       const conversationMapper = TestFactory.conversation_repository.conversationMapper;
@@ -355,9 +569,22 @@ describe('ConversationRepository', () => {
       conversation_et = new Conversation(createRandomUuid());
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const bad_message = {"conversation":`${conversation_et.id}`,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"};
+      const bad_message = {
+        'conversation': `${conversation_et.id}`,
+        'id': 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
+        'from': '532af01e-1e24-4366-aacf-33b67d4ee376',
+        'data': {'content': 'Hello World :)', 'nonce': 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
+        'type': 'conversation.message-add',
+      };
       // prettier-ignore
-      const good_message = {"conversation":`${conversation_et.id}`,"id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"};
+      const good_message = {
+        'conversation': `${conversation_et.id}`,
+        'id': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
+        'from': '8b497692-7a38-4a5d-8287-e3d1006577d6',
+        'time': '2016-08-04T13:28:33.389Z',
+        'data': {'content': 'Fifth message', 'nonce': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', 'previews': []},
+        'type': 'conversation.message-add',
+      };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
@@ -381,7 +608,26 @@ describe('ConversationRepository', () => {
 
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const conversation_payload = {"creator": conversation_et.id, "members": {"self": {"status": 0, "last_read": "1.800122000a54449c", "muted_time": null, "muted": null, "status_time": "2015-01-28T12:53:41.847Z", "status_ref": "0.0", "id": conversation_et.id, "archived": null}, "others": []}, "name": null, "id": conversation_et.id, "type": 0, "last_event_time": "2015-03-20T13:41:12.580Z", "last_event": "25.800122000a0b0bc9"};
+      const conversation_payload = {
+        'creator': conversation_et.id,
+        'members': {
+          'self': {
+            'status': 0,
+            'last_read': '1.800122000a54449c',
+            'muted_time': null,
+            'muted': null,
+            'status_time': '2015-01-28T12:53:41.847Z',
+            'status_ref': '0.0',
+            'id': conversation_et.id,
+            'archived': null,
+          }, 'others': [],
+        },
+        'name': null,
+        'id': conversation_et.id,
+        'type': 0,
+        'last_event_time': '2015-03-20T13:41:12.580Z',
+        'last_event': '25.800122000a0b0bc9',
+      };
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
       spyOn(TestFactory.conversation_repository, 'fetch_conversation_by_id').and.callThrough();
@@ -425,7 +671,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('"_handleConversationEvent"', () => {
+  describe('_handleConversationEvent', () => {
     it('detects events send by a user not in the conversation', () => {
       const conversationEntity = _generate_conversation(ConversationType.GROUP);
       const event = {
@@ -453,7 +699,7 @@ describe('ConversationRepository', () => {
       });
     });
 
-    describe('"conversation.asset-add"', () => {
+    describe('conversation.asset-add', () => {
       beforeEach(() => {
         const matchUsers = new RegExp(`${backendConfig.restUrl}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
@@ -543,9 +789,31 @@ describe('ConversationRepository', () => {
         const sending_user_id = TestFactory.user_repository.self().id;
 
         // prettier-ignore
-        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_start = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T09:43:32.278Z',
+          'data': {
+            'content_length': 23089240,
+            'content_type': 'application/x-msdownload',
+            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
+          },
+          'type': 'conversation.asset-add',
+          'category': 512,
+          'primary_key': 107,
+        };
         // prettier-ignore
-        const upload_cancel = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        const upload_cancel = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T09:43:36.528Z',
+          'data': {'reason': 0, 'status': 'upload-failed'},
+          'type': 'conversation.asset-add',
+        };
 
         return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
@@ -575,9 +843,31 @@ describe('ConversationRepository', () => {
         const sending_user_id = createRandomUuid();
 
         // prettier-ignore
-        const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_start = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T09:43:32.278Z',
+          'data': {
+            'content_length': 23089240,
+            'content_type': 'application/x-msdownload',
+            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
+          },
+          'type': 'conversation.asset-add',
+          'category': 512,
+          'primary_key': 107,
+        };
         // prettier-ignore
-        const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        const upload_cancel = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T09:43:36.528Z',
+          'data': {'reason': 0, 'status': 'upload-failed'},
+          'type': 'conversation.asset-add',
+        };
 
         return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
@@ -607,9 +897,31 @@ describe('ConversationRepository', () => {
         const sending_user_id = TestFactory.user_repository.self().id;
 
         // prettier-ignore
-        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_start = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T09:43:32.278Z',
+          'data': {
+            'content_length': 23089240,
+            'content_type': 'application/x-msdownload',
+            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
+          },
+          'type': 'conversation.asset-add',
+          'category': 512,
+          'primary_key': 107,
+        };
         // prettier-ignore
-        const upload_failed = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T16:14:08.165Z","data":{"reason":1,"status":"upload-failed"},"type":"conversation.asset-add"};
+        const upload_failed = {
+          'conversation': conversation_id,
+          'from': sending_user_id,
+          'id': message_id,
+          'status': 1,
+          'time': '2017-09-06T16:14:08.165Z',
+          'data': {'reason': 1, 'status': 'upload-failed'},
+          'type': 'conversation.asset-add',
+        };
 
         return TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
@@ -634,13 +946,15 @@ describe('ConversationRepository', () => {
       });
     });
 
-    describe('"conversation.create"', () => {
+    describe('conversation.create', () => {
       let conversationId = null;
       let createEvent = null;
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
-        spyOn(TestFactory.conversation_repository, 'mapConversations').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'mapConversations').and.returnValue(
+          new Conversation(createRandomUuid()),
+        );
         spyOn(TestFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
@@ -669,7 +983,7 @@ describe('ConversationRepository', () => {
       });
     });
 
-    describe('"conversation.member-join"', () => {
+    describe('conversation.member-join', () => {
       let memberJoinEvent = null;
 
       beforeEach(() => {
@@ -710,13 +1024,13 @@ describe('ConversationRepository', () => {
       });
     });
 
-    describe('"conversation.message-delete"', () => {
+    describe('conversation.message-delete', () => {
       let message_et = undefined;
 
       beforeEach(() => {
         conversation_et = _generate_conversation(ConversationType.GROUP);
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          message_et = new z.entity.Message(createRandomUuid());
+          message_et = new Message(createRandomUuid());
           message_et.from = TestFactory.user_repository.self().id;
           conversation_et.add_message(message_et);
 
@@ -824,14 +1138,14 @@ describe('ConversationRepository', () => {
       });
     });
 
-    describe('"conversation.message-hidden"', () => {
+    describe('conversation.message-hidden', () => {
       let messageId = null;
 
       beforeEach(() => {
         conversation_et = _generate_conversation(ConversationType.GROUP);
 
         return TestFactory.conversation_repository.save_conversation(conversation_et).then(() => {
-          const messageToHideEt = new z.entity.Message(createRandomUuid());
+          const messageToHideEt = new Message(createRandomUuid());
           conversation_et.add_message(messageToHideEt);
 
           messageId = messageToHideEt.id;
@@ -933,7 +1247,11 @@ describe('ConversationRepository', () => {
   describe('_shouldSendAsExternal', () => {
     it('should return true for big payload', () => {
       const largeConversationEntity = _generate_conversation();
-      largeConversationEntity.participating_user_ids(_.range(128));
+      largeConversationEntity.participating_user_ids(
+        Array(128)
+          .fill()
+          .map((x, i) => i),
+      );
 
       return TestFactory.conversation_repository
         .save_conversation(largeConversationEntity)
@@ -990,7 +1308,7 @@ describe('ConversationRepository', () => {
         .concat(['1000', '1000', '31536000000', '31536000000']);
 
       spyOn(conversationRepository, 'get_message_in_conversation_by_id').and.returnValue(
-        Promise.resolve(new z.entity.Message()),
+        Promise.resolve(new Message()),
       );
       spyOn(conversationRepository.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
       spyOn(conversationRepository.conversationMapper, 'mapConversations').and.returnValue(conversationPromise);
@@ -1015,7 +1333,7 @@ describe('ConversationRepository', () => {
       });
       return Promise.all(sentPromises).then(sentMessages => {
         expect(conversationRepository.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(
-          sentMessages.length,
+          sentMessages.length * 2,
         );
       });
     });

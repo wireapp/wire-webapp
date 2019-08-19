@@ -25,12 +25,14 @@ import {createRandomUuid} from 'Util/util';
 import 'src/script/localization/Localizer';
 
 import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationType} from 'src/script/conversation/ConversationType';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
-import {WebAppEvents} from 'src/script/event/WebApp';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {WebAppEvents} from 'src/script/event/WebApp';
 
 describe('WindowTitleViewModel', () => {
   const suffix = 'Wire';
@@ -80,7 +82,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', () => {
-      const message = new z.entity.ContentMessage();
+      const message = new ContentMessage();
       message.id = createRandomUuid();
       message.timestamp(Date.now());
 
@@ -130,7 +132,7 @@ describe('WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the muted conversation
-      const message_in_muted = new z.entity.ContentMessage();
+      const message_in_muted = new ContentMessage();
       message_in_muted.id = createRandomUuid();
       message_in_muted.timestamp(Date.now());
       muted_conversation.add_message(message_in_muted);
@@ -145,7 +147,7 @@ describe('WindowTitleViewModel', () => {
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the selected conversation
-      const message_in_selected = new z.entity.ContentMessage();
+      const message_in_selected = new ContentMessage();
       message_in_selected.id = createRandomUuid();
       message_in_selected.timestamp(Date.now());
       selected_conversation.add_message(message_in_selected);
@@ -245,7 +247,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it("publishes the badge count (for Wire's wrapper)", done => {
-      const contentMessage = new z.entity.ContentMessage();
+      const contentMessage = new ContentMessage();
       contentMessage.id = createRandomUuid();
       contentMessage.timestamp(Date.now());
 

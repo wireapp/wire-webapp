@@ -17,46 +17,87 @@
  *
  */
 
-import ko from 'knockout';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {flatten, isString} from 'underscore';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
-import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {chunk} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {loadUrlBlob, createRandomUuid, koArrayPushAll} from 'Util/util';
+import {Logger, getLogger} from 'Util/Logger';
 import {sortByPriority} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
 
 import {UNSPLASH_URL} from '../externalRoute';
-import {ConsentValue} from './ConsentValue';
 import {ConsentType} from './ConsentType';
+import {ConsentValue} from './ConsentValue';
 
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 import {UserMapper} from './UserMapper';
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
 
-import {ClientEvent} from '../event/Client';
 import {BackendEvent} from '../event/Backend';
-import {WebAppEvents} from '../event/WebApp';
+import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
+import {WebAppEvents} from '../event/WebApp';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {EventName} from '../tracking/EventName';
 import {SuperProperty} from '../tracking/SuperProperty';
 
-import {createSuggestions} from './UserHandleGenerator';
-import {valueFromType, protoFromType} from './AvailabilityMapper';
-import {showAvailabilityModal} from './AvailabilityModal';
 import {
-  SHOW_REQUEST_MODAL,
-  SHOW_LEGAL_HOLD_MODAL,
   HIDE_REQUEST_MODAL,
+  SHOW_LEGAL_HOLD_MODAL,
+  SHOW_REQUEST_MODAL,
 } from '../view_model/content/LegalHoldModalViewModel';
+import {protoFromType, valueFromType} from './AvailabilityMapper';
+import {showAvailabilityModal} from './AvailabilityModal';
+import {createSuggestions} from './UserHandleGenerator';
 
+import {AssetService} from '../assets/AssetService';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientRepository} from '../client/ClientRepository';
+import {ACCENT_ID, config} from '../config';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {AssetPayload} from '../entity/message/Asset';
 import {BackendClientError} from '../error/BackendClientError';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {SelfService} from '../self/SelfService';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserService} from './UserService';
+
+interface UserUpdate {
+  accent_id?: typeof ACCENT_ID;
+  assets?: {key: string; size: string; type: string}[];
+  handle?: string;
+  id?: string;
+  name?: string;
+  picture?: AssetPayload[];
+}
 
 export class UserRepository {
+  private readonly asset_service: AssetService;
+  private readonly client_repository: ClientRepository;
+  private readonly connected_users: ko.PureComputed<User[]>;
+  private readonly isTeam: ko.Observable<boolean>;
+  private readonly logger: Logger;
+  private readonly number_of_contacts: ko.PureComputed<number>;
+  private readonly propertyRepository: PropertiesRepository;
+  private readonly selfService: SelfService;
+  private readonly teamMembers: ko.ObservableArray<User>;
+  private readonly teamUsers: ko.ObservableArray<User>;
+  private readonly user_mapper: UserMapper;
+  private readonly user_service: UserService;
+  private readonly users: ko.ObservableArray<User>;
+  private should_set_username: boolean;
+  readonly connect_requests: ko.PureComputed<User[]>;
+  readonly isActivatedAccount: ko.PureComputed<boolean>;
+  readonly isTemporaryGuest: ko.PureComputed<boolean>;
+  readonly self: ko.Observable<User>;
+
+  // tslint:disable-next-line:typedef
   static get CONFIG() {
     return {
       MINIMUM_NAME_LENGTH: 2,
@@ -68,17 +109,14 @@ export class UserRepository {
     };
   }
 
-  /**
-   * Construct a new User repository.
-   * @class UserRepository
-   * @param {UserService} user_service - Backend REST API user service implementation
-   * @param {AssetService} asset_service - Backend REST API asset service implementation
-   * @param {z.self.SelfService} selfService - Backend REST API self service implementation
-   * @param {ClientRepository} client_repository - Repository for all client interactions
-   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
-   * @param {PropertiesRepository} propertyRepository - Handles account level properties
-   */
-  constructor(user_service, asset_service, selfService, client_repository, serverTimeHandler, propertyRepository) {
+  constructor(
+    user_service: UserService,
+    asset_service: AssetService,
+    selfService: SelfService,
+    client_repository: ClientRepository,
+    serverTimeHandler: ServerTimeHandler,
+    propertyRepository: PropertiesRepository,
+  ) {
     this.logger = getLogger('UserRepository');
 
     this.asset_service = asset_service;
@@ -133,12 +171,8 @@ export class UserRepository {
 
   /**
    * Listener for incoming user events.
-   *
-   * @param {Object} eventJson - JSON data for event
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
    */
-  on_user_event(eventJson, source) {
+  on_user_event(eventJson: any, source: keyof typeof EventRepository.SOURCE): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -177,7 +211,7 @@ export class UserRepository {
     }
   }
 
-  loadUsers() {
+  loadUsers(): Promise<void> {
     if (this.isTeam()) {
       return this.user_service
         .loadUserFromDb()
@@ -191,51 +225,45 @@ export class UserRepository {
 
             return Promise.all(mappingPromises);
           }
+          return [];
         })
         .then(() => this.users().forEach(userEntity => userEntity.subscribeToChanges()));
     }
+    return Promise.resolve();
   }
 
   /**
    * Retrieves meta information about all the clients of a given user.
-   * @param {string} userId - User ID to retrieve client information for
-   * @param {boolean} updateClients - Automatically update the clients
-   * @returns {Promise<ClientEntity[]>} Resolves with an array of client entities
    */
-  getClientsByUserId(userId, updateClients = true) {
+  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[]> {
     return this.client_repository.getClientsByUserId(userId, updateClients);
   }
 
   /**
    * Persists a conversation state in the database.
-   * @param {User} userEntity - User which should be persisted
-   * @returns {Promise} Resolves when user was saved
    */
-  saveUserInDb(userEntity) {
+  saveUserInDb(userEntity: User): Promise<User> {
     return this.user_service.saveUserInDb(userEntity);
   }
 
   /**
    * Event to delete the matching user.
-   * @param {string} id - User ID of deleted user
-   * @returns {undefined} No return value
    */
-  user_delete({id}) {
+  user_delete({id}: {id: string}): void {
     // @todo Add user deletion cases for other users
     const is_self_user = id === this.self().id;
     if (is_self_user) {
+      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations. That's why we added a timeout, to leave some time for the database to finish running reads/writes before the database connection gets closed and the database gets deleted (WEBAPP-6379).
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-      }, 50);
+      }, 100);
     }
   }
 
   /**
    * Event to update availability of user.
-   * @param {Object} event - Event data
-   * @returns {undefined} No return value
    */
-  onUserAvailability(event) {
+  onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
     if (this.isTeam()) {
       const {
         from: userId,
@@ -247,10 +275,8 @@ export class UserRepository {
 
   /**
    * Event to update the matching user.
-   * @param {Object} user - Update user info
-   * @returns {Promise} Resolves wit the updated user entity
    */
-  user_update({user}) {
+  user_update({user}: {user: UserUpdate}): Promise<User> {
     const is_self_user = user.id === this.self().id;
     const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
     return user_promise.then(user_et => {
@@ -266,10 +292,8 @@ export class UserRepository {
 
   /**
    * Update users matching the given connections.
-   * @param {Array<ConnectionEntity>} connectionEntities - Connection entities
-   * @returns {Promise<Array<ConnectionEntity>>} Promise that resolves when all connections have been updated
    */
-  updateUsersFromConnections(connectionEntities) {
+  updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     return this.get_users_by_id(userIds).then(userEntities => {
       userEntities.forEach(userEntity => {
@@ -282,10 +306,9 @@ export class UserRepository {
 
   /**
    * Assign all locally stored clients to the users.
-   * @private
-   * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
+   * @returns Resolves with all user entities where client entities have been assigned to.
    */
-  _assignAllClients() {
+  private _assignAllClients(): Promise<User[]> {
     return this.client_repository.getAllClientsFromDb().then(recipients => {
       const userIds = Object.keys(recipients);
       this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
@@ -308,12 +331,9 @@ export class UserRepository {
   /**
    * Saves a new client for the first time to the database and adds it to a user's entity.
    *
-   * @param {string} userId - ID of user
-   * @param {Object} clientPayload - Payload of client which should be added to user
-   * @param {boolean} publishClient - Publish new client
-   * @returns {Promise} Promise that resolves when a client and its session have been deleted
+   * @returns Resolves with `true` when a client has been added
    */
-  addClientToUser(userId, clientPayload, publishClient = false) {
+  addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
     return this.get_user_by_id(userId).then(userEntity => {
       const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
       const wasClientAdded = userEntity.add_client(clientEntity);
@@ -329,18 +349,18 @@ export class UserRepository {
           } else if (publishClient) {
             amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
           }
+          return wasClientAdded;
         });
       }
+
+      return wasClientAdded;
     });
   }
 
   /**
    * Removes a stored client and the session connected with it.
-   * @param {string} user_id - ID of user
-   * @param {string} client_id - ID of client to be deleted
-   * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
-  remove_client_from_user(user_id, client_id) {
+  remove_client_from_user(user_id: string, client_id: string): Promise<void> {
     return this.client_repository
       .removeClient(user_id, client_id)
       .then(() => this.get_user_by_id(user_id))
@@ -352,18 +372,15 @@ export class UserRepository {
 
   /**
    * Update clients for given user.
-   * @param {string} user_id - ID of user
-   * @param {Array<ClientEntity>} client_ets - Clients which should get updated
-   * @returns {undefined} No return value
    */
-  update_clients_from_user(user_id, client_ets) {
+  update_clients_from_user(user_id: string, client_ets: ClientEntity[]): void {
     this.get_user_by_id(user_id).then(user_et => {
       user_et.devices(client_ets);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
   }
 
-  setAvailability(availability, method) {
+  setAvailability(availability: Availability.Type, method: string): void {
     const hasAvailabilityChanged = availability !== this.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
@@ -386,15 +403,21 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   }
 
-  onLegalHoldRequestCanceled(eventJson) {
-    if (this.self().id !== eventJson.id) {
-      return;
+  onLegalHoldRequestCanceled(eventJson: any): void {
+    if (this.self().id === eventJson.id) {
+      this.self().hasPendingLegalHold(false);
+      amplify.publish(HIDE_REQUEST_MODAL);
+    } else {
+      /*
+       * TODO:
+       * 1) Get User ID from event and check the clients of that user.
+       * 2) If there is a legal hold client, remove it (in memory and database).
+       * 3) Verify that the removed client is not in the db anymore and not assigned to the user entity.
+       */
     }
-    this.self().hasPendingLegalHold(false);
-    amplify.publish(HIDE_REQUEST_MODAL);
   }
 
-  async onLegalHoldRequest(eventJson) {
+  async onLegalHoldRequest(eventJson: any): Promise<void> {
     if (this.self().id !== eventJson.id) {
       return;
     }
@@ -417,22 +440,20 @@ export class UserRepository {
   /**
    * Track availability action.
    *
-   * @param {AvailabilityType} availability - Type of availability
-   * @param {string} method - Method used for availability change
-   * @returns {undefined} No return value
+   * @param method - Method used for availability change
    */
-  _trackAvailability(availability, method) {
+  _trackAvailability(availability: Availability.Type, method: string): void {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.SETTINGS.CHANGED_STATUS, {
-      method: method,
+      method,
       status: valueFromType(availability),
     });
   }
 
   /**
    * Request account deletion.
-   * @returns {Promise} Promise that resolves when account deletion process has been initiated
+   * @returns Resolves when account deletion process has been initiated
    */
-  delete_me() {
+  delete_me(): Promise<void> {
     return this.selfService
       .deleteSelf()
       .then(() => this.logger.info('Account deletion initiated'))
@@ -441,26 +462,22 @@ export class UserRepository {
 
   /**
    * Get a user from the backend.
-   * @param {string} userId - User ID
-   * @returns {Promise<User>} Promise that resolves with the user entity
    */
-  _fetchUserById(userId) {
+  _fetchUserById(userId: string): Promise<User> {
     return this.fetchUsersById([userId]).then(([userEntity]) => userEntity);
   }
 
   /**
    * Get users from the backend.
-   * @param {Array<string>} userIds - User IDs
-   * @returns {Promise<Array<User>>} Promise that resolves with an array of user entities
    */
-  fetchUsersById(userIds = []) {
+  fetchUsersById(userIds: string[] = []): Promise<User[]> {
     userIds = userIds.filter(userId => !!userId);
 
     if (!userIds.length) {
       return Promise.resolve([]);
     }
 
-    const _getUsers = chunkOfUserIds => {
+    const _getUsers = (chunkOfUserIds: string[]) => {
       return this.user_service
         .getUsers(chunkOfUserIds)
         .then(response => (response ? this.user_mapper.mapUsersFromJson(response) : []))
@@ -473,10 +490,10 @@ export class UserRepository {
         });
     };
 
-    const chunksOfUserIds = chunk(userIds, z.config.MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk(userIds, config.MAXIMUM_USERS_PER_REQUEST) as string[][];
     return Promise.all(chunksOfUserIds.map(chunkOfUserIds => _getUsers(chunkOfUserIds)))
       .then(resolveArray => {
-        const newUserEntities = _.flatten(resolveArray);
+        const newUserEntities = flatten(resolveArray);
 
         if (this.isTeam()) {
           this.mapGuestStatus(newUserEntities);
@@ -497,25 +514,22 @@ export class UserRepository {
 
   /**
    * Find a local user.
-   * @param {string} userId - User ID
-   * @returns {User | undefined} matching user entity if found. Undefined else
    */
-  findUserById(userId) {
+  findUserById(userId: string): User | undefined {
     return this.users().find(userEntity => userEntity.id === userId);
   }
 
   /**
    * Get self user from backend.
-   * @returns {Promise} Promise that will resolve with the self user entity
    */
-  getSelf() {
+  getSelf(): Promise<User> {
     return this.selfService
       .getSelf()
       .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
-        const promises = [this.save_user(userEntity, true), this.initMarketingConsent()];
-        return Promise.all(promises).then(() => userEntity);
+        this.save_user(userEntity, true);
+        return this.initMarketingConsent().then(() => userEntity);
       })
       .catch(error => {
         this.logger.error(`Unable to load self user: ${error.message || error}`, [error]);
@@ -526,11 +540,8 @@ export class UserRepository {
   /**
    * Detects if the user has a profile picture that uses the outdated picture API.
    * Will migrate the picture to the newer assets API if so.
-   *
-   * @param {Object} userData - user data from the backend
-   * @returns {void}
    */
-  _upgradePictureAsset(userData) {
+  _upgradePictureAsset<T extends UserUpdate>(userData: T): T {
     const hasPicture = userData.picture.length;
     const hasAsset = userData.assets.length;
 
@@ -538,7 +549,7 @@ export class UserRepository {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
         const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        medium.load().then(imageBlob => this.change_picture(imageBlob));
+        medium.load().then(imageBlob => this.change_picture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: []});
@@ -549,10 +560,8 @@ export class UserRepository {
 
   /**
    * Check for user locally and fetch it from the server otherwise.
-   * @param {string} user_id - User ID
-   * @returns {Promise<User>} Promise that resolves with the matching user entity
    */
-  get_user_by_id(user_id) {
+  get_user_by_id(user_id: string): Promise<User> {
     const user = this.findUserById(user_id);
     return user
       ? Promise.resolve(user)
@@ -565,7 +574,7 @@ export class UserRepository {
         });
   }
 
-  get_user_id_by_handle(handle) {
+  get_user_id_by_handle(handle: string): Promise<void | User> {
     return this.user_service
       .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
@@ -578,24 +587,22 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
-   * @param {Array<string>} user_ids - User IDs
-   * @param {boolean} offline - Should we only look for cached contacts
-   * @returns {Promise<Array<User>>} Resolves with an array of users
+   * @param offline - Should we only look for cached contacts
    */
-  get_users_by_id(user_ids = [], offline = false) {
+  get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
     if (!user_ids.length) {
       return Promise.resolve([]);
     }
 
-    const _find_user = user_id => {
+    const _find_user = (user_id: string) => {
       return this.findUserById(user_id) || user_id;
     };
 
     const find_users = user_ids.map(user_id => _find_user(user_id));
 
     return Promise.all(find_users).then(resolve_array => {
-      const known_user_ets = resolve_array.filter(array_item => !_.isString(array_item));
-      const unknown_user_ids = resolve_array.filter(array_item => _.isString(array_item));
+      const known_user_ets = resolve_array.filter(array_item => !isString(array_item)) as User[];
+      const unknown_user_ids = resolve_array.filter(array_item => isString(array_item)) as string[];
 
       if (offline || !unknown_user_ids.length) {
         return known_user_ets;
@@ -607,11 +614,9 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param {User|string} user_id - User entity or user ID
-   * @returns {boolean} Is the user the logged in user
    */
-  is_me(user_id) {
-    if (!_.isString(user_id)) {
+  is_me(user_id: User | string): boolean {
+    if (!isString(user_id)) {
       user_id = user_id.id;
     }
     return this.self().id === user_id;
@@ -619,11 +624,9 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param {User|string} user_et - User entity or user ID
-   * @param {boolean} is_me - True, if self user
-   * @returns {Promise} Resolves with the user entity
+   * @param is_me - `true` if self user
    */
-  save_user(user_et, is_me = false) {
+  save_user(user_et: User, is_me: boolean = false): User {
     const user = this.findUserById(user_et.id);
     if (!user) {
       if (is_me) {
@@ -637,10 +640,9 @@ export class UserRepository {
 
   /**
    * Save multiple users at once.
-   * @param {Array<User>} user_ets - Array of user entities to be stored
-   * @returns {Promise} Resolves with users passed as parameter
+   * @returns Resolves with users passed as parameter
    */
-  save_users(user_ets) {
+  save_users(user_ets: User[]): User[] {
     const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
     koArrayPushAll(this.users, newUsers);
     return user_ets;
@@ -648,15 +650,13 @@ export class UserRepository {
 
   /**
    * Update a local user from the backend by ID.
-   * @param {string} userId - User ID
-   * @returns {Promise} Resolves when user was updated
    */
-  updateUserById(userId) {
+  updateUserById(userId: string): Promise<void> {
     const getLocalUser = () => {
       return this.findUserById(userId) || new User();
     };
 
-    return Promise.all([getLocalUser(userId), this.user_service.getUser(userId)])
+    return Promise.all([getLocalUser(), this.user_service.getUser(userId)])
       .then(([localUserEntity, updatedUserData]) =>
         this.user_mapper.updateUserFromObject(localUserEntity, updatedUserData),
       )
@@ -669,11 +669,9 @@ export class UserRepository {
 
   /**
    * Add user entities for suspended users.
-   * @param {Array<string>} userIds - Requested user IDs
-   * @param {Array<User>} userEntities - User entities returned by backend
-   * @returns {Array<User>} User entities to be returned
+   * @returns User entities
    */
-  _add_suspended_users(userIds, userEntities) {
+  private _add_suspended_users(userIds: string[], userEntities: User[]): User[] {
     for (const userId of userIds) {
       const matching_userIds = userEntities.find(user_et => user_et.id === userId);
 
@@ -689,41 +687,33 @@ export class UserRepository {
 
   /**
    * Change the accent color.
-   * @param {number} accent_id - New accent color
-   * @returns {Promise} Resolves when accent color was changed
    */
-  change_accent_color(accent_id) {
-    return this.selfService
-      .putSelf({accent_id})
-      .then(() => this.user_update({user: {accent_id: accent_id, id: this.self().id}}));
+  change_accent_color(accent_id: typeof ACCENT_ID): Promise<User> {
+    return this.selfService.putSelf({accent_id}).then(() => this.user_update({user: {accent_id, id: this.self().id}}));
   }
 
   /**
    * Change name.
-   * @param {string} name - New name
-   * @returns {Promise} Resolves when the name was changed
    */
-  change_name(name) {
+  change_name(name: string): Promise<User> {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name: name}}));
+      return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
     }
 
-    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
   }
 
   /**
    * Whether the user needs to set a username.
-   * @returns {boolean} True, if username should be changed.
    */
-  shouldChangeUsername() {
+  shouldChangeUsername(): boolean {
     return this.should_set_username;
   }
 
   /**
    * Tries to generate a username suggestion.
-   * @returns {Promise} Resolves with the username suggestions
    */
-  get_username_suggestion() {
+  get_username_suggestion(): Promise<void> {
     let suggestions = null;
 
     return Promise.resolve()
@@ -746,10 +736,8 @@ export class UserRepository {
 
   /**
    * Change username.
-   * @param {string} username - New username
-   * @returns {Promise} Resolves when the username was changed
    */
-  change_username(username) {
+  change_username(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       return this.selfService
         .putSelfHandle(username)
@@ -767,24 +755,23 @@ export class UserRepository {
         });
     }
 
-    return Promise.reject(new z.error.UserError(z.userUserError.TYPE.INVALID_UPDATE));
+    return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
   }
 
   /**
    * Verify usernames against the backend.
-   * @param {Array} usernames - Username suggestions
-   * @returns {Promise<string>} A list with usernames that are not taken.
+   * @param usernames - Username suggestions
+   * @returns A list with usernames that are not taken.
    */
-  verify_usernames(usernames) {
+  verify_usernames(usernames: string[]): Promise<string[]> {
     return this.user_service.checkUserHandles(usernames);
   }
 
   /**
    * Verify a username against the backend.
-   * @param {string} username - New user name
-   * @returns {string} Username which is not taken.
+   * @returns Username which is not taken.
    */
-  verify_username(username) {
+  verify_username(username: string): Promise<string> {
     return this.user_service
       .checkUserHandle(username)
       .catch(({code: error_code}) => {
@@ -806,10 +793,8 @@ export class UserRepository {
 
   /**
    * Change the profile image.
-   * @param {string|Object} picture - New user picture
-   * @returns {Promise} Resolves when the picture was updated
    */
-  change_picture(picture) {
+  change_picture(picture: Blob): Promise<User> {
     return this.asset_service
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
@@ -819,7 +804,7 @@ export class UserRepository {
         ];
         return this.selfService
           .putSelf({assets, picture: []})
-          .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
+          .then(() => this.user_update({user: {assets, id: this.self().id}}));
       })
       .catch(error => {
         throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
@@ -827,14 +812,13 @@ export class UserRepository {
   }
 
   /**
-   * Set users default profile image.
-   * @returns {undefined} No return value
+   * Set the user's default profile image.
    */
-  set_default_picture() {
+  set_default_picture(): Promise<User> {
     return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
   }
 
-  mapGuestStatus(userEntities = this.users()) {
+  mapGuestStatus(userEntities = this.users()): void {
     userEntities.forEach(userEntity => {
       if (!userEntity.is_me) {
         const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
@@ -845,8 +829,8 @@ export class UserRepository {
     });
   }
 
-  initMarketingConsent() {
-    if (!z.config.FEATURE.CHECK_CONSENT) {
+  initMarketingConsent(): Promise<void> {
+    if (!config.FEATURE.CHECK_CONSENT) {
       this.logger.warn(
         `Consent check feature is disabled. Defaulting to '${this.propertyRepository.marketingConsent()}'`,
       );

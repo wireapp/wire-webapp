@@ -28,13 +28,13 @@ import {
   GenericMessage,
   Knock,
   LastRead,
+  LegalHoldStatus,
   Location,
   MessageDelete,
   MessageEdit,
   MessageHide,
   Reaction,
   Text,
-  LegalHoldStatus,
 } from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -42,11 +42,11 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
-import {t, Declension, joinNames} from 'Util/LocalizerUtil';
-import {getNextItem, getDifference} from 'Util/ArrayUtil';
-import {loadUrlBlob, arrayToBase64, koArrayPushAll, sortGroupsByLastEvent, createRandomUuid} from 'Util/util';
+import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {getDifference, getNextItem} from 'Util/ArrayUtil';
+import {arrayToBase64, createRandomUuid, koArrayPushAll, loadUrlBlob, sortGroupsByLastEvent} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar, compareTransliteration, startsWith, sortByPriority} from 'Util/StringUtil';
+import {capitalizeFirstChar, compareTransliteration, sortByPriority, startsWith} from 'Util/StringUtil';
 
 import {AssetUploadFailedReason} from '../assets/AssetUploadFailedReason';
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -59,6 +59,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 
 import {Conversation} from '../entity/Conversation';
+import {Message} from '../entity/message/Message';
 
 import * as trackingHelpers from '../tracking/Helpers';
 
@@ -100,7 +101,8 @@ import {Config} from '../auth/config';
 
 import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
-import {ConversationLegalHoldStateHandler, showLegalHoldWarning} from './ConversationLegalHoldStateHandler';
+import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
+import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -173,14 +175,13 @@ export class ConversationRepository {
     this.assetUploader = assetUploader;
     this.logger = getLogger('ConversationRepository');
 
-    this.conversationMapper = new ConversationMapper(this);
+    this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
       this.serverTimeHandler,
     );
-    this.legalHoldStateHandler = new ConversationLegalHoldStateHandler(this, this.serverTimeHandler);
     this.clientMismatchHandler = new ClientMismatchHandler(
       this,
       this.cryptography_repository,
@@ -319,6 +320,7 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.unblocked_user.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage.bind(this));
 
     this.eventService.addEventUpdatedListener(this._updateLocalMessageEntity.bind(this));
     this.eventService.addEventDeletedListener(this._deleteLocalMessageEntity.bind(this));
@@ -759,13 +761,15 @@ export class ConversationRepository {
 
   /**
    * Update all conversations on app init.
-   * @returns {undefined} No return value
+   * @returns {Promise<Conversation[]>} No return value
    */
   updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
-    this.updateUnarchivedConversations();
-    this.sorted_conversations().map(conversationEntity => {
-      this.updateParticipatingUserEntities(conversationEntity, true);
+    return this.updateUnarchivedConversations().then(() => {
+      const updatePromises = this.sorted_conversations().map(conversationEntity => {
+        return this.updateParticipatingUserEntities(conversationEntity, true);
+      });
+      return Promise.all(updatePromises);
     });
   }
 
@@ -779,10 +783,10 @@ export class ConversationRepository {
 
   /**
    * Update users and events for all unarchived conversations.
-   * @returns {undefined} No return value
+   * @returns {Promise<Conversation[]>} No return value
    */
   updateUnarchivedConversations() {
-    this.updateConversations(this.conversations_unarchived());
+    return this.updateConversations(this.conversations_unarchived());
   }
 
   updateConversationFromBackend(conversationEntity) {
@@ -804,7 +808,7 @@ export class ConversationRepository {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = _.flatten(mapOfUserIds);
 
-    this.user_repository
+    return this.user_repository
       .get_users_by_id(userIds)
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
@@ -1734,6 +1738,14 @@ export class ConversationRepository {
     });
   }
 
+  _isUserCancellationError(error) {
+    const errorTypes = [
+      z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+      z.error.ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+    ];
+    return errorTypes.includes(error.type);
+  }
+
   /**
    * Send a read receipt for the last message in a conversation.
    *
@@ -1758,7 +1770,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-          legalHoldStatus: this.legalHoldStatus(conversationEntity),
+          legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
@@ -1829,7 +1841,7 @@ export class ConversationRepository {
         const protoAsset = new Asset({
           [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
           [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+          [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
         });
 
         return protoAsset;
@@ -1850,7 +1862,7 @@ export class ConversationRepository {
         const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
         this.logger.warn(log, error);
 
-        if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (this._isUserCancellationError(error)) {
           throw error;
         }
       });
@@ -1874,7 +1886,7 @@ export class ConversationRepository {
         const retention = this.asset_service.getAssetRetention(this.selfUser(), conversationEntity);
         const options = {
           expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-          legalHoldStatus: this.legalHoldStatus(conversationEntity),
+          legalHoldStatus: conversationEntity.legalHoldStatus(),
           retention,
         };
 
@@ -1917,7 +1929,7 @@ export class ConversationRepository {
     const protoAsset = new Asset({
       [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
     });
 
     const generic_message = new GenericMessage({
@@ -2005,7 +2017,7 @@ export class ConversationRepository {
         }
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           throw error;
         }
 
@@ -2021,7 +2033,7 @@ export class ConversationRepository {
   sendKnock(conversationEntity) {
     const protoKnock = new Knock({
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: this.legalHoldStatus(conversationEntity),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
       hotKnock: false,
     });
 
@@ -2035,7 +2047,7 @@ export class ConversationRepository {
     }
 
     return this._send_and_inject_generic_message(conversationEntity, genericMessage).catch(error => {
-      if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+      if (!this._isUserCancellationError(error)) {
         this.logger.error(`Error while sending knock: ${error.message}`, error);
         throw error;
       }
@@ -2067,7 +2079,7 @@ export class ConversationRepository {
             quoteEntity,
             [linkPreview],
             this.expectReadReceipt(conversationEntity),
-            this.legalHoldStatus(conversationEntity),
+            conversationEntity.legalHoldStatus(),
           );
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
 
@@ -2113,7 +2125,7 @@ export class ConversationRepository {
     const protoLocation = new Location({
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       latitude,
-      legalHoldStatus: this.legalHoldStatus(conversationEntity),
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
       longitude,
       name,
       zoom,
@@ -2132,7 +2144,7 @@ export class ConversationRepository {
    *
    * @param {Conversation} conversationEntity - Conversation entity
    * @param {string} textMessage - Edited plain text message
-   * @param {z.entity.Message} originalMessageEntity - Original message entity
+   * @param {Message} originalMessageEntity - Original message entity
    * @param {Array<MentionEntity>} [mentionEntities] - Mentions as part of the message
    * @returns {Promise} Resolves after sending the message
    */
@@ -2154,7 +2166,7 @@ export class ConversationRepository {
       undefined,
       undefined,
       this.expectReadReceipt(conversationEntity),
-      this.legalHoldStatus(conversationEntity),
+      conversationEntity.legalHoldStatus(),
     );
     const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
     const genericMessage = new GenericMessage({
@@ -2167,7 +2179,7 @@ export class ConversationRepository {
         return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           this.logger.error(`Error while editing message: ${error.message}`, error);
           throw error;
         }
@@ -2261,7 +2273,7 @@ export class ConversationRepository {
       quoteEntity,
       undefined,
       this.expectReadReceipt(conversationEntity),
-      this.legalHoldStatus(conversationEntity),
+      conversationEntity.legalHoldStatus(),
     );
     let genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
@@ -2290,7 +2302,7 @@ export class ConversationRepository {
         return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
       })
       .catch(error => {
-        if (error.type !== z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (!this._isUserCancellationError(error)) {
           this.logger.error(`Error while sending text message: ${error.message}`, error);
           throw error;
         }
@@ -2618,14 +2630,17 @@ export class ConversationRepository {
       });
   }
 
-  async updateAllClients(conversation) {
+  async updateAllClients(conversationEntity, blockSystemMessage = true) {
+    if (blockSystemMessage) {
+      conversationEntity.blockLegalHoldMessage = true;
+    }
     const sender = this.client_repository.currentClient().id;
     try {
-      await this.conversation_service.post_encrypted_message(conversation.id, {recipients: {}, sender});
+      await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (error) {
       if (error.missing) {
         const remoteUserClients = error.missing;
-        const localUserClients = await this.create_recipients(conversation.id);
+        const localUserClients = await this.create_recipients(conversationEntity.id);
         const selfId = this.selfUser().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
@@ -2639,9 +2654,11 @@ export class ConversationRepository {
           return deleted;
         }, {});
 
-        Object.entries(deletedUserClients).forEach(([userId, clients]) => {
-          clients.forEach(clientId => this.user_repository.remove_client_from_user(userId, clientId));
-        });
+        await Promise.all(
+          Object.entries(deletedUserClients).map(([userId, clients]) =>
+            Promise.all(clients.map(clientId => this.user_repository.remove_client_from_user(userId, clientId))),
+          ),
+        );
 
         const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
           if (userId === selfId) {
@@ -2662,28 +2679,80 @@ export class ConversationRepository {
         );
       }
     }
+    if (blockSystemMessage) {
+      conversationEntity.blockLegalHoldMessage = false;
+    }
   }
 
-  _grantOutgoingMessage(eventInfoEntity, userIds) {
+  async injectLegalHoldMessage({
+    conversationEntity,
+    conversationId,
+    userId,
+    timestamp,
+    legalHoldStatus,
+    beforeTimestamp = false,
+  }) {
+    if (typeof legalHoldStatus === 'undefined') {
+      return;
+    }
+    if (!timestamp) {
+      const conversation = conversationEntity || this.find_conversation_by_id(conversationId);
+      const servertime = this.serverTimeHandler.toServerTimestamp();
+      timestamp = conversation.get_latest_timestamp(servertime);
+    }
+    const legalHoldUpdateMessage = z.conversation.EventBuilder.buildLegalHoldMessage(
+      conversationId || conversationEntity.id,
+      userId,
+      timestamp,
+      legalHoldStatus,
+      beforeTimestamp,
+    );
+    await this.eventRepository.injectEvent(legalHoldUpdateMessage);
+  }
+
+  async _grantOutgoingMessage(eventInfoEntity, userIds) {
     const messageType = eventInfoEntity.getType();
-    const allowedMessageTypes = ['cleared', 'confirmation', 'deleted', 'lastRead'];
+    const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
       return Promise.resolve();
     }
-    const message = eventInfoEntity.genericMessage;
-    if (message) {
-      const lhStatus = this.legalHoldStatus(this.find_conversation_by_id(eventInfoEntity.conversationId));
-      message[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = lhStatus;
+
+    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
+
+    // Legal Hold
+    const conversationEntity = this.find_conversation_by_id(eventInfoEntity.conversationId);
+    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+    await this.updateAllClients(conversationEntity, !isMessageEdit);
+    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+    const {genericMessage} = eventInfoEntity;
+    genericMessage[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      await this.injectLegalHoldMessage({
+        beforeTimestamp: true,
+        conversationId,
+        legalHoldStatus: updatedLocalLegalHoldStatus,
+        timestamp: numericTimestamp,
+        userId: this.selfUser().id,
+      });
     }
+
+    const shouldShowLegalHoldWarning =
+      haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
-  grantMessage(eventInfoEntity, consentType, userIds) {
+  grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning = false) {
     return this.get_conversation_by_id(eventInfoEntity.conversationId).then(conversationEntity => {
       const legalHoldMessageTypes = [
         GENERIC_MESSAGE_TYPE.ASSET,
@@ -2693,21 +2762,19 @@ export class ConversationRepository {
       ];
       const isLegalHoldMessageType =
         eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
-      const needsLegalHoldApproval =
-        !this.selfUser().isOnLegalHold() && conversationEntity.needsLegalHoldApproval() && isLegalHoldMessageType;
+
       const verificationState = conversationEntity.verification_state();
       const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
 
-      if (!conversationDegraded && !needsLegalHoldApproval) {
-        return false;
+      if (conversationEntity.needsLegalHoldApproval) {
+        conversationEntity.needsLegalHoldApproval = false;
+        return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      } else if (shouldShowLegalHoldWarning) {
+        conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
       }
 
       if (!conversationDegraded) {
-        return showLegalHoldWarning(conversationEntity);
-      }
-
-      if (needsLegalHoldApproval) {
-        return showLegalHoldWarning(conversationEntity, true);
+        return false;
       }
 
       return new Promise((resolve, reject) => {
@@ -2868,7 +2935,7 @@ export class ConversationRepository {
         this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${upload_duration}`);
       })
       .catch(error => {
-        if (error.type === z.error.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        if (this._isUserCancellationError(error)) {
           throw error;
         }
 
@@ -3032,6 +3099,7 @@ export class ConversationRepository {
 
         return conversationEntity;
       })
+      .then(conversationEntity => this._checkLegalHoldStatus(conversationEntity, eventJson))
       .then(conversationEntity => this._checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._triggerFeatureEventHandlers(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
@@ -3092,6 +3160,51 @@ export class ConversationRepository {
     return conversationEntity;
   }
 
+  async _checkLegalHoldStatus(conversationEntity, eventJson) {
+    if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
+      return conversationEntity;
+    }
+
+    const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(
+      eventJson,
+      conversationEntity.legalHoldStatus(),
+    );
+
+    if (!renderLegalHoldMessage) {
+      return conversationEntity;
+    }
+
+    const {
+      conversation: conversationId,
+      data: {legal_hold_status: messageLegalHoldStatus},
+      from: userId,
+      time: isoTimestamp,
+    } = eventJson;
+
+    await this.injectLegalHoldMessage({
+      beforeTimestamp: true,
+      conversationId,
+      legalHoldStatus: messageLegalHoldStatus,
+      timestamp: isoTimestamp,
+      userId,
+    });
+
+    await this.updateAllClients(conversationEntity);
+
+    if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
+      return conversationEntity;
+    }
+
+    await this.injectLegalHoldMessage({
+      conversationId,
+      legalHoldStatus: conversationEntity.legalHoldStatus(),
+      timestamp: isoTimestamp,
+      userId,
+    });
+
+    return conversationEntity;
+  }
+
   /**
    * Triggers the methods associated with a specific event.
    *
@@ -3143,7 +3256,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         const isMessageEdit = !!eventJson.edited_time;
         if (isMessageEdit) {
-          // in case of an edition, the DB listner will take care of updating the local entity
+          // in case of an edition, the DB listener will take care of updating the local entity
           return {conversationEntity};
         }
         return this._addEventToConversation(conversationEntity, eventJson);
@@ -3152,6 +3265,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
+      case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
@@ -3324,36 +3438,32 @@ export class ConversationRepository {
    * @param {EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onCreate(eventJson, eventSource) {
+  async _onCreate(eventJson, eventSource) {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    try {
+      const existingConversationEntity = this.find_conversation_by_id(conversationId);
+      if (existingConversationEntity) {
+        throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
+      }
 
-    return Promise.resolve(this.find_conversation_by_id(conversationId))
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          throw new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CHANGES);
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp);
+      if (conversationEntity) {
+        if (conversationEntity.participating_user_ids().length) {
+          this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
-        return this.mapConversations(eventData, initialTimestamp);
-      })
-      .then(conversationEntity => this.updateParticipatingUserEntities(conversationEntity))
-      .then(conversationEntity => this.save_conversation(conversationEntity))
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          if (conversationEntity.participating_user_ids().length) {
-            this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
-          }
-
-          this.verificationStateHandler.onConversationCreate(conversationEntity);
-          return {conversationEntity};
-        }
-      })
-      .catch(error => {
-        const isNoChanges = error.type === z.error.ConversationError.TYPE.NO_CHANGES;
-        if (!isNoChanges) {
-          throw error;
-        }
-      });
+        await this.updateParticipatingUserEntities(conversationEntity);
+        this.verificationStateHandler.onConversationCreate(conversationEntity);
+        await this.save_conversation(conversationEntity);
+      }
+      return {conversationEntity};
+    } catch (error) {
+      const isNoChanges = error.type === z.error.ConversationError.TYPE.NO_CHANGES;
+      if (!isNoChanges) {
+        throw error;
+      }
+    }
   }
 
   _onGroupCreation(conversationEntity, eventJson) {
@@ -3816,7 +3926,7 @@ export class ConversationRepository {
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
       return this.user_repository.get_user_by_id(from).then(userEntity => {
-        const reactionMessageEntity = new z.entity.Message(messageEntity.id, SuperType.REACTION);
+        const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
         return {conversationEntity, messageEntity: reactionMessageEntity};
@@ -3969,10 +4079,6 @@ export class ConversationRepository {
     }
 
     return false;
-  }
-
-  legalHoldStatus(conversationEntity) {
-    return conversationEntity.hasLegalHold() ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED;
   }
 
   /**

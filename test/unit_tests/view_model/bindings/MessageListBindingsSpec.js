@@ -19,7 +19,7 @@
 
 import $ from 'jquery';
 
-import {bindHtml} from '../../../api/knockoutHelpers';
+import {bindHtml} from '../../../helper/knockoutHelpers';
 
 import 'src/script/view_model/bindings/MessageListBindings';
 

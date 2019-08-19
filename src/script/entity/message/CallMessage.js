@@ -22,11 +22,9 @@ import {t} from 'Util/LocalizerUtil';
 import {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.CallMessage = class CallMessage extends z.entity.Message {
+export class CallMessage extends Message {
   constructor() {
     super();
     this.super_type = SuperType.CALL;
@@ -61,4 +59,4 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
   was_missed() {
     return this.finished_reason === TERMINATION_REASON.MISSED;
   }
-};
+}

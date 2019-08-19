@@ -21,10 +21,7 @@ import {Message} from './Message';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SuperType} from '../../message/SuperType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-class SystemMessage extends Message {
+export class SystemMessage extends Message {
   constructor() {
     super();
     this.super_type = SuperType.SYSTEM;
@@ -35,6 +32,3 @@ class SystemMessage extends Message {
     return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }
-
-export {SystemMessage};
-z.entity.SystemMessage = SystemMessage;

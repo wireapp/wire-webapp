@@ -18,7 +18,7 @@
  */
 
 import UUID from 'uuidjs';
-import {instantiateComponent} from '../../api/knockoutHelpers';
+import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';

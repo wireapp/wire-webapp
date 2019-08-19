@@ -1,6 +1,6 @@
 # http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 sudo: required
-dist: trusty
+dist: xenial
 
 # https://docs.travis-ci.com/user/encryption-keys/
 env:
@@ -24,11 +24,12 @@ language: node_js
 node_js:
   - '10'
 
+services:
+  - xvfb
+
 # http://docs.travis-ci.com/user/gui-and-headless-browsers/
 before_install:
   - echo -e "machine github.com\n  login $GH_TOKEN" > ~/.netrc
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
 
 # https://docs.travis-ci.com/user/caching/
 cache:
@@ -38,6 +39,12 @@ cache:
 
 before_script:
   - npm rebuild node-sass
+
+script:
+  - |
+    if [ "$DISTRIBUTION" == "wire" ]; then
+      yarn test
+    fi
 
 after_script:
   - 'bash <(curl -s https://codecov.io/bash) -f ./docs/coverage/lcov.info'

@@ -21,23 +21,21 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {AvailabilityType} from './AvailabilityType';
-
 import {BaseError} from '../error/BaseError';
 
-const AVAILABILITY_VALUES = {
+const AVAILABILITY_VALUES: Record<keyof typeof Availability.Type, string> = {
   AVAILABLE: 'available',
   AWAY: 'away',
   BUSY: 'busy',
   NONE: 'none',
 };
 
-export const valueFromType = availabilityType => {
+export const valueFromType = (availabilityType: Availability.Type): string => {
   const TYPE_VALUES = {
-    [AvailabilityType.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
-    [AvailabilityType.AWAY]: AVAILABILITY_VALUES.AWAY,
-    [AvailabilityType.BUSY]: AVAILABILITY_VALUES.BUSY,
-    [AvailabilityType.NONE]: AVAILABILITY_VALUES.NONE,
+    [Availability.Type.AVAILABLE]: AVAILABILITY_VALUES.AVAILABLE,
+    [Availability.Type.AWAY]: AVAILABILITY_VALUES.AWAY,
+    [Availability.Type.BUSY]: AVAILABILITY_VALUES.BUSY,
+    [Availability.Type.NONE]: AVAILABILITY_VALUES.NONE,
   };
 
   const value = TYPE_VALUES[availabilityType];
@@ -47,12 +45,12 @@ export const valueFromType = availabilityType => {
   throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
-export const nameFromType = availabilityType => {
+export const nameFromType = (availabilityType: Availability.Type) => {
   const TYPE_STRINGS = {
-    [AvailabilityType.AVAILABLE]: t('userAvailabilityAvailable'),
-    [AvailabilityType.AWAY]: t('userAvailabilityAway'),
-    [AvailabilityType.BUSY]: t('userAvailabilityBusy'),
-    [AvailabilityType.NONE]: t('userAvailabilityNone'),
+    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+    [Availability.Type.AWAY]: t('userAvailabilityAway'),
+    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
+    [Availability.Type.NONE]: t('userAvailabilityNone'),
   };
 
   const string = TYPE_STRINGS[availabilityType];
@@ -62,7 +60,7 @@ export const nameFromType = availabilityType => {
   throw new z.error.UserError(BaseError.TYPE.INVALID_PARAMETER);
 };
 
-export const protoFromType = availabilityType => {
-  const typeValue = valueFromType(availabilityType).toUpperCase();
+export const protoFromType = (availabilityType: Availability.Type) => {
+  const typeValue = valueFromType(availabilityType).toUpperCase() as keyof typeof Availability.Type;
   return Availability.Type[typeValue];
 };

@@ -122,7 +122,7 @@ export const replaceInRange = (text: string, replacement: string, startIndex: nu
   return `${beforePartial}${replacement}${afterPartial}`;
 };
 
-export const sortByPriority = (stringA = '', stringB = '', query: string) => {
+export const sortByPriority = (stringA = '', stringB = '', query?: string) => {
   stringA = stringA.toLowerCase();
   stringB = stringB.toLowerCase();
 

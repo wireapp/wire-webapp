@@ -26,10 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Message} from './Message';
 import {SuperType} from '../../message/SuperType';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-class ContentMessage extends Message {
+export class ContentMessage extends Message {
   constructor(id) {
     super(id);
 
@@ -181,6 +178,3 @@ class ContentMessage extends Message {
     return file_name;
   }
 }
-
-export {ContentMessage};
-z.entity.ContentMessage = ContentMessage;

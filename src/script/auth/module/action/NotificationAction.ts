@@ -47,9 +47,7 @@ export class NotificationAction {
   setLastEventDate = (lastEventDate: Date): ThunkAction => {
     return (dispatch, getState, {core}) => {
       return Promise.resolve().then(() => {
-        // TODO: Update call to private method once core v6 is inside!
-        // @ts-ignore
-        core.service.notification['setLastEventDate'](lastEventDate);
+        core.service.notification.setLastEventDate(lastEventDate);
       });
     };
   };

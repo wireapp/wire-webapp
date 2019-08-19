@@ -111,8 +111,6 @@ const buildMetadataVideo = (videoFile: File | Blob): Promise<Asset.VideoMetaData
  * Converts an error event into a plain error object.
  * This needs to be done because error events are not standardized between browser implementations.
  * @private
- * @param {Event} event - Error event
- * @returns {MediaError} Error object
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/originalTarget
  */
 const convertEventToError = (event: any): MediaError => {

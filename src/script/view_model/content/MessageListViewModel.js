@@ -163,7 +163,7 @@ class MessageListViewModel {
    * Change conversation.
    *
    * @param {Conversation} conversationEntity - Conversation entity to change to
-   * @param {z.entity.Message} messageEntity - message to be focused
+   * @param {Message} messageEntity - message to be focused
    * @returns {Promise} Resolves when conversation was changed
    */
   changeConversation(conversationEntity, messageEntity) {
@@ -211,7 +211,7 @@ class MessageListViewModel {
   /**
    * Sets the conversation and waits for further processing until knockout has rendered the messages.
    * @param {Conversation} conversationEntity - Conversation entity to set
-   * @param {z.entity.Message} messageEntity - Message that should be in focus when the conversation loads
+   * @param {Message} messageEntity - Message that should be in focus when the conversation loads
    * @returns {Promise} Resolves when conversation was rendered
    */
   _renderConversation(conversationEntity, messageEntity) {
@@ -403,7 +403,7 @@ class MessageListViewModel {
 
   /**
    * Triggered when user clicks on the session reset link in a decrypt error message.
-   * @param {z.entity.DecryptErrorMessage} message_et - Decrypt error message
+   * @param {DecryptErrorMessage} message_et - Decrypt error message
    * @returns {undefined} No return value
    */
   on_session_reset_click(message_et) {
@@ -423,7 +423,7 @@ class MessageListViewModel {
   /**
    * Shows detail image view.
    *
-   * @param {z.entity.Message} message_et - Message with asset to be displayed
+   * @param {Message} message_et - Message with asset to be displayed
    * @param {UIEvent} event - Actual scroll event
    * @returns {undefined} No return value
    */
@@ -470,7 +470,7 @@ class MessageListViewModel {
 
   /**
    * Checks its older neighbor in order to see if the avatar should be rendered or not
-   * @param {z.entity.Message} message_et - Message to check
+   * @param {Message} message_et - Message to check
    * @returns {boolean} Should user avatar be hidden
    */
   should_hide_user_avatar(message_et) {
@@ -489,7 +489,7 @@ class MessageListViewModel {
 
   /**
    * Checks if the given message is the last delivered one
-   * @param {z.entity.Message} message_et - Message to check
+   * @param {Message} message_et - Message to check
    * @returns {boolean} Message is last delivered one
    */
   is_last_delivered_message(message_et) {
@@ -513,7 +513,7 @@ class MessageListViewModel {
   /**
    * Message appeared in viewport.
    * @param {Conversation} conversationEntity - Conversation the message belongs to
-   * @param {z.entity.Message} messageEntity - Message to check
+   * @param {Message} messageEntity - Message to check
    * @returns {Function|null} Callback or null
    */
   getInViewportCallback(conversationEntity, messageEntity) {

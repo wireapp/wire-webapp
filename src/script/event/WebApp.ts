@@ -100,6 +100,7 @@ export const WebAppEvents = {
     IMAGE: {
       SEND: 'wire.webapp.conversation.image.send',
     },
+    INJECT_LEGAL_HOLD_MESSAGE: 'wire.webapp.conversation.insert_legal_hold_message',
     MAP_CONNECTION: 'wire.webapp.conversation.map_connection',
     MESSAGE: {
       ADDED: 'wire.webapp.conversation.message.added',

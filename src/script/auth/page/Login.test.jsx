@@ -46,6 +46,14 @@ describe('when visiting the login page', () => {
   const backButton = () => wrapper.find('[data-uie-name="go-index"]').first();
 
   describe('and the account registration is disabled', () => {
+    beforeAll(() => {
+      Config.FEATURE = {
+        ENABLE_ACCOUNT_REGISTRATION: false,
+      };
+    });
+
+    afterAll(() => (Config.FEATURE = {}));
+
     it('the back button is hidden', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = false;
       wrapper = mountWithIntl(<Login />, mockStore(initialState));
@@ -56,6 +64,14 @@ describe('when visiting the login page', () => {
   });
 
   describe('and the account registration is enabled', () => {
+    beforeAll(() => {
+      Config.FEATURE = {
+        ENABLE_ACCOUNT_REGISTRATION: true,
+      };
+    });
+
+    afterAll(() => (Config.FEATURE = {}));
+
     it('the back button is shown', () => {
       Config.FEATURE.ENABLE_ACCOUNT_REGISTRATION = true;
       wrapper = mountWithIntl(<Login />, mockStore(initialState));

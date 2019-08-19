@@ -53,7 +53,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: './',
-    browserNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 120000,
     browsers: ['ChromeNoSandbox'],
     client: {
       jasmine: {
@@ -111,7 +111,7 @@ module.exports = function(config) {
         rules: [
           {
             exclude: /node_modules/,
-            include: path.resolve('src/script/'),
+            include: [path.resolve('src/script/'), path.resolve('test/helper/')],
             loader: 'babel-loader',
             test: /\.[tj]sx?$/,
           },

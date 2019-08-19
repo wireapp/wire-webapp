@@ -30,13 +30,10 @@ import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
 import {User} from '../User';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-class Message {
+export class Message {
   /**
    * Sort messages by timestamp
-   * @param {Array<z.entity.Message>} message_ets - Message entities
+   * @param {Array<Message>} message_ets - Message entities
    * @returns {boolean} Sorted message entities
    */
   static sort_by_timestamp(message_ets) {
@@ -367,6 +364,3 @@ class Message {
     return false;
   }
 }
-
-export {Message};
-z.entity.Message = Message;

@@ -23,11 +23,9 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {WebAppEvents} from '../../event/WebApp';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.VerificationMessage = class VerificationMessage extends z.entity.Message {
+export class VerificationMessage extends Message {
   constructor() {
     super();
 
@@ -82,4 +80,4 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     const topic = this.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   }
-};
+}

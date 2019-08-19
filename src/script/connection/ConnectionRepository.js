@@ -24,6 +24,7 @@ import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {EventRepository} from '../event/EventRepository';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {MemberMessage} from '../entity/message/MemberMessage';
 
 import {ConnectionStatus} from './ConnectionStatus';
 import {ConnectionMapper} from './ConnectionMapper';
@@ -335,7 +336,7 @@ export class ConnectionRepository {
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
       this.userRepository.get_user_by_id(connectionEntity.userId).then(userEntity => {
-        const messageEntity = new z.entity.MemberMessage();
+        const messageEntity = new MemberMessage();
         messageEntity.user(userEntity);
 
         if (connectionEntity.isConnected()) {

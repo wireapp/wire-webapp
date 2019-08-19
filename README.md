@@ -51,13 +51,13 @@ where `specN` is the path to the spec to run relative to `test/unit_tests` and w
 
 #### Speed up testing for files fully migrated to the module system
 
-When a file (and all its dependencies) do not rely on **any** global dependency, then you can use the `--nolegacy` flag to run the tests on that single file.
+When a file (and all its dependencies) does not rely on **any** global dependency (i.e. `window.z.util`), then you can use the `--nolegacy` flag to run the tests on that single file:
 
 `yarn test:app --specs spec1 --nolegacy`
 
 The test should start very quickly (webpack won't have to resolve all the global dependencies).
 
-If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending, somehow, on, at least, one thing that should be on the global scope.
+If the test doesn't run with the `nolegacy` option (but runs without), it means it's depending on at least one dependency from the global `window` namespace.
 
 **Example**
 
@@ -73,17 +73,15 @@ The command to run is:
 
 #### General workflow
 
-| Stage | Branch |                Action                 |     Environment     | Backend    |
-| :---: | :----: | :-----------------------------------: | :-----------------: | :--------- |
-|   1   |  edge  |                commit                 |  wire-webapp-edge   | Staging    |
-|   2   |  dev   |                commit                 |   wire-webapp-dev   | Staging    |
-|   3   |  dev   |  tag (format: YYYY-MM-DD-staging.X)   | wire-webapp-staging | Production |
-|   4   | master |                commit                 | wire-webapp-master  | Staging    |
-|   5   | master | tag (format: YYYY-MM-DD-production.X) |  wire-webapp-prod   | Production |
+|            Stage            | Branch |                Action                 |     Environment     | Backend    |
+| :-------------------------: | :----: | :-----------------------------------: | :-----------------: | :--------- |
+|   1 (Feature development)   |  edge  |                commit                 |  wire-webapp-edge   | Staging    |
+| 2 (Nightly test automation) |  dev   |                commit                 |   wire-webapp-dev   | Staging    |
+|    3 (Internal release)     |  dev   |  tag (format: YYYY-MM-DD-staging.X)   | wire-webapp-staging | Production |
+|       4 (RC testing)        | master |           merge from "dev"            | wire-webapp-master  | Staging    |
+|   5 (Production release)    | master | tag (format: YYYY-MM-DD-production.X) |  wire-webapp-prod   | Production |
 
-Before RC testing we create a merge commit from "dev" to "master" branch, so that our QA team can run tests on the latest version of our app.
-
-#### Staging Bumps
+#### Staging Bumps for internal releases
 
 **Actions**
 
@@ -102,6 +100,10 @@ git push origin --tags
 If everything is done right, you will see a Travis CI job in the [build pipeline](https://travis-ci.org/wireapp/wire-webapp/builds) based on the new tag:
 
 ![Staging Release](./docs/release/staging-release.png)
+
+#### RC testing
+
+Before RC testing we create a merge commit (**don't squash!**) from "dev" to "master" branch, so that our QA team can run tests on the latest version of our app.
 
 #### Production Release
 

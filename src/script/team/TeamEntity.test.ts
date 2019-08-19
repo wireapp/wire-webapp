@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,18 @@
  *
  */
 
-export enum AvailabilityType {
-  AVAILABLE = 1,
-  AWAY = 2,
-  BUSY = 3,
-  NONE = 0,
-}
+import {TeamEntity} from './TeamEntity';
+
+describe('TeamEntity', () => {
+  it('returns an icon resource', () => {
+    const teamEntity = new TeamEntity();
+
+    expect(teamEntity.getIconResource()).not.toBeDefined();
+
+    teamEntity.icon = 'invalid-icon';
+    expect(teamEntity.getIconResource()).not.toBeDefined();
+
+    teamEntity.icon = '3-1-e705c3f5-7b4b-4136-a09b-01614cb355a1';
+    expect(teamEntity.getIconResource()).toBeDefined();
+  });
+});

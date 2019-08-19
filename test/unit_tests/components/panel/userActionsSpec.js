@@ -17,7 +17,7 @@
  *
  */
 
-import {instantiateComponent} from '../../../api/knockoutHelpers';
+import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';

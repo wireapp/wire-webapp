@@ -21,6 +21,9 @@ import {createRandomUuid} from 'Util/util';
 import 'src/script/localization/Localizer';
 
 import {User} from 'src/script/entity/User';
+import {Text} from 'src/script/entity/message/Text';
+import {MemberMessage} from 'src/script/entity/message/MemberMessage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 
 import {StatusType} from 'src/script/message/StatusType';
@@ -31,7 +34,7 @@ describe('Member Message', () => {
     let message_et = null;
 
     beforeEach(() => {
-      message_et = new z.entity.MemberMessage();
+      message_et = new MemberMessage();
     });
 
     it('can return correct string for one user', () => {
@@ -85,17 +88,17 @@ describe('Member Message', () => {
     let message_et = null;
 
     beforeEach(() => {
-      message_et = new z.entity.ContentMessage();
+      message_et = new ContentMessage();
     });
 
     it('should be deletable when message is not sending', () => {
-      message_et.assets.push(new z.entity.Text());
+      message_et.assets.push(new Text());
 
       expect(message_et.is_deletable()).toBe(true);
     });
 
     it('should not be deletable while message is sending', () => {
-      message_et.assets.push(new z.entity.Text());
+      message_et.assets.push(new Text());
       message_et.status(StatusType.SENDING);
 
       expect(message_et.is_deletable()).toBe(false);
@@ -114,7 +117,7 @@ describe('Member Message', () => {
     let message_et = null;
 
     beforeEach(() => {
-      message_et = new z.entity.ContentMessage();
+      message_et = new ContentMessage();
     });
 
     it('should return false by default', () => {
@@ -122,7 +125,7 @@ describe('Member Message', () => {
     });
 
     it('should return false for Text asset', () => {
-      message_et.assets.push(new z.entity.Text());
+      message_et.assets.push(new Text());
 
       expect(message_et.has_asset_file()).toBeFalsy();
     });

@@ -24,11 +24,9 @@ import {printDevicesId} from 'Util/util';
 
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-window.z = window.z || {};
-window.z.entity = z.entity || {};
-
-z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Message {
+export class DecryptErrorMessage extends Message {
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
     return ProteusErrors.DecryptError.CODE.CASE_204.toString();
   }
@@ -84,4 +82,4 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
     this.htmlErrorMessage = this.error_message;
   }
-};
+}

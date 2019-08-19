@@ -17,40 +17,33 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
 import {joaatHash} from 'Util/Crypto';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
 export class UserMapper {
+  private readonly logger: Logger;
+  private readonly serverTimeHandler: ServerTimeHandler;
+
   /**
    * Construct a new User Mapper.
-   * @class UserMapper
-   * @param {serverTimeHandler} serverTimeHandler - Handles time shift between server and client
+   * @param serverTimeHandler - Handles time shift between server and client
    */
-  constructor(serverTimeHandler) {
+  constructor(serverTimeHandler: ServerTimeHandler) {
     this.logger = getLogger('UserMapper');
     this.serverTimeHandler = serverTimeHandler;
   }
 
-  /**
-   * Converts JSON user into user entity.
-   * @param {Object} userData - User data
-   * @returns {User} Mapped user entity
-   */
-  mapUserFromJson(userData) {
+  mapUserFromJson(userData: Object): User | void {
     return this.updateUserFromObject(new User(), userData);
   }
 
-  /**
-   * Converts JSON self user into user entity.
-   * @param {Object} userData - User data
-   * @returns {User} Mapped user entity
-   */
-  mapSelfUserFromJson(userData) {
-    const userEntity = this.updateUserFromObject(new User(), userData);
+  mapSelfUserFromJson(userData: any): User {
+    const userEntity = this.updateUserFromObject(new User(), userData) as any;
     userEntity.is_me = true;
 
     if (userData.locale) {
@@ -63,11 +56,9 @@ export class UserMapper {
   /**
    * Convert multiple JSON users into user entities.
    * @note Return an empty array in any case to prevent crashes.
-   *
-   * @param {Array<Object>} usersData - Users data
-   * @returns {Array<User>} Mapped user entities
+   * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData) {
+  mapUsersFromJson(usersData: Object[]): (void | User)[] {
     if (usersData && usersData.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -78,13 +69,12 @@ export class UserMapper {
   /**
    * Maps JSON user into a blank user entity or updates an existing one.
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
-   * @param {User} userEntity - User entity that the info shall be mapped to
-   * @param {Object} userData - User data
-   * @returns {User} Mapped user entity
+   * @param userEntity - User entity that the info shall be mapped to
+   * TODO: Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity, userData) {
+  updateUserFromObject(userEntity: User, userData: any): User | undefined {
     if (!userData) {
-      return;
+      return undefined;
     }
 
     // We are trying to update non-matching users
@@ -145,7 +135,8 @@ export class UserMapper {
       if (this.serverTimeHandler.timeOffset() !== undefined) {
         setAdjustedTimestamp();
       } else {
-        this.serverTimeHandler.timeOffset.subscribe_once(setAdjustedTimestamp);
+        // TODO: Find a way to type `subscribe_once` or export the function.
+        (this.serverTimeHandler.timeOffset as any).subscribe_once(setAdjustedTimestamp);
       }
     }
 
@@ -163,9 +154,9 @@ export class UserMapper {
 
     if (service) {
       userEntity.isService = true;
-      userEntity.providerId = service.provider;
-      userEntity.providerName = ko.observable('');
-      userEntity.serviceId = service.id;
+      (userEntity as any).providerId = service.provider;
+      (userEntity as any).providerName = ko.observable('');
+      (userEntity as any).serviceId = service.id;
     }
 
     if (ssoId && Object.keys(ssoId).length) {

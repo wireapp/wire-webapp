@@ -82,10 +82,12 @@ class PreferenceNotificationRepository {
   }
 
   onClientAdd(userId, clientEntity) {
-    this.notifications.push({
-      data: clientEntity,
-      type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-    });
+    if (clientEntity) {
+      this.notifications.push({
+        data: clientEntity,
+        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+      });
+    }
   }
 
   onClientRemove(userId, clientId) {

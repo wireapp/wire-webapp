@@ -27,6 +27,7 @@ export class ClientMapper {
     };
   }
 
+  // TODO: Remove "constructor" and make functions "static"
   constructor() {}
 
   /**

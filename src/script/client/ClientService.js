@@ -157,19 +157,26 @@ export class ClientService {
    * @param {string} primaryKey - Primary key used to find a client in the database
    * @returns {Promise<JSON|string>} Resolves with the client's payload or the primary key if not found
    */
-  loadClientFromDb(primaryKey) {
-    return this.storageService.db[this.CLIENT_STORE_NAME]
-      .where('meta.primary_key')
-      .equals(primaryKey)
-      .first()
-      .then(clientRecord => {
-        if (clientRecord === undefined) {
-          this.logger.info(`Client with primary key '${primaryKey}' not found in database`);
-          return primaryKey;
-        }
-        this.logger.info(`Loaded client record from database '${primaryKey}'`, clientRecord);
-        return clientRecord;
-      });
+  async loadClientFromDb(primaryKey) {
+    let clientRecord;
+
+    if (this.storageService.db) {
+      clientRecord = await this.storageService.db
+        .table(this.CLIENT_STORE_NAME)
+        .where('meta.primary_key')
+        .equals(primaryKey)
+        .first();
+    } else {
+      clientRecord = await this.storageService.load(this.CLIENT_STORE_NAME, primaryKey);
+    }
+
+    if (clientRecord === undefined) {
+      this.logger.info(`Client with primary key '${primaryKey}' not found in database`);
+      return primaryKey;
+    }
+
+    this.logger.info(`Loaded client record from database '${primaryKey}'`, clientRecord);
+    return clientRecord;
   }
 
   /**

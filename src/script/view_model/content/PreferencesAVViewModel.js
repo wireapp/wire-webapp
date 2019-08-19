@@ -168,7 +168,11 @@ z.viewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     return this.constraintsHandler
       .getMediaStreamConstraints(requestAudio, requestVideo)
       .then(streamConstraints => this.streamHandler.requestMediaStream(requestedMediaType, streamConstraints))
-      .then(({stream}) => stream)
+      .then(({stream}) => {
+        // refresh devices list in order to display the labels (see https://stackoverflow.com/a/46659819/2745879)
+        this.devicesHandler.getMediaDevices();
+        return stream;
+      })
       .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
 

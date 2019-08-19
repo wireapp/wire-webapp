@@ -136,7 +136,7 @@ export class NotificationService {
   /**
    * Save last event date to storage.
    * @param {string} eventDate - Event date to be stored
-   * @returns {Promise} Resolves with the stored record
+   * @returns {Promise} Resolves with the primary key of the stored record
    */
   saveLastEventDateToDb(eventDate) {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT, {
@@ -147,7 +147,7 @@ export class NotificationService {
   /**
    * Save last notifications ID to storage.
    * @param {string} notificationId - Notification ID to be stored
-   * @returns {Promise} Resolves with the stored record
+   * @returns {Promise} Resolves with the primary key of the stored record
    */
   saveLastNotificationIdToDb(notificationId) {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {
@@ -158,7 +158,7 @@ export class NotificationService {
   /**
    * Save missed notifications ID to storage.
    * @param {string} notificationId - Notification ID to be stored
-   * @returns {Promise} Resolves with the stored record
+   * @returns {Promise} Resolves with the primary key of the stored record
    */
   saveMissedIdToDb(notificationId) {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED, {

@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import 'src/script/main/globals';
 
-import {resolve as resolveDependency, graph, backendConfig} from './testResolver';
+import {backendConfig, graph, resolve as resolveDependency} from './testResolver';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';
@@ -55,91 +55,74 @@ window.testConfig = {
   connection: backendConfig,
 };
 
-/**
- * @returns {Window.TestFactory} A TestFactory instance.
- * @constructor
- */
-window.TestFactory = function() {};
-
-/**
- *
- * @returns {Promise<AuthRepository>} The authentication repository.
- */
-window.TestFactory.prototype.exposeAuthActors = function() {
-  return new Promise(resolve => {
+window.TestFactory = class TestFactory {
+  /**
+   * @returns {Promise<AuthRepository>} The authentication repository.
+   */
+  async exposeAuthActors() {
     TestFactory.auth_repository = resolveDependency(graph.AuthRepository);
-    resolve(TestFactory.auth_repository);
-  });
-};
+    return TestFactory.auth_repository;
+  }
 
-/**
- *
- * @returns {Promise<StorageRepository>} The storage repository.
- */
-window.TestFactory.prototype.exposeStorageActors = function() {
-  return new Promise(resolve => {
+  /**
+   * @returns {Promise<StorageRepository>} The storage repository.
+   */
+  async exposeStorageActors() {
     TestFactory.storage_service = resolveDependency(graph.StorageService);
     if (!TestFactory.storage_service.db) {
       TestFactory.storage_service.init(entities.user.john_doe.id, false);
     }
-    resolve();
-  }).then(() => {
     TestFactory.storage_repository = singleton(StorageRepository, TestFactory.storage_service);
+
     return TestFactory.storage_repository;
-  });
-};
+  }
 
-window.TestFactory.prototype.exposeBackupActors = function() {
-  return this.exposeStorageActors()
-    .then(() => this.exposeConversationActors())
-    .then(() => {
-      TestFactory.backup_service = resolveDependency(graph.BackupService);
+  async exposeBackupActors() {
+    await this.exposeStorageActors();
+    await this.exposeConversationActors();
+    TestFactory.backup_service = resolveDependency(graph.BackupService);
 
-      TestFactory.backup_repository = new BackupRepository(
-        TestFactory.backup_service,
-        TestFactory.client_repository,
-        TestFactory.connection_repository,
-        TestFactory.conversation_repository,
-        TestFactory.user_repository,
-      );
+    TestFactory.backup_repository = new BackupRepository(
+      TestFactory.backup_service,
+      TestFactory.client_repository,
+      TestFactory.connection_repository,
+      TestFactory.conversation_repository,
+      TestFactory.user_repository,
+    );
 
-      return TestFactory.backup_repository;
-    });
-};
+    return TestFactory.backup_repository;
+  }
 
-/**
- *
- * @param {boolean} mockCryptobox - do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
- * @returns {Promise<CryptographyRepository>} The cryptography repository.
- */
-window.TestFactory.prototype.exposeCryptographyActors = function(mockCryptobox = true) {
-  return this.exposeStorageActors()
-    .then(() => {
-      const currentClient = new ClientEntity(true);
-      currentClient.id = entities.clients.john_doe.permanent.id;
-      TestFactory.cryptography_service = new CryptographyService(resolveDependency(graph.BackendClient));
+  /**
+   * @param {boolean} mockCryptobox - do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
+   * @returns {Promise<CryptographyRepository>} The cryptography repository.
+   */
+  async exposeCryptographyActors(mockCryptobox = true) {
+    await this.exposeStorageActors();
+    const currentClient = new ClientEntity(true);
+    currentClient.id = entities.clients.john_doe.permanent.id;
+    TestFactory.cryptography_service = new CryptographyService(resolveDependency(graph.BackendClient));
 
-      TestFactory.cryptography_repository = new CryptographyRepository(
-        resolveDependency(graph.BackendClient),
-        TestFactory.storage_repository,
-      );
-      TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
+    TestFactory.cryptography_repository = new CryptographyRepository(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_repository,
+    );
+    TestFactory.cryptography_repository.currentClient = ko.observable(currentClient);
 
-      if (mockCryptobox) {
-        // eslint-disable-next-line jasmine/no-unsafe-spy
-        spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
-      }
-      return TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
-    })
-    .then(() => TestFactory.cryptography_repository);
-};
+    if (mockCryptobox) {
+      // eslint-disable-next-line jasmine/no-unsafe-spy
+      spyOn(TestFactory.cryptography_repository, 'createCryptobox').and.returnValue(Promise.resolve());
+    }
+    await TestFactory.cryptography_repository.createCryptobox(TestFactory.storage_service.db);
 
-/**
- *
- * @returns {Promise<ClientRepository>} The client repository.
- */
-window.TestFactory.prototype.exposeClientActors = function() {
-  return this.exposeCryptographyActors().then(() => {
+    return TestFactory.cryptography_repository;
+  }
+
+  /**
+   * @returns {Promise<ClientRepository>} The client repository.
+   */
+  async exposeClientActors() {
+    await this.exposeCryptographyActors();
     const clientEntity = new ClientEntity();
     Object.assign(clientEntity, {
       address: '192.168.0.1',
@@ -160,6 +143,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       TestFactory.storage_service,
       TestFactory.cryptography_repository,
     );
+    TestFactory.client_service = TestFactory.client_repository.clientService;
     TestFactory.client_repository.init(user);
 
     const payload = {
@@ -181,54 +165,49 @@ window.TestFactory.prototype.exposeClientActors = function() {
     TestFactory.client_repository.currentClient(currentClient);
 
     return TestFactory.client_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<EventRepository>} The event repository.
- */
-window.TestFactory.prototype.exposeEventActors = function() {
-  return this.exposeCryptographyActors()
-    .then(() => this.exposeUserActors())
-    .then(() => {
-      TestFactory.web_socket_service = new WebSocketService(
-        resolveDependency(graph.BackendClient),
-        TestFactory.storage_service,
-      );
-      TestFactory.event_service = new EventService(TestFactory.storage_service);
-      TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
-      TestFactory.notification_service = new NotificationService(
-        resolveDependency(graph.BackendClient),
-        TestFactory.storage_service,
-      );
-      TestFactory.conversation_service = new ConversationService(
-        resolveDependency(graph.BackendClient),
-        TestFactory.event_service,
-        TestFactory.storage_service,
-      );
+  /**
+   * @returns {Promise<EventRepository>} The event repository.
+   */
+  async exposeEventActors() {
+    await this.exposeCryptographyActors();
+    await this.exposeUserActors();
 
-      TestFactory.event_repository = new EventRepository(
-        TestFactory.event_service,
-        TestFactory.notification_service,
-        TestFactory.web_socket_service,
-        TestFactory.conversation_service,
-        TestFactory.cryptography_repository,
-        serverTimeHandler,
-        TestFactory.user_repository,
-      );
-      TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
+    TestFactory.web_socket_service = new WebSocketService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_service,
+    );
+    TestFactory.event_service = new EventService(TestFactory.storage_service);
+    TestFactory.event_service_no_compound = new EventServiceNoCompound(TestFactory.storage_service);
+    TestFactory.notification_service = new NotificationService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.storage_service,
+    );
+    TestFactory.conversation_service = new ConversationService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.event_service,
+      TestFactory.storage_service,
+    );
 
-      return TestFactory.event_repository;
-    });
-};
+    TestFactory.event_repository = new EventRepository(
+      TestFactory.event_service,
+      TestFactory.notification_service,
+      TestFactory.web_socket_service,
+      TestFactory.cryptography_repository,
+      serverTimeHandler,
+      TestFactory.user_repository,
+    );
+    TestFactory.event_repository.currentClient = ko.observable(TestFactory.cryptography_repository.currentClient());
 
-/**
- *
- * @returns {Promise<UserRepository>} The user repository.
- */
-window.TestFactory.prototype.exposeUserActors = function() {
-  return this.exposeClientActors().then(() => {
+    return TestFactory.event_repository;
+  }
+
+  /**
+   * @returns {Promise<UserRepository>} The user repository.
+   */
+  async exposeUserActors() {
+    await this.exposeClientActors();
     TestFactory.asset_service = resolveDependency(graph.AssetService);
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
     TestFactory.user_service = resolveDependency(graph.UserService);
@@ -245,15 +224,13 @@ window.TestFactory.prototype.exposeUserActors = function() {
     TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
     return TestFactory.user_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<ConnectionRepository>} The connection repository.
- */
-window.TestFactory.prototype.exposeConnectionActors = function() {
-  return this.exposeUserActors().then(() => {
+  /**
+   * @returns {Promise<ConnectionRepository>} The connection repository.
+   */
+  async exposeConnectionActors() {
+    await this.exposeUserActors();
     TestFactory.connection_service = new ConnectionService(resolveDependency(graph.BackendClient));
 
     TestFactory.connection_repository = new ConnectionRepository(
@@ -262,89 +239,80 @@ window.TestFactory.prototype.exposeConnectionActors = function() {
     );
 
     return TestFactory.connect_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<ConnectRepository>} The connect repository.
- */
-window.TestFactory.prototype.exposeConnectActors = function() {
-  return this.exposeUserActors().then(() => {
+  /**
+   * @returns {Promise<ConnectRepository>} The connect repository.
+   */
+  async exposeConnectActors() {
+    await this.exposeUserActors();
     TestFactory.connectService = new ConnectService(resolveDependency(graph.BackendClient));
 
     TestFactory.connect_repository = new ConnectRepository(TestFactory.connectService, TestFactory.user_repository);
 
     return TestFactory.connect_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<SearchRepository>} The search repository.
- */
-window.TestFactory.prototype.exposeSearchActors = function() {
-  return this.exposeUserActors().then(() => {
+  /**
+   * @returns {Promise<SearchRepository>} The search repository.
+   */
+  async exposeSearchActors() {
+    await this.exposeUserActors();
     TestFactory.search_repository = new SearchRepository(
       resolveDependency(graph.BackendClient),
       TestFactory.user_repository,
     );
 
     return TestFactory.search_repository;
-  });
-};
+  }
 
-window.TestFactory.prototype.exposeTeamActors = function() {
-  return this.exposeUserActors().then(() => {
+  async exposeTeamActors() {
+    await this.exposeUserActors();
     TestFactory.team_repository = new TeamRepository(
       resolveDependency(graph.BackendClient),
       TestFactory.user_repository,
     );
     return TestFactory.team_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<ConversationRepository>} The conversation repository.
- */
-window.TestFactory.prototype.exposeConversationActors = function() {
-  return this.exposeConnectionActors()
-    .then(() => this.exposeTeamActors())
-    .then(() => this.exposeEventActors())
-    .then(() => {
-      TestFactory.conversation_service = new ConversationService(
-        resolveDependency(graph.BackendClient),
-        TestFactory.event_service,
-        TestFactory.storage_service,
-      );
+  /**
+   * @returns {Promise<ConversationRepository>} The conversation repository.
+   */
+  async exposeConversationActors() {
+    await this.exposeConnectionActors();
+    await this.exposeTeamActors();
+    await this.exposeEventActors();
 
-      TestFactory.conversation_repository = new ConversationRepository(
-        TestFactory.conversation_service,
-        TestFactory.asset_service,
-        TestFactory.client_repository,
-        TestFactory.connection_repository,
-        TestFactory.cryptography_repository,
-        TestFactory.event_repository,
-        undefined,
-        resolveDependency(graph.LinkPreviewRepository),
-        resolveDependency(graph.MessageSender),
-        serverTimeHandler,
-        TestFactory.team_repository,
-        TestFactory.user_repository,
-        TestFactory.propertyRepository,
-      );
+    TestFactory.conversation_service = new ConversationService(
+      resolveDependency(graph.BackendClient),
+      TestFactory.event_service,
+      TestFactory.storage_service,
+    );
 
-      return TestFactory.conversation_repository;
-    });
-};
+    TestFactory.conversation_repository = new ConversationRepository(
+      TestFactory.conversation_service,
+      TestFactory.asset_service,
+      TestFactory.client_repository,
+      TestFactory.connection_repository,
+      TestFactory.cryptography_repository,
+      TestFactory.event_repository,
+      undefined,
+      resolveDependency(graph.LinkPreviewRepository),
+      resolveDependency(graph.MessageSender),
+      serverTimeHandler,
+      TestFactory.team_repository,
+      TestFactory.user_repository,
+      TestFactory.propertyRepository,
+    );
 
-/**
- *
- * @returns {Promise<CallingRepository>} The call center.
- */
-window.TestFactory.prototype.exposeCallingActors = function() {
-  return this.exposeConversationActors().then(() => {
+    return TestFactory.conversation_repository;
+  }
+
+  /**
+   * @returns {Promise<CallingRepository>} The call center.
+   */
+  async exposeCallingActors() {
+    await this.exposeConversationActors();
     TestFactory.calling_repository = new CallingRepository(
       resolveDependency(graph.CallingService),
       TestFactory.client_repository,
@@ -355,49 +323,43 @@ window.TestFactory.prototype.exposeCallingActors = function() {
     );
 
     return TestFactory.calling_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<NotificationRepository>} The repository for system notifications.
- */
-window.TestFactory.prototype.exposeNotificationActors = function() {
-  return this.exposeConversationActors()
-    .then(() => this.exposeCallingActors())
-    .then(() => {
-      TestFactory.notification_repository = new NotificationRepository(
-        TestFactory.calling_repository,
-        TestFactory.conversation_repository,
-        resolveDependency(graph.PermissionRepository),
-        TestFactory.user_repository,
-      );
+  /**
+   * @returns {Promise<NotificationRepository>} The repository for system notifications.
+   */
+  async exposeNotificationActors() {
+    await this.exposeConversationActors();
+    await this.exposeCallingActors();
 
-      return TestFactory.notification_repository;
-    });
-};
+    TestFactory.notification_repository = new NotificationRepository(
+      TestFactory.calling_repository,
+      TestFactory.conversation_repository,
+      resolveDependency(graph.PermissionRepository),
+      TestFactory.user_repository,
+    );
 
-/**
- *
- * @returns {Promise<EventTrackingRepository>} The event tracking repository.
- */
-window.TestFactory.prototype.exposeTrackingActors = function() {
-  return this.exposeTeamActors().then(() => {
+    return TestFactory.notification_repository;
+  }
+
+  /**
+   * @returns {Promise<EventTrackingRepository>} The event tracking repository.
+   */
+  async exposeTrackingActors() {
+    await this.exposeTeamActors();
     TestFactory.tracking_repository = new EventTrackingRepository(
       TestFactory.team_repository,
       TestFactory.user_repository,
     );
 
     return TestFactory.tracking_repository;
-  });
-};
+  }
 
-/**
- *
- * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
- */
-window.TestFactory.prototype.exposeLifecycleActors = function() {
-  return this.exposeUserActors().then(() => {
+  /**
+   * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
+   */
+  async exposeLifecycleActors() {
+    await this.exposeUserActors();
     TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
 
     TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(
@@ -405,14 +367,13 @@ window.TestFactory.prototype.exposeLifecycleActors = function() {
       TestFactory.user_repository,
     );
     return TestFactory.lifecycle_repository;
-  });
+  }
 };
 
 const actorsCache = new Map();
 
 /**
  * Will instantiate a service only once (uses the global actorsCache to store instances)
- *
  * @param {Constructor} Service - the service to instantiate
  * @param {any} ...dependencies - the dependencies required by the service
  * @returns {Object} the instantiated service

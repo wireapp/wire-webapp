@@ -47,24 +47,34 @@ export class EventService {
    * @param {string[]} eventIds - ID of events to retrieve
    * @returns {Promise<Object[]>} Resolves with the stored records
    */
-  loadEvents(conversationId, eventIds) {
+  async loadEvents(conversationId, eventIds) {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
-      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER));
+      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
 
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('id')
-      .anyOf(eventIds)
-      .filter(record => record.conversation === conversationId)
-      .toArray()
-      .catch(error => {
-        const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
-          error.message
-        }`;
-        this.logger.error(logMessage, error);
-        throw error;
-      });
+    try {
+      if (this.storageService.db) {
+        const events = await this.storageService.db
+          .table(this.EVENT_STORE_NAME)
+          .where('id')
+          .anyOf(eventIds)
+          .filter(record => record.conversation === conversationId)
+          .toArray();
+        return events;
+      }
+
+      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      return records
+        .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
+        .sort((a, b) => a.id - b.id);
+    } catch (error) {
+      const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
+        error.message
+      }`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
   }
 
   /**
@@ -74,22 +84,33 @@ export class EventService {
    * @param {string} eventId - ID of event to retrieve
    * @returns {Promise} Resolves with the stored record
    */
-  loadEvent(conversationId, eventId) {
+  async loadEvent(conversationId, eventId) {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
-      return Promise.reject(new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER));
+      throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
 
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('id')
-      .equals(eventId)
-      .filter(record => record.conversation === conversationId)
-      .first()
-      .catch(error => {
-        const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
-        this.logger.error(logMessage, error);
-        throw error;
-      });
+    try {
+      if (this.storageService.db) {
+        const entry = await this.storageService.db
+          .table(this.EVENT_STORE_NAME)
+          .where('id')
+          .equals(eventId)
+          .filter(record => record.conversation === conversationId)
+          .first();
+        return entry;
+      }
+
+      const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+      return records
+        .filter(record => record.id === eventId && record.conversation === conversationId)
+        .sort((a, b) => a.id - b.id)
+        .shift();
+    } catch (error) {
+      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
   }
 
   /**
@@ -100,19 +121,47 @@ export class EventService {
    * @param {MessageCategory} [categoryMax=MessageCategory.LIKED] - Maximum message category
    * @returns {Promise} Resolves with matching events
    */
-  loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+category]')
-      .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
-      .sortBy('time');
+  async loadEventsWithCategory(conversationId, categoryMin, categoryMax = MessageCategory.LIKED) {
+    if (this.storageService.db) {
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where('[conversation+category]')
+        .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
+        .sortBy('time');
+      return events;
+    }
+
+    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    return records
+      .filter(
+        record =>
+          record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
+      )
+      .sort((a, b) => a.time - b.time);
   }
 
-  loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where(['conversation', 'time'])
-      .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-      .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
-      .toArray();
+  async loadEventsReplyingToMessage(conversationId, quotedMessageId, quotedMessageTime) {
+    if (this.storageService.db) {
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where(['conversation', 'time'])
+        .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
+        .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
+        .toArray();
+      return events;
+    }
+
+    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    return records
+      .filter(record => {
+        return (
+          record.conversation === conversationId &&
+          record.time >= quotedMessageTime &&
+          record.time <= new Date().toISOString()
+        );
+      })
+      .filter(event => !!event.data && !!event.data.quote && event.data.quote.message_id === quotedMessageId)
+      .sort((a, b) => a.conversation - b.conversation);
   }
 
   /**
@@ -124,20 +173,27 @@ export class EventService {
    * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
-  loadPrecedingEvents(conversationId, fromDate = new Date(0), toDate = new Date(), limit = Number.MAX_SAFE_INTEGER) {
+  async loadPrecedingEvents(
+    conversationId,
+    fromDate = new Date(0),
+    toDate = new Date(),
+    limit = Number.MAX_SAFE_INTEGER,
+  ) {
     const includeParams = {
       includeFrom: true,
       includeTo: false,
     };
 
-    return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams)
-      .reverse()
-      .sortBy('time')
-      .catch(error => {
-        const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
-        this.logger.error(message);
-        throw error;
-      });
+    try {
+      const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
+      return this.storageService.db
+        ? events.reverse().sortBy('time')
+        : events.reverse().sort((a, b) => a.time - b.time);
+    } catch (error) {
+      const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
+      this.logger.error(message);
+      throw error;
+    }
   }
 
   /**
@@ -149,7 +205,7 @@ export class EventService {
    * @param {number} [includeFrom=true] - Should upper bound be part of the messages
    * @returns {Promise} Resolves with the retrieved records
    */
-  loadFollowingEvents(conversationId, fromDate, limit = Number.MAX_SAFE_INTEGER, includeFrom = true) {
+  async loadFollowingEvents(conversationId, fromDate, limit = Number.MAX_SAFE_INTEGER, includeFrom = true) {
     const includeParams = {
       includeFrom,
       includeTo: true,
@@ -160,10 +216,20 @@ export class EventService {
     }
     const toDate = new Date(Math.max(fromDate.getTime() + 1, Date.now()));
 
-    return this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams).sortBy('time');
+    const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
+    return this.storageService.db ? events.sortBy('time') : events.sort((a, b) => a.time - b.time);
   }
 
-  _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
+  /**
+   *
+   * @param {string} conversationId - The conversation ID
+   * @param {Date} fromDate - The lower date bound
+   * @param {Date} toDate - The upper date bound
+   * @param {number} limit - The events limit
+   * @param {{includeFrom: boolean, includeTo: boolean}} includes - If from and to should be included
+   * @returns {Promise<Object[]>} The found events
+   */
+  async _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
     const {includeFrom, includeTo} = includes;
     if (!_.isDate(toDate) || !_.isDate(fromDate)) {
       const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
@@ -175,10 +241,30 @@ export class EventService {
       throw new Error(errorMessage);
     }
 
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('[conversation+time]')
-      .between([conversationId, fromDate.toISOString()], [conversationId, toDate.toISOString()], includeFrom, includeTo)
-      .limit(limit);
+    if (this.storageService.db) {
+      const events = await this.storageService.db
+        .table(this.EVENT_STORE_NAME)
+        .where('[conversation+time]')
+        .between(
+          [conversationId, fromDate.toISOString()],
+          [conversationId, toDate.toISOString()],
+          includeFrom,
+          includeTo,
+        )
+        .limit(limit);
+      return events;
+    }
+
+    const records = await this.storageService.getAll(this.EVENT_STORE_NAME);
+    return records
+      .filter(
+        record =>
+          record.conversation === conversationId &&
+          (includeFrom ? record.time >= fromDate.toISOString() : record.time > fromDate.toISOString()) &&
+          (includeTo ? record.time <= toDate.toISOString() : record.time < toDate.toISOString()),
+      )
+      .sort((a, b) => a.conversation - b.conversation)
+      .slice(0, limit);
   }
 
   /**
@@ -188,9 +274,10 @@ export class EventService {
    * @param {Object} event - JSON event to be stored
    * @returns {Promise<Event>} Resolves with the stored record
    */
-  saveEvent(event) {
+  async saveEvent(event) {
     event.category = categoryFromEvent(event);
-    return this.storageService.save(this.EVENT_STORE_NAME, undefined, event).then(() => event);
+    event.primary_key = await this.storageService.save(this.EVENT_STORE_NAME, undefined, event);
+    return event;
   }
 
   /**
@@ -293,39 +380,42 @@ export class EventService {
    * @param {Object} [changes={}] - Changes to update message with
    * @returns {Promise<Event>} Resolves when the message was updated in database
    */
-  updateEventSequentially(primaryKey, changes = {}) {
-    return Promise.resolve(primaryKey).then(key => {
+  async updateEventSequentially(primaryKey, changes = {}) {
+    return Promise.resolve().then(() => {
       const hasVersionedChanges = !!changes.version;
       if (!hasVersionedChanges) {
         throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_CHANGE);
       }
 
-      // Create a DB transaction to avoid concurrent sequential update.
-      return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
-        return this.storageService.load(this.EVENT_STORE_NAME, key).then(record => {
-          if (!record) {
-            throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
-          }
+      if (this.storageService.db) {
+        // Create a DB transaction to avoid concurrent sequential update.
+        return this.storageService.db.transaction('rw', this.EVENT_STORE_NAME, () => {
+          return this.storageService.load(this.EVENT_STORE_NAME, primaryKey).then(record => {
+            if (!record) {
+              throw new z.error.StorageError(z.error.StorageError.TYPE.NOT_FOUND);
+            }
 
-          const databaseVersion = record.version || 1;
+            const databaseVersion = record.version || 1;
 
-          const isSequentialUpdate = changes.version === databaseVersion + 1;
-          if (isSequentialUpdate) {
-            return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
-          }
+            const isSequentialUpdate = changes.version === databaseVersion + 1;
+            if (isSequentialUpdate) {
+              return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
+            }
 
-          const logMessage = 'Failed sequential database update';
-          const logObject = {
-            databaseVersion: databaseVersion,
-            updateVersion: changes.version,
-          };
+            const logMessage = 'Failed sequential database update';
+            const logObject = {
+              databaseVersion: databaseVersion,
+              updateVersion: changes.version,
+            };
 
-          this.logger.error(logMessage, logObject);
+            this.logger.error(logMessage, logObject);
 
-          Raygun.send(new Error(logMessage), logObject);
-          throw new z.error.StorageError(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+            Raygun.send(new Error(logMessage), logObject);
+            throw new z.error.StorageError(z.error.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
+          });
         });
-      });
+      }
+      return this.storageService.update(this.EVENT_STORE_NAME, primaryKey, changes);
     });
   }
 
@@ -336,12 +426,8 @@ export class EventService {
    * @param {string} eventId - ID of the actual message
    * @returns {Promise} Resolves with the number of deleted records
    */
-  deleteEvent(conversationId, eventId) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('id')
-      .equals(eventId)
-      .and(record => record.conversation === conversationId)
-      .delete();
+  async deleteEvent(conversationId, eventId) {
+    return this.storageService.deleteEventInConversation(this.EVENT_STORE_NAME, conversationId, eventId);
   }
 
   /**
@@ -351,7 +437,7 @@ export class EventService {
    * @returns {Promise} Resolves with the number of deleted records
    */
   deleteEventByKey(primaryKey) {
-    return this.storageService.db[this.EVENT_STORE_NAME].delete(primaryKey);
+    return this.storageService.delete(this.EVENT_STORE_NAME, primaryKey);
   }
 
   /**
@@ -361,11 +447,7 @@ export class EventService {
    * @param {string} [isoDate] - Date in ISO string format as upper bound which events should be removed
    * @returns {Promise} Resolves when the events was deleted
    */
-  deleteEvents(conversationId, isoDate) {
-    return this.storageService.db[this.EVENT_STORE_NAME]
-      .where('conversation')
-      .equals(conversationId)
-      .filter(record => !isoDate || isoDate >= record.time)
-      .delete();
+  async deleteEvents(conversationId, isoDate) {
+    return this.storageService.deleteEventsByDate(this.EVENT_STORE_NAME, conversationId, isoDate);
   }
 }

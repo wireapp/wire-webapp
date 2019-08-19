@@ -17,9 +17,9 @@
  *
  */
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {t} from 'Util/LocalizerUtil';
 
-import {AvailabilityType} from '../user/AvailabilityType';
 import {WebAppEvents} from '../event/WebApp';
 import {Context} from '../ui/ContextMenu';
 
@@ -27,19 +27,19 @@ export const AvailabilityContextMenu = {
   show: (event, method, elementName) => {
     const entries = [
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.NONE, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE, method),
         label: t('userAvailabilityNone'),
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.AVAILABLE, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE, method),
         label: t('userAvailabilityAvailable'),
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.BUSY, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY, method),
         label: t('userAvailabilityBusy'),
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, AvailabilityType.AWAY, method),
+        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY, method),
         label: t('userAvailabilityAway'),
       },
     ];

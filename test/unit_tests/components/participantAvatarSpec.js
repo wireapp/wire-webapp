@@ -17,7 +17,7 @@
  *
  */
 
-import {instantiateComponent} from '../../api/knockoutHelpers';
+import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';

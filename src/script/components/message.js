@@ -438,11 +438,11 @@ const legalHoldTemplate = `
       <legal-hold-dot></legal-hold-dot>
     </div>
     <div class="message-header-label">
-      <!-- ko if: message.isActive -->
+      <!-- ko if: message.isActivationMessage -->
         <span data-bind="text: t('legalHoldActivated')"></span>
         <span class="message-header-label__learn-more" data-bind="click: showLegalHold, text: t('legalHoldActivatedLearnMore')"></span>
       <!-- /ko -->
-      <!-- ko ifnot: message.isActive -->
+      <!-- ko ifnot: message.isActivationMessage -->
         <span class="message-header-label" data-bind="text: t('legalHoldDeactivated')"></span>
       <!-- /ko -->
     </div>
@@ -617,7 +617,7 @@ ko.components.register('message', {
     <!-- ko if: message.super_type === 'ping' -->
       ${pingTemplate}
     <!-- /ko -->
-    <!-- ko if: message.super_type === 'legal-hold' -->
+    <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}
     <!-- /ko -->
     `,

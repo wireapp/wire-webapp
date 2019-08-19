@@ -17,7 +17,7 @@
  *
  */
 
-import {instantiateComponent} from '../../../api/knockoutHelpers';
+import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import {viewportObserver} from 'src/script/ui/viewportObserver';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';

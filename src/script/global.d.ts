@@ -42,10 +42,12 @@ declare global {
         ENVIRONMENT: string;
         FEATURE: {
           CHECK_CONSENT: boolean;
+          DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
+          PERSIST_TEMPORARY_CLIENTS: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
         MAX_GROUP_PARTICIPANTS: number;

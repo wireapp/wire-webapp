@@ -22,7 +22,7 @@ import platform from 'platform';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -96,6 +96,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
+import {CacheRepository} from '../cache/CacheRepository';
 
 class App {
   static get CONFIG() {
@@ -181,7 +182,6 @@ class App {
       this.service.event,
       this.service.notification,
       this.service.webSocket,
-      this.service.conversation,
       repositories.cryptography,
       serverTimeHandler,
       repositories.user,
@@ -333,7 +333,10 @@ class App {
         telemetry.time_step(AppInitTimingsStep.VALIDATED_CLIENT);
         telemetry.add_statistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
+        return this.repository.cryptography.loadCryptobox(
+          this.service.storage.db || this.service.storage.objectDb,
+          this.service.storage.dbName,
+        );
       })
       .then(() => {
         loadingView.updateProgress(10);
@@ -382,6 +385,9 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
+        return this.repository.conversation.updateConversationsOnAppInit();
+      })
+      .then(() => {
         telemetry.time_step(AppInitTimingsStep.APP_LOADED);
         this._showInterface();
         loadingView.removeFromView();
@@ -389,7 +395,6 @@ class App {
         amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
         modals.ready();
         showInitialModal(this.repository.user.self().availability());
-        return this.repository.conversation.updateConversationsOnAppInit();
       })
       .then(() => {
         telemetry.time_step(AppInitTimingsStep.UPDATED_CONVERSATIONS);
@@ -464,20 +469,23 @@ class App {
       ];
 
       if (isSessionExpired.includes(type)) {
-        this.logger.error(`Session expired on page reload: ${message}`, error);
-        Raygun.send(new Error('Session expired on page reload', error));
+        this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const isAccessTokenError = error instanceof z.error.AccessTokenError;
       const isInvalidClient = type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (isAccessTokenError || isInvalidClient) {
+      if (isInvalidClient) {
+        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+      }
+
+      if (isAccessTokenError) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const triggerSource = isAccessTokenError
           ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
           : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload(false));
+        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
       }
     }
 
@@ -673,7 +681,11 @@ class App {
       this.repository.calling.leaveCallOnUnload();
 
       if (this.repository.user.isActivatedAccount()) {
-        this.repository.storage.terminate('window.onunload');
+        if (isTemporaryClientAndNonPersistent()) {
+          this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
+        } else {
+          this.repository.storage.terminate('window.onunload');
+        }
       } else {
         this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();
@@ -710,7 +722,7 @@ class App {
       this._redirectToLogin(signOutReason);
     };
 
-    const _logout = () => {
+    const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
@@ -722,7 +734,6 @@ class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      // @todo remove on next iteration
       const selfUser = this.repository.user.self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
@@ -738,17 +749,22 @@ class App {
         });
 
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
-        resolve(graph.CacheRepository).clearCache(keepConversationInput, keysToKeep);
+        const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
+        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
 
-      // Clear IndexedDB
-      const clearDataPromise = clearData
-        ? this.repository.storage
-            .deleteDatabase()
-            .catch(error => this.logger.error('Failed to delete database before logout', error))
-        : Promise.resolve();
+      if (clearData) {
+        // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
+        CacheRepository.clearCacheStorage();
 
-      return clearDataPromise.then(() => _redirectToLogin());
+        try {
+          await this.repository.storage.deleteDatabase();
+        } catch (error) {
+          this.logger.error('Failed to delete database before logout', error);
+        }
+      }
+
+      return _redirectToLogin();
     };
 
     const _logoutOnBackend = () => {

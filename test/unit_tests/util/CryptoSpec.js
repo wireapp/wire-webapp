@@ -20,7 +20,7 @@
 import {joaatHash} from 'Util/Crypto';
 
 describe('Crypto', () => {
-  describe('Jenkins’ one-at-a-time hash', () => {
+  describe(`Jenkins' one-at-a-time hash`, () => {
     /* eslint-disable sort-keys */
     const sample = {
       '25f79335-6a5b-410e-90ea-653bd18b66da': 348398396,
@@ -36,7 +36,7 @@ describe('Crypto', () => {
     };
     /* eslint-enable sort-keys */
 
-    it('can calculate Jenkins’s one-at-a-time hash for a User ID', () => {
+    it(`can calculate Jenkins' one-at-a-time hash for a User ID`, () => {
       const userId = '532af01e-1e24-4366-aacf-33b67d4ee376';
 
       const actual = joaatHash(userId);

@@ -17,17 +17,21 @@
  *
  */
 
-//import {t} from 'Util/LocalizerUtil';
-
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
+/**
+ * Legal hold system message
+ */
 export class LegalHoldMessage extends Message {
-  isActive: boolean;
-  constructor(isActive: boolean) {
+  constructor(public legalHoldStatus: LegalHoldStatus, timestamp: number) {
     super();
     this.super_type = SuperType.LEGALHOLD;
+    this.timestamp(timestamp);
+  }
 
-    this.isActive = isActive;
+  get isActivationMessage(): boolean {
+    return this.legalHoldStatus === LegalHoldStatus.ENABLED;
   }
 }
