@@ -98,7 +98,7 @@ module.exports = function(config) {
     proxies: {
       '/audio/': '/base/audio/',
       '/ext/js': '/base/node_modules/',
-      '/worker/': '/base/worker/',
+      '/worker/': '/base/src/worker/',
     },
     reporters: ['progress', 'coverage-istanbul'],
     singleRun: true,
