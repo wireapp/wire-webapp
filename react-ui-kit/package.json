@@ -16,7 +16,7 @@
     "@babel/preset-react": "7.0.0",
     "@babel/preset-typescript": "7.3.3",
     "@hot-loader/react-dom": "16.8.6",
-    "@types/react": "16.9.1",
+    "@types/react": "16.9.2",
     "@types/react-test-renderer": "16.9.0",
     "@types/webpack-env": "1.14.0",
     "babel-jest": "24.8.0",
