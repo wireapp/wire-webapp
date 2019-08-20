@@ -577,6 +577,7 @@ export class CallingRepository {
       return;
     }
     call.selfParticipant.releaseMediaStream();
+    call.selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
   };
 

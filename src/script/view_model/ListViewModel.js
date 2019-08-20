@@ -152,7 +152,8 @@ z.viewModel.ListViewModel = class ListViewModel {
   answerCall = conversationEntity => {
     const call = this.callingRepository.findCall(conversationEntity.id);
     if (call) {
-      this.callingRepository.answerCall(call, CALL_TYPE.NORMAL);
+      const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      this.callingRepository.answerCall(call, callType);
     }
   };
 
