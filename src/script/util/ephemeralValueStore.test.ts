@@ -17,9 +17,9 @@
  *
  */
 
-import {get, save} from './valueStore';
+import {get, save} from './ephemeralValueStore';
 
-describe('valueStore', () => {
+describe('ephemeralValueStore', () => {
   it('is initialized with an empty value', async () => {
     const storedValue = await get();
     expect(storedValue).not.toBeDefined();
