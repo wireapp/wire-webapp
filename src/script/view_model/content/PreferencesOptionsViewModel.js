@@ -39,7 +39,7 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
     return {
-      MINIMUM_CALL_LOG_LENGTH: 10,
+      MINIMUM_CALL_LOG_LENGTH: 15,
       OBFUSCATION_TRUNCATE_TO: 4,
     };
   }
