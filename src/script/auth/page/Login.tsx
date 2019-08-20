@@ -50,7 +50,7 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
-import {save} from 'Util/valueStore';
+import {save} from 'Util/ephemeralValueStore';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
