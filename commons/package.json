@@ -20,7 +20,7 @@
     "karma-jasmine": "2.0.1",
     "karma-jasmine-diff-reporter": "2.0.0",
     "karma-typescript": "4.1.1",
-    "rimraf": "2.6.3",
+    "rimraf": "3.0.0",
     "typescript": "3.5.3"
   },
   "description": "Collection of common components that are used across Wire web applications.",
