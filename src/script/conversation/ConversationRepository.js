@@ -1505,7 +1505,7 @@ export class ConversationRepository {
     }
 
     return loadUrlBlob(url).then(blob => {
-      const textMessage = t('extensionsGiphyMessage', tag);
+      const textMessage = t('extensionsGiphyMessage', tag, {}, true);
       this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
     });
