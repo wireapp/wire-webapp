@@ -156,7 +156,7 @@ export class PreferencesAVViewModel {
         return stream;
       })
       .catch(error => {
-        this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
+        this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
 
         const expectedErrors = [MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.TYPE.MEDIA_STREAM_PERMISSION];
 
