@@ -197,6 +197,6 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
   return time.format(format);
 };
 
-export const getCurrentDate = () => new Date().toISOString().substring(0, 19);
+export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
 
 export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
