@@ -50,6 +50,7 @@ import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {noop} from 'Util/util';
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
+import {save} from 'Util/valueStore';
 import {loginStrings, logoutReasonStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
@@ -237,6 +238,11 @@ class Login extends React.Component<CombinedProps, State> {
         return hasKeyAndCode
           ? this.props.doLoginAndJoin(login, this.state.conversationKey, this.state.conversationCode)
           : this.props.doLogin(login);
+      })
+      .then(() => {
+        const secretKey = new Uint32Array(64);
+        self.crypto.getRandomValues(secretKey);
+        return save(secretKey);
       })
       .then(this.navigateChooseHandleOrWebapp)
       .catch((error: Error | BackendError) => {
