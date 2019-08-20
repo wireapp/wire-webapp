@@ -123,7 +123,7 @@ class GroupVideoGrid {
     return VIDEO_SIZE.QUARTER_SCREEN;
   }
 
-  getClassNameForVideo(index: number): string {
+  getClassNameForVideo(index: number, userId: string): string {
     const size = this.getSizeForVideo(index);
     const extraClasses: Record<VIDEO_SIZE, string> = {
       [VIDEO_SIZE.EMPTY]: 'group-video-grid__element--empty',
@@ -134,7 +134,7 @@ class GroupVideoGrid {
 
     const roundedClass =
       this.minimized && this.videoParticipants().length === 1 ? ' group-video-grid__element--rounded' : '';
-    const mirrorClass = ''; //TODO isMirrored ? ' mirror' : '';
+    const mirrorClass = userId === this.selfUserId ? ' mirror' : '';
     return `group-video-grid__element${index} ${extraClasses[size]}${mirrorClass}${roundedClass}`;
   }
 
@@ -159,7 +159,7 @@ ko.components.register('group-video-grid', {
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              css: getClassNameForVideo($index()),
+              css: getClassNameForVideo($index(), participant.userId),
               attr: {'data-uie-value': getUIEValueForVideo($index()), 'data-user-id': participant.userId},
               event: {dblclick: doubleClickedOnVideo}"
             data-uie-name="item-grid"
