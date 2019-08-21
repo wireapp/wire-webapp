@@ -33,6 +33,7 @@ export * from './FileIcon';
 export * from './GifIcon';
 export * from './HangupIcon';
 export * from './ImageIcon';
+export * from './InfoIcon';
 export * from './InviteIcon';
 export * from './LeaveIcon';
 export * from './MessageIcon';
