@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 import {Account} from '@wireapp/core';
 import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/';
-import {MemoryEngine} from '@wireapp/store-engine';
+import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'pure-uuid';
 
@@ -77,16 +77,20 @@ export class Bot {
     }
   }
 
-  public async start(): Promise<void> {
+  public async start(storeEngine?: CRUDEngine): Promise<void> {
     const login = {
       clientType: this.config.clientType,
       email: this.credentials.email,
       password: this.credentials.password,
     };
-    const engine = new MemoryEngine();
-    await engine.init(this.credentials.email);
+
+    if (!storeEngine) {
+      storeEngine = new MemoryEngine();
+      await storeEngine.init(this.credentials.email);
+    }
+
     const apiClient = new APIClient({
-      store: engine,
+      store: storeEngine,
       urls: this.config.backend === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION,
     });
     this.account = new Account(apiClient);
