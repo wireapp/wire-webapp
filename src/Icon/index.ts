@@ -45,6 +45,7 @@ export * from './MuteIcon';
 export * from './OptionsIcon';
 export * from './PingIcon';
 export * from './PlaneIcon';
+export * from './PlusIcon';
 export * from './ProfileIcon';
 export * from './RecordIcon';
 export * from './RecordPendingIcon';
