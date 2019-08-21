@@ -52,5 +52,5 @@
     "test:browser": "karma start",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "5.5.12"
+  "version": "5.5.13"
 }
