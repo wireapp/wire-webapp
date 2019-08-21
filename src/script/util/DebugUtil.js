@@ -346,14 +346,16 @@ export class DebugUtil {
   }
 
   enableFakeMediaDevices() {
-    navigator.mediaDevices.enumerateDevices = () =>
-      Promise.resolve([
-        {deviceId: '440', kind: 'audioinput', label: 'First mic'},
-        {deviceId: '100', kind: 'audioinput', label: 'Second mic'},
-        {deviceId: 'ff0000', kind: 'videoinput', label: 'Red cam'},
-        {deviceId: '00ff00', kind: 'videoinput', label: 'Green cam'},
-        {deviceId: '0000ff', kind: 'videoinput', label: 'Blue cam'},
-      ]);
+    const cameras = [
+      {deviceId: 'ff0000', kind: 'videoinput', label: 'Red cam'},
+      {deviceId: '00ff00', kind: 'videoinput', label: 'Green cam'},
+      {deviceId: '0000ff', kind: 'videoinput', label: 'Blue cam'},
+    ];
+    const microphones = [
+      {deviceId: '440', kind: 'audioinput', label: 'First mic'},
+      {deviceId: '100', kind: 'audioinput', label: 'Second mic'},
+    ];
+    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones));
 
     navigator.mediaDevices.getUserMedia = constraints => {
       const audio = constraints.audio ? generateAudioTrack(constraints.audio) : [];
@@ -362,7 +364,7 @@ export class DebugUtil {
     };
 
     function generateAudioTrack(constraints) {
-      const hz = (constraints.deviceId || {}).exact || '100';
+      const hz = (constraints.deviceId || {}).exact || microphones[0].deviceId;
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
@@ -375,7 +377,7 @@ export class DebugUtil {
     }
 
     function generateVideoTrack(constraints) {
-      const color = (constraints.deviceId || {}).exact || '440';
+      const color = (constraints.deviceId || {}).exact || cameras[0].deviceId;
       const width = 300;
       const height = 240;
       const canvas = Object.assign(document.createElement('canvas'), {height, width});
