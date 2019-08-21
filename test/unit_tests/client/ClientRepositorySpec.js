@@ -17,7 +17,6 @@
  *
  */
 
-import {backendConfig} from '../../api/testResolver';
 import {User} from 'src/script/entity/User';
 import {Environment} from 'src/script/util/Environment';
 
@@ -45,25 +44,23 @@ describe('ClientRepository', () => {
 
       TestFactory.client_repository.currentClient(client);
 
+      const allClients = [
+        {class: 'desktop', id: '706f64373b1bcf79'},
+        {class: 'phone', id: '809fd276d6709474'},
+        {class: 'desktop', id: '8e11e06549c8cf1a'},
+        {class: 'tablet', id: 'c411f97b139c818b'},
+        {class: 'desktop', id: 'cbf3ea49214702d8'},
+      ];
       spyOn(TestFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
-        Promise.resolve([
-          {class: 'desktop', id: '706f64373b1bcf79'},
-          {class: 'phone', id: '809fd276d6709474'},
-          {class: 'desktop', id: '8e11e06549c8cf1a'},
-          {class: 'tablet', id: 'c411f97b139c818b'},
-          {class: 'desktop', id: 'cbf3ea49214702d8'},
-        ]),
+        Promise.resolve(allClients),
       );
 
       return TestFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
-        expect(clientEntities.length).toBe(5);
+        expect(clientEntities.length).toBe(allClients.length);
       });
     }));
 
   describe('getValidLocalClient', () => {
-    let server = undefined;
-
-    const clientUrl = `${backendConfig.restUrl}/clients/${clientId}`;
     const clientPayloadServer = {
       address: '62.96.148.44',
       class: 'desktop',
@@ -78,29 +75,20 @@ describe('ClientRepository', () => {
       type: 'permanent',
     };
 
-    const clientPayloadDatabase = clientPayloadServer;
-    clientPayloadDatabase.meta = {
-      is_verified: true,
-      primary_key: 'local_identity',
+    const clientPayloadDatabase = {
+      ...clientPayloadServer,
+      meta: {
+        is_verified: true,
+        primary_key: 'local_identity',
+      },
     };
 
-    beforeEach(() => {
-      server = sinon.fakeServer.create();
-      server.autoRespond = true;
-    });
-
-    afterEach(() => server.restore());
-
     it('resolves with a valid client', () => {
-      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(clientPayloadDatabase),
-      );
+      const clientService = TestFactory.client_repository.clientService;
+      const backendClient = clientService.backendClient;
 
-      server.respondWith('GET', clientUrl, [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(clientPayloadServer),
-      ]);
+      spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
+      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.resolve(clientPayloadServer));
 
       return TestFactory.client_repository.getValidLocalClient().then(clientObservable => {
         expect(clientObservable).toBeDefined();
@@ -108,34 +96,40 @@ describe('ClientRepository', () => {
       });
     });
 
-    it('rejects with an error if no client found locally', done => {
-      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
+    it('rejects with an error if no client found locally', () => {
+      const clientService = TestFactory.client_repository.clientService;
+      const backendClient = clientService.backendClient;
+      spyOn(clientService, 'loadClientFromDb').and.returnValue(
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
+      const backendError = new Error();
+      backendError.code = 404;
+      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
 
-      TestFactory.client_repository
+      return TestFactory.client_repository
         .getValidLocalClient()
-        .then(done.fail)
+        .then(fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.error.ClientError));
           expect(error.type).toBe(z.error.ClientError.TYPE.NO_VALID_CLIENT);
-          done();
         });
     });
 
-    it('rejects with an error if client removed on backend', done => {
-      spyOn(TestFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
-        Promise.resolve(clientPayloadDatabase),
-      );
+    it('rejects with an error if client removed on backend', () => {
+      const clientService = TestFactory.client_repository.clientService;
+      const backendClient = clientService.backendClient;
+      spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
+      const backendError = new Error();
+      backendError.code = 404;
+      spyOn(backendClient, 'sendRequest').and.returnValue(Promise.reject(backendError));
 
-      TestFactory.client_repository
+      return TestFactory.client_repository
         .getValidLocalClient()
-        .then(done.fail)
+        .then(fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.error.ClientError));
           expect(error.type).toBe(z.error.ClientError.TYPE.NO_VALID_CLIENT);
-          done();
         });
     });
 
