@@ -18,12 +18,14 @@
  */
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Availability} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 import {Logger, getLogger} from 'Util/Logger';
 import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {Grid, getGrid} from '../calling/videoGridHandler';
+import {User} from '../entity/User';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {PermissionState} from '../notification/PermissionState';
@@ -50,6 +52,7 @@ export class CallingViewModel {
   public readonly isChoosingScreen: ko.PureComputed<boolean>;
   private onChooseScreen: (deviceId: string) => void;
   private readonly logger: Logger;
+  private readonly selfUser: ko.Observable<User>;
 
   constructor(
     callingRepository: CallingRepository,
@@ -58,6 +61,7 @@ export class CallingViewModel {
     mediaDevicesHandler: MediaDevicesHandler,
     mediaStreamHandler: MediaStreamHandler,
     permissionRepository: any,
+    selfUser: ko.Observable<User>,
     multitasking: any,
   ) {
     this.logger = getLogger('CallingViewModel');
@@ -66,6 +70,7 @@ export class CallingViewModel {
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
+    this.selfUser = selfUser;
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE),
     );
@@ -108,7 +113,12 @@ export class CallingViewModel {
       });
     };
 
-    this.callingRepository.onIncomingCall(ring);
+    this.callingRepository.onIncomingCall((call: Call) => {
+      const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
+      if (shouldRing) {
+        ring(call);
+      }
+    });
 
     this.callActions = {
       answer: (call: Call) => {
