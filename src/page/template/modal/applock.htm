@@ -6,18 +6,20 @@
     <div class="modal__body">
       <!-- ko if: isSetupScreen() -->
         <form data-bind="submit: onSetCode, template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockSetupMessage')"></div>
+          <div class="modal__text" data-bind="text: t('modalAppLockSetupMessage')" data-uie-name="label-applock-set-text"></div>
           <input
             class="modal__input"
             type="password"
             data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
+            data-uie-name="input-applock-set-a"
           />
           <input
             class="modal__input modal__input--validate"
             type="password"
             data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
+            data-uie-name="input-applock-set-b"
           />
-          <div class="modal__info text-background" data-bind="text: t('modalAppLockSetupInfo')"></div>
+          <div class="modal__info text-background" data-bind="text: t('modalAppLockSetupInfo')" data-uie-name="label-applock-set-info"></div>
           <div class="modal__buttons">
             <button
               type="submit"
@@ -31,14 +33,15 @@
 
       <!-- ko if: isLockScreen() -->
         <form data-bind="submit: onUnlock, template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockLockedMessage')"></div>
+          <div class="modal__text" data-bind="text: t('modalAppLockLockedMessage')" data-uie-name="label-applock-unlock-text"></div>
           <input
             class="modal__input"
             type="password"
             data-bind="event: {'keydown': clearUnlockError}, attr: {placeholder: t('modalAppLockLockedPlaceholder')}"
+            data-uie-name="input-applock-unlock"
           />
           <div style="display: flex">
-            <div style="flex-grow: 1" class="modal__input__error" data-bind="text: unlockError()"></div>
+            <div style="flex-grow: 1" class="modal__input__error" data-bind="text: unlockError()" data-uie-name="label-applock-unlock-error"></div>
             <div
               class="modal__cta modal__cta--input"
               data-bind="click: onClickForgot, text: t('modalAppLockLockedForgotCTA')"
@@ -58,7 +61,7 @@
 
       <!-- ko if: isForgotScreen() -->
         <div data-bind="template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')"></div>
+          <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')" data-uie-name="label-applock-forgot-text></div>
           <div class="modal__cta" data-bind="click: onClickWipe, text: t('modalAppLockForgotWipeCTA')" data-uie-name="go-wipe-database"></div>
           <div class="modal__buttons">
             <button
@@ -72,7 +75,7 @@
 
       <!-- ko if: isWipeConfirmScreen() -->
         <div data-bind="template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockWipeConfirmMessage')"></div>
+          <div class="modal__text" data-bind="text: t('modalAppLockWipeConfirmMessage')" data-uie-name="label-applock-wipe-confirm-text"></div>
           <div class="modal__buttons">
             <button
               data-bind="click: onGoBack, text: t('modalAppLockWipeConfirmGoBackButton')"
@@ -94,8 +97,9 @@
             class="modal__input"
             type="password"
             data-bind="event: {'keydown': clearWipeError}, attr: {placeholder: t('modalAppLockWipePasswordPlaceholder')}"
+            data-uie-name="input-applock-wipe"
           />
-          <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()"></div>
+          <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()" data-uie-name="label-applock-wipe-error"></div>
           <div class="modal__buttons">
             <button
               type="button"
