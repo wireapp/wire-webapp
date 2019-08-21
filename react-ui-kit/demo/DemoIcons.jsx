@@ -21,6 +21,7 @@ import {
   AddPeopleIcon,
   AndroidIcon,
   AppleIcon,
+  ArchiveIcon,
   ArrowIcon,
   AttachmentIcon,
   AudioVideoIcon,
@@ -73,6 +74,7 @@ import React from 'react';
 
 const icons = [
   AddPeopleIcon,
+  ArchiveIcon,
   ArrowIcon,
   AttachmentIcon,
   AudioVideoIcon,
