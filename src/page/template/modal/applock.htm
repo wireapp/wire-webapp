@@ -1,0 +1,117 @@
+<div id="applock">
+  <modal params="isShown: isVisible(), onClosed: onClosed, showLoading: isLoading()" data-uie-name="applock-modal">
+    <div class="modal__header">
+      <div class="modal__header__title" data-bind="text: headerText()" data-uie-name="applock-modal-header"></div>
+    </div>
+    <div class="modal__body">
+      <!-- ko if: isSetupScreen() -->
+        <form data-bind="submit: onSetCode, template: {afterRender: startObserver}">
+          <div class="modal__text" data-bind="text: t('modalAppLockSetupMessage')"></div>
+          <input
+            class="modal__input"
+            type="password"
+            data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
+          />
+          <input
+            class="modal__input modal__input--validate"
+            type="password"
+            data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
+          />
+          <div class="modal__info text-background" data-bind="text: t('modalAppLockSetupInfo')"></div>
+          <div class="modal__buttons">
+            <button
+              type="submit"
+              data-bind="enable: isSetupPasswordBValid(), text: t('modalAppLockSetupAcceptButton')"
+              class="modal__button modal__button--primary modal__button--full"
+              data-uie-name="do-action"
+            ></button>
+          </div>
+        </form>
+      <!-- /ko -->
+
+      <!-- ko if: isLockScreen() -->
+        <form data-bind="submit: onUnlock, template: {afterRender: startObserver}">
+          <div class="modal__text" data-bind="text: t('modalAppLockLockedMessage')"></div>
+          <input
+            class="modal__input"
+            type="password"
+            data-bind="event: {'keydown': clearUnlockError}, attr: {placeholder: t('modalAppLockLockedPlaceholder')}"
+          />
+          <div style="display: flex">
+            <div style="flex-grow: 1" class="modal__input__error" data-bind="text: unlockError()"></div>
+            <div
+              class="modal__cta modal__cta--input"
+              data-bind="click: onClickForgot, text: t('modalAppLockLockedForgotCTA')"
+              data-uie-name="go-forgot-passphrase"
+            ></div>
+          </div>
+          <div class="modal__buttons">
+            <button
+              type="submit"
+              class="modal__button modal__button--primary modal__button--full"
+              data-uie-name="do-action"
+              data-bind="text: t('modalAppLockLockedUnlockButton')"
+            ></button>
+          </div>
+        </form>
+      <!-- /ko -->
+
+      <!-- ko if: isForgotScreen() -->
+        <div data-bind="template: {afterRender: startObserver}">
+          <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')"></div>
+          <div class="modal__cta" data-bind="click: onClickWipe, text: t('modalAppLockForgotWipeCTA')" data-uie-name="go-wipe-database"></div>
+          <div class="modal__buttons">
+            <button
+              data-bind="click: onGoBack, text: t('modalAppLockForgotGoBackButton')"
+              class="modal__button modal__button--secondary modal__button--full"
+              data-uie-name="do-go-back"
+            ></button>
+          </div>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: isWipeConfirmScreen() -->
+        <div data-bind="template: {afterRender: startObserver}">
+          <div class="modal__text" data-bind="text: t('modalAppLockWipeConfirmMessage')"></div>
+          <div class="modal__buttons">
+            <button
+              data-bind="click: onGoBack, text: t('modalAppLockWipeConfirmGoBackButton')"
+              class="modal__button modal__button--secondary"
+              data-uie-name="do-go-back"
+            ></button>
+            <button
+              data-bind="click: onClickWipeConfirm, text: t('modalAppLockWipeConfirmConfirmButton')"
+              class="modal__button modal__button--primary modal__button--alert"
+              data-uie-name="do-action"
+            ></button>
+          </div>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: isWipePasswordScreen() -->
+        <form data-bind="submit: onWipeDatabase, template: {afterRender: startObserver}">
+          <input
+            class="modal__input"
+            type="password"
+            data-bind="event: {'keydown': clearWipeError}, attr: {placeholder: t('modalAppLockWipePasswordPlaceholder')}"
+          />
+          <div class="modal__input__error" style="height: 20px" data-bind="text: wipeError()"></div>
+          <div class="modal__buttons">
+            <button
+              type="button"
+              data-bind="click: onGoBack, text: t('modalAppLockWipePasswordGoBackButton')"
+              class="modal__button modal__button--secondary"
+              data-uie-name="do-go-back"
+            ></button>
+            <button
+              type="submit"
+              class="modal__button modal__button--primary modal__button--alert"
+              data-uie-name="do-action"
+              data-bind="text: t('modalAppLockWipePasswordConfirmButton')"
+            ></button>
+          </div>
+        </form>
+      <!-- /ko -->
+    </div>
+  </modal>
+</div>

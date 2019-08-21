@@ -172,6 +172,10 @@
           <a class="preferences-link accent-text" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
         <!-- /ko -->
 
+        <!-- ko if: optionResetAppLock -->
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: t('preferencesAccountResetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
+        <!-- /ko -->
+
         <!-- ko ifnot: selfUser().isSingleSignOn -->
           <div class="preferences-link accent-text" data-bind="click: clickOnResetPassword, text: t('preferencesAccountResetPassword'), attr: {title: t('tooltipPreferencesPassword')}" data-uie-name="do-reset-password"></div>
         <!-- /ko -->

@@ -162,6 +162,16 @@ export class AuthService {
     });
   }
 
+  validatePassword(password) {
+    return this.backendClient.sendJson({
+      data: {
+        password: password,
+      },
+      type: 'POST',
+      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
+    });
+  }
+
   /**
    * Login in order to obtain an access-token and cookie.
    *

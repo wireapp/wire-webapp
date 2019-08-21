@@ -18,6 +18,8 @@
  */
 
 export const QUERY_KEY = {
+  APPLOCK_SCHEDULED_TIMEOUT: 'applock_scheduled_timeout',
+  APPLOCK_UNFOCUS_TIMEOUT: 'applock_unfocus_timeout',
   CONVERSATION_CODE: 'join_code',
   CONVERSATION_KEY: 'join_key',
   CURRENCY: 'currency',
@@ -33,6 +35,8 @@ export const QUERY_KEY = {
 };
 
 export const FORWARDED_QUERY_KEYS = [
+  QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT,
+  QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT,
   QUERY_KEY.ENVIRONMENT,
   QUERY_KEY.LOCALE,
   QUERY_KEY.PERSIST_TEMPORARY_CLIENTS,

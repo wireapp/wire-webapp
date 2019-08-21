@@ -47,6 +47,7 @@ import {EventName} from '../../tracking/EventName';
 import {ContentViewModel} from '../ContentViewModel';
 
 import 'Components/availabilityState';
+import {isAppLockEnabled} from './AppLockViewModel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -123,6 +124,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
+
+    this.optionResetAppLock = isAppLockEnabled();
 
     this.isMacOsWrapper = Environment.electron && Environment.os.mac;
     this.manageTeamUrl = getManageTeamUrl('client_settings');
@@ -312,6 +315,10 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   clickOnResetPassword() {
     safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
+  }
+
+  clickOnResetAppLockPassphrase() {
+    amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
   }
 
   removedFromView() {
