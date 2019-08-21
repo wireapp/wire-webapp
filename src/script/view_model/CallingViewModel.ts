@@ -87,7 +87,7 @@ export class CallingViewModel {
       };
       const initialCallState = call.state();
       const soundId = sounds[initialCallState];
-      if (!soundId) {
+      if (!soundId || call.reason() !== undefined) {
         return;
       }
 
