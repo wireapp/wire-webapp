@@ -6,18 +6,20 @@
     <div class="modal__body">
       <!-- ko if: isSetupScreen() -->
         <form data-bind="submit: onSetCode, template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockSetupMessage')" data-uie-name="label-applock-set-text"></div>
+          <div class="modal__text" data-bind="html: t('modalAppLockSetupMessage', {}, {br: '<br>'})" data-uie-name="label-applock-set-text"></div>
           <input
             class="modal__input"
             type="password"
             data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
             data-uie-name="input-applock-set-a"
+            autocomplete="new-password"
           />
           <input
             class="modal__input modal__input--validate"
             type="password"
             data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
             data-uie-name="input-applock-set-b"
+            autocomplete="new-password"
           />
           <div class="modal__info text-background" data-bind="text: t('modalAppLockSetupInfo')" data-uie-name="label-applock-set-info"></div>
           <div class="modal__buttons">
@@ -37,8 +39,9 @@
           <input
             class="modal__input"
             type="password"
-            data-bind="event: {'keydown': clearUnlockError}, attr: {placeholder: t('modalAppLockLockedPlaceholder')}"
+            data-bind="event: {'keydown': clearUnlockError}, attr: {placeholder: t('modalAppLockLockedPlaceholder'), id: Math.random().toString(), name:Math.random().toString()}"
             data-uie-name="input-applock-unlock"
+            autocomplete="new-password"
           />
           <div style="display: flex">
             <div style="flex-grow: 1" class="modal__input__error" data-bind="text: unlockError()" data-uie-name="label-applock-unlock-error"></div>
@@ -61,7 +64,7 @@
 
       <!-- ko if: isForgotScreen() -->
         <div data-bind="template: {afterRender: startObserver}">
-          <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')" data-uie-name="label-applock-forgot-text></div>
+          <div class="modal__text" data-bind="text: t('modalAppLockForgotMessage')" data-uie-name="label-applock-forgot-text"></div>
           <div class="modal__cta" data-bind="click: onClickWipe, text: t('modalAppLockForgotWipeCTA')" data-uie-name="go-wipe-database"></div>
           <div class="modal__buttons">
             <button
@@ -96,6 +99,7 @@
           <input
             class="modal__input"
             type="password"
+            autocomplete="new-password"
             data-bind="event: {'keydown': clearWipeError}, attr: {placeholder: t('modalAppLockWipePasswordPlaceholder')}"
             data-uie-name="input-applock-wipe"
           />
