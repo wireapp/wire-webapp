@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.5.51...@wireapp/bot-api@4.6.0) (2019-08-21)
+
+
+### Features
+
+* **bot-api:** Allow custom store engines ([#2215](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/2215)) ([a1b0d63](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/a1b0d63))
+
+
+
+
+
 ## [4.5.51](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@4.5.50...@wireapp/bot-api@4.5.51) (2019-08-21)
 
 **Note:** Version bump only for package @wireapp/bot-api
