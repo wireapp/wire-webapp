@@ -41,6 +41,7 @@ import {
   H1,
   HangupIcon,
   ImageIcon,
+  InfoIcon,
   InviteIcon,
   LeaveIcon,
   Line,
@@ -97,6 +98,7 @@ export const DemoIcons = () => (
       <GifIcon width={32} />
       <HangupIcon width={32} />
       <ImageIcon height={32} />
+      <InfoIcon height={32} />
       <InviteIcon height={32} />
       <LeaveIcon height={32} />
       <MessageIcon height={32} />
@@ -145,6 +147,7 @@ export const DemoIcons = () => (
       <GifIcon width={32} shadow color={COLOR.WHITE} />
       <HangupIcon width={32} shadow color={COLOR.WHITE} />
       <ImageIcon height={32} shadow color={COLOR.WHITE} />
+      <InfoIcon height={32} shadow color={COLOR.WHITE} />
       <InviteIcon height={32} shadow color={COLOR.WHITE} />
       <LeaveIcon height={32} shadow color={COLOR.WHITE} />
       <MessageIcon height={32} shadow color={COLOR.WHITE} />
