@@ -84,6 +84,7 @@ export class MainViewModel {
       repositories.media.devicesHandler,
       repositories.media.streamHandler,
       repositories.permission,
+      this.selfUser,
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
