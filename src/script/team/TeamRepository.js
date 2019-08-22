@@ -180,8 +180,15 @@ export class TeamRepository {
       const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
 
       if (imageResource) {
-        const imageBlob = await imageResource.load();
-        imageDataUrl = await loadDataUrl(imageBlob);
+        let imageBlob;
+
+        try {
+          imageBlob = await imageResource.load();
+          imageDataUrl = await loadDataUrl(imageBlob);
+        } catch (error) {
+          const errorMessage = this.isTeam() ? 'Error while loading team logo' : 'Error while loading user avatar';
+          this.logger.error(errorMessage, error, imageBlob);
+        }
       }
 
       const accountInfo = {
