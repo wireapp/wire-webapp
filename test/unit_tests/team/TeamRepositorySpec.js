@@ -98,13 +98,11 @@ describe('TeamRepository', () => {
   });
 
   describe('sendAccountInfo', () => {
-    it(`doesn't crash when there is no account avatar`, async () => {
-      const selfUser = team_repository.selfUser();
+    it(`doesn't crash when there is no team logo`, async () => {
+      expect(team_repository.isTeam()).toBe(true);
 
-      expect(team_repository.isTeam()).toBe(false);
-
-      selfUser.previewPictureResource({
-        load: () => Promise.resolve(),
+      team_repository.selfUser().getIconResource = async () => ({
+        load: async () => undefined,
       });
 
       const accountInfo = await team_repository.sendAccountInfo(true);
