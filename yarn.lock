@@ -1550,10 +1550,10 @@
     spark-md5 "3.0.0"
     tough-cookie "3.0.1"
 
-"@wireapp/avs@5.1.28":
-  version "5.1.28"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.28.tgz#316e184b4c94613044e7fec4565cff26828d77de"
-  integrity sha512-xABj0vfgVvuLmFnxk5eILNJdLwTCnsQZUsdE4cDZtlVXcO1FQRgA1YM9Gw2sNnxJZWitGfO0TOEpiurLwB1Mog==
+"@wireapp/avs@5.1.33":
+  version "5.1.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-5.1.33.tgz#04c13686271eef557457bb4cd027b238befbccad"
+  integrity sha512-cj4lBMXjsTJlPXyq6KkKThtZPK3e7qv3shDgeCFfsLbcaHfRYIjZDV2t/apA6Zn4J2vg02hlROoR1LG39/mfhg==
 
 "@wireapp/cbor@4.3.9":
   version "4.3.9"
