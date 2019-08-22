@@ -180,8 +180,12 @@ export class TeamRepository {
       const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
 
       if (imageResource) {
-        const imageBlob = await imageResource.load();
-        imageDataUrl = await loadDataUrl(imageBlob);
+        try {
+          const imageBlob = await imageResource.load();
+          imageDataUrl = await loadDataUrl(imageBlob);
+        } catch (error) {
+          this.logger.error('Could not load team image', error);
+        }
       }
 
       const accountInfo = {
