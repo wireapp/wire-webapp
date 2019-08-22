@@ -96,4 +96,20 @@ describe('TeamRepository', () => {
       });
     });
   });
+
+  describe('sendAccountInfo', () => {
+    it(`doesn't crash when there is no account avatar`, async () => {
+      const selfUser = team_repository.selfUser();
+
+      expect(team_repository.isTeam()).toBe(false);
+
+      selfUser.previewPictureResource({
+        load: () => Promise.resolve(),
+      });
+
+      const accountInfo = await team_repository.sendAccountInfo(true);
+
+      expect(accountInfo.picture).toBeUndefined();
+    });
+  });
 });

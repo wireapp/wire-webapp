@@ -104,8 +104,11 @@ export class TeamRepository {
 
         this.team(new TeamEntity());
       })
-      .then(() => this.sendAccountInfo())
-      .then(() => this.team());
+      .then(() => {
+        // doesn't need to be awaited because it publishes the account info over amplify.
+        this.sendAccountInfo();
+        return this.team();
+      });
   }
 
   getTeamMember(teamId, userId) {
@@ -173,12 +176,12 @@ export class TeamRepository {
     }
   }
 
-  sendAccountInfo() {
-    if (Environment.desktop) {
+  sendAccountInfo(isDesktop = Environment.desktop) {
+    if (isDesktop) {
       const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
-      imagePromise
+      return imagePromise
         .then(imageBlob => {
           if (imageBlob) {
             return loadDataUrl(imageBlob);
@@ -189,13 +192,14 @@ export class TeamRepository {
             accentID: this.selfUser().accent_id(),
             name: this.teamName(),
             picture: imageDataUrl,
-            teamID: this.team().id,
+            teamID: this.team() ? this.team().id : undefined,
             teamRole: this.selfUser().teamRole(),
             userID: this.selfUser().id,
           };
 
           this.logger.info('Publishing account info', accountInfo);
           amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
+          return accountInfo;
         });
     }
   }
