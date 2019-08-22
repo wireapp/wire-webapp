@@ -71,10 +71,10 @@ export class PreferencesAVViewModel {
           stream.getTracks().forEach(track => {
             this.mediaStream().addTrack(track);
           });
+          this._initiateAudioMeter(this.mediaStream());
         } else {
           stream.getTracks().forEach(track => track.stop());
         }
-        this._initiateAudioMeter(this.mediaStream());
       });
     };
 
