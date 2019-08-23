@@ -225,10 +225,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/express-useragent@0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-0.2.21.tgz#dbbc684e15aa5dfeef1118eabcbc0084716be59f"
-  integrity sha512-xVZ9GVsrYa5PFghnb9UGiWR0ZOrAWhxSwbTVhqI1tMGU0I1TnAvzCQi15P29GWhc8mR384IUEINlhrPy0mz1Pg==
+"@types/express-useragent@0.2.22":
+  version "0.2.22"
+  resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-0.2.22.tgz#3b508b432ba445f8e61f324c88871d854373691e"
+  integrity sha512-T+YwWSaT4HXtHVmAfGUQBBmJF8pogCEn1V11rd+9Rb2lc/Ze6B0gZLtoDXUvyzlqoGZqX7R5bRQNRE6DXlyVBA==
   dependencies:
     "@types/express" "*"
 
