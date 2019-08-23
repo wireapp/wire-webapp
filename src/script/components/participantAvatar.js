@@ -27,7 +27,7 @@ import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
-class ParticipantAvatar {
+export class ParticipantAvatar {
   static get SIZE() {
     return {
       LARGE: 'avatar-l',
@@ -242,9 +242,3 @@ ko.components.register('participant-avatar', {
     },
   },
 });
-
-export {ParticipantAvatar};
-
-window.z = window.z || {};
-window.z.components = z.components || {};
-z.components.ParticipantAvatar = ParticipantAvatar;

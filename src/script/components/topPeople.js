@@ -17,6 +17,8 @@
  *
  */
 
+import {ParticipantAvatar} from './participantAvatar';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -25,6 +27,7 @@ z.components.TopPeople = class TopPeople {
     this.click = params.click;
     this.maxUsers = params.max || 9;
     this.userEntities = params.users;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
 
@@ -40,7 +43,7 @@ ko.components.register('top-people', {
   template: `
     <div class="search-list search-list-sm" data-bind="foreach: {data: displayedUsers}">
       <div class="search-list-item" data-bind="click: $parent.onUserClick, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <participant-avatar class="search-list-item-image" params="participant: $data, delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+        <participant-avatar class="search-list-item-image" params="participant: $data, delay: 300, size: ParticipantAvatar.SIZE.LARGE"></participant-avatar>
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: first_name"></div>
         </div>

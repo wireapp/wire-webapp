@@ -17,6 +17,8 @@
  *
  */
 
+import {ParticipantAvatar} from './participantAvatar';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -31,6 +33,7 @@ z.components.GroupListViewModel = class GroupListViewModel {
   constructor(params) {
     this.groups = params.groups;
     this.onSelect = params.click;
+    this.ParticipantAvatar = ParticipantAvatar;
   }
 };
 
@@ -41,7 +44,7 @@ ko.components.register('group-list', {
       <div class="search-list-item" data-bind="click: () => onSelect(group), attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
         <div class="search-list-item-image">
           <!-- ko if: group.is1to1() -->
-            <participant-avatar params="participant: group.participating_user_ets()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: group.participating_user_ets()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
           <!-- ko ifnot: group.is1to1() -->
             <group-avatar params="users: group.participating_user_ets()"></group-avatar>

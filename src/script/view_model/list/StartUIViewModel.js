@@ -32,6 +32,7 @@ import {ConnectSource} from '../../connect/ConnectSource';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
+import {ParticipantAvatar} from '../../components/participantAvatar';
 import {WebAppEvents} from '../../event/WebApp';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -80,6 +81,7 @@ class StartUIViewModel {
     this.logger = getLogger('z.viewModel.list.StartUIViewModel');
     this.brandName = Config.BRAND_NAME;
     this.UserlistMode = UserlistMode;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.actionsViewModel = this.mainViewModel.actions;
 

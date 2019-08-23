@@ -41,6 +41,7 @@ import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator'
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
+import {ParticipantAvatar} from '../../components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
@@ -123,6 +124,8 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
+
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.isMacOsWrapper = Environment.electron && Environment.os.mac;
     this.manageTeamUrl = getManageTeamUrl('client_settings');

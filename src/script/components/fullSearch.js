@@ -22,6 +22,8 @@ import moment from 'moment';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
 import {escapeString} from 'Util/SanitizationUtil';
+
+import {ParticipantAvatar} from './participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 
 window.z = window.z || {};
@@ -39,6 +41,7 @@ z.components.FullSearch = class FullSearch {
 
   constructor(params) {
     this.searchProvider = params.search_provider;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.onInputChange = query => {
       if (typeof params.change === 'function') {
@@ -158,7 +161,7 @@ ko.components.register('full-search', {
     <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities, as: 'messageEntity', noChildContext: true}" data-uie-name="full-search-list">
       <div class="full-search-item" data-bind="click: () => clickOnMessage(messageEntity)" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <participant-avatar params="participant: messageEntity.user, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+          <participant-avatar params="participant: messageEntity.user, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
           <div class="full-search-item-content-text ellipsis" data-bind="html: htmlFormatResult(messageEntity)" data-uie-name="full-search-item-text"></div>
