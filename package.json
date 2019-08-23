@@ -32,7 +32,7 @@
     "raygun4js": "2.17.1",
     "react": "16.9.0",
     "react-dom": "16.9.0",
-    "react-intl": "2.9.0",
+    "react-intl": "3.1.11",
     "react-intl-po": "2.2.2",
     "react-redux": "7.1.0",
     "react-router": "5.0.1",
