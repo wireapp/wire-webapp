@@ -21,7 +21,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
-//import {PermissionState} from '../../notification/PermissionState';
+import {ParticipantAvatar} from '../../components/participantAvatar';
 import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
 
 import 'Components/list/participantItem';
@@ -45,6 +45,7 @@ class ConversationListCallingCell {
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
