@@ -28,9 +28,9 @@ type Writable<T> = {
   -readonly [K in keyof T]: T[K];
 };
 
-type wConfig = Writable<typeof Config>;
+type WriteableConfig = Writable<typeof Config>;
 
-const writeableConfig: wConfig = Config;
+const writeableConfig: WriteableConfig = Config;
 
 describe('AppLockViewModel', () => {
   const getAppLock = () =>
@@ -76,7 +76,7 @@ describe('AppLockViewModel', () => {
   it('stores the passphrase, respects the timeout and unlocks', async () => {
     jasmine.clock().install();
     writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
-    let storedCode: string = null;
+    let storedCode: string;
     const passphrase = 'abcABC123!';
     spyOn(window.localStorage, 'setItem').and.callFake((_, code) => {
       storedCode = code;
@@ -93,7 +93,7 @@ describe('AppLockViewModel', () => {
     appLock.setupPasswordB(passphrase);
     await appLock.onSetCode();
     expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-    expect(storedCode).not.toBe(null);
+    expect(storedCode).toBeDefined();
     spyOnProperty(document, 'visibilityState', 'get').and.returnValue('hidden');
     document.dispatchEvent(new Event('visibilitychange'));
     jasmine.clock().tick(5000);

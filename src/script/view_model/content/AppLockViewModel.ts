@@ -45,24 +45,25 @@ const APP_LOCK_STORAGE = 'app_lock';
 const getTimeOut = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
   const queryTimeout = parseInt(getURLParameter(queryName), 10);
   const configTimeout = Config.FEATURE && Config.FEATURE[configName];
-  const isIllegal = (num: number) => !Number.isFinite(num);
-  if (isIllegal(queryTimeout) && isIllegal(configTimeout)) {
+  const isNotFinite = (num: number) => !Number.isFinite(num);
+  if (isNotFinite(queryTimeout) && isNotFinite(configTimeout)) {
     return null;
   }
-  if (isIllegal(queryTimeout)) {
+  if (isNotFinite(queryTimeout)) {
     return configTimeout;
   }
-  if (isIllegal(configTimeout)) {
+  if (isNotFinite(configTimeout)) {
     return queryTimeout;
   }
   return Math.min(queryTimeout, configTimeout);
 };
 
-const getUnfocusAppLockTimeOut = () => getTimeOut(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
-const getScheduledAppLockTimeOut = () => getTimeOut(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
+const getUnfocusAppLockTimeOutinMillis = () => getTimeOut(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+const getScheduledAppLockTimeOutinMillis = () =>
+  getTimeOut(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
 
-const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeOut() !== null;
-const isScheduledAppLockEnabled = () => getScheduledAppLockTimeOut() !== null;
+const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeOutinMillis() !== null;
+const isScheduledAppLockEnabled = () => getScheduledAppLockTimeOutinMillis() !== null;
 
 export const isAppLockEnabled = () => isUnfocusAppLockEnabled() || isScheduledAppLockEnabled();
 
@@ -205,14 +206,14 @@ export class AppLockViewModel {
     window.clearTimeout(this.unfocusTimeOutId);
     const isHidden = document.visibilityState === 'hidden';
     if (isHidden) {
-      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOut() * 1000);
+      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOutinMillis() * 1000);
     }
   };
 
   startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(this.scheduledTimeOutId);
-      this.scheduledTimeOutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeOut() * 1000);
+      this.scheduledTimeOutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeOutinMillis() * 1000);
     }
   };
 
