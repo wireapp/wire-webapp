@@ -57,12 +57,10 @@ export class IndexedDBEngine implements CRUDEngine {
         const diskIsFull = usage >= quota;
         if (diskIsFull) {
           const errorMessage = `Out of disk space. Using "${usage}" out of "${quota}" bytes.`;
-          return Promise.reject(new StoreEngineError.LowDiskSpaceError(errorMessage));
+          throw new StoreEngineError.LowDiskSpaceError(errorMessage);
         }
       }
     }
-
-    return Promise.resolve();
   }
 
   public async isSupported(): Promise<void> {
@@ -75,8 +73,8 @@ export class IndexedDBEngine implements CRUDEngine {
     return this.assignDb(new Dexie(storeName));
   }
 
-  public initWithDb(db: Dexie): Promise<Dexie> {
-    return Promise.resolve(this.assignDb(db));
+  public async initWithDb(db: Dexie): Promise<Dexie> {
+    return this.assignDb(db);
   }
 
   // If you want to add listeners to the database and you don't care if it is a new database (init)
@@ -112,51 +110,43 @@ export class IndexedDBEngine implements CRUDEngine {
     }
   }
 
-  public create<EntityType = Object, PrimaryKey = string>(
+  public async create<EntityType = Object, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
     if (entity) {
-      return this.db
-        .table(tableName)
-        .add(entity, primaryKey)
-        .catch((error: Dexie.DexieError) => {
-          throw this.mapDatabaseError(error, tableName, primaryKey);
-        });
+      try {
+        const newPrimaryKey = await this.db.table(tableName).add(entity, primaryKey);
+        return newPrimaryKey;
+      } catch (error) {
+        throw this.mapDatabaseError(error, tableName, primaryKey);
+      }
     }
     const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-    return Promise.reject(new StoreEngineError.RecordTypeError(message));
+    throw new StoreEngineError.RecordTypeError(message);
   }
 
-  public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
-    return this.db
-      .table(tableName)
-      .delete(primaryKey)
-      .then(() => primaryKey);
+  public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
+    await this.db.table(tableName).delete(primaryKey);
+    return primaryKey;
   }
 
-  public deleteAll(tableName: string): Promise<boolean> {
-    return this.db
-      .table(tableName)
-      .clear()
-      .then(() => true);
+  public async deleteAll(tableName: string): Promise<boolean> {
+    await this.db.table(tableName).clear();
+    return true;
   }
 
-  public read<EntityType = Object, PrimaryKey = string>(
+  public async read<EntityType = Object, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
   ): Promise<EntityType> {
-    return this.db
-      .table<EntityType>(tableName)
-      .get(primaryKey)
-      .then(record => {
-        if (record) {
-          return record;
-        }
-        const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-        throw new StoreEngineError.RecordNotFoundError(message);
-      });
+    const record = await this.db.table<EntityType>(tableName).get(primaryKey);
+    if (record) {
+      return record;
+    }
+    const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+    throw new StoreEngineError.RecordNotFoundError(message);
   }
 
   public readAll<EntityType>(tableName: string): Promise<EntityType[]> {
@@ -171,17 +161,17 @@ export class IndexedDBEngine implements CRUDEngine {
     return keys.map(key => (key as any) as PrimaryKey);
   }
 
-  public update<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, changes: Object): Promise<PrimaryKey> {
-    return this.db
-      .table(tableName)
-      .update(primaryKey, changes)
-      .then((updatedRecords: number) => {
-        if (updatedRecords === 0) {
-          const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-          throw new StoreEngineError.RecordNotFoundError(message);
-        }
-        return primaryKey;
-      });
+  public async update<PrimaryKey = string>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: Object,
+  ): Promise<PrimaryKey> {
+    const updatedRecords = await this.db.table(tableName).update(primaryKey, changes);
+    if (updatedRecords === 0) {
+      const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      throw new StoreEngineError.RecordNotFoundError(message);
+    }
+    return primaryKey;
   }
 
   public updateOrCreate<PrimaryKey = string, ChangesType = Object>(
@@ -192,22 +182,18 @@ export class IndexedDBEngine implements CRUDEngine {
     return this.db.table<ChangesType, PrimaryKey>(tableName).put(changes, primaryKey);
   }
 
-  public append<PrimaryKey = string>(
+  public async append<PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
     additions: string,
   ): Promise<PrimaryKey> {
-    return this.db
-      .table(tableName)
-      .get(primaryKey)
-      .then(record => {
-        if (typeof record === 'string') {
-          record += additions;
-        } else {
-          const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-          throw new StoreEngineError.RecordTypeError(message);
-        }
-        return this.updateOrCreate(tableName, primaryKey, record);
-      });
+    let record = await this.db.table(tableName).get(primaryKey);
+    if (typeof record === 'string') {
+      record += additions;
+    } else {
+      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+      throw new StoreEngineError.RecordTypeError(message);
+    }
+    return this.updateOrCreate(tableName, primaryKey, record);
   }
 }
