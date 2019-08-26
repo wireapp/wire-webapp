@@ -338,7 +338,7 @@ export class CallingRepository {
         const activeCall = this.findCall(conversationId);
         const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
         if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
-          // we want to ignore call start event that already have an active call (wether it's ringing or connected).
+          // we want to ignore call start events that already have an active call (whether it's ringing or connected).
           this.injectActivateEvent(conversationId, userId, time, source);
         }
         break;
