@@ -5,7 +5,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.5.5",
     "@babel/preset-typescript": "7.3.3",
     "@types/sql.js": "1.0.2",
-    "@wireapp/store-engine": "3.9.5",
+    "@wireapp/store-engine": "3.9.6",
     "sql.js": "https://github.com/pwnsdx/sqleet.js#a078babcad5e6beda01370466328e47b3c4a2de7",
     "uint32": "0.2.1"
   },
@@ -41,5 +41,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.7.6"
+  "version": "0.7.7"
 }
