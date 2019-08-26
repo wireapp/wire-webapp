@@ -29,6 +29,7 @@ import {Context} from '../ui/ContextMenu';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -89,6 +90,7 @@ class Message {
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
     this.includesOnlyEmojis = includesOnlyEmojis;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     const markedSubscription = ko.computed(() => {
       const marked = isMarked();
@@ -258,7 +260,7 @@ const normalTemplate = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -420,7 +422,7 @@ const pingTemplate = `
 const deleteTemplate = `
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
@@ -513,7 +515,7 @@ const memberTemplate = `
       <!-- /ko -->
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': message.otherUser().isOutgoingRequest()}"
-                   params="participant: message.otherUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+                   params="participant: message.otherUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
         <div class="message-connected-cancel accent-text"
              data-bind="click: () => onClickCancelRequest(message),

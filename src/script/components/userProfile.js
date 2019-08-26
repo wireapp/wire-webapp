@@ -19,6 +19,8 @@
 
 import {getLogger} from 'Util/Logger';
 
+import {ParticipantAvatar} from 'Components/participantAvatar';
+
 window.z = window.z || {};
 window.z.components = z.components || {};
 
@@ -29,6 +31,7 @@ z.components.UserProfile = class UserProfile {
     this.logger = getLogger('z.components.UserProfile');
 
     this.userEntity = params.user;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && !!this.userEntity());
 
@@ -124,7 +127,7 @@ ko.components.register('user-profile', {
           <div class="user-profile-details">
             <!-- ko if: renderAvatar() -->
               <div class="user-profile-details-avatar">
-                <participant-avatar class="cursor-default" params="participant: userEntity, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+                <participant-avatar class="cursor-default" params="participant: userEntity, size: ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
               </div>
             <!-- /ko -->
           </div>

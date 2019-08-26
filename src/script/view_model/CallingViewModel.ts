@@ -20,7 +20,9 @@
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
+
 import {Logger, getLogger} from 'Util/Logger';
+
 import {AudioType} from '../audio/AudioType';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
@@ -30,7 +32,7 @@ import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {PermissionState} from '../notification/PermissionState';
 
-import '../components/calling/chooseScreen';
+import 'Components/calling/chooseScreen';
 
 declare global {
   interface HTMLAudioElement {
@@ -87,7 +89,7 @@ export class CallingViewModel {
       };
       const initialCallState = call.state();
       const soundId = sounds[initialCallState];
-      if (!soundId) {
+      if (!soundId || call.reason() !== undefined) {
         return;
       }
 

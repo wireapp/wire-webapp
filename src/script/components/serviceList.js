@@ -16,7 +16,10 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {noop} from 'Util/util';
+
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/list/participantItem';
 
@@ -42,9 +45,7 @@ z.components.ServiceList = class ServiceList {
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
 
-    this.avatarSize = this.isCompactMode
-      ? z.components.ParticipantAvatar.SIZE.LARGE
-      : z.components.ParticipantAvatar.SIZE.SMALL;
+    this.avatarSize = this.isCompactMode ? ParticipantAvatar.SIZE.LARGE : ParticipantAvatar.SIZE.SMALL;
 
     this.cssClasses = ko.pureComputed(() => (this.isCompactMode ? 'search-list-sm' : 'search-list-lg'));
   }

@@ -21,6 +21,7 @@ import {noop} from 'Util/util';
 
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import {MediaType} from '../../media/MediaType';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 
 import 'Components/availabilityState';
@@ -30,6 +31,7 @@ class ConversationListCell {
     this.conversation = conversation;
     this.is_selected = is_selected;
     this.on_click = click;
+    this.ParticipantAvatar = ParticipantAvatar;
     this.showJoinButton = showJoinButton;
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
@@ -61,7 +63,7 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
         <!-- ko if: !conversation.isGroup() && users().length -->
           <div class="avatar-halo">
-            <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: users()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>

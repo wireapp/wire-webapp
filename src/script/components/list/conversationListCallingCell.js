@@ -21,7 +21,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
-//import {PermissionState} from '../../notification/PermissionState';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
 
 import 'Components/list/participantItem';
@@ -45,6 +45,7 @@ class ConversationListCallingCell {
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
@@ -144,7 +145,7 @@ ko.components.register('conversation-list-calling-cell', {
             <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
           <!-- /ko -->
           <!-- ko if: !conversation().isGroup() && conversationParticipants().length -->
-            <participant-avatar params="participant: conversationParticipants()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: conversationParticipants()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
         </div>
       <!-- /ko -->

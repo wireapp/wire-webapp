@@ -109,6 +109,14 @@ Before RC testing we create a merge commit (**don't squash!**) from "dev" to "ma
 
 Similar to "Staging Bumps" with the exception that tags are made from "master" branch and contain "production" in the tag name instead of "staging". Example: `2019-07-01-production.0`
 
+Release notes are automatically generated with [generate-changelog](https://github.com/lob/generate-changelog) after merging to "master" using the following command:
+
+```
+generate-changelog -x "chore,docs,refactor,runfix,style,test" -t 2019-08-21-production.0...master
+```
+
+Note: `2019-08-21-production.0` is the tag name of the previous production release.
+
 #### Manual Deployments
 
 Based on the Git branch, builds get deployed automatically by [Travis CI](https://travis-ci.org/). In case Travis CI is not working, a manual deployment can be triggered using `yarn deploy`.
