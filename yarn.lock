@@ -1705,6 +1705,13 @@
   dependencies:
     "@types/node" "~10"
 
+"@wireapp/store-engine@3.9.5":
+  version "3.9.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-3.9.5.tgz#6cf313879ddc9bb0f4dcbd1ffb62d20883bbe987"
+  integrity sha512-k9F+VPoAkb6G9ouPqYdXO1cMF55O3I+DFjeQOJwPcNzEWp3blzvBuiUSYPKhpTXEDdE3SMHmVsJYcWaajzoP+w==
+  dependencies:
+    "@types/node" "~10"
+
 "@wireapp/tslint-config@1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@wireapp/tslint-config/-/tslint-config-1.4.1.tgz#2089af720f65279d696293cbc3ca13063529139a"
