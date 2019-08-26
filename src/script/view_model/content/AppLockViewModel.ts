@@ -171,7 +171,11 @@ export class AppLockViewModel {
     this.startPassphraseObserver();
   };
 
-  onClosed = () => this.state(APPLOCK_STATE.NONE);
+  onClosed = () => {
+    this.state(APPLOCK_STATE.NONE);
+    this.setupPasswordA('');
+    this.setupPasswordB('');
+  };
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
     if (key === this.storageKey()) {
@@ -231,16 +235,10 @@ export class AppLockViewModel {
     this.unlockError(t('modalAppLockLockedError'));
   };
 
-  onSetCode = async (form: HTMLFormElement) => {
-    const input1 = <HTMLInputElement>form[0];
-    const input2 = <HTMLInputElement>form[1];
-    const firstCode = input1.value;
-    const secondCode = input2.value;
-    if (firstCode === secondCode) {
+  onSetCode = async () => {
+    if (this.setupPasswordA() === this.setupPasswordB()) {
       this.stopObserver();
-      await this.setCode(firstCode);
-      input1.value = '';
-      input2.value = '';
+      await this.setCode(this.setupPasswordA());
       this.isVisible(false);
       this.startScheduledTimeout();
     }

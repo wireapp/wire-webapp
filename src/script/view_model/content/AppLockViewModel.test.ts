@@ -82,8 +82,6 @@ describe('AppLockViewModel', () => {
       storedCode = code;
     });
     spyOn(window.localStorage, 'getItem').and.callFake(() => storedCode);
-    document.body.innerHTML += `<form id="setup"><input value="${passphrase}"/><input value="${passphrase}"/></form>`;
-    const setupForm = <HTMLFormElement>document.querySelector('#setup');
     const appLock = getAppLock();
     appLock.isVisible.subscribe(isVisible => {
       if (!isVisible) {
@@ -91,7 +89,9 @@ describe('AppLockViewModel', () => {
       }
     });
     expect(appLock.state()).toBe(APPLOCK_STATE.SETUP);
-    await appLock.onSetCode(setupForm);
+    appLock.setupPasswordA(passphrase);
+    appLock.setupPasswordB(passphrase);
+    await appLock.onSetCode();
     expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
     expect(storedCode).not.toBe(null);
     spyOnProperty(document, 'visibilityState', 'get').and.returnValue('hidden');
