@@ -45,7 +45,7 @@ const APP_LOCK_STORAGE = 'app_lock';
 const getTimeOut = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
   const queryTimeout = parseInt(getURLParameter(queryName), 10);
   const configTimeout = Config.FEATURE && Config.FEATURE[configName];
-  const isNotFinite = (num: number) => !Number.isFinite(num);
+  const isNotFinite = (value: number) => !Number.isFinite(value);
   if (isNotFinite(queryTimeout) && isNotFinite(configTimeout)) {
     return null;
   }
@@ -79,8 +79,8 @@ export class AppLockViewModel {
   passwordRegex: RegExp;
   scheduledTimeOut: number;
   scheduledTimeOutId: number;
-  setupPasswordA: ko.Observable<string>;
-  setupPasswordB: ko.Observable<string>;
+  setupPassphrase: ko.Observable<string>;
+  setupPassphraseRepeat: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
   storageKey: ko.PureComputed<string>;
   unfocusTimeOut: number;
@@ -128,11 +128,13 @@ export class AppLockViewModel {
       }
     });
     this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(8));
-    this.setupPasswordA = ko.observable('');
-    this.setupPasswordB = ko.observable('');
-    this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPasswordA()));
+    this.setupPassphrase = ko.observable('');
+    this.setupPassphraseRepeat = ko.observable('');
+    this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPassphrase()));
     this.isSetupPasswordBValid = ko.pureComputed(
-      () => this.passwordRegex.test(this.setupPasswordB()) && this.setupPasswordB() === this.setupPasswordA(),
+      () =>
+        this.passwordRegex.test(this.setupPassphraseRepeat()) &&
+        this.setupPassphraseRepeat() === this.setupPassphrase(),
     );
     this.unlockError = ko.observable('');
     this.wipeError = ko.observable('');
@@ -174,8 +176,8 @@ export class AppLockViewModel {
 
   onClosed = () => {
     this.state(APPLOCK_STATE.NONE);
-    this.setupPasswordA('');
-    this.setupPasswordB('');
+    this.setupPassphrase('');
+    this.setupPassphraseRepeat('');
   };
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
@@ -237,9 +239,9 @@ export class AppLockViewModel {
   };
 
   onSetCode = async () => {
-    if (this.setupPasswordA() === this.setupPasswordB()) {
+    if (this.setupPassphrase() === this.setupPassphraseRepeat()) {
       this.stopObserver();
-      await this.setCode(this.setupPasswordA());
+      await this.setCode(this.setupPassphrase());
       this.isVisible(false);
       this.startScheduledTimeout();
     }

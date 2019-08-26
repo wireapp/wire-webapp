@@ -53,57 +53,61 @@ describe('AppLockViewModel', () => {
     writeableConfig.FEATURE = originalFeature;
   });
 
-  it('does not shows up if no valid timeout is set', () => {
-    const appLock = getAppLock();
-    expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-  });
-
-  it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
-    writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
-    spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
-    const appLock = getAppLock();
-    expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
-  });
-
-  it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
-    window.history.pushState({}, '', '?applock_unfocus_timeout=10');
-    spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
-    const appLock = getAppLock();
-    expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
-    window.history.pushState({}, '', '');
-  });
-
-  it('stores the passphrase, respects the timeout and unlocks', async () => {
-    jasmine.clock().install();
-    writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
-    let storedCode: string;
-    const passphrase = 'abcABC123!';
-    spyOn(window.localStorage, 'setItem').and.callFake((_, code) => {
-      storedCode = code;
+  describe('constructor', () => {
+    it('does not shows up if no valid timeout is set', () => {
+      const appLock = getAppLock();
+      expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
     });
-    spyOn(window.localStorage, 'getItem').and.callFake(() => storedCode);
-    const appLock = getAppLock();
-    appLock.isVisible.subscribe(isVisible => {
-      if (!isVisible) {
-        appLock.onClosed();
-      }
+
+    it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
+      writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
+      spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
+      const appLock = getAppLock();
+      expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
     });
-    expect(appLock.state()).toBe(APPLOCK_STATE.SETUP);
-    appLock.setupPasswordA(passphrase);
-    appLock.setupPasswordB(passphrase);
-    await appLock.onSetCode();
-    expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-    expect(storedCode).toBeDefined();
-    spyOnProperty(document, 'visibilityState', 'get').and.returnValue('hidden');
-    document.dispatchEvent(new Event('visibilitychange'));
-    jasmine.clock().tick(5000);
-    expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-    jasmine.clock().tick(6000);
-    expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
-    document.body.innerHTML += `<form id="unlock"><input value="${passphrase}"/></form>`;
-    const unlockForm = <HTMLFormElement>document.querySelector('#unlock');
-    await appLock.onUnlock(unlockForm);
-    expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-    jasmine.clock().uninstall();
+
+    it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
+      window.history.pushState({}, '', '?applock_unfocus_timeout=10');
+      spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
+      const appLock = getAppLock();
+      expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
+      window.history.pushState({}, '', '');
+    });
+  });
+
+  describe('unlock', () => {
+    it('stores the passphrase, respects the timeout and unlocks', async () => {
+      jasmine.clock().install();
+      writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
+      let storedCode: string;
+      const passphrase = 'abcABC123!';
+      spyOn(window.localStorage, 'setItem').and.callFake((_, code) => {
+        storedCode = code;
+      });
+      spyOn(window.localStorage, 'getItem').and.callFake(() => storedCode);
+      const appLock = getAppLock();
+      appLock.isVisible.subscribe(isVisible => {
+        if (!isVisible) {
+          appLock.onClosed();
+        }
+      });
+      expect(appLock.state()).toBe(APPLOCK_STATE.SETUP);
+      appLock.setupPassphrase(passphrase);
+      appLock.setupPassphraseRepeat(passphrase);
+      await appLock.onSetCode();
+      expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
+      expect(storedCode).toBeDefined();
+      spyOnProperty(document, 'visibilityState', 'get').and.returnValue('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+      jasmine.clock().tick(5000);
+      expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
+      jasmine.clock().tick(6000);
+      expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
+      document.body.innerHTML += `<form id="unlock"><input value="${passphrase}"/></form>`;
+      const unlockForm = <HTMLFormElement>document.querySelector('#unlock');
+      await appLock.onUnlock(unlockForm);
+      expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
+      jasmine.clock().uninstall();
+    });
   });
 });
