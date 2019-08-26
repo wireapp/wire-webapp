@@ -17,7 +17,7 @@
  *
  */
 
-import {ParticipantAvatar} from '../participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 ko.components.register('panel-service-details', {
   template: `

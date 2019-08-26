@@ -20,7 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {ParticipantAvatar} from '../participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/availabilityState';
 

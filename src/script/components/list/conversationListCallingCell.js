@@ -21,7 +21,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
-import {ParticipantAvatar} from '../../components/participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
 
 import 'Components/list/participantItem';

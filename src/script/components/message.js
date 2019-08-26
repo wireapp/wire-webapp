@@ -29,7 +29,7 @@ import {Context} from '../ui/ContextMenu';
 
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
-import {ParticipantAvatar} from './participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import './asset/audioAsset';
 import './asset/fileAsset';

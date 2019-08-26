@@ -21,7 +21,7 @@ import {noop} from 'Util/util';
 
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import {MediaType} from '../../media/MediaType';
-import {ParticipantAvatar} from '../participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 
 import 'Components/availabilityState';

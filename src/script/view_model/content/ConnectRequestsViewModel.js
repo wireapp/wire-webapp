@@ -21,7 +21,7 @@ import {getLogger} from 'Util/Logger';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 
-import {ParticipantAvatar} from '../../components/participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

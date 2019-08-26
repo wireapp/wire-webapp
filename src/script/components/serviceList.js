@@ -19,7 +19,7 @@
 
 import {noop} from 'Util/util';
 
-import {ParticipantAvatar} from './participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/list/participantItem';
 
