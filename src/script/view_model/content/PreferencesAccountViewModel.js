@@ -41,7 +41,7 @@ import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator'
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {WebAppEvents} from '../../event/WebApp';
-import {ParticipantAvatar} from '../../components/participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {EventName} from '../../tracking/EventName';
