@@ -251,7 +251,9 @@ export class TeamRepository {
 
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      window.setTimeout(() => {
+        amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      }, 50);
     }
   }
 
