@@ -10,14 +10,14 @@
           <input
             class="modal__input"
             type="password"
-            data-bind="textInput: setupPasswordA, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
+            data-bind="textInput: setupPassphrase, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
             data-uie-name="input-applock-set-a"
             autocomplete="new-password"
           />
           <input
             class="modal__input modal__input--validate"
             type="password"
-            data-bind="textInput: setupPasswordB, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
+            data-bind="textInput: setupPassphraseRepeat, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
             data-uie-name="input-applock-set-b"
             autocomplete="new-password"
           />
