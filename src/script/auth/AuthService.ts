@@ -17,19 +17,18 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {BackendClientError} from '../error/BackendClientError';
 
 import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
-import logdown from 'logdown';
 import {BackendClient} from '../service/BackendClient';
 import {QUEUE_STATE} from '../service/QueueState';
 
 export class AuthService {
   private readonly backendClient: any;
-  private readonly logger: logdown.Logger;
+  private readonly logger: Logger;
 
   static get CONFIG(): {
     POST_ACCESS_RETRY: {
@@ -63,6 +62,13 @@ export class AuthService {
     });
   }
 
+  /**
+   * Get access token if a valid cookie is provided.
+   * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//newAccessToken
+   * @param retryAttempt - Retry attempts when a request fails
+   * @returns Promise which resolves with access token data.
+   */
   postAccess(retryAttempt: number = 1): Promise<AccessTokenData> {
     return new Promise((resolve, reject) => {
       const ajaxConfig: JQuery.AjaxSettings = {

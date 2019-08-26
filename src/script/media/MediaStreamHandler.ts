@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Environment} from 'Util/Environment';
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
@@ -44,7 +44,7 @@ export class MediaStreamHandler {
     return {PERMISSION_HINT_DELAY: 200};
   }
 
-  private readonly logger: any;
+  private readonly logger: Logger;
   private requestHintTimeout: number | undefined;
   private readonly screensharingMethod: ScreensharingMethods;
 
