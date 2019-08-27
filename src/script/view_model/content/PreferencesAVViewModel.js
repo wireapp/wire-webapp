@@ -83,7 +83,17 @@ export class PreferencesAVViewModel {
 
     this.constraintsHandler = mediaRepository.constraintsHandler;
     this.streamHandler = mediaRepository.streamHandler;
+
+    const createMediaStreamOfType = tracksGetter => {
+      const tracks = this.mediaStream() && this.mediaStream()[tracksGetter]();
+      if (!tracks || tracks.length === 0) {
+        return undefined;
+      }
+      return new MediaStream(tracks);
+    };
     this.mediaStream = ko.observable();
+    this.audioMediaStream = ko.pureComputed(() => createMediaStreamOfType('getAudioTracks'));
+    this.videoMediaStream = ko.pureComputed(() => createMediaStreamOfType('getVideoTracks'));
 
     this.isVisible = false;
 
@@ -95,7 +105,6 @@ export class PreferencesAVViewModel {
     this.audioLevel = ko.observable(0);
     this.audioSource = undefined;
 
-    this.permissionDenied = ko.observable(false);
     this.brandName = Config.BRAND_NAME;
 
     this.supportsAudioOutput = ko.pureComputed(() => {
@@ -141,7 +150,6 @@ export class PreferencesAVViewModel {
    */
   _getMediaStream(requestedMediaType = MediaType.AUDIO_VIDEO) {
     if (!this.deviceSupport.videoInput() && !this.deviceSupport.audioInput()) {
-      this.permissionDenied(true);
       return Promise.resolve(undefined);
     }
     const supportsVideo = this.deviceSupport.videoInput();
@@ -156,13 +164,35 @@ export class PreferencesAVViewModel {
         return stream;
       })
       .catch(error => {
+        // if getting the streams all together failed, we try to get them separatly.
+        const splitMediaStreamsAttempts = [];
+        if (requestAudio) {
+          splitMediaStreamsAttempts.push(
+            this.streamHandler.requestMediaStream(true, false, false, false).catch(() => undefined),
+          );
+        }
+        if (requestVideo) {
+          splitMediaStreamsAttempts.push(
+            this.streamHandler.requestMediaStream(false, true, false, false).catch(() => undefined),
+          );
+        }
+        return Promise.all(splitMediaStreamsAttempts).then(mediaStreams => {
+          const workingMediaStreams = mediaStreams.filter(mediaStream => !!mediaStream);
+          if (workingMediaStreams.length === 0) {
+            throw error;
+          }
+          const tracks = workingMediaStreams.reduce((trackList, mediaStream) => {
+            return trackList.concat(mediaStream.getTracks());
+          });
+          return new MediaStream(tracks);
+        });
+      })
+      .catch(error => {
         this.logger.warn(`Requesting MediaStream failed: ${error.message}`, error);
-
         const expectedErrors = [MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.TYPE.MEDIA_STREAM_PERMISSION];
 
         const isExpectedError = expectedErrors.includes(error.type);
         if (isExpectedError) {
-          this.permissionDenied(true);
           return false;
         }
 
@@ -233,6 +263,5 @@ export class PreferencesAVViewModel {
       this.streamHandler.releaseTracksFromStream(this.mediaStream());
       this.mediaStream(undefined);
     }
-    this.permissionDenied(false);
   }
 }
