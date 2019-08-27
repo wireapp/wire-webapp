@@ -97,8 +97,7 @@ describe('AppLockViewModel', () => {
       await appLock.onSetCode();
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       expect(storedCode).toBeDefined();
-      spyOnProperty(document, 'visibilityState', 'get').and.returnValue('hidden');
-      document.dispatchEvent(new Event('visibilitychange'));
+      window.dispatchEvent(new Event('blur'));
       jasmine.clock().tick(5000);
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       jasmine.clock().tick(6000);
