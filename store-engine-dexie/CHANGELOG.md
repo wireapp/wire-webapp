@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.6.0...@wireapp/store-engine-dexie@0.6.1) (2019-08-27)
+
+
+### Bug Fixes
+
+* **store-engine-dexie:** Use logdown instead of console ([#2233](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2233)) ([df37844](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/df37844))
+
+
+
+
+
 # [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.5.6...@wireapp/store-engine-dexie@0.6.0) (2019-08-27)
 
 
