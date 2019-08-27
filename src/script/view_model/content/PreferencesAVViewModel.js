@@ -164,7 +164,7 @@ export class PreferencesAVViewModel {
         return stream;
       })
       .catch(error => {
-        // if getting the streams all together failed, we try to get them separatly.
+        // if getting the streams all together failed, we try to get them separately.
         const splitMediaStreamsAttempts = [];
         if (requestAudio) {
           splitMediaStreamsAttempts.push(
