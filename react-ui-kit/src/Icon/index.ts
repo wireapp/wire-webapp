@@ -43,6 +43,8 @@ export * from './LeaveIcon';
 export * from './MessageIcon';
 export * from './MoreIcon';
 export * from './MuteIcon';
+export * from './NotificationIcon';
+export * from './NotificationOffIcon';
 export * from './OptionsIcon';
 export * from './PingIcon';
 export * from './PlaneIcon';
