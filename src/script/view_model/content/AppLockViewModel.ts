@@ -42,7 +42,7 @@ export enum APPLOCK_STATE {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-const getTimeOut = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
+const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
   const queryTimeout = parseInt(getURLParameter(queryName), 10);
   const configTimeout = Config.FEATURE && Config.FEATURE[configName];
   const isNotFinite = (value: number) => !Number.isFinite(value);
@@ -58,12 +58,12 @@ const getTimeOut = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' |
   return Math.min(queryTimeout, configTimeout);
 };
 
-const getUnfocusAppLockTimeOutinMillis = () => getTimeOut(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
-const getScheduledAppLockTimeOutinMillis = () =>
-  getTimeOut(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
+const getUnfocusAppLockTimeoutinMillis = () => getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+const getScheduledAppLockTimeoutinMillis = () =>
+  getTimeout(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
 
-const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeOutinMillis() !== null;
-const isScheduledAppLockEnabled = () => getScheduledAppLockTimeOutinMillis() !== null;
+const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeoutinMillis() !== null;
+const isScheduledAppLockEnabled = () => getScheduledAppLockTimeoutinMillis() !== null;
 
 export const isAppLockEnabled = () => isUnfocusAppLockEnabled() || isScheduledAppLockEnabled();
 
@@ -77,14 +77,14 @@ export class AppLockViewModel {
   localStorage: Storage;
   modalObserver: MutationObserver;
   passwordRegex: RegExp;
-  scheduledTimeOut: number;
-  scheduledTimeOutId: number;
+  scheduledTimeout: number;
+  scheduledTimeoutId: number;
   setupPassphrase: ko.Observable<string>;
   setupPassphraseRepeat: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
   storageKey: ko.PureComputed<string>;
-  unfocusTimeOut: number;
-  unfocusTimeOutId: number;
+  unfocusTimeout: number;
+  unfocusTimeoutId: number;
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
 
@@ -105,11 +105,11 @@ export class AppLockViewModel {
       );
     });
 
-    this.unfocusTimeOut = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
-    this.unfocusTimeOutId = 0;
+    this.unfocusTimeout = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
+    this.unfocusTimeoutId = 0;
 
-    this.scheduledTimeOut = Config.FEATURE.APPLOCK_SCHEDULED_TIMEOUT * 1000;
-    this.scheduledTimeOutId = 0;
+    this.scheduledTimeout = Config.FEATURE.APPLOCK_SCHEDULED_TIMEOUT * 1000;
+    this.scheduledTimeoutId = 0;
 
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
@@ -153,7 +153,11 @@ export class AppLockViewModel {
     if (isAppLockEnabled()) {
       this.showAppLock();
       if (isUnfocusAppLockEnabled()) {
-        document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+        window.addEventListener('blur', () => {
+          this.clearAppLockTimeout();
+          this.startAppLockTimeout();
+        });
+        window.addEventListener('focus', this.clearAppLockTimeout);
       }
       this.startPassphraseObserver();
     }
@@ -204,18 +208,18 @@ export class AppLockViewModel {
     this.appObserver.disconnect();
   };
 
-  handleVisibilityChange = () => {
-    window.clearTimeout(this.unfocusTimeOutId);
-    const isHidden = document.visibilityState === 'hidden';
-    if (isHidden) {
-      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOutinMillis() * 1000);
-    }
+  clearAppLockTimeout = () => {
+    window.clearTimeout(this.unfocusTimeoutId);
+  };
+
+  startAppLockTimeout = () => {
+    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutinMillis() * 1000);
   };
 
   startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
-      window.clearTimeout(this.scheduledTimeOutId);
-      this.scheduledTimeOutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeOutinMillis() * 1000);
+      window.clearTimeout(this.scheduledTimeoutId);
+      this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutinMillis() * 1000);
     }
   };
 
