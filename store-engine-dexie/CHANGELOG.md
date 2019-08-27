@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.5.6...@wireapp/store-engine-dexie@0.6.0) (2019-08-27)
+
+
+### Features
+
+* **store-engine-dexie:** Register persistent storage and call isSupported on initWithDb ([#2224](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2224)) ([4a5b91c](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/4a5b91c))
+
+
+
+
+
 ## [0.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.5.5...@wireapp/store-engine-dexie@0.5.6) (2019-08-26)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie
