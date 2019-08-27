@@ -27,6 +27,7 @@ export * from './CallIcon';
 export * from './CameraIcon';
 export * from './CamIcon';
 export * from './CheckIcon';
+export * from './ChevronIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
 export * from './DownloadIcon';
