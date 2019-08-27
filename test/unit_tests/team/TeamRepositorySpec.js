@@ -96,4 +96,18 @@ describe('TeamRepository', () => {
       });
     });
   });
+
+  describe('sendAccountInfo', () => {
+    it(`doesn't crash when there is no team logo`, async () => {
+      expect(team_repository.isTeam()).toBe(true);
+
+      team_repository.selfUser().getIconResource = async () => ({
+        load: async () => undefined,
+      });
+
+      const accountInfo = await team_repository.sendAccountInfo(true);
+
+      expect(accountInfo.picture).toBeUndefined();
+    });
+  });
 });

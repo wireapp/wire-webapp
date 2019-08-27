@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 
-import {mockStore, mountWithIntl} from '../util/TestUtil';
+import {mockStore, mountComponent} from '../util/TestUtil';
 import AccountForm from './AccountForm';
 
 describe('when entering account data', () => {
@@ -71,7 +71,7 @@ describe('when entering account data', () => {
 
   describe('the submit button', () => {
     it('is disabled if input is insufficient', () => {
-      wrapper = mountWithIntl(<AccountForm />, mockStore(initialState));
+      wrapper = mountComponent(<AccountForm />, mockStore(initialState));
 
       expect(nameInput().props().required).toBe(true);
       expect(emailInput().props().required).toBe(true);
@@ -89,7 +89,7 @@ describe('when entering account data', () => {
         termsAccepted: true,
       };
 
-      wrapper = mountWithIntl(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
+      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
 
       expect(doNextButton().props().disabled).toBe(false);
     });
@@ -106,7 +106,7 @@ describe('when entering account data', () => {
         termsAccepted: true,
       };
 
-      wrapper = mountWithIntl(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
+      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
 
       expect(doNextButton().props().disabled).toBe(true);
       nameInput().simulate('change', {target: {value: expectedName}});
@@ -131,7 +131,7 @@ describe('when entering account data', () => {
         termsAccepted: true,
       };
 
-      wrapper = mountWithIntl(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
+      wrapper = mountComponent(<AccountForm />, mockStore(createAccountState(prefilledAccount)));
 
       expect(doNextButton().props().disabled).toBe(true);
       nameInput().simulate('change', {target: {value: actualName}});

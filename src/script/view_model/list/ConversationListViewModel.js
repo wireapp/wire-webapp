@@ -22,7 +22,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
+import {STATE as CALL_STATE, REASON as CALL_REASON} from '@wireapp/avs';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
@@ -43,6 +45,7 @@ export class ConversationListViewModel {
   constructor(mainViewModel, listViewModel, repositories, onJoinCall) {
     this.isSelectedConversation = this.isSelectedConversation.bind(this);
 
+    this.audioRepository = repositories.audio;
     this.callingRepository = repositories.calling;
     this.conversationRepository = repositories.conversation;
     this.permissionRepository = repositories.permission;
@@ -50,13 +53,14 @@ export class ConversationListViewModel {
     this.teamRepository = repositories.team;
     this.userRepository = repositories.user;
     this.videoGridRepository = repositories.videoGrid;
+    this.ParticipantAvatar = ParticipantAvatar;
 
     this.contentViewModel = mainViewModel.content;
+    this.callingViewModel = mainViewModel.calling;
     this.listViewModel = listViewModel;
     this.onJoinCall = onJoinCall;
 
     this.logger = getLogger('z.viewModel.list.ConversationListViewModel');
-    this.multitasking = this.contentViewModel.multitasking;
 
     this.showCalls = ko.observable();
     this.setShowCallsState(repositories.event.notificationHandlingState());
@@ -86,21 +90,25 @@ export class ConversationListViewModel {
       return this.contentState() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     });
 
-    this.callConversations = this.conversationRepository.conversations_calls;
     this.archivedConversations = this.conversationRepository.conversations_archived;
     this.unarchivedConversations = this.conversationRepository.conversations_unarchived;
 
     this.noConversations = ko.pureComputed(() => {
-      const noConversations = !this.unarchivedConversations().length && !this.callConversations().length;
-      return noConversations && !this.connectRequests().length;
+      return !this.unarchivedConversations().length && !this.connectRequests().length;
     });
 
     this.webappIsLoaded = ko.observable(false);
 
     this.shouldUpdateScrollbar = ko
       .computed(() => {
-        const numberOfConversations = this.unarchivedConversations().length + this.callConversations().length;
-        return this.webappIsLoaded() || numberOfConversations || this.connectRequests().length;
+        // We need all of those as trigger for the antiscroll update.
+        // If we would just use
+        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
+        // it might return after the first truthy value and not monitor the remaining observables.
+        this.unarchivedConversations();
+        this.webappIsLoaded();
+        this.connectRequests();
+        this.callingViewModel.activeCalls();
       })
       .extend({notify: 'always', rateLimit: 500});
 
@@ -141,6 +149,11 @@ export class ConversationListViewModel {
 
   getConversationUrl(conversationEntity) {
     return `/conversation/${conversationEntity.id}`;
+  }
+
+  hasJoinableCall(conversationId) {
+    const call = this.callingRepository.findCall(conversationId);
+    return call && call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
   }
 
   setShowCallsState(handlingNotifications) {

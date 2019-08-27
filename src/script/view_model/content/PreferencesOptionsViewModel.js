@@ -23,7 +23,6 @@ import {getCurrentDate} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 import {downloadBlob} from 'Util/util';
 
-import {CallLogger} from '../../telemetry/calling/CallLogger';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 
@@ -40,7 +39,8 @@ window.z.viewModel.content = z.viewModel.content || {};
 z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
   static get CONFIG() {
     return {
-      MINIMUM_CALL_LOG_LENGTH: 10,
+      MINIMUM_CALL_LOG_LENGTH: 15,
+      OBFUSCATION_TRUNCATE_TO: 4,
     };
   }
 
@@ -96,7 +96,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   }
 
   saveCallLogs() {
-    const messageLog = this.callingRepository.messageLog;
+    const messageLog = this.callingRepository.getCallLog();
     // Very short logs will not contain useful information
     const logExceedsMinimumLength = messageLog.length > PreferencesOptionsViewModel.CONFIG.MINIMUM_CALL_LOG_LENGTH;
     if (logExceedsMinimumLength) {
@@ -104,7 +104,7 @@ z.viewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
 
       const selfUserId = this.userRepository.self().id;
-      const truncatedId = selfUserId.substr(0, CallLogger.CONFIG.OBFUSCATION_TRUNCATE_TO);
+      const truncatedId = selfUserId.substr(0, PreferencesOptionsViewModel.CONFIG.OBFUSCATION_TRUNCATE_TO);
       const filename = `Wire-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       return downloadBlob(blob, filename);

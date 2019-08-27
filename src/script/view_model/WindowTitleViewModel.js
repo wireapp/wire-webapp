@@ -73,7 +73,7 @@ export class WindowTitleViewModel {
 
             return conversationEntity.showNotificationsMentionsAndReplies()
               ? unreadSelfMentions.length || unreadSelfReplies.length
-              : unreadMessages.length > 0 || conversationEntity.hasJoinableCall();
+              : unreadMessages.length > 0;
           }).length;
 
         const unreadCount = connectionRequests + unreadConversations;

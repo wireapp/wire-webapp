@@ -1,6 +1,7 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
 /.idea/**/*.xml
+/.vscode
 /src/ext
 /src/i18n/**/*
 !/src/i18n/**/*.json

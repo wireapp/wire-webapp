@@ -88,7 +88,7 @@
 
       <!-- ko if: isActivatedAccount() -->
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
-          <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+          <participant-avatar params="participant: selfUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file"
                  data-bind="attr: {accept: z.viewModel.content.PreferencesAccountViewModel.CONFIG.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"
@@ -99,7 +99,7 @@
 
       <!-- ko ifnot: isActivatedAccount() -->
         <div>
-          <participant-avatar params="participant: selfUser, size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
+          <participant-avatar params="participant: selfUser, size: ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
         </div>
       <!-- /ko -->
     </section>
@@ -170,6 +170,10 @@
 
         <!-- ko if: !isMacOsWrapper && !!createTeamUrl -->
           <a class="preferences-link accent-text" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
+        <!-- /ko -->
+
+        <!-- ko if: optionResetAppLock -->
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: t('preferencesAccountResetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
         <!-- /ko -->
 
         <!-- ko ifnot: selfUser().isSingleSignOn -->

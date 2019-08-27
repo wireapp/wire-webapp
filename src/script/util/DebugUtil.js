@@ -336,4 +336,62 @@ export class DebugUtil {
         events.forEach(event => this.eventRepository.processEvent(event, EventRepository.SOURCE.STREAM));
       });
   }
+
+  getActiveCallStats() {
+    const activeCall = this.callingRepository.joinedCall();
+    if (!activeCall) {
+      throw new Error('no active call found');
+    }
+    return this.callingRepository.getStats(activeCall.conversationId);
+  }
+
+  enableFakeMediaDevices() {
+    const cameras = [
+      {deviceId: 'ff0000', kind: 'videoinput', label: 'Red cam'},
+      {deviceId: '00ff00', kind: 'videoinput', label: 'Green cam'},
+      {deviceId: '0000ff', kind: 'videoinput', label: 'Blue cam'},
+    ];
+    const microphones = [
+      {deviceId: '440', kind: 'audioinput', label: 'First mic'},
+      {deviceId: '100', kind: 'audioinput', label: 'Second mic'},
+    ];
+    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones));
+
+    navigator.mediaDevices.getUserMedia = constraints => {
+      const audio = constraints.audio ? generateAudioTrack(constraints.audio) : [];
+      const video = constraints.video ? generateVideoTrack(constraints.video) : [];
+      return Promise.resolve(new MediaStream(audio.concat(video)));
+    };
+
+    function generateAudioTrack(constraints) {
+      const hz = (constraints.deviceId || {}).exact || microphones[0].deviceId;
+      const context = new window.AudioContext();
+      const osc = context.createOscillator(); // instantiate an oscillator
+      osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
+      osc.frequency.value = parseInt(hz, 10); // Hz
+      const dest = context.createMediaStreamDestination();
+      osc.connect(dest); // connect it to the destination
+      osc.start(0);
+
+      return dest.stream.getAudioTracks();
+    }
+
+    function generateVideoTrack(constraints) {
+      const color = (constraints.deviceId || {}).exact || cameras[0].deviceId;
+      const width = 300;
+      const height = 240;
+      const canvas = Object.assign(document.createElement('canvas'), {height, width});
+      const ctx = canvas.getContext('2d');
+      setInterval(() => {
+        ctx.fillStyle = `#${color}`;
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = `#000`;
+        ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
+      }, 500);
+      const stream = canvas.captureStream(25);
+      return stream.getVideoTracks();
+    }
+
+    navigator.mediaDevices.ondevicechange();
+  }
 }

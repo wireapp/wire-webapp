@@ -19,10 +19,7 @@
 
 import {BaseError} from './BaseError';
 
-window.z = window.z || {};
-window.z.error = z.error || {};
-
-z.error.PermissionError = class PermissionError extends BaseError {
+export class PermissionError extends BaseError {
   constructor(type, message) {
     super('PermissionError', type, message);
   }
@@ -42,4 +39,4 @@ z.error.PermissionError = class PermissionError extends BaseError {
       UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
     };
   }
-};
+}

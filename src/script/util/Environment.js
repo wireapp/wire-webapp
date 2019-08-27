@@ -103,7 +103,6 @@ const _supportsIndexedDb = () => {
 const _supportsMediaDevices = () => !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
 
 const _supportsPermissions = () => !!navigator.permissions;
-const _supportsMediaPermissions = () => _supportsPermissions() && _isChrome() && _getVersion() >= 64;
 
 const _supportsNotifications = () => {
   const notificationNotSupported = window.Notification === undefined;
@@ -142,7 +141,6 @@ export const Environment = {
       clipboard: _supportsClipboard(),
       indexedDb: _supportsIndexedDb(),
       mediaDevices: _supportsMediaDevices(),
-      mediaPermissions: _supportsMediaPermissions(),
       notifications: _supportsNotifications(),
       permissions: _supportsPermissions(),
       screenSharing: _supportsScreenSharing(),

@@ -62,7 +62,6 @@ export const WebAppEvents = {
       JOIN: 'wire.webapp.call.state.join',
       LEAVE: 'wire.webapp.call.state.leave',
       REJECT: 'wire.webapp.call.state.reject',
-      REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove_participant',
       TOGGLE: 'wire.webapp.call.state.toggle',
     },
   },
@@ -156,6 +155,7 @@ export const WebAppEvents = {
     SHOW: 'wire.webapp.pending.show',
   },
   PREFERENCES: {
+    CHANGE_APP_LOCK_PASSPHRASE: 'wire.webapp.preferences.change_app_lock_passphrase',
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage_account',
     MANAGE_DEVICES: 'wire.webapp.preferences.manage_devices',
     UPLOAD_PICTURE: 'wire.webapp.preferences.upload_picture',
@@ -191,8 +191,6 @@ export const WebAppEvents = {
   SHORTCUT: {
     ADD_PEOPLE: 'wire.webapp.shortcut.add_people',
     ARCHIVE: 'wire.webapp.shortcut.archive',
-    CALL_MUTE: 'wire.webapp.shortcut.call_mute',
-    CALL_REJECT: 'wire.webapp.shortcut.call_reject',
     DELETE: 'wire.webapp.shortcut.delete',
     NEXT: 'wire.webapp.shortcut.next',
     NOTIFICATIONS: 'wire.webapp.shortcut.notifications',

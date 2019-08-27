@@ -78,10 +78,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
-import {PROPERTY_STATE} from '../calling/enum/PropertyState';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -241,7 +237,6 @@ export class ConversationRepository {
     });
 
     this.conversations_archived = ko.observableArray([]);
-    this.conversations_calls = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
 
@@ -280,21 +275,10 @@ export class ConversationRepository {
   _initStateUpdates() {
     ko.computed(() => {
       const conversationsArchived = [];
-      const conversationsCalls = [];
       const conversationsCleared = [];
       const conversationsUnarchived = [];
 
       this.sorted_conversations().forEach(conversationEntity => {
-        const conversationWithCall = this.selfUser().isTemporaryGuest()
-          ? conversationEntity.hasActiveCall() || conversationEntity.hasJoinableCall()
-          : conversationEntity.hasActiveCall();
-        if (conversationWithCall) {
-          if (conversationEntity.call().isOngoing()) {
-            conversationsCalls.unshift(conversationEntity);
-          } else {
-            conversationsCalls.push(conversationEntity);
-          }
-        }
         if (conversationEntity.is_cleared()) {
           conversationsCleared.push(conversationEntity);
         } else if (conversationEntity.is_archived()) {
@@ -305,7 +289,6 @@ export class ConversationRepository {
       });
 
       this.conversations_archived(conversationsArchived);
-      this.conversations_calls(conversationsCalls);
       this.conversations_cleared(conversationsCleared);
       this.conversations_unarchived(conversationsUnarchived);
     });
@@ -1522,7 +1505,7 @@ export class ConversationRepository {
     }
 
     return loadUrlBlob(url).then(blob => {
-      const textMessage = t('extensionsGiphyMessage', tag);
+      const textMessage = t('extensionsGiphyMessage', tag, {}, true);
       this.sendText(conversationEntity, textMessage, null, quoteEntity);
       return this.upload_images(conversationEntity, [blob]);
     });
@@ -1991,38 +1974,21 @@ export class ConversationRepository {
    * Send call message in specified conversation.
    *
    * @param {EventInfoEntity} eventInfoEntity - Event info to be send
-   * @param {Conversation} conversationEntity - Conversation to send call message to
+   * @param {string} conversationId - id of the conversation to send call message to
    * @param {CallMessageEntity} callMessageEntity - Content for call message
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  sendCallingMessage(eventInfoEntity, conversationEntity, callMessageEntity) {
-    return this.messageSender
-      .queueMessage(() => {
-        const options = eventInfoEntity.options;
-        const recipientsPromise = options.recipients
-          ? Promise.resolve(eventInfoEntity)
-          : this.create_recipients(conversationEntity.id, false).then(recipients => {
-              eventInfoEntity.updateOptions({recipients});
-              return eventInfoEntity;
-            });
-
-        return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
-      })
-      .then(() => {
-        const initiatingCallMessage = [CALL_MESSAGE_TYPE.GROUP_START, CALL_MESSAGE_TYPE.SETUP];
-
-        const isCallInitiation = initiatingCallMessage.includes(callMessageEntity.type);
-        if (isCallInitiation) {
-          return this._trackContributed(conversationEntity, eventInfoEntity.genericMessage, callMessageEntity);
-        }
-      })
-      .catch(error => {
-        if (!this._isUserCancellationError(error)) {
-          throw error;
-        }
-
-        amplify.publish(WebAppEvents.CALL.STATE.DELETE, callMessageEntity.conversationId);
-      });
+  sendCallingMessage(eventInfoEntity, conversationId, callMessageEntity) {
+    return this.messageSender.queueMessage(() => {
+      const options = eventInfoEntity.options;
+      const recipientsPromise = options.recipients
+        ? Promise.resolve(eventInfoEntity)
+        : this.create_recipients(conversationId, false).then(recipients => {
+            eventInfoEntity.updateOptions({recipients});
+            return eventInfoEntity;
+          });
+      return recipientsPromise.then(infoEntity => this._sendGenericMessage(infoEntity));
+    });
   }
 
   /**
@@ -3550,11 +3516,6 @@ export class ConversationRepository {
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
 
-      if (conversationEntity.call()) {
-        const reason = TERMINATION_REASON.MEMBER_LEAVE;
-        amplify.publish(WebAppEvents.CALL.STATE.LEAVE, conversationEntity.id, reason);
-      }
-
       if (this.selfUser().isTemporaryGuest()) {
         eventJson.from = this.selfUser().id;
       }
@@ -3571,10 +3532,6 @@ export class ConversationRepository {
 
               if (userEntity.isTemporaryGuest()) {
                 userEntity.clearExpirationTimeout();
-              }
-
-              if (conversationEntity.call()) {
-                amplify.publish(WebAppEvents.CALL.STATE.REMOVE_PARTICIPANT, conversationEntity.id, userEntity.id);
               }
             });
 
@@ -3627,13 +3584,6 @@ export class ConversationRepository {
 
     if (conversationEntity.is_cleared()) {
       this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
-    }
-
-    if (!conversationEntity.showNotificationsEverything()) {
-      const hasIncomingCall = conversationEntity.call() && conversationEntity.call().isIncoming();
-      if (hasIncomingCall) {
-        amplify.publish(WebAppEvents.CALL.STATE.REJECT, conversationEntity.id, false);
-      }
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
@@ -4135,13 +4085,6 @@ export class ConversationRepository {
         if (protoAsset.original) {
           actionType = protoAsset.original.image ? 'photo' : 'file';
         }
-        break;
-      }
-
-      case 'calling': {
-        const properties = callMessageEntity.properties;
-        const isVideoCall = properties.videosend === PROPERTY_STATE.TRUE;
-        actionType = isVideoCall ? 'video_call' : 'audio_call';
         break;
       }
 

@@ -22,6 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {CALL_TYPE} from '@wireapp/avs';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
@@ -112,15 +113,13 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
 
       const hasConnectRequests = !!this.userRepository.connect_requests().length;
-      const states = hasConnectRequests ? ContentViewModel.STATE.CONNECTION_REQUESTS : [];
-      return this.conversationRepository
-        .conversations_calls()
-        .concat(states, this.conversationRepository.conversations_unarchived());
+      const states = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
+      return states.concat(this.conversationRepository.conversations_unarchived());
     });
 
     // Nested view models
-    this.archive = new ArchiveViewModel(this, repositories.conversation, this.joinCall);
-    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.joinCall);
+    this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
+    this.conversations = new ConversationListViewModel(mainViewModel, this, repositories, this.answerCall);
     this.preferences = new PreferencesListViewModel(
       this.contentViewModel,
       this,
@@ -150,8 +149,12 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   }
 
-  joinCall = (conversationEntity, mediaType) => {
-    this.callingRepository.joinCall(conversationEntity, mediaType);
+  answerCall = conversationEntity => {
+    const call = this.callingRepository.findCall(conversationEntity.id);
+    if (call) {
+      const callType = call.selfParticipant.sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
+      this.callingRepository.answerCall(call, callType);
+    }
   };
 
   changeNotificationSetting() {
