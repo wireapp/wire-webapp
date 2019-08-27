@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.2.9...@wireapp/api-client@6.3.0) (2019-08-27)
+
+
+### Features
+
+* **api-client:** Expose phone login ([#2222](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2222)) ([e0ff4f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e0ff4f0))
+
+
+
+
+
 ## [6.2.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.2.8...@wireapp/api-client@6.2.9) (2019-08-26)
 
 **Note:** Version bump only for package @wireapp/api-client

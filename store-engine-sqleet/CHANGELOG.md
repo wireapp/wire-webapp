@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.7.7...@wireapp/store-engine-sqleet@0.8.0) (2019-08-27)
+
+
+### Features
+
+* **api-client:** Expose phone login ([#2222](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2222)) ([e0ff4f0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/e0ff4f0))
+
+
+
+
+
 ## [0.7.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.7.6...@wireapp/store-engine-sqleet@0.7.7) (2019-08-26)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
