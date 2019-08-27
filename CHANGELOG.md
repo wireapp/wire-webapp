@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.17.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.16.0...@wireapp/react-ui-kit@7.17.0) (2019-08-27)
+
+
+### Features
+
+* Add notification icon ([#2232](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2232)) ([b526697](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b526697))
+
+
+
+
+
 # [7.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.15.1...@wireapp/react-ui-kit@7.16.0) (2019-08-27)
 
 
