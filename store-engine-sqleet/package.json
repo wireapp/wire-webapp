@@ -6,7 +6,7 @@
     "@babel/preset-typescript": "7.3.3",
     "@types/sql.js": "1.0.2",
     "@wireapp/store-engine": "3.9.6",
-    "sql.js": "https://github.com/pwnsdx/sqleet.js#a078babcad5e6beda01370466328e47b3c4a2de7",
+    "sql.js": "https://github.com/pwnsdx/sqleet.js#8075c8ed6a95f6fe7ab7a41703b2fcc3a412be2f",
     "uint32": "0.2.1"
   },
   "devDependencies": {
