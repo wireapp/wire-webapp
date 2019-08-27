@@ -84,7 +84,7 @@ export class AppLockViewModel {
   state: ko.Observable<APPLOCK_STATE>;
   storageKey: ko.PureComputed<string>;
   unfocusTimeOut: number;
-  unfocusTimeOutId: number;
+  unfocusTimeoutId: number;
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
 
@@ -106,7 +106,7 @@ export class AppLockViewModel {
     });
 
     this.unfocusTimeOut = Config.FEATURE.APPLOCK_UNFOCUS_TIMEOUT * 1000;
-    this.unfocusTimeOutId = 0;
+    this.unfocusTimeoutId = 0;
 
     this.scheduledTimeOut = Config.FEATURE.APPLOCK_SCHEDULED_TIMEOUT * 1000;
     this.scheduledTimeOutId = 0;
@@ -153,7 +153,11 @@ export class AppLockViewModel {
     if (isAppLockEnabled()) {
       this.showAppLock();
       if (isUnfocusAppLockEnabled()) {
-        document.addEventListener('visibilitychange', this.handleVisibilityChange, false);
+        window.addEventListener('blur', () => {
+          this.clearAppLockTimeout();
+          this.startAppLockTimeout();
+        });
+        window.addEventListener('focus', this.clearAppLockTimeout);
       }
       this.startPassphraseObserver();
     }
@@ -204,12 +208,12 @@ export class AppLockViewModel {
     this.appObserver.disconnect();
   };
 
-  handleVisibilityChange = () => {
-    window.clearTimeout(this.unfocusTimeOutId);
-    const isHidden = document.visibilityState === 'hidden';
-    if (isHidden) {
-      this.unfocusTimeOutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOutinMillis() * 1000);
-    }
+  clearAppLockTimeout = () => {
+    window.clearTimeout(this.unfocusTimeoutId);
+  };
+
+  startAppLockTimeout = () => {
+    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeOutinMillis() * 1000);
   };
 
   startScheduledTimeout = () => {
