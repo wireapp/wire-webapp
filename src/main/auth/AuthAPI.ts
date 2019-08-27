@@ -20,12 +20,13 @@
 import {CRUDEngine} from '@wireapp/store-engine';
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {AccessTokenData, LoginData} from '../auth/';
+import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
 import {ClientType} from '../client/';
 import {HttpClient} from '../http/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user/';
 import {CookieList} from './CookieList';
+import {LoginCodeResponse} from './LoginCodeResponse';
 import {RegisterData} from './RegisterData';
 
 export class AuthAPI {
@@ -38,6 +39,7 @@ export class AuthAPI {
     LOGIN: '/login',
     LOGOUT: 'logout',
     REGISTER: '/register',
+    SEND: 'send',
     SSO: '/sso',
   };
 
@@ -84,6 +86,22 @@ export class AuthAPI {
         persist: loginData.clientType === ClientType.PERMANENT,
       },
       url: AuthAPI.URL.LOGIN,
+      withCredentials: true,
+    };
+
+    return this.client.sendJSON(config);
+  }
+
+  /**
+   * This operation generates and sends a login code. A login code can be used only once and times out after 10 minutes. Only one login code may be pending at a time.
+   * @param loginRequest Phone number to use for login SMS or voice call.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/sendLoginCode
+   */
+  public postLoginSend(loginRequest: SendLoginCode): Promise<AxiosResponse<LoginCodeResponse>> {
+    const config: AxiosRequestConfig = {
+      data: loginRequest,
+      method: 'post',
+      url: `${AuthAPI.URL.LOGIN}/${AuthAPI.URL.SEND}`,
       withCredentials: true,
     };
 

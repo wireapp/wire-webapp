@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,9 @@
  *
  */
 
-export const AUTH_ACCESS_TOKEN_KEY = 'access-token';
-export const AUTH_COOKIE_KEY = 'cookie';
-export const AUTH_TABLE_NAME = 'authentication';
-
-export * from './AccessTokenData';
-export * from './AccessTokenStore';
-export * from './AuthAPI';
-export * from './AuthenticationError';
-export * from './ClientPreKey';
-export * from './Context';
-export * from './Cookie';
-export * from './LoginCodeResponse';
-export * from './LoginData';
-export * from './PreKey';
-export * from './PreKeyBundle';
-export * from './RegisterData';
-export * from './SendLoginCode';
+export interface SendLoginCode {
+  /** E.164 phone number to send the code to. */
+  phone: string;
+  /** Request the code with a call instead (default is SMS). */
+  voice_call?: boolean;
+}
