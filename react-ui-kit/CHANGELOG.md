@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.15.1...@wireapp/react-ui-kit@7.16.0) (2019-08-27)
+
+
+### Features
+
+* **react-ui-kit:** Add ChevronIcon ([#2231](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2231)) ([f142ce3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f142ce3))
+
+
+
+
+
 ## [7.15.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.15.0...@wireapp/react-ui-kit@7.15.1) (2019-08-26)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
