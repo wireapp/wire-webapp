@@ -91,9 +91,10 @@ export class StorageService {
    * Initialize the IndexedDB for a user.
    *
    * @param userId - User ID
+   * @param requestPersistentStorage - if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  async init(userId = this.userId): Promise<string> {
+  async init(userId = this.userId, requestPersistentStorage = false): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
@@ -108,7 +109,11 @@ export class StorageService {
         await this.moveDexieToMemory();
         this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
       } else {
-        await this.engine.initWithDb(this.db);
+        try {
+          await this.engine.initWithDb(this.db, requestPersistentStorage);
+        } catch (error) {
+          await this.engine.initWithDb(this.db, false);
+        }
         await this.db.open();
         this._initCrudHooks();
         this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
