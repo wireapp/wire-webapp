@@ -41,6 +41,7 @@ export * from './InfoIcon';
 export * from './InviteIcon';
 export * from './LeaveIcon';
 export * from './MessageIcon';
+export * from './MinusIcon';
 export * from './MoreIcon';
 export * from './MuteIcon';
 export * from './NotificationIcon';
