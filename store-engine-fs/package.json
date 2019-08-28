@@ -1,12 +1,12 @@
 {
   "dependencies": {
     "@types/fs-extra": "8.0.0",
-    "@wireapp/store-engine": "3.9.6",
     "fs-extra": "8.1.0"
   },
   "devDependencies": {
     "@types/jasmine": "3.4.0",
     "@types/node": "~10",
+    "@wireapp/store-engine": "3.9.6",
     "jasmine": "3.4.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
@@ -20,6 +20,9 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@wireapp/store-engine-fs",
+  "peerDependencies": {
+    "@wireapp/store-engine": "3.x.x"
+  },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs",
   "scripts": {
     "build": "yarn build:node",

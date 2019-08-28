@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "@wireapp/store-engine": "3.9.6",
     "dexie": "2.0.4"
   },
   "devDependencies": {
     "@types/jasmine": "3.4.0",
     "@types/karma": "3.0.3",
     "@types/node": "~10",
+    "@wireapp/store-engine": "3.9.6",
     "jasmine": "3.4.0",
     "karma": "4.2.0",
     "karma-chrome-launcher": "3.1.0",
@@ -24,6 +24,9 @@
   "license": "GPL-3.0",
   "main": "./dist/index.js",
   "name": "@wireapp/store-engine-dexie",
+  "peerDependencies": {
+    "@wireapp/store-engine": "3.x.x"
+  },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie",
   "scripts": {
     "build": "yarn build:node",

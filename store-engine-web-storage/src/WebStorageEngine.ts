@@ -54,7 +54,7 @@ export class WebStorageEngine implements CRUDEngine {
     entity: EntityType,
   ): Promise<PrimaryKey> {
     if (entity) {
-      const internalPrimaryKey = this.createKey<PrimaryKey>(tableName, primaryKey);
+      const internalPrimaryKey: any = this.createKey<PrimaryKey>(tableName, primaryKey);
       return this.read(tableName, primaryKey)
         .catch(error => {
           if (error instanceof StoreEngineError.RecordNotFoundError) {
@@ -73,11 +73,11 @@ export class WebStorageEngine implements CRUDEngine {
               this.webStorage.setItem(`${internalPrimaryKey}`, JSON.stringify(entity));
             }
 
-            if (typeof internalPrimaryKey === 'string') {
-              return (<unknown>internalPrimaryKey.replace(this.createPrefix(tableName), '')) as PrimaryKey;
-            }
+            const keyWithoutPrefix = internalPrimaryKey.replace(this.createPrefix(tableName), '');
+            const numericKey = parseInt(keyWithoutPrefix, 10);
+            const returnKey = isNaN(numericKey) ? keyWithoutPrefix : numericKey;
 
-            return primaryKey;
+            return returnKey as PrimaryKey;
           }
         });
     }
