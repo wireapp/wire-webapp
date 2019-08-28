@@ -51,7 +51,7 @@ import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
-interface Props extends RouteComponentProps<{}> {}
+interface Props extends React.HTMLAttributes<HTMLDivElement>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   error: Error;
