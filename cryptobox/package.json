@@ -10,7 +10,7 @@
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
-    "@wireapp/store-engine-fs": "1.4.6",
+    "@wireapp/store-engine-fs": "1.4.7",
     "browser-sync": "2.26.7",
     "cpx": "1.5.0",
     "cross-env": "5.2.0",
@@ -44,5 +44,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
-  "version": "11.4.26"
+  "version": "11.4.27"
 }

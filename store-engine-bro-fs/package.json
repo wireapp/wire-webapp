@@ -36,5 +36,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.7.5"
+  "version": "0.7.6"
 }
