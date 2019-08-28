@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.18.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.17.0...@wireapp/react-ui-kit@7.18.0) (2019-08-28)
+
+
+### Features
+
+* **react-ui-kit:** Add Minus Icon ([#2234](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2234)) ([9e5acc5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/9e5acc5))
+
+
+
+
+
 # [7.17.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.16.0...@wireapp/react-ui-kit@7.17.0) (2019-08-27)
 
 
