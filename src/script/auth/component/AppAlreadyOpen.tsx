@@ -27,7 +27,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as CookieSelector from '../module/selector/CookieSelector';
 
-export interface Props extends React.HTMLAttributes<AppAlreadyOpen> {
+export interface Props {
   fullscreen?: boolean;
 }
 
@@ -39,38 +39,31 @@ interface DispatchProps {
   removeCookie: (name: string) => Promise<void>;
 }
 
-class AppAlreadyOpen extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps> {
-  onContinue = () => {
-    this.props.removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED);
-  };
+type AppAlreadyOpenProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
-  render = () => {
-    const {
-      isAppAlreadyOpen,
-      fullscreen,
-      intl: {formatMessage: _},
-    } = this.props;
-    return (
-      isAppAlreadyOpen && (
-        <Modal fullscreen={fullscreen}>
-          <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
-            <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
-              {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
-            </H3>
-            <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
-            <Columns style={{marginTop: '20px'}}>
-              <Column style={{textAlign: 'center'}}>
-                <Button block onClick={this.onContinue} style={{marginBottom: '10px'}} data-uie-name="do-action">
-                  {_(appAlreadyOpenStrings.continueButton)}
-                </Button>
-              </Column>
-            </Columns>
-          </Container>
-        </Modal>
-      )
-    );
-  };
-}
+const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, intl: {formatMessage: _}, removeCookie}: AppAlreadyOpenProps) =>
+  isAppAlreadyOpen && (
+    <Modal fullscreen={fullscreen}>
+      <Container style={{maxWidth: '320px'}} data-uie-name="modal-already-open">
+        <H3 style={{fontWeight: 500, marginTop: '10px'}} data-uie-name="status-modal-title">
+          {_(appAlreadyOpenStrings.headline, {brandName: Config.BRAND_NAME})}
+        </H3>
+        <Text data-uie-name="status-modal-text">{_(appAlreadyOpenStrings.text)}</Text>
+        <Columns style={{marginTop: '20px'}}>
+          <Column style={{textAlign: 'center'}}>
+            <Button
+              block
+              onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
+              style={{marginBottom: '10px'}}
+              data-uie-name="do-action"
+            >
+              {_(appAlreadyOpenStrings.continueButton)}
+            </Button>
+          </Column>
+        </Columns>
+      </Container>
+    </Modal>
+  );
 
 export default injectIntl(
   connect(

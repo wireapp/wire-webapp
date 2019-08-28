@@ -30,7 +30,7 @@ import {trimEnd, trimStart} from 'Util/StringUtil';
 
 import {resolve, graph} from '../../config/appResolver';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {ParticipantAvatar} from '../../components/participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import {StorageKey} from '../../storage/StorageKey';
 import {WebAppEvents} from '../../event/WebApp';

@@ -19,7 +19,7 @@
 
 import {getLogger} from 'Util/Logger';
 
-import {ParticipantAvatar} from './participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 window.z = window.z || {};
 window.z.components = z.components || {};

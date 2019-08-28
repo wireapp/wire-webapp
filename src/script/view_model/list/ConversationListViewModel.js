@@ -22,7 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {WebAppEvents} from '../../event/WebApp';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
-import {ParticipantAvatar} from '../../components/participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import {STATE as CALL_STATE, REASON as CALL_REASON} from '@wireapp/avs';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
@@ -101,8 +101,14 @@ export class ConversationListViewModel {
 
     this.shouldUpdateScrollbar = ko
       .computed(() => {
-        const numberOfConversations = this.unarchivedConversations().length;
-        return this.webappIsLoaded() || numberOfConversations || this.connectRequests().length;
+        // We need all of those as trigger for the antiscroll update.
+        // If we would just use
+        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
+        // it might return after the first truthy value and not monitor the remaining observables.
+        this.unarchivedConversations();
+        this.webappIsLoaded();
+        this.connectRequests();
+        this.callingViewModel.activeCalls();
       })
       .extend({notify: 'always', rateLimit: 500});
 

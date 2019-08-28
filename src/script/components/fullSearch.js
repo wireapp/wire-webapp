@@ -23,7 +23,7 @@ import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
 import {escapeString} from 'Util/SanitizationUtil';
 
-import {ParticipantAvatar} from './participantAvatar';
+import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 
 window.z = window.z || {};

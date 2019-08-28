@@ -141,6 +141,16 @@ export class AuthService {
     });
   }
 
+  validatePassword(password: string): Promise<void> {
+    return this.backendClient.sendJson({
+      data: {
+        password: password,
+      },
+      type: 'POST',
+      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
+    });
+  }
+
   postCookiesRemove(email: string, password: string, labels: string[]): Promise<void> {
     return this.backendClient.sendJson({
       data: {

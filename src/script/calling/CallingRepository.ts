@@ -335,7 +335,12 @@ export class CallingRepository {
     switch (type) {
       case CALL_MESSAGE_TYPE.SETUP:
       case CALL_MESSAGE_TYPE.GROUP_START:
-        this.injectActivateEvent(conversationId, userId, time, source);
+        const activeCall = this.findCall(conversationId);
+        const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
+        if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
+          // we want to ignore call start events that already have an active call (whether it's ringing or connected).
+          this.injectActivateEvent(conversationId, userId, time, source);
+        }
         break;
     }
   }

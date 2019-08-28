@@ -155,6 +155,7 @@ export const WebAppEvents = {
     SHOW: 'wire.webapp.pending.show',
   },
   PREFERENCES: {
+    CHANGE_APP_LOCK_PASSPHRASE: 'wire.webapp.preferences.change_app_lock_passphrase',
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage_account',
     MANAGE_DEVICES: 'wire.webapp.preferences.manage_devices',
     UPLOAD_PICTURE: 'wire.webapp.preferences.upload_picture',
