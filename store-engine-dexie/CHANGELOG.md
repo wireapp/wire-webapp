@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.6.1...@wireapp/store-engine-dexie@0.6.2) (2019-08-28)
+
+
+### Bug Fixes
+
+* **store-engine-dexie:** Check usage after assigning ([#2236](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2236)) ([87dd761](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/87dd761))
+
+
+
+
+
 ## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.6.0...@wireapp/store-engine-dexie@0.6.1) (2019-08-27)
 
 
