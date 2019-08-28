@@ -367,6 +367,7 @@ export class CallingRepository {
         const rejectedCallInConversation = this.findCall(conversationId);
         if (rejectedCallInConversation) {
           // if there is a rejected call, we can remove it from the store
+          rejectedCallInConversation.state(CALL_STATE.NONE);
           this.removeCall(rejectedCallInConversation);
         }
         const selfParticipant = new Participant(this.selfUser.id, this.selfClientId);
