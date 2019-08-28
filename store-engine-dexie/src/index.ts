@@ -79,7 +79,7 @@ export class IndexedDBEngine implements CRUDEngine {
 
   public async init(storeName: string, registerPersisted: boolean = false): Promise<Dexie> {
     await this.isSupported();
-    const dexie = await this.assignDb(new Dexie(storeName));
+    const dexie = this.assignDb(new Dexie(storeName));
     if (registerPersisted) {
       await this.registerPersistentStorage();
     }
@@ -87,8 +87,8 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public async initWithDb(db: Dexie, registerPersisted: boolean = false): Promise<Dexie> {
-    await this.isSupported();
     const dexie = this.assignDb(db);
+    await this.isSupported();
     if (registerPersisted) {
       await this.registerPersistentStorage();
     }
@@ -103,8 +103,8 @@ export class IndexedDBEngine implements CRUDEngine {
     return false;
   }
 
-  // If you want to add listeners to the database and you don't care if it is a new database (init)
-  // or an existing (initWithDB) one, then this method is the right place to do it.
+  // If you want to add listeners to the database and you don't care if it is a new database (`init()`)
+  // or an existing (`initWithDb()`) one, then this method is the right place to do it.
   private assignDb(db: Dexie): Dexie {
     this.db = db;
     this.storeName = this.db.name;
