@@ -185,40 +185,42 @@ export class FileSystemEngine implements CRUDEngine {
     return primaryKeys;
   }
 
-  update<PrimaryKey = string, ChangesType = Object>(
+  async update<PrimaryKey = string, ChangesType = Object>(
     tableName: string,
     primaryKey: PrimaryKey,
     changes: ChangesType,
   ): Promise<PrimaryKey> {
     const filePath = this.createFilePath(tableName, primaryKey);
-    return this.read(tableName, primaryKey)
-      .then((record: any) => {
-        if (typeof record === 'string') {
-          record = JSON.parse(record);
-        }
-        const updatedRecord: Object = {...record, ...changes};
-        return JSON.stringify(updatedRecord);
-      })
-      .then((updatedRecord: any) => fs.writeFile(filePath, updatedRecord))
-      .then(() => primaryKey);
+    let record = await this.read(tableName, primaryKey);
+    if (typeof record === 'string') {
+      record = JSON.parse(record);
+    }
+    const updatedRecord: Object = {...record, ...changes};
+    const updatedRecord_1 = JSON.stringify(updatedRecord);
+    await fs.writeFile(filePath, updatedRecord_1);
+    return primaryKey;
   }
 
   async purge(): Promise<void> {
     await fs.rmdir(this.storeName);
   }
 
-  updateOrCreate<PrimaryKey = string, ChangesType = Object>(
+  async updateOrCreate<PrimaryKey = string, ChangesType = Object>(
     tableName: string,
     primaryKey: PrimaryKey,
     changes: ChangesType,
   ): Promise<PrimaryKey> {
-    return this.update(tableName, primaryKey, changes)
-      .catch(error => {
-        if (error instanceof StoreEngineError.RecordNotFoundError) {
-          return this.create(tableName, primaryKey, changes);
-        }
+    let internalPrimaryKey;
+
+    try {
+      internalPrimaryKey = await this.update(tableName, primaryKey, changes);
+    } catch (error) {
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
+        internalPrimaryKey = await this.create(tableName, primaryKey, changes);
+      } else {
         throw error;
-      })
-      .then(internalPrimaryKey => internalPrimaryKey);
+      }
+    }
+    return internalPrimaryKey;
   }
 }
