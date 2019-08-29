@@ -27,18 +27,17 @@ export class MemoryEngine implements CRUDEngine {
   private readonly stores: MemoryStore = {};
   private autoIncrementedPrimaryKey: number = 1;
 
-  append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
+  async append<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey, additions: string): Promise<PrimaryKey> {
     this.prepareTable(tableName);
-    return this.read(tableName, primaryKey).then((record: any) => {
-      if (typeof record === 'string') {
-        record += additions;
-      } else {
-        const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
-        throw new RecordTypeError(message);
-      }
-      this.stores[this.storeName][tableName][primaryKey] = record;
-      return primaryKey;
-    });
+    let record = await this.read(tableName, primaryKey);
+    if (typeof record === 'string') {
+      record += additions;
+    } else {
+      const message = `Cannot append text to record "${primaryKey}" because it's not a string.`;
+      throw new RecordTypeError(message);
+    }
+    this.stores[this.storeName][tableName][primaryKey] = record;
+    return primaryKey;
   }
 
   create<EntityType, PrimaryKey = string>(
@@ -71,19 +70,15 @@ export class MemoryEngine implements CRUDEngine {
     return Promise.reject(new RecordTypeError(message));
   }
 
-  public delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
+  public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     this.prepareTable(tableName);
-    return Promise.resolve().then(() => {
-      delete this.stores[this.storeName][tableName][primaryKey];
-      return primaryKey;
-    });
+    delete this.stores[this.storeName][tableName][primaryKey];
+    return primaryKey;
   }
 
-  public deleteAll(tableName: string): Promise<boolean> {
-    return Promise.resolve().then(() => {
-      delete this.stores[this.storeName][tableName];
-      return true;
-    });
+  public async deleteAll(tableName: string): Promise<boolean> {
+    delete this.stores[this.storeName][tableName];
+    return true;
   }
 
   public async init(storeName: string): Promise<MemoryStore> {
