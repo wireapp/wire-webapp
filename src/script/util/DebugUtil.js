@@ -309,8 +309,8 @@ export class DebugUtil {
    * Print call log to console.
    * @returns {undefined} No return value
    */
-  logCallMessages() {
-    this.callingRepository.printLog();
+  getCallingLogs() {
+    return this.callingRepository.callLog.join('\n');
   }
 
   reprocessNotificationStream(conversationId = this.conversationRepository.active_conversation().id) {
