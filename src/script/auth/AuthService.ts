@@ -17,15 +17,28 @@
  *
  */
 
+import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
-import {BackendClient} from '../service/BackendClient';
-import {QUEUE_STATE} from '../service/QueueState';
 
 import {BackendClientError} from '../error/BackendClientError';
 
+import {AccessTokenData, LoginData} from '@wireapp/api-client/dist/commonjs/auth';
+import {BackendClient} from '../service/BackendClient';
+import {QUEUE_STATE} from '../service/QueueState';
+
 export class AuthService {
-  static get CONFIG() {
+  private readonly backendClient: any;
+  private readonly logger: Logger;
+
+  static get CONFIG(): {
+    POST_ACCESS_RETRY: {
+      LIMIT: number;
+      TIMEOUT: number;
+    };
+    URL_ACCESS: string;
+    URL_COOKIES: string;
+    URL_LOGIN: string;
+  } {
     return {
       POST_ACCESS_RETRY: {
         LIMIT: 10,
@@ -37,17 +50,12 @@ export class AuthService {
     };
   }
 
-  constructor(backendClient, logger) {
+  constructor(backendClient: any) {
     this.backendClient = backendClient;
-    this.logger = logger;
+    this.logger = getLogger('AuthService');
   }
 
-  /**
-   * Get all cookies for a user.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//getCookies
-   * @returns {Promise} Promise that resolves with an array of cookies.
-   */
-  getCookies() {
+  getCookies(): Promise<string[]> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: AuthService.CONFIG.URL_COOKIES,
@@ -56,21 +64,14 @@ export class AuthService {
 
   /**
    * Get access token if a valid cookie is provided.
-   *
-   * @example Access token data we expect:
-   *  access_token: Lt-IRHxkY9JLA5UuBR3Exxj5lCUf... - Token
-   *  expires_in: 900 - Expiration in seconds
-   *  token_type: Bearer - Token type
-   *  user: 4363e274-69c9-... - User ID
-   *
    * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//newAccessToken
-   * @param {number} retryAttempt - Retry attempts when a request fails
-   * @returns {Promise} Promise which resolves with access token data (token_type, etc.).
+   * @param retryAttempt - Retry attempts when a request fails
+   * @returns Promise which resolves with access token data.
    */
-  postAccess(retryAttempt = 1) {
+  postAccess(retryAttempt: number = 1): Promise<AccessTokenData> {
     return new Promise((resolve, reject) => {
-      const ajaxConfig = {
+      const ajaxConfig: JQuery.AjaxSettings = {
         crossDomain: true,
         type: 'POST',
         url: this.backendClient.createUrl(AuthService.CONFIG.URL_ACCESS),
@@ -82,7 +83,7 @@ export class AuthService {
       if (this.backendClient.accessToken) {
         const {accessToken, accessTokenType} = this.backendClient;
         ajaxConfig.headers = {
-          Authorization: `${accessTokenType} ${window.decodeURIComponent(accessToken)}`,
+          Authorization: `${accessTokenType} ${decodeURIComponent(accessToken)}`,
         };
       }
 
@@ -140,17 +141,17 @@ export class AuthService {
     });
   }
 
-  /**
-   * Delete cookies on backend.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//rmCookies
-   *
-   * @param {string} email - Email address of user
-   * @param {string} password - Password of user
-   * @param {string[]} [labels] - A list of cookie labels to remove from the system (optional)
-   * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
-   */
-  postCookiesRemove(email, password, labels) {
+  validatePassword(password: string): Promise<void> {
+    return this.backendClient.sendJson({
+      data: {
+        password: password,
+      },
+      type: 'POST',
+      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
+    });
+  }
+
+  postCookiesRemove(email: string, password: string, labels: string[]): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         email: email,
@@ -162,31 +163,8 @@ export class AuthService {
     });
   }
 
-  validatePassword(password) {
-    return this.backendClient.sendJson({
-      data: {
-        password: password,
-      },
-      type: 'POST',
-      url: `${AuthService.CONFIG.URL_COOKIES}/remove`,
-    });
-  }
-
-  /**
-   * Login in order to obtain an access-token and cookie.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//login
-   *
-   * @param {Object} login - Containing sign in information
-   * @param {string} login.email - The email address for a password login
-   * @param {string} login.phone - The phone number for a password or SMS login
-   * @param {string} login.password - The password for a password login
-   * @param {string} login.code - The login code for an SMS login
-   * @param {boolean} persist - Request a persistent cookie instead of a session cookie
-   * @returns {Promise} Promise that resolves with access token
-   */
-  postLogin(login, persist) {
-    const persistParam = window.encodeURIComponent(persist.toString());
+  postLogin(login: LoginData, persist: boolean): Promise<AccessTokenData> {
+    const persistParam = encodeURIComponent(persist.toString());
     return new Promise((resolve, reject) => {
       $.ajax({
         contentType: 'application/json; charset=utf-8',
@@ -204,16 +182,12 @@ export class AuthService {
     });
   }
 
-  /**
-   * A login code can be used only once and times out after 10 minutes.
-   *
-   * @note Only one login code may be pending at a time.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//sendLoginCode
-   *
-   * @param {Object} requestCode - Containing the phone number in E.164 format and whether a code should be forced
-   * @returns {Promise} Promise that resolves on successful login code request
-   */
-  postLoginSend(requestCode) {
+  postLoginSend(requestCode: {
+    force: number;
+    phone: string;
+  }): Promise<{
+    expires_in: number;
+  }> {
     return this.backendClient.sendJson({
       data: requestCode,
       type: 'POST',
@@ -221,12 +195,7 @@ export class AuthService {
     });
   }
 
-  /**
-   * Logout on the backend side.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/logout
-   * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
-   */
-  postLogout() {
+  postLogout(): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'POST',
       url: `${AuthService.CONFIG.URL_ACCESS}/logout`,
@@ -234,14 +203,7 @@ export class AuthService {
     });
   }
 
-  /**
-   * Save the access token date in the client.
-   *
-   * @param {string} tokenType - Access token type
-   * @param {string} token - Access token
-   * @returns {undefined}
-   */
-  saveAccessTokenInClient(tokenType = '', token = '') {
+  saveAccessTokenInClient(tokenType: string = '', token: string = ''): void {
     this.backendClient.accessTokenType = tokenType;
     this.backendClient.accessToken = token;
   }
