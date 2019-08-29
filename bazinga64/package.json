@@ -3,8 +3,8 @@
   "devDependencies": {
     "@types/jasmine": "3.4.0",
     "@types/karma": "3.0.3",
-    "@types/node": "~10",
     "@types/libsodium-wrappers-sumo": "0.7.1",
+    "@types/node": "~10",
     "cross-env": "5.2.0",
     "jasmine": "3.4.0",
     "karma": "4.2.0",
@@ -53,5 +53,5 @@
     "test:browser": "karma start",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "5.5.13"
+  "version": "5.5.14"
 }
