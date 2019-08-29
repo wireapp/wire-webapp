@@ -183,7 +183,7 @@ describe('numberArrayToArrayBufferView', () => {
     expect(arrayBufferView).toEqual(new Uint8Array(helloDecodedArray));
   });
 
-  if (typeof global === 'object') {
+  if (typeof Window === 'undefined') {
     it('works with plain Buffers', () => {
       const decoded = Buffer.from(helloEncodedString, 'base64');
       const arrayBufferView = bazinga64.Converter.numberArrayToArrayBufferView(decoded);

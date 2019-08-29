@@ -23,7 +23,7 @@
     "karma-typescript": "4.1.1",
     "rimraf": "3.0.0",
     "ts-node": "8.3.0",
-    "typescript": "3.5.3"
+    "typescript": "3.6.2"
   },
   "description": "Store Engine implementation for SQLite 3 (WebAssembly) with encryption.",
   "files": [

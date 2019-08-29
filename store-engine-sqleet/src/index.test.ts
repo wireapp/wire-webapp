@@ -310,21 +310,22 @@ describe('SQLeetEngine', () => {
         },
       };
 
+      const storeName = 'store';
       const primaryKeyName = 'database';
 
       const indexedDB = new IndexedDBEngine();
-      const indexedDBInstance = await indexedDB.init(this.storeName);
-      indexedDBInstance.version(1).stores({[this.storeName]: ''});
+      const indexedDBInstance = await indexedDB.init(storeName);
+      indexedDBInstance.version(1).stores({[storeName]: ''});
       await indexedDBInstance.open();
 
       const engine = await initEngine(schema);
 
       // Write and save
       await engine.create<DBRecord>('users', '1', {name: 'Otto', age: 1});
-      await indexedDB.updateOrCreate(this.storeName, primaryKeyName, await engine.export());
+      await indexedDB.updateOrCreate(storeName, primaryKeyName, await engine.export());
 
       // Import and read
-      const savedDatabase = await indexedDB.read<string>(this.storeName, primaryKeyName);
+      const savedDatabase = await indexedDB.read<string>(storeName, primaryKeyName);
       const engineNew = await initEngine(schema, true, savedDatabase);
       const result = await engineNew.read<DBRecord>('users', '1');
 
