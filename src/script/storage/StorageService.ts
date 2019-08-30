@@ -94,7 +94,7 @@ export class StorageService {
    * @param requestPersistentStorage - if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  async init(userId = this.userId, requestPersistentStorage = false): Promise<string> {
+  async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
