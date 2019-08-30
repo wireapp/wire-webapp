@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import initSqlJs from 'sql.js';
+import * as websql from '@wireapp/websql';
 
 import {
   RESERVED_COLUMN,
@@ -38,24 +38,16 @@ import {
 
 declare const WebAssembly: any;
 
-// https://lowrey.me/lodash-zipobject-in-es6-javascript/
-const zipObject = (props: any[], values: any[]) =>
-  props.reduce((prev, prop, i) => ({...prev, ...{[prop]: values[i]}}), {});
-
 export class SQLeetEngine implements CRUDEngine {
   private autoIncrementedPrimaryKey: number = 1;
-  private db: any;
-  private rawDatabase: string | undefined;
+  private readonly db: websql.Database;
   private readonly schema: SQLiteDatabaseDefinition<Record<string, any>> = {};
-  private readonly encryptionKey: string;
-  private readonly dbConfig: any;
   public storeName = '';
 
   constructor(
-    wasmLocation: Uint8Array | string,
+    private readonly workerLocation: string,
     providedSchema: SQLiteDatabaseSingleColumnDefinition | SQLiteDatabaseDefinition<Record<string, any>>,
-    encryptionKey: string,
-    rawDatabase?: string,
+    private readonly encryptionKey: string,
   ) {
     // Map single column to SQL entity
     for (const tableName in providedSchema) {
@@ -67,16 +59,13 @@ export class SQLeetEngine implements CRUDEngine {
         : (entity as SQLiteTableDefinition<string>);
     }
 
-    this.encryptionKey = encryptionKey;
-    this.dbConfig = {};
-
-    if (typeof wasmLocation === 'string') {
-      this.dbConfig.locateFile = () => wasmLocation;
-    } else if (wasmLocation instanceof Uint8Array) {
-      this.dbConfig.wasmBinary = wasmLocation;
-    }
-    if (rawDatabase) {
-      this.rawDatabase = rawDatabase;
+    try {
+      this.db = new websql.Database(this.workerLocation, {
+        allowMainWebWorker: true,
+        allowWebWorkerFallback: true,
+      });
+    } catch (error) {
+      throw new Error(`An error happened while initializing the engine: ${error.message}`);
     }
   }
 
@@ -89,62 +78,29 @@ export class SQLeetEngine implements CRUDEngine {
     await this.isSupported();
 
     this.storeName = storeName;
-
-    let existingDatabase: Uint8Array | undefined = undefined;
-    if (this.rawDatabase) {
-      existingDatabase = await this.load(this.rawDatabase);
-      this.rawDatabase = undefined;
-    }
-
-    const SQL = await initSqlJs(this.dbConfig);
-    this.db = new SQL.Database(existingDatabase);
-
-    // Settings
-    this.db.run('PRAGMA `encoding`="UTF-8";');
-    this.db.run(`PRAGMA \`key\`=${escape(this.encryptionKey)};`);
+    await this.db.mount({key: this.encryptionKey}, this.storeName);
 
     // Create tables
     let statement = '';
-
     for (const tableName in this.schema) {
       const table = this.schema[tableName];
       statement += createTableIfNotExists(tableName, table);
     }
-
-    this.db.run(statement);
+    await this.db.run(statement);
 
     return this.db;
   }
 
-  public async export<T>(): Promise<string> {
-    if (!this.db) {
-      throw new Error('SQLite needs to be available');
-    }
-    const database: Uint8Array = new Uint8Array(this.db.export());
-    const strings = [];
-    const chunkSize = 0xffff;
-    // There is a maximum stack size. We cannot call `String.fromCharCode` with as many arguments as we want
-    for (let i = 0; i * chunkSize < database.length; i++) {
-      strings[i] = String.fromCharCode.apply(null, <any>database.subarray(i * chunkSize, (i + 1) * chunkSize));
-    }
-    return strings.join('');
-  }
-
-  private async load(database: string): Promise<Uint8Array | undefined> {
-    const databaseBinary = new Uint8Array(database.length);
-    for (let i = 0; i < database.length; i++) {
-      databaseBinary[i] = database.charCodeAt(i);
-    }
-    return databaseBinary;
+  async export(): Promise<string> {
+    return this.db.export('utf8') as any;
   }
 
   async purge(): Promise<void> {
-    // Databases must be closed, when you're finished with them, or the memory consumption will grow forever.
+    // Databases must be closed, when you're finished with them, or the memory consumption will grow forever
     if (this.db) {
-      this.db.close();
+      await this.db.close();
+      await this.db.wipe(this.storeName);
     }
-    this.db = null;
-    this.rawDatabase = undefined;
   }
 
   private buildValues<EntityType = Record<string, SQLiteType>>(
@@ -212,7 +168,7 @@ export class SQLeetEngine implements CRUDEngine {
       true,
     )}) VALUES (@primaryKey,${newValues});`;
     try {
-      this.db.run(statement, {
+      await this.db.run(statement, {
         ...values,
         '@primaryKey': primaryKey,
       });
@@ -230,7 +186,7 @@ export class SQLeetEngine implements CRUDEngine {
   async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     const escapedTableName = escape(tableName);
     const statement = `DELETE FROM ${escapedTableName} WHERE ${SQLeetEnginePrimaryKeyName}=@primaryKey;`;
-    this.db.run(statement, {
+    await this.db.run(statement, {
       '@primaryKey': primaryKey,
     });
     return primaryKey;
@@ -239,7 +195,7 @@ export class SQLeetEngine implements CRUDEngine {
   async deleteAll(tableName: string): Promise<boolean> {
     const escapedTableName = escape(tableName);
     const statement = `DELETE FROM ${escapedTableName}`;
-    this.db.run(statement);
+    await this.db.run(statement);
     return true;
   }
 
@@ -251,13 +207,13 @@ export class SQLeetEngine implements CRUDEngine {
     const columns = getFormattedColumnsFromTableName(table);
     const escapedTableName = escape(tableName);
     const selectRecordStatement = `SELECT ${columns} FROM ${escapedTableName} WHERE ${SQLeetEnginePrimaryKeyName}=@primaryKey;`;
-    const statement = this.db.prepare(selectRecordStatement);
-    const record = statement.getAsObject({
+    const statement = await this.db.prepare(selectRecordStatement, {
       '@primaryKey': primaryKey,
     });
-    statement.free();
+    const record = (await statement.getAsObject())[0];
+    await statement.free();
 
-    if (Object.keys(record).length === 0) {
+    if (typeof record === 'undefined') {
       const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       throw new StoreEngineError.RecordNotFoundError(message);
     }
@@ -276,7 +232,7 @@ export class SQLeetEngine implements CRUDEngine {
       return record[RESERVED_COLUMN];
     }
 
-    return record;
+    return record as EntityType;
   }
 
   async readAll<T>(tableName: string): Promise<T[]> {
@@ -285,25 +241,21 @@ export class SQLeetEngine implements CRUDEngine {
     const escapedTableName = escape(tableName);
 
     const selectRecordStatement = `SELECT ${columns} FROM ${escapedTableName};`;
-    let records = this.db.exec(selectRecordStatement);
+    const statement = await this.db.prepare(selectRecordStatement);
+    const records = (await statement.getAsObject()) as T[];
 
-    // Ensure the record is not empty
-    if (records && records[0]) {
-      records = records[0];
-    } else {
-      return [];
-    }
-
-    return records.values.map((record: any[]) => zipObject(records.columns, record));
+    return records;
   }
 
   async readAllPrimaryKeys(tableName: string): Promise<string[]> {
     const escapedTableName = escape(tableName);
     const statement = `SELECT ${SQLeetEnginePrimaryKeyName} FROM ${escapedTableName};`;
-    const record = this.db.exec(statement);
+
+    const record = await this.db.execute(statement);
     if (record[0] && record[0].values) {
       return record[0].values.map((value: string[]) => value[0]);
     }
+
     return [];
   }
 
@@ -318,7 +270,7 @@ export class SQLeetEngine implements CRUDEngine {
     const statement = `UPDATE ${escapedTableName} SET ${getProtectedColumnReferences(
       columns,
     )} WHERE ${SQLeetEnginePrimaryKeyName}=@primaryKey;`;
-    this.db.run(statement, {
+    await this.db.run(statement, {
       ...values,
       '@primaryKey': primaryKey,
     });
