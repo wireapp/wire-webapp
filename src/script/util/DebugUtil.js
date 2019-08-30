@@ -21,6 +21,7 @@ import $ from 'jquery';
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
 import {util as ProteusUtil} from '@wireapp/proteus';
+import keyboardJS from 'keyboardjs';
 
 import {getLogger} from 'Util/Logger';
 
@@ -30,6 +31,9 @@ import {downloadFile} from './util';
 import {BackendEvent} from '../event/Backend';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
+
+import {h as createElement, init as snabbdomInit} from 'snabbdom';
+import style from 'snabbdom/modules/style';
 
 function downloadText(text, filename = 'default.txt') {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -53,6 +57,9 @@ export class DebugUtil {
     this.Dexie = Dexie;
 
     this.logger = getLogger('DebugUtil');
+
+    this.liveCallingStatsInterval = undefined;
+    keyboardJS.bind('alt+ctrl+c', this.toggleLiveCallingStats.bind(this));
   }
 
   blockAllConnections() {
@@ -393,5 +400,87 @@ export class DebugUtil {
     }
 
     navigator.mediaDevices.ondevicechange();
+  }
+
+  toggleLiveCallingStats() {
+    const containerId = 'live-calling-stats';
+    const containerElement = document.getElementById(containerId);
+    if (containerElement) {
+      clearInterval(this.liveCallingStatsInterval);
+      document.body.removeChild(containerElement);
+      return;
+    }
+    const statsDomElement = Object.assign(document.createElement('div'), {id: containerId});
+    document.body.appendChild(statsDomElement);
+    const patch = snabbdomInit([style]);
+    let vdom = createElement('div');
+    patch(statsDomElement, vdom);
+
+    const renderStats = async participantsStats => {
+      return Promise.all(
+        participantsStats.map(async participantStats => {
+          const rawStats = [];
+          participantStats.stats.forEach(stats => {
+            if (
+              (stats.kind === 'audio' || stats.kind === 'video') &&
+              (stats.packetsReceived || stats.packetsSent) &&
+              !stats.id.includes('rtcp')
+            ) {
+              rawStats.push(stats);
+            }
+          });
+
+          const groupedStats = rawStats.reduce((groups, stats) => {
+            groups.sent = groups.sent || [];
+            groups.received = groups.received || [];
+            if (stats.packetsSent) {
+              groups.sent.push(createElement('li', `🡅 ${stats.kind}: ${stats.packetsSent} packets`));
+            } else {
+              groups.received.push(createElement('li', `🡇 ${stats.kind}: ${stats.packetsReceived} packets`));
+            }
+            return groups;
+          }, {});
+
+          const user = await this.userRepository.get_user_by_id(participantStats.userid);
+
+          return createElement('div', [
+            createElement('div', [createElement('strong', user.first_name())]),
+            createElement('ul', groupedStats.sent.concat(groupedStats.received)),
+          ]);
+        }),
+      ).then(elements => {
+        return createElement(
+          `div#${containerId}`,
+          {
+            style: {
+              backgroundColor: 'black',
+              color: '#00fb00',
+              padding: '1em',
+              position: 'absolute',
+              right: '0',
+              top: '0',
+            },
+          },
+          elements,
+        );
+      });
+    };
+
+    const renderFrame = async () => {
+      const participantsStats = await this.getActiveCallStats();
+      const newVdom = await renderStats(participantsStats);
+      vdom = patch(vdom, newVdom);
+    };
+
+    ko.computed(() => {
+      const call = this.callingRepository.joinedCall();
+      if (call) {
+        renderFrame();
+        this.liveCallingStatsInterval = setInterval(renderFrame, 500);
+      } else {
+        vdom = patch(vdom, createElement('div'));
+        clearInterval(this.liveCallingStatsInterval);
+      }
+    });
   }
 }
