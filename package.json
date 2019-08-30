@@ -131,7 +131,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
-    "less": "3.9.0",
+    "less": "3.10.3",
     "lint-staged": "9.2.3",
     "load-grunt-tasks": "5.1.0",
     "node-sass": "4.12.0",
