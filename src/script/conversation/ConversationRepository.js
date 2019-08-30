@@ -338,7 +338,7 @@ export class ConversationRepository {
         conversationEntity.removed_from_conversation()
       ) {
         this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-        this.delete_conversation(conversationEntity.id);
+        this.deleteConversationFromRepository(conversationEntity.id);
       }
     });
   }
@@ -805,8 +805,15 @@ export class ConversationRepository {
    * @param {string} conversation_id - ID of conversation to be deleted from the repository
    * @returns {undefined} No return value
    */
-  delete_conversation(conversation_id) {
+  deleteConversationFromRepository(conversation_id) {
     this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
+  }
+
+  deleteConversation(conversationId) {
+    this.conversation_service.deleteConversation(this.team().id, conversationId).then(() => {
+      this.deleteConversationFromRepository(conversationId);
+      this.conversation_service.delete_conversation_from_db(conversationId);
+    });
   }
 
   /**
@@ -1672,7 +1679,7 @@ export class ConversationRepository {
 
     if (conversationEntity.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-      this.delete_conversation(conversationEntity.id);
+      this.deleteConversationFromRepository(conversationEntity.id);
     }
   }
 
@@ -3438,7 +3445,7 @@ export class ConversationRepository {
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
         const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
-        const createdBySelfUser = this.selfUser().id === creatorId && !conversationEntity.removed_from_conversation();
+        const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {

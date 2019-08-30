@@ -209,6 +209,25 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
   }
 
+  deleteConversation(conversationEntity) {
+    if (conversationEntity && conversationEntity.isCreatedBySelf()) {
+      return new Promise(resolve => {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+          primaryAction: {
+            action: () => {
+              return this.conversationRepository.deleteConversation(conversationEntity.id);
+            },
+            text: t('modalConversationDeleteAction'),
+          },
+          text: {
+            message: t('modalConversationDeleteMessage'),
+            title: t('modalConversationDeleteHeadline', conversationEntity.display_name()),
+          },
+        });
+      });
+    }
+  }
+
   open1to1Conversation(userEntity) {
     if (userEntity) {
       return this.conversationRepository

@@ -282,6 +282,15 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
           label: t('conversationDetailsActionLeave'),
         },
       },
+      {
+        condition: () => this.isTeam && conversationEntity.isCreatedBySelf(),
+        item: {
+          click: () => this.clickToDelete(),
+          icon: 'delete-icon',
+          identifier: 'do-delete',
+          label: t('conversationDetailsActionDelete'),
+        },
+      },
     ];
 
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
@@ -361,6 +370,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   clickToLeave() {
     this.actionsViewModel.leaveConversation(this.activeConversation());
+  }
+
+  clickToDelete() {
+    this.actionsViewModel.deleteConversation(this.activeConversation());
   }
 
   clickToToggleMute() {
