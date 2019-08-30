@@ -26,8 +26,7 @@ import {readAllSpec} from '@wireapp/store-engine/dist/commonjs/test/readAllSpec'
 import {readSpec} from '@wireapp/store-engine/dist/commonjs/test/readSpec';
 import {updateOrCreateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateOrCreateSpec';
 import {updateSpec} from '@wireapp/store-engine/dist/commonjs/test/updateSpec';
-import {SQLeetEngine} from './index';
-import {SQLiteType} from './SchemaConverter';
+import {SQLeetEngine, SQLiteType} from './index';
 
 interface DBRecord {
   age?: number;
