@@ -22,6 +22,7 @@ import {getLogger} from 'Util/Logger';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
+import {TeamService} from '../team/TeamService';
 
 // Conversation service for all conversation calls to the backend REST API.
 export class ConversationService {
@@ -313,6 +314,13 @@ export class ConversationService {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`,
+    });
+  }
+
+  deleteConversation(teamId, conversationId) {
+    return this.backendClient.sendRequest({
+      type: 'DELETE',
+      url: `${TeamService.URL.TEAMS}/${teamId}/conversations/${conversationId}`,
     });
   }
 
