@@ -256,7 +256,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         condition: () => conversationEntity.isClearable(),
         item: {
           click: () => this.clickToClear(),
-          icon: 'delete-icon',
+          icon: 'eraser-icon',
           identifier: 'do-clear',
           label: t('conversationDetailsActionClear'),
         },
