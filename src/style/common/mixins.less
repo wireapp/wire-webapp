@@ -248,7 +248,9 @@
 
 .hardware-acc {
   -webkit-backface-visibility: hidden;
-  -webkit-perspective: 1000;
+  // Note: Using perspective (with a value different from `0` or `none`) creates a new stacking context which will cause the browser to take advantage of GPU rendering.
+  // @see https://css-tricks.com/almanac/properties/p/perspective/
+  -webkit-perspective: revert;
 }
 
 .mirror {
