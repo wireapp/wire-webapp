@@ -26,6 +26,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {getLogger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray, isTemporaryClientAndNonPersistent, zeroPadding} from 'Util/util';
 
+import {Config} from '../auth/config';
 import {CryptographyMapper} from './CryptographyMapper';
 import {CryptographyService} from './CryptographyService';
 import {WebAppEvents} from '../event/WebApp';
@@ -113,9 +114,13 @@ export class CryptographyRepository {
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
       storeEngine = new IndexedDBEngine();
-      try {
-        await storeEngine.initWithDb(database, true);
-      } catch (error) {
+      if (Config.FEATURE.ENABLE_PERSISTENT_STORAGE) {
+        try {
+          await storeEngine.initWithDb(database, true);
+        } catch (error) {
+          await storeEngine.initWithDb(database, false);
+        }
+      } else {
         await storeEngine.initWithDb(database, false);
       }
     }

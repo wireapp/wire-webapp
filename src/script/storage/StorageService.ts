@@ -83,7 +83,10 @@ export class StorageService {
    * @param requestPersistentStorage - if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
+  async init(
+    userId: string = this.userId,
+    requestPersistentStorage: boolean = Config.FEATURE.ENABLE_PERSISTENT_STORAGE,
+  ): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
@@ -98,9 +101,13 @@ export class StorageService {
         await this.moveDexieToMemory();
         this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
       } else {
-        try {
-          await this.engine.initWithDb(this.db, requestPersistentStorage);
-        } catch (error) {
+        if (requestPersistentStorage) {
+          try {
+            await this.engine.initWithDb(this.db, true);
+          } catch (error) {
+            await this.engine.initWithDb(this.db, false);
+          }
+        } else {
           await this.engine.initWithDb(this.db, false);
         }
         await this.db.open();
