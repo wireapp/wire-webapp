@@ -81,14 +81,14 @@
         <!-- ko if: isTemporaryGuest() -->
           <div class="preferences-detail" data-bind="text: t('preferencesAVTemporaryDisclaimer')"></div>
         <!-- /ko -->
-        <!-- ko if: !videoMediaStream() -->
+        <!-- ko ifnot: videoMediaStream() -->
           <div class="preferences-av-video-disabled">
               <div class="preferences-av-video-disabled__info" data-bind="html: t('preferencesAVNoCamera', brandName, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"></div>
               <div class="preferences-av-video-disabled__try-again" data-bind="click: tryAgain, text: z.string.preferencesAVTryAgain" data-uie-name="do-try-again-preferences-av"></div>
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: !videoMediaStream() -->
-          <video class="preferences-av-video"
+        <!-- ko if: videoMediaStream() -->
+          <video class="preferences-av-video mirror"
                 autoplay
                 playsinline
                 data-bind="muteMediaElement: mediaStream(), sourceStream: mediaStream()">

@@ -734,7 +734,16 @@ class App {
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
 
-      const keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      let keepPermanentDatabase = !clearData;
+
+      try {
+        keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      } catch (error) {
+        if (error.type === z.error.ClientError.TYPE.CLIENT_NOT_SET) {
+          keepPermanentDatabase = false;
+        }
+      }
+
       if (keepPermanentDatabase) {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
