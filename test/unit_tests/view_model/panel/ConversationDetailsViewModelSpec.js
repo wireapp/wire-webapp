@@ -50,6 +50,7 @@ describe('ConversationDetailsViewModel', () => {
       const conversation = new Conversation();
       spyOn(conversation, 'firstUserEntity').and.returnValue({isConnected: () => true});
       spyOn(conversation, 'is_cleared').and.returnValue(false);
+      spyOn(conversation, 'isCreatedBySelf').and.returnValue(false);
 
       const tests = [
         {
