@@ -809,7 +809,8 @@ export class ConversationRepository {
     this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
   }
 
-  deleteConversation(conversationId) {
+  deleteConversation(conversationEntity) {
+    const conversationId = conversationEntity.id;
     this.conversation_service.deleteConversation(this.team().id, conversationId).then(() => {
       this.deleteConversationFromRepository(conversationId);
       this.conversation_service.delete_conversation_from_db(conversationId);
