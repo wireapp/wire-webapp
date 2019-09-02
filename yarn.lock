@@ -1604,10 +1604,10 @@
     platform "1.3.5"
     url-search-params-polyfill "7.0.0"
 
-"@wireapp/copy-config@0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.8.2.tgz#b46de53dd4d585f5fc363030e4b0b73d4c490f22"
-  integrity sha512-3D7YgLqE4xCdGSAOEuo2XC1niKRNH4vbqiKb4d+2DdxqdN8o2bHtJqmEfnBRV1FCOxL/YHw5AdXjFHQY08dxIA==
+"@wireapp/copy-config@0.8.3":
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-0.8.3.tgz#333de638c79ce123e5ada1fcfe4e337a28f12467"
+  integrity sha512-GQRIEjaQSJkQ+HyPMox3ETUpbJ/qHPesKTD6EE6E3uBkoUbmWBckhRhAxZ80cemK5C/zhsLNioWbQYLwoWYS8g==
   dependencies:
     axios "0.19.0"
     copy "0.3.2"
@@ -1615,7 +1615,7 @@
     fs-extra "8.1.0"
     jszip "3.2.2"
     logdown "3.2.8"
-    rimraf "2.6.3"
+    rimraf "3.0.0"
 
 "@wireapp/core@12.17.51":
   version "12.17.51"
@@ -10732,6 +10732,13 @@ rimraf@2, rimraf@2.6.3, rimraf@^2.5.4, rimraf@^2.6.0, rimraf@^2.6.1, rimraf@^2.6
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
   integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
+  dependencies:
+    glob "^7.1.3"
+
+rimraf@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.0.tgz#614176d4b3010b75e5c390eb0ee96f6dc0cebb9b"
+  integrity sha512-NDGVxTsjqfunkds7CqsOiEnxln4Bo7Nddl3XhS4pXg5OzwkLqJ971ZVAAnB+DDLnF76N+VnDEiBHaVV8I06SUg==
   dependencies:
     glob "^7.1.3"
 
