@@ -26,7 +26,7 @@
     "@types/express-useragent": "0.2.22",
     "@types/fs-extra": "8.0.0",
     "@types/hbs": "4.0.1",
-    "@types/helmet": "0.0.43",
+    "@types/helmet": "0.0.44",
     "@types/jasmine": "3.4.0",
     "@types/node": "~10",
     "jasmine": "3.4.0",
