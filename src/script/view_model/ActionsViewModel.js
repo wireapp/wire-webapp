@@ -217,11 +217,11 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
             action: () => {
               return this.conversationRepository.deleteConversation(conversationEntity.id);
             },
-            text: t('modalConversationDeleteAction'),
+            text: t('modalConversationDeleteGroupAction'),
           },
           text: {
-            message: t('modalConversationDeleteMessage'),
-            title: t('modalConversationDeleteHeadline', conversationEntity.display_name()),
+            message: t('modalConversationDeleteGroupMessage'),
+            title: t('modalConversationDeleteGroupHeadline', conversationEntity.display_name()),
           },
         });
       });
