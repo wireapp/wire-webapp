@@ -48,9 +48,6 @@ class StartUIViewModel {
   }
 
   /**
-   * View model for the start UI.
-   * @class z.viewModel.list.StartUIViewModel
-   *
    * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories

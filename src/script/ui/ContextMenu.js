@@ -128,7 +128,7 @@ export const Context = {
    * @param {Event} event - menu will appear at currentTarget position
    * @param {Array} entries - configuration to build the menu {label: 'label', click: function() {}}
    * @param {string} identifier - data-uie-name added to all entries
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   from: (event, entries, identifier) => {
     event.preventDefault();

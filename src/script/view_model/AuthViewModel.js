@@ -1337,7 +1337,7 @@ class AuthViewModel {
   }
 
   /**
-   * Get the validation error by inout type.
+   * Get the validation error by input type.
    *
    * @private
    * @param {AuthView.TYPE} type - Input type to get error for

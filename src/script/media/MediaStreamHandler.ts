@@ -84,8 +84,7 @@ export class MediaStreamHandler {
    * Check for permission for the requested media type.
    *
    * @private
-   * @param {MediaType} mediaType - Requested media type
-   * @returns {Promise} Resolves true when permissions is granted
+   * @returns Resolves `true` when permissions is granted
    */
   private hasPermissionToAccess(audio: boolean, video: boolean): boolean {
     const checkPermissionStates = (typesToCheck: PermissionType[]): boolean => {
