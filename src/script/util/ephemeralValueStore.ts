@@ -38,7 +38,10 @@ export async function save<T>(value: T): Promise<T> {
 }
 
 async function getWorker(): Promise<ServiceWorker> {
-  if (!navigator.serviceWorker || worker) {
+  if (!navigator.serviceWorker) {
+    return undefined;
+  }
+  if (worker) {
     return worker;
   }
 
