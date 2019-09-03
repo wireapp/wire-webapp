@@ -51,7 +51,7 @@ import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
 
-interface Props extends React.HTMLAttributes<TeamName>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
 
 interface ConnectedProps {
   error: Error;
@@ -64,37 +64,32 @@ interface DispatchProps {
   resetInviteErrors: () => Promise<void>;
 }
 
-interface State {
-  enteredTeamName: string;
-  error: Error;
-  isValidTeamName: boolean;
-}
+const TeamName = ({intl: {formatMessage: _}, ...props}: Props & ConnectedProps & DispatchProps & InjectedIntlProps) => {
+  const [enteredTeamName, setEnteredTeamName] = React.useState(props.teamName || '');
+  const [error, setError] = React.useState(null);
+  const [isValidTeamName, setIsValidTeamName] = React.useState(!!props.teamName);
+  const teamNameInput = React.useRef<HTMLInputElement>();
 
-class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & InjectedIntlProps, State> {
-  private readonly teamNameInput: React.RefObject<any> = React.createRef();
-  state: State = {
-    enteredTeamName: this.props.teamName || '',
-    error: null,
-    isValidTeamName: !!this.props.teamName,
+  React.useEffect(() => {
+    props.enterTeamCreationFlow();
+  }, []);
+
+  const resetErrors = () => {
+    setError(null);
+    setIsValidTeamName(true);
+    props.resetInviteErrors();
   };
-
-  componentDidMount(): void {
-    this.props.enterTeamCreationFlow();
-  }
-
-  handleSubmit = (event: React.FormEvent): void => {
+  const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
-    this.teamNameInput.current.value = this.teamNameInput.current.value.trim();
-    if (!this.teamNameInput.current.checkValidity()) {
-      this.setState({
-        error: ValidationError.handleValidationState('name', this.teamNameInput.current.validity),
-        isValidTeamName: false,
-      });
+    teamNameInput.current.value = teamNameInput.current.value.trim();
+    if (!teamNameInput.current.checkValidity()) {
+      setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
+      setIsValidTeamName(false);
     } else {
-      Promise.resolve(this.teamNameInput.current.value)
+      Promise.resolve(teamNameInput.current.value)
         .then(teamName => teamName.trim())
         .then(teamName =>
-          this.props.pushAccountRegistrationData({
+          props.pushAccountRegistrationData({
             team: {
               binding: undefined,
               creator: undefined,
@@ -104,91 +99,81 @@ class TeamName extends React.Component<Props & ConnectedProps & DispatchProps & 
             },
           }),
         )
-        .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
+        .then(() => props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
-    this.teamNameInput.current.focus();
+    teamNameInput.current.focus();
   };
 
-  resetErrors = () => {
-    this.setState({error: null, isValidTeamName: true});
-    this.props.resetInviteErrors();
-  };
+  const backArrow = (
+    <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
+      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    </RouterLink>
+  );
 
-  render() {
-    const {
-      intl: {formatMessage: _},
-    } = this.props;
-    const {enteredTeamName, isValidTeamName, error} = this.state;
-    const backArrow = (
-      <RouterLink to={ROUTE.INDEX} data-uie-name="go-register-team">
-        <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-      </RouterLink>
-    );
-    return (
-      <Page>
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-        <Container centerText verticalCenter style={{width: '100%'}}>
-          <Columns>
-            <IsMobile not>
-              <Column style={{display: 'flex'}}>
-                <div style={{margin: 'auto'}}>{backArrow}</div>
-              </Column>
-            </IsMobile>
-            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-              <ContainerXS
-                centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-              >
-                <div>
-                  <H1 center>{_(teamNameStrings.headline)}</H1>
-                  <Muted>{_(teamNameStrings.subhead)}</Muted>
-                  <Form style={{marginTop: 30}}>
-                    <InputSubmitCombo>
-                      <Input
-                        value={enteredTeamName}
-                        ref={this.teamNameInput}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                          this.resetErrors();
-                          this.setState({enteredTeamName: event.target.value});
-                        }}
-                        placeholder={_(teamNameStrings.teamNamePlaceholder)}
-                        pattern=".{2,256}"
-                        maxLength={256}
-                        minLength={2}
-                        required
-                        autoFocus
-                        data-uie-name="enter-team-name"
-                      />
-                      <RoundIconButton
-                        disabled={!enteredTeamName || !isValidTeamName}
-                        type="submit"
-                        formNoValidate
-                        icon={ICON_NAME.ARROW}
-                        onClick={this.handleSubmit}
-                        data-uie-name="do-next"
-                      />
-                    </InputSubmitCombo>
-                    <ErrorMessage data-uie-name="error-message">
-                      {error ? parseValidationErrors(error) : parseError(this.props.error)}
-                    </ErrorMessage>
-                  </Form>
-                </div>
-                <div>
-                  <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
-                    {_(teamNameStrings.whatIsWireTeamsLink)}
-                  </Link>
-                </div>
-              </ContainerXS>
+  return (
+    <Page>
+      <IsMobile>
+        <div style={{margin: 16}}>{backArrow}</div>
+      </IsMobile>
+      <Container centerText verticalCenter style={{width: '100%'}}>
+        <Columns>
+          <IsMobile not>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>{backArrow}</div>
             </Column>
-            <Column />
-          </Columns>
-        </Container>
-      </Page>
-    );
-  }
-}
+          </IsMobile>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+            >
+              <div>
+                <H1 center>{_(teamNameStrings.headline)}</H1>
+                <Muted>{_(teamNameStrings.subhead)}</Muted>
+                <Form style={{marginTop: 30}}>
+                  <InputSubmitCombo>
+                    <Input
+                      value={enteredTeamName}
+                      ref={teamNameInput}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        resetErrors();
+                        setEnteredTeamName(event.target.value);
+                      }}
+                      placeholder={_(teamNameStrings.teamNamePlaceholder)}
+                      pattern=".{2,256}"
+                      maxLength={256}
+                      minLength={2}
+                      required
+                      autoFocus
+                      data-uie-name="enter-team-name"
+                    />
+                    <RoundIconButton
+                      disabled={!enteredTeamName || !isValidTeamName}
+                      type="submit"
+                      formNoValidate
+                      icon={ICON_NAME.ARROW}
+                      onClick={handleSubmit}
+                      data-uie-name="do-next"
+                    />
+                  </InputSubmitCombo>
+                  <ErrorMessage data-uie-name="error-message">
+                    {error ? parseValidationErrors(error) : parseError(props.error)}
+                  </ErrorMessage>
+                </Form>
+              </div>
+              <div>
+                <Link href={EXTERNAL_ROUTE.WIRE_TEAM_FEATURES} target="_blank" data-uie-name="go-what-is">
+                  {_(teamNameStrings.whatIsWireTeamsLink)}
+                </Link>
+              </div>
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    </Page>
+  );
+};
 
 export default withRouter(
   injectIntl(
