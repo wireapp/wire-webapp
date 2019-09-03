@@ -21,9 +21,6 @@ import moment from 'moment';
 
 import {LDM} from 'Util/moment';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
 class AssetHeader {
   /**
    * Construct a new asset header.

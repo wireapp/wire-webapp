@@ -19,10 +19,7 @@
 
 import {clamp} from 'Util/NumberUtil';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.SeekBarComponent = class SeekBarComponent {
+class SeekBarComponent {
   /**
    * Construct a seek bar.
    *
@@ -118,7 +115,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
     this.media_element.removeEventListener('timeupdate', this.on_timeupdate);
     this.media_element.removeEventListener('ended', this.on_ended);
   }
-};
+}
 
 ko.components.register('seek-bar', {
   template: `
@@ -126,7 +123,7 @@ ko.components.register('seek-bar', {
   `,
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.SeekBarComponent(params, component_info);
+      return new SeekBarComponent(params, component_info);
     },
   },
 });

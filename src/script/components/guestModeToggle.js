@@ -19,17 +19,14 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.GuestModeToggle = class GuestModeToggle {
+class GuestModeToggle {
   constructor(params) {
     this.isChecked = params.isChecked;
     this.onToggle = params.onToggle;
     this.isDisabled = params.isDisabled;
     this.infoText = params.extendedInfo ? t('guestRoomToggleInfoExtended') : t('guestRoomToggleInfo');
   }
-};
+}
 
 ko.components.register('guest-mode-toggle', {
   template: `
@@ -42,5 +39,5 @@ ko.components.register('guest-mode-toggle', {
     </div>
     <div class="info-toggle__details" data-bind="text: infoText" data-uie-name="status-guest-toggle"></div>
   `,
-  viewModel: z.components.GuestModeToggle,
+  viewModel: GuestModeToggle,
 });
