@@ -609,7 +609,7 @@ ko.bindingHandlers.added_to_view = {
 };
 
 /**
- * Element is removed fomr view
+ * Element is removed from view
  */
 ko.bindingHandlers.removed_from_view = {
   init(element, valueAccessor) {

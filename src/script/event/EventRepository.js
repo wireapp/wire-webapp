@@ -595,7 +595,7 @@ export class EventRepository {
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   _handleEvent(event, source) {
     return this._handleEventValidation(event, source)
@@ -615,7 +615,7 @@ export class EventRepository {
    *
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
@@ -921,7 +921,7 @@ export class EventRepository {
    *
    * @private
    * @param {Object} event - Event to validate
-   * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
+   * @returns {true} Returns `true` if event is handled within it's lifetime, otherwise throws error
    */
   _validateCallEventLifetime(event) {
     const {content = {}, conversation: conversationId, time, type} = event;

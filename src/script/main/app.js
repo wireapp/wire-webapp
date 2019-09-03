@@ -583,7 +583,7 @@ class App {
   /**
    * Handle URL params.
    * @private
-   * @returns {undefined} Not return value
+   * @returns {undefined} No return value
    */
   _handleUrlParams() {
     // Currently no URL params to be handled
@@ -592,7 +592,7 @@ class App {
   /**
    * Check whether the page has been reloaded.
    * @private
-   * @returns {boolean}  True if it is a page refresh
+   * @returns {boolean} `true` if it is a page refresh
    */
   _isReload() {
     const isReload = isSameLocation(document.referrer, window.location.href);

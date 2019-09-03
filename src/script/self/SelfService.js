@@ -25,8 +25,6 @@ export class SelfService {
   }
 
   /**
-   * Construct a new Self Service.
-   * @class SelfService
    * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {

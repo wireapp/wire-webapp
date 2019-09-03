@@ -73,7 +73,7 @@ export class AudioRepository {
    * Create HTMLAudioElement.
    * @private
    * @param {string} sourcePath - Source for HTMLAudioElement
-   * @param {boolean} preload - Should sounds be pre-loaded with false as default
+   * @param {boolean} preload - Should sounds be pre-loaded with `false` as default
    * @returns {HTMLAudioElement} Returns the audio element.
    */
   _createAudioElement(sourcePath, preload) {
@@ -99,8 +99,8 @@ export class AudioRepository {
   /**
    * Initialize all sounds.
    * @private
-   * @param {boolean} preload - Should sounds be pre-loaded with false as default
-   * @returns {undefined}
+   * @param {boolean} preload - Should sounds be pre-loaded
+   * @returns {undefined} No return value
    */
   _initSounds(preload) {
     Object.values(AudioType).forEach(audioId => {
@@ -137,7 +137,7 @@ export class AudioRepository {
   /**
    * Stop all sounds playing in loop.
    * @private
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   _stopAll() {
     Object.keys(this.audioElements).forEach(audioId => this._stop(this.audioElements[audioId], audioId));
@@ -146,7 +146,7 @@ export class AudioRepository {
   /**
    * Use Amplify to subscribe to all audio playback related events.
    * @private
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   _subscribeToAudioEvents() {
     amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
@@ -156,7 +156,7 @@ export class AudioRepository {
   /**
    * Use Amplify to subscribe to required events.
    * @private
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
@@ -166,8 +166,8 @@ export class AudioRepository {
 
   /**
    * Initialize the repository.
-   * @param {boolean} preload - Should sounds be pre-loaded with false as default
-   * @returns {undefined}
+   * @param {boolean} preload - Should sounds be pre-loaded with `false` as default
+   * @returns {undefined} No return value
    */
   init(preload = false) {
     this._initSounds(preload);
@@ -178,7 +178,7 @@ export class AudioRepository {
    * Start playback of a sound in a loop.
    * @note Prevent playing multiples instances of looping sounds
    * @param {AudioType} audioId - Sound identifier
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   loop(audioId) {
     return this.play(audioId, true);
@@ -246,7 +246,7 @@ export class AudioRepository {
    * Stop playback of a sound.
    * @param {Audio} audioElement - Audio element that is playing the sound
    * @param {AudioType} audioId - Sound identifier
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   _stop(audioElement, audioId) {
     if (!audioElement.paused) {

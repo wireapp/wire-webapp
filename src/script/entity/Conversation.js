@@ -54,8 +54,6 @@ export class Conversation {
   }
 
   /**
-   * Constructs a new conversation entity.
-   * @class Conversation
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
@@ -421,7 +419,7 @@ export class Conversation {
    * Increment only on timestamp update
    * @param {number} currentTimestamp - Current timestamp
    * @param {number} updatedTimestamp - Timestamp from update
-   * @returns {number|boolean} Updated timestamp or false if not increased
+   * @returns {number|false} Updated timestamp or `false` if not increased
    */
   _incrementTimeOnly(currentTimestamp, updatedTimestamp) {
     const timestampIncreased = updatedTimestamp > currentTimestamp;

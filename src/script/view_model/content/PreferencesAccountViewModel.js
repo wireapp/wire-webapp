@@ -133,7 +133,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.manageTeamUrl = getManageTeamUrl('client_settings');
     this.createTeamUrl = getCreateTeamUrl('client');
 
-    this.isTemporaryAndNonPersistant = isTemporaryClientAndNonPersistent;
+    this.isTemporaryAndNonPersistent = isTemporaryClientAndNonPersistent;
     this.isConsentCheckEnabled = () => z.config.FEATURE.CHECK_CONSENT;
     this.canEditProfile = user => user.managedBy() === User.CONFIG.MANAGED_BY.WIRE;
 
