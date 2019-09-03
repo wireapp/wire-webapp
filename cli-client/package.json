@@ -8,7 +8,7 @@
     "@types/long": "4.0.0",
     "@wireapp/core": "12.17.55",
     "@wireapp/store-engine-fs": "1.4.10",
-    "commander": "3.0.0",
+    "commander": "3.0.1",
     "dotenv": "8.1.0",
     "fs-extra": "8.1.0"
   },
