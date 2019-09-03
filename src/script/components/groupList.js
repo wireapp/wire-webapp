@@ -19,10 +19,7 @@
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.GroupListViewModel = class GroupListViewModel {
+class GroupListViewModel {
   /**
    * Construct a new group list view model.
    *
@@ -35,7 +32,7 @@ z.components.GroupListViewModel = class GroupListViewModel {
     this.onSelect = params.click;
     this.ParticipantAvatar = ParticipantAvatar;
   }
-};
+}
 
 // Knockout registration of the group list component.
 ko.components.register('group-list', {
@@ -54,5 +51,5 @@ ko.components.register('group-list', {
       </div>
     </div>
   `,
-  viewModel: z.components.GroupListViewModel,
+  viewModel: GroupListViewModel,
 });

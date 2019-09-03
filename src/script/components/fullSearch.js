@@ -26,10 +26,7 @@ import {escapeString} from 'Util/SanitizationUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.FullSearch = class FullSearch {
+class FullSearch {
   static get CONFIG() {
     return {
       MAX_OFFSET_INDEX: 30,
@@ -144,7 +141,7 @@ z.components.FullSearch = class FullSearch {
   dispose() {
     $('.collection-list').off('scroll');
   }
-};
+}
 
 ko.components.register('full-search', {
   template: `
@@ -174,5 +171,5 @@ ko.components.register('full-search', {
       </div>
     </div>
   `,
-  viewModel: z.components.FullSearch,
+  viewModel: FullSearch,
 });

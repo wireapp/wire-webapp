@@ -17,14 +17,11 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.GroupAvatar = class GroupAvatar {
+class GroupAvatar {
   constructor({users}) {
     this.users = ko.pureComputed(() => users().slice(0, 4));
   }
-};
+}
 
 ko.components.register('group-avatar', {
   template: `
@@ -32,5 +29,5 @@ ko.components.register('group-avatar', {
       <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
     </div>
   `,
-  viewModel: z.components.GroupAvatar,
+  viewModel: GroupAvatar,
 });

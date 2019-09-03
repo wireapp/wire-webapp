@@ -24,10 +24,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {WebAppEvents} from '../event/WebApp';
 import {QuoteEntity} from '../message/QuoteEntity';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.MessageQuote = class MessageQuote {
+class MessageQuote {
   constructor({
     conversation,
     conversationRepository,
@@ -127,7 +124,7 @@ z.components.MessageQuote = class MessageQuote {
   toggleShowMore() {
     this.showFullText(!this.showFullText());
   }
-};
+}
 
 ko.components.register('message-quote', {
   template: `
@@ -191,5 +188,5 @@ ko.components.register('message-quote', {
     </div>
   <!-- /ko -->
   `,
-  viewModel: z.components.MessageQuote,
+  viewModel: MessageQuote,
 });

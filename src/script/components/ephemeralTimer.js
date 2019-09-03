@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.EphemeralTimer = class EphemeralTimer {
+class EphemeralTimer {
   constructor({message: messageEntity}) {
     this.started = messageEntity.ephemeral_started();
     this.duration = (messageEntity.ephemeral_expires() - this.started) / 1000;
@@ -31,7 +28,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
     // to accomodate for the passed lifetime of the timed message
     event.target.style.animationDelay = `${(this.started - Date.now()) / 1000}s`;
   }
-};
+}
 
 ko.components.register('ephemeral-timer', {
   template: `
@@ -41,5 +38,5 @@ ko.components.register('ephemeral-timer', {
       </circle>
     </svg>
   `,
-  viewModel: z.components.EphemeralTimer,
+  viewModel: EphemeralTimer,
 });

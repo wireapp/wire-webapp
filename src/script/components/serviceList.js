@@ -23,10 +23,7 @@ import {ParticipantAvatar} from 'Components/participantAvatar';
 
 import 'Components/list/participantItem';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.ServiceList = class ServiceList {
+class ServiceList {
   static get MODE() {
     return {
       COMPACT: 'ServiceList.MODE.COMPACT',
@@ -49,7 +46,7 @@ z.components.ServiceList = class ServiceList {
 
     this.cssClasses = ko.pureComputed(() => (this.isCompactMode ? 'search-list-sm' : 'search-list-lg'));
   }
-};
+}
 
 ko.components.register('service-list', {
   template: `
@@ -60,5 +57,5 @@ ko.components.register('service-list', {
       <div class="no-results" data-bind="text: t('searchListNoMatches')"></div>
     <!-- /ko -->
   `,
-  viewModel: z.components.ServiceList,
+  viewModel: ServiceList,
 });
