@@ -37,7 +37,7 @@ export async function save<T>(value: T): Promise<T> {
   return sendMessage(worker, {action: 'save', params: value});
 }
 
-async function getWorker(): Promise<ServiceWorker> {
+async function getWorker(): Promise<ServiceWorker | undefined> {
   if (!navigator.serviceWorker) {
     return undefined;
   }
