@@ -53,97 +53,78 @@ interface DispatchProps {
   resetAuthError: () => Promise<void>;
 }
 
-interface State {
-  currentlySelectedClient: string;
-  loadingTimeoutId: number | undefined;
-  showLoading: boolean;
-}
-
 type CombinedProps = Props & ConnectedProps & DispatchProps & InjectedIntlProps;
 
 const logger = getLogger('ClientList');
 
-class ClientList extends React.Component<CombinedProps, State> {
-  state: State = {
-    currentlySelectedClient: null,
-    loadingTimeoutId: undefined,
-    showLoading: false,
+const ClientList = (props: CombinedProps) => {
+  const [showLoading, setShowLoading] = React.useState(false);
+  const [loadingTimeoutId, setLoadingTimeoutId] = React.useState();
+  const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState();
+
+  React.useEffect(() => resetLoadingSpinner);
+
+  const resetLoadingSpinner = () => {
+    window.clearTimeout(loadingTimeoutId);
+    setShowLoading(false);
   };
 
-  componentWillUnmount(): void {
-    this.resetLoadingSpinner();
-  }
-
-  setSelectedClient = (clientId: string) => {
-    const isSelectedClient = this.state.currentlySelectedClient === clientId;
+  const setSelectedClient = (clientId: string) => {
+    const isSelectedClient = currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
-    this.setState({...this.state, currentlySelectedClient: clientId});
-    this.props.resetAuthError();
+    setCurrentlySelectedClient(clientId);
+    props.resetAuthError();
   };
 
-  removeClient = (clientId: string, password?: string) => {
-    this.setState({showLoading: true});
+  const removeClient = (clientId: string, password?: string) => {
+    setShowLoading(true);
     return Promise.resolve()
-      .then(() => this.props.doRemoveClient(clientId, password))
+      .then(() => props.doRemoveClient(clientId, password))
       .then(() => {
-        const persist = this.props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-        return this.props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
+        const persist = props.getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+        return props.doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
       })
-      .then(() =>
-        this.setState({
-          loadingTimeoutId: window.setTimeout(this.resetLoadingSpinner, 1000),
-          showLoading: true,
-        }),
-      )
+      .then(() => {
+        setLoadingTimeoutId(window.setTimeout(resetLoadingSpinner, 1000));
+        setShowLoading(true);
+      })
       .then(() => window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP)))
       .catch(error => {
         if (error.label === BackendError.LABEL.NEW_CLIENT) {
-          this.props.history.push(ROUTE.HISTORY_INFO);
+          props.history.push(ROUTE.HISTORY_INFO);
         } else {
-          this.resetLoadingSpinner();
+          resetLoadingSpinner();
           logger.error(error);
         }
       });
   };
 
-  resetLoadingSpinner = () => {
-    if (this.state.loadingTimeoutId) {
-      window.clearTimeout(this.state.loadingTimeoutId);
-    }
-    this.setState({showLoading: false, loadingTimeoutId: undefined});
-  };
+  const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
 
-  isSelectedClient = (clientId: string) => clientId === this.state.currentlySelectedClient;
-
-  render() {
-    const {clientError, isFetching, permanentClients, isSSOUser} = this.props;
-    const {showLoading} = this.state;
-
-    return isFetching || showLoading ? (
-      <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
-        <Loading />
-      </ContainerXS>
-    ) : (
-      <ContainerXS
-        centerText
-        verticalCenter
-        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
-      >
-        {permanentClients.map(client => (
-          <ClientItem
-            client={client}
-            clientError={this.isSelectedClient(client.id) && clientError}
-            key={client.id}
-            onClick={() => this.setSelectedClient(client.id)}
-            onClientRemoval={(password?: string) => this.removeClient(client.id, password)}
-            requirePassword={!isSSOUser}
-            selected={this.isSelectedClient(client.id)}
-          />
-        ))}
-      </ContainerXS>
-    );
-  }
-}
+  return props.isFetching || showLoading ? (
+    <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
+      <Loading />
+    </ContainerXS>
+  ) : (
+    <ContainerXS
+      centerText
+      verticalCenter
+      style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
+    >
+      {props.permanentClients.map(client => (
+        <ClientItem
+          client={client}
+          clientError={isSelectedClient(client.id) && props.clientError}
+          key={client.id}
+          onClick={() => setSelectedClient(client.id)}
+          onClientRemoval={(password?: string) => removeClient(client.id, password)}
+          requirePassword={!props.isSSOUser}
+          selected={isSelectedClient(client.id)}
+        />
+      ))}
+    </ContainerXS>
+  );
+};
 
 export default withRouter(
   injectIntl(
