@@ -439,6 +439,9 @@ export class NotificationRepository {
       case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE: {
         return createBodyMessageTimerUpdate(messageEntity);
       }
+      case SystemMessageType.CONVERSATION_DELETE: {
+        return messageEntity.caption;
+      }
     }
   }
 
@@ -628,7 +631,10 @@ export class NotificationRepository {
    * @returns {string} ID of conversation
    */
   _getConversationId(connectionEntity, conversationEntity) {
-    return connectionEntity ? connectionEntity.conversationId : conversationEntity.id;
+    if (connectionEntity) {
+      return connectionEntity.conversationId;
+    }
+    return conversationEntity && conversationEntity.id;
   }
 
   /**

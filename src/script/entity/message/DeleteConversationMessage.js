@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,21 @@
  *
  */
 
-/**
- * @todo Refactor to use member-join and member-leave instead of normal. It duplicates "SuperType".
- */
-export enum SystemMessageType {
-  CONNECTION_ACCEPTED = 'created-one-to-one',
-  CONNECTION_CONNECTED = 'connected',
-  CONNECTION_REQUEST = 'connecting',
-  CONVERSATION_CREATE = 'created-group',
-  CONVERSATION_DELETE = 'deleted-group',
-  CONVERSATION_MESSAGE_TIMER_UPDATE = 'message-timer-update',
-  CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
-  CONVERSATION_RENAME = 'rename',
-  CONVERSATION_RESUME = 'resume',
-  MEMBER_JOIN = 'join',
-  MEMBER_LEAVE = 'leave',
-  NORMAL = 'normal',
+// import {t} from 'Util/LocalizerUtil';
+
+import {BackendEvent} from '../../event/Backend';
+import {SystemMessageType} from '../../message/SystemMessageType';
+import {SystemMessage} from './SystemMessage';
+
+export class DeleteConversationMessage extends SystemMessage {
+  constructor(conversationEntity) {
+    super();
+
+    this.type = BackendEvent.TEAM.DELETE;
+    this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
+
+    this.caption = conversationEntity
+      ? `${conversationEntity.name()} has been deleted`
+      : 'Conversation has been deleted';
+  }
 }

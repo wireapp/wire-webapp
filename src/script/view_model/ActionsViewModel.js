@@ -215,7 +215,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
-              return this.conversationRepository.deleteConversation(conversationEntity);
+              return this.conversationRepository.deleteConversation(conversationEntity, true);
             },
             text: t('modalConversationDeleteGroupAction'),
           },
