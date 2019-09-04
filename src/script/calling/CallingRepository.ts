@@ -701,7 +701,14 @@ export class CallingRepository {
 
     if (Object.keys(missingStreams).length === 0) {
       // we have everything in cache, just return the participant's stream
-      return Promise.resolve(selfParticipant.getMediaStream());
+      return new Promise(resolve => {
+        /*
+          There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
+          This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
+          The timeout(0) fixes this issue.
+        */
+        setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
+      });
     }
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     this.mediaStreamQuery = this.getMediaStream(missingStreams, isGroup)
