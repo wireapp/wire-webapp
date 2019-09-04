@@ -3222,6 +3222,12 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
 
+      case BackendEvent.CONVERSATION.DELETE:
+        const {
+          data: {conv: conversationId},
+        } = eventJson;
+        return this.deleteConversationLocally(conversationId);
+
       case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._onMemberJoin(conversationEntity, eventJson);
 
