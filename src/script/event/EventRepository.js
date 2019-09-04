@@ -287,7 +287,7 @@ export class EventRepository {
           // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
           // we will get a 404 AND notifications
           if (errorResponse.notifications) {
-            await this._missedEventsFromStream();
+            this._missedEventsFromStream();
             return _gotNotifications(errorResponse);
           }
 
@@ -442,12 +442,10 @@ export class EventRepository {
 
   _missedEventsFromStream() {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
-      if (notificationId) {
-        const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
-        if (!lastNotificationIdEqualsMissedId) {
-          amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-          this.notificationService.saveMissedIdToDb(this.lastNotificationId());
-        }
+      const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
+      if (!lastNotificationIdEqualsMissedId) {
+        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+        this.notificationService.saveMissedIdToDb(this.lastNotificationId());
       }
     });
   }
