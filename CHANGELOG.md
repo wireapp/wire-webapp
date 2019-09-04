@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.19.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.18.2...@wireapp/react-ui-kit@7.19.0) (2019-09-04)
+
+
+### Features
+
+* **react-ui-kit:** Add People Icon ([#2264](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2264)) ([76a01dd](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/76a01dd))
+
+
+
+
+
 ## [7.18.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.18.1...@wireapp/react-ui-kit@7.18.2) (2019-08-30)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
