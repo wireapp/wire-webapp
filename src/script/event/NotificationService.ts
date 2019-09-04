@@ -21,8 +21,8 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {StorageService} from 'src/script/storage/StorageService';
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageService} from '../storage/StorageService';
 
 export class NotificationService {
   private readonly backendClient: any;
