@@ -47,6 +47,7 @@ export * from './MuteIcon';
 export * from './NotificationIcon';
 export * from './NotificationOffIcon';
 export * from './OptionsIcon';
+export * from './PeopleIcon';
 export * from './PingIcon';
 export * from './PlaneIcon';
 export * from './PlusIcon';
