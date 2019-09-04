@@ -88,7 +88,6 @@ export class IndexedDBEngine implements CRUDEngine {
 
   public async initWithDb(db: Dexie, registerPersisted: boolean = false): Promise<Dexie> {
     const dexie = this.assignDb(db);
-    await this.isSupported();
     if (registerPersisted) {
       await this.registerPersistentStorage();
     }
