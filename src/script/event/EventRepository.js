@@ -283,7 +283,7 @@ export class EventRepository {
       return this.notificationService
         .getNotifications(this.currentClient().id, notificationId, limit)
         .then(_gotNotifications)
-        .catch(async errorResponse => {
+        .catch(errorResponse => {
           // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
           // we will get a 404 AND notifications
           if (errorResponse.notifications) {
