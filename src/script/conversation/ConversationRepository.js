@@ -821,14 +821,17 @@ export class ConversationRepository {
   }
 
   deleteConversationLocally(conversationId, skipNotification = false) {
-    if (!skipNotification) {
-      const conversation = this.find_conversation_by_id(conversationId);
-      const deletionMessage = new DeleteConversationMessage(conversation);
+    const conversationEntity = this.find_conversation_by_id(conversationId);
+    if (conversationEntity === this.active_conversation()) {
+      const nextConversation = this.get_next_conversation(conversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
+    }
+    if (!skipNotification && conversationEntity) {
+      const deletionMessage = new DeleteConversationMessage(conversationEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
     this.deleteConversationFromRepository(conversationId);
     this.conversation_service.delete_conversation_from_db(conversationId);
-    // TODO: leave conversation in conversation view
   }
 
   /**
