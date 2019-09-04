@@ -17,12 +17,25 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageService} from 'src/script/storage/StorageService';
 
 export class NotificationService {
-  static get CONFIG() {
+  private readonly backendClient: any;
+  private readonly logger: Logger;
+  private readonly storageService: StorageService;
+  private readonly AMPLIFY_STORE_NAME: string;
+
+  static get CONFIG(): {
+    PRIMARY_KEY_LAST_EVENT: string;
+    PRIMARY_KEY_LAST_NOTIFICATION: string;
+    PRIMARY_KEY_MISSED: string;
+    URL_NOTIFICATIONS: string;
+    URL_NOTIFICATIONS_LAST: string;
+  } {
     return {
       PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_DATE',
       PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
@@ -32,29 +45,22 @@ export class NotificationService {
     };
   }
 
-  /**
-   * Construct a new Notification Service.
-   *
-   * @param {BackendClient} backendClient - Client for the API calls
-   * @param {StorageService} storageService - Service for all storage related tasks
-   */
-  constructor(backendClient, storageService) {
+  constructor(backendClient: any, storageService: StorageService) {
     this.backendClient = backendClient;
     this.storageService = storageService;
     this.logger = getLogger('NotificationService');
-
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
   /**
-   * Get notifications from the stream.
-   *
-   * @param {string} clientId - Only return notifications targeted at the given client
-   * @param {string} notificationId - Only return notifications more recent than this notification ID (like "7130304a-c839-11e5-8001-22000b0fe035")
-   * @param {number} size - Maximum number of notifications to return
-   * @returns {Promise} Resolves with the retrieved notifications
+   * Get events from the notification stream.
+   * @param clientId - Only return notifications targeted at the given client
+   * @param notificationId - Only return notifications more recent than the given event ID (like
+   *   "7130304a-c839-11e5-8001-22000b0fe035")
+   * @param size - Maximum number of notifications to return
+   * @returns Resolves with a pages list of notifications
    */
-  getNotifications(clientId, notificationId, size) {
+  getNotifications(clientId: string, notificationId: string, size: number): Promise<NotificationList> {
     return this.backendClient.sendRequest({
       data: {
         client: clientId,
@@ -68,10 +74,10 @@ export class NotificationService {
 
   /**
    * Get the last notification for a given client.
-   * @param {string} clientId - Client ID to retrieve notification ID for
-   * @returns {Promise} Resolves with the last known notification ID for given client
+   * @param clientId - Only return notifications targeted at the given client
+   * @returns Resolves with the last known notification for given client
    */
-  getNotificationsLast(clientId) {
+  getNotificationsLast(clientId: string): Promise<Notification> {
     return this.backendClient.sendRequest({
       data: {
         client: clientId,
@@ -82,12 +88,12 @@ export class NotificationService {
   }
 
   /**
-   * Load last event date from storage.
-   * @returns {Promise} Resolves with the stored last event date.
+   * Load latest event date from persistent storage.
+   * @returns Resolves with the date in ISO 8601 format from the latest event stored in local database
    */
-  getLastEventDateFromDb() {
+  getLastEventDateFromDb(): Promise<string> {
     return this.storageService
-      .load(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
+      .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
       .catch(error => {
         this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
@@ -101,12 +107,12 @@ export class NotificationService {
   }
 
   /**
-   * Load last notifications ID from storage.
-   * @returns {Promise} Resolves with the stored last notification ID.
+   * Load last notifications ID from persistent storage.
+   * @returns Resolves with the stored last notification ID (UUIDv4)
    */
-  getLastNotificationIdFromDb() {
+  getLastNotificationIdFromDb(): Promise<string> {
     return this.storageService
-      .load(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+      .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
       .catch(error => {
         this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
@@ -120,47 +126,48 @@ export class NotificationService {
   }
 
   /**
-   * Load missed ID from storage.
+   * Load missed ID from persistent storage.
    * @returns {Promise} Resolves with the stored missed ID.
    */
-  getMissedIdFromDb() {
+  getMissedIdFromDb(): Promise<string | undefined> {
     return this.storageService
-      .load(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
+      .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
         if (record && record.value) {
           return record.value;
         }
+        return undefined;
       });
   }
 
   /**
-   * Save last event date to storage.
-   * @param {string} eventDate - Event date to be stored
-   * @returns {Promise} Resolves with the primary key of the stored record
+   * Save last event date to persistent storage.
+   * @param eventDate - Event date (in ISO 8601) to be stored
+   * @returns Resolves with the primary key of the stored record
    */
-  saveLastEventDateToDb(eventDate) {
+  saveLastEventDateToDb(eventDate: string): Promise<string> {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT, {
       value: eventDate,
     });
   }
 
   /**
-   * Save last notifications ID to storage.
-   * @param {string} notificationId - Notification ID to be stored
-   * @returns {Promise} Resolves with the primary key of the stored record
+   * Save last notification ID to persistent storage.
+   * @param notificationId - Notification ID to be stored
+   * @returns Resolves with the primary key of the stored record
    */
-  saveLastNotificationIdToDb(notificationId) {
+  saveLastNotificationIdToDb(notificationId: string): Promise<string> {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: notificationId,
     });
   }
 
   /**
-   * Save missed notifications ID to storage.
-   * @param {string} notificationId - Notification ID to be stored
-   * @returns {Promise} Resolves with the primary key of the stored record
+   * Save missed notifications ID to persistent storage.
+   * @param notificationId - Notification ID to be stored
+   * @returns Resolves with the primary key of the stored record
    */
-  saveMissedIdToDb(notificationId) {
+  saveMissedIdToDb(notificationId: string): Promise<string> {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED, {
       value: notificationId,
     });
