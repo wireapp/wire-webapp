@@ -20,6 +20,7 @@
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
+import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {StorageService} from 'src/script/storage/StorageService';
 
@@ -30,15 +31,11 @@ export class NotificationService {
   private readonly AMPLIFY_STORE_NAME: string;
 
   static get CONFIG(): {
-    PRIMARY_KEY_LAST_EVENT: string;
-    PRIMARY_KEY_LAST_NOTIFICATION: string;
     PRIMARY_KEY_MISSED: string;
     URL_NOTIFICATIONS: string;
     URL_NOTIFICATIONS_LAST: string;
   } {
     return {
-      PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_DATE',
-      PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
       PRIMARY_KEY_MISSED: 'z.storage.StorageKey.NOTIFICATION.MISSED',
       URL_NOTIFICATIONS: '/notifications',
       URL_NOTIFICATIONS_LAST: '/notifications/last',
@@ -93,7 +90,7 @@ export class NotificationService {
    */
   getLastEventDateFromDb(): Promise<string> {
     return this.storageService
-      .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
+      .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_EVENT)
       .catch(error => {
         this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
@@ -112,7 +109,7 @@ export class NotificationService {
    */
   getLastNotificationIdFromDb(): Promise<string> {
     return this.storageService
-      .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+      .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION)
       .catch(error => {
         this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
         throw new z.error.EventError(z.error.EventError.TYPE.DATABASE_FAILURE);
@@ -146,7 +143,7 @@ export class NotificationService {
    * @returns Resolves with the primary key of the stored record
    */
   saveLastEventDateToDb(eventDate: string): Promise<string> {
-    return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT, {
+    return this.storageService.save(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {
       value: eventDate,
     });
   }
@@ -157,7 +154,7 @@ export class NotificationService {
    * @returns Resolves with the primary key of the stored record
    */
   saveLastNotificationIdToDb(notificationId: string): Promise<string> {
-    return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {
+    return this.storageService.save(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: notificationId,
     });
   }
