@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.3.8...@wireapp/api-client@6.4.0) (2019-09-05)
+
+
+### Bug Fixes
+
+* **api-client:** Remove "cancel_fallback" from "/notifications" ([#2267](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2267)) ([a27cb55](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a27cb55))
+
+
+### Features
+
+* **api-client:** Expose time from notification stream ([#2265](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2265)) ([090cd63](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/090cd63))
+
+
+
+
+
 ## [6.3.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.3.7...@wireapp/api-client@6.3.8) (2019-09-04)
 
 **Note:** Version bump only for package @wireapp/api-client
