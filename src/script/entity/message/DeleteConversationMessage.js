@@ -17,8 +17,7 @@
  *
  */
 
-// import {t} from 'Util/LocalizerUtil';
-
+import {t} from 'Util/LocalizerUtil';
 import {BackendEvent} from '../../event/Backend';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
@@ -31,7 +30,7 @@ export class DeleteConversationMessage extends SystemMessage {
     this.system_message_type = SystemMessageType.CONVERSATION_DELETE;
 
     this.caption = conversationEntity
-      ? `${conversationEntity.name()} has been deleted`
-      : 'Conversation has been deleted';
+      ? t('notificationConversationDeletedNamed', conversationEntity.name())
+      : t('notificationConversationDeleted');
   }
 }

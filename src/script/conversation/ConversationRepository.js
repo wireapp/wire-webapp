@@ -814,10 +814,20 @@ export class ConversationRepository {
     this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
   }
 
-  deleteConversation(conversationEntity, skipNotification = false) {
-    this.conversation_service.deleteConversation(this.team().id, conversationEntity.id).then(() => {
-      this.deleteConversationLocally(conversationEntity.id, true);
-    });
+  deleteConversation(conversationEntity) {
+    this.conversation_service
+      .deleteConversation(this.team().id, conversationEntity.id)
+      .then(() => {
+        this.deleteConversationLocally(conversationEntity.id, true);
+      })
+      .catch(() => {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+            title: t('modalConversationDeleteErrorHeadline'),
+          },
+        });
+      });
   }
 
   deleteConversationLocally(conversationId, skipNotification = false) {
