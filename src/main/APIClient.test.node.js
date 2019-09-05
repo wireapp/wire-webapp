@@ -190,7 +190,7 @@ describe('APIClient', () => {
     beforeEach(() => {
       nock(baseUrl)
         .post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`)
-        .reply(200, undefined);
+        .reply(200);
     });
 
     it('can logout a user', async () => {
