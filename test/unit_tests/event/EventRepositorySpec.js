@@ -86,12 +86,13 @@ describe('EventRepository', () => {
   beforeEach(() => {
     return test_factory.exposeEventActors().then(event_repository => {
       event_repository.webSocketService = websocket_service_mock;
-
       last_notification_id = undefined;
     });
   });
 
   describe('updateFromStream', () => {
+    const latestNotificationId = createRandomUuid();
+
     beforeEach(() => {
       spyOn(TestFactory.event_repository, '_handleNotification').and.callThrough();
       spyOn(TestFactory.event_repository, '_bufferWebSocketNotification').and.callThrough();
@@ -104,14 +105,14 @@ describe('EventRepository', () => {
           window.setTimeout(() => {
             resolve({
               has_more: false,
-              notifications: [{id: createRandomUuid(), payload: []}, {id: createRandomUuid(), payload: []}],
+              notifications: [{id: createRandomUuid(), payload: []}, {id: latestNotificationId, payload: []}],
             });
           }, 10);
         });
       });
 
       spyOn(TestFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: createRandomUuid(), payload: [{}]}),
+        Promise.resolve({id: latestNotificationId, payload: [{}]}),
       );
 
       spyOn(TestFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
@@ -125,18 +126,27 @@ describe('EventRepository', () => {
       );
     });
 
-    it('should fetch last notifications ID from backend if not found in storage', () => {
-      const missed_events_spy = jasmine.createSpy();
+    it('should fetch last notifications ID from backend if not found in storage', async () => {
+      const missedEventsSpy = jasmine.createSpy('missedEventsSpy');
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, missed_events_spy);
+      amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, missedEventsSpy);
+
+      const clientId = TestFactory.event_repository.currentClient().id;
+
+      expect(TestFactory.event_repository.lastNotificationId()).toBeUndefined();
 
       TestFactory.event_repository.connectWebSocket();
-      return TestFactory.event_repository.initializeFromStream().then(() => {
-        expect(TestFactory.notification_service.getLastNotificationIdFromDb).toHaveBeenCalled();
-        expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalled();
-        expect(TestFactory.notification_service.getNotifications).toHaveBeenCalled();
-        expect(missed_events_spy).toHaveBeenCalled();
-      });
+      await TestFactory.event_repository.initializeFromStream();
+
+      expect(TestFactory.notification_service.getLastNotificationIdFromDb);
+      expect(TestFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
+      expect(TestFactory.notification_service.getNotifications).toHaveBeenCalledWith(
+        clientId,
+        latestNotificationId,
+        EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
+      );
+
+      expect(missedEventsSpy).toHaveBeenCalled();
     });
 
     it('should buffer notifications when notification stream is not processed', () => {
