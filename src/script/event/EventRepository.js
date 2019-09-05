@@ -305,7 +305,7 @@ export class EventRepository {
 
   /**
    * Get the last notification.
-   * @returns {Promise} Resolves with the last handled notification ID
+   * @returns {Promise<string>} Resolves with the last handled notification ID
    */
   getStreamState() {
     return this.notificationService
