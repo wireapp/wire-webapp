@@ -17,10 +17,9 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
+import {Logger, getLogger} from 'Util/Logger';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 
@@ -57,7 +56,7 @@ export class NotificationService {
    * @param size - Maximum number of notifications to return
    * @returns Resolves with a pages list of notifications
    */
-  getNotifications(clientId: string, notificationId: string, size: number): Promise<NotificationList> {
+  getNotifications(clientId: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
     return this.backendClient.sendRequest({
       data: {
         client: clientId,
@@ -168,5 +167,37 @@ export class NotificationService {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED, {
       value: notificationId,
     });
+  }
+
+  async getNotificationIdByMessageId(messageId: string, clientId: string): Promise<string> {
+    const notificationIds: string[] = [];
+
+    if (this.storageService.db) {
+      // TODO: Type return value from storage service
+      const message = await this.storageService.db
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .where({id: messageId})
+        .first();
+      const {notifications} = await this.getNotifications(clientId);
+
+      // TOOD: Replace with for-loop and break
+      notifications.forEach(notification => {
+        notification.payload.forEach(event => {
+          if (event.type === 'conversation.otr-message-add') {
+            // TODO: Add typings in core for OTR message add event
+            const otrEvent = event as any;
+            const eventLooksLikeMessage =
+              otrEvent.time === message.time &&
+              otrEvent.from === message.from &&
+              otrEvent.conversation === message.conversation;
+            if (eventLooksLikeMessage) {
+              notificationIds.push(notification.id);
+            }
+          }
+        });
+      });
+    }
+
+    return notificationIds[0];
   }
 }
