@@ -3347,7 +3347,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Add missed events message to conversations.
+   * Add missed events system message to conversations.
    * @returns {undefined} No return value
    */
   on_missed_events() {

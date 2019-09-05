@@ -127,7 +127,7 @@ describe('EventRepository', () => {
     });
 
     it('should fetch last notifications ID from backend if not found in storage', async () => {
-      const missedEventsSpy = jasmine.createSpy();
+      const missedEventsSpy = jasmine.createSpy('missedEventsSpy');
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MISSED_EVENTS);
       amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, missedEventsSpy);
 
