@@ -822,7 +822,7 @@ export class ConversationRepository {
 
   deleteConversationLocally(conversationId, skipNotification = false) {
     const conversationEntity = this.find_conversation_by_id(conversationId);
-    if (conversationEntity === this.active_conversation()) {
+    if (this.is_active_conversation(conversationEntity)) {
       const nextConversation = this.get_next_conversation(conversationEntity);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
     }
