@@ -56,12 +56,10 @@ export class NotificationAPI {
     clientId?: string,
     size: number = NOTIFICATION_SIZE_MAXIMUM,
     since?: Date,
-    cancelFallbackNotifications?: boolean,
   ): Promise<NotificationList> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
-        cancel_fallback: cancelFallbackNotifications,
         client: clientId,
         since,
         size,
@@ -77,15 +75,10 @@ export class NotificationAPI {
    * Fetch a notification by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/getNotification
    */
-  public async getNotification(
-    notificationId: string,
-    clientId?: string,
-    cancelFallbackNotifications?: boolean,
-  ): Promise<Notification> {
+  public async getNotification(notificationId: string, clientId?: string): Promise<Notification> {
     const config: AxiosRequestConfig = {
       method: 'get',
       params: {
-        cancel_fallback: cancelFallbackNotifications,
         client: clientId,
       },
       url: `${NotificationAPI.URL.NOTIFICATION}/${notificationId}`,
