@@ -250,7 +250,7 @@ export class EventRepository {
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
   getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
           this.serverTimeHandler.computeTimeOffset(time);
@@ -280,26 +280,31 @@ export class EventRepository {
         return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
-      return this.notificationService
-        .getNotifications(this.currentClient().id, notificationId, limit)
-        .then(_gotNotifications)
-        .catch(errorResponse => {
-          // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
-          // we will get a 404 AND notifications
-          if (errorResponse.notifications) {
-            this._missedEventsFromStream();
-            return _gotNotifications(errorResponse);
-          }
+      const notificationList = await this.notificationService.getNotifications(
+        this.currentClient().id,
+        notificationId,
+        limit,
+      );
 
-          const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
-            this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
-            return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
-          }
+      try {
+        await _gotNotifications(notificationList);
+      } catch (errorResponse) {
+        // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
+        // we will get a 404 AND notifications
+        if (errorResponse.notifications) {
+          await this._missedEventsFromStream();
+          return _gotNotifications(errorResponse);
+        }
 
-          this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
-          return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
-        });
+        const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isNotFound) {
+          this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
+          return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
+        }
+
+        this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
+        return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
+      }
     });
   }
 
@@ -442,10 +447,12 @@ export class EventRepository {
 
   _missedEventsFromStream() {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
-      const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
-      if (!lastNotificationIdEqualsMissedId) {
-        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-        this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+      if (notificationId) {
+        const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
+        if (!lastNotificationIdEqualsMissedId) {
+          amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+          this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+        }
       }
     });
   }
