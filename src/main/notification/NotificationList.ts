@@ -22,4 +22,6 @@ import {Notification} from './Notification';
 export interface NotificationList {
   has_more: boolean;
   notifications: Notification[];
+  /** ISO 8601 formatted date */
+  time: string;
 }
