@@ -18,7 +18,8 @@
  */
 
 export interface AssetUploadData {
-  expires: string; // ISO-8601 formatted date
+  /** ISO 8601 formatted date */
+  expires: string;
   key: string;
   token: string;
 }
