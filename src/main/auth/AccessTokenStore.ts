@@ -46,7 +46,7 @@ export class AccessTokenStore extends EventEmitter {
 
   public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
-      this.logger.log('Updating local access token');
+      this.logger.log('Saving local access token');
       this.accessToken = accessToken;
       this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessToken);
     }
