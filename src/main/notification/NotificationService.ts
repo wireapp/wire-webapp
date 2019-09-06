@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {Notification, NotificationEvent} from '@wireapp/api-client/dist/commonjs/notification/';
+import {Notification, NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
@@ -47,7 +47,7 @@ export class NotificationService {
     return !!notificationEvents.length;
   }
 
-  public getNotificationEventList(): Promise<NotificationEvent[]> {
+  public getNotificationEventList(): Promise<NotificationPayload[]> {
     return this.database.getNotificationEventList();
   }
 
