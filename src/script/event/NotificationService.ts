@@ -21,8 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/commonjs/event';
 import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {StorageService} from '../storage/StorageService';
+import {EventRecord, StorageSchemata, StorageService} from '../storage/';
 
 export class NotificationService {
   private readonly backendClient: any;
@@ -172,27 +171,30 @@ export class NotificationService {
 
   getNotificationIdByMessageId(messageId: string, clientId: string): Promise<string | void> {
     return new Promise(async resolve => {
-      if (this.storageService.db) {
-        const message = await this.storageService.db
+      let message: EventRecord;
+
+      if (this.storageService.isTemporaryAndNonPersistent) {
+        message = Object.values(this.storageService.objectDb.events).filter(event => event.id === messageId)[0];
+      } else {
+        message = await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where({id: messageId})
           .first();
-        const {notifications} = await this.getNotifications(clientId);
-
-        notifications.forEach(notification => {
-          notification.payload.forEach(event => {
-            if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
-              const eventLooksLikeMessage =
-                event.time === message.time &&
-                event.from === message.from &&
-                event.conversation === message.conversation;
-              if (eventLooksLikeMessage) {
-                resolve(notification.id);
-              }
-            }
-          });
-        });
       }
+
+      const {notifications} = await this.getNotifications(clientId);
+
+      notifications.forEach(notification => {
+        notification.payload.forEach(event => {
+          if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
+            const eventLooksLikeMessage =
+              event.time === message.time && event.from === message.from && event.conversation === message.conversation;
+            if (eventLooksLikeMessage) {
+              resolve(notification.id);
+            }
+          }
+        });
+      });
     });
   }
 }
