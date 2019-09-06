@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.4.0...@wireapp/api-client@6.4.1) (2019-09-06)
+
+
+### Bug Fixes
+
+* **api-client:** Don't disconnect WebSocket on failed ping ([#2272](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2272)) ([54cf092](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/54cf092))
+
+
+
+
+
 # [6.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.3.8...@wireapp/api-client@6.4.0) (2019-09-05)
 
 
