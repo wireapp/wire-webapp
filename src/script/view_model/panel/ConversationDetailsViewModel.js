@@ -282,6 +282,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
           label: t('conversationDetailsActionLeave'),
         },
       },
+
+      // TODO: Comment this out for the initial release, as there should only be support for handling the event in the beginning
       {
         condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
         item: {
