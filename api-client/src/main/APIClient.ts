@@ -109,7 +109,7 @@ export class APIClient extends EventEmitter {
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore, this.config.store);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
-    webSocket.on(WebSocketTopic.ON_DISCONNECT, async (error: InvalidTokenError) => {
+    webSocket.on(WebSocketTopic.ON_INVALID_TOKEN, async (error: InvalidTokenError) => {
       this.logger.warn(`Cannot renew access token because cookie is invalid: ${error.message}`, error);
       await this.logout();
       this.emit(APIClientTopic.ON_LOGOUT, error);

@@ -17,6 +17,7 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
 import {Context, LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/';
@@ -37,6 +38,9 @@ import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {error as StoreEngineError} from '@wireapp/store-engine';
+import EventEmitter from 'events';
+import logdown from 'logdown';
+
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
@@ -61,16 +65,12 @@ import {
   ReactionContent,
   TextContent,
 } from './conversation/content/';
+import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {CryptographyService} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {NotificationService} from './notification/';
 import {SelfService} from './self/';
 import {TeamService} from './team/';
-
-import {APIClient} from '@wireapp/api-client';
-import EventEmitter from 'events';
-import logdown from 'logdown';
-import {MessageBuilder} from './conversation/message/MessageBuilder';
 import {UserService} from './user/';
 
 export class Account extends EventEmitter {
@@ -149,7 +149,7 @@ export class Account extends EventEmitter {
     initClient: boolean = true,
     clientInfo?: ClientInfo,
   ): Promise<Context | undefined> {
-    await this.resetContext();
+    this.resetContext();
     await this.init();
 
     LoginSanitizer.removeNonPrintableCharacters(loginData);

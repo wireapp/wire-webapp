@@ -178,7 +178,7 @@ const messageIdCache = {};
 
   apiClient.transport.ws.on(WebSocketTopic.ON_OFFLINE, () => logger.info('API Client is offline'));
 
-  apiClient.transport.ws.on(WebSocketTopic.ON_RECONNECT, () => logger.info('API Client is reconnected'));
+  apiClient.transport.ws.on(WebSocketTopic.ON_ONLINE, () => logger.info('API Client is online'));
 
   account.on(PayloadBundleType.TEXT, async data => {
     const {
