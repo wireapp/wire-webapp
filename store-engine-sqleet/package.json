@@ -12,7 +12,7 @@
     "@types/karma": "3.0.3",
     "@types/node": "~10",
     "@types/uint32": "0.2.0",
-    "@wireapp/store-engine": "3.9.10",
+    "@wireapp/store-engine": "3.9.11",
     "babel-loader": "8.0.6",
     "bazinga64": "5.5.16",
     "jasmine": "3.4.0",
@@ -43,5 +43,5 @@
     "test": "karma start",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.8.6"
+  "version": "0.8.7"
 }

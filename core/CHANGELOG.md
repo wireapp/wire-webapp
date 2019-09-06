@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.17.58](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.57...@wireapp/core@12.17.58) (2019-09-06)
+
+
+### Bug Fixes
+
+* **api-client:** Don't disconnect WebSocket on failed ping ([#2272](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2272)) ([54cf092](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/54cf092))
+
+
+
+
+
 ## [12.17.57](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.56...@wireapp/core@12.17.57) (2019-09-05)
 
 **Note:** Version bump only for package @wireapp/core
