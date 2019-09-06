@@ -211,7 +211,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   deleteConversation(conversationEntity) {
     if (conversationEntity && conversationEntity.isCreatedBySelf()) {
-      return new Promise(resolve => {
+      return new Promise(() => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
