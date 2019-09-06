@@ -17,6 +17,9 @@
  *
  */
 
-export interface NotificationEvent {
-  type: string;
-}
+import {ConversationOtrMessageAddNotification, UserClientAddNotification, UserUpdateNotification} from '../event';
+
+export type NotificationPayload =
+  | ConversationOtrMessageAddNotification
+  | UserClientAddNotification
+  | UserUpdateNotification;

@@ -19,10 +19,11 @@
 
 import {AudioPreference} from '../audio/';
 import {PreKey} from '../auth/';
-import {RegisteredClient} from '../client/';
+import {RegisteredClient, UpdatedClient} from '../client/';
 import {Connection} from '../connection/';
 import {NotificationPreference} from '../notification/';
-import {Self} from '../self/';
+import {Picture, Self} from '../self/';
+import {UserAsset} from '../user';
 import {BackendEvent} from './BackendEvent';
 
 type UserID = string;
@@ -51,6 +52,11 @@ export interface UserActivateEvent extends UserEvent {
 
 export interface UserClientAddEvent extends UserEvent {
   client: RegisteredClient;
+  type: USER_EVENT.CLIENT_ADD;
+}
+
+export interface UserClientAddNotification {
+  client: UpdatedClient;
   type: USER_EVENT.CLIENT_ADD;
 }
 
@@ -118,4 +124,13 @@ export interface UserPropertiesSetEvent extends UserEvent {
 
 export interface UserUpdateEvent extends UserEvent {
   type: USER_EVENT.UPDATE;
+}
+
+export interface UserUpdateNotification {
+  type: USER_EVENT.UPDATE;
+  user: {
+    assets?: UserAsset[];
+    id: string;
+    picture?: Picture[];
+  };
 }

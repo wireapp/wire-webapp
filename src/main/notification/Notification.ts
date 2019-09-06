@@ -17,9 +17,9 @@
  *
  */
 
-import {NotificationEvent} from './NotificationEvent';
+import {NotificationPayload} from './NotificationPayload';
 
 export interface Notification {
   id: string;
-  payload: NotificationEvent[];
+  payload: NotificationPayload[];
 }
