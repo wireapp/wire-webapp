@@ -19,6 +19,6 @@
 
 export * from './Notification';
 export * from './NotificationAPI';
-export * from './NotificationEvent';
+export * from './NotificationPayload';
 export * from './NotificationList';
 export * from './NotificationPreference';

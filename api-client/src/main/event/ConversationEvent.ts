@@ -125,6 +125,18 @@ export interface ConversationOtrMessageAddEvent extends ConversationEvent {
   type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
 }
 
+export interface ConversationOtrMessageAddNotification {
+  conversation: string;
+  data: {
+    recipient: string;
+    sender: string;
+    text: string;
+  };
+  from: string;
+  time: string;
+  type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+}
+
 export interface ConversationRenameEvent extends ConversationEvent {
   data: {
     name: string;
