@@ -169,32 +169,33 @@ export class NotificationService {
     });
   }
 
-  getNotificationIdByMessageId(messageId: string, clientId: string): Promise<string | void> {
-    return new Promise(async resolve => {
-      let message: EventRecord;
+  async getNotificationIdByMessageId(messageId: string, clientId: string): Promise<string | void> {
+    let message: EventRecord;
 
-      if (this.storageService.isTemporaryAndNonPersistent) {
-        message = Object.values(this.storageService.objectDb.events).filter(event => event.id === messageId)[0];
-      } else {
-        message = await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where({id: messageId})
-          .first();
-      }
+    if (this.storageService.isTemporaryAndNonPersistent) {
+      message = Object.values(this.storageService.objectDb.events).filter(event => event.id === messageId)[0];
+    } else {
+      message = await this.storageService.db
+        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .where({id: messageId})
+        .first();
+    }
 
-      const {notifications} = await this.getNotifications(clientId);
+    const {notifications} = await this.getNotifications(clientId);
 
-      notifications.forEach(notification => {
-        notification.payload.forEach(event => {
-          if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
-            const eventLooksLikeMessage =
-              event.time === message.time && event.from === message.from && event.conversation === message.conversation;
-            if (eventLooksLikeMessage) {
-              resolve(notification.id);
-            }
-          }
-        });
+    for (const notification of notifications) {
+      const matchedEvent = notification.payload.find(event => {
+        return (
+          event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD &&
+          event.time === message.time &&
+          event.from === message.from &&
+          event.conversation === message.conversation
+        );
       });
-    });
+
+      if (matchedEvent) {
+        return notification.id;
+      }
+    }
   }
 }
