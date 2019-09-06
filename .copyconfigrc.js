@@ -3,16 +3,51 @@ const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
 const path = require('path');
 
-const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
-  .toString()
-  .trim();
-const isTagged = !!execSync('git tag -l --points-at HEAD')
-  .toString()
-  .trim();
-const configBranchSelection = isTagged || currentBranch === 'master' ? 'master' : 'staging';
-const distribution = process.env.DISTRIBUTION !== 'wire' && process.env.DISTRIBUTION;
-const suffix = distribution || configBranchSelection;
-const configurationEntry = `wire-web-config-default-${suffix}`;
+/**
+ * Selects the configuration by precedence:
+ * 1. distribution (other than 'wire')
+ * 2. branch (one of 'master', 'staging', 'dev')
+ * 3. tagged commit
+ * 4. default
+ *
+ * Scenari:
+ * 1. When executed locally the current commit can be the HEAD of a branch (master, staging, dev) AND a tag. The branch has precedence here.
+ * 2. When executed on CI it is either a tagged commit OR a branch.
+ */
+const selectConfiguration = () => {
+  const distribution = process.env.DISTRIBUTION !== 'wire' && process.env.DISTRIBUTION;
+  if (distribution) {
+    console.log(`Selecting configuration "${distribution}" (reason: custom distribution)`);
+    return distribution;
+  }
+  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD')
+    .toString()
+    .trim();
+  switch (currentBranch) {
+    case 'master':
+    case 'staging': {
+      console.log(`Selecting configuration "${currentBranch}" (reason: branch)`);
+      return currentBranch;
+    }
+    case 'dev': {
+      console.log(`Selecting configuration "staging" (reason: branch)`);
+      return 'staging';
+    }
+    default: {
+      const isTaggedCommit = !!execSync('git tag -l --points-at HEAD')
+        .toString()
+        .trim();
+      if (isTaggedCommit) {
+        console.log('Selecting configuration "master" (reason: tagged commit)');
+        return 'master';
+      }
+      console.log('Selecting configuration "staging" (reason: default)');
+      return 'staging';
+    }
+  }
+};
+
+const configurationEntry = `wire-web-config-default-${selectConfiguration()}`;
 const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
 
 console.log('repo url', repositoryUrl, suffix);
