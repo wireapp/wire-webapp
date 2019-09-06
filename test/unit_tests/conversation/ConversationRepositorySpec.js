@@ -1469,4 +1469,25 @@ describe('ConversationRepository', () => {
       expect(shouldSend).toBe(!!conversationEntity.receiptMode());
     });
   });
+
+  describe('checkForDeletedConversations', () => {
+    it('removes conversations that have been deleted on the backend', async () => {
+      const existingGroup = _generate_conversation(ConversationType.GROUP);
+      const deletedGroup = _generate_conversation(ConversationType.GROUP);
+      spyOn(TestFactory.conversation_service, 'get_conversation_by_id').and.callFake(id => {
+        if (id === deletedGroup.id) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          return Promise.reject({code: 404});
+        }
+        return Promise.resolve();
+      });
+      TestFactory.conversation_repository.save_conversation(existingGroup);
+      TestFactory.conversation_repository.save_conversation(deletedGroup);
+      await TestFactory.conversation_repository.checkForDeletedConversations();
+
+      expect(TestFactory.conversation_repository.conversations().length).toBe(2);
+    });
+  });
+
+  describe('deleteConversationLocally', () => {});
 });

@@ -1119,16 +1119,18 @@ export class ConversationRepository {
       });
   }
 
-  checkForDeletedConversations() {
-    this.conversations().forEach(async conversation => {
-      try {
-        await this.conversation_service.get_conversation_by_id(conversation.id);
-      } catch ({code}) {
-        if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
-          this.deleteConversationLocally(conversation.id, true);
+  async checkForDeletedConversations() {
+    return Promise.all(
+      this.conversations().map(async conversation => {
+        try {
+          await this.conversation_service.get_conversation_by_id(conversation.id);
+        } catch ({code}) {
+          if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+            this.deleteConversationLocally(conversation.id, true);
+          }
         }
-      }
-    });
+      }),
+    );
   }
 
   /**
