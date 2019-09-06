@@ -47,8 +47,8 @@ export class SingleInstanceHandler {
 
   /**
    * Set the cookie to verify we are running a single instace tab.
-   * Returns true if the instance has been registered successfully.
-   * Returns false if the app is already running in another instance.
+   * Returns `true` if the instance has been registered successfully.
+   * Returns `false` if the app is already running in another instance.
    *
    * Side effects: will also start the interval check if a callback was provided in the constructor
    *

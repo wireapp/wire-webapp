@@ -414,7 +414,6 @@ export class StorageService {
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
    * @param reason - Cause for the termination
-   * @returns No return value
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);

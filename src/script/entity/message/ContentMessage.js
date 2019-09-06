@@ -123,7 +123,7 @@ export class ContentMessage extends Message {
 
   /**
    * @param {string} userId - The user id to check
-   * @returns {boolean} True if the message mentions the user.
+   * @returns {boolean} `true` if the message mentions the user.
    */
   isUserMentioned(userId) {
     return this.has_asset_text()
@@ -133,7 +133,7 @@ export class ContentMessage extends Message {
 
   /**
    * @param {string} userId - The user id to check
-   * @returns {boolean} True if the message quotes the user.
+   * @returns {boolean} `true` if the message quotes the user.
    */
   isUserQuoted(userId) {
     return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
@@ -141,7 +141,7 @@ export class ContentMessage extends Message {
 
   /**
    * @param {string} userId - The user id to check
-   * @returns {boolean} True if the user was mentioned or quoted.
+   * @returns {boolean} `true` if the user was mentioned or quoted.
    */
   isUserTargeted(userId) {
     return this.isUserMentioned(userId) || this.isUserQuoted(userId);

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,6 @@
  *
  */
 
-class GroupAvatar {
-  constructor({users}) {
-    this.users = ko.pureComputed(() => users().slice(0, 4));
-  }
+export function generateConversationUrl(conversationId: string): string {
+  return `/conversation/${conversationId}`;
 }
-
-ko.components.register('group-avatar', {
-  template: `
-    <div class="group-avatar-box-wrapper" data-bind="foreach: users">
-      <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
-    </div>
-  `,
-  viewModel: GroupAvatar,
-});

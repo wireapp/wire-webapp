@@ -113,7 +113,6 @@ export class MediaDevicesHandler {
 
   /**
    * Initialize the list of MediaDevices and subscriptions.
-   * @returns {undefined} No return value
    */
   _initializeMediaDevices(): void {
     if (Environment.browser.supports.mediaDevices) {
@@ -126,7 +125,6 @@ export class MediaDevicesHandler {
 
   /**
    * Subscribe to MediaDevices updates if available.
-   * @returns {undefined} No return value
    */
   _subscribeToDevices(): void {
     navigator.mediaDevices.ondevicechange = () => {
@@ -137,7 +135,6 @@ export class MediaDevicesHandler {
 
   /**
    * Subscribe to Knockout observables.
-   * @returns {undefined} No return value
    */
   _subscribeToObservables(): void {
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
@@ -155,7 +152,7 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
-   * @returns {Promise} Resolves with all MediaDevices when the list has been updated
+   * @returns Resolves with all MediaDevices when the list has been updated
    */
   refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
     return navigator.mediaDevices
@@ -204,7 +201,7 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available screens.
-   * @returns {Promise} resolves with all screen sources when the list has been updated
+   * @returns Resolves with all screen sources when the list has been updated
    */
   getScreenSources(): Promise<any[]> {
     return new Promise((resolve, reject) => {
@@ -230,7 +227,6 @@ export class MediaDevicesHandler {
   /**
    * Remove all known MediaDevices from the lists.
    * @private
-   * @returns {undefined} No return value
    */
   _removeAllDevices(): void {
     this.availableDevices.audioInput.removeAll();

@@ -212,7 +212,7 @@ export class NotificationRepository {
   /**
    * Set the permission state.
    * @param {PermissionStatusState} permissionState - State of browser permission
-   * @returns {Promise} Resolves with true if notifications are enabled
+   * @returns {Promise} Resolves with `true` if notifications are enabled
    */
   updatePermissionState(permissionState) {
     this.permissionState(permissionState);
@@ -640,7 +640,7 @@ export class NotificationRepository {
   /**
    * Evaluates the current permission state.
    * @private
-   * @returns {Promise} Resolves with true if notifications are permitted
+   * @returns {Promise} Resolves with `true` if notifications are permitted
    */
   _checkPermissionState() {
     switch (this.permissionState()) {
@@ -848,10 +848,10 @@ export class NotificationRepository {
   /**
    * Check whether conversation is in state to trigger notitication.
    *
-   * @param {Conversation} conversationEntity - Conversation to notify in .
+   * @param {Conversation} conversationEntity - Conversation to notify in.
    * @param {Message} messageEntity - The message to filter from.
    * @param {string} userId - The user id to check mentions for.
-   * @returns {boolean} True if the conversation should show notification.
+   * @returns {boolean} `true` if the conversation should show notification.
    */
   static shouldNotifyInConversation(conversationEntity, messageEntity, userId) {
     if (conversationEntity.showNotificationsNothing()) {

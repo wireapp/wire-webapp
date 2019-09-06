@@ -205,7 +205,7 @@ export class AuthRepository {
    * @private
    * @param {Object} accessTokenResponse - Access token data structure
    * @param {number} expirationTimestamp - Timestamp when access token expires
-   * @returns {undefined}
+   * @returns {undefined} No return value
    */
   _logAccessTokenUpdate(accessTokenResponse, expirationTimestamp) {
     const expirationDate = formatTimestamp(expirationTimestamp, false);

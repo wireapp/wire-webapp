@@ -250,7 +250,7 @@ export class EventRepository {
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
   getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
           this.serverTimeHandler.computeTimeOffset(time);
@@ -280,32 +280,37 @@ export class EventRepository {
         return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
-      return this.notificationService
-        .getNotifications(this.currentClient().id, notificationId, limit)
-        .then(_gotNotifications)
-        .catch(errorResponse => {
-          // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
-          // we will get a 404 AND notifications
-          if (errorResponse.notifications) {
-            this._missedEventsFromStream();
-            return _gotNotifications(errorResponse);
-          }
+      const notificationList = await this.notificationService.getNotifications(
+        this.currentClient().id,
+        notificationId,
+        limit,
+      );
 
-          const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
-            this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
-            return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
-          }
+      try {
+        await _gotNotifications(notificationList);
+      } catch (errorResponse) {
+        // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
+        // we will get a 404 AND notifications
+        if (errorResponse.notifications) {
+          await this._missedEventsFromStream();
+          return _gotNotifications(errorResponse);
+        }
 
-          this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
-          return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
-        });
+        const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isNotFound) {
+          this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
+          return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
+        }
+
+        this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
+        return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
+      }
     });
   }
 
   /**
    * Get the last notification.
-   * @returns {Promise} Resolves with the last handled notification ID
+   * @returns {Promise<string>} Resolves with the last handled notification ID
    */
   getStreamState() {
     return this.notificationService
@@ -318,7 +323,7 @@ export class EventRepository {
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
         return this.setStreamState(this.currentClient().id).then(() => {
-          this._missedEventsFromStream();
+          this._triggerMissedSystemEventMessageRendering();
           return this.lastNotificationId();
         });
       })
@@ -440,10 +445,10 @@ export class EventRepository {
       : this.lastNotificationId();
   }
 
-  _missedEventsFromStream() {
+  _triggerMissedSystemEventMessageRendering() {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
-      const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
-      if (!lastNotificationIdEqualsMissedId) {
+      const shouldUpdatePersistedId = this.lastNotificationId() !== notificationId;
+      if (shouldUpdatePersistedId) {
         amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
         this.notificationService.saveMissedIdToDb(this.lastNotificationId());
       }
@@ -595,7 +600,7 @@ export class EventRepository {
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   _handleEvent(event, source) {
     return this._handleEventValidation(event, source)
@@ -615,7 +620,7 @@ export class EventRepository {
    *
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
@@ -921,7 +926,7 @@ export class EventRepository {
    *
    * @private
    * @param {Object} event - Event to validate
-   * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
+   * @returns {true} Returns `true` if event is handled within it's lifetime, otherwise throws error
    */
   _validateCallEventLifetime(event) {
     const {content = {}, conversation: conversationId, time, type} = event;

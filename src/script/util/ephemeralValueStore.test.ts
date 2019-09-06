@@ -20,6 +20,22 @@
 import {get, save} from './ephemeralValueStore';
 
 describe('ephemeralValueStore', () => {
+  describe('ServiceWorker is not available', () => {
+    let originalServiceWorker: ServiceWorkerContainer;
+    beforeEach(() => {
+      originalServiceWorker = window.navigator.serviceWorker;
+      (window.navigator as any).__defineGetter__('serviceWorker', (): void => undefined);
+    });
+    afterEach(() => {
+      (window.navigator as any).__defineGetter__('serviceWorker', (): ServiceWorkerContainer => originalServiceWorker);
+    });
+
+    it('does not crash if serviceWorker is not available', async () => {
+      const notSavedValue = await save('value');
+      expect(notSavedValue).not.toBeDefined();
+    });
+  });
+
   it('is initialized with an empty value', async () => {
     const storedValue = await get();
     expect(storedValue).not.toBeDefined();

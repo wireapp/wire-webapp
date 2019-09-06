@@ -23,10 +23,7 @@ import {getDomainName} from 'Util/UrlUtil';
 
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
+class LinkPreviewAssetComponent {
   /**
    * Construct a new link preview asset.
    *
@@ -65,7 +62,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
   dispose() {
     this.element.removeEventListener('click', this.onClick);
   }
-};
+}
 
 ko.components.register('link-preview-asset', {
   template: `
@@ -110,7 +107,7 @@ ko.components.register('link-preview-asset', {
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
-      return new z.components.LinkPreviewAssetComponent(params, componentInfo);
+      return new LinkPreviewAssetComponent(params, componentInfo);
     },
   },
 });

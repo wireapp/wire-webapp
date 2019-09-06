@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.DeviceRemove = class DeviceRemove {
+class DeviceRemove {
   constructor(params) {
     this.dispose = this.dispose.bind(this);
 
@@ -58,7 +55,7 @@ z.components.DeviceRemove = class DeviceRemove {
   dispose() {
     this.password_subscription.dispose();
   }
-};
+}
 
 ko.components.register('device-remove', {
   template: `
@@ -85,7 +82,7 @@ ko.components.register('device-remove', {
   `,
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.DeviceRemove(params, component_info);
+      return new DeviceRemove(params, component_info);
     },
   },
 });

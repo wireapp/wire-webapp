@@ -21,14 +21,11 @@ import {getLogger} from 'Util/Logger';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.UserProfile = class UserProfile {
+class UserProfile {
   constructor(params) {
     this.dispose = this.dispose.bind(this);
 
-    this.logger = getLogger('z.components.UserProfile');
+    this.logger = getLogger('UserProfile');
 
     this.userEntity = params.user;
     this.ParticipantAvatar = ParticipantAvatar;
@@ -112,7 +109,7 @@ z.components.UserProfile = class UserProfile {
   dispose() {
     this.renderAvatarComputed.dispose();
   }
-};
+}
 
 ko.components.register('user-profile', {
   template: `
@@ -138,5 +135,5 @@ ko.components.register('user-profile', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: z.components.UserProfile,
+  viewModel: UserProfile,
 });

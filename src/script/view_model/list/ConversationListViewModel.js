@@ -29,6 +29,7 @@ import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
+import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/legalHoldDot';
 import 'Components/availabilityState';
@@ -73,6 +74,7 @@ export class ConversationListViewModel {
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
     this.isTeam = this.teamRepository.isTeam;
     this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.getConversationUrl = generateConversationUrl;
 
     this.selfUser = ko.pureComputed(() => this.userRepository.self && this.userRepository.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
@@ -145,10 +147,6 @@ export class ConversationListViewModel {
 
   clickOnConnectRequests() {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
-  }
-
-  getConversationUrl(conversationEntity) {
-    return `/conversation/${conversationEntity.id}`;
   }
 
   hasJoinableCall(conversationId) {

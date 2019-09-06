@@ -19,10 +19,7 @@
 
 import {isRemovalAction} from 'Util/KeyboardUtil';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.UserInput = class UserInput {
+class UserInput {
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
 
@@ -80,7 +77,7 @@ z.components.UserInput = class UserInput {
       this.selectedSubscription.dispose();
     }
   }
-};
+}
 
 ko.components.register('user-input', {
   template: `
@@ -108,7 +105,7 @@ ko.components.register('user-input', {
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
-      return new z.components.UserInput(params, componentInfo);
+      return new UserInput(params, componentInfo);
     },
   },
 });

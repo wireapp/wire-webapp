@@ -68,13 +68,13 @@ export const obfuscate = (text: string) =>
   Array.from(text, char => (/\s/.test(char) ? char : randomElement(alphabet))).join('');
 
 /**
- * Returns true if the string and the query match by applying transliteration first.
+ * Returns `true` if the string and the query match by applying transliteration first.
  *
  * @param string - the string to compare the query against
  * @param query - the query to compare to the string
  * @param excludedChars - extra characters to ignore when creating a slug
  * @param fromStart - should the query match the string from the beginning of the string
- * @returns does the string matches the query
+ * @returns does the string match the query
  */
 export const compareTransliteration = (
   string: string,

@@ -1032,7 +1032,7 @@ export class ConversationRepository {
    *
    * @param {string} conversation_id - Conversation ID
    * @param {string} message_id - Message ID
-   * @returns {Promise} Resolves with true if message is marked as read
+   * @returns {Promise} Resolves with `true` if message is marked as read
    */
   is_message_read(conversation_id, message_id) {
     if (!conversation_id || !message_id) {
@@ -3317,7 +3317,7 @@ export class ConversationRepository {
    * @private
    * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
    * @param {EventRepository.SOURCE} eventSource - Source of event
-   * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
+   * @param {boolean} previouslyArchived - `true` if the previous state of the conversation was archived
    * @returns {Promise} Resolves when the conversation was updated
    */
   _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
@@ -3399,7 +3399,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Add missed events message to conversations.
+   * Add "missed events" system message to conversation.
    * @returns {undefined} No return value
    */
   on_missed_events() {
