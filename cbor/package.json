@@ -7,7 +7,7 @@
     "jasmine": "3.4.0",
     "rimraf": "3.0.0",
     "webpack": "4.39.3",
-    "webpack-cli": "3.3.7"
+    "webpack-cli": "3.3.8"
   },
   "files": [
     "dist"
