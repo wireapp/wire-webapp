@@ -53,7 +53,7 @@ export class StorageService {
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
-  private readonly isTemporaryAndNonPersistent: boolean;
+  public readonly isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
   private userId?: string;
   public dbName?: string;
