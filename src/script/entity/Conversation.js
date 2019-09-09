@@ -191,6 +191,10 @@ export class Conversation {
       }
     });
 
+    this.isCreatedBySelf = ko.pureComputed(
+      () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
+    );
+
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });

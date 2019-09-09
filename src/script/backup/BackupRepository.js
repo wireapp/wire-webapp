@@ -223,6 +223,7 @@ class BackupRepository {
       .then(importedEntities => {
         this.conversationRepository.updateConversations(importedEntities);
         this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
+        this.conversationRepository.checkForDeletedConversations();
       });
   }
 

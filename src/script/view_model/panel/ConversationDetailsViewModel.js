@@ -256,7 +256,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         condition: () => conversationEntity.isClearable(),
         item: {
           click: () => this.clickToClear(),
-          icon: 'delete-icon',
+          icon: 'eraser-icon',
           identifier: 'do-clear',
           label: t('conversationDetailsActionClear'),
         },
@@ -282,6 +282,16 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
           label: t('conversationDetailsActionLeave'),
         },
       },
+      // TODO: Uncomment this when there should be support for conversation deletion
+      // {
+      //   condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
+      //   item: {
+      //     click: () => this.clickToDelete(),
+      //     icon: 'delete-icon',
+      //     identifier: 'do-delete',
+      //     label: t('conversationDetailsActionDelete'),
+      //   },
+      // },
     ];
 
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
@@ -361,6 +371,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   clickToLeave() {
     this.actionsViewModel.leaveConversation(this.activeConversation());
+  }
+
+  clickToDelete() {
+    this.actionsViewModel.deleteConversation(this.activeConversation());
   }
 
   clickToToggleMute() {

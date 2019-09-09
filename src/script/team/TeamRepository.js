@@ -145,9 +145,8 @@ export class TeamRepository {
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case BackendEvent.TEAM.CONVERSATION_CREATE:
       case BackendEvent.TEAM.CONVERSATION_DELETE: {
-        this._onUnhandled(eventJson);
+        this._onDeleteConversation(eventJson);
         break;
       }
       case BackendEvent.TEAM.DELETE: {
@@ -170,6 +169,7 @@ export class TeamRepository {
         this._onUpdate(eventJson);
         break;
       }
+      case BackendEvent.TEAM.CONVERSATION_CREATE:
       default: {
         this._onUnhandled(eventJson);
       }
@@ -255,6 +255,10 @@ export class TeamRepository {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
+  }
+
+  _onDeleteConversation({data: {conv: conversationId}}) {
+    amplify.publish(WebAppEvents.CONVERSATION.DELETE, conversationId);
   }
 
   _onMemberJoin(eventJson) {

@@ -99,6 +99,7 @@ import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
+import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -296,6 +297,7 @@ export class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -338,7 +340,7 @@ export class ConversationRepository {
         conversationEntity.removed_from_conversation()
       ) {
         this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-        this.delete_conversation(conversationEntity.id);
+        this.deleteConversationFromRepository(conversationEntity.id);
       }
     });
   }
@@ -418,36 +420,39 @@ export class ConversationRepository {
 
   /**
    * Get a conversation from the backend.
-   * @param {string} conversation_id - Conversation to be retrieved from the backend
+   * @param {string} conversationId - Conversation to be retrieved from the backend
    * @returns {Promise} Resolve with the conversation entity
    */
-  fetch_conversation_by_id(conversation_id) {
-    if (this.fetching_conversations.hasOwnProperty(conversation_id)) {
+  fetch_conversation_by_id(conversationId) {
+    if (this.fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
-        this.fetching_conversations[conversation_id].push({reject_fn: reject, resolve_fn: resolve});
+        this.fetching_conversations[conversationId].push({reject_fn: reject, resolve_fn: resolve});
       });
     }
 
-    this.fetching_conversations[conversation_id] = [];
+    this.fetching_conversations[conversationId] = [];
 
     return this.conversation_service
-      .get_conversation_by_id(conversation_id)
+      .get_conversation_by_id(conversationId)
       .then(response => {
         const conversationEntity = this.mapConversations(response);
 
-        this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
+        this.logger.info(`Fetched conversation '${conversationId}' from backend`);
         this.save_conversation(conversationEntity);
 
-        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
-        delete this.fetching_conversations[conversation_id];
+        this.fetching_conversations[conversationId].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
+        delete this.fetching_conversations[conversationId];
 
         return conversationEntity;
       })
-      .catch(() => {
+      .catch(({code}) => {
+        if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+          return this.deleteConversationLocally(conversationId);
+        }
         const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
 
-        this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
-        delete this.fetching_conversations[conversation_id];
+        this.fetching_conversations[conversationId].forEach(({reject_fn}) => reject_fn(error));
+        delete this.fetching_conversations[conversationId];
 
         throw error;
       });
@@ -805,8 +810,38 @@ export class ConversationRepository {
    * @param {string} conversation_id - ID of conversation to be deleted from the repository
    * @returns {undefined} No return value
    */
-  delete_conversation(conversation_id) {
+  deleteConversationFromRepository(conversation_id) {
     this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
+  }
+
+  deleteConversation(conversationEntity) {
+    this.conversation_service
+      .deleteConversation(this.team().id, conversationEntity.id)
+      .then(() => {
+        this.deleteConversationLocally(conversationEntity.id, true);
+      })
+      .catch(() => {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+            title: t('modalConversationDeleteErrorHeadline'),
+          },
+        });
+      });
+  }
+
+  deleteConversationLocally(conversationId, skipNotification = false) {
+    const conversationEntity = this.find_conversation_by_id(conversationId);
+    if (this.is_active_conversation(conversationEntity)) {
+      const nextConversation = this.get_next_conversation(conversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
+    }
+    if (!skipNotification && conversationEntity) {
+      const deletionMessage = new DeleteConversationMessage(conversationEntity);
+      amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
+    }
+    this.deleteConversationFromRepository(conversationId);
+    this.conversation_service.delete_conversation_from_db(conversationId);
   }
 
   /**
@@ -1082,6 +1117,20 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  async checkForDeletedConversations() {
+    return Promise.all(
+      this.conversations().map(async conversation => {
+        try {
+          await this.conversation_service.get_conversation_by_id(conversation.id);
+        } catch ({code}) {
+          if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+            this.deleteConversationLocally(conversation.id, true);
+          }
+        }
+      }),
+    );
   }
 
   /**
@@ -1672,7 +1721,7 @@ export class ConversationRepository {
 
     if (conversationEntity.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-      this.delete_conversation(conversationEntity.id);
+      this.deleteConversationFromRepository(conversationEntity.id);
     }
   }
 
@@ -3185,6 +3234,9 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
 
+      case BackendEvent.CONVERSATION.DELETE:
+        return this.deleteConversationLocally(eventJson.conversation);
+
       case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._onMemberJoin(conversationEntity, eventJson);
 
@@ -3438,7 +3490,7 @@ export class ConversationRepository {
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
         const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
-        const createdBySelfUser = this.selfUser().id === creatorId && !conversationEntity.removed_from_conversation();
+        const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {

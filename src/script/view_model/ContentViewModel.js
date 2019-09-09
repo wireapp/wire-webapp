@@ -278,8 +278,10 @@ export class ContentViewModel {
       if (isStateRequests) {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
+      const previousId = this.previousConversation && this.previousConversation.id;
+      const repoHasConversation = this.conversationRepository.conversations().some(({id}) => id === previousId);
 
-      if (this.previousConversation && !this.previousConversation.is_archived()) {
+      if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
         return this.showConversation(this.previousConversation);
       }
 
