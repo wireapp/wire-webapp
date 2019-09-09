@@ -1,7 +1,6 @@
 const pkg = require('./package.json');
 const appConfigPkg = require('./app-config/package.json');
 const {execSync} = require('child_process');
-const path = require('path');
 
 /**
  * Selects the configuration by precedence:
@@ -10,7 +9,7 @@ const path = require('path');
  * 3. tagged commit
  * 4. default
  *
- * Scenari:
+ * Scenarios:
  * 1. When executed locally the current commit can be the HEAD of a branch (master, staging, dev) AND a tag. The branch has precedence here.
  * 2. When executed on CI it is either a tagged commit OR a branch.
  */
