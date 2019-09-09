@@ -282,17 +282,16 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
           label: t('conversationDetailsActionLeave'),
         },
       },
-
-      // TODO: Comment this out for the initial release, as there should only be support for handling the event in the beginning
-      {
-        condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
-        item: {
-          click: () => this.clickToDelete(),
-          icon: 'delete-icon',
-          identifier: 'do-delete',
-          label: t('conversationDetailsActionDelete'),
-        },
-      },
+      // TODO: Uncomment this when there should be support for conversation deletion
+      // {
+      //   condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
+      //   item: {
+      //     click: () => this.clickToDelete(),
+      //     icon: 'delete-icon',
+      //     identifier: 'do-delete',
+      //     label: t('conversationDetailsActionDelete'),
+      //   },
+      // },
     ];
 
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
