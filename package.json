@@ -11,7 +11,7 @@
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/react-ui-kit": "7.19.0",
     "@wireapp/store-engine": "3.9.10",
-    "@wireapp/store-engine-dexie": "0.6.8",
+    "@wireapp/store-engine-dexie": "0.6.9",
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "core-js": "2.6.9",
     "crypto-js": "3.1.9-1",
