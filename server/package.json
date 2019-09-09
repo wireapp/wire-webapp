@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "2.2.11",
+    "@wireapp/commons": "2.2.12",
     "dotenv": "8.1.0",
     "dotenv-extended": "2.4.0",
     "express": "4.17.1",
