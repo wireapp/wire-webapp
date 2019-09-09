@@ -19,8 +19,8 @@
 
 import EventEmitter from 'events';
 import logdown from 'logdown';
-
 import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
+
 import {InvalidTokenError} from '../auth/';
 import {IncomingNotification} from '../conversation/';
 import {BackendErrorMapper, HttpClient, NetworkError} from '../http/';
@@ -33,21 +33,14 @@ export enum WebSocketTopic {
   ON_STATE_CHANGE = 'WebSocketTopic.ON_STATE_CHANGE',
 }
 
-export enum CloseEventCode {
-  GOING_AWAY = 1001,
-  NORMAL_CLOSURE = 1000,
-  PROTOCOL_ERROR = 1002,
-  UNSUPPORTED_DATA = 1003,
-}
-
 export class WebSocketClient extends EventEmitter {
+  private clientId?: string;
+  private isRefreshingAccessToken: boolean;
   private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
-  private clientId?: string;
-  public client: HttpClient;
-  private isRefreshingAccessToken: boolean;
   private readonly socket: ReconnectingWebsocket;
   private websocketState: WEBSOCKET_STATE;
+  public client: HttpClient;
 
   constructor(baseUrl: string, client: HttpClient) {
     super();

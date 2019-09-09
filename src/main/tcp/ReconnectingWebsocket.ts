@@ -21,8 +21,7 @@ import {TimeUtil} from '@wireapp/commons';
 import logdown from 'logdown';
 import NodeWebSocket = require('ws');
 
-import RWS, {Options} from 'reconnecting-websocket';
-import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket/dist/events';
+import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
 import * as buffer from '../shims/node/buffer';
 
 export enum CloseEventCode {
@@ -119,10 +118,7 @@ export class ReconnectingWebsocket {
   }
 
   public getState(): WEBSOCKET_STATE {
-    if (this.socket) {
-      return this.socket.readyState;
-    }
-    return WEBSOCKET_STATE.CLOSED;
+    return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
   }
 
   public disconnect(reason = 'Closed by client', keepClosed = true): void {
