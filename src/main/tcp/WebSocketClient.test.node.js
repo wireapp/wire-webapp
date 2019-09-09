@@ -17,8 +17,7 @@
  *
  */
 
-const {WebSocketClient, WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
-const {Server: WebSocketServer} = require('ws');
+const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
 
 const accessTokenPayload = {
   access_token:
@@ -35,75 +34,61 @@ const fakeHttpClient = {
   refreshAccessToken: () => Promise.resolve(accessTokenPayload),
 };
 
-const WEBSOCKET_PORT = 8087;
-const WEBSOCKET_URL = `ws://localhost:${WEBSOCKET_PORT}`;
-let server = undefined;
-
-function startEchoServer() {
-  server = new WebSocketServer({port: WEBSOCKET_PORT});
-  server.on('connection', ws => {
-    ws.on('message', message => {
-      server.clients.forEach(client => {
-        const payload = {
-          fromServer: `Echo: ${message}`,
-        };
-
-        const options = {
-          binary: true,
-          mask: false,
-        };
-
-        client.send(JSON.stringify(payload), options);
-      });
-    });
-  });
-
-  server.on('error', error => console.error(`Echo WebSocket server error: "${error.message}"`));
-}
-
 describe('WebSocketClient', () => {
-  describe('"connect"', () => {
-    beforeEach(() => startEchoServer());
+  describe('handler', () => {
+    it('calls "onOpen" when WebSocket opens', async () => {
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const onOpenSpy = spyOn(websocketClient, 'onOpen').and.callThrough();
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-    afterEach(done => {
-      if (server) {
-        server.close(() => {
-          server = undefined;
-          done();
-        });
-      }
+      await websocketClient.connect();
+      fakeSocket.onopen();
+
+      expect(onOpenSpy.calls.count()).toBe(1);
     });
 
-    it('connects to a WebSocket.', async done => {
-      const message = 'Hello, World!';
-      const client = new WebSocketClient(WEBSOCKET_URL, fakeHttpClient);
-      spyOn(client, 'sendPing').and.returnValue();
+    it('calls "onClose" when WebSocket closes', async () => {
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const onCloseSpy = spyOn(websocketClient, 'onClose').and.callThrough();
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-      const webSocketClient = await client.connect();
-      expect(webSocketClient).toBeDefined();
+      await websocketClient.connect();
+      fakeSocket.onclose();
 
-      webSocketClient.on(WebSocketTopic.ON_MESSAGE, data => {
-        expect(data.fromServer).toBe(`Echo: ${message}`);
-        done();
-      });
-
-      webSocketClient.socket.addEventListener('open', () => webSocketClient.socket.send(message));
+      expect(onCloseSpy.calls.count()).toBe(1);
     });
 
-    it(
-      'automatically reconnects with a WebSocket.',
-      async done => {
-        const client = new WebSocketClient(WEBSOCKET_URL, fakeHttpClient);
-        spyOn(client, 'sendPing').and.returnValue();
+    it('calls "onError" when WebSocket received error', async () => {
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const onErrorSpy = spyOn(websocketClient, 'onError').and.callThrough();
+      const refreshTokenSpy = spyOn(websocketClient, 'refreshAccessToken').and.callThrough();
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-        const webSocketClient = await client.connect();
-        expect(webSocketClient).toBeDefined();
-        // "open" listener which will be triggered on WebSocket reconnect which is expected after a WebSocket server restart
-        webSocketClient.socket.addEventListener('open', done);
-        // Restart WebSocket server
-        server.close(() => startEchoServer());
-      },
-      WebSocketClient.RECONNECTING_OPTIONS.maxReconnectionDelay,
-    );
+      await websocketClient.connect();
+      fakeSocket.onerror(new Error('error'));
+
+      expect(onErrorSpy.calls.count()).toBe(1);
+      expect(refreshTokenSpy.calls.count()).toBe(1);
+    });
+
+    it('calls "onMessage" when WebSocket received message', async () => {
+      const message = 'hello';
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const onMessageSpy = spyOn(websocketClient, 'onMessage').and.callThrough();
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
+
+      await websocketClient.connect();
+      fakeSocket.onmessage({data: Buffer.from(JSON.stringify({message}), 'utf-8')});
+
+      expect(onMessageSpy.calls.count()).toBe(1);
+    });
   });
 });

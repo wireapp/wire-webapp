@@ -37,11 +37,11 @@ describe('Client', () => {
       apiClient.accessTokenStore.accessToken = accessTokenData;
 
       const promise = apiClient.connect();
-      apiClient.transport.ws.socket.onopen(message);
+      apiClient.transport.ws.socket.internalOnMessage(message);
       const socket = await promise;
 
       expect(socket).toBeDefined();
-      apiClient.transport.ws.socket.onmessage(message);
+      apiClient.transport.ws.socket.internalOnMessage(message);
     });
   });
 });
