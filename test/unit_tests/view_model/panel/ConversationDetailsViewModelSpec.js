@@ -104,7 +104,7 @@ describe('ConversationDetailsViewModel', () => {
         },
         {
           conversationType: ConversationType.GROUP,
-          expected: ['do-archive', 'do-clear', 'do-leave', 'do-delete'],
+          expected: ['do-archive', 'do-clear', 'do-leave'],
           permission: {canCreateGroupConversation: () => true},
         },
         {
