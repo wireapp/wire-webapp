@@ -19,15 +19,28 @@
 
 /* eslint-disable no-magic-numbers */
 
+const {TimeUtil} = require('@wireapp/commons');
 const {ReconnectingWebsocket} = require('@wireapp/api-client/dist/commonjs/tcp/ReconnectingWebsocket');
 const {Server: WebSocketServer} = require('ws');
 
-const WEBSOCKET_PORT = 8087;
-const WEBSOCKET_URL = `ws://127.0.0.1:${WEBSOCKET_PORT}`;
-let server = undefined;
+const reservedPorts = [];
 
 function startEchoServer() {
-  server = new WebSocketServer({port: WEBSOCKET_PORT});
+  const getWebsocketPort = () => {
+    const WEBSOCKET_START_PORT = 8087;
+    let currentPort = WEBSOCKET_START_PORT;
+    while (true) {
+      if (!reservedPorts.includes(currentPort)) {
+        reservedPorts.push(currentPort);
+        break;
+      } else {
+        currentPort++;
+      }
+    }
+    return currentPort;
+  };
+  const PORT = getWebsocketPort();
+  const server = new WebSocketServer({port: PORT});
   server.on('connection', ws => {
     ws.on('message', message => {
       server.clients.forEach(client => {
@@ -50,10 +63,16 @@ function startEchoServer() {
   });
 
   server.on('error', error => console.error(`Echo WebSocket server error: "${error.message}"`));
+  return server;
 }
 
 describe('ReconnectingWebsocket', () => {
-  beforeEach(() => startEchoServer());
+  let server;
+  const getServerAddress = () => `http://127.0.0.1:${server.address().port}`;
+
+  beforeEach(() => {
+    server = startEchoServer();
+  });
 
   afterEach(done => {
     if (server) {
@@ -63,9 +82,8 @@ describe('ReconnectingWebsocket', () => {
       });
     }
   });
-
   it('calls "onReconnect", "onOpen" and "onClose"', done => {
-    const onReconnect = jasmine.createSpy().and.returnValue(WEBSOCKET_URL);
+    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);
     RWS.setOnOpen(() => {
       expect(onReconnect.calls.count()).toBe(1);
@@ -79,7 +97,7 @@ describe('ReconnectingWebsocket', () => {
   });
 
   it('closes the connection without reconnecting when server terminates the connection', done => {
-    const onReconnect = jasmine.createSpy().and.returnValue(WEBSOCKET_URL);
+    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);
     RWS.setOnOpen(() => {
       expect(onReconnect.calls.count()).toBe(1);
@@ -99,7 +117,7 @@ describe('ReconnectingWebsocket', () => {
    */
   it('reconnects', done => {
     let reconnectCalls = 0;
-    const onReconnect = jasmine.createSpy().and.returnValue(WEBSOCKET_URL);
+    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);
 
     RWS.connect();
@@ -121,4 +139,17 @@ describe('ReconnectingWebsocket', () => {
       }
     });
   }, 2000);
+
+  it('sends ping messages', done => {
+    const RWS = new ReconnectingWebsocket(() => getServerAddress(), {pingInterval: TimeUtil.TimeInMillis.SECOND});
+    RWS.setOnMessage(data => {
+      expect(JSON.parse(data)).toEqual({fromServer: 'Echo: ping'});
+      RWS.disconnect();
+    });
+    RWS.setOnClose(event => {
+      expect(event.wasClean).toBe(true);
+      done();
+    });
+    RWS.connect();
+  });
 });
