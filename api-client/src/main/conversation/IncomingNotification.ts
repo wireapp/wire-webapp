@@ -22,5 +22,11 @@ import {IncomingEvent} from '../event/';
 export interface IncomingNotification {
   id: string;
   payload: IncomingEvent[];
+  /**
+   * Whether the notification is transient, i.e. not stored in the notification queue.
+   * The  transient` property is only set when notifications arrive through the WebSocket.
+   * Notifications from the notification stream don't have that property.
+   * @see https://github.com/wearezeta/backend-api-docs/wiki/API-User-Notifications#notification-structure
+   */
   transient?: boolean;
 }
