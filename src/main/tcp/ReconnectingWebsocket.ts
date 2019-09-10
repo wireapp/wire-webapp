@@ -44,9 +44,6 @@ export enum PingMessage {
 }
 
 export class ReconnectingWebsocket {
-  private static readonly CONFIG = {
-    PING_INTERVAL: TimeUtil.TimeInMillis.SECOND * 20,
-  };
   private static readonly RECONNECTING_OPTIONS: Options = {
     WebSocket: typeof window !== 'undefined' ? WebSocket : NodeWebSocket,
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
@@ -59,7 +56,8 @@ export class ReconnectingWebsocket {
 
   private readonly logger: logdown.Logger;
   private socket?: RWS;
-  private pingInterval?: NodeJS.Timeout;
+  private pingerId?: NodeJS.Timeout;
+  private readonly PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
   private hasUnansweredPing: boolean;
 
   private onOpen?: (event: Event) => void;
@@ -67,11 +65,20 @@ export class ReconnectingWebsocket {
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
 
-  constructor(private readonly onReconnect: () => string) {
+  constructor(
+    private readonly onReconnect: () => string,
+    options: {
+      pingInterval?: number;
+    } = {},
+  ) {
     this.logger = logdown('@wireapp/api-client/tcp/ReconnectingWebsocket', {
       logger: console,
       markdown: false,
     });
+
+    if (options.pingInterval) {
+      this.PING_INTERVAL = options.pingInterval;
+    }
 
     this.hasUnansweredPing = false;
   }
@@ -141,12 +148,12 @@ export class ReconnectingWebsocket {
   private startPinging(): void {
     this.stopPinging();
     this.hasUnansweredPing = false;
-    this.pingInterval = setInterval(this.sendPing, ReconnectingWebsocket.CONFIG.PING_INTERVAL);
+    this.pingerId = setInterval(this.sendPing, this.PING_INTERVAL);
   }
 
   private stopPinging(): void {
-    if (this.pingInterval) {
-      clearInterval(this.pingInterval);
+    if (this.pingerId) {
+      clearInterval(this.pingerId);
     }
   }
 
