@@ -709,38 +709,4 @@ describe('EventRepository', () => {
       });
     });
   });
-
-  describe('_handleEventValidation', () => {
-    it('ignores "conversation.typing" events', () => {
-      TestFactory.event_repository
-        ._handleEventValidation({type: BackendEvent.CONVERSATION.TYPING})
-        .then(fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
-        });
-    });
-
-    it('skips outdated events arriving via notification stream', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const event = {
-        conversation: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
-        time: '2016-08-05T16:18:41.820Z',
-        data: {content: 'Hello', nonce: '1cea64c5-afbe-4c9d-b7d0-c49aa3b0a53d'},
-        from: '532af01e-1e24-4366-aacf-33b67d4ee376',
-        id: '74f.800122000b2d7182',
-        type: 'conversation.message-add',
-      };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      TestFactory.event_repository.lastEventDate('2017-08-05T16:18:41.820Z');
-
-      TestFactory.event_repository
-        ._handleEventValidation(event, EventRepository.SOURCE.STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(z.error.EventError));
-          expect(error.type).toBe(z.error.EventError.TYPE.VALIDATION_FAILED);
-        });
-    });
-  });
 });
