@@ -150,3 +150,13 @@ export interface ConversationTypingEvent extends ConversationEvent {
   };
   type: CONVERSATION_EVENT.TYPING;
 }
+
+export interface ConversationTypingNotification {
+  conversation: string;
+  data: {
+    status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
+  };
+  from: string;
+  time: string;
+  type: CONVERSATION_EVENT.TYPING;
+}

@@ -17,9 +17,15 @@
  *
  */
 
-import {ConversationOtrMessageAddNotification, UserClientAddNotification, UserUpdateNotification} from '../event';
+import {
+  ConversationOtrMessageAddNotification,
+  ConversationTypingNotification,
+  UserClientAddNotification,
+  UserUpdateNotification,
+} from '../event';
 
 export type NotificationPayload =
   | ConversationOtrMessageAddNotification
+  | ConversationTypingNotification
   | UserClientAddNotification
   | UserUpdateNotification;
