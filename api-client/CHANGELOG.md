@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.4.5...@wireapp/api-client@6.5.0) (2019-09-10)
+
+
+### Features
+
+* **api-client:** Expose "is typing" notification payload ([#2287](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2287)) ([8b4f21a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8b4f21a))
+
+
+
+
+
 ## [6.4.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.4.4...@wireapp/api-client@6.4.5) (2019-09-09)
 
 
