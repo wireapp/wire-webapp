@@ -130,7 +130,7 @@ export class EventRepository {
 
         return this._handleNotification(notification)
           .catch(error => {
-            const errorMessage = `We failed to handle a notification but will continue with queue: ${error.message}`;
+            const errorMessage = `We failed to handle notification ID '${notification.id}' but will continue to process queued notifications. Error: ${error.message}`;
             this.logger.warn(errorMessage, error);
           })
           .then(() => {
