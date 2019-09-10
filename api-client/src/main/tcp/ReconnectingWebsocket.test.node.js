@@ -29,12 +29,10 @@ function startEchoServer() {
   const getWebsocketPort = () => {
     const WEBSOCKET_START_PORT = 8087;
     let currentPort = WEBSOCKET_START_PORT;
-    while (true) {
+    while (currentPort++) {
       if (!reservedPorts.includes(currentPort)) {
         reservedPorts.push(currentPort);
         break;
-      } else {
-        currentPort++;
       }
     }
     return currentPort;
