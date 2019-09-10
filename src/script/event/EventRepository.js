@@ -602,17 +602,18 @@ export class EventRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
-  _handleEvent(event, source) {
-    return this._handleEventValidation(event, source)
-      .then(validatedEvent => this.processEvent(validatedEvent, source))
-      .catch(error => {
-        const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
-        if (!isIgnoredError) {
-          throw error;
-        }
+  async _handleEvent(event, source) {
+    try {
+      await this._handleEventValidation(event, source);
+      return this.processEvent(event, source);
+    } catch (error) {
+      const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
+      if (!isIgnoredError) {
+        throw error;
+      }
 
-        return event;
-      });
+      return event;
+    }
   }
 
   /**
@@ -884,7 +885,7 @@ export class EventRepository {
 
         if (outdatedEvent) {
           const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-          this.logger.info(`Event from stream skipped as outdated: '${eventType}'`, logObject);
+          this.logger.info(`Skipped event from stream because it is outdated: '${eventType}'`, logObject);
           const errorMessage = 'Event validation failed: Outdated timestamp';
           throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, errorMessage);
         }
