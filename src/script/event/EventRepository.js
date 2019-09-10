@@ -35,6 +35,7 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {BackendClientError} from '../error/BackendClientError';
+import {EventSource} from './EventSource';
 
 export class EventRepository {
   static get CONFIG() {
@@ -58,10 +59,10 @@ export class EventRepository {
 
   static get SOURCE() {
     return {
-      BACKEND_RESPONSE: 'backend_response',
-      INJECTED: 'injected',
-      STREAM: 'Notification Stream',
-      WEB_SOCKET: 'WebSocket',
+      BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
+      INJECTED: EventSource.INJECTED,
+      STREAM: EventSource.STREAM,
+      WEB_SOCKET: EventSource.WEB_SOCKET,
     };
   }
 
