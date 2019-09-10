@@ -17,7 +17,12 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationOtrMessageAddNotification} from '@wireapp/api-client/dist/commonjs/event';
+import {
+  CONVERSATION_EVENT,
+  CONVERSATION_TYPING,
+  ConversationOtrMessageAddNotification,
+  ConversationTypingNotification,
+} from '@wireapp/api-client/dist/commonjs/event';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {handleEventValidation} from './EventValidator';
@@ -25,18 +30,16 @@ import {handleEventValidation} from './EventValidator';
 describe('EventValidator', () => {
   describe('handleEventValidation', () => {
     it('ignores "conversation.typing" events', () => {
-      const event = {
+      const event: ConversationTypingNotification = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
-        data: {status: 'started'},
+        data: {status: CONVERSATION_TYPING.STARTED},
         from: 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b',
         time: '2019-09-10T16:16:25.635Z',
         type: CONVERSATION_EVENT.TYPING,
       };
 
       const source = EventSource.WEB_SOCKET;
-
       const result = handleEventValidation(event, source, undefined);
-
       expect(result).toBe(EventValidation.IGNORED_TYPE);
     });
 
@@ -54,11 +57,8 @@ describe('EventValidator', () => {
       };
 
       const source = EventSource.STREAM;
-
       const lastEventDate = '2019-09-10T16:05:01.794Z';
-
       const result = handleEventValidation(event, source, lastEventDate);
-
       expect(result).toBe(EventValidation.OUTDATED_TIMESTAMP);
     });
   });
