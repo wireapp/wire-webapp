@@ -26,7 +26,9 @@ export const ConfigRoute = (config: ServerConfig) =>
       APP_BASE: config.SERVER.APP_BASE,
     };
 
-    res
-      .type('application/javascript')
-      .send(`window.wire = window.wire || {};\nwindow.wire.env = ${JSON.stringify(clientConfig)};`);
+    const payload = `
+window.wire = window.wire || {};
+window.wire.env = ${JSON.stringify(clientConfig)};`;
+
+    res.type('application/javascript').send(payload);
   });
