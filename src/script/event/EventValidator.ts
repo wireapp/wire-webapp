@@ -29,7 +29,10 @@ export function handleEventValidation(
   lastEventDate?: string,
 ): EventValidation {
   const eventType = event.type;
-  const canSkipVerification: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
+  const canSkipVerification: (CONVERSATION_EVENT | USER_EVENT)[] = [
+    CONVERSATION_EVENT.TYPING,
+    CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+  ];
   if (canSkipVerification.includes(eventType)) {
     return EventValidation.IGNORED_TYPE;
   }
