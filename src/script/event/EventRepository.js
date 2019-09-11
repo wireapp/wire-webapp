@@ -610,14 +610,17 @@ export class EventRepository {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = handleEventValidation(event, source, this.lastEventDate());
     switch (validationResult) {
-      default:
-        return event;
-      case EventValidation.IGNORED_TYPE:
+      default: {
+        return Promise.resolve(event);
+      }
+      case EventValidation.IGNORED_TYPE: {
         this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return event;
-      case EventValidation.OUTDATED_TIMESTAMP:
+        return Promise.resolve(event);
+      }
+      case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return event;
+        return Promise.resovlve(event);
+      }
       case EventValidation.VALID:
         return this.processEvent(event, source);
     }
