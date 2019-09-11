@@ -211,7 +211,10 @@ export class ContentViewModel {
 
     conversationPromise
       .then(conversationEntity => {
-        const isActiveConversation = conversationEntity === this.conversationRepository.active_conversation();
+        if (!conversationEntity) {
+          throw new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
+        }
+        const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
         const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
         const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
@@ -253,13 +256,18 @@ export class ContentViewModel {
           });
         });
       })
-      .catch(() => {
-        this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: t('conversationNotFoundMessage'),
-            title: t('conversationNotFoundTitle', Config.BRAND_NAME),
-          },
-        });
+      .catch(error => {
+        const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (isConversationNotFound) {
+          this.mainViewModel.modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            text: {
+              message: t('conversationNotFoundMessage'),
+              title: t('conversationNotFoundTitle', Config.BRAND_NAME),
+            },
+          });
+        } else {
+          throw error;
+        }
       });
   };
 

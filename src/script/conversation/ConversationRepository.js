@@ -1025,9 +1025,8 @@ export class ConversationRepository {
    * @returns {boolean} Is the conversation active
    */
   is_active_conversation(conversationEntity) {
-    if (this.active_conversation()) {
-      return this.active_conversation().id === conversationEntity.id;
-    }
+    const activeConversation = this.active_conversation();
+    return !!activeConversation && activeConversation.id === conversationEntity.id;
   }
 
   /**
