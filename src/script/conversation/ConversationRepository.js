@@ -1026,7 +1026,7 @@ export class ConversationRepository {
    */
   is_active_conversation(conversationEntity) {
     const activeConversation = this.active_conversation();
-    return !!activeConversation && activeConversation.id === conversationEntity.id;
+    return !!activeConversation && !!conversationEntity && activeConversation.id === conversationEntity.id;
   }
 
   /**
