@@ -29,6 +29,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
+import {EventSource} from '../event/EventSource';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {ConsentType} from './ConsentType';
@@ -172,7 +173,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  on_user_event(eventJson: any, source: keyof typeof EventRepository.SOURCE): void {
+  on_user_event(eventJson: any, source: EventSource): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};

@@ -36,6 +36,8 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {BackendClientError} from '../error/BackendClientError';
 import {EventSource} from './EventSource';
+import {EventValidation} from './EventValidation';
+import {handleEventValidation} from './EventValidator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -57,6 +59,7 @@ export class EventRepository {
     };
   }
 
+  // TODO: Will be replaced with "EventSource"
   static get SOURCE() {
     return {
       BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
@@ -599,21 +602,24 @@ export class EventRepository {
    * Handle a single event from the notification stream or WebSocket.
    *
    * @private
-   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {JSON} event - Event coming from backend
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
+   * @returns {Promise} Resolves with the saved record or the plain event if the event was skipped
    */
   async _handleEvent(event, source) {
-    try {
-      await this._handleEventValidation(event, source);
-      return this.processEvent(event, source);
-    } catch (error) {
-      const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
-      if (!isIgnoredError) {
-        throw error;
-      }
-
-      return event;
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    const validationResult = handleEventValidation(event, source, this.lastEventDate());
+    switch (validationResult) {
+      default:
+        return event;
+      case EventValidation.IGNORED_TYPE:
+        this.logger.info(`Ignored event type '${event.type}'`, logObject);
+        return event;
+      case EventValidation.OUTDATED_TIMESTAMP:
+        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
+        return event;
+      case EventValidation.VALID:
+        return this.processEvent(event, source);
     }
   }
 
@@ -858,42 +864,6 @@ export class EventRepository {
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
     throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
-  }
-
-  /**
-   * Handle an event by validating it.
-   *
-   * @private
-   * @param {JSON} event - Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the event
-   */
-  _handleEventValidation(event, source) {
-    return Promise.resolve().then(() => {
-      const {time: eventDate, type: eventType} = event;
-
-      const isIgnoredEvent = EventTypeHandling.IGNORE.includes(eventType);
-      if (isIgnoredEvent) {
-        this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-        const errorMessage = 'Event ignored: Type ignored';
-        throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      const eventFromStream = source === EventRepository.SOURCE.STREAM;
-      const shouldCheckEventDate = eventFromStream && eventDate;
-      if (shouldCheckEventDate) {
-        const outdatedEvent = this.lastEventDate() >= new Date(eventDate).toISOString();
-
-        if (outdatedEvent) {
-          const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-          this.logger.info(`Skipped event from stream because it is outdated: '${eventType}'`, logObject);
-          const errorMessage = 'Event validation failed: Outdated timestamp';
-          throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-      }
-
-      return event;
-    });
   }
 
   /**
