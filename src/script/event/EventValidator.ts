@@ -19,6 +19,7 @@
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
 import {NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification';
+
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
