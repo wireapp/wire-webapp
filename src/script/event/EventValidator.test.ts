@@ -20,16 +20,15 @@
 import {
   CONVERSATION_EVENT,
   CONVERSATION_TYPING,
-  ConversationOtrMessageAddNotification,
   ConversationTypingNotification,
 } from '@wireapp/api-client/dist/commonjs/event';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
-import {handleEventValidation} from './EventValidator';
+import {validateEvent} from './EventValidator';
 
 describe('EventValidator', () => {
-  describe('handleEventValidation', () => {
+  describe('validateEvent', () => {
     it('ignores "conversation.typing" events', () => {
       const event: ConversationTypingNotification = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
@@ -40,27 +39,8 @@ describe('EventValidator', () => {
       };
 
       const source = EventSource.WEB_SOCKET;
-      const result = handleEventValidation(event, source, undefined);
+      const result = validateEvent(event, source, undefined);
       expect(result).toBe(EventValidation.IGNORED_TYPE);
-    });
-
-    it('skips outdated events arriving via notification stream', () => {
-      const event: ConversationOtrMessageAddNotification = {
-        conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
-        data: {
-          recipient: 'a211140d4f00bf24',
-          sender: '86dca64a2a6a0ace',
-          text: 'ENCRYPTED',
-        },
-        from: 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b',
-        time: '2018-09-10T16:05:01.794Z',
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
-      };
-
-      const source = EventSource.STREAM;
-      const lastEventDate = '2019-09-10T16:05:01.794Z';
-      const result = handleEventValidation(event, source, lastEventDate);
-      expect(result).toBe(EventValidation.OUTDATED_TIMESTAMP);
     });
   });
 });

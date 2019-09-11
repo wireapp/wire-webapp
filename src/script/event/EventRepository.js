@@ -37,7 +37,7 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 import {BackendClientError} from '../error/BackendClientError';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
-import {handleEventValidation} from './EventValidator';
+import {validateEvent} from './EventValidator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -608,7 +608,7 @@ export class EventRepository {
    */
   _handleEvent(event, source) {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const validationResult = handleEventValidation(event, source, this.lastEventDate());
+    const validationResult = validateEvent(event, source, this.lastEventDate());
     switch (validationResult) {
       default: {
         return Promise.resolve(event);
