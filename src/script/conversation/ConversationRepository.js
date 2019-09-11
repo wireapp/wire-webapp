@@ -832,11 +832,14 @@ export class ConversationRepository {
 
   deleteConversationLocally(conversationId, skipNotification = false) {
     const conversationEntity = this.find_conversation_by_id(conversationId);
+    if (!conversationEntity) {
+      return;
+    }
     if (this.is_active_conversation(conversationEntity)) {
       const nextConversation = this.get_next_conversation(conversationEntity);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
     }
-    if (!skipNotification && conversationEntity) {
+    if (!skipNotification) {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
@@ -847,7 +850,7 @@ export class ConversationRepository {
   /**
    * Find a local conversation by ID.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Conversation} Conversation is locally available
+   * @returns {Conversation | undefined} Conversation is locally available
    */
   find_conversation_by_id(conversation_id) {
     return this.conversations().find(conversation => conversation.id === conversation_id);
