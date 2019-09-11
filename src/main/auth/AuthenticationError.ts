@@ -70,7 +70,7 @@ export class TokenExpiredError extends AuthenticationError {
 export class InvalidTokenError extends AuthenticationError {
   constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
     super(message, label, code);
-    Object.setPrototypeOf(this, TokenExpiredError.prototype);
+    Object.setPrototypeOf(this, InvalidTokenError.prototype);
     this.name = 'InvalidTokenError';
   }
 }

@@ -80,6 +80,7 @@ describe('ReconnectingWebsocket', () => {
       });
     }
   });
+
   it('calls "onReconnect", "onOpen" and "onClose"', done => {
     const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);

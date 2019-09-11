@@ -17,7 +17,8 @@
  *
  */
 
-const {WebSocketClient} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
+const {WebSocketClient, WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/WebSocketClient');
+const {InvalidTokenError} = require('@wireapp/api-client/dist/commonjs/auth/');
 
 const accessTokenPayload = {
   access_token:
@@ -32,6 +33,13 @@ const fakeHttpClient = {
     accessToken: accessTokenPayload,
   },
   refreshAccessToken: () => Promise.resolve(accessTokenPayload),
+};
+
+const invalidTokenHttpClient = {
+  accessTokenStore: {
+    accessToken: accessTokenPayload,
+  },
+  refreshAccessToken: () => Promise.reject(new InvalidTokenError('Invalid token')),
 };
 
 describe('WebSocketClient', () => {
@@ -89,6 +97,23 @@ describe('WebSocketClient', () => {
       fakeSocket.onmessage({data: Buffer.from(JSON.stringify({message}), 'utf-8')});
 
       expect(onMessageSpy.calls.count()).toBe(1);
+    });
+  });
+
+  describe('refreshAccessToken', () => {
+    it('emits the correct message for invalid tokens', async done => {
+      const websocketClient = new WebSocketClient('url', invalidTokenHttpClient);
+      const fakeSocket = {
+        close: () => {},
+      };
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
+
+      await websocketClient.connect();
+
+      websocketClient.on(WebSocketTopic.ON_INVALID_TOKEN, () => done());
+
+      fakeSocket.onerror(new Error('error'));
     });
   });
 });
