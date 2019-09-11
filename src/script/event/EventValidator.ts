@@ -36,7 +36,7 @@ export function handleEventValidation(
 
   const hasTime = (event as any).time;
   const isFromNotificationStream = source === EventSource.STREAM;
-  const shouldCheckEventDate = hasTime && isFromNotificationStream && lastEventDate;
+  const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
 
   if (shouldCheckEventDate) {
     const isOutdated = new Date(lastEventDate).getTime() >= new Date(eventTime).getTime();
