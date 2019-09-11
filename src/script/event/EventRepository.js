@@ -606,7 +606,7 @@ export class EventRepository {
    * @param {EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or the plain event if the event was skipped
    */
-  async _handleEvent(event, source) {
+  _handleEvent(event, source) {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = handleEventValidation(event, source, this.lastEventDate());
     switch (validationResult) {
