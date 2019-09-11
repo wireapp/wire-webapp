@@ -30,7 +30,7 @@ import {handleEventValidation} from './EventValidator';
 
 describe('EventValidator', () => {
   describe('handleEventValidation', () => {
-    it('ignores "conversation.typing" events', () => {
+    it('ignores "conversation.typing" events', async () => {
       const event: ConversationTypingNotification = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
         data: {status: CONVERSATION_TYPING.STARTED},
@@ -40,11 +40,11 @@ describe('EventValidator', () => {
       };
 
       const source = EventSource.WEB_SOCKET;
-      const result = handleEventValidation(event, source, undefined);
+      const result = await handleEventValidation(event, source, undefined);
       expect(result).toBe(EventValidation.IGNORED_TYPE);
     });
 
-    it('skips outdated events arriving via notification stream', () => {
+    it('skips outdated events arriving via notification stream', async () => {
       const event: ConversationOtrMessageAddNotification = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
         data: {
@@ -59,7 +59,7 @@ describe('EventValidator', () => {
 
       const source = EventSource.STREAM;
       const lastEventDate = '2019-09-10T16:05:01.794Z';
-      const result = handleEventValidation(event, source, lastEventDate);
+      const result = await handleEventValidation(event, source, lastEventDate);
       expect(result).toBe(EventValidation.OUTDATED_TIMESTAMP);
     });
   });
