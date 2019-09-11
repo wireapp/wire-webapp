@@ -23,6 +23,7 @@ import {
   ConversationOtrMessageAddNotification,
   ConversationTypingNotification,
 } from '@wireapp/api-client/dist/commonjs/event';
+
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {handleEventValidation} from './EventValidator';
