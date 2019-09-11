@@ -28,7 +28,6 @@ import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
-import {isSameLocation} from 'Util/ValidationUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
 import {Config} from '../auth/config';
@@ -306,7 +305,9 @@ class App {
    * @param {boolean} [isReload=_isReload()] - App init after page reload
    * @returns {undefined} No return value
    */
-  initApp(isReload = this._isReload()) {
+  initApp() {
+    const isReload = this._isReload();
+    this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
@@ -595,10 +596,8 @@ class App {
    * @returns {boolean} `true` if it is a page refresh
    */
   _isReload() {
-    const isReload = isSameLocation(document.referrer, window.location.href);
-    const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
-    this.logger.debug(log);
-    return isReload;
+    const NAVIGATION_TYPE_RELOAD = 1;
+    return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
 
   /**

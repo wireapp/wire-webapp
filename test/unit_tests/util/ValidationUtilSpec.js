@@ -30,7 +30,6 @@ import {
   assetRetentionPolicy,
   assetV3,
   ValidationUtilError,
-  isSameLocation,
 } from 'Util/ValidationUtil';
 
 describe('ValidationUtil', () => {
@@ -261,64 +260,6 @@ describe('ValidationUtil', () => {
       for (const url of urls) {
         expect(isTweetUrl(url)).toBe(true);
       }
-    });
-  });
-
-  describe('is_same_location', () => {
-    it('returns false if page was accessed directly', () => {
-      expect(isSameLocation('', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if page was accessed from https://wire.com', () => {
-      expect(isSameLocation('https://wire.com', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if page was accessed from https://wire.com/download', () => {
-      expect(isSameLocation('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if page was accessed from https://get.wire.com', () => {
-      expect(isSameLocation('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if page was accessed from an external link', () => {
-      expect(isSameLocation('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if redirected from auth', () => {
-      expect(isSameLocation('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
-    });
-
-    it('returns false if redirected from auth with parameter', () => {
-      expect(isSameLocation('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')).toBeFalsy();
-    });
-
-    it('returns false if redirected from auth with history hashtag', () => {
-      expect(isSameLocation('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')).toBeFalsy();
-    });
-
-    it('returns false if redirected from auth with login hashtag', () => {
-      expect(
-        isSameLocation('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging'),
-      ).toBeFalsy();
-    });
-
-    it('returns false if redirected from auth with registration hashtag', () => {
-      expect(
-        isSameLocation('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging'),
-      ).toBeFalsy();
-    });
-
-    it('returns true if auth with login hashtag was reloaded', () => {
-      expect(isSameLocation('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
-    });
-
-    it('returns true if page was reloaded', () => {
-      expect(isSameLocation('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
-    });
-
-    it('returns true if page was reloaded with parameters', () => {
-      expect(isSameLocation('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
     });
   });
 });

@@ -55,10 +55,6 @@ export const isValidEmail = (email: string) => {
   return regExp.test(email);
 };
 
-export const isSameLocation = (pastLocation: string, currentLocation: string) => {
-  return pastLocation !== '' && currentLocation.startsWith(pastLocation);
-};
-
 // Since some special chars are allowed, remember to always
 // encode Bearer tokens using encodeURIComponents afterwards!
 export const isBearerToken = (token: string) => /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
