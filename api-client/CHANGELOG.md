@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.5.0...@wireapp/api-client@6.5.1) (2019-09-11)
+
+
+### Bug Fixes
+
+* **api-client:** Set correct prototype for InvalidTokenError ([#2288](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2288)) ([a49fb5b](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a49fb5b))
+
+
+
+
+
 # [6.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.4.5...@wireapp/api-client@6.5.0) (2019-09-10)
 
 

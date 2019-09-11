@@ -76,5 +76,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/APIClient.d.ts",
-  "version": "6.5.0"
+  "version": "6.5.1"
 }
