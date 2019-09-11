@@ -41,6 +41,7 @@ import {MentionEntity} from '../../message/MentionEntity';
 
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {Config} from '../../auth/config';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,6 +53,49 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return {
       ASSETS: {
         CONCURRENT_UPLOAD_LIMIT: 10,
+      },
+      FILES: {
+        RESTRICTED_FILES: [
+          '.application',
+          '.bat',
+          '.cmd',
+          '.com',
+          '.cpl',
+          '.exe',
+          '.gadget',
+          '.hta',
+          '.inf',
+          '.jar',
+          '.js',
+          '.jse',
+          '.lnk',
+          '.msc',
+          '.msh',
+          '.msh1',
+          '.msh1xml',
+          '.msh2',
+          '.msh2xml',
+          '.mshxml',
+          '.msi',
+          '.msp',
+          '.pif',
+          '.ps1',
+          '.ps1xml',
+          '.ps2',
+          '.ps2xml',
+          '.psc1',
+          '.psc2',
+          '.reg',
+          '.scf',
+          '.scr',
+          '.vb',
+          '.vbe',
+          '.vbs',
+          '.ws',
+          '.wsc',
+          '.wsf',
+          '.wsh',
+        ],
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -812,15 +856,36 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post files to a conversation.
-   * @param {Array|FileList} files - Images
+   * @param {Array|FileList} files - Files
    * @returns {undefined} No return value
    */
   uploadFiles(files) {
+    const fileArray = Array.from(files);
+
+    if (Config.FEATURE.ENABLE_FILE_UPLOAD_RESTRICTION) {
+      const fileNameRegex = new RegExp(`(\\${InputBarViewModel.CONFIG.FILES.RESTRICTED_FILES.join('|\\')})$`);
+
+      for (const file of fileArray) {
+        const restrictedFiletype = fileNameRegex.test(file.name.toLowerCase());
+
+        if (restrictedFiletype) {
+          const options = {
+            text: {
+              message: `The filetype of "${file.name}" is not allowed.`,
+              title: 'Restricted filetype',
+            },
+          };
+
+          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+        }
+      }
+    }
+
     const uploadLimit = this.selfUser().inTeam()
       ? z.config.MAXIMUM_ASSET_FILE_SIZE_TEAM
       : z.config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
-      for (const file of Array.from(files)) {
+      for (const file of fileArray) {
         const isTooLarge = file.size > uploadLimit;
         if (isTooLarge) {
           const fileSize = formatBytes(uploadLimit);
