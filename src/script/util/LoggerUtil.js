@@ -29,7 +29,8 @@ function enableLogging(force = false, search = window.location.search) {
 
   try {
     localStorage = window.localStorage;
-  } catch (error) {
+  } catch (error) {}
+  if (!localStorage) {
     return;
   }
 
