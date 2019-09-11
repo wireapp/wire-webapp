@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationOtrMessageAddNotification} from '@wireapp/api-client/dist/commonjs/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
 import {NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
@@ -27,18 +27,18 @@ export function handleEventValidation(
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
-  const eventType = event.type as CONVERSATION_EVENT;
-  const canSkipVerification = [CONVERSATION_EVENT.TYPING];
+  const eventType = event.type;
+  const canSkipVerification: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
   if (canSkipVerification.includes(eventType)) {
     return EventValidation.IGNORED_TYPE;
   }
 
-  const eventDate = (event as ConversationOtrMessageAddNotification).time;
+  const hasTime = (event as any).time;
   const isFromNotificationStream = source === EventSource.STREAM;
-  const shouldCheckEventDate = eventDate && isFromNotificationStream && lastEventDate;
+  const shouldCheckEventDate = hasTime && isFromNotificationStream && lastEventDate;
 
   if (shouldCheckEventDate) {
-    const isOutdated = new Date(lastEventDate).getTime() >= new Date(eventDate).getTime();
+    const isOutdated = new Date(lastEventDate).getTime() >= new Date(hasTime).getTime();
     if (isOutdated) {
       return EventValidation.OUTDATED_TIMESTAMP;
     }
