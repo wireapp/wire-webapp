@@ -273,7 +273,21 @@ describe('e2e audio call', () => {
   beforeEach(() => {
     joinedCallSub = client.joinedCall.subscribe(call => {
       if (call) {
-        return setTimeout(onCallConnected, 200);
+        const audioFlowingInterval = setInterval(() => {
+          /* Wait for audio to start flowing before calling the onCallConnected callback.
+           * To achieve this, we check every couple of ms that the stats contain audio and that there are bytes flowing there
+           * Jasmine will eventually timeout if the audio is not flowing after 5s
+           */
+          client
+            .getStats(call.conversationId)
+            .then(extractAudioStats)
+            .then(audioStats => {
+              if (audioStats.length > 0) {
+                onCallConnected();
+                clearInterval(audioFlowingInterval);
+              }
+            });
+        }, 30);
       }
     });
     activeCallsSub = client.activeCalls.subscribe(calls => {
@@ -320,7 +334,6 @@ describe('e2e audio call', () => {
         .getStats('conv-1')
         .then(extractAudioStats)
         .then(audioStats => {
-          // we cannot test that the audio is flowing, it's never happening in an headless browser
           expect(audioStats.length).toBeGreaterThan(0);
           audioStats.forEach(stats => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
@@ -353,7 +366,7 @@ function extractAudioStats(stats) {
     userStats.stats.forEach(data => {
       if (data.kind === 'audio' || data.mediaType === 'audio') {
         const bytesFlowing = data.bytesReceived || data.bytesSent;
-        if (bytesFlowing !== undefined) {
+        if (bytesFlowing !== undefined && bytesFlowing > 0) {
           audioStats.push({bytesFlowing, id: data.id});
         }
       }
