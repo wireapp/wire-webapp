@@ -1052,10 +1052,10 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/chai@4.2.1":
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.2.1.tgz#de162553aceca778d989929d821c5d4942921ebc"
-  integrity sha512-LDKlQW/V8bQr5p9aoHye9p7x9faxq0GVeWAkn/Zgyyn848LIAzuR1sHQjGmUBFUpINuGWDG2NTM/ofA2aLMIew==
+"@types/chai@4.2.2":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.2.2.tgz#6b825013863d04868c15624ec8b7fdced88a47c6"
+  integrity sha512-8V2aCcPM3WLuJvJpF6N60uUvdZb7NHjpjQlLk1QmZbTP4XZET/FX0c3TJ3K7qt4L98FS1Pifa8BVofTVuJFWVA==
 
 "@types/cheerio@*":
   version "0.22.12"
@@ -1551,10 +1551,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@6.4.2":
-  version "6.4.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-6.4.2.tgz#14df13d2c7ef593ecb85226bfb6444f96b6cb60b"
-  integrity sha512-A/1yVgijWmxJxKWwDFYYQPtIRn8CwcEig3hPMCSKiM+T8uz+cj6wxG+NyOuRqqAnVcN6G4+hUMLdRCmXuuCYfA==
+"@wireapp/api-client@6.5.0":
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-6.5.0.tgz#a257c69030d868297fa29b8dd274af2a786c4f13"
+  integrity sha512-1X/Z97/tKZUxUE8oixV15OfpR4C/dS/F9JELXb0U97E4J3s8z8nej3Qf1XOg7OdivTtkDDT1gclDZPP69Mdz/A==
   dependencies:
     "@types/node" "~10"
     "@types/spark-md5" "3.0.1"
@@ -1608,15 +1608,15 @@
     logdown "3.2.8"
     rimraf "3.0.0"
 
-"@wireapp/core@12.17.59":
-  version "12.17.59"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.59.tgz#3a8879ae5515c2a4ef508212b57bb6a15c69ba82"
-  integrity sha512-fdSR5QwSbvhujy08Ub31qQfmP2/s4eWXnWM+/7u43VHkeSQ3CwZg9ThRuRUEClEhWVkPPY4JHLFlH5RqIolfJA==
+"@wireapp/core@12.17.63":
+  version "12.17.63"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-12.17.63.tgz#c48cd7def57fd39253749becfa7002ad6b0b69ba"
+  integrity sha512-79hEI/Wgzv5NryaD8iy82kHSLsW9i+/+3dARtU3R8pQ61tjzs8tdLSqw2ATRA7Y56Uv89buDRFBKBqHM4ETwlQ==
   dependencies:
     "@types/long" "4.0.0"
     "@types/node" "~10"
-    "@wireapp/api-client" "6.4.2"
-    "@wireapp/cryptobox" "11.4.32"
+    "@wireapp/api-client" "6.5.0"
+    "@wireapp/cryptobox" "11.4.33"
     "@wireapp/protocol-messaging" "1.24.2"
     "@wireapp/store-engine" "3.9.11"
     bazinga64 "5.5.16"
@@ -1625,15 +1625,15 @@
     protobufjs "6.8.8"
     pure-uuid "1.5.7"
 
-"@wireapp/cryptobox@11.4.32":
-  version "11.4.32"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-11.4.32.tgz#04c693943370a3bd511e3be2265af1bf13c78a3a"
-  integrity sha512-Lq0MsfytvHm8+uhAadwBeSEy/tfau3U8s249xI495zFDIOaJgTptaw0ozgr7SLDzTZJcUrp/nWW5vXlzcvkqXA==
+"@wireapp/cryptobox@11.4.33":
+  version "11.4.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-11.4.33.tgz#ea2735e6dd6a0df27bef960fab0b50ea1529e755"
+  integrity sha512-RKGhYMlPliRPqtRqxHaPQyqQq8kJg5zSf6sYMSMy4oZEnF1Rb+sn8uXRZjxY/LJ4WMZvRjJPT/xAiqWNBiLlrw==
   dependencies:
     "@types/node" "~10"
     "@wireapp/lru-cache" "3.3.14"
     "@wireapp/priority-queue" "1.2.15"
-    "@wireapp/proteus" "9.4.6"
+    "@wireapp/proteus" "9.4.7"
     "@wireapp/store-engine" "3.9.11"
     bazinga64 "5.5.16"
     logdown "3.2.8"
@@ -1661,12 +1661,12 @@
     "@types/node" "~10"
     pure-uuid "1.5.7"
 
-"@wireapp/proteus@9.4.6":
-  version "9.4.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.4.6.tgz#18f205d2c85299f523e3cada6a83b5e2eb791e13"
-  integrity sha512-NzS8625mUr8FskOkUVekB2owQ8phWgJrjBf++Q6+aSEoiLojybYH5u0r2UQtHMEbKycM7C1CCeV753JTF6U0VA==
+"@wireapp/proteus@9.4.7":
+  version "9.4.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.4.7.tgz#149e7da667f2b3bac03252e75379a3b1828a6d1d"
+  integrity sha512-rJeZUuPYNYXXzLotUone1pxmOmgUnxNXyBqIqn2IUjZvRiG738pa/T5i6+WkbORSS9WGv3v6jCW0ztEXtktpYw==
   dependencies:
-    "@types/chai" "4.2.1"
+    "@types/chai" "4.2.2"
     "@types/ed2curve" "0.2.2"
     "@types/node" "~10"
     "@wireapp/cbor" "4.3.14"
