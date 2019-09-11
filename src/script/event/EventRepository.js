@@ -619,7 +619,7 @@ export class EventRepository {
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resovlve(event);
+        return Promise.resolve(event);
       }
       case EventValidation.VALID:
         return this.processEvent(event, source);
