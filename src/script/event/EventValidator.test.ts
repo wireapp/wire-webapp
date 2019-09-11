@@ -25,10 +25,10 @@ import {
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
-import {handleEventValidation} from './EventValidator';
+import {validateEvent} from './EventValidator';
 
 describe('EventValidator', () => {
-  describe('handleEventValidation', () => {
+  describe('validateEvent', () => {
     it('ignores "conversation.typing" events', () => {
       const event: ConversationTypingNotification = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
@@ -39,7 +39,7 @@ describe('EventValidator', () => {
       };
 
       const source = EventSource.WEB_SOCKET;
-      const result = handleEventValidation(event, source, undefined);
+      const result = validateEvent(event, source, undefined);
       expect(result).toBe(EventValidation.IGNORED_TYPE);
     });
   });
