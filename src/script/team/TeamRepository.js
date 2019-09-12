@@ -51,6 +51,7 @@ export class TeamRepository {
     this.team = ko.observable();
 
     this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
+    this.isTeamDeleted = ko.observable(false);
 
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
     this.memberRoles = ko.observable({});
@@ -251,6 +252,7 @@ export class TeamRepository {
 
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
+      this.isTeamDeleted(true);
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
