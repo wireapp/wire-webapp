@@ -21,6 +21,7 @@
     "dist"
   ],
   "license": "GPL-3.0",
+  "main": "dist/index.js",
   "name": "@wireapp/cli-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client",
   "scripts": {

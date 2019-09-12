@@ -27,14 +27,14 @@ import {PayloadBundle, PayloadBundleType} from '@wireapp/core/dist/conversation/
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {AxiosError} from 'axios';
 import * as program from 'commander';
+import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 
-import * as dotenv from 'dotenv';
 dotenv.config();
 
-const {description, version}: {description: string; version: string} = require('../../package.json');
+const {description, version}: {description: string; version: string} = require('../package.json');
 
 program
   .version(version)
