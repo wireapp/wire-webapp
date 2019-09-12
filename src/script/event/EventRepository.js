@@ -37,7 +37,7 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 import {BackendClientError} from '../error/BackendClientError';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
-import {handleEventValidation} from './EventValidator';
+import {validateEvent} from './EventValidator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -284,19 +284,19 @@ export class EventRepository {
         return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
-      const notificationList = await this.notificationService.getNotifications(
-        this.currentClient().id,
-        notificationId,
-        limit,
-      );
-
       try {
+        const notificationList = await this.notificationService.getNotifications(
+          this.currentClient().id,
+          notificationId,
+          limit,
+        );
         await _gotNotifications(notificationList);
       } catch (errorResponse) {
-        // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
-        // we will get a 404 AND notifications
+        // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
+        // we will receive a HTTP 404 status code with a `notifications` payload
+        // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
         if (errorResponse.notifications) {
-          await this._missedEventsFromStream();
+          await this._triggerMissedSystemEventMessageRendering();
           return _gotNotifications(errorResponse);
         }
 
@@ -608,7 +608,7 @@ export class EventRepository {
    */
   _handleEvent(event, source) {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const validationResult = handleEventValidation(event, source, this.lastEventDate());
+    const validationResult = validateEvent(event, source, this.lastEventDate());
     switch (validationResult) {
       default: {
         return Promise.resolve(event);

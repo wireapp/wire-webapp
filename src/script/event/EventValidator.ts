@@ -23,14 +23,15 @@ import {NotificationPayload} from '@wireapp/api-client/dist/commonjs/notificatio
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
-export function handleEventValidation(
+export function validateEvent(
   event: NotificationPayload,
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
   const eventType = event.type;
-  const canSkipVerification: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
-  if (canSkipVerification.includes(eventType)) {
+  const unhandledEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
+
+  if (unhandledEvents.includes(eventType)) {
     return EventValidation.IGNORED_TYPE;
   }
 

@@ -79,6 +79,7 @@ export class AppLockViewModel {
   passwordRegex: RegExp;
   scheduledTimeout: number;
   scheduledTimeoutId: number;
+  minPasswordLength: number;
   setupPassphrase: ko.Observable<string>;
   setupPassphraseRepeat: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
@@ -111,6 +112,8 @@ export class AppLockViewModel {
     this.scheduledTimeout = Config.FEATURE.APPLOCK_SCHEDULED_TIMEOUT * 1000;
     this.scheduledTimeoutId = 0;
 
+    this.minPasswordLength = Config.NEW_PASSWORD_MINIMUM_LENGTH;
+
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
         case APPLOCK_STATE.SETUP:
@@ -127,7 +130,7 @@ export class AppLockViewModel {
           return '';
       }
     });
-    this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(8));
+    this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(this.minPasswordLength));
     this.setupPassphrase = ko.observable('');
     this.setupPassphraseRepeat = ko.observable('');
     this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPassphrase()));
