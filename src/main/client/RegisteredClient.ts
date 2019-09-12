@@ -17,15 +17,12 @@
  *
  */
 
-import {ClientClassification} from './ClientClassification';
 import {ClientType} from './ClientType';
+import {PublicClient} from './PublicClient';
 
-export interface UpdatedClient {
+export interface UpdatedClient extends PublicClient {
   /** The IP address from which the client was registered */
   address?: string;
-  class: ClientClassification;
-  /** The client ID */
-  id: string;
   label?: string;
   location?: Location;
   model?: string;
