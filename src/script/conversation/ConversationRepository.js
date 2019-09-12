@@ -853,11 +853,10 @@ export class ConversationRepository {
    * @returns {Conversation | undefined} Conversation is locally available
    */
   find_conversation_by_id(conversation_id) {
-    if (this.team_repository.isTeamDeleted()) {
-      // we prevent access to local conversation if the team is deleted
-      return undefined;
-    }
-    return this.conversations().find(conversation => conversation.id === conversation_id);
+    // we prevent access to local conversation if the team is deleted
+    return this.team_repository.isTeamDeleted()
+      ? undefined
+      : this.conversations().find(conversation => conversation.id === conversation_id);
   }
 
   get_all_users_in_conversation(conversation_id) {
