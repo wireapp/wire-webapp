@@ -15,7 +15,7 @@
     "karma-typescript": "4.1.1",
     "rimraf": "3.0.0",
     "ts-node": "8.3.0",
-    "typescript": "3.6.2"
+    "typescript": "3.6.3"
   },
   "description": "Store Engine implementation for the browser's File and Directory Entries API.",
   "files": [
