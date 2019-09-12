@@ -30,14 +30,9 @@ export function validateEvent(
 ): EventValidation {
   const eventType = event.type;
   const unhandledEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
-  const grantedEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.OTR_MESSAGE_ADD];
 
   if (unhandledEvents.includes(eventType)) {
     return EventValidation.IGNORED_TYPE;
-  }
-
-  if (grantedEvents.includes(eventType)) {
-    return EventValidation.VALID;
   }
 
   const eventTime = (event as any).time;
