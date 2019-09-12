@@ -130,7 +130,7 @@ export class AppLockViewModel {
           return '';
       }
     });
-    this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(8));
+    this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(this.minPasswordLength));
     this.setupPassphrase = ko.observable('');
     this.setupPassphraseRepeat = ko.observable('');
     this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPassphrase()));
