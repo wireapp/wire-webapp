@@ -1275,11 +1275,11 @@ describe('ConversationRepository', () => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
       });
 
-      const inexistantConversationIds = [
+      const inexistentConversationIds = [
         'f573c44f-c549-4e8f-a4d5-20fdc7adc789',
         'eece4e13-41d4-4ea8-9aa3-383a710a5137',
       ];
-      inexistantConversationIds.forEach(conversationId => {
+      inexistentConversationIds.forEach(conversationId => {
         expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
       });
     });
