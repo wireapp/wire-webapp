@@ -53,7 +53,7 @@ export class ReceiptsMiddleware {
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         return this.conversationRepository.get_conversation_by_id(event.conversation).then(conversation => {
-          if (conversation.isGroup()) {
+          if (conversation && conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === ReceiptMode.DELIVERY_AND_READ;
             event.data.expects_read_confirmation = !!expectsReadConfirmation;
           }
