@@ -16,31 +16,35 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
 
-const auth = require('../../../dist/auth/');
+import {LoginSanitizer} from './LoginSanitizer';
 
 describe('LoginSanitizer', () => {
   describe('"removeNonPrintableCharacters"', () => {
     it('sanitizes login data in-place', () => {
-      const loginData = {
+      const loginData: LoginData = {
+        clientType: ClientType.NONE,
         email: 'me@wire.com\t',
         password: '\r\nsecret',
       };
 
-      auth.LoginSanitizer.removeNonPrintableCharacters(loginData);
+      LoginSanitizer.removeNonPrintableCharacters(loginData);
       expect(loginData.email).toBe('me@wire.com');
       expect(loginData.password).toBe('\r\nsecret');
     });
 
     it('does not strip non-ASCII', () => {
-      const loginData = {
+      const loginData: LoginData = {
+        clientType: ClientType.NONE,
         email:
           '😀中文¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿƒΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωϑϒϖ•…′″‾⁄℘ℑℜ™ℵ←↑→↓↔↵⇐⇑⇒⇓⇔∀∂∃∅∇∈∉∋∏∑−∗√∝∞∠∧∨∩∪∫∴∼≅≈≠≡≤≥⊂⊃⊄⊆⊇⊕⊗⊥⋅⌈⌉⌊⌋⟨〈⟩〉◊♠♣♥♦"&<>ŒœŠšŸˆ˜‌‍‎‏–—‘’‚“”„†‡‰‹›€@wire.com',
         password:
           ' 😀中文¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿƒΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωϑϒϖ•…′″‾⁄℘ℑℜ™ℵ←↑→↓↔↵⇐⇑⇒⇓⇔∀∂∃∅∇∈∉∋∏∑−∗√∝∞∠∧∨∩∪∫∴∼≅≈≠≡≤≥⊂⊃⊄⊆⊇⊕⊗⊥⋅⌈⌉⌊⌋⟨〈⟩〉◊♠♣♥♦"&<>ŒœŠšŸˆ˜‌‍‎‏–—‘’‚“”„†‡‰‹›€',
       };
 
-      auth.LoginSanitizer.removeNonPrintableCharacters(loginData);
+      LoginSanitizer.removeNonPrintableCharacters(loginData);
       expect(loginData.email).toBe(
         '😀中文¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿƒΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωϑϒϖ•…′″‾⁄℘ℑℜ™ℵ←↑→↓↔↵⇐⇑⇒⇓⇔∀∂∃∅∇∈∉∋∏∑−∗√∝∞∠∧∨∩∪∫∴∼≅≈≠≡≤≥⊂⊃⊄⊆⊇⊕⊗⊥⋅⌈⌉⌊⌋⟨〈⟩〉◊♠♣♥♦"&<>ŒœŠšŸˆ˜‌‍‎‏–—‘’‚“”„†‡‰‹›€@wire.com',
       );
@@ -50,12 +54,13 @@ describe('LoginSanitizer', () => {
     });
 
     it('turns a given password into a string', () => {
-      const loginData = {
+      const loginData: LoginData = {
+        clientType: ClientType.NONE,
         email: 'me@wire.com\t',
         password: 1234567890,
       };
 
-      auth.LoginSanitizer.removeNonPrintableCharacters(loginData);
+      LoginSanitizer.removeNonPrintableCharacters(loginData);
       expect(loginData.password).toEqual(jasmine.any(String));
     });
   });

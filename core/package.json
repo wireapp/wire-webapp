@@ -16,6 +16,8 @@
     "pure-uuid": "1.5.7"
   },
   "devDependencies": {
+    "@types/faker": "4.1.5",
+    "@types/jasmine": "3.4.0",
     "@wireapp/commons": "2.2.13",
     "commander": "3.0.1",
     "cross-env": "5.2.1",
@@ -60,7 +62,7 @@
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
     "test:project": "yarn dist && yarn test",
-    "test:node": "nyc jasmine --config=jasmine.json"
+    "test:node": "cross-env NODE_ENV=test nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
   "version": "12.17.66"

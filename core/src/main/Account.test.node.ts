@@ -17,20 +17,38 @@
  *
  */
 
-const nock = require('nock');
-const {Account} = require('@wireapp/core');
-const {PayloadBundleState, PayloadBundleType} = require('@wireapp/core/dist/conversation/');
-const {APIClient} = require('@wireapp/api-client');
-const {AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
-const {BackendErrorLabel, StatusCode} = require('@wireapp/api-client/dist/commonjs/http/');
-const {ClientAPI, ClientType} = require('@wireapp/api-client/dist/commonjs/client/');
-const {ConversationAPI} = require('@wireapp/api-client/dist/commonjs/conversation/');
-const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
-const {MemoryEngine} = require('@wireapp/store-engine');
-const {NotificationAPI} = require('@wireapp/api-client/dist/commonjs/notification/');
-const {ValidationUtil} = require('@wireapp/commons');
-const {WebSocketTopic} = require('@wireapp/api-client/dist/commonjs/tcp/');
-const {Server: MockSocketServer} = require('mock-socket');
+import {APIClient} from '@wireapp/api-client';
+import {AuthAPI, Context} from '@wireapp/api-client/dist/commonjs/auth';
+import {ClientAPI, ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/commonjs/connection';
+import {
+  ConversationAPI,
+  ConversationMessageTimerUpdate,
+  MemberJoin,
+  Rename,
+  Typing,
+} from '@wireapp/api-client/dist/commonjs/conversation';
+import {
+  CONVERSATION_EVENT,
+  CONVERSATION_TYPING,
+  ConversationMemberJoinEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationRenameEvent,
+  ConversationTypingEvent,
+  USER_EVENT,
+  UserConnectionEvent,
+} from '@wireapp/api-client/dist/commonjs/event';
+import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/dist/commonjs/http';
+import {NotificationAPI} from '@wireapp/api-client/dist/commonjs/notification';
+import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp';
+import {ValidationUtil} from '@wireapp/commons';
+import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {MemoryEngine} from '@wireapp/store-engine';
+import {Server as MockSocketServer} from 'mock-socket';
+import nock = require('nock');
+
+import {Account} from './Account';
+import {PayloadBundle, PayloadBundleState, PayloadBundleType} from './conversation';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -39,7 +57,7 @@ const MOCK_BACKEND = {
   ws: `wss://${BASE_URL}`,
 };
 
-async function createAccount(storageName = `test-${Date.now()}`) {
+async function createAccount(storageName = `test-${Date.now()}`): Promise<Account> {
   const storeEngine = new MemoryEngine();
   await storeEngine.init(storageName);
 
@@ -62,7 +80,7 @@ describe('Account', () => {
     nock(MOCK_BACKEND.rest)
       .post(AuthAPI.URL.LOGIN, body => body.email && body.password)
       .query(() => true)
-      .reply((uri, body) => {
+      .reply((uri, body: any) => {
         if (body.password === 'wrong') {
           return [
             StatusCode.FORBIDDEN,
@@ -111,7 +129,7 @@ describe('Account', () => {
   describe('"createText"', () => {
     it('creates a text payload', async () => {
       const account = await createAccount();
-      expect(account.apiClient.context).toBeUndefined();
+      expect(account['apiClient'].context).toBeUndefined();
 
       await account.init();
 
@@ -121,10 +139,10 @@ describe('Account', () => {
         password: 'my-secret',
       });
 
-      expect(account.apiClient.context.userId).toBeDefined();
+      expect(account['apiClient'].context!.userId).toBeDefined();
 
       const text = 'FIFA World Cup';
-      const payload = account.service.conversation.messageBuilder.createText(text).build();
+      const payload = account.service!.conversation.messageBuilder.createText('', text).build();
 
       expect(payload.timestamp).toBeGreaterThan(0);
     });
@@ -136,8 +154,8 @@ describe('Account', () => {
 
       await account.init();
 
-      expect(account.service.conversation).toBeDefined();
-      expect(account.service.cryptography).toBeDefined();
+      expect(account.service!.conversation).toBeDefined();
+      expect(account.service!.cryptography).toBeDefined();
 
       const message = GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',
@@ -150,18 +168,20 @@ describe('Account', () => {
 
   describe('"mapConversationEvent"', () => {
     it('maps "conversation.message-timer-update" events', () => {
-      const event = {
+      const event: ConversationMessageTimerUpdateEvent = {
         conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
         data: {
           message_timer: 2419200000,
         },
         from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
         time: '2018-08-01T09:40:25.481Z',
-        type: 'conversation.message-timer-update',
+        type: CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
       };
 
       const account = new Account();
-      const incomingEvent = account.mapConversationEvent(event);
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {
+        content: ConversationMessageTimerUpdate;
+      };
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -174,7 +194,7 @@ describe('Account', () => {
     });
 
     it('maps "conversation.member-join" events', () => {
-      const event = {
+      const event: ConversationMemberJoinEvent = {
         conversation: '87591650-8676-430f-985f-dec8583f58cb',
         data: {
           user_ids: [
@@ -185,11 +205,11 @@ describe('Account', () => {
         },
         from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
         time: '2018-07-12T09:43:34.442Z',
-        type: 'conversation.member-join',
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
       };
 
       const account = new Account();
-      const incomingEvent = account.mapConversationEvent(event);
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: MemberJoin};
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -202,18 +222,18 @@ describe('Account', () => {
     });
 
     it('maps "conversation.rename" events', () => {
-      const event = {
+      const event: ConversationRenameEvent = {
         conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
         data: {
           name: 'Tiny Timed Messages',
         },
         from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
         time: '2018-08-01T12:01:21.629Z',
-        type: 'conversation.rename',
+        type: CONVERSATION_EVENT.RENAME,
       };
 
       const account = new Account();
-      const incomingEvent = account.mapConversationEvent(event);
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: Rename};
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -226,16 +246,16 @@ describe('Account', () => {
     });
 
     it('maps "conversation.typing" events', () => {
-      const event = {
+      const event: ConversationTypingEvent = {
         conversation: '508f14b9-ef4c-405d-bba9-5c4300cc1cbf',
-        data: {status: 'started'},
+        data: {status: CONVERSATION_TYPING.STARTED},
         from: '16d71f22-0f7b-425e-b4b3-5e288700ac1f',
         time: '2018-08-01T12:10:42.422Z',
-        type: 'conversation.typing',
+        type: CONVERSATION_EVENT.TYPING,
       };
 
       const account = new Account();
-      const incomingEvent = account.mapConversationEvent(event);
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: Typing};
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -250,20 +270,23 @@ describe('Account', () => {
 
   describe('"mapUserEvent"', () => {
     it('maps "user.connection" events', () => {
-      const event = {
+      const event: UserConnectionEvent = {
         connection: {
           conversation: '19dbbc18-5e22-41dc-acce-0d9d983c1a60',
           from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
           last_update: '2018-07-06T09:38:52.286Z',
           message: ' ',
-          status: 'sent',
+          status: ConnectionStatus.SENT,
           to: 'e023c681-7e51-43dd-a5d8-0f821e70a9c0',
         },
-        type: 'user.connection',
+        type: USER_EVENT.CONNECTION,
+        user: {
+          name: 'Someone',
+        },
       };
 
       const account = new Account();
-      const incomingEvent = account.mapUserEvent(event);
+      const incomingEvent = account['mapUserEvent'](event) as PayloadBundle & {content: Connection};
 
       expect(incomingEvent.content).toBe(event.connection);
       expect(incomingEvent.conversation).toBe(event.connection.conversation);
@@ -285,11 +308,11 @@ describe('Account', () => {
       const account = new Account(apiClient);
 
       await account.init();
-      const {clientId, clientType, userId} = await account.login({
+      const {clientId, clientType, userId} = (await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
         password: 'my-secret',
-      });
+      })) as Context;
 
       expect(clientId).toBe(CLIENT_ID);
       expect(ValidationUtil.isUUIDv4(userId)).toBe(true);
@@ -329,8 +352,8 @@ describe('Account', () => {
       const mockSocketServer = new MockSocketServer(MOCK_BACKEND.rest, {});
 
       const account = new Account(apiClient);
-      spyOn(account, 'handleEvent').and.throwError('Test error');
-      spyOn(account.apiClient.transport.ws, 'connect').and.returnValue(Promise.resolve(mockSocketServer));
+      spyOn<any>(account, 'handleEvent').and.throwError('Test error');
+      spyOn<any>(account['apiClient'].transport.ws, 'connect').and.returnValue(Promise.resolve(mockSocketServer));
 
       await account.init();
 
@@ -351,7 +374,7 @@ describe('Account', () => {
         payload: [{}],
       };
 
-      account.apiClient.transport.ws.emit(WebSocketTopic.ON_MESSAGE, notification);
+      account['apiClient'].transport.ws.emit(WebSocketTopic.ON_MESSAGE, notification);
     });
   });
 });

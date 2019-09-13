@@ -16,32 +16,31 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {APIClient} from '@wireapp/api-client';
+import {Cryptobox} from '@wireapp/cryptobox';
+import * as Proteus from '@wireapp/proteus';
+import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
+import * as bazinga64 from 'bazinga64';
+import * as crypto from 'crypto';
+import {promisify} from 'util';
 
-/* eslint-disable no-magic-numbers */
+import * as CryptographyHelper from '../test/CryptographyHelper';
+import {decryptAsset, encryptAsset} from './AssetCryptography.node';
+import {CryptographyService} from './CryptographyService';
 
-const CryptographyHelper = require('../test/CryptographyHelper');
-const bazinga64 = require('bazinga64');
-const crypto = require('crypto');
-const Proteus = require('@wireapp/proteus');
-const {Cryptobox} = require('@wireapp/cryptobox');
-const {CryptographyService} = require('@wireapp/core/dist/cryptography/');
-const {MemoryEngine} = require('@wireapp/store-engine');
-const {promisify} = require('util');
-const {decryptAsset, encryptAsset} = require('@wireapp/core/dist/cryptography/AssetCryptography.node');
-
-async function createEngine(storeName) {
+async function createEngine(storeName: string): Promise<CRUDEngine> {
   const engine = new MemoryEngine();
   await engine.init(storeName);
   return engine;
 }
 
 describe('CryptographyService', () => {
-  let cryptographyService;
-  let aliceLastResortPreKey;
-  let bob;
+  let cryptographyService: CryptographyService;
+  let aliceLastResortPreKey: Proteus.keys.PreKey;
+  let bob: Cryptobox;
 
   beforeEach(async () => {
-    cryptographyService = new CryptographyService(undefined, await createEngine('wire'), undefined);
+    cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'));
     const preKeys = await cryptographyService.cryptobox.create();
     aliceLastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID)[0];
     bob = new Cryptobox(await createEngine('wire'));
@@ -50,7 +49,7 @@ describe('CryptographyService', () => {
 
   describe('"constructor"', () => {
     it('creates an instance.', () => {
-      expect(cryptographyService.cryptobox.identity.public_key.fingerprint()).toBeDefined();
+      expect(cryptographyService.cryptobox.identity!.public_key.fingerprint()).toBeDefined();
       expect(cryptographyService).toBeDefined();
     });
   });
@@ -67,7 +66,7 @@ describe('CryptographyService', () => {
 
   describe('"decrypt"', () => {
     it('decrypts a Base64-encoded cipher message.', async () => {
-      const alicePublicKey = cryptographyService.cryptobox.identity.public_key;
+      const alicePublicKey = cryptographyService.cryptobox.identity!.public_key;
       const publicPreKeyBundle = Proteus.keys.PreKeyBundle.new(alicePublicKey, aliceLastResortPreKey);
       const text = 'Hello Alice!';
       const encryptedPreKeyMessage = await bob.encrypt(
@@ -77,15 +76,19 @@ describe('CryptographyService', () => {
       );
       const encodedPreKeyMessage = bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
       const decryptResult = await cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
-      const plaintext = Buffer.from(decryptResult.value).toString('utf8');
-      expect(plaintext).toBe(text);
+      if (decryptResult.isSuccess === true) {
+        const plaintext = Buffer.from(decryptResult.value).toString('utf8');
+        expect(plaintext).toBe(text);
+      } else {
+        throw new Error();
+      }
     });
 
     it('is resistant to duplicated message errors', async () => {
-      const receiver = cryptographyService.cryptobox.identity;
+      const receiver = cryptographyService.cryptobox.identity!;
       const preKey = await cryptographyService.cryptobox.get_prekey();
       const text = 'Hi!';
-      const encodedPreKeyMessage = await CryptographyHelper.createEncodedCipherText(receiver, preKey, text);
+      const encodedPreKeyMessage = await CryptographyHelper.createEncodedCipherText(receiver, preKey!, text);
       const sessionId = 'alice-to-bob';
       const plaintext = await CryptographyHelper.getPlainText(cryptographyService, encodedPreKeyMessage, sessionId);
       // Testing to decrypt the same message multiple times (to provoke duplicate message errors)
@@ -101,7 +104,7 @@ describe('CryptographyService', () => {
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
       const sessionId = CryptographyService.constructSessionId(userId, clientId);
-      const [actualUserId, actualClientId] = CryptographyService.dismantleSessionId(sessionId);
+      const [actualUserId, actualClientId] = CryptographyService['dismantleSessionId'](sessionId);
       expect(actualClientId).toBe(clientId);
       expect(actualUserId).toBe(userId);
     });
@@ -166,32 +169,6 @@ describe('CryptographyService', () => {
 
       expect(decryptedBuffer).toEqual(byteBuffer);
     });
-
-    it('does not decrypt when the hash is missing', async () => {
-      const bytes = new Uint8Array(16);
-      await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = Buffer.from(bytes.buffer);
-
-      const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
-
-      try {
-        await decryptAsset(cipherText, keyBytes, null);
-        fail();
-      } catch (error) {}
-    });
-
-    it('does not decrypt when hash is an empty array', async () => {
-      const bytes = new Uint8Array(16);
-      await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = Buffer.from(bytes.buffer);
-
-      const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
-
-      try {
-        await decryptAsset(cipherText, keyBytes, new Uint8Array([]));
-        fail();
-      } catch (error) {}
-    });
   });
 
   describe('"encryptPayloadForSession"', () => {
@@ -200,7 +177,7 @@ describe('CryptographyService', () => {
       const text = new Uint8Array([72, 101, 108, 108, 111, 32, 66, 111, 98, 33]); // "Hello Bob!"
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      const {sessionId, encryptedPayload} = await cryptographyService.encryptPayloadForSession(
+      const {sessionId, encryptedPayload} = await cryptographyService['encryptPayloadForSession'](
         sessionWithBobId,
         text,
         encodedPreKey,
@@ -213,9 +190,9 @@ describe('CryptographyService', () => {
       const sessionWithBobId = 'bob-user-id@bob-client-id';
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      const {sessionId, encryptedPayload} = await cryptographyService.encryptPayloadForSession(
+      const {sessionId, encryptedPayload} = await cryptographyService['encryptPayloadForSession'](
         sessionWithBobId,
-        undefined,
+        undefined as any,
         encodedPreKey,
       );
       expect(encryptedPayload).toBe('💣');

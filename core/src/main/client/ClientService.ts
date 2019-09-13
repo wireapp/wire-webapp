@@ -26,7 +26,7 @@ import {ClientInfo} from './';
 import {ClientBackendRepository} from './ClientBackendRepository';
 import {ClientDatabaseRepository} from './ClientDatabaseRepository';
 
-const pkg = require('../../package.json');
+const pkg = process.env.NODE_ENV === 'test' ? require('../../../package.json') : require('../../package.json');
 
 export interface MetaClient extends RegisteredClient {
   meta: {

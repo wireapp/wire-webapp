@@ -17,15 +17,13 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
-const {APIClient} = require('@wireapp/api-client');
-const UUID = require('pure-uuid');
-const {Account} = require('@wireapp/core');
-const {MemoryEngine} = require('@wireapp/store-engine');
+import {APIClient} from '@wireapp/api-client';
+import {MemoryEngine} from '@wireapp/store-engine';
+import UUID from 'pure-uuid';
+import {Account} from '../Account';
 
 describe('AssetService', () => {
-  let account;
+  let account: Account;
 
   beforeAll(async () => {
     const engine = new MemoryEngine();
@@ -45,7 +43,7 @@ describe('AssetService', () => {
         token: new UUID(4).format(),
       };
 
-      const assetService = account.service.conversation.assetService;
+      const assetService = account.service!.conversation['assetService'];
       const image = {
         data: Buffer.from([1, 2, 3]),
         height: 600,
@@ -53,7 +51,7 @@ describe('AssetService', () => {
         width: 600,
       };
 
-      spyOn(assetService, 'postAsset').and.returnValue(Promise.resolve(assetServerData));
+      spyOn<any>(assetService, 'postAsset').and.returnValue(Promise.resolve(assetServerData));
 
       const asset = await assetService.uploadImageAsset(image);
 
