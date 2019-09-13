@@ -59,7 +59,7 @@ export class IntegrationService {
     });
   }
 
-  getServices(tags: string[], start: string): Promise<any> {
+  getServices(tags: string[] | string, start: string): Promise<any> {
     const params: Record<string, string[] | string> = {tags};
     if (start) {
       params.start = start;
