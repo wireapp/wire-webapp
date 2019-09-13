@@ -259,7 +259,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   _updateTimedMessage(messageEntity) {
-    if (_.isString(messageEntity.ephemeral_expires())) {
+    if (typeof messageEntity.ephemeral_expires() === 'string') {
       const remainingTime = Math.max(0, messageEntity.ephemeral_expires() - Date.now());
       messageEntity.ephemeral_remaining(remainingTime);
 

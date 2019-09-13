@@ -21,10 +21,8 @@ import ko from 'knockout';
 import $ from 'jquery';
 import moment from 'moment';
 import SimpleBar from 'simplebar';
-import {debounce} from 'underscore';
-/* eslint-disable no-unused-vars */
-import antiscroll2 from '@wireapp/antiscroll-2/dist/antiscroll-2';
-/* eslint-enable no-unused-vars */
+import {debounce, throttle} from 'underscore';
+import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -165,7 +163,7 @@ ko.bindingHandlers.resize = {
         textareaElement.style.overflowY = newStyleOverflowY;
       }
     }).bind(null, element);
-    const throttledResizeTextarea = _.throttle(resizeTextarea, 100, {leading: !params.delayedResize});
+    const throttledResizeTextarea = throttle(resizeTextarea, 100, {leading: !params.delayedResize});
 
     resizeTextarea();
     return ko.applyBindingsToNode(
@@ -455,7 +453,7 @@ ko.bindingHandlers.antiscroll = {
       const resize_event = `resize.${Date.now()}`;
       $(window).on(
         resize_event,
-        _.throttle(() => {
+        throttle(() => {
           antiscroll.rebuild();
         }, 100),
       );

@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {debounce} from 'underscore';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -336,7 +337,7 @@ export class Conversation {
     });
 
     this.shouldPersistStateChanges = false;
-    this.publishPersistState = _.debounce(() => amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this), 100);
+    this.publishPersistState = debounce(() => amplify.publish(WebAppEvents.CONVERSATION.PERSIST_STATE, this), 100);
 
     this._initSubscriptions();
   }
@@ -402,7 +403,7 @@ export class Conversation {
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
   setTimestamp(timestamp, type, forceUpdate = false) {
-    if (_.isString(timestamp)) {
+    if (typeof timestamp === 'string') {
       timestamp = window.parseInt(timestamp, 10);
     }
 
@@ -488,7 +489,7 @@ export class Conversation {
   }
 
   get_next_iso_date(currentTimestamp) {
-    if (!_.isNumber(currentTimestamp)) {
+    if (typeof currentTimestamp !== 'number') {
       currentTimestamp = Date.now();
     }
     const timestamp = Math.max(this.last_server_timestamp() + 1, currentTimestamp);
@@ -545,7 +546,7 @@ export class Conversation {
    * @returns {undefined} No return value
    */
   remove_messages(timestamp) {
-    if (timestamp && _.isNumber(timestamp)) {
+    if (timestamp && typeof timestamp === 'number') {
       return this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
     }
     this.messages_unordered.removeAll();
@@ -615,7 +616,7 @@ export class Conversation {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 
-      if (!_.isNaN(timestamp)) {
+      if (!isNaN(timestamp)) {
         this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }
     }

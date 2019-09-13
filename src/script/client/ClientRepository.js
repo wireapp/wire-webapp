@@ -140,7 +140,7 @@ export class ClientRepository {
         throw new z.error.ClientError(z.error.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(clientPayload => {
-        if (_.isString(clientPayload)) {
+        if (typeof clientPayload === 'string') {
           this.logger.info('No local client found in database');
           throw new z.error.ClientError(z.error.ClientError.TYPE.NO_VALID_CLIENT);
         }

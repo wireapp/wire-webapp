@@ -60,7 +60,7 @@ export class EventServiceNoCompound extends EventService {
       ? (date, timestamp) => timestamp <= date
       : (date, timestamp) => timestamp < date;
 
-    if (!_.isDate(toDate) || !_.isDate(fromDate)) {
+    if (!(toDate instanceof Date) || !(fromDate instanceof Date)) {
       const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
       throw new Error(errorMessage);
     }

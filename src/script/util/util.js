@@ -156,7 +156,7 @@ export const loadUrlBlob = url => {
  * @returns {string} File extension
  */
 export const getFileExtension = filename => {
-  if (!_.isString(filename) || !filename.includes('.')) {
+  if (typeof filename !== 'string' || !filename.includes('.')) {
     return '';
   }
 
@@ -173,7 +173,7 @@ export const getFileExtension = filename => {
  * @returns {string} New String without extension
  */
 export const trimFileExtension = filename => {
-  if (_.isString(filename)) {
+  if (typeof filename === 'string') {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
     }

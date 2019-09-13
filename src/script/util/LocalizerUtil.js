@@ -19,14 +19,13 @@
 
 import {escapeString, getSelfName} from './SanitizationUtil';
 import {sortByPriority} from './StringUtil';
-import {isString, isNumber} from 'underscore';
 
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
 let strings = {};
 
-const isStringOrNumber = toTest => isString(toTest) || isNumber(toTest);
+const isStringOrNumber = toTest => typeof toTest === 'string' || typeof toTest === 'number';
 
 const replaceSubstituteEscaped = (string, regex, substitute) => {
   const replacement = isStringOrNumber(substitute)

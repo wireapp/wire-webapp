@@ -210,7 +210,7 @@ export class EventService {
       includeFrom,
       includeTo: true,
     };
-    if (!_.isDate(fromDate)) {
+    if (!(fromDate instanceof Date)) {
       const errorMessage = `fromDate ('${typeof fromDate}') must be of type 'Date'.`;
       throw new Error(errorMessage);
     }
@@ -231,7 +231,7 @@ export class EventService {
    */
   async _loadEventsInDateRange(conversationId, fromDate, toDate, limit, includes) {
     const {includeFrom, includeTo} = includes;
-    if (!_.isDate(toDate) || !_.isDate(fromDate)) {
+    if (!(toDate instanceof Date) || !(fromDate instanceof Date)) {
       const errorMessage = `Lower bound (${typeof toDate}) and upper bound (${typeof fromDate}) must be of type 'Date'.`;
       throw new Error(errorMessage);
     }

@@ -17,6 +17,8 @@
  *
  */
 
+import {debounce} from 'underscore';
+
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -49,7 +51,7 @@ class AudioSeekBarComponent {
       this.loudness = this._normalizeLoudness(assetMeta.loudness, this.element.clientHeight);
     }
 
-    this._onResizeFired = _.debounce(() => {
+    this._onResizeFired = debounce(() => {
       this._renderLevels();
       this._onTimeUpdate();
     }, 500);
@@ -87,7 +89,7 @@ class AudioSeekBarComponent {
   _onLevelClick(event) {
     const mouse_x = event.pageX - event.currentTarget.getBoundingClientRect().left;
     const calculatedTime = (this.audioElement.duration * mouse_x) / event.currentTarget.clientWidth;
-    const currentTime = window.isNaN(calculatedTime) ? 0 : calculatedTime;
+    const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
 
     this.audioElement.currentTime = clamp(currentTime, 0, this.audioElement.duration);
     this._onTimeUpdate();

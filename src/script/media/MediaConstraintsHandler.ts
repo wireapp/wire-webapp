@@ -17,7 +17,6 @@
  *
  */
 
-import {isString} from 'underscore';
 import {Logger, getLogger} from 'Util/Logger';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 
@@ -162,7 +161,7 @@ export class MediaConstraintsHandler {
   ): MediaTrackConstraints {
     const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
 
-    if (isString(mediaDeviceId) && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
+    if (typeof mediaDeviceId === 'string' && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
       streamConstraints.deviceId = {exact: mediaDeviceId};
     } else {
       streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE;
