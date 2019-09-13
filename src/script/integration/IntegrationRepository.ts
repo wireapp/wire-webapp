@@ -17,32 +17,52 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import {Observable, ObservableArray, PureComputed} from 'knockout';
+import {isArray, isString} from 'underscore';
+
 import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ACCESS_STATE} from '../conversation/AccessState';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';
+import {TeamRepository} from '../team/TeamRepository';
+import {EventName} from '../tracking/EventName';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
+import {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
-import {EventName} from '../tracking/EventName';
 
 export class IntegrationRepository {
+  private readonly conversationRepository: ConversationRepository;
+  private readonly integrationService: IntegrationService;
+  private readonly logger: Logger;
+  private readonly teamRepository: TeamRepository;
+  public readonly isTeam: PureComputed<boolean>;
+  public readonly services: ObservableArray<ServiceEntity>;
+
   /**
    * Trim query string for search.
-   * @param {string} query - Service search string
-   * @returns {string} Normalized service search query
+   * @param query Service search string
+   * @returns Normalized service search query
    */
-  static normalizeQuery(query) {
-    if (!_.isString(query)) {
+  static normalizeQuery(query: string): string {
+    if (!isString(query)) {
       return '';
     }
     return query.trim().toLowerCase();
   }
 
-  constructor(integrationService, conversationRepository, teamRepository) {
+  constructor(
+    integrationService: IntegrationService,
+    conversationRepository: ConversationRepository,
+    teamRepository: TeamRepository,
+  ) {
     this.logger = getLogger('IntegrationRepository');
 
     this.integrationService = integrationService;
@@ -59,14 +79,18 @@ export class IntegrationRepository {
    * @param {ServiceEntity|User} entity - Service or user to add provider name to
    * @returns {Promise} - Resolves with the entity
    */
-  addProviderNameToParticipant(entity) {
-    const shouldUpdateProviderName = entity.providerName && !entity.providerName().trim();
+  addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
+  addProviderNameToParticipant(entity: User): Promise<User>;
+  addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User> {
+    const shouldUpdateProviderName =
+      (entity as ServiceEntity).providerName && !(entity as ServiceEntity).providerName().trim();
+
     return shouldUpdateProviderName
-      ? this.getProviderById(entity.providerId).then(providerEntity => {
-          entity.providerName(providerEntity.name);
+      ? this.getProviderById((entity as ServiceEntity).providerId).then(providerEntity => {
+          (entity as ServiceEntity).providerName(providerEntity.name);
           return entity;
         })
-      : entity;
+      : Promise.resolve(entity);
   }
 
   /**
@@ -74,11 +98,11 @@ export class IntegrationRepository {
    * @param {ServiceEntity|User} entity - Service or user to resolve to ServiceEntity
    * @returns {Promise} - Resolves with the ServiceEntity
    */
-  getServiceFromUser(entity) {
+  getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity> {
     if (entity instanceof ServiceEntity) {
       return Promise.resolve(entity);
     }
-    const {providerId, serviceId} = entity;
+    const {providerId, serviceId} = entity as any;
     return this.getServiceById(providerId, serviceId);
   }
 
@@ -90,7 +114,7 @@ export class IntegrationRepository {
    * @param {string} method - Method used to add service
    * @returns {Promise} Resolves when service was added
    */
-  addService(conversationEntity, serviceEntity, method) {
+  addService(conversationEntity: Conversation, serviceEntity: ServiceEntity, method: string): Promise<any> {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
@@ -114,9 +138,9 @@ export class IntegrationRepository {
    * Add service to conversation.
    *
    * @param {ServiceEntity} serviceEntity - Information about service to be added
-   * @returns {Promise} Resolves when conversation with the integration was was created
+   * @returns {Promise} Resolves when conversation with the integration was created
    */
-  create1to1ConversationWithService(serviceEntity) {
+  create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
     return this.conversationRepository
       .createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUEST_ROOM)
       .then(conversationEntity => {
@@ -142,7 +166,7 @@ export class IntegrationRepository {
    * @param {Service} serviceEntity - Service entity for whom to get the conversation
    * @returns {Promise} Resolves with the conversation with requested service
    */
-  get1To1ConversationWithService(serviceEntity) {
+  get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
     const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
       if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
@@ -177,31 +201,33 @@ export class IntegrationRepository {
       : this.create1to1ConversationWithService(serviceEntity);
   }
 
-  getProviderById(providerId) {
+  getProviderById(providerId: string): Promise<any> {
     return this.integrationService.getProvider(providerId).then(providerData => {
       if (providerData) {
         return IntegrationMapper.mapProviderFromObject(providerData);
       }
+      return undefined;
     });
   }
 
-  getServiceById(providerId, serviceId) {
+  getServiceById(providerId: string, serviceId: string): Promise<any> {
     return this.integrationService.getService(providerId, serviceId).then(serviceData => {
       if (serviceData) {
         return IntegrationMapper.mapServiceFromObject(serviceData);
       }
+      return undefined;
     });
   }
 
-  getServices(tags, start) {
-    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
+  getServices(tags: ServiceTag | ServiceTag[], start: string): Promise<ServiceEntity[]> {
+    const tagsArray = isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services: servicesData}) => {
       return IntegrationMapper.mapServicesFromArray(servicesData);
     });
   }
 
-  getServicesByProvider(providerId) {
+  getServicesByProvider(providerId: string): Promise<ServiceEntity[]> {
     return this.integrationService.getProviderServices(providerId).then(servicesData => {
       return IntegrationMapper.mapServicesFromArray(servicesData);
     });
@@ -214,8 +240,8 @@ export class IntegrationRepository {
    * @param {User} userEntity - Service user to be removed from the conversation
    * @returns {Promise} Resolves when service was removed from the conversation
    */
-  removeService(conversationEntity, userEntity) {
-    const {id: userId, serviceId} = userEntity;
+  removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
+    const {id: userId, serviceId} = userEntity as any;
 
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
@@ -226,12 +252,12 @@ export class IntegrationRepository {
     });
   }
 
-  searchForServices(query, queryObservable) {
+  searchForServices(query: string, queryObservable: Observable<string>): Promise<void> {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     return this.teamRepository
       .getWhitelistedServices(this.teamRepository.team().id, 20)
-      .then(serviceEntities => {
+      .then((serviceEntities: ServiceEntity[]) => {
         const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
         if (isCurrentQuery) {
           serviceEntities = serviceEntities
@@ -242,6 +268,6 @@ export class IntegrationRepository {
           this.services(serviceEntities);
         }
       })
-      .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
+      .catch((error: Error) => this.logger.error(`Error searching for services: ${error.message}`, error));
   }
 }
