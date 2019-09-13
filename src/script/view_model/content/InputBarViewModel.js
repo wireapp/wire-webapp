@@ -55,47 +55,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         CONCURRENT_UPLOAD_LIMIT: 10,
       },
       FILES: {
-        RESTRICTED_FILES: [
-          '.application',
-          '.bat',
-          '.cmd',
-          '.com',
-          '.cpl',
-          '.exe',
-          '.gadget',
-          '.hta',
-          '.inf',
-          '.jar',
-          '.js',
-          '.jse',
-          '.lnk',
-          '.msc',
-          '.msh',
-          '.msh1',
-          '.msh1xml',
-          '.msh2',
-          '.msh2xml',
-          '.mshxml',
-          '.msi',
-          '.msp',
-          '.pif',
-          '.ps1',
-          '.ps1xml',
-          '.ps2',
-          '.ps2xml',
-          '.psc1',
-          '.psc2',
-          '.reg',
-          '.scf',
-          '.scr',
-          '.vb',
-          '.vbe',
-          '.vbs',
-          '.ws',
-          '.wsc',
-          '.wsf',
-          '.wsh',
-        ],
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.split(','),
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -861,14 +821,16 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
    */
   uploadFiles(files) {
     const fileArray = Array.from(files);
+    const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+    const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
 
-    if (Config.FEATURE.ENABLE_FILE_UPLOAD_RESTRICTION) {
-      const fileNameRegex = new RegExp(`(\\${InputBarViewModel.CONFIG.FILES.RESTRICTED_FILES.join('|\\')})$`);
+    if (!allowAllExtensions) {
+      const fileNameRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
 
       for (const file of fileArray) {
-        const restrictedFiletype = fileNameRegex.test(file.name.toLowerCase());
+        const allowedFiletype = fileNameRegex.test(file.name.toLowerCase());
 
-        if (restrictedFiletype) {
+        if (!allowedFiletype) {
           const options = {
             text: {
               message: `The filetype of "${file.name}" is not allowed.`,

@@ -9,13 +9,13 @@ export interface ServerConfig {
     BRAND_NAME: string;
     ENVIRONMENT: string;
     FEATURE: {
+      ALLOWED_FILE_UPLOAD_EXTENSIONS: string;
       APPLOCK_SCHEDULED_TIMEOUT: number;
       APPLOCK_UNFOCUS_TIMEOUT: number;
       CHECK_CONSENT: boolean;
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_DEBUG: boolean;
-      ENABLE_FILE_UPLOAD_RESTRICTION: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       PERSIST_TEMPORARY_CLIENTS: boolean;
