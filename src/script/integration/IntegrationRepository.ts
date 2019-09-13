@@ -19,7 +19,6 @@
 
 import {amplify} from 'amplify';
 import {Observable, ObservableArray, PureComputed} from 'knockout';
-import {isArray, isString} from 'underscore';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -52,7 +51,7 @@ export class IntegrationRepository {
    * @returns Normalized service search query
    */
   static normalizeQuery(query: string): string {
-    if (!isString(query)) {
+    if (typeof query !== 'string') {
       return '';
     }
     return query.trim().toLowerCase();
@@ -220,7 +219,7 @@ export class IntegrationRepository {
   }
 
   getServices(tags: ServiceTag | ServiceTag[], start: string): Promise<ServiceEntity[]> {
-    const tagsArray = isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
+    const tagsArray = Array.isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services: servicesData}) => {
       return IntegrationMapper.mapServicesFromArray(servicesData);
