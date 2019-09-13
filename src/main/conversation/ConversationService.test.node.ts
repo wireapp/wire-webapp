@@ -16,18 +16,16 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {APIClient} from '@wireapp/api-client';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user';
+import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {MemoryEngine} from '@wireapp/store-engine';
+import {Account} from '../Account';
+import * as PayloadHelper from '../test/PayloadHelper';
+import {MentionContent, QuoteContent} from './content';
 
-/* eslint-disable no-magic-numbers */
-
-const {APIClient} = require('@wireapp/api-client');
-const {Account} = require('@wireapp/core');
-const {GenericMessage, Text} = require('@wireapp/protocol-messaging');
-const {MemoryEngine} = require('@wireapp/store-engine');
-const {LegalHoldStatus} = require('@wireapp/core/dist/conversation/content/');
-
-const PayloadHelper = require('../test/PayloadHelper');
-
-const createMessage = content => {
+const createMessage = (content: string) => {
   const customTextMessage = GenericMessage.create({
     messageId: PayloadHelper.getUUID(),
     text: Text.create({content}),
@@ -36,21 +34,24 @@ const createMessage = content => {
   return GenericMessage.encode(customTextMessage).finish();
 };
 
-const generatePreKeyBundle = (userCount, clientsPerUser) => {
-  const prekeyBundle = {};
+const generatePreKeyBundle = (userCount: number, clientsPerUser: number): UserPreKeyBundleMap => {
+  const prekeyBundle: UserPreKeyBundleMap = {};
   for (let userIndex = 0; userIndex < userCount; userIndex++) {
     const userId = PayloadHelper.getUUID();
     prekeyBundle[userId] = {};
     for (let clientIndex = 0; clientIndex < clientsPerUser; clientIndex++) {
       const clientId = PayloadHelper.getUUID();
-      prekeyBundle[userId][clientId] = {};
+      prekeyBundle[userId][clientId] = {
+        id: -1,
+        key: '',
+      };
     }
   }
   return prekeyBundle;
 };
 
 describe('ConversationService', () => {
-  let account;
+  let account: Account;
 
   beforeAll(async () => {
     const engine = new MemoryEngine();
@@ -64,25 +65,23 @@ describe('ConversationService', () => {
 
   describe("'shouldSendAsExternal'", () => {
     it('returns true for a big payload', () => {
-      const {conversation} = account.service;
       const preKeyBundles = generatePreKeyBundle(128, 4);
 
       const longMessage =
         'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem';
       const plainText = createMessage(longMessage);
 
-      const shouldSendAsExternal = conversation.shouldSendAsExternal(plainText, preKeyBundles);
+      const shouldSendAsExternal = account.service!.conversation['shouldSendAsExternal'](plainText, preKeyBundles);
       expect(shouldSendAsExternal).toBe(true);
     });
 
     it('returns false for a small payload', async () => {
-      const {conversation} = account.service;
       const preKeyBundles = generatePreKeyBundle(2, 1);
 
       const shortMessage = PayloadHelper.getUUID();
       const plainText = createMessage(shortMessage);
 
-      const shouldSendAsExternal = conversation.shouldSendAsExternal(plainText, preKeyBundles);
+      const shouldSendAsExternal = account.service!.conversation['shouldSendAsExternal'](plainText, preKeyBundles);
       expect(shouldSendAsExternal).toBe(false);
     });
 
@@ -92,17 +91,19 @@ describe('ConversationService', () => {
       const bobId = PayloadHelper.getUUID();
       const bobClientId = PayloadHelper.getUUID();
 
-      const initialPreKeyBundles = {
+      const initialPreKeyBundles: UserPreKeyBundleMap = {
         [aliceId]: {
-          [PayloadHelper.getUUID()]: {},
+          [PayloadHelper.getUUID()]: {
+            id: -1,
+            key: '',
+          },
         },
       };
 
-      spyOn(account.apiClient.conversation.api, 'postOTRMessage').and.callFake(
+      spyOn(account['apiClient'].conversation.api, 'postOTRMessage').and.callFake(
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
-            if (message.recipients[aliceId] && !message.recipients[aliceId][aliceClientId]) {
-              // eslint-disable-next-line prefer-promise-reject-errors
+            if (message!.recipients[aliceId] && !message!.recipients[aliceId][aliceClientId]) {
               reject({
                 response: {
                   data: {
@@ -122,7 +123,7 @@ describe('ConversationService', () => {
             }
           }),
       );
-      spyOn(account.apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(
+      spyOn<any>(account['apiClient'].user.api, 'postMultiPreKeyBundles').and.returnValue(
         Promise.resolve({
           [aliceId]: {
             [aliceClientId]: {},
@@ -134,12 +135,12 @@ describe('ConversationService', () => {
       );
 
       const payload = createMessage('Hello, world!');
-      const recipients = await account.service.cryptography.encrypt(payload, initialPreKeyBundles);
+      const recipients = await account.service!.cryptography.encrypt(payload, initialPreKeyBundles);
       expect(recipients[aliceId]).toBeDefined();
       expect(recipients[aliceId][aliceClientId]).toBeUndefined();
       expect(recipients[bobId]).toBeUndefined();
 
-      await account.service.conversation.sendOTRMessage(aliceId, PayloadHelper.getUUID(), recipients, payload);
+      await account.service!.conversation['sendOTRMessage'](aliceId, PayloadHelper.getUUID(), recipients, payload);
       expect(recipients[aliceId][aliceClientId]).toBeDefined();
       expect(recipients[bobId][bobClientId]).toBeDefined();
     });
@@ -148,18 +149,23 @@ describe('ConversationService', () => {
       const aliceId = PayloadHelper.getUUID();
       const aliceClientId = PayloadHelper.getUUID();
 
-      const initialPreKeyBundles = {
+      const initialPreKeyBundles: UserPreKeyBundleMap = {
         [aliceId]: {
-          [PayloadHelper.getUUID()]: {},
-          [aliceClientId]: {},
+          [PayloadHelper.getUUID()]: {
+            id: -1,
+            key: '',
+          },
+          [aliceClientId]: {
+            id: -1,
+            key: '',
+          },
         },
       };
 
-      spyOn(account.apiClient.conversation.api, 'postOTRMessage').and.callFake(
+      spyOn(account['apiClient'].conversation.api, 'postOTRMessage').and.callFake(
         (sendingClientId, conversationId, message) =>
           new Promise((resolve, reject) => {
-            if (message.recipients[aliceId] && message.recipients[aliceId][aliceClientId]) {
-              // eslint-disable-next-line prefer-promise-reject-errors
+            if (message!.recipients[aliceId] && message!.recipients[aliceId][aliceClientId]) {
               reject({
                 response: {
                   data: {
@@ -178,13 +184,13 @@ describe('ConversationService', () => {
             }
           }),
       );
-      spyOn(account.apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve());
+      spyOn(account['apiClient'].user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
       const payload = createMessage('Hello, world!');
-      const recipients = await account.service.cryptography.encrypt(payload, initialPreKeyBundles);
+      const recipients = await account.service!.cryptography.encrypt(payload, initialPreKeyBundles);
       expect(recipients[aliceId][aliceClientId]).toBeDefined();
 
-      await account.service.conversation.sendOTRMessage(aliceId, PayloadHelper.getUUID(), recipients, payload);
+      await account.service!.conversation['sendOTRMessage'](aliceId, PayloadHelper.getUUID(), recipients, payload);
       expect(recipients[aliceId]).toBeDefined();
       expect(recipients[aliceId][aliceClientId]).toBeUndefined();
     });
@@ -192,7 +198,8 @@ describe('ConversationService', () => {
 
   describe('"createText"', () => {
     it('adds link previews correctly', async () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
@@ -208,7 +215,7 @@ describe('ConversationService', () => {
       };
       const urlOffset = 0;
 
-      const linkPreview = await account.service.conversation.messageBuilder.createLinkPreview({
+      const linkPreview = await account.service!.conversation.messageBuilder.createLinkPreview({
         permanentUrl,
         summary,
         title,
@@ -216,16 +223,16 @@ describe('ConversationService', () => {
         url,
         urlOffset,
       });
-      const textMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const textMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withLinkPreviews([linkPreview])
         .build();
 
       expect(textMessage.content.text).toEqual(text);
       expect(textMessage.content.linkPreviews).toEqual(jasmine.any(Array));
-      expect(textMessage.content.linkPreviews.length).toBe(1);
+      expect(textMessage.content.linkPreviews!.length).toBe(1);
 
-      expect(textMessage.content.linkPreviews[0]).toEqual(
+      expect(textMessage.content.linkPreviews![0]).toEqual(
         jasmine.objectContaining({
           permanentUrl,
           summary,
@@ -238,22 +245,24 @@ describe('ConversationService', () => {
     });
 
     it('does not add link previews', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.messageBuilder.createText(undefined, text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
 
       expect(textMessage.content.linkPreviews).toBeUndefined();
     });
 
     it('uploads link previews', async () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
-      spyOn(account.service.asset, 'uploadImageAsset').and.returnValue(
+      spyOn(account.service!.asset, 'uploadImageAsset').and.returnValue(
         Promise.resolve({
           cipherText: Buffer.from([]),
           key: '',
@@ -273,18 +282,18 @@ describe('ConversationService', () => {
       const text = url;
       const urlOffset = 0;
 
-      const linkPreview = await account.service.conversation.messageBuilder.createLinkPreview({image, url, urlOffset});
-      const textMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const linkPreview = await account.service!.conversation.messageBuilder.createLinkPreview({image, url, urlOffset});
+      const textMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withLinkPreviews([linkPreview])
         .build();
 
-      expect(account.service.asset.uploadImageAsset).toHaveBeenCalledTimes(1);
+      expect(account.service!.asset.uploadImageAsset).toHaveBeenCalledTimes(1);
 
       expect(textMessage.content.linkPreviews).toEqual(jasmine.any(Array));
-      expect(textMessage.content.linkPreviews.length).toBe(1);
+      expect(textMessage.content.linkPreviews!.length).toBe(1);
 
-      expect(textMessage.content.linkPreviews[0]).toEqual(
+      expect(textMessage.content.linkPreviews![0]).toEqual(
         jasmine.objectContaining({
           url,
           urlOffset,
@@ -293,86 +302,88 @@ describe('ConversationService', () => {
     });
 
     it('adds mentions correctly', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Hello @user!';
 
-      const mention = {
-        end: 11,
+      const mention: MentionContent = {
+        length: 5,
         start: 6,
         userId: PayloadHelper.getUUID(),
       };
 
-      const textMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const textMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withMentions([mention])
         .build();
 
       expect(textMessage.content.text).toEqual(text);
       expect(textMessage.content.mentions).toEqual(jasmine.any(Array));
-      expect(textMessage.content.mentions.length).toBe(1);
+      expect(textMessage.content.mentions!.length).toBe(1);
 
-      expect(textMessage.content.mentions[0]).toEqual(jasmine.objectContaining(mention));
+      expect(textMessage.content.mentions![0]).toEqual(jasmine.objectContaining(mention));
     });
 
     it('does not add mentions', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.messageBuilder.createText(text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
 
       expect(textMessage.content.mentions).toBeUndefined();
     });
 
     it('adds a quote correctly', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const quoteId = PayloadHelper.getUUID();
-      const textSHA256 = PayloadHelper.getUUID();
-
       const text = 'I totally agree.';
 
-      const quote = {
-        id: quoteId,
-        sha256: textSHA256,
+      const quote: QuoteContent = {
+        quotedMessageId: quoteId,
       };
 
-      const replyMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const replyMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withQuote(quote)
         .build();
 
       expect(replyMessage.content.text).toEqual(text);
-      expect(replyMessage.content.quote).toEqual(jasmine.objectContaining({id: quoteId, sha256: textSHA256}));
+      expect(replyMessage.content.quote).toEqual(jasmine.objectContaining({quotedMessageId: quoteId}));
       expect(replyMessage.content.quote).toEqual(jasmine.objectContaining(quote));
     });
 
     it('does not add a quote', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service.conversation.messageBuilder.createText(undefined, text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
 
       expect(textMessage.content.quote).toBeUndefined();
     });
 
     it('adds a read confirmation request correctly', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Please read me';
 
-      const replyMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const replyMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withReadConfirmation(true)
         .build();
 
@@ -381,21 +392,22 @@ describe('ConversationService', () => {
     });
 
     it('adds a legal hold status', () => {
-      account.apiClient.context = {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
       };
 
       const text = 'Please read me';
 
-      const firstMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const firstMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withLegalHoldStatus()
         .build();
 
       expect(firstMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.UNKNOWN);
 
-      const replyMessage = account.service.conversation.messageBuilder
-        .createText(undefined, text)
+      const replyMessage = account
+        .service!.conversation.messageBuilder.createText('', text)
         .withLegalHoldStatus(LegalHoldStatus.ENABLED)
         .build();
 

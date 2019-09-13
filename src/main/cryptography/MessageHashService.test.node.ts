@@ -16,12 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-//@ts-check
-
-/* eslint-disable no-magic-numbers */
-
-const {MessageHashService} = require('@wireapp/core/dist/cryptography/');
+import {AvailableMessageContent, MessageHashService} from './MessageHashService';
 
 describe('MessageHashService', () => {
   describe('"getHash"', () => {
@@ -32,13 +27,13 @@ describe('MessageHashService', () => {
 
       const messageHashService = new MessageHashService(content);
 
-      spyOn(messageHashService, 'getTextBytes').and.callThrough();
-      spyOn(messageHashService, 'getLocationBytes').and.callThrough();
+      spyOn<any>(messageHashService, 'getTextBytes').and.callThrough();
+      spyOn<any>(messageHashService, 'getLocationBytes').and.callThrough();
 
       messageHashService.getHash();
 
-      expect(messageHashService.getTextBytes).toHaveBeenCalled();
-      expect(messageHashService.getLocationBytes).not.toHaveBeenCalled();
+      expect(messageHashService['getTextBytes']).toHaveBeenCalled();
+      expect(messageHashService['getLocationBytes']).not.toHaveBeenCalled();
     });
 
     it('correctly creates a timestamp bytes buffer.', () => {
@@ -49,7 +44,7 @@ describe('MessageHashService', () => {
       const timestamp = 1540213769;
 
       const messageHashService = new MessageHashService(content, timestamp);
-      const buffer = messageHashService.getTimestampBuffer(timestamp);
+      const buffer = messageHashService['getTimestampBuffer'](timestamp);
 
       const hexValue = buffer.toString('hex');
       expect(hexValue).toBe(expectedHexValue);
@@ -144,9 +139,11 @@ describe('MessageHashService', () => {
     it('correctly creates an asset bytes buffer.', () => {
       const expectedHashValue = 'bf20de149847ae999775b3cc88e5ff0c0382e9fa67b9d382b1702920b8afa1de';
 
-      const content = {
+      const content: AvailableMessageContent = {
         uploaded: {
           assetId: '3-2-1-38d4f5b9',
+          otrKey: new Uint8Array(),
+          sha256: new Uint8Array(),
         },
       };
       const timestamp = 1540213769000;
@@ -160,9 +157,11 @@ describe('MessageHashService', () => {
     it('correctly creates another asset bytes buffer.', () => {
       const expectedHashValue = '2235f5b6c00d9b0917675399d0314c8401f0525457b00aa54a38998ab93b90d6';
 
-      const content = {
+      const content: AvailableMessageContent = {
         uploaded: {
           assetId: '3-3-3-82a62735',
+          otrKey: new Uint8Array(),
+          sha256: new Uint8Array(),
         },
       };
       const timestamp = 1540213965000;
