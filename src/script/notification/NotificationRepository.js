@@ -114,7 +114,7 @@ export class NotificationRepository {
    */
   checkPermission() {
     return this._checkPermissionState().then(isPermitted => {
-      if (_.isBoolean(isPermitted)) {
+      if (typeof isPermitted === 'boolean') {
         return isPermitted;
       }
 

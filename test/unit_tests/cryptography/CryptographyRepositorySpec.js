@@ -21,7 +21,6 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {isString} from 'underscore';
 
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 
@@ -95,7 +94,7 @@ describe('CryptographyRepository', () => {
         expect(Object.keys(payload.recipients).length).toBe(2);
         expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
         expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
-        expect(isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBe(true);
+        expect(payload.recipients[jane_roe.id][jane_roe.clients.phone_id]).toEqual(jasmine.any(String));
       });
     });
   });

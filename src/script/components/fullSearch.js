@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {debounce} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
@@ -59,7 +60,7 @@ class FullSearch {
 
     this.input = ko.observable();
     this.input.subscribe(
-      _.debounce(searchQuery => {
+      debounce(searchQuery => {
         searchQuery = searchQuery.trim();
 
         this.onInputChange(searchQuery);
@@ -109,7 +110,7 @@ class FullSearch {
     const markOffset = transformedText.indexOf('<mark') - 1;
     let sliceOffset = markOffset;
 
-    for (const index of _.range(markOffset).reverse()) {
+    for (const index of [...Array(markOffset).keys()].reverse()) {
       if (index < markOffset - FullSearch.CONFIG.PRE_MARKED_OFFSET) {
         break;
       }

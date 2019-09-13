@@ -124,7 +124,9 @@ describe('EventTrackingRepository', () => {
 
       expect(error_payload).toBe(raygun_payload);
 
-      _.times(100, () => (error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload)));
+      for (let index = 0; index < 100; index++) {
+        error_payload = TestFactory.tracking_repository._checkErrorPayload(raygun_payload);
+      }
 
       expect(error_payload).toBe(false);
       jasmine.clock().mockDate(Date.now());

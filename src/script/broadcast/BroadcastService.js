@@ -48,7 +48,7 @@ export class BroadcastService {
    */
   postBroadcastMessage(payload, preconditionOption) {
     let url = `${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`;
-    if (_.isArray(preconditionOption)) {
+    if (Array.isArray(preconditionOption)) {
       url = `${url}?report_missing=${preconditionOption.join(',')}`;
     } else if (preconditionOption) {
       url = `${url}?ignore_missing=true`;

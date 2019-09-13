@@ -60,11 +60,11 @@ export class Message {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (_.isNumber(this.ephemeral_expires())) {
+      if (typeof this.ephemeral_expires() === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (_.isString(this.ephemeral_expires())) {
+      if (typeof this.ephemeral_expires() === 'string') {
         const isExpiring = Date.now() >= this.ephemeral_expires();
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }

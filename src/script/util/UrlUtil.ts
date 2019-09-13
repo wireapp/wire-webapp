@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {isNumber} from 'underscore';
 
 import {t} from 'Util/LocalizerUtil';
 import {includesString} from 'Util/StringUtil';
@@ -27,7 +26,7 @@ export const appendParameter = (url: string, parameter: string) => {
 };
 
 export const buildSupportUrl = (supportId: string) =>
-  isNumber(supportId)
+  typeof supportId === 'number'
     ? `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportArticles')}${supportId}`
     : `${window.wire.env.URL.SUPPORT_BASE}${t('urlSupportRequests')}`;
 

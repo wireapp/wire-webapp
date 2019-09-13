@@ -17,8 +17,6 @@
  *
  */
 
-import {isNumber, isString} from 'underscore';
-
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
@@ -42,7 +40,7 @@ export class AppInitTimings {
     const timings = {};
 
     Object.entries(this).forEach(([key, value]) => {
-      if (key.toString() !== 'init' && _.isNumber(value)) {
+      if (key.toString() !== 'init' && typeof value === 'number') {
         timings[key] = value;
       }
     });
@@ -60,7 +58,10 @@ export class AppInitTimings {
 
   log() {
     const statsData = Object.entries(this).reduce((stats, [key, value]) => {
-      return isNumber(value) || isString(value) ? {...stats, [key]: value} : stats;
+      if (typeof value === 'number' || typeof value === 'string') {
+        stats[key] = value;
+      }
+      return stats;
     }, {});
     this.logger.debug('App initialization step durations', statsData);
   }

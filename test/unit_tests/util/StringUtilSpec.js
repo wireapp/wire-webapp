@@ -17,8 +17,6 @@
  *
  */
 
-import _ from 'underscore';
-
 import {
   padStart,
   bytesToHex,
@@ -65,7 +63,7 @@ describe('StringUtil', () => {
 
   describe('getRandomChar', () => {
     it('always returns an alphanumeric character', () => {
-      _.range(1000).map(() => {
+      [...Array(1000).keys()].map(() => {
         expect(getRandomChar()).toMatch(/(\w|\d){1}/);
       });
     });

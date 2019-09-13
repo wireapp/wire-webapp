@@ -17,6 +17,8 @@
  *
  */
 
+import {debounce} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 import {alias} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
@@ -95,7 +97,7 @@ class StartUIViewModel {
 
     this.submittedSearch = false;
 
-    this.search = _.debounce(query => {
+    this.search = debounce(query => {
       this._clearSearchResults();
       if (this.peopleTabActive()) {
         return this._searchPeople(query);
