@@ -870,7 +870,7 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the Conversation entity
+   * @returns {Promise<ConversationEntity | undefined>} Resolves with the Conversation entity or `undefined` if not found
    */
   get_conversation_by_id(conversation_id) {
     if (typeof conversation_id !== 'string') {
