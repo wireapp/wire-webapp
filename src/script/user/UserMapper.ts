@@ -154,9 +154,9 @@ export class UserMapper {
 
     if (service) {
       userEntity.isService = true;
-      (userEntity as any).providerId = service.provider;
-      (userEntity as any).providerName = ko.observable('');
-      (userEntity as any).serviceId = service.id;
+      userEntity.providerId = service.provider;
+      userEntity.providerName('');
+      userEntity.serviceId = service.id;
     }
 
     if (ssoId && Object.keys(ssoId).length) {

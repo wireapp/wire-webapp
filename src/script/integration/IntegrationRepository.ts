@@ -81,12 +81,11 @@ export class IntegrationRepository {
   addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
   addProviderNameToParticipant(entity: User): Promise<User>;
   addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User> {
-    const shouldUpdateProviderName =
-      (entity as ServiceEntity).providerName && !(entity as ServiceEntity).providerName().trim();
+    const shouldUpdateProviderName = !!entity.providerName() && !entity.providerName().trim();
 
     return shouldUpdateProviderName
-      ? this.getProviderById((entity as ServiceEntity).providerId).then(providerEntity => {
-          (entity as ServiceEntity).providerName(providerEntity.name);
+      ? this.getProviderById(entity.providerId).then(providerEntity => {
+          entity.providerName(providerEntity.name);
           return entity;
         })
       : Promise.resolve(entity);
@@ -101,7 +100,7 @@ export class IntegrationRepository {
     if (entity instanceof ServiceEntity) {
       return Promise.resolve(entity);
     }
-    const {providerId, serviceId} = entity as any;
+    const {providerId, serviceId} = entity;
     return this.getServiceById(providerId, serviceId);
   }
 
@@ -240,7 +239,7 @@ export class IntegrationRepository {
    * @returns Resolves when service was removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
-    const {id: userId, serviceId} = userEntity as any;
+    const {id: userId, serviceId} = userEntity;
 
     return this.conversationRepository.removeService(conversationEntity, userId).then(event => {
       if (event) {
