@@ -64,6 +64,9 @@ class User {
     this.isService = false;
     this.isSingleSignOn = false;
     this.isDeleted = false;
+    this.providerId = undefined;
+    this.serviceId = undefined;
+    this.providerName = ko.observable(undefined);
 
     this.joaatHash = -1;
 
