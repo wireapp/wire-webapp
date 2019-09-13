@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/long": "4.0.0",
     "@types/node": "~10",
-    "@wireapp/api-client": "6.5.3",
+    "@wireapp/api-client": "6.5.4",
     "@wireapp/cryptobox": "11.4.34",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/store-engine": "3.9.12",
@@ -65,5 +65,5 @@
     "test:node": "cross-env NODE_ENV=test nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "12.17.66"
+  "version": "12.17.67"
 }
