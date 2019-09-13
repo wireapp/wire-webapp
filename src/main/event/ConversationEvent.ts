@@ -18,11 +18,17 @@
  */
 
 import {
-  CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  AccessUpdate,
+  CodeUpdate,
+  ConnectRequest,
   Conversation,
   ConversationMessageTimerUpdate,
+  MemberJoin,
+  MemberLeave,
   MemberUpdate,
+  OtrMessageAdd,
+  Rename,
+  Typing,
 } from '../conversation/';
 import {BackendEvent} from './BackendEvent';
 
@@ -56,10 +62,7 @@ export interface ConversationEvent extends BackendEvent {
 }
 
 export interface ConversationAccessUpdateEvent extends ConversationEvent {
-  data: {
-    access: CONVERSATION_ACCESS;
-    access_role: CONVERSATION_ACCESS_ROLE;
-  };
+  data: AccessUpdate;
   type: CONVERSATION_EVENT.ACCESS_UPDATE;
 }
 
@@ -68,18 +71,12 @@ export interface ConversationCodeDeleteEvent extends ConversationEvent {
 }
 
 export interface ConversationCodeUpdateEvent extends ConversationEvent {
-  data: {
-    code: string;
-    key: string;
-    uri: string;
-  };
+  data: CodeUpdate;
   type: CONVERSATION_EVENT.CODE_UPDATE;
 }
 
 export interface ConversationConnectRequestEvent extends ConversationEvent {
-  data: {
-    recipient: string;
-  };
+  data: ConnectRequest;
   type: CONVERSATION_EVENT.CONNECT_REQUEST;
 }
 
@@ -93,16 +90,12 @@ export interface ConversationDeleteEvent extends ConversationEvent {
 }
 
 export interface ConversationMemberJoinEvent extends ConversationEvent {
-  data: {
-    user_ids: string[];
-  };
+  data: MemberJoin;
   type: CONVERSATION_EVENT.MEMBER_JOIN;
 }
 
 export interface ConversationMemberLeaveEvent extends ConversationEvent {
-  data: {
-    user_ids: string[];
-  };
+  data: MemberLeave;
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 }
 
@@ -117,45 +110,31 @@ export interface ConversationMessageTimerUpdateEvent extends ConversationEvent {
 }
 
 export interface ConversationOtrMessageAddEvent extends ConversationEvent {
-  data: {
-    recipient: string;
-    sender: string;
-    text: string;
-  };
+  data: OtrMessageAdd;
   type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
 }
 
 export interface ConversationOtrMessageAddNotification {
   conversation: string;
-  data: {
-    recipient: string;
-    sender: string;
-    text: string;
-  };
+  data: OtrMessageAdd;
   from: string;
   time: string;
   type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
 }
 
 export interface ConversationRenameEvent extends ConversationEvent {
-  data: {
-    name: string;
-  };
+  data: Rename;
   type: CONVERSATION_EVENT.RENAME;
 }
 
 export interface ConversationTypingEvent extends ConversationEvent {
-  data: {
-    status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
-  };
+  data: Typing;
   type: CONVERSATION_EVENT.TYPING;
 }
 
 export interface ConversationTypingNotification {
   conversation: string;
-  data: {
-    status: CONVERSATION_TYPING.STARTED | CONVERSATION_TYPING.STOPPED;
-  };
+  data: Typing;
   from: string;
   time: string;
   type: CONVERSATION_EVENT.TYPING;
