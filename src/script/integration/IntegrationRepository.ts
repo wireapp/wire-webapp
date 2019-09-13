@@ -51,10 +51,10 @@ export class IntegrationRepository {
    * @returns Normalized service search query
    */
   static normalizeQuery(query: string): string {
-    if (typeof query !== 'string') {
-      return '';
+    if (typeof query === 'string') {
+      return query.trim().toLowerCase();
     }
-    return query.trim().toLowerCase();
+    return '';
   }
 
   constructor(
