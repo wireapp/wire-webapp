@@ -825,6 +825,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
 
     if (!allowAllExtensions) {
+      // Creates a regex like this: (\.txt|\.pdf)$
       const fileNameRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
 
       for (const file of fileArray) {
@@ -833,6 +834,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         if (!allowedFiletype) {
           const options = {
             text: {
+              // TODO: Add to translations
               message: `The filetype of "${file.name}" is not allowed.`,
               title: 'Restricted filetype',
             },
