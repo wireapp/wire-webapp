@@ -68,7 +68,13 @@ export class NotificationService {
     });
   }
 
-  getAllNotificationsForClient(clientId: string): Promise<Notification[]> {
+  async getServerTime(): Promise<string> {
+    // Info: We use "100" as size limit because it's the minimum value accepted by the backend's notification stream
+    const notificationList = await this.getNotifications(undefined, undefined, 100);
+    return notificationList.time;
+  }
+
+  getAllNotificationsForClient(clientId: string, notificationId?: string): Promise<Notification[]> {
     const notifications: Notification[] = [];
 
     const collectNotifications = async (lastNotificationId?: string): Promise<Notification[]> => {
@@ -79,7 +85,7 @@ export class NotificationService {
       return notificationList.has_more ? collectNotifications(lastNotificationId) : notifications;
     };
 
-    return collectNotifications(undefined);
+    return collectNotifications(notificationId);
   }
 
   /**
