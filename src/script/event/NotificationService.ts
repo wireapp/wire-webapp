@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/commonjs/event';
-import {NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
+import {Notification, NotificationList} from '@wireapp/api-client/dist/commonjs/notification';
 import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
 import {Logger, getLogger} from 'Util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
@@ -56,7 +56,7 @@ export class NotificationService {
    * @param size - Maximum number of notifications to return
    * @returns Resolves with a pages list of notifications
    */
-  getNotifications(clientId: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
+  getNotifications(clientId?: string, notificationId?: string, size: number = 10000): Promise<NotificationList> {
     return this.backendClient.sendRequest({
       data: {
         client: clientId,
@@ -66,6 +66,20 @@ export class NotificationService {
       type: 'GET',
       url: NotificationService.CONFIG.URL_NOTIFICATIONS,
     });
+  }
+
+  getAllNotificationsForClient(clientId: string): Promise<Notification[]> {
+    const notifications: Notification[] = [];
+
+    const collectNotifications = async (lastNotificationId?: string): Promise<Notification[]> => {
+      const notificationList = await this.getNotifications(clientId, lastNotificationId);
+      const newNotifications = notificationList.notifications;
+      lastNotificationId = newNotifications[newNotifications.length - 1].id;
+      notifications.push(...newNotifications);
+      return notificationList.has_more ? collectNotifications(lastNotificationId) : notifications;
+    };
+
+    return collectNotifications(undefined);
   }
 
   /**
