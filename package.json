@@ -61,7 +61,7 @@
     "@types/enzyme": "3.10.3",
     "@types/faker": "4.1.5",
     "@types/helmet": "0.0.43",
-    "@types/jasmine": "3.3.15",
+    "@types/jasmine": "3.4.0",
     "@types/js-cookie": "2.2.2",
     "@types/libsodium-wrappers-sumo": "0.7.1",
     "@types/linkify-it": "2.1.0",
