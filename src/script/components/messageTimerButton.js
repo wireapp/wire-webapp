@@ -23,10 +23,7 @@ import {formatDuration} from 'Util/TimeUtil';
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.MessageTimerButton = class MessageTimerButton {
+class MessageTimerButton {
   constructor(params) {
     this.conversationEntity = params.conversation;
     this.hasMessageTimer = ko.pureComputed(() => {
@@ -67,7 +64,7 @@ z.components.MessageTimerButton = class MessageTimerButton {
 
     Context.from(event, entries, 'message-timer-menu');
   }
-};
+}
 
 ko.components.register('message-timer-button', {
   template: `
@@ -88,5 +85,5 @@ ko.components.register('message-timer-button', {
       <!-- /ko -->
     </span>
     `,
-  viewModel: z.components.MessageTimerButton,
+  viewModel: MessageTimerButton,
 });

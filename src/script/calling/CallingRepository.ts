@@ -238,7 +238,7 @@ export class CallingRepository {
 
   /**
    * Extended check for calling support of browser.
-   * @returns {boolean} True if calling is supported
+   * @returns `true` if calling is supported
    */
   get supportsCalling(): boolean {
     return Environment.browser.supports.calling;
@@ -246,7 +246,7 @@ export class CallingRepository {
 
   /**
    * Extended check for screen sharing support of browser.
-   * @returns {boolean} True if screen sharing is supported
+   * @returns `true` if screen sharing is supported
    */
   get supportsScreenSharing(): boolean {
     return Environment.browser.supports.screenSharing;
@@ -254,7 +254,6 @@ export class CallingRepository {
 
   /**
    * Subscribe to amplify topics.
-   * @returns {undefined} No return value
    */
   subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
@@ -270,7 +269,6 @@ export class CallingRepository {
    *
    * @param {Object} event - Event payload
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {undefined} No return value
    */
   onCallEvent(event: any, source: string): void {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
@@ -391,7 +389,9 @@ export class CallingRepository {
       .catch(() => {});
   }
 
-  // Toggles the camera ON and OFF for the given call (does not switch between different cameras)
+  /**
+   * Toggles the camera ON and OFF for the given call (does not switch between different cameras)
+   */
   toggleCamera(call: Call): void {
     const selfParticipant = call.selfParticipant;
     const newState = selfParticipant.sharesCamera() ? VIDEO_STATE.STOPPED : VIDEO_STATE.STARTED;
@@ -406,7 +406,9 @@ export class CallingRepository {
     this.wCall.setVideoSendState(this.wUser, call.conversationId, newState);
   }
 
-  // Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+  /**
+   * Toggles screenshare ON and OFF for the given call (does not switch between different screens)
+   */
   toggleScreenshare(call: Call): void {
     const selfParticipant = call.selfParticipant;
     const newState = selfParticipant.sharesScreen() ? VIDEO_STATE.STOPPED : VIDEO_STATE.SCREENSHARE;
@@ -462,7 +464,9 @@ export class CallingRepository {
     }
   }
 
-  // returns true if a media stream has been stopped.
+  /**
+   * @returns `true` if a media stream has been stopped.
+   */
   public stopMediaSource(mediaType: MediaType): boolean {
     const activeCall = this.joinedCall();
     if (!activeCall) {
@@ -480,7 +484,9 @@ export class CallingRepository {
     return true;
   }
 
-  // will change the input source of all the active calls for the given media type
+  /**
+   * Will change the input source of all the active calls for the given media type
+   */
   public changeMediaSource(mediaStream: MediaStream, mediaType: MediaType, call: Call = this.joinedCall()): void {
     if (!call) {
       return;
@@ -695,7 +701,14 @@ export class CallingRepository {
 
     if (Object.keys(missingStreams).length === 0) {
       // we have everything in cache, just return the participant's stream
-      return Promise.resolve(selfParticipant.getMediaStream());
+      return new Promise(resolve => {
+        /*
+          There is a bug in Chrome (from version 73, the version where it's fixed is unknown).
+          This bug crashes the browser if the mediaStream is returned right away (probably some race condition in Chrome internal code)
+          The timeout(0) fixes this issue.
+        */
+        setTimeout(() => resolve(selfParticipant.getMediaStream()), 0);
+      });
     }
     const isGroup = call.conversationType === CONV_TYPE.GROUP;
     this.mediaStreamQuery = this.getMediaStream(missingStreams, isGroup)
@@ -823,9 +836,8 @@ export class CallingRepository {
   //##############################################################################
 
   /**
-   * Leave a call we are joined immediately in case the browser window is closed.
+   * Leave a call we joined immediately in case the browser window is closed.
    * @note Should only used by "window.onbeforeunload".
-   * @returns {undefined} No return value
    */
   destroy(): void {
     this.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));

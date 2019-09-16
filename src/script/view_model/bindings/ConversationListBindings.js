@@ -17,13 +17,14 @@
  *
  */
 
+import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
 import {WebAppEvents} from '../../event/WebApp';
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function() {
-  const calculate_borders = _.throttle(element => {
+  const calculate_borders = throttle(element => {
     if (element) {
       window.requestAnimationFrame(() => {
         const list_column = $(element).parent();

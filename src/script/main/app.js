@@ -28,7 +28,6 @@ import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
-import {isSameLocation} from 'Util/ValidationUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
 import {Config} from '../auth/config';
@@ -306,7 +305,9 @@ class App {
    * @param {boolean} [isReload=_isReload()] - App init after page reload
    * @returns {undefined} No return value
    */
-  initApp(isReload = this._isReload()) {
+  initApp() {
+    const isReload = this._isReload();
+    this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
     const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
@@ -583,7 +584,7 @@ class App {
   /**
    * Handle URL params.
    * @private
-   * @returns {undefined} Not return value
+   * @returns {undefined} No return value
    */
   _handleUrlParams() {
     // Currently no URL params to be handled
@@ -592,13 +593,11 @@ class App {
   /**
    * Check whether the page has been reloaded.
    * @private
-   * @returns {boolean}  True if it is a page refresh
+   * @returns {boolean} `true` if it is a page refresh
    */
   _isReload() {
-    const isReload = isSameLocation(document.referrer, window.location.href);
-    const log = `App reload: '${isReload}', Referrer: '${document.referrer}', Location: '${window.location.href}'`;
-    this.logger.debug(log);
-    return isReload;
+    const NAVIGATION_TYPE_RELOAD = 1;
+    return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
 
   /**
@@ -734,7 +733,16 @@ class App {
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
 
-      const keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      let keepPermanentDatabase = !clearData;
+
+      try {
+        keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
+      } catch (error) {
+        if (error.type === z.error.ClientError.TYPE.CLIENT_NOT_SET) {
+          keepPermanentDatabase = false;
+        }
+      }
+
       if (keepPermanentDatabase) {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }

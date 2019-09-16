@@ -21,6 +21,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
+import {generateConversationUrl} from '../../router/routeGenerator';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {STATE as CALL_STATE, REASON as CALL_REASON, CALL_TYPE} from '@wireapp/avs';
 
@@ -47,6 +48,7 @@ class ConversationListCallingCell {
     this.callActions = callActions;
     this.ParticipantAvatar = ParticipantAvatar;
 
+    this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
     this.videoGrid = videoGrid;
@@ -151,7 +153,7 @@ ko.components.register('conversation-list-calling-cell', {
       <!-- /ko -->
 
       <div class="conversation-list-cell-center" data-bind="css: {'conversation-list-cell-center-no-left': temporaryUserStyle}">
-        <span class="conversation-list-cell-name" data-bind="text: conversation().display_name()"></span>
+        <span class="conversation-list-cell-name" data-bind="link_to: conversationUrl, text: conversation().display_name()"></span>
         <!-- ko if: isIncoming() -->
           <!-- ko if: call.isGroup -->
             <span class="conversation-list-cell-description" data-bind="text: t('callStateIncomingGroup', call.creatingUser.first_name())" data-uie-name="call-label-incoming"></span>
@@ -194,7 +196,6 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: showNoCameraPreview() -->
       <div class="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access" data-bind="text: t('callNoCameraAccess')" data-uie-name="label-no-camera-access-preview"></div>
     <!-- /ko -->
-
 
     <!-- ko if: !isDeclined() -->
       <div class="conversation-list-calling-cell-controls">

@@ -17,15 +17,13 @@
  *
  */
 
-import {isString} from 'underscore';
-
 export class ValidationError extends Error {
   types: string | string[];
 
   constructor(types: string | string[], errorMessage: string) {
     super();
 
-    if (isString(types)) {
+    if (typeof types === 'string') {
       types = [types];
     }
 

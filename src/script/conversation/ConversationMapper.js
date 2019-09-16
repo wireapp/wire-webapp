@@ -17,13 +17,15 @@
  *
  */
 
+import {isObject} from 'underscore';
+import ko from 'knockout';
+
 import {ACCESS_MODE} from './AccessMode';
 import {ACCESS_ROLE} from './AccessRole';
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationType} from './ConversationType';
 import {ConversationStatus} from './ConversationStatus';
-import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
 import {BaseError} from '../error/BaseError';
 
@@ -103,7 +105,7 @@ export class ConversationMapper {
     if (conversationsData === undefined) {
       throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
-    if (!_.isArray(conversationsData) || !conversationsData.length) {
+    if (!Array.isArray(conversationsData) || !conversationsData.length) {
       throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData, index) => {
@@ -254,7 +256,7 @@ export class ConversationMapper {
     if (conversationData === undefined) {
       throw new z.error.ConversationError(BaseError.TYPE.MISSING_PARAMETER);
     }
-    if (!_.isObject(conversationData) || !Object.keys(conversationData).length) {
+    if (!isObject(conversationData) || !Object.keys(conversationData).length) {
       throw new z.error.ConversationError(BaseError.TYPE.INVALID_PARAMETER);
     }
 

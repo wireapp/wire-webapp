@@ -27,8 +27,6 @@ export class TeamService {
   }
 
   /**
-   * Construct a new Team Service.
-   * @class z.user.TeamService
    * @param {BackendClient} backendClient - Client for the API calls
    */
   constructor(backendClient) {

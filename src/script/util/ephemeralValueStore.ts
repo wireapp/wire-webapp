@@ -37,7 +37,10 @@ export async function save<T>(value: T): Promise<T> {
   return sendMessage(worker, {action: 'save', params: value});
 }
 
-async function getWorker(): Promise<ServiceWorker> {
+async function getWorker(): Promise<ServiceWorker | undefined> {
+  if (!navigator.serviceWorker) {
+    return undefined;
+  }
   if (worker) {
     return worker;
   }
@@ -47,7 +50,10 @@ async function getWorker(): Promise<ServiceWorker> {
   return worker;
 }
 
-function sendMessage(worker: ServiceWorker, action: any): Promise<any> {
+function sendMessage(worker: ServiceWorker | undefined, action: any): Promise<any> {
+  if (!worker) {
+    return Promise.resolve(undefined);
+  }
   const messageChannel = new MessageChannel();
   return new Promise((resolve, reject) => {
     messageChannel.port1.onmessage = event => {

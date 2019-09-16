@@ -113,7 +113,11 @@ export class CryptographyRepository {
     } else {
       this.logger.info(`Initializing Cryptobox with database '${databaseName}'...`);
       storeEngine = new IndexedDBEngine();
-      await storeEngine.initWithDb(database);
+      try {
+        await storeEngine.initWithDb(database, true);
+      } catch (error) {
+        await storeEngine.initWithDb(database, false);
+      }
     }
     this.cryptobox = new Cryptobox(storeEngine, 10);
 

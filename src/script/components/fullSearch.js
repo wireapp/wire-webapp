@@ -18,6 +18,7 @@
  */
 
 import moment from 'moment';
+import {debounce} from 'underscore';
 
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {koArrayPushAll} from 'Util/util';
@@ -26,10 +27,7 @@ import {escapeString} from 'Util/SanitizationUtil';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.FullSearch = class FullSearch {
+class FullSearch {
   static get CONFIG() {
     return {
       MAX_OFFSET_INDEX: 30,
@@ -62,7 +60,7 @@ z.components.FullSearch = class FullSearch {
 
     this.input = ko.observable();
     this.input.subscribe(
-      _.debounce(searchQuery => {
+      debounce(searchQuery => {
         searchQuery = searchQuery.trim();
 
         this.onInputChange(searchQuery);
@@ -112,7 +110,7 @@ z.components.FullSearch = class FullSearch {
     const markOffset = transformedText.indexOf('<mark') - 1;
     let sliceOffset = markOffset;
 
-    for (const index of _.range(markOffset).reverse()) {
+    for (const index of [...Array(Math.max(markOffset, 0)).keys()].reverse()) {
       if (index < markOffset - FullSearch.CONFIG.PRE_MARKED_OFFSET) {
         break;
       }
@@ -144,7 +142,7 @@ z.components.FullSearch = class FullSearch {
   dispose() {
     $('.collection-list').off('scroll');
   }
-};
+}
 
 ko.components.register('full-search', {
   template: `
@@ -174,5 +172,5 @@ ko.components.register('full-search', {
       </div>
     </div>
   `,
-  viewModel: z.components.FullSearch,
+  viewModel: FullSearch,
 });

@@ -79,7 +79,9 @@ class BackupRepository {
       client_id: this.clientRepository.currentClient().id,
       creation_time: new Date().toISOString(),
       platform: 'Web',
+      user_handle: this.userRepository.self().username(),
       user_id: this.userRepository.self().id,
+      user_name: this.userRepository.self().name(),
       version: this.backupService.getDatabaseVersion(),
     };
   }
@@ -172,7 +174,7 @@ class BackupRepository {
     const zip = new JSZip();
 
     // first write the metadata file
-    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData));
+    zip.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metaData, null, 2));
 
     // then all the other tables
     Object.keys(exportedData).forEach(tableName => {
@@ -221,6 +223,7 @@ class BackupRepository {
       .then(importedEntities => {
         this.conversationRepository.updateConversations(importedEntities);
         this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
+        this.conversationRepository.checkForDeletedConversations();
       });
   }
 

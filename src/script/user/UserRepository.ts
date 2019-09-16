@@ -20,7 +20,7 @@
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {flatten, isString} from 'underscore';
+import {flatten} from 'underscore';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 
 import {chunk} from 'Util/ArrayUtil';
@@ -29,6 +29,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {sortByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, koArrayPushAll, loadUrlBlob} from 'Util/util';
+import {EventSource} from '../event/EventSource';
 
 import {UNSPLASH_URL} from '../externalRoute';
 import {ConsentType} from './ConsentType';
@@ -172,7 +173,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  on_user_event(eventJson: any, source: keyof typeof EventRepository.SOURCE): void {
+  on_user_event(eventJson: any, source: EventSource): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -601,8 +602,8 @@ export class UserRepository {
     const find_users = user_ids.map(user_id => _find_user(user_id));
 
     return Promise.all(find_users).then(resolve_array => {
-      const known_user_ets = resolve_array.filter(array_item => !isString(array_item)) as User[];
-      const unknown_user_ids = resolve_array.filter(array_item => isString(array_item)) as string[];
+      const known_user_ets = resolve_array.filter(array_item => typeof array_item !== 'string') as User[];
+      const unknown_user_ids = resolve_array.filter(array_item => typeof array_item === 'string') as string[];
 
       if (offline || !unknown_user_ids.length) {
         return known_user_ets;
@@ -616,7 +617,7 @@ export class UserRepository {
    * Is the user the logged in user.
    */
   is_me(user_id: User | string): boolean {
-    if (!isString(user_id)) {
+    if (typeof user_id !== 'string') {
       user_id = user_id.id;
     }
     return this.self().id === user_id;

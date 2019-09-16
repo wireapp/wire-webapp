@@ -53,21 +53,10 @@ export class StorageService {
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
-  private readonly isTemporaryAndNonPersistent: boolean;
+  public readonly isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
   private userId?: string;
   public dbName?: string;
-
-  static get DEXIE_CRUD_EVENTS(): typeof DEXIE_CRUD_EVENT {
-    return DEXIE_CRUD_EVENT;
-  }
-
-  // tslint:disable-next-line:typedef
-  static get CONFIG() {
-    return {
-      SIMPLE_STORE_NAME: 'simple_store',
-    };
-  }
 
   constructor() {
     this.logger = getLogger('StorageService');
@@ -91,9 +80,10 @@ export class StorageService {
    * Initialize the IndexedDB for a user.
    *
    * @param userId - User ID
+   * @param requestPersistentStorage - if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  async init(userId = this.userId): Promise<string> {
+  async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
@@ -108,7 +98,11 @@ export class StorageService {
         await this.moveDexieToMemory();
         this.logger.info(`Storage Service initialized with in-memory database '${this.dbName}'`);
       } else {
-        await this.engine.initWithDb(this.db);
+        try {
+          await this.engine.initWithDb(this.db, requestPersistentStorage);
+        } catch (error) {
+          await this.engine.initWithDb(this.db, false);
+        }
         await this.db.open();
         this._initCrudHooks();
         this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
@@ -362,7 +356,7 @@ export class StorageService {
 
   async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T | undefined> {
     if (this.isTemporaryAndNonPersistent) {
-      return this.load<T>(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey);
+      return this.load<T>(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey);
     }
 
     return loadValue(primaryKey);
@@ -410,7 +404,7 @@ export class StorageService {
 
   async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
     if (this.isTemporaryAndNonPersistent) {
-      await this.engine.updateOrCreate(StorageService.CONFIG.SIMPLE_STORE_NAME, primaryKey, entity);
+      await this.engine.updateOrCreate(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey, entity);
     } else {
       storeValue(primaryKey, entity);
     }
@@ -420,7 +414,6 @@ export class StorageService {
    * Closes the database. This operation completes immediately and there is no returned Promise.
    * @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
    * @param reason - Cause for the termination
-   * @returns No return value
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);

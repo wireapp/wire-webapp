@@ -19,10 +19,7 @@
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.TopPeople = class TopPeople {
+class TopPeople {
   constructor(params) {
     this.click = params.click;
     this.maxUsers = params.max || 9;
@@ -37,7 +34,7 @@ z.components.TopPeople = class TopPeople {
       }
     };
   }
-};
+}
 
 ko.components.register('top-people', {
   template: `
@@ -50,5 +47,5 @@ ko.components.register('top-people', {
       </div>
     </div>
   `,
-  viewModel: z.components.TopPeople,
+  viewModel: TopPeople,
 });

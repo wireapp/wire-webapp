@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.InputLevel = class InputLevel {
+class InputLevel {
   constructor(params) {
     this.input_level = params.level;
     this.disabled = params.disabled;
@@ -39,7 +36,7 @@ z.components.InputLevel = class InputLevel {
       return 'input-level-bullet-active';
     }
   }
-};
+}
 
 ko.components.register('input-level', {
   template: `\
@@ -47,5 +44,5 @@ ko.components.register('input-level', {
      <li class="input-level-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
     </ul>\
   `,
-  viewModel: z.components.InputLevel,
+  viewModel: InputLevel,
 });

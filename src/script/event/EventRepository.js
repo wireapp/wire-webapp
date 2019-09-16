@@ -35,6 +35,9 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {BackendClientError} from '../error/BackendClientError';
+import {EventSource} from './EventSource';
+import {EventValidation} from './EventValidation';
+import {validateEvent} from './EventValidator';
 
 export class EventRepository {
   static get CONFIG() {
@@ -56,12 +59,13 @@ export class EventRepository {
     };
   }
 
+  // TODO: Will be replaced with "EventSource"
   static get SOURCE() {
     return {
-      BACKEND_RESPONSE: 'backend_response',
-      INJECTED: 'injected',
-      STREAM: 'Notification Stream',
-      WEB_SOCKET: 'WebSocket',
+      BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
+      INJECTED: EventSource.INJECTED,
+      STREAM: EventSource.STREAM,
+      WEB_SOCKET: EventSource.WEB_SOCKET,
     };
   }
 
@@ -130,7 +134,7 @@ export class EventRepository {
 
         return this._handleNotification(notification)
           .catch(error => {
-            const errorMessage = `We failed to handle a notification but will continue with queue: ${error.message}`;
+            const errorMessage = `We failed to handle notification ID '${notification.id}' but will continue to process queued notifications. Error: ${error.message}`;
             this.logger.warn(errorMessage, error);
           })
           .then(() => {
@@ -250,7 +254,7 @@ export class EventRepository {
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
   getNotifications(notificationId, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const _gotNotifications = ({has_more: hasAdditionalNotifications, notifications, time}) => {
         if (time) {
           this.serverTimeHandler.computeTimeOffset(time);
@@ -280,32 +284,37 @@ export class EventRepository {
         return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
-      return this.notificationService
-        .getNotifications(this.currentClient().id, notificationId, limit)
-        .then(_gotNotifications)
-        .catch(errorResponse => {
-          // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
-          // we will get a 404 AND notifications
-          if (errorResponse.notifications) {
-            this._missedEventsFromStream();
-            return _gotNotifications(errorResponse);
-          }
+      try {
+        const notificationList = await this.notificationService.getNotifications(
+          this.currentClient().id,
+          notificationId,
+          limit,
+        );
+        await _gotNotifications(notificationList);
+      } catch (errorResponse) {
+        // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
+        // we will receive a HTTP 404 status code with a `notifications` payload
+        // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
+        if (errorResponse.notifications) {
+          await this._triggerMissedSystemEventMessageRendering();
+          return _gotNotifications(errorResponse);
+        }
 
-          const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
-          if (isNotFound) {
-            this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
-            return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
-          }
+        const isNotFound = errorResponse.code === BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (isNotFound) {
+          this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
+          return reject(new z.error.EventError(z.error.EventError.TYPE.NO_NOTIFICATIONS));
+        }
 
-          this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
-          return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
-        });
+        this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
+        return reject(new z.error.EventError(z.error.EventError.TYPE.REQUEST_FAILURE));
+      }
     });
   }
 
   /**
    * Get the last notification.
-   * @returns {Promise} Resolves with the last handled notification ID
+   * @returns {Promise<string>} Resolves with the last handled notification ID
    */
   getStreamState() {
     return this.notificationService
@@ -318,7 +327,7 @@ export class EventRepository {
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
         return this.setStreamState(this.currentClient().id).then(() => {
-          this._missedEventsFromStream();
+          this._triggerMissedSystemEventMessageRendering();
           return this.lastNotificationId();
         });
       })
@@ -440,10 +449,10 @@ export class EventRepository {
       : this.lastNotificationId();
   }
 
-  _missedEventsFromStream() {
+  _triggerMissedSystemEventMessageRendering() {
     this.notificationService.getMissedIdFromDb().then(notificationId => {
-      const lastNotificationIdEqualsMissedId = this.lastNotificationId() === notificationId;
-      if (!lastNotificationIdEqualsMissedId) {
+      const shouldUpdatePersistedId = this.lastNotificationId() !== notificationId;
+      if (shouldUpdatePersistedId) {
         amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
         this.notificationService.saveMissedIdToDb(this.lastNotificationId());
       }
@@ -593,21 +602,28 @@ export class EventRepository {
    * Handle a single event from the notification stream or WebSocket.
    *
    * @private
-   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {JSON} event - Event coming from backend
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or the plain event if the event was skipped
    */
   _handleEvent(event, source) {
-    return this._handleEventValidation(event, source)
-      .then(validatedEvent => this.processEvent(validatedEvent, source))
-      .catch(error => {
-        const isIgnoredError = EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type);
-        if (!isIgnoredError) {
-          throw error;
-        }
-
-        return event;
-      });
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    const validationResult = validateEvent(event, source, this.lastEventDate());
+    switch (validationResult) {
+      default: {
+        return Promise.resolve(event);
+      }
+      case EventValidation.IGNORED_TYPE: {
+        this.logger.info(`Ignored event type '${event.type}'`, logObject);
+        return Promise.resolve(event);
+      }
+      case EventValidation.OUTDATED_TIMESTAMP: {
+        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
+        return Promise.resolve(event);
+      }
+      case EventValidation.VALID:
+        return this.processEvent(event, source);
+    }
   }
 
   /**
@@ -615,7 +631,7 @@ export class EventRepository {
    *
    * @param {JSON} event - Backend event extracted from notification stream
    * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
+   * @returns {Promise} Resolves with the saved record or `true` if the event was skipped
    */
   processEvent(event, source) {
     const isEncryptedEvent = event.type === BackendEvent.CONVERSATION.OTR_MESSAGE_ADD;
@@ -854,42 +870,6 @@ export class EventRepository {
   }
 
   /**
-   * Handle an event by validating it.
-   *
-   * @private
-   * @param {JSON} event - Backend event extracted from notification stream
-   * @param {EventRepository.SOURCE} source - Source of event
-   * @returns {Promise} Resolves with the event
-   */
-  _handleEventValidation(event, source) {
-    return Promise.resolve().then(() => {
-      const {time: eventDate, type: eventType} = event;
-
-      const isIgnoredEvent = EventTypeHandling.IGNORE.includes(eventType);
-      if (isIgnoredEvent) {
-        this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-        const errorMessage = 'Event ignored: Type ignored';
-        throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-      }
-
-      const eventFromStream = source === EventRepository.SOURCE.STREAM;
-      const shouldCheckEventDate = eventFromStream && eventDate;
-      if (shouldCheckEventDate) {
-        const outdatedEvent = this.lastEventDate() >= new Date(eventDate).toISOString();
-
-        if (outdatedEvent) {
-          const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-          this.logger.info(`Event from stream skipped as outdated: '${eventType}'`, logObject);
-          const errorMessage = 'Event validation failed: Outdated timestamp';
-          throw new z.error.EventError(z.error.EventError.TYPE.VALIDATION_FAILED, errorMessage);
-        }
-      }
-
-      return event;
-    });
-  }
-
-  /**
    * Handle all events from the payload of an incoming notification.
    *
    * @private
@@ -921,7 +901,7 @@ export class EventRepository {
    *
    * @private
    * @param {Object} event - Event to validate
-   * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
+   * @returns {true} Returns `true` if event is handled within it's lifetime, otherwise throws error
    */
   _validateCallEventLifetime(event) {
     const {content = {}, conversation: conversationId, time, type} = event;

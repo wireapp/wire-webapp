@@ -17,6 +17,8 @@
  *
  */
 
+import {debounce} from 'underscore';
+
 import {getLogger} from 'Util/Logger';
 import {alias} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
@@ -48,9 +50,6 @@ class StartUIViewModel {
   }
 
   /**
-   * View model for the start UI.
-   * @class z.viewModel.list.StartUIViewModel
-   *
    * @param {MainViewModel} mainViewModel - Main view model
    * @param {z.viewModel.ListViewModel} listViewModel - List view model
    * @param {Object} repositories - Object containing all repositories
@@ -98,7 +97,7 @@ class StartUIViewModel {
 
     this.submittedSearch = false;
 
-    this.search = _.debounce(query => {
+    this.search = debounce(query => {
       this._clearSearchResults();
       if (this.peopleTabActive()) {
         return this._searchPeople(query);

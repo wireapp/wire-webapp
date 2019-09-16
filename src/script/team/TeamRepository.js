@@ -51,6 +51,7 @@ export class TeamRepository {
     this.team = ko.observable();
 
     this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
+    this.isTeamDeleted = ko.observable(false);
 
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
     this.memberRoles = ko.observable({});
@@ -145,9 +146,8 @@ export class TeamRepository {
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
-      case BackendEvent.TEAM.CONVERSATION_CREATE:
       case BackendEvent.TEAM.CONVERSATION_DELETE: {
-        this._onUnhandled(eventJson);
+        this._onDeleteConversation(eventJson);
         break;
       }
       case BackendEvent.TEAM.DELETE: {
@@ -170,6 +170,7 @@ export class TeamRepository {
         this._onUpdate(eventJson);
         break;
       }
+      case BackendEvent.TEAM.CONVERSATION_CREATE:
       default: {
         this._onUnhandled(eventJson);
       }
@@ -251,10 +252,15 @@ export class TeamRepository {
 
   _onDelete({team: teamId}) {
     if (this.isTeam() && this.team().id === teamId) {
+      this.isTeamDeleted(true);
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
+  }
+
+  _onDeleteConversation({data: {conv: conversationId}}) {
+    amplify.publish(WebAppEvents.CONVERSATION.DELETE, conversationId);
   }
 
   _onMemberJoin(eventJson) {

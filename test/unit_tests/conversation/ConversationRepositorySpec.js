@@ -1244,6 +1244,47 @@ describe('ConversationRepository', () => {
     });
   });
 
+  describe('find_conversation_by_id', () => {
+    let conversationRepository;
+    const conversationIds = ['40b05b5f-d906-4276-902c-3fa16af3b2bd', '3dd5a837-a7a5-40c6-b6c9-b1ab155e1e55'];
+    beforeEach(() => {
+      conversationRepository = TestFactory.conversation_repository;
+
+      const conversationEntities = conversationIds.map(id => new Conversation(id));
+      conversationRepository.conversations(conversationEntities);
+    });
+
+    afterEach(() => {
+      conversationRepository.conversations([]);
+    });
+
+    it('does not return any conversation if team is marked for deletion', () => {
+      spyOn(conversationRepository.team_repository, 'isTeamDeleted').and.returnValue(false);
+      conversationIds.forEach(conversationId => {
+        expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
+      });
+
+      conversationRepository.team_repository.isTeamDeleted.and.returnValue(true);
+      conversationIds.forEach(conversationId => {
+        expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
+      });
+    });
+
+    it('returns the conversation if present in the local conversations', () => {
+      conversationIds.forEach(conversationId => {
+        expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
+      });
+
+      const inexistentConversationIds = [
+        'f573c44f-c549-4e8f-a4d5-20fdc7adc789',
+        'eece4e13-41d4-4ea8-9aa3-383a710a5137',
+      ];
+      inexistentConversationIds.forEach(conversationId => {
+        expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
+      });
+    });
+  });
+
   describe('_shouldSendAsExternal', () => {
     it('should return true for big payload', () => {
       const largeConversationEntity = _generate_conversation();
@@ -1469,4 +1510,25 @@ describe('ConversationRepository', () => {
       expect(shouldSend).toBe(!!conversationEntity.receiptMode());
     });
   });
+
+  describe('checkForDeletedConversations', () => {
+    it('removes conversations that have been deleted on the backend', async () => {
+      const existingGroup = _generate_conversation(ConversationType.GROUP);
+      const deletedGroup = _generate_conversation(ConversationType.GROUP);
+      spyOn(TestFactory.conversation_service, 'get_conversation_by_id').and.callFake(id => {
+        if (id === deletedGroup.id) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          return Promise.reject({code: 404});
+        }
+        return Promise.resolve();
+      });
+      TestFactory.conversation_repository.save_conversation(existingGroup);
+      TestFactory.conversation_repository.save_conversation(deletedGroup);
+      await TestFactory.conversation_repository.checkForDeletedConversations();
+
+      expect(TestFactory.conversation_repository.conversations().length).toBe(2);
+    });
+  });
+
+  describe('deleteConversationLocally', () => {});
 });

@@ -17,10 +17,7 @@
  *
  */
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.AccentColorPicker = class AccentColorPicker {
+class AccentColorPicker {
   constructor({user, selected}) {
     this.user = ko.unwrap(user);
 
@@ -34,7 +31,7 @@ z.components.AccentColorPicker = class AccentColorPicker {
     this.getId = id => `accent${id}`;
     this.getClass = id => `accent-color-${id}`;
   }
-};
+}
 
 // Knockout registration of the accent color picker component.
 ko.components.register('accent-color-picker', {
@@ -45,5 +42,5 @@ ko.components.register('accent-color-picker', {
       <label data-bind="attr: {for: $parent.getId(id)}, css: $parent.getClass(id)"></label>
     <!-- /ko -->
   `,
-  viewModel: z.components.AccentColorPicker,
+  viewModel: AccentColorPicker,
 });

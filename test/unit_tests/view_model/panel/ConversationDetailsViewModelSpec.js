@@ -46,10 +46,50 @@ describe('ConversationDetailsViewModel', () => {
   });
 
   describe('getConversationActions', () => {
-    it("returns the right actions depending on the conversation's type", () => {
+    it("returns the right actions depending on the conversation's type for non group creators", () => {
       const conversation = new Conversation();
       spyOn(conversation, 'firstUserEntity').and.returnValue({isConnected: () => true});
       spyOn(conversation, 'is_cleared').and.returnValue(false);
+      spyOn(conversation, 'isCreatedBySelf').and.returnValue(false);
+
+      const tests = [
+        {
+          conversationType: ConversationType.ONE2ONE,
+          expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
+          permission: {canCreateGroupConversation: () => true},
+        },
+        {
+          conversationType: ConversationType.ONE2ONE,
+          expected: ['do-archive', 'do-clear', 'do-block'],
+          permission: {canCreateGroupConversation: () => false},
+        },
+        {
+          conversationType: ConversationType.GROUP,
+          expected: ['do-archive', 'do-clear', 'do-leave'],
+          permission: {canCreateGroupConversation: () => true},
+        },
+        {
+          conversationType: ConversationType.CONNECT,
+          expected: ['do-archive', 'do-cancel-request', 'do-block'],
+          permission: {canCreateGroupConversation: () => true},
+        },
+      ];
+
+      return tests.forEach(({expected, permission, conversationType}) => {
+        conversation.type(conversationType);
+        window.z.userPermission = () => permission;
+        const items = conversationDetailsViewModel.getConversationActions(conversation);
+
+        expect(items.map(item => item.identifier)).toEqual(expected);
+      });
+    });
+
+    it("returns the right actions depending on the conversation's type for group creators", () => {
+      const conversation = new Conversation();
+      spyOn(conversation, 'firstUserEntity').and.returnValue({isConnected: () => true});
+      spyOn(conversation, 'is_cleared').and.returnValue(false);
+      spyOn(conversation, 'isCreatedBySelf').and.returnValue(true);
+      spyOn(conversationDetailsViewModel, 'isTeam').and.returnValue(true);
 
       const tests = [
         {

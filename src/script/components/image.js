@@ -19,10 +19,7 @@
 
 import {viewportObserver} from '../ui/viewportObserver';
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.Image = class Image {
+class Image {
   constructor(params, componentInfo) {
     this.asset = ko.unwrap(params.asset);
     this.assetSrc = ko.observable();
@@ -54,7 +51,7 @@ z.components.Image = class Image {
       window.URL.revokeObjectURL(this.assetSrc());
     }
   }
-};
+}
 
 ko.components.register('image-component', {
   template: `
@@ -68,7 +65,7 @@ ko.components.register('image-component', {
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
-      return new z.components.Image(params, componentInfo);
+      return new Image(params, componentInfo);
     },
   },
 });

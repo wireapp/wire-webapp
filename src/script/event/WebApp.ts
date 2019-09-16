@@ -91,6 +91,7 @@ export const WebAppEvents = {
     },
     CREATE_GROUP: 'wire.webapp.conversation.create_group',
     DEBUG: 'wire.webapp.conversation.debug',
+    DELETE: 'wire.webapp.conversation.delete',
     DETAIL_VIEW: {
       SHOW: 'wire.webapp.conversation.detail_view.show',
     },

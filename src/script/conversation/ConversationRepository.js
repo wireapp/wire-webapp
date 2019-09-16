@@ -36,6 +36,8 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
+import {flatten} from 'underscore';
+
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
@@ -99,6 +101,7 @@ import {BaseError} from '../error/BaseError';
 import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
 import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
+import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 
 // Conversation repository for all conversation interactions with the conversation service
 export class ConversationRepository {
@@ -296,6 +299,7 @@ export class ConversationRepository {
 
   _init_subscriptions() {
     amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
@@ -338,7 +342,7 @@ export class ConversationRepository {
         conversationEntity.removed_from_conversation()
       ) {
         this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-        this.delete_conversation(conversationEntity.id);
+        this.deleteConversationFromRepository(conversationEntity.id);
       }
     });
   }
@@ -418,36 +422,39 @@ export class ConversationRepository {
 
   /**
    * Get a conversation from the backend.
-   * @param {string} conversation_id - Conversation to be retrieved from the backend
+   * @param {string} conversationId - Conversation to be retrieved from the backend
    * @returns {Promise} Resolve with the conversation entity
    */
-  fetch_conversation_by_id(conversation_id) {
-    if (this.fetching_conversations.hasOwnProperty(conversation_id)) {
+  fetch_conversation_by_id(conversationId) {
+    if (this.fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
-        this.fetching_conversations[conversation_id].push({reject_fn: reject, resolve_fn: resolve});
+        this.fetching_conversations[conversationId].push({reject_fn: reject, resolve_fn: resolve});
       });
     }
 
-    this.fetching_conversations[conversation_id] = [];
+    this.fetching_conversations[conversationId] = [];
 
     return this.conversation_service
-      .get_conversation_by_id(conversation_id)
+      .get_conversation_by_id(conversationId)
       .then(response => {
         const conversationEntity = this.mapConversations(response);
 
-        this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
+        this.logger.info(`Fetched conversation '${conversationId}' from backend`);
         this.save_conversation(conversationEntity);
 
-        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
-        delete this.fetching_conversations[conversation_id];
+        this.fetching_conversations[conversationId].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
+        delete this.fetching_conversations[conversationId];
 
         return conversationEntity;
       })
-      .catch(() => {
+      .catch(({code}) => {
+        if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+          return this.deleteConversationLocally(conversationId);
+        }
         const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
 
-        this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
-        delete this.fetching_conversations[conversation_id];
+        this.fetching_conversations[conversationId].forEach(({reject_fn}) => reject_fn(error));
+        delete this.fetching_conversations[conversationId];
 
         throw error;
       });
@@ -789,7 +796,7 @@ export class ConversationRepository {
    */
   updateConversations(conversationEntities) {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
-    const userIds = _.flatten(mapOfUserIds);
+    const userIds = flatten(mapOfUserIds);
 
     return this.user_repository
       .get_users_by_id(userIds)
@@ -805,17 +812,53 @@ export class ConversationRepository {
    * @param {string} conversation_id - ID of conversation to be deleted from the repository
    * @returns {undefined} No return value
    */
-  delete_conversation(conversation_id) {
+  deleteConversationFromRepository(conversation_id) {
     this.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
+  }
+
+  deleteConversation(conversationEntity) {
+    this.conversation_service
+      .deleteConversation(this.team().id, conversationEntity.id)
+      .then(() => {
+        this.deleteConversationLocally(conversationEntity.id, true);
+      })
+      .catch(() => {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
+            title: t('modalConversationDeleteErrorHeadline'),
+          },
+        });
+      });
+  }
+
+  deleteConversationLocally(conversationId, skipNotification = false) {
+    const conversationEntity = this.find_conversation_by_id(conversationId);
+    if (!conversationEntity) {
+      return;
+    }
+    if (this.is_active_conversation(conversationEntity)) {
+      const nextConversation = this.get_next_conversation(conversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
+    }
+    if (!skipNotification) {
+      const deletionMessage = new DeleteConversationMessage(conversationEntity);
+      amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
+    }
+    this.deleteConversationFromRepository(conversationId);
+    this.conversation_service.delete_conversation_from_db(conversationId);
   }
 
   /**
    * Find a local conversation by ID.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Conversation} Conversation is locally available
+   * @returns {Conversation | undefined} Conversation is locally available
    */
   find_conversation_by_id(conversation_id) {
-    return this.conversations().find(conversation => conversation.id === conversation_id);
+    // we prevent access to local conversation if the team is deleted
+    return this.team_repository.isTeamDeleted()
+      ? undefined
+      : this.conversations().find(conversation => conversation.id === conversation_id);
   }
 
   get_all_users_in_conversation(conversation_id) {
@@ -827,10 +870,10 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the Conversation entity
+   * @returns {Promise<ConversationEntity | undefined>} Resolves with the Conversation entity or `undefined` if not found
    */
   get_conversation_by_id(conversation_id) {
-    if (!_.isString(conversation_id)) {
+    if (typeof conversation_id !== 'string') {
       return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID));
     }
     const conversationEntity = this.find_conversation_by_id(conversation_id);
@@ -987,9 +1030,8 @@ export class ConversationRepository {
    * @returns {boolean} Is the conversation active
    */
   is_active_conversation(conversationEntity) {
-    if (this.active_conversation()) {
-      return this.active_conversation().id === conversationEntity.id;
-    }
+    const activeConversation = this.active_conversation();
+    return !!activeConversation && !!conversationEntity && activeConversation.id === conversationEntity.id;
   }
 
   /**
@@ -997,7 +1039,7 @@ export class ConversationRepository {
    *
    * @param {string} conversation_id - Conversation ID
    * @param {string} message_id - Message ID
-   * @returns {Promise} Resolves with true if message is marked as read
+   * @returns {Promise} Resolves with `true` if message is marked as read
    */
   is_message_read(conversation_id, message_id) {
     if (!conversation_id || !message_id) {
@@ -1082,6 +1124,20 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  async checkForDeletedConversations() {
+    return Promise.all(
+      this.conversations().map(async conversation => {
+        try {
+          await this.conversation_service.get_conversation_by_id(conversation.id);
+        } catch ({code}) {
+          if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
+            this.deleteConversationLocally(conversation.id, true);
+          }
+        }
+      }),
+    );
   }
 
   /**
@@ -1672,7 +1728,7 @@ export class ConversationRepository {
 
     if (conversationEntity.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversationEntity.id);
-      this.delete_conversation(conversationEntity.id);
+      this.deleteConversationFromRepository(conversationEntity.id);
     }
   }
 
@@ -2439,7 +2495,7 @@ export class ConversationRepository {
           changes.time = isoDate;
 
           const timestamp = new Date(isoDate).getTime();
-          if (!_.isNaN(timestamp)) {
+          if (!isNaN(timestamp)) {
             messageEntity.timestamp(timestamp);
             conversationEntity.update_timestamp_server(timestamp, true);
             conversationEntity.update_timestamps(messageEntity);
@@ -3185,6 +3241,9 @@ export class ConversationRepository {
       case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
 
+      case BackendEvent.CONVERSATION.DELETE:
+        return this.deleteConversationLocally(eventJson.conversation);
+
       case BackendEvent.CONVERSATION.MEMBER_JOIN:
         return this._onMemberJoin(conversationEntity, eventJson);
 
@@ -3265,7 +3324,7 @@ export class ConversationRepository {
    * @private
    * @param {Object} entityObject - Object containing the conversation and the message that are targeted by the event
    * @param {EventRepository.SOURCE} eventSource - Source of event
-   * @param {boolean} previouslyArchived - true if the previous state of the conversation was archived
+   * @param {boolean} previouslyArchived - `true` if the previous state of the conversation was archived
    * @returns {Promise} Resolves when the conversation was updated
    */
   _handleConversationNotification(entityObject = {}, eventSource, previouslyArchived) {
@@ -3347,7 +3406,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Add missed events message to conversations.
+   * Add "missed events" system message to conversation.
    * @returns {undefined} No return value
    */
   on_missed_events() {
@@ -3407,7 +3466,7 @@ export class ConversationRepository {
   async _onCreate(eventJson, eventSource) {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
-    const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
     try {
       const existingConversationEntity = this.find_conversation_by_id(conversationId);
       if (existingConversationEntity) {
@@ -3438,7 +3497,7 @@ export class ConversationRepository {
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
         const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
-        const createdBySelfUser = this.selfUser().id === creatorId && !conversationEntity.removed_from_conversation();
+        const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {

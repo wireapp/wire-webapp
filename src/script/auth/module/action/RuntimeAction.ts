@@ -99,38 +99,27 @@ export class RuntimeAction {
 
       try {
         dbOpenRequest = window.indexedDB.open('test');
-        dbOpenRequest.onerror = event => {
-          if (dbOpenRequest.error) {
-            event.preventDefault();
-            return Promise.reject(new Error('Error opening IndexedDB'));
-          }
-          return undefined;
-        };
       } catch (error) {
         return Promise.reject(new Error('Error initializing IndexedDB'));
       }
 
       return new Promise((resolve, reject) => {
-        const interval = 10;
-        const maxRetry = 50;
-
-        function checkDbRequest(currentAttempt = 0): void {
-          const tooManyAttempts = currentAttempt >= maxRetry;
-          const isRequestDone = dbOpenRequest.readyState === 'done';
-
-          if (isRequestDone) {
-            const hasResult = !!dbOpenRequest.result;
-            return hasResult ? resolve() : reject(new Error('Failed to open IndexedDb'));
+        const connectionTimeout = setTimeout(
+          () => reject(new Error('Error opening IndexedDB (response timeout)')),
+          5000,
+        );
+        dbOpenRequest.onerror = event => {
+          clearTimeout(connectionTimeout);
+          if (dbOpenRequest.error) {
+            event.preventDefault();
+            return reject(new Error('Error opening IndexedDB'));
           }
-
-          if (tooManyAttempts) {
-            return reject(new Error('IndexedDb open request timed out'));
-          }
-
-          window.setTimeout(() => checkDbRequest(currentAttempt + 1), interval);
-        }
-
-        checkDbRequest();
+          return undefined;
+        };
+        dbOpenRequest.onsuccess = event => {
+          clearTimeout(connectionTimeout);
+          resolve();
+        };
       });
     }
 

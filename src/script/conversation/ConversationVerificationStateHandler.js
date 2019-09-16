@@ -130,7 +130,7 @@ export class ConversationVerificationStateHandler {
    *
    * @private
    * @param {Conversation} conversationEntity - Changed conversation entity
-   * @returns {boolean} True if state changed
+   * @returns {boolean} `true` if state changed
    */
   _checkChangeToVerified(conversationEntity) {
     if (this._willChangeToVerified(conversationEntity)) {
@@ -148,7 +148,7 @@ export class ConversationVerificationStateHandler {
    * @param {Conversation} conversationEntity - Changed conversation entity
    * @param {Array<string>} userIds - IDs of affected users
    * @param {VerificationMessageType} type - Type of degradation
-   * @returns {boolean} True if state changed
+   * @returns {boolean} `true` if state changed
    */
   _checkChangeToDegraded(conversationEntity, userIds, type) {
     const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
