@@ -272,7 +272,7 @@ export class EventRepository {
 
           this.notificationsTotal += notifications.length;
 
-          // FIXME: Juse one more call to /notifications might not be enough. Consider using "getAllNotificationsForClient" from "NotificationsService".
+          // FIXME: Just one more call to /notifications might not be enough. Consider using "getAllNotificationsForClient" from "NotificationsService".
           if (hasAdditionalNotifications) {
             return this.getNotifications(notificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.SUBSEQUENT);
           }
