@@ -80,8 +80,10 @@ export class NotificationService {
     const collectNotifications = async (lastNotificationId?: string): Promise<Notification[]> => {
       const notificationList = await this.getNotifications(clientId, lastNotificationId);
       const newNotifications = notificationList.notifications;
-      lastNotificationId = newNotifications[newNotifications.length - 1].id;
-      notifications.push(...newNotifications);
+      if (newNotifications.length > 0) {
+        lastNotificationId = newNotifications[newNotifications.length - 1].id;
+        notifications.push(...newNotifications);
+      }
       return notificationList.has_more ? collectNotifications(lastNotificationId) : notifications;
     };
 
