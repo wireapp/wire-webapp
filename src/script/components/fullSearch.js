@@ -110,7 +110,7 @@ class FullSearch {
     const markOffset = transformedText.indexOf('<mark') - 1;
     let sliceOffset = markOffset;
 
-    for (const index of [...Array(markOffset < 0 ? 0 : markOffset).keys()].reverse()) {
+    for (const index of [...Array(Math.max(markOffset, 0)).keys()].reverse()) {
       if (index < markOffset - FullSearch.CONFIG.PRE_MARKED_OFFSET) {
         break;
       }
