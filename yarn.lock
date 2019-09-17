@@ -2374,16 +2374,16 @@ babel-plugin-macros@^2.0.0:
     cosmiconfig "^5.2.0"
     resolve "^1.10.0"
 
-babel-plugin-react-intl@4.1.15:
-  version "4.1.15"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-4.1.15.tgz#323c54ef82effeb4fb71e135360d0b29cd02c0fd"
-  integrity sha512-iNry3eNkdj1Q2MmnVOfMHV7lYBpK1EHiJZH/82Z0Bh7TyDfwKioS5t1RpkL0HXDcwGlIquZ9hxDxpRLCbxLI+w==
+babel-plugin-react-intl@4.1.18:
+  version "4.1.18"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-4.1.18.tgz#44552a540139a5a3eb1f0a417272fddf6fa1e36d"
+  integrity sha512-Vg83Y8zv8DWyOsO6bmLNs94ulZzxsJ5uWKvSEc6EvrBihcnUpVRSYSiWEra0kAGxZjIYXO0a7G3/JmimQapguw==
   dependencies:
     "@babel/core" "^7.4.5"
     "@babel/helper-plugin-utils" "^7.0.0"
     "@types/babel__core" "^7.1.2"
     fs-extra "^8.0.1"
-    intl-messageformat-parser "^3.0.8"
+    intl-messageformat-parser "^3.1.1"
 
 babel-plugin-syntax-jsx@^6.18.0:
   version "6.18.0"
@@ -6320,10 +6320,10 @@ intl-messageformat-parser@1.4.0:
   resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-1.4.0.tgz#b43d45a97468cadbe44331d74bb1e8dea44fc075"
   integrity sha1-tD1FqXRoytvkQzHXS7Ho3qRPwHU=
 
-intl-messageformat-parser@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.0.8.tgz#4ec0a9e1dc7449c7222289306be96d24f4f082e5"
-  integrity sha512-tyMsm1XlYWO07pS490cH0rgj4Ger7PQRKi8PhsjGZpB0foDvuzIOJSB06VVkZtCReZquJ5bAVyL4sODqrdNEcg==
+intl-messageformat-parser@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-3.1.1.tgz#9e2800252dba23f59cce136bd85b1f4e9914c48a"
+  integrity sha512-rp28ut8Xj/R0IN3wcvJqtVTKWDNaBk9Z5R+D/mSB7rpycc1jsE3vn5ShZa//zN7NpYXF3rkl8A6mZVhWNlMUJA==
 
 intl-messageformat@^2.0.0, intl-messageformat@^2.1.0:
   version "2.2.0"
