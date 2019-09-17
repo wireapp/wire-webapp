@@ -6,7 +6,7 @@
   "devDependencies": {
     "@types/jasmine": "3.4.0",
     "@types/node": "~10",
-    "@wireapp/store-engine": "3.9.12",
+    "@wireapp/store-engine": "3.9.13",
     "jasmine": "3.4.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
@@ -32,5 +32,5 @@
     "test": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "1.4.13"
+  "version": "1.4.14"
 }

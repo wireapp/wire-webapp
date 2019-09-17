@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@0.1.9...@wireapp/store-engine-web-storage@0.1.10) (2019-09-17)
+
+**Note:** Version bump only for package @wireapp/store-engine-web-storage
+
+
+
+
+
 ## [0.1.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@0.1.8...@wireapp/store-engine-web-storage@0.1.9) (2019-09-12)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage

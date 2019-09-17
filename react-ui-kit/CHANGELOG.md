@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.20.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.19.6...@wireapp/react-ui-kit@7.20.0) (2019-09-17)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Min height for avatar component ([#2304](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2304)) ([fca2278](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fca2278))
+
+
+### Features
+
+* **react-ui-kit:** Make breakpoint configurable for Columns co… ([#2305](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2305)) ([edeb473](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/edeb473))
+
+
+
+
+
 ## [7.19.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.19.5...@wireapp/react-ui-kit@7.19.6) (2019-09-13)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
