@@ -54,7 +54,7 @@
     "@babel/plugin-proposal-class-properties": "7.5.5",
     "@babel/preset-env": "7.5.5",
     "@babel/preset-react": "7.0.0",
-    "@babel/preset-typescript": "7.3.3",
+    "@babel/preset-typescript": "7.6.0",
     "@emotion/babel-preset-css-prop": "10.0.14",
     "@hot-loader/react-dom": "16.9.0",
     "@types/crypto-js": "3.1.43",
