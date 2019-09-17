@@ -20,17 +20,24 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import {QueryKeys, media} from '../mediaQueries';
+import {filterProps} from '../util';
 import {GUTTER} from './sizes';
 
-export type ColumnsProps<T = HTMLDivElement> = React.HTMLProps<T>;
+export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+  query?: keyof QueryKeys;
+}
 
-const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined> = props => ({
+export const filterColumnsProps = (props: ColumnsProps) => {
+  return filterProps(props, ['query']);
+};
+
+const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined> = ({query = QueryKeys.MOBILE}) => ({
   display: 'flex',
   marginLeft: `-${GUTTER}px`,
-  [media[QueryKeys.MOBILE]]: {flexDirection: 'column'},
+  [media[query]]: {flexDirection: 'column'},
 });
 
-export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...props} />;
+export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {...filterColumnsProps(props)} />;
 
 export type ColumnProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
