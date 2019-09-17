@@ -64,6 +64,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => ObjectInterpolation<undefined> 
     fontWeight: isAvatarGridItem ? 700 : 300,
     height: `${size}px`,
     justifyContent: 'center',
+    minHeight: `${size}px`,
     minWidth: `${size}px`,
     width: `${size}px`,
   };
