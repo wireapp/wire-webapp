@@ -272,6 +272,7 @@ export class EventRepository {
 
           this.notificationsTotal += notifications.length;
 
+          // FIXME: Just one more call to /notifications might not be enough. Consider using "getAllNotificationsForClient" from "NotificationsService".
           if (hasAdditionalNotifications) {
             return this.getNotifications(notificationId, EventRepository.CONFIG.NOTIFICATION_BATCHES.SUBSEQUENT);
           }
@@ -290,7 +291,7 @@ export class EventRepository {
           notificationId,
           limit,
         );
-        await _gotNotifications(notificationList);
+        return _gotNotifications(notificationList);
       } catch (errorResponse) {
         // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
         // we will receive a HTTP 404 status code with a `notifications` payload
