@@ -26,8 +26,6 @@ import {ClientInfo} from './';
 import {ClientBackendRepository} from './ClientBackendRepository';
 import {ClientDatabaseRepository} from './ClientDatabaseRepository';
 
-const pkg = process.env.NODE_ENV === 'test' ? require('../../../package.json') : require('../../package.json');
-
 export interface MetaClient extends RegisteredClient {
   meta: {
     primary_key: string;
@@ -76,7 +74,7 @@ export class ClientService {
     clientInfo: ClientInfo = {
       classification: ClientClassification.DESKTOP,
       cookieLabel: 'default',
-      model: `${pkg.name} v${pkg.version}`,
+      model: '@wireapp/core',
     },
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {

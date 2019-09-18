@@ -62,7 +62,7 @@
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
     "test:project": "yarn dist && yarn test",
-    "test:node": "cross-env NODE_ENV=test nyc jasmine --config=jasmine.json"
+    "test:node": "nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
   "version": "12.17.69"
