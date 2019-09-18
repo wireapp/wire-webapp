@@ -17,22 +17,22 @@
  *
  */
 
-import { Decoder, Encoder } from 'bazinga64';
-import UUID from 'uuidjs';
-import hljs from 'highlightjs';
+import {Decoder, Encoder} from 'bazinga64';
 import CryptoJS from 'crypto-js';
+import hljs from 'highlightjs';
 import MarkdownIt from 'markdown-it';
 import 'phoneformat.js';
+import UUID from 'uuidjs';
 
-import { escapeString } from './SanitizationUtil';
-import { replaceInRange } from './StringUtil';
-import { loadValue } from './StorageUtil';
-import { Environment } from './Environment';
+import {Environment} from './Environment';
+import {escapeString} from './SanitizationUtil';
+import {loadValue} from './StorageUtil';
+import {replaceInRange} from './StringUtil';
 
-import { Config } from '../auth/config';
-import { QUERY_KEY } from '../auth/route';
+import {Config} from '../auth/config';
+import {QUERY_KEY} from '../auth/route';
 import * as URLUtil from '../auth/util/urlUtil';
-import { StorageKey } from '../storage/StorageKey';
+import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (): boolean => {
   const enableTransientTemporaryClients =
@@ -112,7 +112,7 @@ export const loadUrlBuffer = (url: string, xhrAccessorFunction?: (xhr: XMLHttpRe
     xhr.onload = () => {
       const isStatusOK = xhr.status === 200;
       return isStatusOK
-        ? resolve({ buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type') })
+        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
         : reject(new Error(xhr.status.toString(10)));
     };
 
@@ -125,11 +125,11 @@ export const loadUrlBuffer = (url: string, xhrAccessorFunction?: (xhr: XMLHttpRe
   });
 };
 
-export const loadImage = function (blob: string) {
+export const loadImage = function(blob: string) {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
-    img.onload = function (): void {
+    img.onload = function(): void {
       resolve(this);
       window.URL.revokeObjectURL(object_url);
     };
@@ -148,7 +148,7 @@ export const loadFileBuffer = (file: Blob | File) => {
 };
 
 export const loadUrlBlob = (url: string) => {
-  return loadUrlBuffer(url).then(({ buffer, mimeType }) => new Blob([new Uint8Array(buffer)], { type: mimeType }));
+  return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
 export const getFileExtension = (filename: string): string => {
@@ -196,7 +196,8 @@ export const base64ToArray = (base64: string): Uint8Array => Decoder.fromBase64(
 /**
  * Convert ArrayBuffer or UInt8Array to base64 string
  */
-export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string => Encoder.toBase64(new Uint8Array(array)).asString;
+export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string =>
+  Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
@@ -213,7 +214,7 @@ export const arrayToMd5Base64 = (array: Uint8Array): string => {
 export const base64ToBlob = (base64: string): Blob => {
   const mimeType = getContentTypeFromDataUrl(base64);
   const bytes = base64ToArray(base64);
-  return new Blob([bytes], { type: mimeType });
+  return new Blob([bytes], {type: mimeType});
 };
 
 /**
@@ -266,7 +267,8 @@ export const phoneNumberToE164 = (phoneNumber: string, countryCode: string) => {
 
 export const createRandomUuid = () => UUID.genV4().hexString;
 
-export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray) => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
+export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray) =>
+  CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
@@ -296,7 +298,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const previousWithMap = tokens
     .slice(0, idx)
     .reverse()
-    .find(({ map }) => map && map.length);
+    .find(({map}) => map && map.length);
   const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
   const count = position - previousPosition;
   return '<br>'.repeat(count);
@@ -355,7 +357,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
     }, message);
 
   markdownit.set({
-    highlight: function (code) {
+    highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -580,4 +582,4 @@ export const afterRender = callback => window.requestAnimationFrame(() => window
  * No operation
  * @returns {void}
  */
-export const noop = () => { };
+export const noop = () => {};
