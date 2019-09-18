@@ -834,9 +834,8 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
         if (!allowedFiletype) {
           const options = {
             text: {
-              // TODO: Add to translations
-              message: `The filetype of "${file.name}" is not allowed.`,
-              title: 'Restricted filetype',
+              message: t('modalAssetFileTypeRestrictionMessage', file.name),
+              title: t('modalAssetFileTypeRestrictionHeadline'),
             },
           };
 
