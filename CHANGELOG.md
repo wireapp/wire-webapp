@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.5.5...@wireapp/api-client@6.5.6) (2019-09-18)
+
+
+### Bug Fixes
+
+* **api-client:** Property key is always a string ([#2307](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2307)) ([43184a9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/43184a9))
+
+
+
+
+
 ## [6.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.5.4...@wireapp/api-client@6.5.5) (2019-09-17)
 
 **Note:** Version bump only for package @wireapp/api-client
