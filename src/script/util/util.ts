@@ -20,8 +20,9 @@
 import {Decoder, Encoder} from 'bazinga64';
 import CryptoJS from 'crypto-js';
 import hljs from 'highlightjs';
+import {ObservableArray} from 'knockout';
 import MarkdownIt from 'markdown-it';
-import 'phoneformat.js';
+import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
 
 import {Environment} from './Environment';
@@ -32,6 +33,8 @@ import {replaceInRange} from './StringUtil';
 import {Config} from '../auth/config';
 import {QUERY_KEY} from '../auth/route';
 import * as URLUtil from '../auth/util/urlUtil';
+import {Conversation} from '../entity/Conversation';
+import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (): boolean => {
@@ -103,7 +106,10 @@ export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   });
 };
 
-export const loadUrlBuffer = (url: string, xhrAccessorFunction?: (xhr: XMLHttpRequest) => void) => {
+export const loadUrlBuffer = (
+  url: string,
+  xhrAccessorFunction?: (xhr: XMLHttpRequest) => void,
+): Promise<{buffer: ArrayBuffer; mimeType: string}> => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -125,7 +131,7 @@ export const loadUrlBuffer = (url: string, xhrAccessorFunction?: (xhr: XMLHttpRe
   });
 };
 
-export const loadImage = function(blob: string) {
+export const loadImage = function(blob: Blob): Promise<GlobalEventHandlers> {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
@@ -138,7 +144,7 @@ export const loadImage = function(blob: string) {
   });
 };
 
-export const loadFileBuffer = (file: Blob | File) => {
+export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -225,7 +231,7 @@ export const base64ToBlob = (base64: string): Blob => {
  * @returns {number} Timeout identifier
  */
 
-export const downloadBlob = (blob: Blob, filename: string, mimeType: string): number => {
+export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
   if (blob) {
     const url = window.URL.createObjectURL(blob);
     return downloadFile(url, filename, mimeType);
@@ -234,7 +240,7 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType: string): nu
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-export const downloadFile = (url: string, fileName: string, mimeType: string) => {
+export const downloadFile = (url: string, fileName: string, mimeType?: string) => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
@@ -256,18 +262,13 @@ export const downloadFile = (url: string, fileName: string, mimeType: string) =>
   }, 100);
 };
 
-/**
- * @param {string} phoneNumber - The phone number
- * @param {string} countryCode - The country code
- * @returns {string} The formatted phone number
- */
-export const phoneNumberToE164 = (phoneNumber: string, countryCode: string) => {
-  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
+export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): string => {
+  return formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
 export const createRandomUuid = () => UUID.genV4().hexString;
 
-export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray) =>
+export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray): string =>
   CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
 // Note IE10 listens to "transitionend" instead of "animationend"
@@ -288,7 +289,7 @@ const originalFenceRule = markdownit.renderer.rules.fence;
 markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
   const highlighted = originalFenceRule(tokens, idx, options, env, self);
   tokens[idx].map[1] += 1;
-  return highlighted.replace(/\n$/, '');
+  return ((highlighted as unknown) as string).replace(/\n$/, '');
 };
 
 markdownit.renderer.rules.softbreak = () => '<br>';
@@ -306,7 +307,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 markdownit.renderer.rules.paragraph_close = () => '';
 
 // https://github.com/markdown-it/markdown-it/issues/458#issuecomment-401221267
-function fixMarkdownLinks(markdown) {
+function fixMarkdownLinks(markdown: string): string {
   const matches = markdownit.linkify.match(markdown);
   if (!matches || matches.length === 0) {
     return markdown;
@@ -327,9 +328,14 @@ function fixMarkdownLinks(markdown) {
   return result.join('');
 }
 
-export const renderMessage = (message, selfId, mentionEntities = []) => {
-  const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
-  const renderMention = mentionData => {
+export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
+  interface MentionText {
+    text: string;
+    userId: string;
+    isSelfMentioned: boolean;
+  }
+  const createMentionHash = (mention: MentionEntity) => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
       ? ' data-uie-name="label-self-mention"'
@@ -339,7 +345,8 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
     const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
-  const mentionTexts = {};
+
+  const mentionTexts: Record<string, MentionText> = {};
 
   let mentionlessText = mentionEntities
     .slice()
@@ -357,7 +364,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
     }, message);
 
   markdownit.set({
-    highlight: function(code) {
+    highlight: function(code): boolean | string {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -372,7 +379,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
   });
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = hashedString =>
+    const cleanString = (hashedString: string) =>
       escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
@@ -434,7 +441,7 @@ export const renderMessage = (message, selfId, mentionEntities = []) => {
   return parsedText;
 };
 
-export const koArrayPushAll = (koArray, valuesToPush) => {
+export const koArrayPushAll = (koArray: ObservableArray, valuesToPush: any[]) => {
   // append array to knockout observableArray
   // https://github.com/knockout/knockout/issues/416
   const underlyingArray = koArray();
@@ -443,7 +450,7 @@ export const koArrayPushAll = (koArray, valuesToPush) => {
   koArray.valueHasMutated();
 };
 
-export const koArrayUnshiftAll = (koArray, valuesToShift) => {
+export const koArrayUnshiftAll = (koArray: ObservableArray, valuesToShift: any[]) => {
   // prepend array to knockout observableArray
   const underlyingArray = koArray();
   koArray.valueWillMutate();
@@ -451,9 +458,9 @@ export const koArrayUnshiftAll = (koArray, valuesToShift) => {
   koArray.valueHasMutated();
 };
 
-export const koPushDeferred = (target, src, number = 100, delay = 300) => {
+export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
   // push array deferred to knockout observableArray
-  let interval;
+  let interval: number;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
@@ -467,18 +474,16 @@ export const koPushDeferred = (target, src, number = 100, delay = 300) => {
 
 /**
  * Add zero padding until limit is reached.
- * @param {string|number} value - Input
- * @param {number} length - Final output length
- * @returns {string} Input value with leading zeros (padding)
  */
-export const zeroPadding = (value, length = 2) => {
+export const zeroPadding = (value: string | number, length = 2): string => {
   const zerosNeeded = Math.max(0, length - value.toString().length);
   return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
-export const sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
+export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
+  groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
-export const sortObjectByKeys = (object, reverse) => {
+export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) => {
   const keys = Object.keys(object);
   keys.sort();
 
@@ -487,16 +492,16 @@ export const sortObjectByKeys = (object, reverse) => {
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce((sortedObject, key) => {
+  return keys.reduce((sortedObject: Record<string, any>, key: string) => {
     sortedObject[key] = object[key];
     return sortedObject;
   }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
-export const stripUrlWrapper = url => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-export const validateProfileImageResolution = (file, minWidth, minHeight) => {
+export const validateProfileImageResolution = (file: any, minWidth: number, minHeight: number): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
@@ -505,7 +510,7 @@ export const validateProfileImageResolution = (file, minWidth, minHeight) => {
   });
 };
 
-export const murmurhash3 = (key, seed) => {
+export const murmurhash3 = (key: string, seed: number): number => {
   const remainder = key.length & 3; // key.length % 4
   const bytes = key.length - remainder;
   let h1 = seed;
@@ -563,7 +568,7 @@ export const murmurhash3 = (key, seed) => {
   return h1 >>> 0;
 };
 
-export const printDevicesId = id => {
+export const printDevicesId = (id: string): string => {
   if (!id) {
     return '';
   }
@@ -576,10 +581,11 @@ export const printDevicesId = id => {
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-export const afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
+export const afterRender = (callback: TimerHandler): number =>
+  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 
 /**
  * No operation
  * @returns {void}
  */
-export const noop = () => {};
+export const noop = (): void => {};
