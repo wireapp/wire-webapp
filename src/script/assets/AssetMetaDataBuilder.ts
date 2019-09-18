@@ -56,7 +56,7 @@ const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData
     .then(buffer => {
       const audioContext = new AudioContext();
       audioContext.close();
-      return audioContext.decodeAudioData(buffer);
+      return audioContext.decodeAudioData(buffer as ArrayBuffer);
     })
     .then(audioBuffer => {
       const durationInMillis = audioBuffer.duration * TIME_IN_MILLIS.SECOND;
