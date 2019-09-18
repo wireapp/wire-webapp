@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.17.70](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.69...@wireapp/core@12.17.70) (2019-09-18)
+
+
+### Bug Fixes
+
+* **core:** Remove core version from client registration ([#2308](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2308)) ([18131d6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/18131d6))
+
+
+
+
+
 ## [12.17.69](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.68...@wireapp/core@12.17.69) (2019-09-18)
 
 **Note:** Version bump only for package @wireapp/core
