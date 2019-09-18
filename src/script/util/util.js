@@ -18,26 +18,23 @@
  */
 
 import {Decoder, Encoder} from 'bazinga64';
-import CryptoJS from 'crypto-js';
-import hljs from 'highlightjs';
-import {ObservableArray} from 'knockout';
-import MarkdownIt from 'markdown-it';
-import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
+import hljs from 'highlightjs';
+import CryptoJS from 'crypto-js';
+import MarkdownIt from 'markdown-it';
+import 'phoneformat.js';
 
-import {Environment} from './Environment';
 import {escapeString} from './SanitizationUtil';
-import {loadValue} from './StorageUtil';
 import {replaceInRange} from './StringUtil';
+import {loadValue} from './StorageUtil';
+import {Environment} from './Environment';
 
 import {Config} from '../auth/config';
-import {QUERY_KEY} from '../auth/route';
-import * as URLUtil from '../auth/util/urlUtil';
-import {Conversation} from '../entity/Conversation';
-import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';
+import * as URLUtil from '../auth/util/urlUtil';
+import {QUERY_KEY} from '../auth/route';
 
-export const isTemporaryClientAndNonPersistent = (): boolean => {
+export const isTemporaryClientAndNonPersistent = () => {
   const enableTransientTemporaryClients =
     URLUtil.getURLParameter(QUERY_KEY.PERSIST_TEMPORARY_CLIENTS) === 'false' ||
     (Config.FEATURE && Config.FEATURE.PERSIST_TEMPORARY_CLIENTS === false);
@@ -57,7 +54,7 @@ export const checkIndexedDb = () => {
   }
 
   if (Environment.browser.firefox) {
-    let dbOpenRequest: IDBOpenDBRequest;
+    let dbOpenRequest;
 
     try {
       dbOpenRequest = window.indexedDB.open('test');
@@ -66,7 +63,6 @@ export const checkIndexedDb = () => {
           event.preventDefault();
           return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
         }
-        return undefined;
       };
     } catch (error) {
       return Promise.reject(new z.error.AuthError(z.error.AuthError.TYPE.PRIVATE_MODE));
@@ -97,7 +93,7 @@ export const checkIndexedDb = () => {
   return Promise.resolve();
 };
 
-export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
+export const loadDataUrl = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -106,10 +102,7 @@ export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   });
 };
 
-export const loadUrlBuffer = (
-  url: string,
-  xhrAccessorFunction?: (xhr: XMLHttpRequest) => void,
-): Promise<{buffer: ArrayBuffer; mimeType: string}> => {
+export const loadUrlBuffer = (url, xhrAccessorFunction) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -119,7 +112,7 @@ export const loadUrlBuffer = (
       const isStatusOK = xhr.status === 200;
       return isStatusOK
         ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
-        : reject(new Error(xhr.status.toString(10)));
+        : reject(new Error(xhr.status));
     };
 
     xhr.onerror = reject;
@@ -131,11 +124,11 @@ export const loadUrlBuffer = (
   });
 };
 
-export const loadImage = function(blob: Blob): Promise<GlobalEventHandlers> {
+export const loadImage = function(blob) {
   return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
-    img.onload = function(): void {
+    img.onload = function() {
       resolve(this);
       window.URL.revokeObjectURL(object_url);
     };
@@ -144,7 +137,7 @@ export const loadImage = function(blob: Blob): Promise<GlobalEventHandlers> {
   });
 };
 
-export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer> => {
+export const loadFileBuffer = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -153,17 +146,33 @@ export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer>
   });
 };
 
-export const loadUrlBlob = (url: string) => {
+export const loadUrlBlob = url => {
   return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
-export const getFileExtension = (filename: string): string => {
-  const extensionMatch = filename.match(/\.(tar\.gz|[^.]*)$/i);
-  const foundExtension = extensionMatch && extensionMatch[1];
-  return foundExtension || '';
+/**
+ * Get extension of a filename.
+ * @param {string} filename - filename including extension
+ * @returns {string} File extension
+ */
+export const getFileExtension = filename => {
+  if (typeof filename !== 'string' || !filename.includes('.')) {
+    return '';
+  }
+
+  if (filename.endsWith('.tar.gz')) {
+    return 'tar.gz';
+  }
+
+  return filename.substr(filename.lastIndexOf('.') + 1);
 };
 
-export const trimFileExtension = (filename: string): string => {
+/**
+ * Remove extension of a filename.
+ * @param {string} filename - filename including extension
+ * @returns {string} New String without extension
+ */
+export const trimFileExtension = filename => {
   if (typeof filename === 'string') {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
@@ -175,7 +184,13 @@ export const trimFileExtension = (filename: string): string => {
   return '';
 };
 
-export const formatBytes = (bytes: number, decimals: number): string => {
+/**
+ * Format bytes into a human readable string.
+ * @param {number} bytes - bytes to format
+ * @param {number} [decimals] - Number of decimals to keep
+ * @returns {string} Bytes as a human readable string
+ */
+export const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
     return '0B';
   }
@@ -187,37 +202,47 @@ export const formatBytes = (bytes: number, decimals: number): string => {
   return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
 };
 
-export const getContentTypeFromDataUrl = (dataUrl: string): string => {
-  return dataUrl.match(/^.*:(.*);.*,/)[1];
+export const getContentTypeFromDataUrl = data_url => {
+  return data_url
+    .split(',')[0]
+    .split(':')[1]
+    .split(';')[0];
 };
 
-export const stripDataUri = (string: string): string => string.replace(/^data:.*,/, '');
+export const stripDataUri = string => string.replace(/^data:.*,/, '');
 
 /**
  * Convert base64 string to UInt8Array.
  * @note Function will remove "data-uri" attribute if present.
+ * @param {string} base64 - base64 encoded string
+ * @returns {UInt8Array} Typed array
  */
-export const base64ToArray = (base64: string): Uint8Array => Decoder.fromBase64(stripDataUri(base64)).asBytes;
+export const base64ToArray = base64 => Decoder.fromBase64(stripDataUri(base64)).asBytes;
 
 /**
  * Convert ArrayBuffer or UInt8Array to base64 string
+ * @param {ArrayBuffer|UInt8Array} array - raw binary data or bytes
+ * @returns {string} Base64-encoded string
  */
-export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string =>
-  Encoder.toBase64(new Uint8Array(array)).asString;
+export const arrayToBase64 = array => Encoder.toBase64(new Uint8Array(array)).asString;
 
 /**
  * Returns base64 encoded md5 of the the given array.
+ * @param {Uint8Array} array - Input array
+ * @returns {string} MD5 hash
  */
-export const arrayToMd5Base64 = (array: Uint8Array): string => {
+export const arrayToMd5Base64 = array => {
   const wordArray = CryptoJS.lib.WordArray.create(array);
   return CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Base64);
 };
 
 /**
  * Convert base64 dataURI to Blob
+ * @param {string} base64 - base64 encoded data uri
+ * @returns {Blob} Binary output
  */
 
-export const base64ToBlob = (base64: string): Blob => {
+export const base64ToBlob = base64 => {
   const mimeType = getContentTypeFromDataUrl(base64);
   const bytes = base64ToArray(base64);
   return new Blob([bytes], {type: mimeType});
@@ -231,7 +256,7 @@ export const base64ToBlob = (base64: string): Blob => {
  * @returns {number} Timeout identifier
  */
 
-export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
+export const downloadBlob = (blob, filename, mimeType) => {
   if (blob) {
     const url = window.URL.createObjectURL(blob);
     return downloadFile(url, filename, mimeType);
@@ -240,11 +265,11 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): n
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-export const downloadFile = (url: string, fileName: string, mimeType?: string) => {
+export const downloadFile = (url, fileName, mimeType) => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
-  anchor.style.display = 'none';
+  anchor.style = 'display: none';
   if (mimeType) {
     anchor.type = mimeType;
   }
@@ -262,14 +287,18 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string) =
   }, 100);
 };
 
-export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): string => {
-  return formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
+/**
+ * @param {string} phoneNumber - The phone number
+ * @param {string} countryCode - The country code
+ * @returns {string} The formatted phone number
+ */
+export const phoneNumberToE164 = (phoneNumber, countryCode) => {
+  return window.PhoneFormat.formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
 export const createRandomUuid = () => UUID.genV4().hexString;
 
-export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray): string =>
-  CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
+export const encodeSha256Base64 = text => CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
@@ -289,8 +318,7 @@ const originalFenceRule = markdownit.renderer.rules.fence;
 markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
   const highlighted = originalFenceRule(tokens, idx, options, env, self);
   tokens[idx].map[1] += 1;
-  // TODO: remove this casting as soon as https://github.com/DefinitelyTyped/DefinitelyTyped/pull/38461 is merged
-  return ((highlighted as unknown) as string).replace(/\n$/, '');
+  return highlighted.replace(/\n$/, '');
 };
 
 markdownit.renderer.rules.softbreak = () => '<br>';
@@ -308,7 +336,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 markdownit.renderer.rules.paragraph_close = () => '';
 
 // https://github.com/markdown-it/markdown-it/issues/458#issuecomment-401221267
-function fixMarkdownLinks(markdown: string): string {
+function fixMarkdownLinks(markdown) {
   const matches = markdownit.linkify.match(markdown);
   if (!matches || matches.length === 0) {
     return markdown;
@@ -329,14 +357,9 @@ function fixMarkdownLinks(markdown: string): string {
   return result.join('');
 }
 
-export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
-  interface MentionText {
-    text: string;
-    userId: string;
-    isSelfMentioned: boolean;
-  }
-  const createMentionHash = (mention: MentionEntity) => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
-  const renderMention = (mentionData: MentionText) => {
+export const renderMessage = (message, selfId, mentionEntities = []) => {
+  const createMentionHash = mention => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const renderMention = mentionData => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
       ? ' data-uie-name="label-self-mention"'
@@ -346,8 +369,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
     return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
   };
-
-  const mentionTexts: Record<string, MentionText> = {};
+  const mentionTexts = {};
 
   let mentionlessText = mentionEntities
     .slice()
@@ -365,7 +387,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
     }, message);
 
   markdownit.set({
-    highlight: function(code): boolean | string {
+    highlight: function(code) {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -380,7 +402,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
   });
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = (hashedString: string) =>
+    const cleanString = hashedString =>
       escapeString(
         Object.entries(mentionTexts).reduce(
           (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
@@ -442,7 +464,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
   return parsedText;
 };
 
-export const koArrayPushAll = (koArray: ObservableArray, valuesToPush: any[]) => {
+export const koArrayPushAll = (koArray, valuesToPush) => {
   // append array to knockout observableArray
   // https://github.com/knockout/knockout/issues/416
   const underlyingArray = koArray();
@@ -451,7 +473,7 @@ export const koArrayPushAll = (koArray: ObservableArray, valuesToPush: any[]) =>
   koArray.valueHasMutated();
 };
 
-export const koArrayUnshiftAll = (koArray: ObservableArray, valuesToShift: any[]) => {
+export const koArrayUnshiftAll = (koArray, valuesToShift) => {
   // prepend array to knockout observableArray
   const underlyingArray = koArray();
   koArray.valueWillMutate();
@@ -459,9 +481,9 @@ export const koArrayUnshiftAll = (koArray: ObservableArray, valuesToShift: any[]
   koArray.valueHasMutated();
 };
 
-export const koPushDeferred = (target: ObservableArray, src: any[], number = 100, delay = 300) => {
+export const koPushDeferred = (target, src, number = 100, delay = 300) => {
   // push array deferred to knockout observableArray
-  let interval: number;
+  let interval;
 
   return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
@@ -475,16 +497,18 @@ export const koPushDeferred = (target: ObservableArray, src: any[], number = 100
 
 /**
  * Add zero padding until limit is reached.
+ * @param {string|number} value - Input
+ * @param {number} length - Final output length
+ * @returns {string} Input value with leading zeros (padding)
  */
-export const zeroPadding = (value: string | number, length = 2): string => {
+export const zeroPadding = (value, length = 2) => {
   const zerosNeeded = Math.max(0, length - value.toString().length);
   return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
-export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
-  groupB.last_event_timestamp() - groupA.last_event_timestamp();
+export const sortGroupsByLastEvent = (groupA, groupB) => groupB.last_event_timestamp() - groupA.last_event_timestamp();
 
-export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) => {
+export const sortObjectByKeys = (object, reverse) => {
   const keys = Object.keys(object);
   keys.sort();
 
@@ -493,16 +517,16 @@ export const sortObjectByKeys = (object: Record<string, any>, reverse: boolean) 
   }
 
   // Returns a copy of an object, which is ordered by the keys of the original object.
-  return keys.reduce((sortedObject: Record<string, any>, key: string) => {
+  return keys.reduce((sortedObject, key) => {
     sortedObject[key] = object[key];
     return sortedObject;
   }, {});
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
-export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+export const stripUrlWrapper = url => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 
-export const validateProfileImageResolution = (file: any, minWidth: number, minHeight: number): Promise<boolean> => {
+export const validateProfileImageResolution = (file, minWidth, minHeight) => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
@@ -511,7 +535,7 @@ export const validateProfileImageResolution = (file: any, minWidth: number, minH
   });
 };
 
-export const murmurhash3 = (key: string, seed: number): number => {
+export const murmurhash3 = (key, seed) => {
   const remainder = key.length & 3; // key.length % 4
   const bytes = key.length - remainder;
   let h1 = seed;
@@ -569,7 +593,7 @@ export const murmurhash3 = (key: string, seed: number): number => {
   return h1 >>> 0;
 };
 
-export const printDevicesId = (id: string): string => {
+export const printDevicesId = id => {
   if (!id) {
     return '';
   }
@@ -582,11 +606,10 @@ export const printDevicesId = (id: string): string => {
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-export const afterRender = (callback: TimerHandler): number =>
-  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
+export const afterRender = callback => window.requestAnimationFrame(() => window.setTimeout(callback, 0));
 
 /**
  * No operation
  * @returns {void}
  */
-export const noop = (): void => {};
+export const noop = () => {};

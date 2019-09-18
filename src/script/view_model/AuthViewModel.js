@@ -18,9 +18,9 @@
  */
 
 import Cookies from 'js-cookie';
-import {formatNumberForMobileDialing} from 'phoneformat.js';
 import moment from 'moment';
 import {ValidationUtil} from '@wireapp/commons';
+import 'phoneformat.js';
 
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -212,7 +212,8 @@ class AuthViewModel {
 
     this.posted_text = ko.pureComputed(() => t('authPostedResend', this.username()));
     this.verify_code_text = ko.pureComputed(() => {
-      const phone_number = formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
+      const phone_number =
+        PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
       return t('authVerifyCodeDescription', phone_number);
     });
 
