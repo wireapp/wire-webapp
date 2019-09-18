@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "2.2.12",
+    "@wireapp/commons": "2.2.13",
     "dotenv": "8.1.0",
     "dotenv-extended": "2.4.0",
     "express": "4.17.1",
@@ -32,12 +32,12 @@
     "jasmine": "3.4.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
-    "ts-node": "8.3.0",
-    "tslint": "5.19.0",
+    "ts-node": "8.4.1",
+    "tslint": "5.20.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-eslint-rules": "5.4.0",
     "tslint-plugin-prettier": "2.0.1",
-    "typescript": "3.6.2"
+    "typescript": "3.6.3"
   },
   "scripts": {
     "build": "yarn clean && tsc -P tsconfig.json && node ./bin/copy_server_assets.js && node ./bin/create_commit_sha_file.js",

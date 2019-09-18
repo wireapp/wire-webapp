@@ -42,7 +42,7 @@ export class SearchRepository {
    * @returns {string} Normalized search query
    */
   static normalizeQuery(query) {
-    if (!_.isString(query)) {
+    if (typeof query !== 'string') {
       return '';
     }
     return query

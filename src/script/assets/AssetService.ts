@@ -98,7 +98,7 @@ export class AssetService {
   }
 
   uploadAsset(file: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
-    return loadFileBuffer(file).then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction));
+    return loadFileBuffer(file).then(buffer => this._uploadAsset(buffer as ArrayBuffer, options, xhrAccessorFunction));
   }
 
   uploadImageAsset(image: Blob | File, options: AssetUploadOptions, xhrAccessorFunction: Function): Promise<Asset> {
@@ -223,7 +223,7 @@ export class AssetService {
     return loadFileBuffer(image)
       .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
-          return new Uint8Array(buffer);
+          return new Uint8Array(buffer as ArrayBuffer);
         }
         return new WebWorker(pathToWorkerFile).post(buffer);
       })

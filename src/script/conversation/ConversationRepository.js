@@ -36,6 +36,8 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
+import {flatten} from 'underscore';
+
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
@@ -794,7 +796,7 @@ export class ConversationRepository {
    */
   updateConversations(conversationEntities) {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
-    const userIds = _.flatten(mapOfUserIds);
+    const userIds = flatten(mapOfUserIds);
 
     return this.user_repository
       .get_users_by_id(userIds)
@@ -868,10 +870,10 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    * @param {string} conversation_id - ID of conversation to get
-   * @returns {Promise} Resolves with the Conversation entity
+   * @returns {Promise<ConversationEntity | undefined>} Resolves with the Conversation entity or `undefined` if not found
    */
   get_conversation_by_id(conversation_id) {
-    if (!_.isString(conversation_id)) {
+    if (typeof conversation_id !== 'string') {
       return Promise.reject(new z.error.ConversationError(z.error.ConversationError.TYPE.NO_CONVERSATION_ID));
     }
     const conversationEntity = this.find_conversation_by_id(conversation_id);
@@ -2493,7 +2495,7 @@ export class ConversationRepository {
           changes.time = isoDate;
 
           const timestamp = new Date(isoDate).getTime();
-          if (!_.isNaN(timestamp)) {
+          if (!isNaN(timestamp)) {
             messageEntity.timestamp(timestamp);
             conversationEntity.update_timestamp_server(timestamp, true);
             conversationEntity.update_timestamps(messageEntity);
@@ -3464,7 +3466,7 @@ export class ConversationRepository {
   async _onCreate(eventJson, eventSource) {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
-    const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
     try {
       const existingConversationEntity = this.find_conversation_by_id(conversationId);
       if (existingConversationEntity) {

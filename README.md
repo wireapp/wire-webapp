@@ -109,7 +109,7 @@ Before RC testing we create a merge commit (**don't squash!**) from "dev" to "ma
 
 Similar to "Staging Bumps" with the exception that tags are made from "master" branch and contain "production" in the tag name instead of "staging". Example: `2019-07-01-production.0`
 
-Release notes are automatically generated with [generate-changelog](https://github.com/lob/generate-changelog) after merging to "master" using the following command:
+Release notes can be generated with [generate-changelog](https://github.com/lob/generate-changelog) after merging to "master" using the following command:
 
 ```
 generate-changelog -x "chore,docs,refactor,runfix,style,test" -t 2019-08-21-production.0...master

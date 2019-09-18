@@ -17,6 +17,7 @@
  *
  */
 
+import {extend} from 'underscore';
 import 'url-search-params-polyfill';
 
 import {Environment} from 'Util/Environment';
@@ -39,7 +40,7 @@ const _createIframeContainer = options => {
     width: '100%',
   };
 
-  options = _.extend(defaults, options);
+  options = extend(defaults, options);
   const iframeContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
 
   if (!options.video) {

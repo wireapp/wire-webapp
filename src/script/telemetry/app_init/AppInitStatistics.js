@@ -17,8 +17,6 @@
  *
  */
 
-import {isNumber, isString} from 'underscore';
-
 import {getLogger} from 'Util/Logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
@@ -39,7 +37,7 @@ export class AppInitStatistics {
   }
 
   add(statistic, value, bucket_size) {
-    if (bucket_size && _.isNumber(value)) {
+    if (bucket_size && typeof value === 'number') {
       const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
 
       return (this[statistic] = value === 0 ? 0 : bucket_size * buckets);
@@ -52,7 +50,7 @@ export class AppInitStatistics {
     const statistics = {};
 
     Object.entries(this).forEach(([key, value]) => {
-      if (_.isNumber(value) || _.isString(value)) {
+      if (typeof value === 'number' || typeof value === 'string') {
         statistics[key] = value;
       }
     });
@@ -62,7 +60,10 @@ export class AppInitStatistics {
 
   log() {
     const statsData = Object.entries(this).reduce((stats, [key, value]) => {
-      return isNumber(value) || isString(value) ? {...stats, [key]: value} : stats;
+      if (typeof value === 'number' || typeof value === 'string') {
+        stats[key] = value;
+      }
+      return stats;
     }, {});
     this.logger.debug('App initialization statistics', statsData);
   }

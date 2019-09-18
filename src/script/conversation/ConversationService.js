@@ -368,7 +368,7 @@ export class ConversationService {
   post_encrypted_message(conversation_id, payload, precondition_option) {
     let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
-    if (_.isArray(precondition_option)) {
+    if (Array.isArray(precondition_option)) {
       url = `${url}?report_missing=${precondition_option.join(',')}`;
     } else if (precondition_option === true) {
       url = `${url}?ignore_missing=true`;

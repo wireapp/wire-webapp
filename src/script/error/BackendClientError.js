@@ -17,6 +17,8 @@
  *
  */
 
+import {isObject} from 'underscore';
+
 import {BaseError} from './BaseError';
 
 export class BackendClientError extends BaseError {
@@ -25,10 +27,10 @@ export class BackendClientError extends BaseError {
 
     super('BackendClientError', BackendClientError.TYPE.GENERIC, message);
 
-    if (_.isObject(params)) {
+    if (isObject(params)) {
       this.code = params.code;
       this.label = params.label;
-    } else if (_.isNumber(params)) {
+    } else if (typeof params === 'number') {
       this.code = params;
     }
   }

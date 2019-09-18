@@ -19,7 +19,6 @@
 
 import {ClientClassification} from '@wireapp/api-client/dist/commonjs/client/';
 import ko from 'knockout';
-import {isString} from 'underscore';
 
 import {zeroPadding} from 'Util/util';
 import {ClientMapper} from './ClientMapper';
@@ -69,7 +68,7 @@ export class ClientEntity {
    * Splits an ID into user ID & client ID.
    */
   static dismantleUserClientId(id: string): {clientId: string; userId: string} {
-    const [userId, clientId] = isString(id) ? id.split('@') : ([] as string[]);
+    const [userId, clientId] = typeof id === 'string' ? id.split('@') : ([] as string[]);
     return {clientId, userId};
   }
 
