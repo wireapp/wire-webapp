@@ -89,7 +89,7 @@ function modifyMarkdownLinks(markdown: string): string {
 }
 
 export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
-  const createMentionHash = (mention: MentionEntity) => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     const elementAttributes = mentionData.isSelfMentioned
