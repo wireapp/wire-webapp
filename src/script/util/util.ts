@@ -19,22 +19,17 @@
 
 import {Decoder, Encoder} from 'bazinga64';
 import CryptoJS from 'crypto-js';
-import hljs from 'highlightjs';
 import {ObservableArray} from 'knockout';
-import MarkdownIt from 'markdown-it';
 import {formatE164} from 'phoneformat.js';
 import UUID from 'uuidjs';
 
 import {Environment} from './Environment';
-import {escapeString} from './SanitizationUtil';
 import {loadValue} from './StorageUtil';
-import {replaceInRange} from './StringUtil';
 
 import {Config} from '../auth/config';
 import {QUERY_KEY} from '../auth/route';
 import * as URLUtil from '../auth/util/urlUtil';
 import {Conversation} from '../entity/Conversation';
-import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (): boolean => {
@@ -44,7 +39,7 @@ export const isTemporaryClientAndNonPersistent = (): boolean => {
   return loadValue(StorageKey.AUTH.PERSIST) === false && enableTransientTemporaryClients;
 };
 
-export const checkIndexedDb = () => {
+export const checkIndexedDb = (): Promise<void> => {
   if (isTemporaryClientAndNonPersistent()) {
     return Promise.resolve();
   }
@@ -153,7 +148,7 @@ export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer>
   });
 };
 
-export const loadUrlBlob = (url: string) => {
+export const loadUrlBlob = (url: string): Promise<Blob> => {
   return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
@@ -224,11 +219,7 @@ export const base64ToBlob = (base64: string): Blob => {
 };
 
 /**
- * Downloads blob using a hidden link element.
- * @param {Blob} blob - Blob to store
- * @param {string} filename - Data will be saved under this name
- * @param {string} [mimeType] - Mime type of the generated download
- * @returns {number} Timeout identifier
+ * Downloads blob using a hidden link element.ƒ
  */
 
 export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
@@ -240,7 +231,7 @@ export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): n
   throw new Error('Failed to download blob: Resource not provided');
 };
 
-export const downloadFile = (url: string, fileName: string, mimeType?: string) => {
+export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
   const anchor = document.createElement('a');
   anchor.download = fileName;
   anchor.href = url;
@@ -266,7 +257,7 @@ export const phoneNumberToE164 = (phoneNumber: string, countryCode: string): str
   return formatE164(`${countryCode}`.toUpperCase(), `${phoneNumber}`);
 };
 
-export const createRandomUuid = () => UUID.genV4().hexString;
+export const createRandomUuid = (): string => UUID.genV4().hexString;
 
 export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray): string =>
   CryptoJS.SHA256(text).toString(CryptoJS.enc.Base64);
@@ -274,172 +265,6 @@ export const encodeSha256Base64 = (text: string | CryptoJS.LibWordArray): string
 // Note IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
-};
-
-// Note: We are using "Underscore.js" to escape HTML in the original message
-const markdownit = new MarkdownIt('zero', {
-  breaks: true,
-  html: false,
-  langPrefix: 'lang-',
-  linkify: true,
-}).enable(['autolink', 'backticks', 'code', 'emphasis', 'fence', 'link', 'linkify', 'newline']);
-
-const originalFenceRule = markdownit.renderer.rules.fence;
-
-markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
-  const highlighted = originalFenceRule(tokens, idx, options, env, self);
-  tokens[idx].map[1] += 1;
-  // TODO: remove this casting as soon as https://github.com/DefinitelyTyped/DefinitelyTyped/pull/38461 is merged
-  return ((highlighted as unknown) as string).replace(/\n$/, '');
-};
-
-markdownit.renderer.rules.softbreak = () => '<br>';
-markdownit.renderer.rules.hardbreak = () => '<br>';
-markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
-  const [position] = tokens[idx].map;
-  const previousWithMap = tokens
-    .slice(0, idx)
-    .reverse()
-    .find(({map}) => map && map.length);
-  const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
-  const count = position - previousPosition;
-  return '<br>'.repeat(count);
-};
-markdownit.renderer.rules.paragraph_close = () => '';
-
-// https://github.com/markdown-it/markdown-it/issues/458#issuecomment-401221267
-function fixMarkdownLinks(markdown: string): string {
-  const matches = markdownit.linkify.match(markdown);
-  if (!matches || matches.length === 0) {
-    return markdown;
-  }
-  const result = [];
-  let prevEndIndex = 0;
-  for (const match of matches) {
-    const startsWithProto = /^https?:\/\//i.test(match.raw);
-    const noStartBracket = match.index === 0 || markdown[match.index - 1] !== '<';
-    const noEndBracket = match.lastIndex === markdown.length || markdown[match.lastIndex] !== '>';
-    const shouldInsertBrackets = startsWithProto && noStartBracket && noEndBracket;
-
-    result.push(markdown.slice(prevEndIndex, match.index));
-    result.push(shouldInsertBrackets ? `<${match.raw}>` : match.raw);
-    prevEndIndex = match.lastIndex;
-  }
-  result.push(markdown.slice(prevEndIndex));
-  return result.join('');
-}
-
-export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
-  interface MentionText {
-    text: string;
-    userId: string;
-    isSelfMentioned: boolean;
-  }
-  const createMentionHash = (mention: MentionEntity) => `@@${btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
-  const renderMention = (mentionData: MentionText) => {
-    const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
-    const elementAttributes = mentionData.isSelfMentioned
-      ? ' data-uie-name="label-self-mention"'
-      : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
-
-    const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${escapeString(mentionText)}`;
-    return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
-  };
-
-  const mentionTexts: Record<string, MentionText> = {};
-
-  let mentionlessText = mentionEntities
-    .slice()
-    // sort mentions to start with the latest mention first (in order not to have to recompute the index everytime we modify the original text)
-    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
-    .reduce((strippedText, mention) => {
-      const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
-      const mentionKey = createMentionHash(mention);
-      mentionTexts[mentionKey] = {
-        isSelfMentioned: mention.targetsUser(selfId),
-        text: mentionText,
-        userId: mention.userId,
-      };
-      return replaceInRange(strippedText, mentionKey, mention.startIndex, mention.startIndex + mention.length);
-    }, message);
-
-  markdownit.set({
-    highlight: function(code): boolean | string {
-      const containsMentions = mentionEntities.some(mention => {
-        const hash = createMentionHash(mention);
-        return code.includes(hash);
-      });
-      if (containsMentions) {
-        // disable code highlighting if there is a mention in there
-        // highlighting will be wrong anyway because this is not valid code
-        return code;
-      }
-      return hljs.highlightAuto(code).value;
-    },
-  });
-
-  markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = (hashedString: string) =>
-      escapeString(
-        Object.entries(mentionTexts).reduce(
-          (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
-          hashedString,
-        ),
-      );
-    const link = tokens[idx];
-    const href = cleanString(link.attrGet('href'));
-    const isEmail = href.startsWith('mailto:');
-    const isWireDeepLink = href.toLowerCase().startsWith('wire://');
-    const nextToken = tokens[idx + 1];
-    const text = nextToken && nextToken.type === 'text' ? nextToken.content : '';
-
-    if (!href || !text.trim()) {
-      nextToken.content = '';
-      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
-      closeToken.type = 'text';
-      closeToken.content = '';
-      return `[${cleanString(text)}](${cleanString(href)})`;
-    }
-    if (isEmail) {
-      link.attrPush(['data-email-link', 'true']);
-    } else {
-      link.attrPush(['target', '_blank']);
-      link.attrPush(['rel', 'nofollow noopener noreferrer']);
-    }
-    if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
-      const title = link.attrGet('title');
-      if (title) {
-        link.attrSet('title', cleanString(title));
-      }
-      link.attrSet('href', cleanString(href));
-      if (nextToken && nextToken.type === 'text') {
-        nextToken.content = text;
-      }
-      link.attrPush(['data-md-link', 'true']);
-      link.attrPush(['data-uie-name', 'markdown-link']);
-    }
-    if (isWireDeepLink) {
-      link.attrPush(['data-uie-name', 'wire-deep-link']);
-    }
-    if (link.markup === 'linkify') {
-      nextToken.content = encodeURI(nextToken.content);
-    }
-    return self.renderToken(tokens, idx, options);
-  };
-
-  mentionlessText = fixMarkdownLinks(mentionlessText);
-  mentionlessText = markdownit.render(mentionlessText);
-  // Remove <br> and \n if it is the last thing in a message
-  mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
-
-  const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
-    const mentionMarkup = renderMention(mentionTexts[mentionHash]);
-
-    return text.replace(mentionHash, mentionMarkup);
-  }, mentionlessText);
-
-  return parsedText;
 };
 
 export const koArrayPushAll = (koArray: ObservableArray, valuesToPush: any[]) => {

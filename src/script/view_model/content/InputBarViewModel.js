@@ -23,7 +23,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {afterRender, formatBytes, renderMessage} from 'Util/util';
+import {afterRender, formatBytes} from 'Util/util';
+import {renderMessage} from 'Util/messageRenderer';
+
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
 import {trimEnd, trimStart} from 'Util/StringUtil';
