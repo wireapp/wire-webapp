@@ -20,30 +20,13 @@
 /** @jsx jsx */
 import {ObjectInterpolation, jsx} from '@emotion/core';
 import React from 'react';
-import {
-  ArrowIcon,
-  AttachmentIcon,
-  CheckIcon,
-  CloseIcon,
-  GifIcon,
-  ImageIcon,
-  PingIcon,
-  PlaneIcon,
-  ProfileIcon,
-  TeamIcon,
-  TimedIcon,
-  TrashIcon,
-} from '../Icon';
+import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
+import {childrenWithDefaultProps} from '../Misc/';
 import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 
-export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {
-  icon?: ICON_NAME;
-  iconColor?: string;
-  iconHeight?: number;
-  iconWidth?: number;
-}
+export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {}
 
 export const roundIconButtonStyle: <T>(
   theme: Theme,
@@ -62,81 +45,13 @@ export const roundIconButtonStyle: <T>(
   width: `${props.size}px`,
 });
 
-export enum ICON_NAME {
-  ARROW = 'arrow',
-  ATTACHMENT = 'attachment',
-  CHECK = 'check',
-  CLOSE = 'close',
-  GIF = 'gif',
-  IMAGE = 'image',
-  PING = 'ping',
-  PLANE = 'plane',
-  PROFILE = 'profile',
-  TEAM = 'team',
-  TIMED = 'timed',
-  TRASH = 'trash',
-}
-
-export const RoundIconButton: React.SFC<RoundIconButtonProps> = ({
-  icon,
-  iconColor,
-  iconHeight,
-  iconWidth,
-  children,
-  ...props
-}) => (
+export const RoundIconButton: React.SFC<RoundIconButtonProps> = ({children, ...props}) => (
   <button css={theme => roundIconButtonStyle(theme, props)} {...filterButtonProps(props)}>
-    {(() => {
-      switch (icon) {
-        case ICON_NAME.ATTACHMENT: {
-          return <AttachmentIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.CHECK: {
-          return <CheckIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.CLOSE: {
-          return <CloseIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.GIF: {
-          return <GifIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.IMAGE: {
-          return <ImageIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.PING: {
-          return <PingIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.PLANE: {
-          return <PlaneIcon color={iconColor} height={iconHeight} width={iconWidth} style={{marginLeft: 2}} />;
-        }
-        case ICON_NAME.PROFILE: {
-          const defaultSize = 24;
-          return <ProfileIcon color={iconColor} height={iconHeight || defaultSize} width={iconWidth || defaultSize} />;
-        }
-        case ICON_NAME.TEAM: {
-          const defaultSize = 24;
-          return <TeamIcon color={iconColor} height={iconHeight || defaultSize} width={iconWidth || defaultSize} />;
-        }
-        case ICON_NAME.TIMED: {
-          return <TimedIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.TRASH: {
-          return <TrashIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        case ICON_NAME.ARROW: {
-          return <ArrowIcon color={iconColor} height={iconHeight} width={iconWidth} />;
-        }
-        default: {
-          return null;
-        }
-      }
-    })()}
-    {children}
+    {childrenWithDefaultProps<SVGSVGElement, SVGIconProps>({children, defaultProps: {color: COLOR.WHITE}})}
   </button>
 );
 
 RoundIconButton.defaultProps = {
   backgroundColor: COLOR.BLUE,
-  iconColor: COLOR.WHITE,
   size: 32,
 };
