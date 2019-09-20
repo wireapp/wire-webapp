@@ -281,8 +281,10 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
         if (userId === this.selfUser.id && clientId !== this.selfClientId) {
           const call = this.findCall(conversationId);
-          if (call) {
-            // If the group leave was sent from the self user from another device, we reset the reason so that the call would show in the UI again
+          if (call && call.state() === CALL_STATE.INCOMING) {
+            // If the group leave was sent from the self user from another device,
+            // we reset the reason so that the call is not shown in the UI.
+            // If the call is already accepted, we keep the call UI.
             call.reason(REASON.STILL_ONGOING);
           }
         }
@@ -658,7 +660,11 @@ export class CallingRepository {
       const newMembers = members
         .filter(({userid}) => !this.findParticipant(conversationId, userid))
         .map(({userid, clientid}) => new Participant(userid, clientid));
-      const removedMembers = call.participants().filter(({userId}) => !members.find(({userid}) => userid === userId));
+      const removedMembers = call
+        .participants()
+        .filter(
+          ({userId, deviceId}) => !members.find(({userid, clientid}) => userid === userId && clientid === deviceId),
+        );
 
       newMembers.forEach(participant => call.participants.unshift(participant));
       removedMembers.forEach(participant => call.participants.remove(participant));
