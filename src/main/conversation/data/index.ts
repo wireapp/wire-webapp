@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,5 @@
  *
  */
 
-import {MutedStatus, ServiceRef} from '../conversation/';
-
-export interface Member {
-  hidden?: boolean;
-  hidden_ref: string | null;
-  id: string;
-  otr_archived?: boolean;
-  otr_archived_ref: string | null;
-  otr_muted: boolean | null;
-  otr_muted_ref: string | null;
-  otr_muted_status: MutedStatus | null;
-  service: ServiceRef | null;
-  status_ref: string;
-  status_time: string;
-}
+export * from './ConversationMemberLeaveData';
+export * from './ConversationConnectRequestData';

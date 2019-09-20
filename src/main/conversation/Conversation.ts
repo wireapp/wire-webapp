@@ -48,6 +48,6 @@ export interface Conversation {
   members: ConversationMembers;
   message_timer: number | null;
   name: string;
-  team?: string;
+  team: string | null;
   type: CONVERSATION_TYPE;
 }
