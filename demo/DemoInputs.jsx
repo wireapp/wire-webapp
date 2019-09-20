@@ -18,10 +18,14 @@
  */
 
 import {
+  ArrowIcon,
+  AttachmentIcon,
   Button,
   ButtonLink,
   Checkbox,
   CheckboxLabel,
+  CheckIcon,
+  CloseIcon,
   CodeInput,
   COLOR,
   Column,
@@ -30,9 +34,10 @@ import {
   ContainerXS,
   ErrorMessage,
   Form,
+  GifIcon,
   H1,
   H2,
-  ICON_NAME,
+  ImageIcon,
   Input,
   InputBlock,
   InputSubmitCombo,
@@ -40,15 +45,21 @@ import {
   LabelLink,
   Line,
   Link,
+  PingIcon,
+  PlaneIcon,
+  ProfileIcon,
   RoundIconButton,
   Select,
   ShakeBox,
   TabBar,
   TabBarItem,
+  TeamIcon,
   Text,
   TextArea,
   TextLink,
+  TimedIcon,
   Tooltip,
+  TrashIcon,
 } from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 
@@ -295,20 +306,44 @@ export const DemoInputs = () => {
               <Tooltip text="Lots of icons here">
                 <InputSubmitCombo markInvalid>
                   <Input placeholder="InputSubmitCombo" name="password" />
-                  <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.ATTACHMENT} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.GIF} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.IMAGE} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.PING} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.TIMED} formNoValidate />
-                  <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
                   <RoundIconButton type="submit" formNoValidate>
-                    M
+                    <ArrowIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <AttachmentIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <CheckIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <CloseIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <GifIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <ImageIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <PingIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <PlaneIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <ProfileIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <TeamIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <TimedIcon />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <TrashIcon color={COLOR.GREEN} />
+                  </RoundIconButton>
+                  <RoundIconButton type="submit" formNoValidate>
+                    <Text color={COLOR.GREEN}>M</Text>
                   </RoundIconButton>
                 </InputSubmitCombo>
               </Tooltip>
