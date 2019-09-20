@@ -315,7 +315,7 @@ export class EventRepository {
 
   /**
    * Get the last notification.
-   * @returns {Promise<string>} Resolves with the last handled notification ID
+   * @returns {Promise<{eventDate: string, notificationId: string}>} Resolves with the last handled notification ID and time
    */
   getStreamState() {
     return this.notificationService
@@ -672,7 +672,10 @@ export class EventRepository {
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
     if (canSetEventDate) {
-      this._updateLastEventDate(eventDate);
+      // HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket. This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435). That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER modify the last event timestamp which we use to query the backend's notification stream.
+      if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
+        this._updateLastEventDate(eventDate);
+      }
     }
 
     const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
@@ -925,7 +928,7 @@ export class EventRepository {
     }
 
     const eventIsoDate = new Date(time).toISOString();
-    const logMessage = `Ignored outdated '${type}' event (${eventIsoDate}) in conversation '${conversationId}'`;
+    const logMessage = `Ignored outdated calling event '${type}' (${eventIsoDate}) in conversation '${conversationId}'`;
     const logObject = {
       eventJson: JSON.stringify(event),
       eventObject: event,
