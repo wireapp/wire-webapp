@@ -279,7 +279,8 @@ export class CallingRepository {
     let validatedPromise = Promise.resolve();
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        if (userId === this.selfUser.id && clientId !== this.selfClientId) {
+        const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
+        if (isAnotherSelfClient) {
           const call = this.findCall(conversationId);
           if (call && call.state() === CALL_STATE.INCOMING) {
             // If the group leave was sent from the self user from another device,
