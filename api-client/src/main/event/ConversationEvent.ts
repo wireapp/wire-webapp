@@ -30,6 +30,7 @@ import {
   Rename,
   Typing,
 } from '../conversation/';
+import {ConversationConnectRequestData, ConversationMemberLeaveData} from '../conversation/data';
 import {BackendEvent} from './BackendEvent';
 
 export enum CONVERSATION_EVENT {
@@ -80,12 +81,42 @@ export interface ConversationConnectRequestEvent extends ConversationEvent {
   type: CONVERSATION_EVENT.CONNECT_REQUEST;
 }
 
+export interface ConversationConnectRequestNotification {
+  conversation: string;
+  data: ConversationConnectRequestData;
+  from: string;
+  time: string;
+  type: CONVERSATION_EVENT.CONNECT_REQUEST;
+}
+
 export interface ConversationCreateEvent extends ConversationEvent {
   data: Conversation;
   type: CONVERSATION_EVENT.CREATE;
 }
 
+export interface ConversationCreateNotification {
+  conversation: string;
+  data: Conversation & {
+    /** @deprecated */
+    last_event: string;
+    /** @deprecated */
+    last_event_time: string;
+    receipt_mode: null;
+  };
+  from: string;
+  time: string;
+  type: CONVERSATION_EVENT.CREATE;
+}
+
 export interface ConversationDeleteEvent extends ConversationEvent {
+  type: CONVERSATION_EVENT.DELETE;
+}
+
+export interface ConversationDeleteNotification {
+  conversation: string;
+  data: null;
+  from: string;
+  time: string;
   type: CONVERSATION_EVENT.DELETE;
 }
 
@@ -94,8 +125,26 @@ export interface ConversationMemberJoinEvent extends ConversationEvent {
   type: CONVERSATION_EVENT.MEMBER_JOIN;
 }
 
+export interface ConversationMemberJoinNotification {
+  conversation: string;
+  data: {
+    user_ids: string[];
+  };
+  from: string;
+  time: string;
+  type: CONVERSATION_EVENT.MEMBER_JOIN;
+}
+
 export interface ConversationMemberLeaveEvent extends ConversationEvent {
   data: MemberLeave;
+  type: CONVERSATION_EVENT.MEMBER_LEAVE;
+}
+
+export interface ConversationMemberLeaveNotification {
+  conversation: string;
+  from: string;
+  time: string;
+  data: ConversationMemberLeaveData;
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 }
 

@@ -22,8 +22,8 @@ import {PreKey} from '../auth/';
 import {RegisteredClient, UpdatedClient} from '../client/';
 import {Connection} from '../connection/';
 import {NotificationPreference} from '../notification/';
-import {Picture, Self} from '../self/';
-import {UserAsset} from '../user';
+import {Self} from '../self/';
+import {UserClientRemoveData, UserConnectionData, UserPushRemoveData, UserUpdateData} from '../user/data';
 import {BackendEvent} from './BackendEvent';
 
 type UserID = string;
@@ -38,6 +38,7 @@ export enum USER_EVENT {
   LEGAL_HOLD_DISABLE = 'user.legalhold-disable',
   LEGAL_HOLD_ENABLE = 'user.legalhold-enable',
   PROPERTIES_SET = 'user.properties-set',
+  PUSH_REMOVE = 'user.push-remove',
   UPDATE = 'user.update',
 }
 
@@ -85,11 +86,21 @@ export interface UserClientRemoveEvent extends UserEvent {
   type: USER_EVENT.CLIENT_REMOVE;
 }
 
+export interface UserClientRemoveNotification {
+  client: UserClientRemoveData;
+  type: USER_EVENT.CLIENT_REMOVE;
+}
+
 export interface UserConnectionEvent extends UserEvent {
   connection: Connection;
   user: {
     name: string;
   };
+  type: USER_EVENT.CONNECTION;
+}
+
+export interface UserConnectionNotification {
+  connection: UserConnectionData;
   type: USER_EVENT.CONNECTION;
 }
 
@@ -126,11 +137,12 @@ export interface UserUpdateEvent extends UserEvent {
   type: USER_EVENT.UPDATE;
 }
 
+export interface UserPushRemoveNotification {
+  type: USER_EVENT.PUSH_REMOVE;
+  token: UserPushRemoveData;
+}
+
 export interface UserUpdateNotification {
   type: USER_EVENT.UPDATE;
-  user: {
-    assets?: UserAsset[];
-    id: string;
-    picture?: Picture[];
-  };
+  user: UserUpdateData;
 }

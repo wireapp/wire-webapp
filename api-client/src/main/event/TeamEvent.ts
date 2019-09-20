@@ -17,6 +17,12 @@
  *
  */
 
+import {
+  TeamConversationCreateData,
+  TeamConversationDeleteData,
+  TeamMemberLeaveData,
+  TeamUpdateData,
+} from '../team/data';
 import {BackendEvent} from './BackendEvent';
 
 export enum TEAM_EVENT {
@@ -38,7 +44,21 @@ export interface TeamConversationCreateEvent extends TeamEvent {
   type: TEAM_EVENT.CONVERSATION_CREATE;
 }
 
+export interface TeamConversationCreateNotification {
+  data: TeamConversationCreateData;
+  team: string;
+  time: string;
+  type: TEAM_EVENT.CONVERSATION_CREATE;
+}
+
 export interface TeamConversationDeleteEvent extends TeamEvent {
+  type: TEAM_EVENT.CONVERSATION_DELETE;
+}
+
+export interface TeamConversationDeleteNotification {
+  data: TeamConversationDeleteData;
+  team: string;
+  time: string;
   type: TEAM_EVENT.CONVERSATION_DELETE;
 }
 
@@ -58,10 +78,24 @@ export interface TeamMemberLeaveEvent extends TeamEvent {
   type: TEAM_EVENT.MEMBER_LEAVE;
 }
 
+export interface TeamMemberLeaveNotification {
+  data: TeamMemberLeaveData;
+  team: string;
+  time: string;
+  type: TEAM_EVENT.MEMBER_LEAVE;
+}
+
 export interface TeamMemberUpdateEvent extends TeamEvent {
   type: TEAM_EVENT.MEMBER_UPDATE;
 }
 
 export interface TeamUpdateEvent extends TeamEvent {
+  type: TEAM_EVENT.UPDATE;
+}
+
+export interface TeamUpdateNotification {
+  data: TeamUpdateData;
+  team: string;
+  time: string;
   type: TEAM_EVENT.UPDATE;
 }
