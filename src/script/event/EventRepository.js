@@ -315,7 +315,7 @@ export class EventRepository {
 
   /**
    * Get the last notification.
-   * @returns {Promise<string>} Resolves with the last handled notification ID
+   * @returns {Promise<{eventDate: string, notificationId: string}>} Resolves with the last handled notification ID and time
    */
   getStreamState() {
     return this.notificationService
@@ -671,7 +671,7 @@ export class EventRepository {
     const eventDate = this._getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
-    if (canSetEventDate) {
+    if (canSetEventDate && event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
       this._updateLastEventDate(eventDate);
     }
 
@@ -925,7 +925,7 @@ export class EventRepository {
     }
 
     const eventIsoDate = new Date(time).toISOString();
-    const logMessage = `Ignored outdated '${type}' event (${eventIsoDate}) in conversation '${conversationId}'`;
+    const logMessage = `Ignored outdated calling event '${type}' (${eventIsoDate}) in conversation '${conversationId}'`;
     const logObject = {
       eventJson: JSON.stringify(event),
       eventObject: event,
