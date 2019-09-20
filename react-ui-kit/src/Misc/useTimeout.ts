@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-const useTimeout = (onTimeoutStop: () => {}, duration: number) => {
+const useTimeout = (onTimeoutStop: () => void, duration: number) => {
   const [timerId, setTimerId] = useState(null);
 
   const removeTimeout = () => {
