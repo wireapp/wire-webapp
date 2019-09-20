@@ -16,7 +16,7 @@
     "rimraf": "3.0.0",
     "typescript": "3.6.3",
     "webpack": "4.40.2",
-    "webpack-cli": "3.3.8"
+    "webpack-cli": "3.3.9"
   },
   "files": [
     "dist"
