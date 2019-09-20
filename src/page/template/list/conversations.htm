@@ -1,21 +1,23 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
   <div class="left-list-header">
     <!-- ko if: isTeam() -->
+      <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
+        <legal-hold-dot style="padding: 8px"
+        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
+        data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
+        </legal-hold-dot>
+      <!-- /ko -->
       <availability-state class="left-list-header-availability"
                           data-bind="clickOrDrag: clickOnAvailability"
                           data-uie-name="status-availability"
                           params="availability: selfAvailability, label: selfUserName">
       </availability-state>
-      <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
-        <legal-hold-dot style="margin: 0 16px 0 auto"
-                        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
-                        data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
-        </legal-hold-dot>
-      <!-- /ko -->
+
     <!-- /ko -->
     <!-- ko ifnot: isTeam() -->
       <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>
     <!-- /ko -->
+    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
   </div>
   <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
@@ -91,6 +93,5 @@
     <!-- ko if: archivedConversations().length > 0 -->
       <archive-icon class="svg-button" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
     <!-- /ko -->
-    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>

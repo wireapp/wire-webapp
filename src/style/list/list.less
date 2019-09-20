@@ -50,21 +50,31 @@
   position: relative;
   height: @left-list-header-height;
   flex-shrink: 0;
+  padding: 0 16px;
 }
+
 .left-list-header-start-ui {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
 .left-list-header-availability {
-  position: absolute;
+  position: relative;
+  flex: 1;
+  margin-left: 8px;
   cursor: pointer;
 
   .availability-state-label {
     .label-bold-xs;
-
+    position: absolute;
+    right: 0;
+    left: 0;
     display: inline-block;
-    max-width: @conversation-list-width - 58px;
     line-height: 12px;
+
+    text-align: center;
+  }
+  .availability-state-icon + .availability-state-label {
+    margin-left: 16px;
   }
 }
 
