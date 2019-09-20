@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.5.6...@wireapp/api-client@6.6.0) (2019-09-20)
+
+
+### Features
+
+* **api-client:** Extend notification payloads ([#2309](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2309)) ([6ca3382](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6ca3382))
+
+
+
+
+
 ## [6.5.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@6.5.5...@wireapp/api-client@6.5.6) (2019-09-18)
 
 
