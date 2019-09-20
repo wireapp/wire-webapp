@@ -374,10 +374,14 @@ export class EventRepository {
    * @returns {Promise} Resolves when all missed notifications have been handled
    */
   recoverFromStream() {
+    const lastNotificationId = this._getLastKnownNotificationId();
+    this.logger.warn(
+      `Recovering from notification stream (after connectivity loss) with notification ID '${lastNotificationId}'...`,
+    );
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
-    return this._updateFromStream(this._getLastKnownNotificationId())
+    return this._updateFromStream(lastNotificationId)
       .then(numberOfNotifications => {
         this.logger.info(`Retrieved '${numberOfNotifications}' notifications from stream after connectivity loss`);
       })
@@ -557,7 +561,7 @@ export class EventRepository {
     const {conversation: conversationId, id = 'ID not specified', type} = event;
     const inSelfConversation = conversationId === this.userRepository.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
+      this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
       return this._handleEvent(event, source);
     }
     return Promise.resolve(event);

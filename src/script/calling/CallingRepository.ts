@@ -586,7 +586,7 @@ export class CallingRepository {
         call.startedAt() ? Date.now() - call.startedAt() : 0,
         reason,
         new Date().toISOString(),
-        EventRepository.SOURCE.INJECTED,
+        EventRepository.SOURCE.WEB_SOCKET,
       );
       this.removeCall(call);
       return;
