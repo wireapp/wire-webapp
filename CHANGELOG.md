@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.22.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.21.0...@wireapp/react-ui-kit@7.22.0) (2019-09-20)
+
+
+### Features
+
+* **react-ui-kit:** Hook useTimeout ([#2318](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2318)) ([9b6c3ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/9b6c3ee))
+
+
+
+
+
 # [7.21.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.20.1...@wireapp/react-ui-kit@7.21.0) (2019-09-20)
 
 
