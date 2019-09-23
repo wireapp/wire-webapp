@@ -4,7 +4,7 @@
     "@types/node": "~10",
     "cross-env": "5.2.1",
     "istanbul": "1.1.0-alpha.1",
-    "jasmine": "3.4.0",
+    "jasmine": "3.5.0",
     "rimraf": "3.0.0",
     "webpack": "4.40.2",
     "webpack-cli": "3.3.9"

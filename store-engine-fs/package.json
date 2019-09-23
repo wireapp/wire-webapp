@@ -7,7 +7,7 @@
     "@types/jasmine": "3.4.0",
     "@types/node": "~10",
     "@wireapp/store-engine": "3.9.14",
-    "jasmine": "3.4.0",
+    "jasmine": "3.5.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
     "ts-node": "8.4.1",
