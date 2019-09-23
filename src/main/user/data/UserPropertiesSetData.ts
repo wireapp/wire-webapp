@@ -17,8 +17,26 @@
  *
  */
 
-export * from './UserUpdateData';
-export * from './UserPushRemoveData';
-export * from './UserConnectionData';
-export * from './UserClientRemoveData';
-export * from './UserPropertiesSetData';
+import {AudioPreference} from '../../audio';
+import {NotificationPreference} from '../../notification';
+
+export interface UserPropertiesSetData {
+  contact_import: Object;
+  enable_debugging: boolean;
+  settings: {
+    emoji: {
+      replace_inline: boolean;
+    };
+    notifications: NotificationPreference;
+    previews: {
+      send: boolean;
+    };
+    privacy: {
+      improve_wire: boolean;
+    };
+    sound: {
+      alerts: AudioPreference;
+    };
+  };
+  version: number;
+}

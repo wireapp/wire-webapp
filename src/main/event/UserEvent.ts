@@ -17,13 +17,17 @@
  *
  */
 
-import {AudioPreference} from '../audio/';
 import {PreKey} from '../auth/';
 import {RegisteredClient, UpdatedClient} from '../client/';
 import {Connection} from '../connection/';
-import {NotificationPreference} from '../notification/';
 import {Self} from '../self/';
-import {UserClientRemoveData, UserConnectionData, UserPushRemoveData, UserUpdateData} from '../user/data';
+import {
+  UserClientRemoveData,
+  UserConnectionData,
+  UserPropertiesSetData,
+  UserPushRemoveData,
+  UserUpdateData,
+} from '../user/data';
 import {BackendEvent} from './BackendEvent';
 
 type UserID = string;
@@ -80,9 +84,7 @@ export interface UserLegalHoldDisableEvent extends UserEvent {
 }
 
 export interface UserClientRemoveEvent extends UserEvent {
-  client: {
-    id: string;
-  };
+  client: UserClientRemoveData;
   type: USER_EVENT.CLIENT_REMOVE;
 }
 
@@ -109,26 +111,7 @@ export interface UserDeleteEvent extends UserEvent {
 }
 
 export interface UserPropertiesSetEvent extends UserEvent {
-  value: {
-    contact_import: Object;
-    enable_debugging: boolean;
-    settings: {
-      emoji: {
-        replace_inline: boolean;
-      };
-      notifications: NotificationPreference;
-      previews: {
-        send: boolean;
-      };
-      privacy: {
-        improve_wire: boolean;
-      };
-      sound: {
-        alerts: AudioPreference;
-      };
-    };
-    version: number;
-  };
+  value: UserPropertiesSetData;
   key: 'webapp';
   type: USER_EVENT.PROPERTIES_SET;
 }
