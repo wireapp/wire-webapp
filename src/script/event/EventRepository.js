@@ -315,7 +315,7 @@ export class EventRepository {
 
   /**
    * Get the last notification.
-   * @returns {Promise<string>} Resolves with the last handled notification ID
+   * @returns {Promise<{eventDate: string, notificationId: string}>} Resolves with the last handled notification ID and time
    */
   getStreamState() {
     return this.notificationService
@@ -374,10 +374,14 @@ export class EventRepository {
    * @returns {Promise} Resolves when all missed notifications have been handled
    */
   recoverFromStream() {
+    const lastNotificationId = this._getLastKnownNotificationId();
+    this.logger.warn(
+      `Recovering from notification stream (after connectivity loss) with notification ID '${lastNotificationId}'...`,
+    );
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.RECOVERY);
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
 
-    return this._updateFromStream(this._getLastKnownNotificationId())
+    return this._updateFromStream(lastNotificationId)
       .then(numberOfNotifications => {
         this.logger.info(`Retrieved '${numberOfNotifications}' notifications from stream after connectivity loss`);
       })
@@ -557,7 +561,7 @@ export class EventRepository {
     const {conversation: conversationId, id = 'ID not specified', type} = event;
     const inSelfConversation = conversationId === this.userRepository.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
+      this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
       return this._handleEvent(event, source);
     }
     return Promise.resolve(event);
@@ -668,7 +672,10 @@ export class EventRepository {
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
     if (canSetEventDate) {
-      this._updateLastEventDate(eventDate);
+      // HOTFIX: The "conversation.voice-channel-deactivate" event is the ONLY event which we inject with a source set to WebSocket. This is wrong but changing it will break our current conversation archive functionality (WEBAPP-6435). That's why we need to explicitly list the "conversation.voice-channel-deactivate" here because injected events should NEVER modify the last event timestamp which we use to query the backend's notification stream.
+      if (event.type !== ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
+        this._updateLastEventDate(eventDate);
+      }
     }
 
     const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
@@ -921,7 +928,7 @@ export class EventRepository {
     }
 
     const eventIsoDate = new Date(time).toISOString();
-    const logMessage = `Ignored outdated '${type}' event (${eventIsoDate}) in conversation '${conversationId}'`;
+    const logMessage = `Ignored outdated calling event '${type}' (${eventIsoDate}) in conversation '${conversationId}'`;
     const logObject = {
       eventJson: JSON.stringify(event),
       eventObject: event,

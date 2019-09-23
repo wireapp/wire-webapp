@@ -125,7 +125,7 @@ export class AppLockViewModel {
         case APPLOCK_STATE.WIPE_CONFIRM:
           return t('modalAppLockWipeConfirmTitle');
         case APPLOCK_STATE.WIPE_PASSWORD:
-          return t('modalAppLockWipePasswordTitle');
+          return t('modalAppLockWipePasswordTitle', Config.BRAND_NAME);
         default:
           return '';
       }
