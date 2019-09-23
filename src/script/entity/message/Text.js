@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {renderMessage} from 'Util/util';
+import {renderMessage} from 'Util/messageRenderer';
 
 import {Asset} from './Asset';
 import {AssetType} from '../../assets/AssetType';

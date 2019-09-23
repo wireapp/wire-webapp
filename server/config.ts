@@ -127,6 +127,7 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
+      ALLOWED_FILE_UPLOAD_EXTENSIONS: process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*',
       APPLOCK_SCHEDULED_TIMEOUT: process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,

@@ -184,7 +184,7 @@ export class WebSocketService {
    */
   reconnected() {
     amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-    this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
+    this.logger.warn('Re-established WebSocket connection.');
     amplify.publish(WebAppEvents.CONNECTION.ONLINE);
   }
 

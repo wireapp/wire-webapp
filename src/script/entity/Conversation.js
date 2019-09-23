@@ -17,6 +17,7 @@
  *
  */
 
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {debounce} from 'underscore';

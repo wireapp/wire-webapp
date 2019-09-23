@@ -96,8 +96,6 @@ module.exports = {
       Components: path.resolve(srcScript, 'components'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
-      // override phoneformat export, because the 'main' file is not exporting anything
-      'phoneformat.js': path.resolve(ROOT_PATH, 'node_modules/phoneformat.js/dist/phone-format-global.js'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
     modules: [auth, 'node_modules'],

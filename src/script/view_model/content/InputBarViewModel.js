@@ -23,7 +23,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {afterRender, formatBytes, renderMessage} from 'Util/util';
+import {afterRender, formatBytes} from 'Util/util';
+import {renderMessage} from 'Util/messageRenderer';
+
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {escapeString} from 'Util/SanitizationUtil';
 import {trimEnd, trimStart} from 'Util/StringUtil';
@@ -41,6 +43,7 @@ import {MentionEntity} from '../../message/MentionEntity';
 
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
+import {Config} from '../../auth/config';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -52,6 +55,9 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
     return {
       ASSETS: {
         CONCURRENT_UPLOAD_LIMIT: 10,
+      },
+      FILES: {
+        ALLOWED_FILE_UPLOAD_EXTENSIONS: Config.FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.split(','),
       },
       GIPHY_TEXT_LENGTH: 256,
       IMAGE: {
@@ -812,15 +818,39 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
 
   /**
    * Post files to a conversation.
-   * @param {Array|FileList} files - Images
+   * @param {Array|FileList} files - Files
    * @returns {undefined} No return value
    */
   uploadFiles(files) {
+    const fileArray = Array.from(files);
+    const allowedFileUploadExtensions = InputBarViewModel.CONFIG.FILES.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+    const allowAllExtensions = allowedFileUploadExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
+
+    if (!allowAllExtensions) {
+      // Creates a regex like this: (\.txt|\.pdf)$
+      const fileNameRegex = new RegExp(`(\\${allowedFileUploadExtensions.join('|\\')})$`);
+
+      for (const file of fileArray) {
+        const allowedFiletype = fileNameRegex.test(file.name.toLowerCase());
+
+        if (!allowedFiletype) {
+          const options = {
+            text: {
+              message: t('modalAssetFileTypeRestrictionMessage', file.name),
+              title: t('modalAssetFileTypeRestrictionHeadline'),
+            },
+          };
+
+          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+        }
+      }
+    }
+
     const uploadLimit = this.selfUser().inTeam()
       ? z.config.MAXIMUM_ASSET_FILE_SIZE_TEAM
       : z.config.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
     if (!this._isHittingUploadLimit(files)) {
-      for (const file of Array.from(files)) {
+      for (const file of fileArray) {
         const isTooLarge = file.size > uploadLimit;
         if (isTooLarge) {
           const fileSize = formatBytes(uploadLimit);
