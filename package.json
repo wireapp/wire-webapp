@@ -228,7 +228,7 @@
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "bundle:test": "webpack --config webpack.config.test.js",
-    "changelog": "node ./release-notes.js",
+    "changelog": "node ./changelog.js",
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
     "dist": "grunt build",
