@@ -73,13 +73,13 @@ The command to run is:
 
 #### General workflow
 
-|            Stage            | Branch |                Action                 |     Environment     | Backend    |
-| :-------------------------: | :----: | :-----------------------------------: | :-----------------: | :--------- |
-|   1 (Feature development)   |  edge  |                commit                 |  wire-webapp-edge   | Staging    |
-| 2 (Nightly test automation) |  dev   |                commit                 |   wire-webapp-dev   | Staging    |
-|    3 (Internal release)     |  dev   |  tag (format: YYYY-MM-DD-staging.X)   | wire-webapp-staging | Production |
-|       4 (RC testing)        | master |           merge from "dev"            | wire-webapp-master  | Staging    |
-|   5 (Production release)    | master | tag (format: YYYY-MM-DD-production.X) |  wire-webapp-prod   | Production |
+| Stage | Branch | Action | Environment | Backend |
+| :-: | :-: | :-: | :-: | :-- |
+| 1 (Feature development) | edge | commit | wire-webapp-edge | Staging |
+| 2 (Nightly test automation) | dev | commit or squash merge from edge | wire-webapp-dev | Staging |
+| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | wire-webapp-staging | Production |
+| 4 (RC testing) | master | merge from "dev"; afterwards generate release notes | wire-webapp-master | Staging |
+| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | wire-webapp-prod | Production |
 
 #### Staging Bumps for internal releases
 
@@ -109,13 +109,9 @@ Before RC testing we create a merge commit (**don't squash!**) from "dev" to "ma
 
 Similar to "Staging Bumps" with the exception that tags are made from "master" branch and contain "production" in the tag name instead of "staging". Example: `2019-07-01-production.0`
 
-Release notes can be generated with [generate-changelog](https://github.com/lob/generate-changelog) after merging to "master" using the following command:
+##### Release notes
 
-```
-generate-changelog -x "chore,docs,refactor,runfix,style,test" -t 2019-08-21-production.0...master
-```
-
-Note: `2019-08-21-production.0` is the tag name of the previous production release.
+Release notes need to be generated with `yarn changelog` after merging to "master" and before creating the new production release tag. Release notes will be locally available (not committed to the repository) in [./CHANGELOG.md](./CHANGELOG.md) and sent to our Marketing team to create release notes on [Medium](https://medium.com/wire-news/desktop-updates/home).
 
 #### Manual Deployments
 
