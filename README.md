@@ -111,7 +111,7 @@ Similar to "Staging Bumps" with the exception that tags are made from "master" b
 
 ##### Release notes
 
-Release notes need to be generated with `yarn changelog` after merging to "master" and before creating the new production release tag. Release notes will be locally available (not committed to the repository) in [./CHANGELOG.md](./CHANGELOG.md) and sent to our Marketing team to create release notes on [Medium](https://medium.com/wire-news/desktop-updates/home).
+Release notes need to be generated with `yarn changelog` after merging to "master" and before creating the new production release tag. Release notes will be locally available (not committed to the repository) in [./CHANGELOG.md](./CHANGELOG.md) and sent to our marketing team to create release notes on [Medium](https://medium.com/wire-news/desktop-updates/home).
 
 #### Manual Deployments
 
