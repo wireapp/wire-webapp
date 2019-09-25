@@ -48,7 +48,7 @@ describe('NotificationService', () => {
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient, engine);
+      const notificationService = new NotificationService(apiClient);
       spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
       spyOn(engine, 'read').and.callThrough();
       spyOn(engine, 'update').and.callThrough();
@@ -78,7 +78,7 @@ describe('NotificationService', () => {
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient, engine);
+      const notificationService = new NotificationService(apiClient);
 
       await apiClient.initEngine({userId: new UUID(UUIDVersion)});
       storeName = engine.storeName;
@@ -111,7 +111,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, engine);
+    const notificationService = new NotificationService(apiClient);
     const greaterDate = new Date(1);
     const lesserDate = new Date(0);
 
@@ -146,7 +146,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, engine);
+    const notificationService = new NotificationService(apiClient);
     spyOn(notificationService.database, 'getLastNotificationId').and.callThrough();
     spyOn(engine, 'read').and.callThrough();
     spyOn(engine, 'update').and.callThrough();
@@ -155,16 +155,11 @@ describe('NotificationService', () => {
     await apiClient.initEngine({userId: new UUID(UUIDVersion)});
     storeName = engine.storeName;
 
-    const returnValue = await notificationService.setLastNotificationId({id: '12'});
-    expect(returnValue).toEqual('12');
-
-    expect(notificationService.database.getLastNotificationId).toHaveBeenCalledTimes(1);
-    expect(engine.read).toHaveBeenCalledTimes(1);
-    expect(engine.update).toHaveBeenCalledTimes(0);
-    expect(engine.create).toHaveBeenCalledTimes(1);
+    const lastNotificationId = await notificationService.setLastNotificationId({id: '12'});
+    expect(lastNotificationId).toEqual('12');
   });
 
-  it('updates last notification ID  if database entry exists', async () => {
+  it('updates last notification ID if database entry exists', async () => {
     const engine = new IndexedDBEngine();
     const apiClient = new APIClient({
       schemaCallback: db => {
@@ -176,7 +171,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, engine);
+    const notificationService = new NotificationService(apiClient);
 
     await apiClient.initEngine({userId: new UUID(UUIDVersion)});
     storeName = engine.storeName;
@@ -190,10 +185,5 @@ describe('NotificationService', () => {
 
     const returnValue = await notificationService.setLastNotificationId({id: '13'});
     expect(returnValue).toEqual('13');
-
-    expect(notificationService.database.getLastNotificationId).toHaveBeenCalledTimes(1);
-    expect(engine.read).toHaveBeenCalledTimes(1);
-    expect(engine.update).toHaveBeenCalledTimes(1);
-    expect(engine.create).toHaveBeenCalledTimes(0);
   });
 });
