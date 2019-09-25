@@ -16,6 +16,29 @@ Wire for Web's communication core.
 yarn add @wireapp/core
 ```
 
+### Setup
+
+```ts
+import {Account} from '@wireapp/core';
+import {APIClient} from '@wireapp/api-client';
+import {ClientType} from '@wireapp/api-client/dist/commonjs/client';
+import {LoginData} from '@wireapp/api-client/dist/commonjs/auth/';
+import {MemoryEngine} from '@wireapp/store-engine';
+
+const client = new APIClient({store: new MemoryEngine(), urls: APIClient.BACKEND.PRODUCTION});
+const account = new Account(client);
+const credentials: LoginData = {
+  clientType: ClientType.TEMPORARY,
+  email: 'email@wire.com',
+  password: 'password',
+};
+
+account.login(credentials).then(context => {
+  console.log('User ID', context.userId);
+  console.log('Client ID', context.clientId);
+});
+```
+
 #### Demo
 
 - [echo.js](./src/demo/echo.js)

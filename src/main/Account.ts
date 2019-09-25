@@ -144,11 +144,7 @@ export class Account extends EventEmitter {
     };
   }
 
-  public async login(
-    loginData: LoginData,
-    initClient: boolean = true,
-    clientInfo?: ClientInfo,
-  ): Promise<Context | undefined> {
+  public async login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
     this.resetContext();
     await this.init();
 
@@ -160,7 +156,11 @@ export class Account extends EventEmitter {
       await this.initClient(loginData, clientInfo);
     }
 
-    return this.apiClient.context;
+    if (this.apiClient.context) {
+      return this.apiClient.context;
+    }
+
+    throw Error('Login failed.');
   }
 
   public async initClient(
