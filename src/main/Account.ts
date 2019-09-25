@@ -122,7 +122,7 @@ export class Account extends EventEmitter {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const conversationService = new ConversationService(this.apiClient, cryptographyService, assetService);
-    const notificationService = new NotificationService(this.apiClient, this.apiClient.config.store);
+    const notificationService = new NotificationService(this.apiClient);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
 

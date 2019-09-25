@@ -33,13 +33,10 @@ export enum DatabaseKeys {
 const STORE_AMPLIFY = CryptographyDatabaseRepository.STORES.AMPLIFY;
 
 export class NotificationDatabaseRepository {
-  public static readonly STORES = DatabaseStores;
-  public static readonly KEYS = DatabaseKeys;
-
   constructor(private readonly storeEngine: CRUDEngine) {}
 
   public getNotificationEventList(): Promise<NotificationPayload[]> {
-    return this.storeEngine.readAll<NotificationPayload>(NotificationDatabaseRepository.STORES.EVENTS);
+    return this.storeEngine.readAll<NotificationPayload>(DatabaseStores.EVENTS);
   }
 
   public async getLastEventDate(): Promise<Date> {
@@ -67,14 +64,7 @@ export class NotificationDatabaseRepository {
   }
 
   public async updateLastNotificationId(lastNotification: Notification): Promise<string> {
-    await this.storeEngine.update(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
-      value: lastNotification.id,
-    });
-    return lastNotification.id;
-  }
-
-  public async createLastNotificationId(lastNotification: Notification): Promise<string> {
-    await this.storeEngine.create(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
+    await this.storeEngine.updateOrCreate(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: lastNotification.id,
     });
     return lastNotification.id;
