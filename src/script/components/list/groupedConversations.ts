@@ -43,9 +43,9 @@ ko.components.register('grouped-conversations', {
         <!-- ko if: isExpanded(folder.id) -->
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
-              data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': listViewModel.onContextMenu}"
+              data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
               data-uie-name="item-conversation"
-              params="click: listViewModel.onContextMenu, conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
+              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
             </conversation-list-cell>
           <!-- /ko -->
         <!-- /ko -->
