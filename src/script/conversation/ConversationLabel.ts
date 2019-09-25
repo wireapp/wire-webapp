@@ -17,7 +17,56 @@
  *
  */
 
-interface ConversationLabel {
+import ko from 'knockout';
+import {createRandomUuid} from 'Util/util';
+
+import {Conversation} from '../entity/Conversation';
+
+export enum LabelType {
+  Custom = 1,
+  Favorite = 2,
+}
+
+export interface ConversationLabel {
+  id: string;
   name: string;
-  conversations: string[];
+  conversations: Conversation[];
+  type: LabelType;
+}
+
+export const createLabel = (
+  conversations: Conversation[] = [],
+  id: string = createRandomUuid(),
+  name: string,
+  type: LabelType = LabelType.Custom,
+): ConversationLabel => ({
+  conversations,
+  id,
+  name,
+  type,
+});
+
+export class ConversationLabelRepository {
+  labels: ConversationLabel[];
+
+  constructor(private readonly conversations: ko.ObservableArray<Conversation>) {
+    this.labels = [];
+  }
+
+  getAllLabeledConversations = () =>
+    this.labels.reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []);
+
+  getGroupsWithoutLabel = () => {
+    const allLabeledConversations = this.getAllLabeledConversations();
+    return this.conversations().filter(
+      conversation => conversation.isGroup() && !allLabeledConversations.includes(conversation),
+    );
+  };
+
+  getContactsWithoutLabel = () => {
+    const allLabeledConversations = this.getAllLabeledConversations();
+    return this.conversations().filter(
+      conversation => conversation.is1to1() && !allLabeledConversations.includes(conversation),
+    );
+  };
 }

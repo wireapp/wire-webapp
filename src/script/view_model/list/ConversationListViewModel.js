@@ -33,6 +33,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/legalHoldDot';
 import 'Components/availabilityState';
+import 'Components/list/groupedConversations';
 
 export class ConversationListViewModel {
   /**
@@ -101,19 +102,6 @@ export class ConversationListViewModel {
 
     this.webappIsLoaded = ko.observable(false);
 
-    this.shouldUpdateScrollbar = ko
-      .computed(() => {
-        // We need all of those as trigger for the antiscroll update.
-        // If we would just use
-        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
-        // it might return after the first truthy value and not monitor the remaining observables.
-        this.unarchivedConversations();
-        this.webappIsLoaded();
-        this.connectRequests();
-        this.callingViewModel.activeCalls();
-      })
-      .extend({notify: 'always', rateLimit: 500});
-
     this.activeConversationId = ko.pureComputed(() => {
       if (this.conversationRepository.active_conversation()) {
         return this.conversationRepository.active_conversation().id;
@@ -133,6 +121,24 @@ export class ConversationListViewModel {
       return this.preferenceNotificationRepository.notifications().length > 0;
     });
 
+    this.showRecentConversations = ko.observable(true);
+    this.expandedFolders = ko.observableArray([]);
+
+    this.shouldUpdateScrollbar = ko
+      .computed(() => {
+        // We need all of those as trigger for the antiscroll update.
+        // If we would just use
+        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
+        // it might return after the first truthy value and not monitor the remaining observables.
+        this.unarchivedConversations();
+        this.webappIsLoaded();
+        this.connectRequests();
+        this.showRecentConversations();
+        this.expandedFolders();
+        this.callingViewModel.activeCalls();
+      })
+      .extend({notify: 'always', rateLimit: 500});
+
     this._initSubscriptions();
   }
 
@@ -149,10 +155,10 @@ export class ConversationListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   }
 
-  hasJoinableCall(conversationId) {
+  hasJoinableCall = conversationId => {
     const call = this.callingRepository.findCall(conversationId);
     return call && call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
-  }
+  };
 
   setShowCallsState(handlingNotifications) {
     const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
