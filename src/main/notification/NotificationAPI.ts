@@ -21,7 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 import {HttpClient} from '../http/';
 import {Notification, NotificationList} from './';
 
-const NOTIFICATION_SIZE_MAXIMUM = 10_000;
+export const NOTIFICATION_SIZE_MAXIMUM = 10_000;
 
 export class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
@@ -55,7 +55,7 @@ export class NotificationAPI {
   public async getNotifications(
     clientId?: string,
     size: number = NOTIFICATION_SIZE_MAXIMUM,
-    since?: Date,
+    since?: string,
   ): Promise<NotificationList> {
     const config: AxiosRequestConfig = {
       method: 'get',
