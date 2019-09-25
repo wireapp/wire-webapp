@@ -59,22 +59,18 @@
 
 .left-list-header-availability {
   position: relative;
+  overflow: hidden;
   flex: 1;
+  justify-content: center;
   margin-left: 8px;
   cursor: pointer;
 
   .availability-state-label {
     .label-bold-xs;
-    position: absolute;
-    right: 0;
-    left: 0;
     display: inline-block;
     line-height: 12px;
 
     text-align: center;
-  }
-  .availability-state-icon + .availability-state-label {
-    margin-left: 16px;
   }
 }
 
