@@ -21,15 +21,16 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import fs from 'fs-extra';
 import path from 'path';
 
+export interface FileEngineOptions {
+  fileExtension: string;
+}
+
 export class FileEngine implements CRUDEngine {
   [index: string]: any;
 
   private autoIncrementedPrimaryKey: number = 1;
 
   public storeName = '';
-  public options: {fileExtension: string} = {
-    fileExtension: '.dat',
-  };
   // Using a reference to Node.js' "path" module to influence the platform-specific behaviour in our tests
   public static path: any = path;
 
@@ -51,7 +52,12 @@ export class FileEngine implements CRUDEngine {
     return unsafePath;
   }
 
-  constructor(private readonly baseDirectory = './') {}
+  constructor(
+    private readonly baseDirectory: string = './',
+    public options: FileEngineOptions = {
+      fileExtension: '.dat',
+    },
+  ) {}
 
   public async isSupported(): Promise<void> {
     const isNodeOrElectron = typeof process === 'object';
