@@ -35,9 +35,9 @@ export interface ConversationLabel {
 }
 
 export const createLabel = (
+  name: string,
   conversations: Conversation[] = [],
   id: string = createRandomUuid(),
-  name: string,
   type: LabelType = LabelType.Custom,
 ): ConversationLabel => ({
   conversations,
