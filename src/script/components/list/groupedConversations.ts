@@ -37,7 +37,7 @@ ko.components.register('grouped-conversations', {
   template: `
     <!-- ko foreach: {data: folders, as: 'folder', noChildContext: true} -->
       <div class="conversation-folder" data-uie-name="conversation-folder" data-bind="attr: {'data-uie-value': folder.name}">
-        <div class="conversation-folder__head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
+        <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
           <disclose-icon></disclose-icon><span data-bind="text: folder.name"></span>
         </div>
         <!-- ko if: isExpanded(folder.id) -->
