@@ -48,25 +48,24 @@ export const createLabel = (
 
 export class ConversationLabelRepository {
   labels: ConversationLabel[];
+  allLabeledConversations: ko.Computed<Conversation[]>;
 
   constructor(private readonly conversations: ko.ObservableArray<Conversation>) {
     this.labels = [];
+    this.allLabeledConversations = ko.computed(() =>
+      this.labels.reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []),
+    );
   }
 
-  getAllLabeledConversations = () =>
-    this.labels.reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []);
-
   getGroupsWithoutLabel = () => {
-    const allLabeledConversations = this.getAllLabeledConversations();
     return this.conversations().filter(
-      conversation => conversation.isGroup() && !allLabeledConversations.includes(conversation),
+      conversation => conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
   getContactsWithoutLabel = () => {
-    const allLabeledConversations = this.getAllLabeledConversations();
     return this.conversations().filter(
-      conversation => conversation.is1to1() && !allLabeledConversations.includes(conversation),
+      conversation => !conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
 }
