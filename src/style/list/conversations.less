@@ -27,6 +27,11 @@
   &.left-list-is-visible {
     .start-ui-transition-fadein;
   }
+
+  .left-list-header-text {
+    flex: 1;
+    text-align: center;
+  }
 }
 
 .conversations-footer {
@@ -110,7 +115,7 @@
       margin: 0 8px 0 15px;
 
       svg {
-        transform: rotate(-90deg);
+        transform: rotate(0);
         transition: transform @animation-timing-fast @ease-out-expo;
       }
     }
