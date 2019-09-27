@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.8.13...@wireapp/store-engine-sqleet@0.9.0) (2019-09-27)
+
+
+### Features
+
+* **store-engine-sqleet:** Add support for Node.js 12 ([#2338](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/2338)) ([a31a96f](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/a31a96f))
+
+
+
+
+
 ## [0.8.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@0.8.12...@wireapp/store-engine-sqleet@0.8.13) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
