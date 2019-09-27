@@ -49,7 +49,7 @@ export class NotificationAPI {
   }
 
   /**
-   * Fetch notifications
+   * Fetch paged notifications.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
   public async getNotifications(
@@ -69,6 +69,37 @@ export class NotificationAPI {
 
     const response = await this.client.sendJSON<NotificationList>(config);
     return response.data;
+  }
+
+  /**
+   * Fetch all notifications.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
+   */
+  public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<Notification[]> {
+    let notificationList: Notification[] = [];
+
+    const getNotificationChunks = async (clientId?: string, lastNotificationId?: string): Promise<Notification[]> => {
+      const {notifications, has_more} = await this.getNotifications(
+        clientId,
+        NOTIFICATION_SIZE_MAXIMUM,
+        lastNotificationId,
+      );
+
+      if (notifications.length) {
+        notificationList = notificationList.concat(notifications);
+      }
+
+      if (has_more) {
+        const lastNotification = notifications[notifications.length - 1];
+        if (lastNotification) {
+          return getNotificationChunks(clientId, lastNotification.id);
+        }
+      }
+
+      return notificationList;
+    };
+
+    return getNotificationChunks(clientId, lastNotificationId);
   }
 
   /**

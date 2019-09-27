@@ -36,10 +36,17 @@ export class NotificationService {
     this.database = new NotificationDatabaseRepository(this.storeEngine);
   }
 
+  public async getAllNotifications(): Promise<Notification[]> {
+    const clientId = this.apiClient.clientId;
+    const lastNotificationId = await this.database.getLastNotificationId();
+    return this.backend.getAllNotifications(clientId, lastNotificationId);
+  }
+
+  /** Should only be called with a completely new client. */
   public async initializeNotificationStream(clientId: string): Promise<string> {
     await this.setLastEventDate(new Date(0));
-    const notification = await this.backend.getLastNotification(clientId);
-    return this.setLastNotificationId(notification);
+    const latestNotificationId = await this.backend.getLastNotification(clientId);
+    return this.setLastNotificationId(latestNotificationId);
   }
 
   public async hasHistory(): Promise<boolean> {

@@ -94,7 +94,6 @@ describe('Account', () => {
       await account.loadAndValidateLocalClient();
 
       expect(account.apiClient.context.clientId).toBe(clientId);
-      expect(account.service.conversation.clientID).toBe(clientId);
     });
   });
 
@@ -118,7 +117,6 @@ describe('Account', () => {
       await account.registerClient();
 
       expect(account.apiClient.context.clientId).toBe(clientId);
-      expect(account.service.conversation.clientID).toBe(clientId);
     });
   });
 });
