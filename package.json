@@ -44,7 +44,7 @@
     "react-dom": "16.9.0",
     "react-hot-loader": "4.12.14",
     "rimraf": "3.0.0",
-    "sinon": "7.4.2",
+    "sinon": "7.5.0",
     "sinon-har-server": "0.3.0",
     "typescript": "3.6.3",
     "webpack": "4.41.0",
