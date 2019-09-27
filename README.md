@@ -78,7 +78,7 @@ The command to run is:
 | 1 (Feature development) | edge | commit | wire-webapp-edge | Staging |
 | 2 (Nightly test automation) | dev | commit or squash merge from edge | wire-webapp-dev | Staging |
 | 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | wire-webapp-staging | Production |
-| 4 (RC testing) | master | merge from "dev"; afterwards [generate release notes](#release-notes) | wire-webapp-master | Staging |
+| 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | wire-webapp-master | Staging |
 | 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | wire-webapp-prod | Production |
 
 #### Staging Bumps for internal releases
