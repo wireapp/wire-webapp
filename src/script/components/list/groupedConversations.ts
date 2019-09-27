@@ -21,8 +21,12 @@ import ko from 'knockout';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationListViewModel} from 'src/script/view_model/list/ConversationListViewModel';
-import {t} from 'Util/LocalizerUtil';
-import {ConversationLabel, createLabel} from '../../conversation/ConversationLabel';
+import {
+  ConversationLabel,
+  createLabelContacts,
+  createLabelFavorites,
+  createLabelGroups,
+} from '../../conversation/ConversationLabel';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
 interface GroupedConversationsParams {
@@ -73,17 +77,17 @@ ko.components.register('grouped-conversations', {
 
       const favorites = conversationLabelRepository.getFavorites();
       if (favorites.length) {
-        folders.push(createLabel(t('conversationLabelFavorites'), favorites, 'favorites'));
+        folders.push(createLabelFavorites(favorites));
       }
 
       const groups = conversationLabelRepository.getGroupsWithoutLabel();
       if (groups.length) {
-        folders.push(createLabel(t('conversationLabelGroups'), groups, 'groups'));
+        folders.push(createLabelGroups(groups));
       }
 
       const contacts = conversationLabelRepository.getContactsWithoutLabel();
       if (contacts.length) {
-        folders.push(createLabel(t('conversationLabelContacts'), contacts, 'contacts'));
+        folders.push(createLabelContacts(contacts));
       }
 
       return folders;

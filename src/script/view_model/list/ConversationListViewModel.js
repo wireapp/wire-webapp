@@ -124,6 +124,15 @@ export class ConversationListViewModel {
     this.showRecentConversations = ko.observable(true);
     this.expandedFolders = ko.observableArray([]);
 
+    this.conversationRepository.active_conversation.subscribe(activeConversation => {
+      const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
+        activeConversation,
+      );
+      if (!this.expandedFolders().includes(activeLabel)) {
+        this.expandedFolders.push(activeLabel);
+      }
+    });
+
     this.shouldUpdateScrollbar = ko
       .computed(() => {
         // We need all of those as trigger for the antiscroll update.

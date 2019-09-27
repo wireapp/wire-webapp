@@ -20,11 +20,18 @@
 import ko from 'knockout';
 import {createRandomUuid} from 'Util/util';
 
+import {t} from 'Util/LocalizerUtil';
 import {Conversation} from '../entity/Conversation';
 
 export enum LabelType {
   Custom = 1,
   Favorite = 2,
+}
+
+enum DefaultLabelIds {
+  Groups = 'groups',
+  Contacts = 'contacts',
+  Favorites = 'favorites',
 }
 
 export interface ConversationLabel {
@@ -46,6 +53,15 @@ export const createLabel = (
   type,
 });
 
+export const createLabelGroups = (groups: Conversation[] = []) =>
+  createLabel(t('conversationLabelGroups'), groups, DefaultLabelIds.Groups);
+
+export const createLabelContacts = (contacts: Conversation[] = []) =>
+  createLabel(t('conversationLabelContacts'), contacts, DefaultLabelIds.Contacts);
+
+export const createLabelFavorites = (favorites: Conversation[] = []) =>
+  createLabel(t('conversationLabelFavorites'), favorites, DefaultLabelIds.Favorites);
+
 export class ConversationLabelRepository {
   labels: ko.ObservableArray<ConversationLabel>;
   allLabeledConversations: ko.Computed<Conversation[]>;
@@ -53,7 +69,11 @@ export class ConversationLabelRepository {
   constructor(private readonly conversations: ko.ObservableArray<Conversation>) {
     this.labels = ko.observableArray([]);
     this.allLabeledConversations = ko.computed(() =>
-      this.labels().reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []),
+      this.labels().reduce(
+        (accumulated: Conversation[], {conversations, type}) =>
+          type === LabelType.Custom ? accumulated.concat(conversations) : accumulated,
+        [],
+      ),
     );
   }
 
@@ -96,5 +116,19 @@ export class ConversationLabelRepository {
       );
     }
     this.labels.valueHasMutated();
+  };
+
+  getConversationLabelId = (conversation: Conversation) => {
+    if (this.allLabeledConversations().includes(conversation)) {
+      const label = this.labels().find(({conversations}) => conversations.includes(conversation));
+      return label.id;
+    }
+    if (this.getFavorites().includes(conversation)) {
+      return DefaultLabelIds.Favorites;
+    }
+    if (conversation.isGroup()) {
+      return DefaultLabelIds.Groups;
+    }
+    return DefaultLabelIds.Contacts;
   };
 }
