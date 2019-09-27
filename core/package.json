@@ -19,7 +19,7 @@
     "@types/faker": "4.1.5",
     "@types/jasmine": "3.4.0",
     "@wireapp/commons": "2.2.14",
-    "commander": "3.0.1",
+    "commander": "3.0.2",
     "cross-env": "5.2.1",
     "dotenv": "8.1.0",
     "faker": "4.1.0",
