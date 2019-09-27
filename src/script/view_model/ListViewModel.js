@@ -358,6 +358,19 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
     }
 
+    const {conversationLabelRepository} = this.conversationRepository;
+    if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+      entries.push({
+        click: () => conversationLabelRepository.addConversationToFavorites(conversationEntity),
+        label: t('conversationContextMenuFavorite'),
+      });
+    } else {
+      entries.push({
+        click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+        label: t('conversationContextMenuUnfavorite'),
+      });
+    }
+
     if (conversationEntity.is_archived()) {
       entries.push({
         click: () => this.clickToUnarchive(conversationEntity),

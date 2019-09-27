@@ -47,13 +47,13 @@ export const createLabel = (
 });
 
 export class ConversationLabelRepository {
-  labels: ConversationLabel[];
+  labels: ko.ObservableArray<ConversationLabel>;
   allLabeledConversations: ko.Computed<Conversation[]>;
 
   constructor(private readonly conversations: ko.ObservableArray<Conversation>) {
-    this.labels = [];
+    this.labels = ko.observableArray([]);
     this.allLabeledConversations = ko.computed(() =>
-      this.labels.reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []),
+      this.labels().reduce((accumulated: Conversation[], {conversations}) => accumulated.concat(conversations), []),
     );
   }
 
@@ -67,5 +67,34 @@ export class ConversationLabelRepository {
     return this.conversations().filter(
       conversation => !conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
+  };
+
+  getFavoriteLabel = () => this.labels().find(({type}) => type === LabelType.Favorite);
+
+  getFavorites = () => {
+    const favoriteLabel = this.getFavoriteLabel();
+    return favoriteLabel ? favoriteLabel.conversations : [];
+  };
+
+  isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
+
+  addConversationToFavorites = (addedConversation: Conversation): void => {
+    let favoriteLabel = this.getFavoriteLabel();
+    if (!favoriteLabel) {
+      favoriteLabel = createLabel('Favorites', undefined, undefined, LabelType.Favorite);
+      this.labels.push(favoriteLabel);
+    }
+    favoriteLabel.conversations.push(addedConversation);
+    this.labels.valueHasMutated();
+  };
+
+  removeConversationFromFavorites = (removedConversation: Conversation): void => {
+    const favoriteLabel = this.getFavoriteLabel();
+    if (favoriteLabel) {
+      favoriteLabel.conversations = favoriteLabel.conversations.filter(
+        conversation => conversation !== removedConversation,
+      );
+    }
+    this.labels.valueHasMutated();
   };
 }

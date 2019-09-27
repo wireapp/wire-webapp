@@ -21,6 +21,7 @@ import ko from 'knockout';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationListViewModel} from 'src/script/view_model/list/ConversationListViewModel';
+import {t} from 'Util/LocalizerUtil';
 import {ConversationLabel, createLabel} from '../../conversation/ConversationLabel';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
@@ -69,15 +70,22 @@ ko.components.register('grouped-conversations', {
 
     this.folders = ko.pureComputed<ConversationLabel[]>(() => {
       const folders: ConversationLabel[] = [];
-      const groups = conversationLabelRepository.getGroupsWithoutLabel();
 
-      if (groups.length) {
-        folders.push(createLabel('Groups', groups, 'groups'));
+      const favorites = conversationLabelRepository.getFavorites();
+      if (favorites.length) {
+        folders.push(createLabel(t('conversationLabelFavorites'), favorites, 'favorites'));
       }
+
+      const groups = conversationLabelRepository.getGroupsWithoutLabel();
+      if (groups.length) {
+        folders.push(createLabel(t('conversationLabelGroups'), groups, 'groups'));
+      }
+
       const contacts = conversationLabelRepository.getContactsWithoutLabel();
       if (contacts.length) {
-        folders.push(createLabel('Contacts', contacts, 'contacts'));
+        folders.push(createLabel(t('conversationLabelContacts'), contacts, 'contacts'));
       }
+
       return folders;
     });
     this.isExpanded = (folderId: string): boolean => expandedFolders().includes(folderId);
