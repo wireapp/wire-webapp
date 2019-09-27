@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.18.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.77...@wireapp/core@12.18.0) (2019-09-27)
+
+
+### Features
+
+* **api-client,core:** Get notifications from notification service ([#2330](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2330)) ([2d2197c](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/2d2197c))
+
+
+
+
+
 ## [12.17.77](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.76...@wireapp/core@12.17.77) (2019-09-25)
 
 **Note:** Version bump only for package @wireapp/core
