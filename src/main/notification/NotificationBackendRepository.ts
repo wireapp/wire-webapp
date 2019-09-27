@@ -23,6 +23,10 @@ import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
 export class NotificationBackendRepository {
   constructor(private readonly apiClient: APIClient) {}
 
+  public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<Notification[]> {
+    return this.apiClient.notification.api.getAllNotifications(clientId, lastNotificationId);
+  }
+
   public getLastNotification(clientId: string): Promise<Notification> {
     return this.apiClient.notification.api.getLastNotification(clientId);
   }

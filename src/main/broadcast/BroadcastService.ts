@@ -53,13 +53,10 @@ export class BroadcastService {
   }
 
   public async broadcastGenericMessage(teamId: string, genericMessage: GenericMessage): Promise<void> {
-    const clientId = this.conversationService.getClientID();
-
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const preKeyBundle = await this.getPreKeyBundle(teamId);
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundle);
-
-    return this.sendOTRBroadcastMessage(clientId, recipients, plainTextArray);
+    return this.sendOTRBroadcastMessage(this.apiClient.validatedClientId, recipients, plainTextArray);
   }
 
   private async sendOTRBroadcastMessage(

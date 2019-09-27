@@ -99,7 +99,6 @@ import {
 import {MessageBuilder} from './message/MessageBuilder';
 
 export class ConversationService {
-  private clientID: string = '';
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
 
@@ -192,7 +191,12 @@ export class ConversationService {
 
     if (this.shouldSendAsExternal(plainTextArray, preKeyBundles)) {
       const encryptedAsset = await AssetCryptography.encryptAsset(plainTextArray);
-      return this.sendExternalGenericMessage(this.clientID, conversationId, encryptedAsset, preKeyBundles);
+      return this.sendExternalGenericMessage(
+        this.apiClient.validatedClientId,
+        conversationId,
+        encryptedAsset,
+        preKeyBundles,
+      );
     }
 
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
@@ -277,7 +281,12 @@ export class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -328,7 +337,12 @@ export class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -369,7 +383,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -410,7 +429,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -447,7 +471,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -501,7 +530,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -533,7 +567,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -561,7 +600,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -585,7 +629,12 @@ export class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -600,7 +649,7 @@ export class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, sessionReset, userIds);
+    await this.sendGenericMessage(this.apiClient.validatedClientId, payloadBundle.conversation, sessionReset, userIds);
 
     return {
       ...payloadBundle,
@@ -619,7 +668,12 @@ export class ConversationService {
       messageId: payloadBundle.id,
     });
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -669,7 +723,12 @@ export class ConversationService {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(this.clientID, payloadBundle.conversation, genericMessage, userIds);
+    await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+    );
 
     return {
       ...payloadBundle,
@@ -701,7 +760,7 @@ export class ConversationService {
 
     const {id: selfConversationId} = await this.getSelfConversation();
 
-    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+    await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage);
 
     return {
       content,
@@ -730,7 +789,7 @@ export class ConversationService {
 
     const {id: selfConversationId} = await this.getSelfConversation();
 
-    await this.sendGenericMessage(this.clientID, selfConversationId, genericMessage);
+    await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage);
 
     return {
       content,
@@ -760,7 +819,7 @@ export class ConversationService {
       messageId,
     });
 
-    await this.sendGenericMessage(this.clientID, conversationId, genericMessage, userIds);
+    await this.sendGenericMessage(this.apiClient.validatedClientId, conversationId, genericMessage, userIds);
 
     return {
       content,
@@ -901,10 +960,6 @@ export class ConversationService {
     return this.apiClient.asset.api.getAsset(assetId, assetToken);
   }
 
-  public getClientID(): string {
-    return this.clientID;
-  }
-
   public async addUser(conversationId: string, userId: string): Promise<string>;
   public async addUser(conversationId: string, userIds: string[]): Promise<string[]>;
   public async addUser(conversationId: string, userIds: string | string[]): Promise<string | string[]> {
@@ -967,10 +1022,6 @@ export class ConversationService {
 
   public sendTypingStop(conversationId: string): Promise<void> {
     return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
-  }
-
-  public setClientID(clientID: string): void {
-    this.clientID = clientID;
   }
 
   public setConversationMutedStatus(
