@@ -40,7 +40,6 @@ module.exports = (config: Config): void => {
     },
     files: ['**/*.ts', {pattern: '**/*.js', watched: true, served: true, included: false}],
     frameworks: ['jasmine', 'karma-typescript'],
-
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors: {

@@ -48,6 +48,7 @@ export class SQLeetEngine implements CRUDEngine {
     private readonly workerLocation: string,
     providedSchema: SQLiteDatabaseSingleColumnDefinition | SQLiteDatabaseDefinition<Record<string, any>>,
     private readonly encryptionKey: string,
+    private readonly nodeDatabaseDir?: string,
   ) {
     // Map single column to SQL entity
     for (const tableName in providedSchema) {
@@ -78,7 +79,7 @@ export class SQLeetEngine implements CRUDEngine {
     await this.isSupported();
 
     this.storeName = storeName;
-    await this.db.mount({key: this.encryptionKey}, this.storeName);
+    await this.db.mount({key: this.encryptionKey}, this.storeName, this.nodeDatabaseDir);
 
     // Create tables
     let statement = '';
