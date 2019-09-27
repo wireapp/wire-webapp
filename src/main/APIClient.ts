@@ -289,4 +289,34 @@ export class APIClient extends EventEmitter {
     }
     return this.config.store;
   }
+
+  public get clientId(): string | undefined {
+    if (this.context && this.context.clientId) {
+      return this.context.clientId;
+    }
+    return undefined;
+  }
+
+  public get userId(): string | undefined {
+    if (this.context && this.context.userId) {
+      return this.context.userId;
+    }
+    return undefined;
+  }
+
+  /** Should be used in cases where the user ID is MANDATORY. */
+  public get validatedUserId(): string {
+    if (this.userId) {
+      return this.userId;
+    }
+    throw new Error('No valid user ID.');
+  }
+
+  /** Should be used in cases where the client ID is MANDATORY. */
+  public get validatedClientId(): string {
+    if (this.clientId) {
+      return this.clientId;
+    }
+    throw new Error('No valid client ID.');
+  }
 }
