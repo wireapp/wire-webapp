@@ -24,8 +24,8 @@ yarn add @wireapp/license-collector
 
 ### CLI Usage
 
-- Add a `repositories.txt` file ([example]('./repositories.txt))
-- Optional: add a `filter.txt` file ([example]('./filter.txt'))
+- Add a `repositories.txt` file ([example](./repositories.txt))
+- Optional: add a `filter.txt` file ([example](./filter.txt'))
 
 - Run
   ```
