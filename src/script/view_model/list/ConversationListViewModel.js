@@ -125,6 +125,9 @@ export class ConversationListViewModel {
     this.expandedFolders = ko.observableArray([]);
 
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
+      if (!activeConversation) {
+        return;
+      }
       const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
         activeConversation,
       );
