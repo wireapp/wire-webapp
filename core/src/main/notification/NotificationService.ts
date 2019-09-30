@@ -18,20 +18,44 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {BackendEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {
+  BackendEvent,
+  CONVERSATION_EVENT,
+  ConversationEvent,
+  ConversationOtrMessageAddEvent,
+  USER_EVENT,
+  UserEvent,
+} from '@wireapp/api-client/dist/commonjs/event';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {EventEmitter} from 'events';
+import logdown = require('logdown');
+
+import {PayloadBundle, PayloadBundleType} from '../conversation';
+import {AssetContent} from '../conversation/content';
+import {ConversationMapper} from '../conversation/ConversationMapper';
+import {CryptographyService} from '../cryptography';
+import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 
-export class NotificationService {
+export type NotificationHandler = (notification: Notification) => Promise<void>;
+
+export class NotificationService extends EventEmitter {
   private readonly apiClient: APIClient;
+  private readonly cryptographyService: CryptographyService;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
   private readonly storeEngine: CRUDEngine;
+  private readonly logger = logdown('@wireapp/core/notification/NotificationService', {
+    logger: console,
+    markdown: false,
+  });
 
-  constructor(apiClient: APIClient) {
+  constructor(apiClient: APIClient, cryptographyService: CryptographyService) {
+    super();
     this.apiClient = apiClient;
+    this.cryptographyService = cryptographyService;
     this.storeEngine = apiClient.config.store;
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(this.storeEngine);
@@ -81,5 +105,104 @@ export class NotificationService {
 
   public async setLastNotificationId(lastNotification: Notification): Promise<string> {
     return this.database.updateLastNotificationId(lastNotification);
+  }
+
+  public async handleNotificationStream(notificationHandler?: NotificationHandler): Promise<void> {
+    const notifications = await this.getAllNotifications();
+    const selectedHandler = notificationHandler ? notificationHandler : this.handleNotification.bind(this);
+    for (const notification of notifications) {
+      await selectedHandler(notification).catch(error => this.logger.error(error));
+    }
+  }
+
+  public readonly handleNotification: NotificationHandler = async notification => {
+    for (const event of notification.payload) {
+      let data;
+
+      try {
+        data = await this.handleEvent(event);
+        if (!notification.transient) {
+          await this.setLastNotificationId(notification);
+        }
+      } catch (error) {
+        this.emit('error', error);
+        continue;
+      }
+
+      if (data) {
+        switch (data.type) {
+          case PayloadBundleType.ASSET_IMAGE:
+          case PayloadBundleType.CALL:
+          case PayloadBundleType.CLEARED:
+          case PayloadBundleType.CLIENT_ACTION:
+          case PayloadBundleType.CLIENT_ADD:
+          case PayloadBundleType.CLIENT_REMOVE:
+          case PayloadBundleType.CONFIRMATION:
+          case PayloadBundleType.CONNECTION_REQUEST:
+          case PayloadBundleType.LOCATION:
+          case PayloadBundleType.MESSAGE_DELETE:
+          case PayloadBundleType.MESSAGE_EDIT:
+          case PayloadBundleType.MESSAGE_HIDE:
+          case PayloadBundleType.PING:
+          case PayloadBundleType.REACTION:
+          case PayloadBundleType.TEXT:
+            this.emit(data.type, data);
+            break;
+          case PayloadBundleType.ASSET: {
+            const assetContent = data.content as AssetContent;
+            const isMetaData = !!assetContent && !!assetContent.original && !assetContent.uploaded;
+            const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
+
+            if (isMetaData) {
+              data.type = PayloadBundleType.ASSET_META;
+              this.emit(PayloadBundleType.ASSET_META, data);
+            } else if (isAbort) {
+              data.type = PayloadBundleType.ASSET_ABORT;
+              this.emit(PayloadBundleType.ASSET_ABORT, data);
+            } else {
+              this.emit(PayloadBundleType.ASSET, data);
+            }
+            break;
+          }
+          case PayloadBundleType.TIMER_UPDATE:
+          case PayloadBundleType.CONVERSATION_RENAME:
+          case PayloadBundleType.MEMBER_JOIN:
+          case PayloadBundleType.TYPING:
+            this.emit(data.type, event);
+            break;
+        }
+      } else {
+        const {type, conversation, from} = event as ConversationEvent;
+        const conversationText = conversation ? ` in conversation "${conversation}"` : '';
+        const fromText = from ? ` from user "${from}".` : '';
+
+        this.logger.log(`Received unsupported event "${type}"${conversationText}${fromText}`, {event});
+      }
+    }
+  };
+
+  private async handleEvent(event: BackendEvent): Promise<PayloadBundle | void> {
+    this.logger.log(`Handling event of type "${event.type}"`, event);
+    switch (event.type) {
+      // Encrypted events
+      case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
+        return this.cryptographyService.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
+      }
+      // Meta events
+      case CONVERSATION_EVENT.MEMBER_JOIN:
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
+      case CONVERSATION_EVENT.RENAME:
+      case CONVERSATION_EVENT.TYPING: {
+        const {conversation, from} = event as ConversationEvent;
+        const metaEvent = {...event, from, conversation};
+        return ConversationMapper.mapConversationEvent(metaEvent as ConversationEvent);
+      }
+      // User events
+      case USER_EVENT.CONNECTION:
+      case USER_EVENT.CLIENT_ADD:
+      case USER_EVENT.CLIENT_REMOVE: {
+        return UserMapper.mapUserEvent(event as UserEvent, this.apiClient.context!.userId);
+      }
+    }
   }
 }

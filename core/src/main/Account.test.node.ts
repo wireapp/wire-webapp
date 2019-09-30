@@ -20,35 +20,15 @@
 import {APIClient} from '@wireapp/api-client';
 import {AuthAPI, Context} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientAPI, ClientType} from '@wireapp/api-client/dist/commonjs/client';
-import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/commonjs/connection';
 import {ConversationAPI} from '@wireapp/api-client/dist/commonjs/conversation';
-import {
-  CONVERSATION_EVENT,
-  ConversationMemberJoinEvent,
-  ConversationMessageTimerUpdateEvent,
-  ConversationRenameEvent,
-  ConversationTypingEvent,
-  USER_EVENT,
-  UserConnectionEvent,
-} from '@wireapp/api-client/dist/commonjs/event';
 import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/dist/commonjs/http';
 import {NotificationAPI} from '@wireapp/api-client/dist/commonjs/notification';
-import {WebSocketTopic} from '@wireapp/api-client/dist/commonjs/tcp';
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {Server as MockSocketServer} from 'mock-socket';
 import nock = require('nock');
 
-import {
-  CONVERSATION_TYPING,
-  ConversationMemberJoinData,
-  ConversationMessageTimerUpdateData,
-  ConversationRenameData,
-  ConversationTypingData,
-} from '@wireapp/api-client/dist/commonjs/conversation/data';
 import {Account} from './Account';
-import {PayloadBundle, PayloadBundleState, PayloadBundleType} from './conversation';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -166,141 +146,6 @@ describe('Account', () => {
     });
   });
 
-  describe('"mapConversationEvent"', () => {
-    it('maps "conversation.message-timer-update" events', () => {
-      const event: ConversationMessageTimerUpdateEvent = {
-        conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
-        data: {
-          message_timer: 2419200000,
-        },
-        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-        time: '2018-08-01T09:40:25.481Z',
-        type: CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
-      };
-
-      const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {
-        content: ConversationMessageTimerUpdateData;
-      };
-
-      expect(incomingEvent.content).toBe(event.data);
-      expect(incomingEvent.conversation).toBe(event.conversation);
-      expect(incomingEvent.from).toBe(event.from);
-      expect(typeof incomingEvent.id).toBe('string');
-      expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
-      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
-      expect(incomingEvent.type).toBe(PayloadBundleType.TIMER_UPDATE);
-    });
-
-    it('maps "conversation.member-join" events', () => {
-      const event: ConversationMemberJoinEvent = {
-        conversation: '87591650-8676-430f-985f-dec8583f58cb',
-        data: {
-          user_ids: [
-            'e023c681-7e51-43dd-a5d8-0f821e70a9c0',
-            'b8a09877-7b73-4636-a664-95b2bda193b0',
-            '5b068afd-1ef2-4860-9fbb-9c3c70a22f97',
-          ],
-        },
-        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-        time: '2018-07-12T09:43:34.442Z',
-        type: CONVERSATION_EVENT.MEMBER_JOIN,
-      };
-
-      const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {
-        content: ConversationMemberJoinData;
-      };
-
-      expect(incomingEvent.content).toBe(event.data);
-      expect(incomingEvent.conversation).toBe(event.conversation);
-      expect(incomingEvent.from).toBe(event.from);
-      expect(typeof incomingEvent.id).toBe('string');
-      expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
-      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
-      expect(incomingEvent.type).toBe(PayloadBundleType.MEMBER_JOIN);
-    });
-
-    it('maps "conversation.rename" events', () => {
-      const event: ConversationRenameEvent = {
-        conversation: 'ed5e4cd5-85ab-4d9e-be59-4e1c0324a9d4',
-        data: {
-          name: 'Tiny Timed Messages',
-        },
-        from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-        time: '2018-08-01T12:01:21.629Z',
-        type: CONVERSATION_EVENT.RENAME,
-      };
-
-      const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: ConversationRenameData};
-
-      expect(incomingEvent.content).toBe(event.data);
-      expect(incomingEvent.conversation).toBe(event.conversation);
-      expect(incomingEvent.from).toBe(event.from);
-      expect(typeof incomingEvent.id).toBe('string');
-      expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
-      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
-      expect(incomingEvent.type).toBe(PayloadBundleType.CONVERSATION_RENAME);
-    });
-
-    it('maps "conversation.typing" events', () => {
-      const event: ConversationTypingEvent = {
-        conversation: '508f14b9-ef4c-405d-bba9-5c4300cc1cbf',
-        data: {status: CONVERSATION_TYPING.STARTED},
-        from: '16d71f22-0f7b-425e-b4b3-5e288700ac1f',
-        time: '2018-08-01T12:10:42.422Z',
-        type: CONVERSATION_EVENT.TYPING,
-      };
-
-      const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: ConversationTypingData};
-
-      expect(incomingEvent.content).toBe(event.data);
-      expect(incomingEvent.conversation).toBe(event.conversation);
-      expect(incomingEvent.from).toBe(event.from);
-      expect(typeof incomingEvent.id).toBe('string');
-      expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
-      expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
-      expect(incomingEvent.type).toBe(PayloadBundleType.TYPING);
-    });
-  });
-
-  describe('"mapUserEvent"', () => {
-    it('maps "user.connection" events', () => {
-      const event: UserConnectionEvent = {
-        connection: {
-          conversation: '19dbbc18-5e22-41dc-acce-0d9d983c1a60',
-          from: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-          last_update: '2018-07-06T09:38:52.286Z',
-          message: ' ',
-          status: ConnectionStatus.SENT,
-          to: 'e023c681-7e51-43dd-a5d8-0f821e70a9c0',
-        },
-        type: USER_EVENT.CONNECTION,
-        user: {
-          name: 'Someone',
-        },
-      };
-
-      const account = new Account();
-      const incomingEvent = account['mapUserEvent'](event) as PayloadBundle & {content: Connection};
-
-      expect(incomingEvent.content).toBe(event.connection);
-      expect(incomingEvent.conversation).toBe(event.connection.conversation);
-      expect(incomingEvent.from).toBe(event.connection.from);
-      expect(typeof incomingEvent.id).toBe('string');
-      expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
-      expect(incomingEvent.timestamp).toBe(new Date(event.connection.last_update).getTime());
-      expect(incomingEvent.type).toBe(PayloadBundleType.CONNECTION_REQUEST);
-    });
-  });
-
   describe('"login"', () => {
     it('logs in with correct credentials', async () => {
       const storeEngine = new MemoryEngine();
@@ -342,48 +187,6 @@ describe('Account', () => {
         expect(error.code).toBe(StatusCode.FORBIDDEN);
         expect(error.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
       }
-    });
-  });
-
-  describe('handleEvent', () => {
-    beforeEach(() => {
-      nock(MOCK_BACKEND.rest)
-        .get(`${NotificationAPI.URL.NOTIFICATION}?client=${CLIENT_ID}&size=10000`)
-        .reply(StatusCode.OK, {has_more: false, notifications: []})
-        .persist();
-    });
-
-    it('propagates errors to the outer calling function', async done => {
-      const storeEngine = new MemoryEngine();
-      await storeEngine.init('account.test');
-
-      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
-      const mockSocketServer = new MockSocketServer(MOCK_BACKEND.rest, {});
-
-      const account = new Account(apiClient);
-      spyOn<any>(account, 'handleEvent').and.throwError('Test error');
-      spyOn<any>(account['apiClient'].transport.ws, 'connect').and.returnValue(Promise.resolve(mockSocketServer));
-
-      await account.init();
-
-      await account.login({
-        clientType: ClientType.TEMPORARY,
-        email: 'hello@example.com',
-        password: 'my-secret',
-      });
-
-      await account.listen();
-
-      account.on('error', error => {
-        expect(error.message).toBe('Test error');
-        done();
-      });
-
-      const notification = {
-        payload: [{}],
-      };
-
-      account['apiClient'].transport.ws.emit(WebSocketTopic.ON_MESSAGE, notification);
     });
   });
 });

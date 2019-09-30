@@ -21,14 +21,18 @@ import {APIClient} from '@wireapp/api-client';
 import {PreKey as SerializedPreKey} from '@wireapp/api-client/dist/commonjs/auth/';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/commonjs/event';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
+import {GenericMessageType, PayloadBundle} from '../conversation';
 import {SessionPayloadBundle} from '../cryptography/';
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
+import {GenericMessageMapper} from './GenericMessageMapper';
 
 export interface MetaClient extends RegisteredClient {
   meta: {
@@ -174,5 +178,32 @@ export class CryptographyService {
   public async resetSession(sessionId: string): Promise<void> {
     await this.cryptobox.session_delete(sessionId);
     this.logger.log(`Deleted session ID "${sessionId}".`);
+  }
+
+  public async decodeGenericMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<PayloadBundle> {
+    const {
+      from,
+      data: {sender, text: cipherText},
+    } = otrMessage;
+
+    const sessionId = CryptographyService.constructSessionId(from, sender);
+    const decryptedMessage = await this.decrypt(sessionId, cipherText);
+    if (decryptedMessage.isSuccess) {
+      const genericMessage = GenericMessage.decode(decryptedMessage.value);
+
+      if (genericMessage.content === GenericMessageType.EPHEMERAL) {
+        const unwrappedMessage = GenericMessageMapper.mapGenericMessage(genericMessage.ephemeral, otrMessage);
+        unwrappedMessage.id = genericMessage.messageId;
+        if (genericMessage.ephemeral) {
+          const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
+          unwrappedMessage.messageTimer =
+            typeof expireAfterMillis === 'number' ? expireAfterMillis : expireAfterMillis.toNumber();
+        }
+        return unwrappedMessage;
+      }
+      return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage);
+    }
+
+    throw decryptedMessage.error;
   }
 }
