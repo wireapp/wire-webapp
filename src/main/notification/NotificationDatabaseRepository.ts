@@ -17,7 +17,8 @@
  *
  */
 
-import {Notification, NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification/';
+import {BackendEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
 
@@ -35,8 +36,8 @@ const STORE_AMPLIFY = CryptographyDatabaseRepository.STORES.AMPLIFY;
 export class NotificationDatabaseRepository {
   constructor(private readonly storeEngine: CRUDEngine) {}
 
-  public getNotificationEventList(): Promise<NotificationPayload[]> {
-    return this.storeEngine.readAll<NotificationPayload>(DatabaseStores.EVENTS);
+  public getNotificationEventList(): Promise<BackendEvent[]> {
+    return this.storeEngine.readAll<BackendEvent>(DatabaseStores.EVENTS);
   }
 
   public async getLastEventDate(): Promise<Date> {

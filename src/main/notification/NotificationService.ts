@@ -18,7 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {Notification, NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification/';
+import {BackendEvent} from '@wireapp/api-client/dist/commonjs/event';
+import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
@@ -43,10 +44,11 @@ export class NotificationService {
   }
 
   /** Should only be called with a completely new client. */
-  public async initializeNotificationStream(clientId: string): Promise<string> {
+  public async initializeNotificationStream(): Promise<string> {
+    const clientId = this.apiClient.clientId;
     await this.setLastEventDate(new Date(0));
-    const latestNotificationId = await this.backend.getLastNotification(clientId);
-    return this.setLastNotificationId(latestNotificationId);
+    const latestNotification = await this.backend.getLastNotification(clientId);
+    return this.setLastNotificationId(latestNotification);
   }
 
   public async hasHistory(): Promise<boolean> {
@@ -54,7 +56,7 @@ export class NotificationService {
     return !!notificationEvents.length;
   }
 
-  public getNotificationEventList(): Promise<NotificationPayload[]> {
+  public getNotificationEventList(): Promise<BackendEvent[]> {
     return this.database.getNotificationEventList();
   }
 

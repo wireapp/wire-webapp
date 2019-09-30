@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationEventData} from '@wireapp/api-client/dist/commonjs/event/';
 import {ConversationContent} from '../content';
 
 export enum PayloadBundleState {
@@ -26,7 +27,7 @@ export enum PayloadBundleState {
 }
 
 export interface PayloadBundle {
-  content?: ConversationContent;
+  content?: ConversationContent | ConversationEventData;
   conversation: string;
   from: string;
   fromClientId?: string;
