@@ -17,8 +17,6 @@
  *
  */
 
-export interface OtrMessageAdd {
-  recipient: string;
-  sender: string;
-  text: string;
+export interface ConversationRenameData {
+  name: string;
 }

@@ -27,7 +27,7 @@ export class NotificationBackendRepository {
     return this.apiClient.notification.api.getAllNotifications(clientId, lastNotificationId);
   }
 
-  public getLastNotification(clientId: string): Promise<Notification> {
+  public getLastNotification(clientId?: string): Promise<Notification> {
     return this.apiClient.notification.api.getLastNotification(clientId);
   }
 }

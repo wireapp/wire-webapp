@@ -17,6 +17,14 @@
  *
  */
 
-import {ConversationEvent, UserEvent} from '../event/';
+import {MutedStatus} from '..';
 
-export type IncomingEvent = ConversationEvent | UserEvent;
+export interface ConversationMemberUpdateData {
+  hidden_ref?: string;
+  hidden?: boolean;
+  otr_archived_ref?: string;
+  otr_archived?: boolean;
+  otr_muted_ref?: string | null;
+  otr_muted?: boolean | null;
+  otr_muted_status?: MutedStatus | null;
+}

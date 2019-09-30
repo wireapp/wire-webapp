@@ -23,19 +23,17 @@ import {
   Conversation,
   ConversationCode,
   ConversationIds,
-  ConversationMessageTimerUpdate,
   ConversationUpdate,
   Conversations,
   Invite,
   Member,
-  MemberUpdate,
   NewConversation,
   NewOTRMessage,
-  Typing,
 } from '../conversation/';
 import {ConversationEvent, ConversationMemberJoinEvent, ConversationMemberLeaveEvent} from '../event/';
 import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
+import {ConversationMemberUpdateData, ConversationMessageTimerUpdateData, ConversationTypingData} from './data';
 
 export class ConversationAPI {
   static readonly MAX_CHUNK_SIZE = 500;
@@ -412,7 +410,7 @@ export class ConversationAPI {
    * @param typingData The typing status
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/isTyping
    */
-  public async postTyping(conversationId: string, typingData: Typing): Promise<void> {
+  public async postTyping(conversationId: string, typingData: ConversationTypingData): Promise<void> {
     const config: AxiosRequestConfig = {
       data: typingData,
       method: 'post',
@@ -450,7 +448,7 @@ export class ConversationAPI {
    */
   public async putConversationMessageTimer(
     conversationId: string,
-    messageTimerData: ConversationMessageTimerUpdate,
+    messageTimerData: ConversationMessageTimerUpdateData,
   ): Promise<ConversationEvent> {
     const config: AxiosRequestConfig = {
       data: messageTimerData,
@@ -487,7 +485,10 @@ export class ConversationAPI {
    * @param memberData The new conversation
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateSelf
    */
-  public async putMembershipProperties(conversationId: string, memberData: MemberUpdate): Promise<void> {
+  public async putMembershipProperties(
+    conversationId: string,
+    memberData: ConversationMemberUpdateData,
+  ): Promise<void> {
     const config: AxiosRequestConfig = {
       data: memberData,
       method: 'put',

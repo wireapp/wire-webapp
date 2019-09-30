@@ -22,7 +22,6 @@ import logdown from 'logdown';
 import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
 
 import {InvalidTokenError} from '../auth/';
-import {IncomingNotification} from '../conversation/';
 import {BackendErrorMapper, HttpClient, NetworkError} from '../http/';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
 
@@ -65,7 +64,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private readonly onMessage = (data: string) => {
-    const notification: IncomingNotification = JSON.parse(data);
+    const notification: Notification = JSON.parse(data);
     this.emit(WebSocketTopic.ON_MESSAGE, notification);
   };
 

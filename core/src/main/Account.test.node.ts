@@ -21,16 +21,9 @@ import {APIClient} from '@wireapp/api-client';
 import {AuthAPI, Context} from '@wireapp/api-client/dist/commonjs/auth';
 import {ClientAPI, ClientType} from '@wireapp/api-client/dist/commonjs/client';
 import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/commonjs/connection';
-import {
-  ConversationAPI,
-  ConversationMessageTimerUpdate,
-  MemberJoin,
-  Rename,
-  Typing,
-} from '@wireapp/api-client/dist/commonjs/conversation';
+import {ConversationAPI} from '@wireapp/api-client/dist/commonjs/conversation';
 import {
   CONVERSATION_EVENT,
-  CONVERSATION_TYPING,
   ConversationMemberJoinEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
@@ -47,6 +40,13 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Server as MockSocketServer} from 'mock-socket';
 import nock = require('nock');
 
+import {
+  CONVERSATION_TYPING,
+  ConversationMemberJoinData,
+  ConversationMessageTimerUpdateData,
+  ConversationRenameData,
+  ConversationTypingData,
+} from '@wireapp/api-client/dist/commonjs/conversation/data';
 import {Account} from './Account';
 import {PayloadBundle, PayloadBundleState, PayloadBundleType} from './conversation';
 
@@ -180,7 +180,7 @@ describe('Account', () => {
 
       const account = new Account();
       const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {
-        content: ConversationMessageTimerUpdate;
+        content: ConversationMessageTimerUpdateData;
       };
 
       expect(incomingEvent.content).toBe(event.data);
@@ -209,7 +209,9 @@ describe('Account', () => {
       };
 
       const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: MemberJoin};
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {
+        content: ConversationMemberJoinData;
+      };
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -233,7 +235,7 @@ describe('Account', () => {
       };
 
       const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: Rename};
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: ConversationRenameData};
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -255,7 +257,7 @@ describe('Account', () => {
       };
 
       const account = new Account();
-      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: Typing};
+      const incomingEvent = account['mapConversationEvent'](event) as PayloadBundle & {content: ConversationTypingData};
 
       expect(incomingEvent.content).toBe(event.data);
       expect(incomingEvent.conversation).toBe(event.conversation);
@@ -344,6 +346,13 @@ describe('Account', () => {
   });
 
   describe('handleEvent', () => {
+    beforeEach(() => {
+      nock(MOCK_BACKEND.rest)
+        .get(`${NotificationAPI.URL.NOTIFICATION}?client=${CLIENT_ID}&size=10000`)
+        .reply(StatusCode.OK, {has_more: false, notifications: []})
+        .persist();
+    });
+
     it('propagates errors to the outer calling function', async done => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('account.test');

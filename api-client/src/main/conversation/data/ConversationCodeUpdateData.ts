@@ -17,6 +17,8 @@
  *
  */
 
-export interface MemberLeave {
-  user_ids: string[];
+export interface ConversationCodeUpdateData {
+  code: string;
+  key: string;
+  uri: string;
 }

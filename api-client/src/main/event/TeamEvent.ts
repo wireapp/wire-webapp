@@ -23,7 +23,6 @@ import {
   TeamMemberLeaveData,
   TeamUpdateData,
 } from '../team/data';
-import {BackendEvent} from './BackendEvent';
 
 export enum TEAM_EVENT {
   CONVERSATION_CREATE = 'team.conversation-create',
@@ -36,7 +35,7 @@ export enum TEAM_EVENT {
   UPDATE = 'team.update',
 }
 
-export interface TeamEvent extends BackendEvent {
+export interface TeamEvent {
   type: TEAM_EVENT;
 }
 

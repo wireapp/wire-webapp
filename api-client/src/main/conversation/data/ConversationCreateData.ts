@@ -17,8 +17,12 @@
  *
  */
 
-export interface CodeUpdate {
-  code: string;
-  key: string;
-  uri: string;
-}
+import {Conversation} from '../Conversation';
+
+export type ConversationCreateData = Conversation & {
+  /** @deprecated */
+  last_event: string;
+  /** @deprecated */
+  last_event_time: string;
+  receipt_mode: null;
+};
