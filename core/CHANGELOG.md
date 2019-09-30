@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.18.0...@wireapp/core@13.0.0) (2019-09-30)
+
+
+### Features
+
+* **api-client,core:** Process notification stream (BREAKING CHANGE) ([#2337](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2337)) ([9d315ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9d315ee))
+
+
+### BREAKING CHANGES
+
+* **api-client,core:** - Moved AudioPreference & NotificationPreference types next to UserPropertiesSetData type
+- Moved all ConversationEvent data types from /conversation to /conversation/data
+- Renamed type AccessUpdate to ConversationAccessUpdateData
+- Renamed type CodeUpdate to ConversationCodeUpdateData
+- Renamed type MemberJoin to ConversationMemberJoinData
+- Renamed type MemberUpdate to Conversation MemberUpdateData
+- Renamed type ConversationMessageTimerUpdate to Conversation - ConversationMessageTimerUpdateData
+- Renamed type OtrMessageAdd to Conversation ConversationOtrMessageAddData
+- Renamed type Rename to Conversation ConversationRenameData
+- Renamed type Typing to Conversation ConversationTypingData
+- Renamed type ConnectRequest to Conversation ConversationConnectRequestData
+- Removed BackendEvent
+- Renamed IncomingEvent to BackendEvent
+- Removed NotificationPayload and replaced it with BackendEvent
+- Removed IncomingNotification and replaced it with Notification
+
+
+
+
+
 # [12.18.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@12.17.77...@wireapp/core@12.18.0) (2019-09-27)
 
 
