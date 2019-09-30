@@ -17,6 +17,6 @@
  *
  */
 
-export interface Rename {
-  name: string;
+export interface ConversationMemberJoinData {
+  user_ids: string[];
 }

@@ -28,7 +28,6 @@ import {
   UserPushRemoveData,
   UserUpdateData,
 } from '../user/data';
-import {BackendEvent} from './BackendEvent';
 
 type UserID = string;
 
@@ -46,7 +45,7 @@ export enum USER_EVENT {
   UPDATE = 'user.update',
 }
 
-export interface UserEvent extends BackendEvent {
+export interface UserEvent {
   type: USER_EVENT;
 }
 

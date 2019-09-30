@@ -17,8 +17,18 @@
  *
  */
 
-import {AudioPreference} from '../../audio';
-import {NotificationPreference} from '../../notification';
+export enum AudioPreference {
+  ALL = 'all',
+  NONE = 'none',
+  SOME = 'some',
+}
+
+export enum NotificationPreference {
+  NONE = 'none',
+  OBFUSCATE = 'obfuscate',
+  OBFUSCATE_MESSAGE = 'obfuscate-message',
+  ON = 'on',
+}
 
 export interface UserPropertiesSetData {
   contact_import: Object;
