@@ -35,7 +35,7 @@
     "nock": "11.3.5",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
-    "terser-webpack-plugin": "2.1.0",
+    "terser-webpack-plugin": "2.1.2",
     "ts-node": "8.4.1",
     "typescript": "3.6.3",
     "webpack": "4.41.0",
