@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.23.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.3...@wireapp/react-ui-kit@7.23.4) (2019-10-01)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Export useLongTouch ([#2358](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2358)) ([f75c646](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f75c646))
+
+
+
+
+
 ## [7.23.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.2...@wireapp/react-ui-kit@7.23.3) (2019-10-01)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
