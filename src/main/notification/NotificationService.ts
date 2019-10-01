@@ -18,14 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {
-  BackendEvent,
-  CONVERSATION_EVENT,
-  ConversationEvent,
-  ConversationOtrMessageAddEvent,
-  USER_EVENT,
-  UserEvent,
-} from '@wireapp/api-client/dist/commonjs/event';
+import {BackendEvent, CONVERSATION_EVENT, ConversationEvent, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
 import {Notification} from '@wireapp/api-client/dist/commonjs/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
@@ -185,22 +178,22 @@ export class NotificationService extends EventEmitter {
     switch (event.type) {
       // Encrypted events
       case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-        return this.cryptographyService.decodeGenericMessage(event as ConversationOtrMessageAddEvent);
+        return this.cryptographyService.decodeGenericMessage(event);
       }
       // Meta events
       case CONVERSATION_EVENT.MEMBER_JOIN:
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case CONVERSATION_EVENT.RENAME:
       case CONVERSATION_EVENT.TYPING: {
-        const {conversation, from} = event as ConversationEvent;
+        const {conversation, from} = event;
         const metaEvent = {...event, from, conversation};
-        return ConversationMapper.mapConversationEvent(metaEvent as ConversationEvent);
+        return ConversationMapper.mapConversationEvent(metaEvent);
       }
       // User events
       case USER_EVENT.CONNECTION:
       case USER_EVENT.CLIENT_ADD:
       case USER_EVENT.CLIENT_REMOVE: {
-        return UserMapper.mapUserEvent(event as UserEvent, this.apiClient.context!.userId);
+        return UserMapper.mapUserEvent(event, this.apiClient.context!.userId);
       }
     }
   }
