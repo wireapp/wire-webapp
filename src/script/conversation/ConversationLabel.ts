@@ -153,7 +153,7 @@ export class ConversationLabelRepository {
   getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
 
   getLabelConversations = (label: ConversationLabel): Conversation[] =>
-    label ? label.conversations.filter(conversation => this.conversations().includes(conversation)) : [];
+    label ? this.conversations().filter(conversation => label.conversations.includes(conversation)) : [];
 
   isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
