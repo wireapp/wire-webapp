@@ -17,8 +17,14 @@
  *
  */
 
-export * from './UserUpdateData';
-export * from './UserPushRemoveData';
-export * from './UserConnectionData';
+export * from './UserActivateData';
+export * from './UserClientAddData';
+export * from './UserClientLegalHoldRequestData';
 export * from './UserClientRemoveData';
+export * from './UserConnectionData';
+export * from './UserDeleteData';
+export * from './UserLegalHoldDisableData';
+export * from './UserLegalHoldEnableData';
 export * from './UserPropertiesSetData';
+export * from './UserPushRemoveData';
+export * from './UserUpdateData';

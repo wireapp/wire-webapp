@@ -20,8 +20,10 @@
 import {UserPushTokenProvider} from './UserPushTokenProvider';
 
 export interface UserPushRemoveData {
-  app: string;
-  client: string;
-  token: string;
-  transport: UserPushTokenProvider;
+  token: {
+    app: string;
+    client: string;
+    token: string;
+    transport: UserPushTokenProvider;
+  };
 }
