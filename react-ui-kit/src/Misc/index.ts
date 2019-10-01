@@ -17,8 +17,10 @@
  *
  */
 
+export * from './childrenWithDefaultProps';
 export * from './IsInViewport';
 export * from './Loading';
 export * from './Pagination';
 export * from './Pill';
-export * from './childrenWithDefaultProps';
+export * from './useLongTouch';
+export * from './useTimeout';
