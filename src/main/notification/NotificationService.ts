@@ -107,11 +107,10 @@ export class NotificationService extends EventEmitter {
     return this.database.updateLastNotificationId(lastNotification);
   }
 
-  public async handleNotificationStream(notificationHandler?: NotificationHandler): Promise<void> {
+  public async handleNotificationStream(notificationHandler: NotificationHandler): Promise<void> {
     const notifications = await this.getAllNotifications();
-    const selectedHandler = notificationHandler ? notificationHandler : this.handleNotification.bind(this);
     for (const notification of notifications) {
-      await selectedHandler(notification).catch(error => this.logger.error(error));
+      await notificationHandler(notification).catch(error => this.logger.error(error));
     }
   }
 

@@ -216,24 +216,23 @@ export class Account extends EventEmitter {
 
     this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
 
-    if (notificationHandler) {
-      this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, notificationHandler);
-    } else {
-      this.apiClient.transport.ws.on(
-        WebSocketTopic.ON_MESSAGE,
-        this.service!.notification.handleNotification.bind(this),
-      );
-    }
+    this.apiClient.transport.ws.on(
+      WebSocketTopic.ON_MESSAGE,
+      notificationHandler || this.service!.notification.handleNotification,
+    );
+
     for (const payloadType of Object.values(PayloadBundleType)) {
       this.service!.notification.on(payloadType, this.handlePayload);
     }
 
-    await this.service!.notification.handleNotificationStream(notificationHandler);
+    await this.service!.notification.handleNotificationStream(
+      notificationHandler || this.service!.notification.handleNotification,
+    );
     await this.apiClient.connect();
     return this;
   }
 
-  private async handlePayload(payload: PayloadBundle): Promise<void> {
+  private readonly handlePayload = async (payload: PayloadBundle): Promise<void> => {
     switch (payload.type) {
       case PayloadBundleType.TIMER_UPDATE: {
         const {
@@ -246,5 +245,5 @@ export class Account extends EventEmitter {
       }
     }
     this.emit(payload.type, payload);
-  }
+  };
 }
