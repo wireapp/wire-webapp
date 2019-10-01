@@ -131,9 +131,7 @@ export class ConversationListViewModel {
       const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
         activeConversation,
       );
-      if (!this.expandedFolders().includes(activeLabel)) {
-        this.expandedFolders.push(activeLabel);
-      }
+      this.expandFolder(activeLabel);
     });
 
     this.shouldUpdateScrollbar = ko
@@ -158,6 +156,12 @@ export class ConversationListViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
   }
+
+  expandFolder = label => {
+    if (!this.expandedFolders().includes(label)) {
+      this.expandedFolders.push(label);
+    }
+  };
 
   clickOnAvailability(viewModel, event) {
     AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
