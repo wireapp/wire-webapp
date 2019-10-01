@@ -20,7 +20,7 @@
     "@types/jasmine": "3.4.1",
     "@wireapp/commons": "2.2.15",
     "commander": "3.0.2",
-    "cross-env": "5.2.1",
+    "cross-env": "6.0.0",
     "dotenv": "8.1.0",
     "faker": "4.1.0",
     "istanbul": "1.1.0-alpha.1",
