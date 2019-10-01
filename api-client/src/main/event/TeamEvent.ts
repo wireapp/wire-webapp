@@ -35,66 +35,66 @@ export enum TEAM_EVENT {
   UPDATE = 'team.update',
 }
 
-export interface TeamEvent {
+export type TeamEventData =
+  | TeamConversationCreateData
+  | TeamConversationDeleteData
+  | TeamMemberLeaveData
+  | TeamUpdateData
+  | null;
+
+export type TeamEvent =
+  | TeamConversationCreateEvent
+  | TeamConversationDeleteEvent
+  | TeamCreateEvent
+  | TeamDeleteEvent
+  | TeamMemberJoinEvent
+  | TeamMemberLeaveEvent
+  | TeamMemberUpdateEvent
+  | TeamUpdateEvent;
+
+export interface BaseTeamEvent {
+  data: TeamEventData;
+  team: string;
+  time: string;
   type: TEAM_EVENT;
 }
 
-export interface TeamConversationCreateEvent extends TeamEvent {
-  type: TEAM_EVENT.CONVERSATION_CREATE;
-}
-
-export interface TeamConversationCreateNotification {
+export interface TeamConversationCreateEvent extends BaseTeamEvent {
   data: TeamConversationCreateData;
-  team: string;
-  time: string;
   type: TEAM_EVENT.CONVERSATION_CREATE;
 }
 
-export interface TeamConversationDeleteEvent extends TeamEvent {
-  type: TEAM_EVENT.CONVERSATION_DELETE;
-}
-
-export interface TeamConversationDeleteNotification {
+export interface TeamConversationDeleteEvent extends BaseTeamEvent {
   data: TeamConversationDeleteData;
-  team: string;
-  time: string;
   type: TEAM_EVENT.CONVERSATION_DELETE;
 }
 
-export interface TeamCreateEvent extends TeamEvent {
+export interface TeamCreateEvent extends BaseTeamEvent {
+  // TODO: add data
   type: TEAM_EVENT.CREATE;
 }
 
-export interface TeamDeleteEvent extends TeamEvent {
+export interface TeamDeleteEvent extends BaseTeamEvent {
+  // TODO: add data
   type: TEAM_EVENT.DELETE;
 }
 
-export interface TeamMemberJoinEvent extends TeamEvent {
+export interface TeamMemberJoinEvent extends BaseTeamEvent {
+  // TODO: add data
   type: TEAM_EVENT.MEMBER_JOIN;
 }
 
-export interface TeamMemberLeaveEvent extends TeamEvent {
-  type: TEAM_EVENT.MEMBER_LEAVE;
-}
-
-export interface TeamMemberLeaveNotification {
+export interface TeamMemberLeaveEvent extends BaseTeamEvent {
   data: TeamMemberLeaveData;
-  team: string;
-  time: string;
   type: TEAM_EVENT.MEMBER_LEAVE;
 }
 
-export interface TeamMemberUpdateEvent extends TeamEvent {
+export interface TeamMemberUpdateEvent extends BaseTeamEvent {
+  // TODO: add data
   type: TEAM_EVENT.MEMBER_UPDATE;
 }
 
-export interface TeamUpdateEvent extends TeamEvent {
-  type: TEAM_EVENT.UPDATE;
-}
-
-export interface TeamUpdateNotification {
+export interface TeamUpdateEvent extends BaseTeamEvent {
   data: TeamUpdateData;
-  team: string;
-  time: string;
   type: TEAM_EVENT.UPDATE;
 }

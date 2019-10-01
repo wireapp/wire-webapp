@@ -17,19 +17,19 @@
  *
  */
 
-import {PreKey} from '../auth/';
-import {RegisteredClient, UpdatedClient} from '../client/';
-import {Connection} from '../connection/';
-import {Self} from '../self/';
 import {
+  UserActivateData,
+  UserClientAddData,
+  UserClientLegalHoldRequestData,
   UserClientRemoveData,
   UserConnectionData,
+  UserDeleteData,
+  UserLegalHoldDisableData,
+  UserLegalHoldEnableData,
   UserPropertiesSetData,
   UserPushRemoveData,
   UserUpdateData,
 } from '../user/data';
-
-type UserID = string;
 
 export enum USER_EVENT {
   ACTIVATE = 'user.activate',
@@ -45,86 +45,77 @@ export enum USER_EVENT {
   UPDATE = 'user.update',
 }
 
-export interface UserEvent {
+export type UserEventData =
+  | UserActivateData
+  | UserClientAddData
+  | UserClientLegalHoldRequestData
+  | UserLegalHoldEnableData
+  | UserLegalHoldDisableData
+  | UserClientRemoveData
+  | UserConnectionData
+  | UserDeleteData
+  | UserPropertiesSetData
+  | UserUpdateData
+  | UserPushRemoveData
+  | null;
+
+export type UserEvent =
+  | UserActivateEvent
+  | UserClientAddEvent
+  | UserClientLegalHoldRequestEvent
+  | UserLegalHoldEnableEvent
+  | UserLegalHoldDisableEvent
+  | UserClientRemoveEvent
+  | UserConnectionEvent
+  | UserDeleteEvent
+  | UserPropertiesSetEvent
+  | UserUpdateEvent
+  | UserPushRemoveEvent;
+
+export interface BaseUserEvent {
   type: USER_EVENT;
 }
 
-export interface UserActivateEvent extends UserEvent {
+export interface UserActivateEvent extends BaseUserEvent, UserActivateData {
   type: USER_EVENT.ACTIVATE;
-  user: Self;
 }
 
-export interface UserClientAddEvent extends UserEvent {
-  client: RegisteredClient;
+export interface UserClientAddEvent extends BaseUserEvent, UserClientAddData {
   type: USER_EVENT.CLIENT_ADD;
 }
 
-export interface UserClientAddNotification {
-  client: UpdatedClient;
-  type: USER_EVENT.CLIENT_ADD;
-}
-
-export interface UserClientLegalHoldRequestEvent extends UserEvent {
-  client_id: string;
-  last_prekey: PreKey;
-  requester: string;
-  target_user: string;
+export interface UserClientLegalHoldRequestEvent extends BaseUserEvent, UserClientLegalHoldRequestData {
   type: USER_EVENT.CLIENT_LEGAL_HOLD_REQUEST;
 }
 
-export interface UserLegalHoldEnableEvent extends UserEvent {
-  id: UserID;
+export interface UserLegalHoldEnableEvent extends BaseUserEvent, UserLegalHoldEnableData {
   type: USER_EVENT.LEGAL_HOLD_ENABLE;
 }
 
-export interface UserLegalHoldDisableEvent extends UserEvent {
-  id: UserID;
+export interface UserLegalHoldDisableEvent extends BaseUserEvent, UserLegalHoldDisableData {
   type: USER_EVENT.LEGAL_HOLD_DISABLE;
 }
 
-export interface UserClientRemoveEvent extends UserEvent {
-  client: UserClientRemoveData;
+export interface UserClientRemoveEvent extends BaseUserEvent, UserClientRemoveData {
   type: USER_EVENT.CLIENT_REMOVE;
 }
 
-export interface UserClientRemoveNotification {
-  client: UserClientRemoveData;
-  type: USER_EVENT.CLIENT_REMOVE;
-}
-
-export interface UserConnectionEvent extends UserEvent {
-  connection: Connection;
-  user: {
-    name: string;
-  };
+export interface UserConnectionEvent extends BaseUserEvent, UserConnectionData {
   type: USER_EVENT.CONNECTION;
 }
 
-export interface UserConnectionNotification {
-  connection: UserConnectionData;
-  type: USER_EVENT.CONNECTION;
-}
-
-export interface UserDeleteEvent extends UserEvent {
+export interface UserDeleteEvent extends BaseUserEvent, UserDeleteData {
   type: USER_EVENT.DELETE;
 }
 
-export interface UserPropertiesSetEvent extends UserEvent {
-  value: UserPropertiesSetData;
-  key: 'webapp';
+export interface UserPropertiesSetEvent extends BaseUserEvent, UserPropertiesSetData {
   type: USER_EVENT.PROPERTIES_SET;
 }
 
-export interface UserUpdateEvent extends UserEvent {
+export interface UserUpdateEvent extends BaseUserEvent, UserUpdateData {
   type: USER_EVENT.UPDATE;
 }
 
-export interface UserPushRemoveNotification {
+export interface UserPushRemoveEvent extends BaseUserEvent, UserPushRemoveData {
   type: USER_EVENT.PUSH_REMOVE;
-  token: UserPushRemoveData;
-}
-
-export interface UserUpdateNotification {
-  type: USER_EVENT.UPDATE;
-  user: UserUpdateData;
 }

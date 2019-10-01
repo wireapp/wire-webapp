@@ -18,5 +18,5 @@
  */
 
 export interface UserClientRemoveData {
-  id: string;
+  client: {id: string};
 }

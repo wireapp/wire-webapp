@@ -21,8 +21,10 @@ import {Picture} from '../../self';
 import {UserAsset} from '../UserAsset';
 
 export interface UserUpdateData {
-  assets?: UserAsset[];
-  id: string;
-  picture?: Picture[];
-  name?: string;
+  user: {
+    assets?: UserAsset[];
+    id: string;
+    picture?: Picture[];
+    name?: string;
+  };
 }

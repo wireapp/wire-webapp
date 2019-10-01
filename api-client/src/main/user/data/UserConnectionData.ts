@@ -17,13 +17,11 @@
  *
  */
 
-import {ConnectionStatus} from '../../connection';
+import {Connection} from '../../connection';
 
 export interface UserConnectionData {
-  conversation: string;
-  from: string;
-  last_update: string;
-  message: string;
-  status: ConnectionStatus;
-  to: string;
+  connection: Connection;
+  user: {
+    name: string;
+  };
 }

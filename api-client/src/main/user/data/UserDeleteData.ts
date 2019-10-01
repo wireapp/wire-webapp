@@ -17,39 +17,6 @@
  *
  */
 
-export enum AudioPreference {
-  ALL = 'all',
-  NONE = 'none',
-  SOME = 'some',
-}
-
-export enum NotificationPreference {
-  NONE = 'none',
-  OBFUSCATE = 'obfuscate',
-  OBFUSCATE_MESSAGE = 'obfuscate-message',
-  ON = 'on',
-}
-
-export interface UserPropertiesSetData {
-  value: {
-    contact_import: Object;
-    enable_debugging: boolean;
-    settings: {
-      emoji: {
-        replace_inline: boolean;
-      };
-      notifications: NotificationPreference;
-      previews: {
-        send: boolean;
-      };
-      privacy: {
-        improve_wire: boolean;
-      };
-      sound: {
-        alerts: AudioPreference;
-      };
-    };
-    version: number;
-  };
-  key: 'webapp';
+export interface UserDeleteData {
+  client: {id: string};
 }
