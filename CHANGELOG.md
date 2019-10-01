@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.0.2...@wireapp/core@13.0.3) (2019-10-01)
+
+
+### Bug Fixes
+
+* Incorrect binding of handlePayload + test ([#2357](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2357)) ([3fd8106](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3fd8106))
+
+
+
+
+
 ## [13.0.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.0.1...@wireapp/core@13.0.2) (2019-10-01)
 
 
