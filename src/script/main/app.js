@@ -388,7 +388,9 @@ class App {
         return this._handleUrlParams();
       })
       .then(() => {
-        return this.repository.conversation.updateConversationsOnAppInit();
+        return this.repository.conversation
+          .updateConversationsOnAppInit()
+          .then(() => this.repository.conversation.conversationLabelRepository.loadLabels());
       })
       .then(() => {
         telemetry.time_step(AppInitTimingsStep.APP_LOADED);
