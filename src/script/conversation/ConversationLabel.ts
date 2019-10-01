@@ -148,12 +148,12 @@ export class ConversationLabelRepository {
     );
   };
 
-  getFavoriteLabel = () => this.labels().find(({type}) => type === LabelType.Favorite);
+  getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
 
-  getFavorites = () => {
-    const favoriteLabel = this.getFavoriteLabel();
-    return favoriteLabel ? favoriteLabel.conversations : [];
-  };
+  getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
+
+  getLabelConversations = (label: ConversationLabel): Conversation[] =>
+    label ? label.conversations.filter(conversation => this.conversations().includes(conversation)) : [];
 
   isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
