@@ -5,7 +5,7 @@
     "pure-uuid": "1.5.7"
   },
   "devDependencies": {
-    "cross-env": "5.2.1",
+    "cross-env": "6.0.0",
     "jasmine": "3.5.0",
     "rimraf": "3.0.0",
     "typescript": "3.6.3"
