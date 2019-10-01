@@ -56,6 +56,7 @@ const Types = {
   INPUT: 'modal-template-input',
   MULTI_ACTIONS: 'modal-multi-actions',
   OPTION: 'modal-template-option',
+  PASSWORD: 'modal-template-password',
   SESSION_RESET: 'modal-session-reset',
 };
 
@@ -69,6 +70,7 @@ export class ModalsViewModel {
     this.elementId = 'modals';
 
     this.optionChecked = ko.observable(false);
+    this.passwordValue = ko.observable('');
     this.inputValue = ko.observable('');
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
@@ -180,6 +182,7 @@ export class ModalsViewModel {
         break;
       }
       case Types.INPUT:
+      case Types.PASSWORD:
       case Types.OPTION: {
         if (!hideSecondary) {
           content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
@@ -213,6 +216,7 @@ export class ModalsViewModel {
     this.state(States.OPEN);
   };
 
+  hasPassword = () => this.content().currentType === Types.PASSWORD;
   hasInput = () => this.content().currentType === Types.INPUT;
   hasOption = () => this.content().currentType === Types.OPTION;
   hasMultipleSecondary = () => this.content().currentType === Types.MULTI_ACTIONS;
@@ -225,6 +229,9 @@ export class ModalsViewModel {
       }
       if (this.content().currentType === Types.INPUT) {
         return action(this.inputValue());
+      }
+      if (this.content().currentType === Types.PASSWORD) {
+        return action(this.passwordValue());
       }
       action();
     }
@@ -245,6 +252,7 @@ export class ModalsViewModel {
   onModalHidden = () => {
     this.content(defaultContent);
     this.inputValue('');
+    this.passwordValue('');
     this.optionChecked(false);
     this.state(States.READY);
     this.unqueue();

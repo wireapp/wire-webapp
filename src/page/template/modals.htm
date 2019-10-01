@@ -19,8 +19,15 @@
           <div data-bind="text: content().messageText"></div>
         <!-- /ko -->
       </div>
+      <!-- ko if: hasPassword() -->
+        <form data-bind="submit: () => doAction(confirm)">
+          <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
+        </form>
+      <!-- /ko -->
       <!-- ko if: hasInput() -->
-        <input class="modal__input" type="password" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}"/>
+        <form data-bind="submit: () => doAction(confirm)">
+          <input class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
+        </form>
       <!-- /ko -->
       <!-- ko if: hasOption() -->
         <div class="modal-option">

@@ -17,11 +17,15 @@
  *
  */
 
+import {amplify} from 'amplify';
 import ko from 'knockout';
+
 import {createRandomUuid} from 'Util/util';
 
 import {t} from 'Util/LocalizerUtil';
 import {Conversation} from '../entity/Conversation';
+import {WebAppEvents} from '../event/WebApp';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum LabelType {
   Custom = 1,
@@ -89,7 +93,8 @@ export class ConversationLabelRepository {
     );
   };
 
-  getFavoriteLabel = () => this.labels().find(({type}) => type === LabelType.Favorite);
+  getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
+  getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
 
   getFavorites = () => {
     const favoriteLabel = this.getFavoriteLabel();
@@ -120,8 +125,7 @@ export class ConversationLabelRepository {
 
   getConversationLabelId = (conversation: Conversation) => {
     if (this.allLabeledConversations().includes(conversation)) {
-      const label = this.labels().find(({conversations}) => conversations.includes(conversation));
-      return label.id;
+      return this.getConversationCustomLabel(conversation).id;
     }
     if (this.getFavorites().includes(conversation)) {
       return DefaultLabelIds.Favorites;
@@ -130,5 +134,40 @@ export class ConversationLabelRepository {
       return DefaultLabelIds.Groups;
     }
     return DefaultLabelIds.Contacts;
+  };
+
+  getConversationCustomLabel = (conversation: Conversation) =>
+    this.labels().find(({conversations}) => conversations.includes(conversation));
+
+  getLabels = (): ConversationLabel[] => this.labels().filter(({type}) => type === LabelType.Custom);
+
+  removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation) => {
+    label.conversations = label.conversations.filter(conversation => conversation !== removeConversation);
+    if (label.conversations.length) {
+      return this.labels.valueHasMutated();
+    }
+    this.labels.remove(label);
+  };
+
+  addConversationToLabel = (label: ConversationLabel, conversation: Conversation) => {
+    label.conversations.push(conversation);
+    this.labels.valueHasMutated();
+  };
+
+  addConversationToNewLabel = (conversation: Conversation) => {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
+      primaryAction: {
+        action: (name: string) => {
+          const newFolder = createLabel(name, [conversation]);
+          this.labels.push(newFolder);
+        },
+        text: 'Create',
+      },
+      text: {
+        input: 'Folder name',
+        message: 'Move the conversation to a new folder',
+        title: 'Create new folder',
+      },
+    });
   };
 }

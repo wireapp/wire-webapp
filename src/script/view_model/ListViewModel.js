@@ -33,6 +33,7 @@ import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 import {WebAppEvents} from '../event/WebApp';
 
 import {Context} from '../ui/ContextMenu';
+import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
@@ -370,6 +371,19 @@ z.viewModel.ListViewModel = class ListViewModel {
         label: t('conversationContextMenuUnfavorite'),
       });
     }
+
+    const customLabel = conversationLabelRepository.getConversationCustomLabel();
+    if (customLabel) {
+      entries.push({
+        click: () => {},
+        label: `Remove from '${customLabel.name}'`,
+      });
+    }
+
+    entries.push({
+      click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
+      label: 'Move to ...',
+    });
 
     if (conversationEntity.is_archived()) {
       entries.push({

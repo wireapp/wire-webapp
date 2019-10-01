@@ -96,17 +96,25 @@ const _build = (entries, defaultIdentifier) => {
   const menu = document.createElement('div');
   menu.classList.add('ctx-menu');
 
-  entries.forEach(({title, label, click, identifier}) => {
+  entries.forEach(({title, label, click, identifier, icon, isSeparator, isDisabled, isChecked}) => {
     const element = document.createElement('div');
+    if (isSeparator) {
+      element.classList.add('ctx-menu-separator');
+      return menu.appendChild(element);
+    }
     element.setAttribute('data-uie-name', identifier || defaultIdentifier || 'ctx-menu-item');
     element.setAttribute('title', title || label || '');
     element.classList.add('ctx-menu-item');
     element.innerText = label;
 
+    if (isDisabled) {
+      element.classList.add('ctx-menu-item--disabled');
+      return menu.appendChild(element);
+    }
     element.onclick = event => {
       event.stopPropagation();
       _cleanup();
-      click();
+      click(event);
     };
 
     element.onmouseenter = () => {
@@ -115,10 +123,22 @@ const _build = (entries, defaultIdentifier) => {
         selectedEntry.classList.remove('selected');
       }
     };
+    if (icon) {
+      const iconComponent = document.createElement(icon);
+      iconComponent.classList.add('ctx-menu-icon');
+      ko.applyBindingsToNode(iconComponent, {component: icon});
+      element.prepend(iconComponent);
+    }
 
+    if (isChecked) {
+      element.classList.add('ctx-menu-item--checked');
+      const checkIcon = document.createElement('check-icon');
+      checkIcon.classList.add('ctx-menu-check');
+      ko.applyBindingsToNode(checkIcon, {component: 'check-icon'});
+      element.append(checkIcon);
+    }
     menu.appendChild(element);
   });
-
   return menu;
 };
 

@@ -33,11 +33,37 @@
 }
 
 .ctx-menu-item {
+  display: flex;
+  align-items: center;
   padding-left: 24px;
   cursor: pointer;
 
   &:hover,
   &.selected {
     background-color: var(--foreground-fade-16);
+  }
+
+  &--disabled {
+    color: var(--foreground-fade-48);
+    cursor: default;
+    font-style: italic;
+    &:hover,
+    &.selected {
+      background-color: transparent;
+    }
+  }
+}
+
+.ctx-menu-separator {
+  border-top: 1px solid var(--foreground-fade-16);
+  margin: 4px 0;
+}
+
+.ctx-menu-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  svg {
+    max-width: 10px;
   }
 }

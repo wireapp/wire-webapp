@@ -62,7 +62,7 @@ export class ConversationListViewModel {
     this.listViewModel = listViewModel;
     this.onJoinCall = onJoinCall;
 
-    this.logger = getLogger('z.viewModel.list.ConversationListViewModel');
+    this.logger = getLogger('ConversationListViewModel');
 
     this.showCalls = ko.observable();
     this.setShowCallsState(repositories.event.notificationHandlingState());
@@ -123,6 +123,13 @@ export class ConversationListViewModel {
 
     this.showRecentConversations = ko.observable(true);
     this.expandedFolders = ko.observableArray([]);
+
+    this.showRecentConversations.subscribe(() => {
+      const antiscrollInner = document.querySelector('.left-list-items.antiscroll-inner');
+      if (antiscrollInner) {
+        antiscrollInner.scrollTop = 0;
+      }
+    });
 
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
       if (!activeConversation) {
