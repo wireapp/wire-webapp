@@ -55,4 +55,70 @@ describe('NotificationService', () => {
       await notificationService.handleNotification(notification);
     });
   });
+
+  describe('handleNotification', () => {
+    it('updates last notification ID when notification is NOT transient', async () => {
+      const storeEngine = new MemoryEngine();
+      await storeEngine.init('NotificationService.test');
+
+      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+
+      spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
+      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
+
+      const notification = ({
+        payload: [{}],
+        transient: false,
+      } as unknown) as Notification;
+
+      await notificationService.handleNotification(notification);
+
+      expect(spySetLastNotificationId.calls.count()).toBe(1);
+    });
+
+    it('does NOT update last notification ID when notification is transient', async () => {
+      const storeEngine = new MemoryEngine();
+      await storeEngine.init('NotificationService.test');
+
+      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+
+      spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
+      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
+
+      const notification = ({
+        payload: [{}],
+        transient: true,
+      } as unknown) as Notification;
+
+      await notificationService.handleNotification(notification);
+
+      expect(spySetLastNotificationId.calls.count()).toBe(0);
+    });
+
+    it('does NOT update last notification ID when event processing fails', async () => {
+      const storeEngine = new MemoryEngine();
+      await storeEngine.init('NotificationService.test');
+
+      const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
+      const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+
+      spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
+      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
+
+      const notification = ({
+        payload: [{}],
+        transient: true,
+      } as unknown) as Notification;
+
+      try {
+        await notificationService.handleNotification(notification);
+        fail('handleNotification should fail');
+      } catch (error) {
+        expect(error.message).toBe('Test error');
+        expect(spySetLastNotificationId.calls.count()).toBe(0);
+      }
+    });
+  });
 });
