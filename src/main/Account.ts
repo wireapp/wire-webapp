@@ -245,6 +245,6 @@ export class Account extends EventEmitter {
         break;
       }
     }
-    this.emit(payload.type, event);
+    this.emit(payload.type, payload);
   }
 }
