@@ -282,16 +282,15 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
           label: t('conversationDetailsActionLeave'),
         },
       },
-      // TODO: Uncomment this when there should be support for conversation deletion
-      // {
-      //   condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
-      //   item: {
-      //     click: () => this.clickToDelete(),
-      //     icon: 'delete-icon',
-      //     identifier: 'do-delete',
-      //     label: t('conversationDetailsActionDelete'),
-      //   },
-      // },
+      {
+        condition: () => !isSingleUserMode && this.isTeam() && conversationEntity.isCreatedBySelf(),
+        item: {
+          click: () => this.clickToDelete(),
+          icon: 'delete-icon',
+          identifier: 'do-delete',
+          label: t('conversationDetailsActionDelete'),
+        },
+      },
     ];
 
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
