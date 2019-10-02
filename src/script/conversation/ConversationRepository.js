@@ -79,6 +79,7 @@ import {ConversationVerificationStateHandler} from './ConversationVerificationSt
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
+import {ConversationLabelRepository} from './ConversationLabel';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
@@ -269,6 +270,11 @@ export class ConversationRepository {
       }
       return connectedUsers;
     });
+
+    this.conversationLabelRepository = new ConversationLabelRepository(
+      this.conversations_unarchived,
+      propertyRepository.propertiesService,
+    );
   }
 
   checkMessageTimer(messageEntity) {

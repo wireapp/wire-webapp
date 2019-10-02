@@ -1,15 +1,16 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
   <div class="left-list-header">
+    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
     <!-- ko if: isTeam() -->
       <availability-state class="left-list-header-availability"
-                          data-bind="clickOrDrag: clickOnAvailability"
-                          data-uie-name="status-availability"
-                          params="availability: selfAvailability, label: selfUserName">
+        data-bind="clickOrDrag: clickOnAvailability"
+        data-uie-name="status-availability"
+        params="availability: selfAvailability, label: selfUserName">
       </availability-state>
       <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
-        <legal-hold-dot style="margin: 0 16px 0 auto"
-                        params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
-                        data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
+        <legal-hold-dot style="padding: 8px"
+          params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
+          data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}">
         </legal-hold-dot>
       <!-- /ko -->
     <!-- /ko -->
@@ -38,41 +39,51 @@
   <div class="left-list-center">
     <!-- ko if: unarchivedConversations().length > 0 || showConnectRequests() -->
       <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: unarchivedConversations">
+        <!-- ko if: showConnectRequests() -->
+          <li class="conversation-list-cell" data-bind="click: clickOnConnectRequests, css: {'conversation-list-cell-active': stateIsRequests()}">
+            <div class="conversation-list-cell-left">
+              <!-- ko if: connectRequests().length === 1 -->
+                <div class="avatar-halo">
+                  <participant-avatar params="participant: connectRequests()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+                </div>
+              <!-- /ko -->
 
-      <!-- ko if: showConnectRequests() -->
-        <li class="conversation-list-cell" data-bind="click: clickOnConnectRequests, css: {'conversation-list-cell-active': stateIsRequests()}">
-          <div class="conversation-list-cell-left">
-            <!-- ko if: connectRequests().length === 1 -->
-              <div class="avatar-halo">
-                <participant-avatar params="participant: connectRequests()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
-              </div>
-            <!-- /ko -->
+              <!-- ko if: connectRequests().length > 1 -->
+                <group-avatar params="users: connectRequests()"></group-avatar>
+              <!-- /ko -->
+            </div>
 
-            <!-- ko if: connectRequests().length > 1 -->
-              <group-avatar params="users: connectRequests()"></group-avatar>
-            <!-- /ko -->
-          </div>
+            <div class="conversation-list-cell-center">
+              <span class="conversation-list-cell-name"
+                    data-bind="text: connectRequestsText, css: {'accent-text': stateIsRequests()}"
+                    data-uie-name="item-pending-requests"></span>
+            </div>
 
-          <div class="conversation-list-cell-center">
-            <span class="conversation-list-cell-name"
-                  data-bind="text: connectRequestsText, css: {'accent-text': stateIsRequests()}"
-                  data-uie-name="item-pending-requests"></span>
-          </div>
-
-          <div class="conversation-list-cell-right">
-            <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
-          </div>
-        </li>
-      <!-- /ko -->
-
-      <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
-        <conversation-list-cell
-          data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': listViewModel.onContextMenu}"
-          data-uie-name="item-conversation"
-          params="click: listViewModel.onContextMenu, conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
-        </conversation-list-cell>
-      <!-- /ko -->
-    </ul>
+            <div class="conversation-list-cell-right">
+              <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
+            </div>
+          </li>
+        <!-- /ko -->
+        <!-- ko if: showRecentConversations() -->
+          <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
+            <conversation-list-cell
+              data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
+              data-uie-name="item-conversation"
+              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
+            </conversation-list-cell>
+          <!-- /ko -->   
+        <!-- /ko -->
+        <!-- ko ifnot: showRecentConversations() -->
+          <grouped-conversations params="
+            conversationRepository: conversationRepository, 
+            listViewModel: listViewModel,
+            hasJoinableCall: hasJoinableCall,
+            onJoinCall: onJoinCall,
+            isSelectedConversation: isSelectedConversation,      
+            expandedFolders: expandedFolders">
+            </grouped-conversations>
+        <!-- /ko -->
+      </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->
       <!-- ko if: archivedConversations().length === 0 -->
@@ -88,9 +99,10 @@
   </div>
   <div class="conversations-footer">
     <people-icon class="button-icon-large" data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton" data-uie-name="go-people"></people-icon>
+    <conversations-recent-icon class="button-icon-large" data-uie-name="go-recent-view" data-bind="attr: {'data-uie-status': showRecentConversations() ? 'active' : 'inactive'}, css: {'accent-fill': showRecentConversations()}, click: () => showRecentConversations(true)"></conversations-recent-icon>
+    <conversations-folder-icon class="button-icon-large" data-uie-name="go-folder-view" data-bind="attr: {'data-uie-status': showRecentConversations() ? 'inactive' : 'active'}, css: {'accent-fill': !showRecentConversations()}, click: () => showRecentConversations(false)"></conversations-folder-icon>
     <!-- ko if: archivedConversations().length > 0 -->
-      <archive-icon class="svg-button" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
+      <archive-icon class="button-icon-large" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
     <!-- /ko -->
-    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>
