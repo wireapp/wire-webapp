@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.0.6...@wireapp/core@13.1.0) (2019-10-02)
+
+
+### Features
+
+* **api-client,core:** Open WebSocket & buffer messages before fetching notification stream ([#2364](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2364)) ([653e564](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/653e564))
+
+
+
+
+
 ## [13.0.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.0.5...@wireapp/core@13.0.6) (2019-10-02)
 
 **Note:** Version bump only for package @wireapp/core
