@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationListViewModel} from 'src/script/view_model/list/ConversationListViewModel';
