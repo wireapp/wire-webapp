@@ -136,10 +136,12 @@ export class ConversationListViewModel {
 
     this.shouldUpdateScrollbar = ko
       .computed(() => {
-        // We need all of those as trigger for the antiscroll update.
-        // If we would just use
-        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
-        // it might return after the first truthy value and not monitor the remaining observables.
+        /**
+         * We need all of those as trigger for the antiscroll update.
+         * If we would just use
+         * ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
+         * it might return after the first truthy value and not monitor the remaining observables.
+         */
         this.unarchivedConversations();
         this.webappIsLoaded();
         this.connectRequests();

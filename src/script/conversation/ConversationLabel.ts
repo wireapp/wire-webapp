@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
 import {PropertiesService} from '../config/dependenciesGraph';
@@ -79,6 +80,7 @@ export const createLabelFavorites = (favorites: Conversation[] = []) =>
 export class ConversationLabelRepository {
   labels: ko.ObservableArray<ConversationLabel>;
   allLabeledConversations: ko.Computed<Conversation[]>;
+  logger: Logger;
 
   constructor(
     private readonly conversations: ko.ObservableArray<Conversation>,
@@ -92,6 +94,7 @@ export class ConversationLabelRepository {
         [],
       ),
     );
+    this.logger = getLogger('ConversationLabelRepository');
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
@@ -127,7 +130,9 @@ export class ConversationLabelRepository {
     try {
       const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
       this.unmarshal(labelProperties);
-    } catch {}
+    } catch (error) {
+      this.logger.warn(`No labels were loaded: ${error.message}`);
+    }
   };
 
   onUserEvent = (event: any) => {
@@ -160,7 +165,8 @@ export class ConversationLabelRepository {
   addConversationToFavorites = (addedConversation: Conversation): void => {
     let favoriteLabel = this.getFavoriteLabel();
     if (!favoriteLabel) {
-      favoriteLabel = createLabel('Favorites', undefined, undefined, LabelType.Favorite);
+      // The favorite label doesn't need a name since it is set at runtime for i18n compatibility
+      favoriteLabel = createLabel('', undefined, undefined, LabelType.Favorite);
       this.labels.push(favoriteLabel);
     }
     favoriteLabel.conversations.push(addedConversation);
