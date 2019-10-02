@@ -29,12 +29,10 @@ const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touc
     }
 
     const onTouchStart = (event: TouchEvent) => {
-      event.preventDefault();
       startTimeout();
     };
 
     const onTouchEnd = (event: TouchEvent) => {
-      event.preventDefault();
       removeTimeout();
     };
 
