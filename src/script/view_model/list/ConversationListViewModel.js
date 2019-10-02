@@ -124,6 +124,13 @@ export class ConversationListViewModel {
     this.showRecentConversations = ko.observable(true);
     this.expandedFolders = ko.observableArray([]);
 
+    this.showRecentConversations.subscribe(() => {
+      const conversationList = document.querySelector('.conversation-list');
+      if (conversationList) {
+        conversationList.scrollTop = 0;
+      }
+    });
+
     this.conversationRepository.active_conversation.subscribe(activeConversation => {
       if (!activeConversation) {
         return;

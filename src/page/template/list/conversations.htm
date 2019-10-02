@@ -38,7 +38,7 @@
   <!-- /ko -->
   <div class="left-list-center">
     <!-- ko if: unarchivedConversations().length > 0 || showConnectRequests() -->
-      <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: unarchivedConversations">
+      <ul class="left-list-items conversation-list" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: unarchivedConversations">
         <!-- ko if: showConnectRequests() -->
           <li class="conversation-list-cell" data-bind="click: clickOnConnectRequests, css: {'conversation-list-cell-active': stateIsRequests()}">
             <div class="conversation-list-cell-left">
