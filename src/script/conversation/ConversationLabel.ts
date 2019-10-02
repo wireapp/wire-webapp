@@ -27,6 +27,7 @@ import {PropertiesService} from '../config/dependenciesGraph';
 import {Conversation} from '../entity/Conversation';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+
 export enum LabelType {
   Custom = 0,
   Favorite = 1,
