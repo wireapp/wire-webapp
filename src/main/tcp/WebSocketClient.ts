@@ -40,10 +40,14 @@ export class WebSocketClient extends EventEmitter {
   private readonly socket: ReconnectingWebsocket;
   private websocketState: WEBSOCKET_STATE;
   public client: HttpClient;
+  private isSocketLocked: boolean;
+  private bufferedMessages: string[];
 
   constructor(baseUrl: string, client: HttpClient) {
     super();
 
+    this.bufferedMessages = [];
+    this.isSocketLocked = false;
     this.baseUrl = baseUrl;
     this.client = client;
     this.isRefreshingAccessToken = false;
@@ -64,8 +68,12 @@ export class WebSocketClient extends EventEmitter {
   }
 
   private readonly onMessage = (data: string) => {
-    const notification: Notification = JSON.parse(data);
-    this.emit(WebSocketTopic.ON_MESSAGE, notification);
+    if (this.isLocked()) {
+      this.bufferedMessages.push(data);
+    } else {
+      const notification: Notification = JSON.parse(data);
+      this.emit(WebSocketTopic.ON_MESSAGE, notification);
+    }
   };
 
   private readonly onError = async (error: ErrorEvent) => {
@@ -87,7 +95,24 @@ export class WebSocketClient extends EventEmitter {
     this.onStateChange(this.socket.getState());
   };
 
-  public async connect(clientId?: string): Promise<WebSocketClient> {
+  /**
+   * Attaches all listeners to the websocket and establishes the connection.
+   *
+   * @param clientId
+   * When provided the websocket will get messages specific to the client.
+   * If omitted the websocket will receive global messages for the account.
+   *
+   * @param shouldLockWebsocket
+   * If `true` locks the connection which doesn't emit any messages until the websocket gets unlocked.
+   * While locked, incoming messages are buffered. When unlocking all buffered messages get emitted.
+   * The websocket should be locked when fetching messages from the notification stream.
+   */
+  public async connect(clientId?: string, shouldLockWebsocket: boolean = false): Promise<WebSocketClient> {
+    if (shouldLockWebsocket) {
+      this.lock();
+    } else {
+      this.unlock();
+    }
     this.clientId = clientId;
 
     this.socket.setOnMessage(this.onMessage);
@@ -127,6 +152,35 @@ export class WebSocketClient extends EventEmitter {
     if (this.socket) {
       this.socket.disconnect(reason, keepClosed);
     }
+  }
+
+  /**
+   * Unlocks the websocket.
+   * When unlocking the websocket all buffered messages between
+   * connecting the websocket and the unlocking the websocket will be emitted.
+   */
+  public readonly unlock = () => {
+    this.logger.info(`Unlocking WebSocket - Emitting "${this.bufferedMessages.length}" unprocessed messages`);
+    this.isSocketLocked = false;
+    for (const bufferedMessage of this.bufferedMessages) {
+      this.onMessage(bufferedMessage);
+    }
+    this.bufferedMessages = [];
+  };
+
+  /**
+   * Locks the websocket so messages are buffered instead of being emitted.
+   * Once the websocket gets unlocked buffered messages get emitted.
+   * This behaviour is needed in order to not miss any messages
+   * during fetching notifications from the notification stream.
+   */
+  public readonly lock = () => {
+    this.logger.info('Locking WebSocket');
+    this.isSocketLocked = true;
+  };
+
+  public isLocked(): boolean {
+    return this.isSocketLocked;
   }
 
   private buildWebSocketUrl(accessToken = this.client.accessTokenStore.accessToken!.access_token): string {
