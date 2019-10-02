@@ -359,20 +359,22 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
     }
 
-    const {conversationLabelRepository} = this.conversationRepository;
-    if (!conversationLabelRepository.isFavorite(conversationEntity)) {
-      entries.push({
-        click: () => {
-          conversationLabelRepository.addConversationToFavorites(conversationEntity);
-          this.conversations.expandFolder(DefaultLabelIds.Favorites);
-        },
-        label: t('conversationContextMenuFavorite'),
-      });
-    } else {
-      entries.push({
-        click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
-        label: t('conversationContextMenuUnfavorite'),
-      });
+    if (!conversationEntity.is_archived()) {
+      const {conversationLabelRepository} = this.conversationRepository;
+      if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+        entries.push({
+          click: () => {
+            conversationLabelRepository.addConversationToFavorites(conversationEntity);
+            this.conversations.expandFolder(DefaultLabelIds.Favorites);
+          },
+          label: t('conversationContextMenuFavorite'),
+        });
+      } else {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+          label: t('conversationContextMenuUnfavorite'),
+        });
+      }
     }
 
     if (conversationEntity.is_archived()) {
