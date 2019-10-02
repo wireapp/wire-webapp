@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.23.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.4...@wireapp/react-ui-kit@7.23.5) (2019-10-02)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Remove preventDefaults from touch events ([#2365](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2365)) ([9ec1e57](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/9ec1e57))
+
+
+
+
+
 ## [7.23.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.3...@wireapp/react-ui-kit@7.23.4) (2019-10-01)
 
 
