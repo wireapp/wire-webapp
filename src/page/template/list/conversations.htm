@@ -64,7 +64,7 @@
             </div>
           </li>
         <!-- /ko -->
-        <!-- ko if: showRecentConversations() -->
+        <div data-bind="visible: showRecentConversations()">
           <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
               data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
@@ -72,8 +72,8 @@
               params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
             </conversation-list-cell>
           <!-- /ko -->   
-        <!-- /ko -->
-        <!-- ko ifnot: showRecentConversations() -->
+        </div>
+        <div data-bind="hidden: showRecentConversations()">
           <grouped-conversations params="
             conversationRepository: conversationRepository, 
             listViewModel: listViewModel,
@@ -82,7 +82,7 @@
             isSelectedConversation: isSelectedConversation,      
             expandedFolders: expandedFolders">
             </grouped-conversations>
-        <!-- /ko -->
+            </div>
       </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->

@@ -46,7 +46,7 @@ ko.components.register('grouped-conversations', {
         <div class="conversation-folder__head" data-uie-name="conversation-folder-head" data-bind="click: () => toggle(folder.id), css: {'conversation-folder__head--open': isExpanded(folder.id)}">
           <disclose-icon></disclose-icon><span data-bind="text: folder.name"></span>
         </div>
-        <!-- ko if: isExpanded(folder.id) -->
+        <div data-bind="visible: isExpanded(folder.id)">
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
               data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
@@ -54,7 +54,7 @@ ko.components.register('grouped-conversations', {
               params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
             </conversation-list-cell>
           <!-- /ko -->
-        <!-- /ko -->
+        </div>
       </div>
     <!-- /ko -->
   `,
