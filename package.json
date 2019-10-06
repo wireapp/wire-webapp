@@ -145,7 +145,7 @@
     "prettier": "1.18.2",
     "raf": "3.4.1",
     "react-addons-test-utils": "15.6.2",
-    "react-hot-loader": "4.12.12",
+    "react-hot-loader": "4.12.14",
     "redux-devtools-extension": "2.13.8",
     "redux-mock-store": "1.5.3",
     "simple-git": "1.126.0",
