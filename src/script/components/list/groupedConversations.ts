@@ -91,6 +91,11 @@ ko.components.register('grouped-conversations', {
         folders.push(createLabelContacts(contacts));
       }
 
+      const custom = conversationLabelRepository
+        .getLabels()
+        .sort(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB));
+      folders.push(...custom);
+
       return folders;
     });
     this.isExpanded = (folderId: string): boolean => expandedFolders().includes(folderId);

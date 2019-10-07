@@ -44,7 +44,7 @@ export enum DefaultLabelIds {
 export interface ConversationLabel {
   id: string;
   name: string;
-  conversations: Conversation[];
+  conversations: ko.ObservableArray<Conversation>;
   type: LabelType;
 }
 
@@ -64,7 +64,7 @@ export const createLabel = (
   id: string = createRandomUuid(),
   type: LabelType = LabelType.Custom,
 ): ConversationLabel => ({
-  conversations,
+  conversations: ko.observableArray(conversations),
   id,
   name,
   type,
@@ -92,7 +92,7 @@ export class ConversationLabelRepository {
     this.allLabeledConversations = ko.computed(() =>
       this.labels().reduce(
         (accumulated: Conversation[], {conversations, type}) =>
-          type === LabelType.Custom ? accumulated.concat(conversations) : accumulated,
+          type === LabelType.Custom ? accumulated.concat(conversations()) : accumulated,
         [],
       ),
     );
@@ -102,7 +102,7 @@ export class ConversationLabelRepository {
 
   marshal = (): LabelProperty => {
     const labelJson = this.labels().map(({id, type, name, conversations}) => ({
-      conversations: conversations.map(({id}) => id),
+      conversations: conversations().map(({id}) => id),
       id,
       name,
       type,
@@ -113,9 +113,11 @@ export class ConversationLabelRepository {
   unmarshal = (labelJson: LabelProperty) => {
     const labels = labelJson.labels.map(
       ({id, type, name, conversations}): ConversationLabel => ({
-        conversations: conversations
-          .map(conversationId => this.conversations().find(({id}) => id === conversationId))
-          .filter(conversation => !!conversation),
+        conversations: ko.observableArray(
+          conversations
+            .map(conversationId => this.conversations().find(({id}) => id === conversationId))
+            .filter(conversation => !!conversation),
+        ),
         id,
         name,
         type,
@@ -161,7 +163,7 @@ export class ConversationLabelRepository {
   getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
 
   getLabelConversations = (label: ConversationLabel): Conversation[] =>
-    label ? this.conversations().filter(conversation => label.conversations.includes(conversation)) : [];
+    label ? this.conversations().filter(conversation => label.conversations().includes(conversation)) : [];
 
   isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
@@ -180,11 +182,10 @@ export class ConversationLabelRepository {
   removeConversationFromFavorites = (removedConversation: Conversation): void => {
     const favoriteLabel = this.getFavoriteLabel();
     if (favoriteLabel) {
-      favoriteLabel.conversations = favoriteLabel.conversations.filter(
-        conversation => conversation !== removedConversation,
+      favoriteLabel.conversations(
+        favoriteLabel.conversations().filter(conversation => conversation !== removedConversation),
       );
     }
-    this.labels.valueHasMutated();
     this.saveLabels();
   };
 
@@ -202,29 +203,43 @@ export class ConversationLabelRepository {
   };
 
   getConversationCustomLabel = (conversation: Conversation) =>
-    this.labels().find(({conversations}) => conversations.includes(conversation));
+    this.labels().find(({conversations}) => conversations().includes(conversation));
 
   getLabels = (): ConversationLabel[] => this.labels().filter(({type}) => type === LabelType.Custom);
 
-  removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation) => {
-    label.conversations = label.conversations.filter(conversation => conversation !== removeConversation);
-    if (label.conversations.length) {
-      return this.labels.valueHasMutated();
+  removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
+    label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+    if (!label.conversations().length) {
+      this.labels.remove(label);
     }
-    this.labels.remove(label);
   };
 
-  addConversationToLabel = (label: ConversationLabel, conversation: Conversation) => {
+  removeConversationFromAllLabels = (removeConversation: Conversation, removeFromFavorites: boolean = false): void => {
+    this.labels().forEach(label => {
+      const isCustom = label.type === LabelType.Custom;
+      if (removeFromFavorites || isCustom) {
+        label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+      }
+      if (isCustom && !label.conversations().length) {
+        this.labels.remove(label);
+      }
+    });
+  };
+
+  addConversationToLabel = (label: ConversationLabel, conversation: Conversation): void => {
+    this.removeConversationFromAllLabels(conversation);
     label.conversations.push(conversation);
-    this.labels.valueHasMutated();
+    this.saveLabels();
   };
 
   addConversationToNewLabel = (conversation: Conversation) => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
       primaryAction: {
         action: (name: string) => {
+          this.removeConversationFromAllLabels(conversation);
           const newFolder = createLabel(name, [conversation]);
           this.labels.push(newFolder);
+          this.saveLabels();
         },
         text: 'Create',
       },
