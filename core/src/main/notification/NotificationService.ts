@@ -27,6 +27,7 @@ import logdown = require('logdown');
 import {PayloadBundle, PayloadBundleType} from '../conversation';
 import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
+import {CoreError, NotificationError} from '../CoreError';
 import {CryptographyService} from '../cryptography';
 import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
@@ -44,6 +45,9 @@ export class NotificationService extends EventEmitter {
     logger: console,
     markdown: false,
   });
+  public static TOPIC = {
+    NOTIFICATION_ERROR: 'NotificationService.TOPIC.NOTIFICATION_ERROR',
+  };
 
   constructor(apiClient: APIClient, cryptographyService: CryptographyService) {
     super();
@@ -117,7 +121,9 @@ export class NotificationService extends EventEmitter {
           await this.setLastNotificationId(notification);
         }
       } catch (error) {
-        this.emit('error', error);
+        this.logger.error(`There was an error with notification ID "${notification.id}": ${error.message}`, error);
+        const notificationError: NotificationError = {error, notification, type: CoreError.NOTIFICATION_ERROR};
+        this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
         continue;
       }
 
