@@ -105,7 +105,9 @@ const _build = (entries, defaultIdentifier) => {
     element.setAttribute('data-uie-name', identifier || defaultIdentifier || 'ctx-menu-item');
     element.setAttribute('title', title || label || '');
     element.classList.add('ctx-menu-item');
-    element.innerText = label;
+    const itemText = document.createElement('span');
+    itemText.innerText = label;
+    element.appendChild(itemText);
 
     if (isDisabled) {
       element.classList.add('ctx-menu-item--disabled');

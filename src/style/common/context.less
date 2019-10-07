@@ -34,9 +34,18 @@
 
 .ctx-menu-item {
   display: flex;
+  overflow: hidden;
+  max-width: 300px;
   align-items: center;
-  padding-left: 24px;
+  padding: 0 16px 0 24px;
   cursor: pointer;
+
+  span {
+    display: inline-block;
+    overflow: hidden;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+  }
 
   &:hover,
   &.selected {
@@ -51,6 +60,10 @@
     &.selected {
       background-color: transparent;
     }
+  }
+
+  &--checked {
+    font-weight: @font-weight-bold;
   }
 }
 

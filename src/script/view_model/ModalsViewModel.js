@@ -75,6 +75,7 @@ export class ModalsViewModel {
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
     this.queue = [];
+    this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().length);
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
@@ -238,6 +239,9 @@ export class ModalsViewModel {
   };
 
   doAction = action => {
+    if (!this.actionEnabled()) {
+      return;
+    }
     if (typeof action === 'function') {
       action();
     }

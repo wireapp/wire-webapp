@@ -377,7 +377,7 @@ z.viewModel.ListViewModel = class ListViewModel {
         });
       }
 
-      const customLabel = conversationLabelRepository.getConversationCustomLabel();
+      const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
       if (customLabel) {
         entries.push({
           click: () => {},
@@ -387,7 +387,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
       entries.push({
         click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
-        label: 'Move to ...',
+        label: 'Move to...',
       });
     }
 

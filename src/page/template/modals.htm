@@ -26,7 +26,7 @@
       <!-- /ko -->
       <!-- ko if: hasInput() -->
         <form data-bind="submit: () => doAction(confirm)">
-          <input class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
+          <input maxlength="64" class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
         </form>
       <!-- /ko -->
       <!-- ko if: hasOption() -->
@@ -44,7 +44,7 @@
           <div data-bind="text: secondary.text, click: () => doAction(secondary.action), css: {'modal__button--full': hasMultipleSecondary()}, attr: {'data-uie-name': secondary.uieName}" class="modal__button modal__button--secondary"></div>
         <!-- /ko -->
         <!-- ko if: content().primaryAction.text -->
-          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
+          <div data-bind="text: content().primaryAction.text, click: () => doAction(confirm), css: {'modal__button--full': hasMultipleSecondary(), 'modal__button--disabled': !actionEnabled()}" class="modal__button modal__button--primary" data-uie-name="do-action"></div>
         <!-- /ko -->
       </div>
     </div>
