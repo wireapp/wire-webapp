@@ -75,13 +75,9 @@ describe('CryptographyService', () => {
         publicPreKeyBundle.serialise(),
       );
       const encodedPreKeyMessage = bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
-      const decryptResult = await cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
-      if (decryptResult.isSuccess === true) {
-        const plaintext = Buffer.from(decryptResult.value).toString('utf8');
-        expect(plaintext).toBe(text);
-      } else {
-        throw new Error();
-      }
+      const decryptedMessage = await cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
+      const plaintext = Buffer.from(decryptedMessage).toString('utf8');
+      expect(plaintext).toBe(text);
     });
 
     it('is resistant to duplicated message errors', async () => {
