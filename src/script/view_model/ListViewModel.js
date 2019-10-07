@@ -37,6 +37,7 @@ import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
+import {DefaultLabelIds} from '../conversation/ConversationLabel';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -359,31 +360,36 @@ z.viewModel.ListViewModel = class ListViewModel {
       }
     }
 
-    const {conversationLabelRepository} = this.conversationRepository;
-    if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+    if (!conversationEntity.is_archived()) {
+      const {conversationLabelRepository} = this.conversationRepository;
+      if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+        entries.push({
+          click: () => {
+            conversationLabelRepository.addConversationToFavorites(conversationEntity);
+            this.conversations.expandFolder(DefaultLabelIds.Favorites);
+          },
+          label: t('conversationContextMenuFavorite'),
+        });
+      } else {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+          label: t('conversationContextMenuUnfavorite'),
+        });
+      }
+
+      const customLabel = conversationLabelRepository.getConversationCustomLabel();
+      if (customLabel) {
+        entries.push({
+          click: () => {},
+          label: `Remove from '${customLabel.name}'`,
+        });
+      }
+
       entries.push({
-        click: () => conversationLabelRepository.addConversationToFavorites(conversationEntity),
-        label: t('conversationContextMenuFavorite'),
-      });
-    } else {
-      entries.push({
-        click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
-        label: t('conversationContextMenuUnfavorite'),
+        click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
+        label: 'Move to ...',
       });
     }
-
-    const customLabel = conversationLabelRepository.getConversationCustomLabel();
-    if (customLabel) {
-      entries.push({
-        click: () => {},
-        label: `Remove from '${customLabel.name}'`,
-      });
-    }
-
-    entries.push({
-      click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
-      label: 'Move to ...',
-    });
 
     if (conversationEntity.is_archived()) {
       entries.push({

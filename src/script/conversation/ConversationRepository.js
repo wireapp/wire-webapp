@@ -271,7 +271,10 @@ export class ConversationRepository {
       return connectedUsers;
     });
 
-    this.conversationLabelRepository = new ConversationLabelRepository(this.conversations_unarchived);
+    this.conversationLabelRepository = new ConversationLabelRepository(
+      this.conversations_unarchived,
+      propertyRepository.propertiesService,
+    );
   }
 
   checkMessageTimer(messageEntity) {

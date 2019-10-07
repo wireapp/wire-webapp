@@ -125,9 +125,9 @@ export class ConversationListViewModel {
     this.expandedFolders = ko.observableArray([]);
 
     this.showRecentConversations.subscribe(() => {
-      const antiscrollInner = document.querySelector('.left-list-items.antiscroll-inner');
-      if (antiscrollInner) {
-        antiscrollInner.scrollTop = 0;
+      const conversationList = document.querySelector('.conversation-list');
+      if (conversationList) {
+        conversationList.scrollTop = 0;
       }
     });
 
@@ -138,17 +138,17 @@ export class ConversationListViewModel {
       const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
         activeConversation,
       );
-      if (!this.expandedFolders().includes(activeLabel)) {
-        this.expandedFolders.push(activeLabel);
-      }
+      this.expandFolder(activeLabel);
     });
 
     this.shouldUpdateScrollbar = ko
       .computed(() => {
-        // We need all of those as trigger for the antiscroll update.
-        // If we would just use
-        // ```this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();```
-        // it might return after the first truthy value and not monitor the remaining observables.
+        /**
+         * We need all of those as trigger for the antiscroll update.
+         * If we would just use
+         * `this.unarchivedConversations() || this.webappIsLoaded() || this.connectRequests() || this.callingViewModel.activeCalls();`
+         * it might return after the first truthy value and not monitor the remaining observables.
+         */
         this.unarchivedConversations();
         this.webappIsLoaded();
         this.connectRequests();
@@ -165,6 +165,12 @@ export class ConversationListViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
   }
+
+  expandFolder = label => {
+    if (!this.expandedFolders().includes(label)) {
+      this.expandedFolders.push(label);
+    }
+  };
 
   clickOnAvailability(viewModel, event) {
     AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');

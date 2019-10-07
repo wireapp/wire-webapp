@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,22 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
+import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
-import {t} from 'Util/LocalizerUtil';
+import {PropertiesService} from '../config/dependenciesGraph';
 import {Conversation} from '../entity/Conversation';
+import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum LabelType {
-  Custom = 1,
-  Favorite = 2,
+  Custom = 0,
+  Favorite = 1,
 }
 
-enum DefaultLabelIds {
+export enum DefaultLabelIds {
   Groups = 'groups',
   Contacts = 'contacts',
   Favorites = 'favorites',
@@ -44,6 +47,16 @@ export interface ConversationLabel {
   conversations: Conversation[];
   type: LabelType;
 }
+
+interface ConversationLabelJson extends Omit<ConversationLabel, 'conversations'> {
+  conversations: string[];
+}
+
+interface LabelProperty {
+  labels: ConversationLabelJson[];
+}
+
+const propertiesKey = 'labels';
 
 export const createLabel = (
   name: string,
@@ -69,8 +82,12 @@ export const createLabelFavorites = (favorites: Conversation[] = []) =>
 export class ConversationLabelRepository {
   labels: ko.ObservableArray<ConversationLabel>;
   allLabeledConversations: ko.Computed<Conversation[]>;
+  logger: Logger;
 
-  constructor(private readonly conversations: ko.ObservableArray<Conversation>) {
+  constructor(
+    private readonly conversations: ko.ObservableArray<Conversation>,
+    private readonly propertiesService: PropertiesService,
+  ) {
     this.labels = ko.observableArray([]);
     this.allLabeledConversations = ko.computed(() =>
       this.labels().reduce(
@@ -79,7 +96,52 @@ export class ConversationLabelRepository {
         [],
       ),
     );
+    this.logger = getLogger('ConversationLabelRepository');
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
+
+  marshal = (): LabelProperty => {
+    const labelJson = this.labels().map(({id, type, name, conversations}) => ({
+      conversations: conversations.map(({id}) => id),
+      id,
+      name,
+      type,
+    }));
+    return {labels: labelJson};
+  };
+
+  unmarshal = (labelJson: LabelProperty) => {
+    const labels = labelJson.labels.map(
+      ({id, type, name, conversations}): ConversationLabel => ({
+        conversations: conversations
+          .map(conversationId => this.conversations().find(({id}) => id === conversationId))
+          .filter(conversation => !!conversation),
+        id,
+        name,
+        type,
+      }),
+    );
+    this.labels(labels);
+  };
+
+  saveLabels = () => {
+    this.propertiesService.putPropertiesByKey(propertiesKey, this.marshal());
+  };
+
+  loadLabels = async () => {
+    try {
+      const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
+      this.unmarshal(labelProperties);
+    } catch (error) {
+      this.logger.warn(`No labels were loaded: ${error.message}`);
+    }
+  };
+
+  onUserEvent = (event: any) => {
+    if (event.type === BackendEvent.USER.PROPERTIES_SET && event.key === propertiesKey) {
+      this.unmarshal(event.value);
+    }
+  };
 
   getGroupsWithoutLabel = () => {
     return this.conversations().filter(
@@ -96,21 +158,23 @@ export class ConversationLabelRepository {
   getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
   getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
 
-  getFavorites = () => {
-    const favoriteLabel = this.getFavoriteLabel();
-    return favoriteLabel ? favoriteLabel.conversations : [];
-  };
+  getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
+
+  getLabelConversations = (label: ConversationLabel): Conversation[] =>
+    label ? this.conversations().filter(conversation => label.conversations.includes(conversation)) : [];
 
   isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
   addConversationToFavorites = (addedConversation: Conversation): void => {
     let favoriteLabel = this.getFavoriteLabel();
     if (!favoriteLabel) {
-      favoriteLabel = createLabel('Favorites', undefined, undefined, LabelType.Favorite);
+      // The favorite label doesn't need a name since it is set at runtime for i18n compatibility
+      favoriteLabel = createLabel('', undefined, undefined, LabelType.Favorite);
       this.labels.push(favoriteLabel);
     }
     favoriteLabel.conversations.push(addedConversation);
     this.labels.valueHasMutated();
+    this.saveLabels();
   };
 
   removeConversationFromFavorites = (removedConversation: Conversation): void => {
@@ -121,6 +185,7 @@ export class ConversationLabelRepository {
       );
     }
     this.labels.valueHasMutated();
+    this.saveLabels();
   };
 
   getConversationLabelId = (conversation: Conversation) => {
