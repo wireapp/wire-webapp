@@ -48,8 +48,10 @@ export async function getPlainText(
   encodedPreKeyMessage: string,
   sessionId: string = `temp-${Date.now()}`,
 ): Promise<string | void> {
-  const decryptResult = await cryptographyService.decrypt(sessionId, encodedPreKeyMessage);
-  if (decryptResult.isSuccess) {
-    return Buffer.from(decryptResult.value).toString('utf8');
+  try {
+    const decryptedMessage = await cryptographyService.decrypt(sessionId, encodedPreKeyMessage);
+    return Buffer.from(decryptedMessage).toString('utf8');
+  } catch (error) {
+    return;
   }
 }
