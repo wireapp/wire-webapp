@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.1.0...@wireapp/core@13.1.1) (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Return complete stack trace from decryption errors ([#2387](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2387)) ([d815d69](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d815d69))
+
+
+
+
+
 # [13.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.0.6...@wireapp/core@13.1.0) (2019-10-02)
 
 

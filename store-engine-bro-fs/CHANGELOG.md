@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.7.17 (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Pass payload to Account emitter ([#2355](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/issues/2355)) ([b37fc0d](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/commit/b37fc0d))
+
+
+
+
+
 ## [0.7.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@0.7.15...@wireapp/store-engine-bro-fs@0.7.16) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/store-engine-bro-fs

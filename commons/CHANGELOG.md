@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.2.16 (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Pass payload to Account emitter ([#2355](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/2355)) ([b37fc0d](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/b37fc0d))
+
+
+
+
+
 ## [2.2.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@2.2.14...@wireapp/commons@2.2.15) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/commons

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.9.17 (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Pass payload to Account emitter ([#2355](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/2355)) ([b37fc0d](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/b37fc0d))
+
+
+
+
+
 ## [3.9.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@3.9.15...@wireapp/store-engine@3.9.16) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/store-engine

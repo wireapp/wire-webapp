@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.4.19 (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Pass payload to Account emitter ([#2355](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/issues/2355)) ([b37fc0d](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/commit/b37fc0d))
+
+
+
+
+
 ## [1.4.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@1.4.17...@wireapp/store-engine-fs@1.4.18) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs

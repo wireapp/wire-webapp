@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.6.15 (2019-10-07)
+
+
+### Bug Fixes
+
+* **core:** Pass payload to Account emitter ([#2355](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/2355)) ([b37fc0d](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/b37fc0d))
+
+
+
+
+
 ## [0.6.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@0.6.13...@wireapp/store-engine-dexie@0.6.14) (2019-09-27)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie
