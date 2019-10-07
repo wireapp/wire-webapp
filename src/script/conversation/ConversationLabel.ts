@@ -113,7 +113,7 @@ export class ConversationLabelRepository {
     const labels = labelJson.labels.map(
       ({id, type, name, conversations}): ConversationLabel => ({
         conversations: conversations
-          .map(conversationId => this.conversations().find(({id}) => id === conversationId))
+          .map(conversationId => this.conversations().find(({id}) => id === conversationId.toLowerCase()))
           .filter(conversation => !!conversation),
         id,
         name,
