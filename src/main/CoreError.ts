@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,14 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/';
-import * as conversation from './conversation/';
-import {CoreError} from './CoreError';
-import * as cryptography from './cryptography/';
+import {Notification} from '@wireapp/api-client/dist/commonjs/notification';
 
-export = {
-  Account,
-  CoreError,
-  auth,
-  conversation,
-  cryptography,
-};
+export enum CoreError {
+  NOTIFICATION_ERROR = 'CoreError.NOTIFICATION_ERROR',
+}
+
+export interface NotificationError {
+  error: Error;
+  notification: Notification;
+  type: CoreError.NOTIFICATION_ERROR;
+}

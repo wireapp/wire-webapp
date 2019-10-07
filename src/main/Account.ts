@@ -34,6 +34,7 @@ import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService, PayloadBundle, PayloadBundleType} from './conversation/';
+import {CoreError} from './CoreError';
 import {CryptographyService} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {NotificationHandler, NotificationService} from './notification/';
@@ -57,6 +58,10 @@ export class Account extends EventEmitter {
     self: SelfService;
     team: TeamService;
     user: UserService;
+  };
+
+  public static TOPIC = {
+    ERROR: 'Account.TOPIC.ERROR',
   };
 
   constructor(apiClient: APIClient = new APIClient()) {
@@ -221,6 +226,8 @@ export class Account extends EventEmitter {
       notificationHandler || this.service!.notification.handleNotification,
     );
 
+    this.service!.notification.on(NotificationService.TOPIC.NOTIFICATION_ERROR, this.handleError);
+
     for (const payloadType of Object.values(PayloadBundleType)) {
       this.service!.notification.on(payloadType, this.handlePayload);
     }
@@ -249,5 +256,9 @@ export class Account extends EventEmitter {
       }
     }
     this.emit(payload.type, payload);
+  };
+
+  private readonly handleError = (accountError: CoreError): void => {
+    this.emit(Account.TOPIC.ERROR, accountError);
   };
 }

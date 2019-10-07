@@ -43,8 +43,8 @@ describe('NotificationService', () => {
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
 
-      notificationService.on('error', error => {
-        expect(error.message).toBe('Test error');
+      notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
+        expect(notificationError.error.message).toBe('Test error');
         done();
       });
 
@@ -97,12 +97,17 @@ describe('NotificationService', () => {
       expect(spySetLastNotificationId.calls.count()).toBe(0);
     });
 
-    it('does NOT update last notification ID when event processing fails', async () => {
+    it('does NOT update last notification ID when event processing fails', async done => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({store: storeEngine, urls: MOCK_BACKEND});
       const notificationService = new NotificationService(apiClient, ({} as unknown) as CryptographyService);
+      notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
+        expect(notificationError.error.message).toBe('Test error');
+        expect(spySetLastNotificationId.calls.count()).toBe(0);
+        done();
+      });
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
       const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
@@ -112,13 +117,7 @@ describe('NotificationService', () => {
         transient: true,
       } as unknown) as Notification;
 
-      try {
-        await notificationService.handleNotification(notification);
-        fail('handleNotification should fail');
-      } catch (error) {
-        expect(error.message).toBe('Test error');
-        expect(spySetLastNotificationId.calls.count()).toBe(0);
-      }
+      await notificationService.handleNotification(notification);
     });
   });
 });
