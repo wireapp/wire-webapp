@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.1.1...@wireapp/core@13.2.0) (2019-10-07)
+
+
+### Features
+
+* Emit notification handling errors ([#2388](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2388)) ([629b467](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/629b467))
+
+
+
+
+
 ## [13.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.1.0...@wireapp/core@13.1.1) (2019-10-07)
 
 
