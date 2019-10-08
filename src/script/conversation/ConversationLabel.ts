@@ -237,6 +237,7 @@ export class ConversationLabelRepository {
     if (!label.conversations().includes(conversation)) {
       this.removeConversationFromAllLabels(conversation);
       label.conversations.push(conversation);
+      amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, label.id);
       this.saveLabels();
     }
   };
@@ -248,6 +249,7 @@ export class ConversationLabelRepository {
           this.removeConversationFromAllLabels(conversation);
           const newFolder = createLabel(name, [conversation]);
           this.labels.push(newFolder);
+          amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
           this.saveLabels();
         },
         text: t('modalCreateFolderAction'),

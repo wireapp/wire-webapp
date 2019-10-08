@@ -72,7 +72,7 @@
               params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
             </conversation-list-cell>
           <!-- /ko -->   
-          </div>
+        </div>
         <div data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
           <grouped-conversations params="
             conversationRepository: conversationRepository, 
@@ -81,8 +81,8 @@
             onJoinCall: onJoinCall,
             isSelectedConversation: isSelectedConversation,      
             expandedFolders: expandedFolders">
-            </grouped-conversations>
-          </div>
+          </grouped-conversations>
+        </div>
       </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->

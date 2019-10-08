@@ -166,6 +166,7 @@ export class ConversationListViewModel {
   _initSubscriptions() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);
   }
 
   expandFolder = label => {
