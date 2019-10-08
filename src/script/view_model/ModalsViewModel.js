@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
-import {noop} from 'Util/util';
+import {noop, afterRender} from 'Util/util';
 
 import {WebAppEvents} from '../event/WebApp';
 
@@ -72,6 +72,7 @@ export class ModalsViewModel {
     this.optionChecked = ko.observable(false);
     this.passwordValue = ko.observable('');
     this.inputValue = ko.observable('');
+    this.inputFocus = ko.observable(false);
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
     this.queue = [];
@@ -215,6 +216,7 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.state(States.OPEN);
+    afterRender(() => this.inputFocus(true));
   };
 
   hasPassword = () => this.content().currentType === Types.PASSWORD;
@@ -249,6 +251,7 @@ export class ModalsViewModel {
   };
 
   hide = () => {
+    this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();
   };

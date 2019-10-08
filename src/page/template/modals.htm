@@ -21,12 +21,12 @@
       </div>
       <!-- ko if: hasPassword() -->
         <form data-bind="submit: () => doAction(confirm)">
-          <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
+          <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>
         </form>
       <!-- /ko -->
       <!-- ko if: hasInput() -->
         <form data-bind="submit: () => doAction(confirm)">
-          <input maxlength="64" class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: true"/>
+          <input maxlength="64" class="modal__input" data-bind="textInput: inputValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>
         </form>
       <!-- /ko -->
       <!-- ko if: hasOption() -->

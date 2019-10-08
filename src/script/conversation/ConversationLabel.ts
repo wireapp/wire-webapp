@@ -218,6 +218,7 @@ export class ConversationLabelRepository {
     if (!label.conversations().length) {
       this.labels.remove(label);
     }
+    this.saveLabels();
   };
 
   removeConversationFromAllLabels = (removeConversation: Conversation, removeFromFavorites: boolean = false): void => {
