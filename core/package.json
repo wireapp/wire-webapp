@@ -32,7 +32,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.32",
     "mock-socket": "9.0.1",
-    "nock": "11.3.6",
+    "nock": "11.4.0",
     "nyc": "14.1.1",
     "rimraf": "3.0.0",
     "terser-webpack-plugin": "2.1.2",
