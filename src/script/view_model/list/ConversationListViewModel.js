@@ -114,6 +114,8 @@ export class ConversationListViewModel {
 
     const startShortcut = Shortcut.getShortcutTooltip(ShortcutType.START);
     this.startTooltip = t('tooltipConversationsStart', startShortcut);
+    this.conversationsTooltip = t('conversationViewTooltip');
+    this.foldersTooltip = t('folderViewTooltip');
 
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 

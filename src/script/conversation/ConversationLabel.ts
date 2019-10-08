@@ -73,8 +73,8 @@ export const createLabel = (
 export const createLabelGroups = (groups: Conversation[] = []) =>
   createLabel(t('conversationLabelGroups'), groups, DefaultLabelIds.Groups);
 
-export const createLabelContacts = (contacts: Conversation[] = []) =>
-  createLabel(t('conversationLabelContacts'), contacts, DefaultLabelIds.Contacts);
+export const createLabelPeople = (contacts: Conversation[] = []) =>
+  createLabel(t('conversationLabelPeople'), contacts, DefaultLabelIds.Contacts);
 
 export const createLabelFavorites = (favorites: Conversation[] = []) =>
   createLabel(t('conversationLabelFavorites'), favorites, DefaultLabelIds.Favorites);
@@ -202,10 +202,16 @@ export class ConversationLabelRepository {
     return DefaultLabelIds.Contacts;
   };
 
-  getConversationCustomLabel = (conversation: Conversation) =>
-    this.labels().find(({conversations}) => conversations().includes(conversation));
+  getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) =>
+    this.labels().find(
+      ({type, conversations}) =>
+        (includeFavorites || type === LabelType.Custom) && conversations().includes(conversation),
+    );
 
-  getLabels = (): ConversationLabel[] => this.labels().filter(({type}) => type === LabelType.Custom);
+  getLabels = (): ConversationLabel[] =>
+    this.labels()
+      .filter(({type}) => type === LabelType.Custom)
+      .sort(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
 
   removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
@@ -227,9 +233,11 @@ export class ConversationLabelRepository {
   };
 
   addConversationToLabel = (label: ConversationLabel, conversation: Conversation): void => {
-    this.removeConversationFromAllLabels(conversation);
-    label.conversations.push(conversation);
-    this.saveLabels();
+    if (!label.conversations().includes(conversation)) {
+      this.removeConversationFromAllLabels(conversation);
+      label.conversations.push(conversation);
+      this.saveLabels();
+    }
   };
 
   addConversationToNewLabel = (conversation: Conversation) => {
@@ -241,12 +249,12 @@ export class ConversationLabelRepository {
           this.labels.push(newFolder);
           this.saveLabels();
         },
-        text: 'Create',
+        text: t('modalCreateFolderAction'),
       },
       text: {
-        input: 'Folder name',
-        message: 'Move the conversation to a new folder',
-        title: 'Create new folder',
+        input: t('modalCreateFolderPlaceholder'),
+        message: t('modalCreateFolderMessage'),
+        title: t('modalCreateFolderHeadline'),
       },
     });
   };

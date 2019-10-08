@@ -72,11 +72,19 @@
   margin: 4px 0;
 }
 
-.ctx-menu-icon {
+.ctx-menu-icon,
+.ctx-menu-check {
   display: flex;
   align-items: center;
-  margin-right: 8px;
   svg {
     max-width: 10px;
+
+    path {
+      fill: currentColor;
+    }
   }
+}
+
+.ctx-menu-icon {
+  margin-right: 8px;
 }

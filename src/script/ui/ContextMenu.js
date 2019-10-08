@@ -136,6 +136,7 @@ const _build = (entries, defaultIdentifier) => {
       element.classList.add('ctx-menu-item--checked');
       const checkIcon = document.createElement('check-icon');
       checkIcon.classList.add('ctx-menu-check');
+      checkIcon.setAttribute('data-uie-name', 'ctx-menu-check');
       ko.applyBindingsToNode(checkIcon, {component: 'check-icon'});
       element.append(checkIcon);
     }

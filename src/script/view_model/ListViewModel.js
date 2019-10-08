@@ -368,26 +368,26 @@ z.viewModel.ListViewModel = class ListViewModel {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
             this.conversations.expandFolder(DefaultLabelIds.Favorites);
           },
-          label: t('conversationContextMenuFavorite'),
+          label: t('conversationPopoverFavorite'),
         });
       } else {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
-          label: t('conversationContextMenuUnfavorite'),
+          label: t('conversationPopoverUnfavorite'),
         });
       }
 
       const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
       if (customLabel) {
         entries.push({
-          click: () => {},
-          label: `Remove from '${customLabel.name}'`,
+          click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
+          label: t('conversationsPopoverRemoveFrom', customLabel.name),
         });
       }
 
       entries.push({
         click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
-        label: 'Move to...',
+        label: t('conversationsPopoverMoveTo'),
       });
     }
 

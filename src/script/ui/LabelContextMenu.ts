@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'Util/LocalizerUtil';
+
 import {ConversationLabelRepository} from '../conversation/ConversationLabel';
 import {Conversation} from '../entity/Conversation';
 import {Context} from '../ui/ContextMenu';
@@ -29,13 +31,13 @@ export const showLabelContextMenu = (
   const newLabel = {
     click: () => labelRepository.addConversationToNewLabel(conversation),
     icon: 'plus-icon',
-    label: 'New Label',
+    label: t('conversationsPopoverNewFolder'),
   };
   const separator = {isSeparator: true};
 
   const noLabels = {
     isDisabled: true,
-    label: 'No custom folder',
+    label: t('conversationsPopoverNoCustomFolders'),
   };
 
   const conversationLabelId = labelRepository.getConversationLabelId(conversation);

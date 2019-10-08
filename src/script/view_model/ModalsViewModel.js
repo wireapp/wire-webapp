@@ -75,7 +75,7 @@ export class ModalsViewModel {
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
     this.queue = [];
-    this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().length);
+    this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().trim().length);
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
@@ -238,8 +238,8 @@ export class ModalsViewModel {
     }
   };
 
-  doAction = action => {
-    if (!this.actionEnabled()) {
+  doAction = (action, skipValidation = false) => {
+    if (!skipValidation && !this.actionEnabled()) {
       return;
     }
     if (typeof action === 'function') {
