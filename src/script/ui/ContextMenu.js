@@ -173,7 +173,8 @@ export const Context = {
     const menuHeight = menu.offsetHeight;
 
     menu.style.left = `${windowWidth - clickX < menuWidth ? clickX - menuWidth : clickX}px`;
-    menu.style.top = `${windowHeight - clickY < menuHeight ? clickY - menuHeight : clickY}px`;
+    menu.style.top = `${Math.max(windowHeight - clickY < menuHeight ? clickY - menuHeight : clickY, 0)}px`;
+    menu.style.maxHeight = `${windowHeight}px`;
     menu.style.visibility = '';
 
     _addListeners();
