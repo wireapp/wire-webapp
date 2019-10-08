@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/ansi-regex": "4.0.0",
+    "@types/ansi-regex": "5.0.0",
     "@types/fs-extra": "8.0.0",
     "@types/node": "~10",
     "@types/platform": "1.3.2",
