@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.2.2...@wireapp/core@13.3.0) (2019-10-09)
+
+
+### Features
+
+* **core:** Synchronize outgoing messages ([#2401](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2401)) ([14f1984](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/14f1984))
+
+
+
+
+
 ## [13.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.2.1...@wireapp/core@13.2.2) (2019-10-09)
 
 **Note:** Version bump only for package @wireapp/core
