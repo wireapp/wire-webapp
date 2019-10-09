@@ -175,7 +175,7 @@ after_failure:
     if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       if [[ "${TRAVIS_BRANCH}" =~ ^(dev|master)$ ]]; then
         LAST_COMMITTER_NAME="$(git --no-pager show -s --format='%an' HEAD)"
-        TRAVIS_BUILD_URL="https://travis-ci.org/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
+        TRAVIS_BUILD_URL="https://travis-ci.com/${TRAVIS_REPO_SLUG}/builds/${TRAVIS_BUILD_ID}"
         yarn global add @wireapp/changelog-bot@2.2.1
         wire-changelog-bot -e "${WIRE_WEBAPP_BOT_EMAIL}" -p "${WIRE_WEBAPP_BOT_PASSWORD}" -c "b2cc7120-4154-4be4-b0c0-45a8c361c4d1" -m "${LAST_COMMITTER_NAME} broke the \"${TRAVIS_BRANCH}\" branch on \"${TRAVIS_REPO_SLUG}\" (Build #${TRAVIS_BUILD_NUMBER}). 🌵 → ${TRAVIS_BUILD_URL}"
       fi

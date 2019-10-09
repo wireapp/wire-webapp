@@ -115,7 +115,9 @@ export class ConversationLabelRepository {
       ({id, type, name, conversations}): ConversationLabel => ({
         conversations: ko.observableArray(
           conversations
-            .map(conversationId => this.conversations().find(({id}) => id === conversationId))
+            .map(conversationId =>
+              this.conversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
+            )
             .filter(conversation => !!conversation),
         ),
         id,
