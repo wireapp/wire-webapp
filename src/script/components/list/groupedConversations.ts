@@ -91,7 +91,7 @@ ko.components.register('grouped-conversations', {
         folders.push(createLabelPeople(contacts));
       }
 
-      const custom = conversationLabelRepository.getLabels();
+      const custom = conversationLabelRepository.getLabels().filter(({conversations}) => !!conversations.length);
       folders.push(...custom);
 
       return folders;
