@@ -1,6 +1,6 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
   <div class="left-list-header">
-    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
+    <settings-icon class="conversations-settings button-icon-large accent-text" data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}" data-uie-name="go-preferences"></settings-icon>
     <!-- ko if: isTeam() -->
       <availability-state class="left-list-header-availability"
         data-bind="clickOrDrag: clickOnAvailability"
@@ -64,7 +64,7 @@
             </div>
           </li>
         <!-- /ko -->
-        <!-- ko if: showRecentConversations() -->
+        <div data-uie-name="recent-view" data-bind="visible: showRecentConversations()">
           <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
               data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
@@ -72,8 +72,8 @@
               params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall">
             </conversation-list-cell>
           <!-- /ko -->   
-        <!-- /ko -->
-        <!-- ko ifnot: showRecentConversations() -->
+        </div>
+        <div data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
           <grouped-conversations params="
             conversationRepository: conversationRepository, 
             listViewModel: listViewModel,
@@ -81,8 +81,8 @@
             onJoinCall: onJoinCall,
             isSelectedConversation: isSelectedConversation,      
             expandedFolders: expandedFolders">
-            </grouped-conversations>
-        <!-- /ko -->
+          </grouped-conversations>
+        </div>
       </ul>
     <!-- /ko -->
     <!-- ko if: noConversations() -->
@@ -99,8 +99,8 @@
   </div>
   <div class="conversations-footer">
     <people-icon class="button-icon-large" data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton" data-uie-name="go-people"></people-icon>
-    <conversations-recent-icon class="button-icon-large" data-uie-name="go-recent-view" data-bind="attr: {'data-uie-status': showRecentConversations() ? 'active' : 'inactive'}, css: {'accent-fill': showRecentConversations()}, click: () => showRecentConversations(true)"></conversations-recent-icon>
-    <conversations-folder-icon class="button-icon-large" data-uie-name="go-folder-view" data-bind="attr: {'data-uie-status': showRecentConversations() ? 'inactive' : 'active'}, css: {'accent-fill': !showRecentConversations()}, click: () => showRecentConversations(false)"></conversations-folder-icon>
+    <conversations-recent-icon class="button-icon-large" data-uie-name="go-recent-view" data-bind="attr: {title: conversationsTooltip, 'data-uie-status': showRecentConversations() ? 'active' : 'inactive'}, css: {'accent-fill': showRecentConversations()}, click: () => showRecentConversations(true)"></conversations-recent-icon>
+    <conversations-folder-icon class="button-icon-large" data-uie-name="go-folder-view" data-bind="attr: {title: foldersTooltip, 'data-uie-status': showRecentConversations() ? 'inactive' : 'active'}, css: {'accent-fill': !showRecentConversations()}, click: () => showRecentConversations(false)"></conversations-folder-icon>
     <!-- ko if: archivedConversations().length > 0 -->
       <archive-icon class="button-icon-large" data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton" data-uie-name="go-archive"></archive-icon >
     <!-- /ko -->

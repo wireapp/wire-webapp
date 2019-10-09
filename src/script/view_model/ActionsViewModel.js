@@ -121,7 +121,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.PASSWORD, {
         preventClose: true,
         primaryAction: {
           action: password => {

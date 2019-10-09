@@ -30,14 +30,62 @@
   font-size: 12px;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
+  overflow-y: auto;
 }
 
 .ctx-menu-item {
-  padding-left: 24px;
+  display: flex;
+  overflow: hidden;
+  max-width: 300px;
+  align-items: center;
+  padding: 0 16px 0 24px;
   cursor: pointer;
+
+  span {
+    .ellipsis;
+
+    display: inline-block;
+    flex-grow: 1;
+  }
 
   &:hover,
   &.selected {
     background-color: var(--foreground-fade-16);
   }
+
+  &--disabled {
+    color: var(--foreground-fade-48);
+    cursor: default;
+    font-style: italic;
+    &:hover,
+    &.selected {
+      background-color: transparent;
+    }
+  }
+
+  &--checked {
+    font-weight: @font-weight-bold;
+  }
+}
+
+.ctx-menu-separator {
+  border-top: 1px solid var(--foreground-fade-16);
+  margin: 4px 0;
+}
+
+.ctx-menu-icon,
+.ctx-menu-check {
+  display: flex;
+  align-items: center;
+  svg {
+    max-width: 10px;
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.ctx-menu-icon {
+  margin-right: 8px;
 }

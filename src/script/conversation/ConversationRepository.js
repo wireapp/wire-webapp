@@ -851,6 +851,10 @@ export class ConversationRepository {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
+    if (this.conversationLabelRepository.getConversationCustomLabel(conversationEntity, true)) {
+      this.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
+      this.conversationLabelRepository.saveLabels();
+    }
     this.deleteConversationFromRepository(conversationId);
     this.conversation_service.delete_conversation_from_db(conversationId);
   }

@@ -62,7 +62,7 @@ export class ConversationListViewModel {
     this.listViewModel = listViewModel;
     this.onJoinCall = onJoinCall;
 
-    this.logger = getLogger('z.viewModel.list.ConversationListViewModel');
+    this.logger = getLogger('ConversationListViewModel');
 
     this.showCalls = ko.observable();
     this.setShowCallsState(repositories.event.notificationHandlingState());
@@ -114,6 +114,8 @@ export class ConversationListViewModel {
 
     const startShortcut = Shortcut.getShortcutTooltip(ShortcutType.START);
     this.startTooltip = t('tooltipConversationsStart', startShortcut);
+    this.conversationsTooltip = t('conversationViewTooltip');
+    this.foldersTooltip = t('folderViewTooltip');
 
     this.showConnectRequests = ko.pureComputed(() => this.connectRequests().length);
 
@@ -164,6 +166,7 @@ export class ConversationListViewModel {
   _initSubscriptions() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded.bind(this));
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton.bind(this));
+    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);
   }
 
   expandFolder = label => {
