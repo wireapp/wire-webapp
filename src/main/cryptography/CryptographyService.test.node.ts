@@ -144,13 +144,41 @@ describe('CryptographyService', () => {
           },
         },
       };
-
       const text = new Uint8Array([72, 101, 108, 108, 111, 33]); // "Hello!"
       const otrBundle = await cryptographyService.encrypt(text, preKeyBundleMap);
       expect(Object.keys(otrBundle).length).toBe(2);
       expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
       expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
       expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(String));
+    });
+
+    it('does not generate a message counter twice when ran asynchronously multiple times for the same cryptographic session', async () => {
+      const userId = 'bc0c99f1-49a5-4ad2-889a-62885af37088';
+      const clientId = '5e80ea7886680975';
+      const preKeyBundleMap = {
+        [userId]: {
+          [clientId]: {
+            id: 1337,
+            key:
+              'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
+          },
+        },
+      };
+      const text = new Uint8Array([72, 101, 108, 108, 111, 33]); // "Hello!"
+      const encryptionRuns = 100;
+      const otrBundles = await Promise.all(
+        Array.from(Array(encryptionRuns).keys()).map(() => cryptographyService.encrypt(text, preKeyBundleMap)),
+      );
+      const encryptedPayloads = otrBundles.map(bundle => bundle[userId][clientId]);
+      const messageCounters = encryptedPayloads.map(encodedCiphertext => {
+        const messageBytes = bazinga64.Decoder.fromBase64(encodedCiphertext).asBytes;
+        const messageEnvelope = Proteus.message.Envelope.deserialise(messageBytes.buffer);
+        const preKeyMessage = messageEnvelope.message as Proteus.message.PreKeyMessage;
+        const cipherMessage = preKeyMessage.message;
+        return cipherMessage.counter;
+      });
+      const uniqueValues = messageCounters.filter((value, index, self) => self.indexOf(value) === index);
+      expect(uniqueValues.length).toBe(encryptionRuns);
     });
   });
 
