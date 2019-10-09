@@ -3243,6 +3243,14 @@ export class ConversationRepository {
    * @returns {Promise<any>} Resolves when the event has been treated
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
+    const dontNeedConversationEntity = [
+      BackendEvent.CONVERSATION.CREATE,
+      BackendEvent.CONVERSATION.DELETE,
+      ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
+    ];
+    if (!dontNeedConversationEntity.includes(eventJson.type) && !conversationEntity) {
+      return Promise.resolve();
+    }
     switch (eventJson.type) {
       case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
