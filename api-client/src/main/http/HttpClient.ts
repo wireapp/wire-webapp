@@ -179,7 +179,7 @@ export class HttpClient extends EventEmitter {
     return response.data;
   }
 
-  public sendRequest<T>(config: AxiosRequestConfig, tokenAsParam: boolean = false): Promise<AxiosResponse<T>> {
+  public async sendRequest<T>(config: AxiosRequestConfig, tokenAsParam: boolean = false): Promise<AxiosResponse<T>> {
     return this.requestQueue.add(() => this._sendRequest<T>(config, tokenAsParam));
   }
 

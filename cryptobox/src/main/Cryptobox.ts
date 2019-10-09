@@ -371,28 +371,18 @@ export class Cryptobox extends EventEmitter {
       .then((newPreKeys: ProteusKeys.PreKey[]) => this.store.save_prekeys(newPreKeys));
   }
 
-  public encrypt(session_id: string, payload: string | Uint8Array, pre_key_bundle?: ArrayBuffer): Promise<ArrayBuffer> {
-    let encryptedBuffer: ArrayBuffer;
-    let loadedSession: CryptoboxSession;
-
-    return this.get_session_queue(session_id).add(() => {
-      return Promise.resolve()
-        .then(() => {
-          if (pre_key_bundle) {
-            return this.session_from_prekey(session_id, pre_key_bundle);
-          }
-
-          return this.session_load(session_id);
-        })
-        .then((session: CryptoboxSession) => {
-          loadedSession = session;
-          return loadedSession.encrypt(payload);
-        })
-        .then((encrypted: ArrayBuffer) => {
-          encryptedBuffer = encrypted;
-          return this.session_update(loadedSession);
-        })
-        .then(() => encryptedBuffer);
+  public async encrypt(
+    session_id: string,
+    payload: string | Uint8Array,
+    pre_key_bundle?: ArrayBuffer,
+  ): Promise<ArrayBuffer> {
+    return this.get_session_queue(session_id).add(async () => {
+      const session = pre_key_bundle
+        ? await this.session_from_prekey(session_id, pre_key_bundle)
+        : await this.session_load(session_id);
+      const encryptedBuffer = session.encrypt(payload);
+      await this.session_update(session);
+      return encryptedBuffer;
     });
   }
 

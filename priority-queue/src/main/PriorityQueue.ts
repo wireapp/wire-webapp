@@ -39,11 +39,7 @@ export class PriorityQueue {
     this.config = {...this.config, ...config};
   }
 
-  public add(thunkedPromise: any, priority: Priority = Priority.MEDIUM, label?: string): Promise<any> {
-    if (typeof thunkedPromise !== 'function') {
-      thunkedPromise = () => thunkedPromise;
-    }
-
+  public add<T>(thunkedPromise: () => T, priority: Priority = Priority.MEDIUM, label?: string): Promise<T> {
     return new Promise((resolve, reject) => {
       const queueObject = new Item();
       queueObject.fn = thunkedPromise;
@@ -111,10 +107,8 @@ export class PriorityQueue {
             wrappedResolve();
           }
           this.isPending = false;
-          const nextItem: Item | undefined = this.queue.shift();
-          if (nextItem) {
-            this.resolveItems();
-          }
+          this.queue.shift();
+          this.resolveItems();
         }
       });
     /* tslint:enable:no-floating-promises */

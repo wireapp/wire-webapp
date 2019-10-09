@@ -107,9 +107,9 @@ describe('PriorityQueue', () => {
       const queue = new PriorityQueue();
       const zebra = () => Promise.resolve('zebra').then(done());
 
-      queue.add('ape');
-      queue.add('cat');
-      queue.add('dog');
+      queue.add(() => 'ape');
+      queue.add(() => 'cat');
+      queue.add(() => 'dog');
       queue.add(zebra);
     });
 

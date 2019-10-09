@@ -37,14 +37,14 @@ describe('PriorityQueue', () => {
       const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
       queue = new PriorityQueue({maxRetries: 0});
       expect(queue.config.maxRetries).toBe(0);
-      queue.add(promise);
+      queue.add(() => promise);
       expect(queue.first.retry).toBe(0);
     });
 
     it('does not apply negative retries', () => {
       const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
       queue = new PriorityQueue({maxRetries: -12});
-      queue.add(promise);
+      queue.add(() => promise);
       expect(queue.first.retry).toBe(Infinity);
     });
   });
@@ -115,10 +115,10 @@ describe('PriorityQueue', () => {
       const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
 
       queue = new PriorityQueue();
-      queue.add(promise, 1, 'get request');
-      queue.add(promise, 1, 'put request');
-      queue.add(promise, 5, 'access token refresh');
-      queue.add(promise, 1, 'another get request');
+      queue.add(() => promise, 1, 'get request');
+      queue.add(() => promise, 1, 'put request');
+      queue.add(() => promise, 5, 'access token refresh');
+      queue.add(() => promise, 1, 'another get request');
 
       const promisesByPriority = queue.all;
       expect(promisesByPriority[0].label).toBe('access token refresh');
@@ -130,10 +130,10 @@ describe('PriorityQueue', () => {
       const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
 
       queue = new PriorityQueue();
-      queue.add(promise, 1);
-      queue.add(promise, 1);
-      queue.add(promise, 1, 'delete-me');
-      queue.add(promise, 1);
+      queue.add(() => promise, 1);
+      queue.add(() => promise, 1);
+      queue.add(() => promise, 1, 'delete-me');
+      queue.add(() => promise, 1);
 
       expect(queue.all.length).toBe(4);
 
@@ -148,9 +148,9 @@ describe('PriorityQueue', () => {
       const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
 
       queue = new PriorityQueue();
-      queue.add(promise);
-      queue.add(promise);
-      queue.add(promise);
+      queue.add(() => promise);
+      queue.add(() => promise);
+      queue.add(() => promise);
 
       expect(queue.all.length).toBe(3);
 
