@@ -491,12 +491,14 @@ export class CryptographyRepository {
     const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
     if (isDuplicateMessage || isOutdatedMessage) {
-      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
+      const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
     const isCryptographyError = error instanceof z.error.CryptographyError;
     if (isCryptographyError && error.type === z.error.CryptographyError.TYPE.PREVIOUSLY_STORED) {
-      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
+      const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is already persisted.`;
+      throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
     const remoteClientId = eventData.sender;

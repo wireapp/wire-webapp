@@ -144,7 +144,7 @@ export class CryptographyMapper {
       default: {
         const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
-        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE);
+        throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, logMessage);
       }
     }
 
@@ -237,7 +237,7 @@ export class CryptographyMapper {
     ];
 
     if (!knownAvailabilityTypes.includes(availability.type)) {
-      const message = 'Unhandled availability type';
+      const message = `Availability type "${availability.type}" is unknown.`;
       throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
@@ -279,7 +279,7 @@ export class CryptographyMapper {
             case Confirmation.Type.READ:
               return StatusType.SEEN;
             default:
-              const message = 'Unhandled confirmation type';
+              const message = `Confirmation type "${confirmation.type}" is unknown.`;
               throw new z.error.CryptographyError(z.error.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
