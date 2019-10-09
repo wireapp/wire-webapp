@@ -455,7 +455,7 @@ export class ConversationRepository {
       })
       .catch(({code}) => {
         if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
-          return this.deleteConversationLocally(conversationId);
+          this.deleteConversationLocally(conversationId);
         }
         const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
 
@@ -892,8 +892,8 @@ export class ConversationRepository {
     }
     return this.fetch_conversation_by_id(conversation_id).catch(error => {
       const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (!isConversationNotFound) {
-        this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
+      if (isConversationNotFound) {
+        this.logger.warn(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
       }
 
       throw error;
@@ -3137,8 +3137,12 @@ export class ConversationRepository {
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
-        const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
-        if (!isMessageNotFound) {
+        const ignoredErrorTypes = [
+          z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ];
+
+        if (!ignoredErrorTypes.includes(error.type)) {
           throw error;
         }
       });
@@ -3247,14 +3251,6 @@ export class ConversationRepository {
    * @returns {Promise<any>} Resolves when the event has been treated
    */
   _reactToConversationEvent(conversationEntity, eventJson, eventSource) {
-    const dontNeedConversationEntity = [
-      BackendEvent.CONVERSATION.CREATE,
-      BackendEvent.CONVERSATION.DELETE,
-      ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
-    ];
-    if (!dontNeedConversationEntity.includes(eventJson.type) && !conversationEntity) {
-      return Promise.resolve();
-    }
     switch (eventJson.type) {
       case BackendEvent.CONVERSATION.CREATE:
         return this._onCreate(eventJson, eventSource);
