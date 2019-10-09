@@ -114,24 +114,26 @@ participant-item {
 
       .participant-item-content-name {
         .ellipsis;
-
         width: 100%;
         padding-right: 8px;
         white-space: nowrap;
       }
 
       .participant-item-content-info {
-        overflow: hidden;
+        .ellipsis;
         max-width: 100%;
         margin-top: 2px;
         font-size: 0;
         line-height: 16px;
         opacity: 0.56;
-        text-overflow: ellipsis;
-        white-space: nowrap;
 
         * {
           font-size: 12px;
+        }
+
+        .participant-item-content-username {
+          .ellipsis;
+          display: block;
         }
       }
 
