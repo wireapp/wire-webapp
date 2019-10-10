@@ -899,6 +899,9 @@ export class EventRepository {
     return Promise.all(events.map(event => this._handleEvent(event, source)))
       .then(() => (isTransientEvent ? id : this._updateLastNotificationId(id)))
       .catch(error => {
+        if (error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
+          return;
+        }
         this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
         throw error;
       });
