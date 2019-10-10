@@ -222,12 +222,13 @@ export class Account extends EventEmitter {
     }
 
     this.apiClient.transport.ws.removeAllListeners(WebSocketTopic.ON_MESSAGE);
-
     this.apiClient.transport.ws.on(WebSocketTopic.ON_MESSAGE, notificationHandler);
 
+    this.service!.notification.removeAllListeners(NotificationService.TOPIC.NOTIFICATION_ERROR);
     this.service!.notification.on(NotificationService.TOPIC.NOTIFICATION_ERROR, this.handleError);
 
     for (const payloadType of Object.values(PayloadBundleType)) {
+      this.service!.notification.removeAllListeners(payloadType);
       this.service!.notification.on(payloadType, this.handlePayload);
     }
 
