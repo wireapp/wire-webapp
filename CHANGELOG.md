@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.3.0...@wireapp/core@13.3.1) (2019-10-10)
+
+
+### Bug Fixes
+
+* **core:** Cleanup notification listeners ([#2415](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/2415)) ([267bd01](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/267bd01))
+
+
+
+
+
 # [13.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@13.2.2...@wireapp/core@13.3.0) (2019-10-09)
 
 
