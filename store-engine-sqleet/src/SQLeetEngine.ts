@@ -19,6 +19,7 @@
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import * as websql from '@wireapp/websql';
+import fs from 'fs';
 
 import {
   RESERVED_COLUMN,
@@ -58,6 +59,10 @@ export class SQLeetEngine implements CRUDEngine {
       this.schema[tableName] = isSingleColumnTable
         ? {[RESERVED_COLUMN]: entity as SQLiteType}
         : (entity as SQLiteTableDefinition<string>);
+    }
+
+    if (nodeDatabaseDir) {
+      fs.mkdirSync(nodeDatabaseDir, {recursive: true});
     }
 
     try {

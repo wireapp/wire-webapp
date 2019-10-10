@@ -2,8 +2,9 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "resolveJsonModule": true
   },
-  "exclude": ["dist", "karma.conf.ts", "node_modules", "webpack.config.ts", "src/**/*.test*.ts"],
+  "exclude": ["dist", "jasmine.json", "karma.conf.ts", "node_modules", "webpack.config.ts", "src/**/*.test*.ts", "worker_threads"],
   "extends": "../../tsconfig.json"
 }
