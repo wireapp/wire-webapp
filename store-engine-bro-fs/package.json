@@ -6,7 +6,7 @@
   "devDependencies": {
     "@types/jasmine": "3.4.2",
     "@types/karma": "3.0.3",
-    "@types/node": "~10",
+    "@types/node": "~12",
     "@wireapp/store-engine": "3.9.17",
     "jasmine": "3.5.0",
     "karma": "4.3.0",

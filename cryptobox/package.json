@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "~10",
+    "@types/node": "~12",
     "@wireapp/lru-cache": "3.3.21",
     "@wireapp/priority-queue": "1.2.23",
     "@wireapp/proteus": "9.4.14",

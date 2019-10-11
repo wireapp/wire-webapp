@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "3.4.2",
-    "@types/node": "~10",
+    "@types/node": "~12",
     "@wireapp/store-engine": "3.9.17",
     "jasmine": "3.5.0",
     "nyc": "14.1.1",
