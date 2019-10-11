@@ -79,7 +79,7 @@ import {ConversationVerificationStateHandler} from './ConversationVerificationSt
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
-import {ConversationLabelRepository} from './ConversationLabel';
+import {ConversationLabelRepository} from './ConversationLabelRepository';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';

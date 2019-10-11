@@ -19,7 +19,7 @@
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ConversationLabelRepository} from '../conversation/ConversationLabel';
+import {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
 import {Conversation} from '../entity/Conversation';
 import {Context} from '../ui/ContextMenu';
 

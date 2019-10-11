@@ -124,6 +124,7 @@ export class ConversationListViewModel {
     });
 
     this.showRecentConversations = ko.observable(true);
+    // TODO: Rename "expandedFolders" to "expandedFolderIds"
     this.expandedFolders = ko.observableArray([]);
 
     this.showRecentConversations.subscribe(() => {
@@ -140,6 +141,9 @@ export class ConversationListViewModel {
       const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
         activeConversation,
       );
+
+      // TODO: Check if "activeLabel" is already in "expandedFolders"
+
       this.expandFolder(activeLabel);
     });
 

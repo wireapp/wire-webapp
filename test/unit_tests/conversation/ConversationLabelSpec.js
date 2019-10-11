@@ -20,7 +20,7 @@
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabel';
+import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 
 describe('ConversationLabelRepository', () => {
   const createConversation = isGroup => {
