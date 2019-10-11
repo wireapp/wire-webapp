@@ -191,7 +191,14 @@ export class ConversationLabelRepository {
     this.saveLabels();
   };
 
-  getConversationLabelId = (conversation: Conversation) => {
+  /**
+   * Returns the conversation label with the highest order:
+   * 1. Favorites
+   * 2. Groups
+   * 3. Contacts
+   * 4. Custom
+   */
+  getConversationLabelId = (conversation: Conversation): string => {
     if (this.getFavorites().includes(conversation)) {
       return DefaultLabelIds.Favorites;
     }
@@ -202,6 +209,27 @@ export class ConversationLabelRepository {
       return this.getConversationCustomLabel(conversation).id;
     }
     return DefaultLabelIds.Contacts;
+  };
+
+  // TODO: Write test cases!
+  getConversationLabelIds = (conversation: Conversation): string[] => {
+    const ids: string[] = [];
+
+    if (this.getFavorites().includes(conversation)) {
+      ids.push(DefaultLabelIds.Favorites);
+    }
+
+    const isInCustomFolder = this.allLabeledConversations().includes(conversation);
+
+    if (isInCustomFolder) {
+      ids.push(this.getConversationCustomLabel(conversation).id);
+    } else if (conversation.isGroup()) {
+      ids.push(DefaultLabelIds.Groups);
+    } else {
+      ids.push(DefaultLabelIds.Contacts);
+    }
+
+    return ids;
   };
 
   getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) =>

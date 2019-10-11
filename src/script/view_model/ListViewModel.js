@@ -444,6 +444,7 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
     if (this.isActivatedAccount()) {
+      this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
   }
