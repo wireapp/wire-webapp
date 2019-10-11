@@ -37,7 +37,7 @@ import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
-import {DefaultLabelIds} from '../conversation/ConversationLabel';
+import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};

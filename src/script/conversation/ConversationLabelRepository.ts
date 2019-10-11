@@ -192,14 +192,14 @@ export class ConversationLabelRepository {
   };
 
   getConversationLabelId = (conversation: Conversation) => {
-    if (this.allLabeledConversations().includes(conversation)) {
-      return this.getConversationCustomLabel(conversation).id;
-    }
     if (this.getFavorites().includes(conversation)) {
       return DefaultLabelIds.Favorites;
     }
     if (conversation.isGroup()) {
       return DefaultLabelIds.Groups;
+    }
+    if (this.allLabeledConversations().includes(conversation)) {
+      return this.getConversationCustomLabel(conversation).id;
     }
     return DefaultLabelIds.Contacts;
   };

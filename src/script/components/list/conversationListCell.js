@@ -30,6 +30,7 @@ class ConversationListCell {
   constructor({showJoinButton, conversation, onJoinCall, is_selected = noop, click = noop}) {
     this.conversation = conversation;
     this.is_selected = is_selected;
+    // TODO: "click" should be renamed to "right_click"
     this.on_click = click;
     this.ParticipantAvatar = ParticipantAvatar;
     this.showJoinButton = showJoinButton;

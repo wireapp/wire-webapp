@@ -27,7 +27,7 @@ import {
   createLabelFavorites,
   createLabelGroups,
   createLabelPeople,
-} from '../../conversation/ConversationLabel';
+} from '../../conversation/ConversationLabelRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
 interface GroupedConversationsParams {
