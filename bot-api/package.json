@@ -8,7 +8,7 @@
     "cross-env": "6.0.3",
     "jasmine": "3.5.0",
     "rimraf": "3.0.0",
-    "typescript": "3.6.3"
+    "typescript": "3.6.4"
   },
   "files": [
     "dist"
