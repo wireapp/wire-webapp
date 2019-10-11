@@ -328,10 +328,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
-  //##############################################################################
-  // Context menu
-  //##############################################################################
-
   onContextMenu(conversationEntity, event) {
     const entries = [];
 
@@ -444,17 +440,17 @@ z.viewModel.ListViewModel = class ListViewModel {
 
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
     if (this.isActivatedAccount()) {
-      this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
       this.actionsViewModel.archiveConversation(conversationEntity);
+      this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
     }
   }
 
-  clickToBlock(conversationEntity) {
+  async clickToBlock(conversationEntity) {
     const userEntity = conversationEntity.firstUserEntity();
     const hideConversation = this._shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
-
-    this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+    await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+    this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
   }
 
   clickToCancelRequest(conversationEntity) {
