@@ -1209,10 +1209,10 @@
   dependencies:
     "@types/sizzle" "*"
 
-"@types/js-cookie@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.2.tgz#84e8848e14d44418726ceb52dd887c7bfe45d678"
-  integrity sha512-vkuGzldF9mNsWS9cmmMFfW1rufa7IdPUorS150gKoU/2fzLJ/0LXiMMtRqIBWz0sZ/VF2VxwB25WXEOo6akU6w==
+"@types/js-cookie@2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.3.tgz#30525e93231074d4a092d9f5608c25d5c7a72085"
+  integrity sha512-gfrTQ6xQhPch+Jew+GVUXa7W2Wssh6EbxXDV8xkLD+Pe3VMIuWUh25yH1wOKiWyrYi2zPrS8e6UEgZt7dZXwyQ==
 
 "@types/libsodium-wrappers-sumo@0.7.1":
   version "0.7.1"
