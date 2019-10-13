@@ -1729,10 +1729,10 @@
     emotion-theming "10.0.17"
     react-transition-group "4.3.0"
 
-"@wireapp/store-engine-dexie@0.6.9":
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.6.9.tgz#1085f9a805129c8e84193e88c095d11399529dc3"
-  integrity sha512-UUxJvfoZYgv/mHcHGNGuQYcPUN2tSXmL8GePz+pfebD53DxKxo5yw/WezyuTjePfjGaO2dkYFuZWcJ/99jx9tg==
+"@wireapp/store-engine-dexie@0.6.15":
+  version "0.6.15"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-0.6.15.tgz#ed32db357ecc6ea6220af4873ad102ef66162668"
+  integrity sha512-llUadJyrDB4WA52YxmrCqjGXcQXBaBRVySkbCOAO0v4il2pm5YAbmKW4vM8NOLXJTvolgovuz5wJIPwHC482mg==
   dependencies:
     dexie "2.0.4"
 
