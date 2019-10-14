@@ -102,10 +102,6 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
         primaryAction: {
           action: (leaveConversation = false) => {
             this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
-            this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(
-              conversationEntity,
-              true,
-            );
           },
           text: t('modalConversationClearAction'),
         },
