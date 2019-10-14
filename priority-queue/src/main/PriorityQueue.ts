@@ -106,7 +106,6 @@ export class PriorityQueue {
       /* tslint:disable-next-line:no-floating-promises */
       this.processList();
     } catch (error) {
-      // TODO: print soomething when retrying execution
       if (queueObject.retry >= this.config.maxRetries) {
         this.queue.shift();
         queueObject.reject(error);
