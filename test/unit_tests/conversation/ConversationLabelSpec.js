@@ -37,7 +37,7 @@ describe('ConversationLabelRepository', () => {
     createConversation(true),
   ];
 
-  const conversationLabelRepository = new ConversationLabelRepository(conversations);
+  const conversationLabelRepository = new ConversationLabelRepository(conversations, conversations);
 
   describe('getGroupsWithoutLabel', () => {
     it('returns the right amount of unlabelled group conversations', () => {
