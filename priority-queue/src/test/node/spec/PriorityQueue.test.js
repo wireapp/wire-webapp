@@ -34,18 +34,11 @@ describe('PriorityQueue', () => {
 
   describe('"constructor"', () => {
     it('allows a configuration with zero retries', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
+      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
       queue = new PriorityQueue({maxRetries: 0});
       expect(queue.config.maxRetries).toBe(0);
       queue.add(() => promise);
       expect(queue.first.retry).toBe(0);
-    });
-
-    it('does not apply negative retries', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
-      queue = new PriorityQueue({maxRetries: -12});
-      queue.add(() => promise);
-      expect(queue.first.retry).toBe(Infinity);
     });
   });
 
@@ -102,7 +95,7 @@ describe('PriorityQueue', () => {
         throw Error('not so happy');
       }
 
-      queue = new PriorityQueue();
+      queue = new PriorityQueue({maxRetries: 3, retryDelay: 100});
       try {
         await queue.add(() => notHappyFn());
         fail();
@@ -112,7 +105,7 @@ describe('PriorityQueue', () => {
     });
 
     it('supports adding a label', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
+      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
 
       queue = new PriorityQueue();
       queue.add(() => promise, 1, 'get request');
@@ -123,11 +116,40 @@ describe('PriorityQueue', () => {
       const promisesByPriority = queue.all;
       expect(promisesByPriority[0].label).toBe('access token refresh');
     });
+
+    it('does not retry execution with maxRetries set to 0', async () => {
+      const task = jasmine.createSpy().and.returnValue(Promise.reject(new Error('nope')));
+
+      queue = new PriorityQueue({maxRetries: 0});
+      try {
+        await queue.add(task);
+      } catch (error) {
+        expect(task.calls.count()).toBe(1);
+      }
+    });
+
+    it('does retry execution with maxRetries set to 1', async () => {
+      const task = jasmine.createSpy().and.returnValue(Promise.reject(new Error('nope')));
+
+      queue = new PriorityQueue({maxRetries: 1});
+      try {
+        await queue.add(task);
+      } catch (error) {
+        expect(task.calls.count()).toBe(2);
+      }
+    });
+
+    it('set retry count to 0', () => {
+      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
+      queue = new PriorityQueue();
+      queue.add(() => promise);
+      expect(queue.first.retry).toBe(0);
+    });
   });
 
   describe('"delete"', () => {
     it("deletes a Promise from the queue by it's UUID", () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
+      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
 
       queue = new PriorityQueue();
       queue.add(() => promise, 1);
@@ -145,7 +167,7 @@ describe('PriorityQueue', () => {
 
   describe('"deleteAll"', () => {
     it('deletes all queued Promises', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), Number.MAX_SAFE_INTEGER));
+      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
 
       queue = new PriorityQueue();
       queue.add(() => promise);
@@ -157,6 +179,34 @@ describe('PriorityQueue', () => {
       queue.deleteAll();
 
       expect(queue.all.length).toBe(0);
+    });
+  });
+
+  describe('"getGrowingDelay"', () => {
+    it('delay is growing exponentially', () => {
+      queue = new PriorityQueue({maxRetries: 3, retryDelay: 1000, retryGrowthFactor: 1.3});
+
+      expect(queue.getGrowingDelay(0))
+        .withContext('first try')
+        .toBe(1000);
+      expect(queue.getGrowingDelay(1))
+        .withContext('one try left')
+        .toBe(1300);
+      expect(queue.getGrowingDelay(2))
+        .withContext('last try')
+        .toBe(2600);
+    });
+
+    it('does not exceed maxRetryDelay', () => {
+      const config = {
+        maxRetries: 3,
+        maxRetryDelay: Number.MAX_SAFE_INTEGER,
+        retryDelay: Number.MAX_SAFE_INTEGER + 1,
+        retryGrowthFactor: 1.3,
+      };
+      queue = new PriorityQueue(config);
+
+      expect(queue.getGrowingDelay(1)).toBe(config.maxRetryDelay);
     });
   });
 });

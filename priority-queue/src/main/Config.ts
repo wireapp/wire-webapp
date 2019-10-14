@@ -20,7 +20,9 @@
 import {Item} from './Item';
 
 export interface Config {
-  comparator?: (a: Item, b: Item) => number;
-  maxRetries?: number;
-  retryDelay?: number;
+  comparator: (a: Item, b: Item) => number;
+  maxRetries: number;
+  maxRetryDelay: number;
+  retryDelay: number;
+  retryGrowthFactor: number;
 }

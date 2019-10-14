@@ -17,11 +17,17 @@
  *
  */
 
+import logdown from 'logdown';
 import {Config} from './Config';
 import {Item} from './Item';
 import {Priority} from './Priority';
 
 export class PriorityQueue {
+  private readonly logger: logdown.Logger = logdown('@wireapp/priority-queue/PriorityQueue', {
+    logger: console,
+    markdown: false,
+  });
+
   private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
@@ -29,13 +35,16 @@ export class PriorityQueue {
       }
       return b.priority - a.priority;
     },
-    maxRetries: Infinity,
+    maxRetries: 0,
+    maxRetryDelay: Number.MAX_SAFE_INTEGER,
     retryDelay: 1000,
+    retryGrowthFactor: 1.3,
   };
-  public isPending: boolean = false;
+
+  private isRunning: boolean = false;
   private queue: Item[] = [];
 
-  constructor(config?: Config) {
+  constructor(config?: Partial<Config>) {
     this.config = {...this.config, ...config};
   }
 
@@ -47,11 +56,16 @@ export class PriorityQueue {
       queueObject.priority = priority;
       queueObject.reject = reject;
       queueObject.resolve = resolve;
-      queueObject.retry = Number(this.config.maxRetries) >= 0 ? Number(this.config.maxRetries) : queueObject.retry;
+      queueObject.retry = 0;
       queueObject.timestamp = Date.now() + this.size;
       this.queue.push(queueObject);
       this.queue.sort(this.config.comparator);
-      this.run();
+
+      if (!this.isRunning) {
+        this.isRunning = true;
+        /* tslint:disable-next-line:no-floating-promises */
+        this.processList();
+      }
     });
   }
 
@@ -79,52 +93,43 @@ export class PriorityQueue {
     return this.queue.length;
   }
 
-  private resolveItems(): void {
+  private async processList(): Promise<void> {
     const queueObject = this.first;
     if (!queueObject) {
+      this.isRunning = false;
       return;
     }
 
-    /* tslint:disable:no-floating-promises */
-    Promise.resolve(queueObject.fn())
-      .then((result: any) => {
-        return {shouldContinue: true, wrappedResolve: () => queueObject.resolve(result)};
-      })
-      .catch((error: Error) => {
-        if (queueObject.retry > 0) {
-          queueObject.retry -= 1;
-          // TODO: Implement configurable reconnection delay (and reconnection delay growth factor)
-          setTimeout(() => this.resolveItems(), this.config.retryDelay || 1000);
-          return {shouldContinue: false};
-        } else {
-          queueObject.reject(error);
-          return {shouldContinue: true};
-        }
-      })
-      .then(({shouldContinue, wrappedResolve}: {shouldContinue: boolean; wrappedResolve?: Function}) => {
-        if (shouldContinue) {
-          if (wrappedResolve) {
-            wrappedResolve();
-          }
-          this.isPending = false;
-          this.queue.shift();
-          this.resolveItems();
-        }
-      });
-    /* tslint:enable:no-floating-promises */
+    try {
+      queueObject.resolve(await queueObject.fn());
+      this.queue.shift();
+      /* tslint:disable-next-line:no-floating-promises */
+      this.processList();
+    } catch (error) {
+      // TODO: print soomething when retrying execution
+      if (queueObject.retry >= this.config.maxRetries) {
+        this.queue.shift();
+        queueObject.reject(error);
+        /* tslint:disable-next-line:no-floating-promises */
+        this.processList();
+      } else {
+        this.logger.log(`Retrying item "${queueObject}"`);
+        setTimeout(() => this.processList(), this.getGrowingDelay(queueObject.retry));
+        queueObject.retry++;
+      }
+    }
   }
 
-  private run(): void {
-    if (!this.isPending && this.first) {
-      this.isPending = true;
-      this.resolveItems();
-    }
+  private getGrowingDelay(currentRetry: number): number {
+    const delay =
+      currentRetry < 1 ? this.config.retryDelay : this.config.retryDelay * currentRetry * this.config.retryGrowthFactor;
+    return Math.min(delay, this.config.maxRetryDelay);
   }
 
   public toString(): string {
     return this.queue
       .map((item: Item, index: number) => {
-        return `"${index}": ${item.fn.toString().replace(/(\r\n|\n|\r|\s+)/gm, '')}`;
+        return `"${index}": ${item.toString()}`;
       })
       .join('\r\n');
   }

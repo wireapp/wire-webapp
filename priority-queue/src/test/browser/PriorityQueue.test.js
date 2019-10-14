@@ -40,20 +40,20 @@ describe('PriorityQueue', () => {
       };
 
       setTimeout(() => (isLocked = false), 1500);
-      const queue = new PriorityQueue({retryDelay: 3000});
+      const queue = new PriorityQueue({maxRetries: Infinity, retryDelay: 3000});
       queue.add(businessLogic);
     });
 
-    it('supports limiting the amount of retries', done => {
-      const businessLogic = () => Promise.reject(new Error('Error'));
+    it('supports limiting the amount of retries', async () => {
+      const businessLogic = jasmine.createSpy().and.returnValue(Promise.reject(new Error('Error')));
       const queue = new PriorityQueue({maxRetries: 1});
-      queue
-        .add(businessLogic)
-        .then(done.fail)
-        .catch(() => {
-          expect(queue.size).toBe(0);
-          done();
-        });
+      try {
+        await queue.add(businessLogic);
+        fail();
+      } catch (error) {
+        expect(queue.size).toBe(0);
+        expect(businessLogic.calls.count()).toBe(2);
+      }
     });
   });
 
@@ -103,16 +103,6 @@ describe('PriorityQueue', () => {
   });
 
   describe('"run"', () => {
-    it('works with primitive values', done => {
-      const queue = new PriorityQueue();
-      const zebra = () => Promise.resolve('zebra').then(done());
-
-      queue.add(() => 'ape');
-      queue.add(() => 'cat');
-      queue.add(() => 'dog');
-      queue.add(zebra);
-    });
-
     it('executes an item from the queue', done => {
       const queue = new PriorityQueue();
       const ape = () => Promise.resolve('ape').then(done());
@@ -170,7 +160,7 @@ describe('PriorityQueue', () => {
         });
       };
 
-      const queue = new PriorityQueue();
+      const queue = new PriorityQueue({maxRetries: Infinity});
       queue.add(businessLogic);
       setTimeout(() => queue.add(unlock, Priority.HIGH), 200);
     });
@@ -251,7 +241,8 @@ describe('PriorityQueue', () => {
   describe('"comparator"', () => {
     it('uses a descending priority order by default', async () => {
       const queue = new PriorityQueue();
-      queue.isPending = true;
+      // prevents item processing
+      queue.isRunning = true;
 
       queue.add(() => 'ape', Priority.HIGH);
       queue.add(() => 'cat');
@@ -267,7 +258,8 @@ describe('PriorityQueue', () => {
     it('supports a custom comparator', async () => {
       const ascendingPriority = (first, second) => first.priority - second.priority;
       const queue = new PriorityQueue({comparator: ascendingPriority});
-      queue.isPending = true;
+      // prevents item processing
+      queue.isRunning = true;
 
       queue.add(() => 'ape', Priority.HIGH);
       queue.add(() => 'cat');
@@ -281,7 +273,7 @@ describe('PriorityQueue', () => {
     });
 
     it('continues after the maximum amount of retries', done => {
-      const queue = new PriorityQueue({maxRetries: 5});
+      const queue = new PriorityQueue({maxRetries: 3});
 
       const promise1 = () =>
         Promise.resolve('one').then(item => {

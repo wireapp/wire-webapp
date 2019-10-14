@@ -32,4 +32,13 @@ export class Item {
   retry: number = Infinity;
   /** time when the item has been added to the queue */
   timestamp: number = 0;
+
+  public toString(): string {
+    return `
+    label=${this.label},
+    priority=${this.priority},
+    timestamp=${this.timestamp},
+    retry=${this.retry},
+    fn=${this.fn.toString().replace(/(\r\n|\n|\r|\s+)/gm, ' ')},`;
+  }
 }
