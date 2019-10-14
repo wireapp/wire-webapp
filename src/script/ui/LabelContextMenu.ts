@@ -42,7 +42,7 @@ export const showLabelContextMenu = (
 
   const conversationLabelId = labelRepository.getConversationLabelId(conversation);
 
-  const labels = labelRepository.getLabels();
+  const labels = labelRepository.getLabels().filter(label => !!labelRepository.getLabelConversations(label).length);
   const namedLabels = labels.length
     ? labels.map(label => ({
         click: () => labelRepository.addConversationToLabel(label, conversation),
