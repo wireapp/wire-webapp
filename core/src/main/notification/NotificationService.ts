@@ -116,6 +116,7 @@ export class NotificationService extends EventEmitter {
       let data;
 
       try {
+        this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
         data = await this.handleEvent(event);
         if (!notification.transient) {
           await this.setLastNotificationId(notification);
@@ -180,7 +181,6 @@ export class NotificationService extends EventEmitter {
   };
 
   private async handleEvent(event: BackendEvent): Promise<PayloadBundle | void> {
-    this.logger.log(`Handling event of type "${event.type}"`, event);
     switch (event.type) {
       // Encrypted events
       case CONVERSATION_EVENT.OTR_MESSAGE_ADD: {

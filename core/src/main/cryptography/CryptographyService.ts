@@ -24,7 +24,6 @@ import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/commonjs/event';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {PriorityQueue} from '@wireapp/priority-queue';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
@@ -47,7 +46,6 @@ export class CryptographyService {
 
   public cryptobox: Cryptobox;
   private readonly database: CryptographyDatabaseRepository;
-  private readonly sendQueue = new PriorityQueue();
 
   constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
     this.cryptobox = new Cryptobox(this.storeEngine);
@@ -87,10 +85,6 @@ export class CryptographyService {
   }
 
   public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
-    return this.sendQueue.add(() => this.queuedEncrypt(plainText, preKeyBundles));
-  }
-
-  private async queuedEncrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
     const recipients: OTRRecipients = {};
     const encryptions: Promise<SessionPayloadBundle>[] = [];
 
