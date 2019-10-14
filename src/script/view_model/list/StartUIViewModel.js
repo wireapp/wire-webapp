@@ -57,6 +57,7 @@ class StartUIViewModel {
   constructor(mainViewModel, listViewModel, repositories) {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnContact = this.clickOnContact.bind(this);
+    this.alreadyClickedOnContact = {};
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
     this.clickToOpenService = this.clickToOpenService.bind(this);
@@ -248,8 +249,14 @@ class StartUIViewModel {
     this._closeList();
   }
 
-  clickOnContact(userEntity) {
-    return this.actionsViewModel.open1to1Conversation(userEntity).then(() => this._closeList());
+  async clickOnContact(userEntity) {
+    if (this.alreadyClickedOnContact[userEntity.id] === true) {
+      return;
+    }
+    this.alreadyClickedOnContact[userEntity.id] = true;
+    await this.actionsViewModel.open1to1Conversation(userEntity);
+    this._closeList();
+    delete this.alreadyClickedOnContact[userEntity.id];
   }
 
   clickOnConversation(conversationEntity) {
