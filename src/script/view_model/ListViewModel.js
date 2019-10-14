@@ -441,7 +441,6 @@ z.viewModel.ListViewModel = class ListViewModel {
   clickToArchive(conversationEntity = this.conversationRepository.active_conversation()) {
     if (this.isActivatedAccount()) {
       this.actionsViewModel.archiveConversation(conversationEntity);
-      this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
     }
   }
 
@@ -450,7 +449,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     const hideConversation = this._shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
-    this.conversationRepository.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
   }
 
   clickToCancelRequest(conversationEntity) {

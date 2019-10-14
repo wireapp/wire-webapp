@@ -24,6 +24,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationListViewModel} from 'src/script/view_model/list/ConversationListViewModel';
 import {
   ConversationLabel,
+  createLabel,
   createLabelFavorites,
   createLabelGroups,
   createLabelPeople,
@@ -91,7 +92,10 @@ ko.components.register('grouped-conversations', {
         folders.push(createLabelPeople(contacts));
       }
 
-      const custom = conversationLabelRepository.getLabels().filter(({conversations}) => !!conversations().length);
+      const custom = conversationLabelRepository
+        .getLabels()
+        .filter(({conversations}) => !!conversations().length)
+        .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label)));
       folders.push(...custom);
 
       return folders;
