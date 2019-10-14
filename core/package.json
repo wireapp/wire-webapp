@@ -5,11 +5,11 @@
   "dependencies": {
     "@types/long": "4.0.0",
     "@types/node": "~12",
-    "@wireapp/api-client": "7.1.3",
-    "@wireapp/cryptobox": "11.4.42",
+    "@wireapp/api-client": "7.1.4",
+    "@wireapp/cryptobox": "11.4.43",
     "@wireapp/protocol-messaging": "1.24.2",
-    "@wireapp/store-engine": "3.9.17",
-    "bazinga64": "5.5.22",
+    "@wireapp/store-engine": "3.9.18",
+    "bazinga64": "5.5.23",
     "hash.js": "1.1.7",
     "logdown": "3.2.8",
     "protobufjs": "6.8.8",
@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/faker": "4.1.6",
     "@types/jasmine": "3.4.4",
-    "@wireapp/commons": "2.2.17",
+    "@wireapp/commons": "2.2.18",
     "commander": "3.0.2",
     "cross-env": "6.0.3",
     "dotenv": "8.1.0",
@@ -65,5 +65,5 @@
     "test:node": "nyc jasmine --config=jasmine.json"
   },
   "types": "./dist/Account.d.ts",
-  "version": "13.3.1"
+  "version": "13.3.2"
 }

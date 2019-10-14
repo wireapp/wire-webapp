@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.2.23...@wireapp/priority-queue@1.3.0) (2019-10-14)
+
+
+### Features
+
+* **priority-queue:** Growing retry delay ([#2423](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/2423)) ([5a60d0f](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/5a60d0f988e16414e487453f15a77c364c29fa15))
+
+
+
+
+
 ## [1.2.23](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.2.22...@wireapp/priority-queue@1.2.23) (2019-10-09)
 
 **Note:** Version bump only for package @wireapp/priority-queue
