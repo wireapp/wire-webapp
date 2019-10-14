@@ -79,6 +79,7 @@ import {ConversationVerificationStateHandler} from './ConversationVerificationSt
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
+import {ConversationLabelRepository} from './ConversationLabelRepository';
 
 import {ConnectionStatus} from '../connection/ConnectionStatus';
 import * as AssetMetaDataBuilder from '../assets/AssetMetaDataBuilder';
@@ -269,6 +270,12 @@ export class ConversationRepository {
       }
       return connectedUsers;
     });
+
+    this.conversationLabelRepository = new ConversationLabelRepository(
+      this.conversations,
+      this.conversations_unarchived,
+      propertyRepository.propertiesService,
+    );
   }
 
   checkMessageTimer(messageEntity) {
@@ -449,7 +456,7 @@ export class ConversationRepository {
       })
       .catch(({code}) => {
         if (code === BackendClientError.STATUS_CODE.NOT_FOUND) {
-          return this.deleteConversationLocally(conversationId);
+          this.deleteConversationLocally(conversationId);
         }
         const error = new z.error.ConversationError(z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
 
@@ -845,6 +852,10 @@ export class ConversationRepository {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
+    if (this.conversationLabelRepository.getConversationCustomLabel(conversationEntity, true)) {
+      this.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
+      this.conversationLabelRepository.saveLabels();
+    }
     this.deleteConversationFromRepository(conversationId);
     this.conversation_service.delete_conversation_from_db(conversationId);
   }
@@ -882,8 +893,8 @@ export class ConversationRepository {
     }
     return this.fetch_conversation_by_id(conversation_id).catch(error => {
       const isConversationNotFound = error.type === z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (!isConversationNotFound) {
-        this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
+      if (isConversationNotFound) {
+        this.logger.warn(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
       }
 
       throw error;
@@ -3127,8 +3138,12 @@ export class ConversationRepository {
       .then(conversationEntity => this._reactToConversationEvent(conversationEntity, eventJson, eventSource))
       .then((entityObject = {}) => this._handleConversationNotification(entityObject, eventSource, previouslyArchived))
       .catch(error => {
-        const isMessageNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
-        if (!isMessageNotFound) {
+        const ignoredErrorTypes = [
+          z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          z.error.ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ];
+
+        if (!ignoredErrorTypes.includes(error.type)) {
           throw error;
         }
       });

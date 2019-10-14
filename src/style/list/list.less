@@ -46,25 +46,32 @@
 
 .left-list-header {
   .flex-center;
-
   position: relative;
   height: @left-list-header-height;
   flex-shrink: 0;
+  justify-content: flex-start;
+  padding: 0 12px;
 }
+
 .left-list-header-start-ui {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
 .left-list-header-availability {
-  position: absolute;
+  position: relative;
+  overflow: hidden;
+  max-width: 208px;
+  flex: 1;
+  justify-content: center;
+  margin-left: 8px;
   cursor: pointer;
 
   .availability-state-label {
     .label-bold-xs;
-
     display: inline-block;
-    max-width: @conversation-list-width - 58px;
     line-height: 12px;
+
+    text-align: center;
   }
 }
 
@@ -74,6 +81,8 @@
 
   display: inline-block;
   max-width: @conversation-list-width - 40px;
+  flex-grow: 1;
+  text-align: center;
 }
 
 .left-list-header-close-button {

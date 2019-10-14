@@ -51,11 +51,12 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
 
   blockUser(userEntity, hideConversation, nextConversationEntity) {
     if (userEntity) {
+      // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
-            action: () => {
-              this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
+            action: async () => {
+              await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
               resolve();
             },
             text: t('modalUserBlockAction'),
@@ -121,7 +122,7 @@ z.viewModel.ActionsViewModel = class ActionsViewModel {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.PASSWORD, {
         preventClose: true,
         primaryAction: {
           action: password => {

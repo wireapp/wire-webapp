@@ -82,6 +82,7 @@ export const WebAppEvents = {
     ONLINE: 'wire.webapp.connection.online',
   },
   CONTENT: {
+    EXPAND_FOLDER: 'wire.webapp.content.expand_folder',
     SWITCH: 'wire.webapp.content.switch',
   },
   CONTEXT_MENU: 'wire.webapp.context_menu',

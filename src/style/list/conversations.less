@@ -18,6 +18,7 @@
  */
 
 .conversations {
+  user-select: none;
   .left-list-container;
 
   &:not(.left-list-is-visible) {
@@ -26,6 +27,12 @@
 
   &.left-list-is-visible {
     .start-ui-transition-fadein;
+  }
+
+  .left-list-header-text {
+    max-width: 208px;
+    flex: 1;
+    text-align: center;
   }
 }
 
@@ -37,10 +44,6 @@
   padding-right: 12px;
   padding-left: 12px;
   color: #fff;
-
-  svg {
-    fill: #fff;
-  }
 
   .conversations-footer-contacts-label {
     .label-xs;
@@ -100,4 +103,42 @@
   .text-white;
 
   flex-direction: column;
+}
+
+.conversation-folder {
+  &__head {
+    display: flex;
+    margin: 20px 0;
+    cursor: pointer;
+
+    disclose-icon {
+      display: flex;
+      align-items: center;
+      margin: 0 8px 0 15px;
+
+      svg {
+        transform: rotate(0);
+        transition: transform @animation-timing-fast @ease-out-expo;
+      }
+    }
+
+    span {
+      .ellipsis;
+
+      display: inline-block;
+      flex-grow: 1;
+      font-size: 11px;
+      font-weight: @font-weight-regular;
+      text-transform: uppercase;
+    }
+
+    &--open {
+      disclose-icon svg {
+        transform: rotate(90deg);
+      }
+    }
+  }
+  & + & {
+    margin-top: 40px;
+  }
 }

@@ -33,9 +33,11 @@ import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 import {WebAppEvents} from '../event/WebApp';
 
 import {Context} from '../ui/ContextMenu';
+import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
+import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 
 window.z = window.z || {};
 window.z.viewModel = z.viewModel || {};
@@ -326,10 +328,6 @@ z.viewModel.ListViewModel = class ListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   }
 
-  //##############################################################################
-  // Context menu
-  //##############################################################################
-
   onContextMenu(conversationEntity, event) {
     const entries = [];
 
@@ -356,6 +354,37 @@ z.viewModel.ListViewModel = class ListViewModel {
           title,
         });
       }
+    }
+
+    if (!conversationEntity.is_archived()) {
+      const {conversationLabelRepository} = this.conversationRepository;
+      if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+        entries.push({
+          click: () => {
+            conversationLabelRepository.addConversationToFavorites(conversationEntity);
+            this.conversations.expandFolder(DefaultLabelIds.Favorites);
+          },
+          label: t('conversationPopoverFavorite'),
+        });
+      } else {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+          label: t('conversationPopoverUnfavorite'),
+        });
+      }
+
+      const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
+      if (customLabel) {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
+          label: t('conversationsPopoverRemoveFrom', customLabel.name),
+        });
+      }
+
+      entries.push({
+        click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
+        label: t('conversationsPopoverMoveTo'),
+      });
     }
 
     if (conversationEntity.is_archived()) {
@@ -415,12 +444,11 @@ z.viewModel.ListViewModel = class ListViewModel {
     }
   }
 
-  clickToBlock(conversationEntity) {
+  async clickToBlock(conversationEntity) {
     const userEntity = conversationEntity.firstUserEntity();
     const hideConversation = this._shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
-
-    this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
+    await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   }
 
   clickToCancelRequest(conversationEntity) {

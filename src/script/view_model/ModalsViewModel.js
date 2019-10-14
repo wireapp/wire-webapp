@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {buildSupportUrl} from 'Util/UrlUtil';
-import {noop} from 'Util/util';
+import {noop, afterRender} from 'Util/util';
 
 import {WebAppEvents} from '../event/WebApp';
 
@@ -56,6 +56,7 @@ const Types = {
   INPUT: 'modal-template-input',
   MULTI_ACTIONS: 'modal-multi-actions',
   OPTION: 'modal-template-option',
+  PASSWORD: 'modal-template-password',
   SESSION_RESET: 'modal-session-reset',
 };
 
@@ -69,10 +70,13 @@ export class ModalsViewModel {
     this.elementId = 'modals';
 
     this.optionChecked = ko.observable(false);
+    this.passwordValue = ko.observable('');
     this.inputValue = ko.observable('');
+    this.inputFocus = ko.observable(false);
     this.content = ko.observable(defaultContent);
     this.state = ko.observable(States.NONE);
     this.queue = [];
+    this.actionEnabled = ko.pureComputed(() => !this.hasInput() || !!this.inputValue().trim().length);
 
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
@@ -180,6 +184,7 @@ export class ModalsViewModel {
         break;
       }
       case Types.INPUT:
+      case Types.PASSWORD:
       case Types.OPTION: {
         if (!hideSecondary) {
           content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
@@ -211,8 +216,10 @@ export class ModalsViewModel {
     }
     this.content(content);
     this.state(States.OPEN);
+    afterRender(() => this.inputFocus(true));
   };
 
+  hasPassword = () => this.content().currentType === Types.PASSWORD;
   hasInput = () => this.content().currentType === Types.INPUT;
   hasOption = () => this.content().currentType === Types.OPTION;
   hasMultipleSecondary = () => this.content().currentType === Types.MULTI_ACTIONS;
@@ -226,11 +233,17 @@ export class ModalsViewModel {
       if (this.content().currentType === Types.INPUT) {
         return action(this.inputValue());
       }
+      if (this.content().currentType === Types.PASSWORD) {
+        return action(this.passwordValue());
+      }
       action();
     }
   };
 
-  doAction = action => {
+  doAction = (action, skipValidation = false) => {
+    if (!skipValidation && !this.actionEnabled()) {
+      return;
+    }
     if (typeof action === 'function') {
       action();
     }
@@ -238,6 +251,7 @@ export class ModalsViewModel {
   };
 
   hide = () => {
+    this.inputFocus(false);
     this.state(States.CLOSING);
     this.content().closeFn();
   };
@@ -245,6 +259,7 @@ export class ModalsViewModel {
   onModalHidden = () => {
     this.content(defaultContent);
     this.inputValue('');
+    this.passwordValue('');
     this.optionChecked(false);
     this.state(States.READY);
     this.unqueue();
