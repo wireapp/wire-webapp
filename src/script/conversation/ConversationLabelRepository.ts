@@ -85,6 +85,7 @@ export class ConversationLabelRepository {
   logger: Logger;
 
   constructor(
+    private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.ObservableArray<Conversation>,
     private readonly propertiesService: PropertiesService,
   ) {
@@ -116,7 +117,7 @@ export class ConversationLabelRepository {
         conversations: ko.observableArray(
           conversations
             .map(conversationId =>
-              this.conversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
+              this.allConversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
             )
             .filter(conversation => !!conversation),
         ),

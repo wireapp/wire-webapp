@@ -272,6 +272,7 @@ export class ConversationRepository {
     });
 
     this.conversationLabelRepository = new ConversationLabelRepository(
+      this.conversations,
       this.conversations_unarchived,
       propertyRepository.propertiesService,
     );
