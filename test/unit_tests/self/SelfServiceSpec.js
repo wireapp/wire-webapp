@@ -18,10 +18,11 @@
  */
 
 import {resolve, graph} from '../../api/testResolver';
+import {SelfService} from 'src/script/self/SelfService';
 
 describe('SelfService', () => {
-  const selfService = resolve(graph.SelfService);
   const backendClient = resolve(graph.BackendClient);
+  const selfService = new SelfService(backendClient);
 
   beforeEach(() => {
     spyOn(backendClient, 'sendRequest').and.returnValue(Promise.resolve());
@@ -44,7 +45,7 @@ describe('SelfService', () => {
     expect(backendClient.sendRequest).toHaveBeenCalledWith(
       jasmine.objectContaining({
         type: 'GET',
-        url: graph.SelfService.URL.SELF,
+        url: SelfService.URL.SELF,
       }),
     );
   });
@@ -68,7 +69,7 @@ describe('SelfService', () => {
       jasmine.objectContaining({
         data: JSON.stringify(updates),
         type: 'PUT',
-        url: graph.SelfService.URL.SELF,
+        url: SelfService.URL.SELF,
       }),
     );
   });

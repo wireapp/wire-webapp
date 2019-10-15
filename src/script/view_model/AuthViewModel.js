@@ -67,6 +67,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 
 import {BackendClientError} from '../error/BackendClientError';
 import {FORWARDED_QUERY_KEYS} from '../auth/route';
+import {SelfService} from '../self/SelfService';
 
 class AuthViewModel {
   static get CONFIG() {
@@ -94,13 +95,10 @@ class AuthViewModel {
     this.storageService = new StorageService();
     this.storage_repository = new StorageRepository(this.storageService);
 
-    this.cryptography_repository = new CryptographyRepository(
-      resolveDependency(graph.BackendClient),
-      this.storage_repository,
-    );
+    this.cryptography_repository = new CryptographyRepository(backendClient, this.storage_repository);
     this.client_repository = new ClientRepository(backendClient, this.storageService, this.cryptography_repository);
 
-    this.selfService = resolveDependency(graph.SelfService);
+    this.selfService = new SelfService(backendClient);
     this.user_repository = new UserRepository(
       resolveDependency(graph.UserService),
       this.asset_service,

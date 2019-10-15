@@ -50,6 +50,7 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {SelfService} from 'src/script/self/SelfService';
 
 window.testConfig = {
   connection: backendConfig,
@@ -216,7 +217,7 @@ window.TestFactory = class TestFactory {
     TestFactory.user_repository = new UserRepository(
       TestFactory.user_service,
       TestFactory.asset_service,
-      resolveDependency(graph.SelfService),
+      new SelfService(resolveDependency(graph.BackendClient)),
       TestFactory.client_repository,
       serverTimeHandler,
       TestFactory.propertyRepository,
