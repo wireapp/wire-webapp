@@ -62,7 +62,7 @@ class PropertiesService {
     });
   }
 
-  getPropertiesByKey(key: string): Promise<void> {
+  getPropertiesByKey(key: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
