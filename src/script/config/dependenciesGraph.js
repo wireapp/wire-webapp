@@ -59,8 +59,8 @@ dependencies.set(LinkPreviewRepository, {
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
-dependencies.set(PropertiesRepository, {dependencies: [PropertiesService], name: 'PropertiesRepository'});
-dependencies.set(PropertiesService, {dependencies: [BackendClient, SelfService], name: 'PropertiesService'});
+dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
+dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
