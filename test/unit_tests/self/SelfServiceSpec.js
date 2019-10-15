@@ -45,7 +45,7 @@ describe('SelfService', () => {
     expect(backendClient.sendRequest).toHaveBeenCalledWith(
       jasmine.objectContaining({
         type: 'GET',
-        url: graph.SelfService.URL.SELF,
+        url: selfService.URL.SELF,
       }),
     );
   });
@@ -69,7 +69,7 @@ describe('SelfService', () => {
       jasmine.objectContaining({
         data: JSON.stringify(updates),
         type: 'PUT',
-        url: graph.SelfService.URL.SELF,
+        url: selfService.URL.SELF,
       }),
     );
   });
