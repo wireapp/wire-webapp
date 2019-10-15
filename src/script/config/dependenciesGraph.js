@@ -24,7 +24,6 @@ import {AuthRepository} from '../auth/AuthRepository';
 import {AuthService} from '../auth/AuthService';
 import {BackendClient} from '../service/BackendClient';
 import {BackupService} from '../backup/BackupService';
-import {BroadcastService} from '../broadcast/BroadcastService';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
@@ -51,7 +50,6 @@ dependencies.set(AuthRepository, {dependencies: [AuthService], name: 'AuthReposi
 dependencies.set(AuthService, {dependencies: [BackendClient], name: 'AuthService'});
 dependencies.set(BackendClient, {dependencies: [], name: 'BackendClient'});
 dependencies.set(BackupService, {dependencies: [StorageService], name: 'BackupService'});
-dependencies.set(BroadcastService, {dependencies: [BackendClient], name: 'BroadcastService'});
 dependencies.set(GiphyRepository, {dependencies: [GiphyService], name: 'GiphyRepository'});
 dependencies.set(GiphyService, {dependencies: [BackendClient], name: 'GiphyService'});
 dependencies.set(LinkPreviewRepository, {
@@ -76,7 +74,6 @@ export {
   AuthRepository,
   BackendClient,
   BackupService,
-  BroadcastService,
   GiphyRepository,
   GiphyService,
   LinkPreviewRepository,

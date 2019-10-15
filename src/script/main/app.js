@@ -96,6 +96,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
+import {BroadcastService} from '../broadcast/BroadcastService';
 
 class App {
   static get CONFIG() {
@@ -229,7 +230,7 @@ class App {
       repositories.user,
     );
     repositories.broadcast = new BroadcastRepository(
-      resolve(graph.BroadcastService),
+      new BroadcastService(resolve(graph.BackendClient)),
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
