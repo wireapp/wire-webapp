@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {BackendClient} from '../service/BackendClient';
 
 class PropertiesService {
-  static get CONFIG() {
+  private readonly backendClient: BackendClient;
+
+  static get CONFIG(): {URL_PROPERTIES: string} {
     return {
       URL_PROPERTIES: '/properties',
     };
@@ -30,9 +32,8 @@ class PropertiesService {
    * Construct a new Properties Service.
    * @param {BackendClient} backendClient - Client for the API calls
    */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
-    this.logger = getLogger('PropertiesService');
   }
 
   /**
@@ -40,61 +41,35 @@ class PropertiesService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/clearProperties
    * @returns {Promise} Resolves when all properties for user have been cleared
    */
-  deleteProperties() {
+  deleteProperties(): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
-  /**
-   * Delete a property.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteProperty
-   * @param {string} key - Key used to store user properties
-   * @returns {Promise} Resolves when the requested property for user has been cleared
-   */
-  deletePropertiesByKey(key) {
+  deletePropertiesByKey(key: string): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'DELETE',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
-  /**
-   * List all property keys stored for the user.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/listPropertyKeys
-   * @returns {Promise} Resolves with an array of the property keys stored for the user
-   */
-  getProperties() {
+  getProperties(): Promise<void> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: PropertiesService.CONFIG.URL_PROPERTIES,
     });
   }
 
-  /**
-   * Get a property value stored for a key.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getProperty
-   *
-   * @param {string} key - Key used to store user properties
-   * @returns {Promise} Resolves with the property set for the given key
-   */
-  getPropertiesByKey(key) {
+  getPropertiesByKey(key: string): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
     });
   }
 
-  /**
-   * Set a property value for a key.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/setProperty
-   *
-   * @param {string} key - Key used to store user properties
-   * @param {Object|boolean} properties - Payload to be stored
-   * @returns {Promise} Resolves when the property has been stored
-   */
-  putPropertiesByKey(key, properties) {
+  putPropertiesByKey(key: string, properties: {} | boolean): Promise<void> {
     return this.backendClient.sendJson({
       data: properties,
       type: 'PUT',

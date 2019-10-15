@@ -24,10 +24,10 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 
-import {PropertiesService} from '../config/dependenciesGraph';
 import {Conversation} from '../entity/Conversation';
 import {BackendEvent} from '../event/Backend';
 import {WebAppEvents} from '../event/WebApp';
+import {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum LabelType {
@@ -90,7 +90,7 @@ export class ConversationLabelRepository {
     private readonly propertiesService: PropertiesService,
   ) {
     this.labels = ko.observableArray([]);
-    this.allLabeledConversations = ko.computed(() =>
+    this.allLabeledConversations = ko.pureComputed(() =>
       this.labels().reduce(
         (accumulated: Conversation[], {conversations, type}) =>
           type === LabelType.Custom ? accumulated.concat(conversations()) : accumulated,
@@ -178,7 +178,6 @@ export class ConversationLabelRepository {
       this.labels.push(favoriteLabel);
     }
     favoriteLabel.conversations.push(addedConversation);
-    this.labels.valueHasMutated();
     this.saveLabels();
   };
 
@@ -203,11 +202,11 @@ export class ConversationLabelRepository {
     if (this.getFavorites().includes(conversation)) {
       return DefaultLabelIds.Favorites;
     }
-    if (conversation.isGroup()) {
-      return DefaultLabelIds.Groups;
-    }
     if (this.allLabeledConversations().includes(conversation)) {
       return this.getConversationCustomLabel(conversation).id;
+    }
+    if (conversation.isGroup()) {
+      return DefaultLabelIds.Groups;
     }
     return DefaultLabelIds.Contacts;
   };

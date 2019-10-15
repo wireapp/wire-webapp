@@ -19,12 +19,14 @@
 
 import {resolve, graph} from './../../api/testResolver';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesService} from 'src/script/properties/PropertiesService';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
+  const backendClient = resolve(graph.BackendClient);
 
   beforeEach(() => {
-    const propertiesService = resolve(graph.PropertiesService);
+    const propertiesService = new PropertiesService(backendClient);
     propertiesRepository = new PropertiesRepository(propertiesService);
   });
 
