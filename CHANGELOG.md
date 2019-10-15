@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.23.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.9...@wireapp/react-ui-kit@7.23.10) (2019-10-15)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** TabBarItem active opacity ([#2426](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/2426)) ([7e47008](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/7e470085e99ced09601394695158642f92bba448))
+
+
+
+
+
 ## [7.23.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.23.8...@wireapp/react-ui-kit@7.23.9) (2019-10-14)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
