@@ -17,8 +17,8 @@
  *
  */
 
+import {Consent} from '@wireapp/api-client/dist/commonjs/self';
 import {BackendClient} from '../service/BackendClient';
-import {ConsentValue} from '../user/ConsentValue';
 
 export class SelfService {
   private readonly backendClient: BackendClient;
@@ -50,7 +50,7 @@ export class SelfService {
     });
   }
 
-  getSelfConsent(): Promise<ConsentValue> {
+  getSelfConsent(): Promise<Consent[]> {
     return this.backendClient
       .sendRequest({
         type: 'GET',
