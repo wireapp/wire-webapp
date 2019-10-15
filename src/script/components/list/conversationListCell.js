@@ -40,7 +40,6 @@ class ConversationListCell {
     this.isGroup = conversation.isGroup();
     this.is1To1 = conversation.is1to1();
     this.isInTeam = conversation.selfUser().inTeam();
-    this.displayName = conversation.display_name();
     this.isInViewport = ko.observable(false);
 
     viewportObserver.trackElement(element, this.isInViewport, false);
@@ -69,7 +68,7 @@ class ConversationListCell {
 
 ko.components.register('conversation-list-cell', {
   template: `
-    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': displayName}, css: {'conversation-list-cell-active': isSelected()}">
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name()}, css: {'conversation-list-cell-active': isSelected()}">
     <!-- ko if: isInViewport() -->
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
         <!-- ko if: isGroup -->
@@ -85,11 +84,11 @@ ko.components.register('conversation-list-cell', {
         <!-- ko if: is1To1 && isInTeam -->
           <availability-state class="conversation-list-cell-availability"
                               data-uie-name="status-availability-item"
-                              params="availability: conversation.availabilityOfUser, label: displayName, theme: isSelected()">
+                              params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: isSelected()">
           </availability-state>
         <!-- /ko -->
         <!-- ko ifnot: is1To1 && isInTeam -->
-          <span class="conversation-list-cell-name" data-bind="text: displayName, css: {'accent-text': isSelected()}"></span>
+          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'accent-text': isSelected()}"></span>
         <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
