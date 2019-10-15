@@ -138,13 +138,15 @@ export class ConversationListViewModel {
       if (!activeConversation) {
         return;
       }
-      const activeLabel = this.conversationRepository.conversationLabelRepository.getConversationLabelId(
+      const activeLabelIds = this.conversationRepository.conversationLabelRepository.getConversationLabelIds(
         activeConversation,
       );
 
-      // TODO: Check if "activeLabel" is already in "expandedFolders"
+      const isAlreadyOpen = activeLabelIds.some(labelId => this.expandedFolders().includes(labelId));
 
-      this.expandFolder(activeLabel);
+      if (!isAlreadyOpen) {
+        this.expandFolder(activeLabelIds[0]);
+      }
     });
 
     this.shouldUpdateScrollbar = ko
