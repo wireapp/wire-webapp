@@ -90,7 +90,7 @@ export class ConversationLabelRepository {
     private readonly propertiesService: PropertiesService,
   ) {
     this.labels = ko.observableArray([]);
-    this.allLabeledConversations = ko.computed(() =>
+    this.allLabeledConversations = ko.pureComputed(() =>
       this.labels().reduce(
         (accumulated: Conversation[], {conversations, type}) =>
           type === LabelType.Custom ? accumulated.concat(conversations()) : accumulated,
@@ -178,7 +178,6 @@ export class ConversationLabelRepository {
       this.labels.push(favoriteLabel);
     }
     favoriteLabel.conversations.push(addedConversation);
-    this.labels.valueHasMutated();
     this.saveLabels();
   };
 
