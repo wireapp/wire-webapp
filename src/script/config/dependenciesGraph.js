@@ -62,6 +62,7 @@ dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepos
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
+dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
