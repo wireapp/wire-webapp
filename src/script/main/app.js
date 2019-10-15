@@ -96,6 +96,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
+import {SelfService} from '../self/SelfService';
 
 class App {
   static get CONFIG() {
@@ -164,14 +165,14 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new CryptographyRepository(resolve(graph.BackendClient), repositories.storage);
+    repositories.cryptography = new CryptographyRepository(this.backendClient, repositories.storage);
     const storageService = resolve(graph.StorageService);
     repositories.client = new ClientRepository(this.backendClient, storageService, repositories.cryptography);
     repositories.media = resolve(graph.MediaRepository);
     repositories.user = new UserRepository(
       resolve(graph.UserService),
       this.service.asset,
-      resolve(graph.SelfService),
+      new SelfService(this.backendClient),
       repositories.client,
       serverTimeHandler,
       repositories.properties,

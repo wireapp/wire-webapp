@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,13 @@
  *
  */
 
+import {BackendClient} from '../service/BackendClient';
+import {ConsentValue} from '../user/ConsentValue';
+
 export class SelfService {
-  static get URL() {
+  private readonly backendClient: BackendClient;
+
+  static get URL(): {SELF: string} {
     return {
       SELF: '/self',
     };
@@ -27,7 +32,7 @@ export class SelfService {
   /**
    * @param {BackendClient} backendClient - Client for the API calls
    */
-  constructor(backendClient) {
+  constructor(backendClient: BackendClient) {
     this.backendClient = backendClient;
   }
 
@@ -39,7 +44,7 @@ export class SelfService {
    * @param {string} [password] - Self user password to authorize immediate account deletion
    * @returns {Promise} Promise that resolves when account deletion has been initiated
    */
-  deleteSelf(password) {
+  deleteSelf(password: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         password: password,
@@ -54,18 +59,14 @@ export class SelfService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//self
    * @returns {Promise} Promise that will resolve with the self user
    */
-  getSelf() {
+  getSelf(): Promise<any> {
     return this.backendClient.sendRequest({
       type: 'GET',
       url: SelfService.URL.SELF,
     });
   }
 
-  /**
-   * Get your consents.
-   * @returns {Promise<ConsentValue>} Promise that will resolve with the consents user has given
-   */
-  getSelfConsent() {
+  getSelfConsent(): Promise<ConsentValue> {
     return this.backendClient
       .sendRequest({
         type: 'GET',
@@ -82,7 +83,7 @@ export class SelfService {
    * @param {Object} selfData - Updated user profile information
    * @returns {Promise} Resolves with backend response.
    */
-  putSelf(selfData) {
+  putSelf(selfData: {}): Promise<void> {
     return this.backendClient.sendJson({
       data: selfData,
       type: 'PUT',
@@ -98,7 +99,7 @@ export class SelfService {
    * @param {string} source - Identifier of app from consent
    * @returns {Promise} Promise that will resolve with the self user
    */
-  putSelfConsent(consentType, value, source) {
+  putSelfConsent(consentType: number, value: number, source: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         source: source,
@@ -118,7 +119,7 @@ export class SelfService {
    * @param {string} email - New email address for the user
    * @returns {Promise} Promise that resolves when email changing process has been started on backend
    */
-  putSelfEmail(email) {
+  putSelfEmail(email: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         email: email,
@@ -136,7 +137,7 @@ export class SelfService {
    * @param {string} username - New username for the user
    * @returns {Promise} Promise that resolves when username changing process has been started on backend
    */
-  putSelfHandle(username) {
+  putSelfHandle(username: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         handle: username,
@@ -154,7 +155,7 @@ export class SelfService {
    * @param {string} newLocale - Locale to be set
    * @returns {Promise} Promise that resolves when locale has been changed on backend
    */
-  putSelfLocale(newLocale) {
+  putSelfLocale(newLocale: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         locale: newLocale,
@@ -164,16 +165,7 @@ export class SelfService {
     });
   }
 
-  /**
-   * Change own user password.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//changePassword
-   *
-   * @param {string} newPassword - New user password
-   * @param {string} [oldPassword] - Old password of the user
-   * @returns {Promise} Promise that resolves when password has been changed on backend
-   */
-  putSelfPassword(newPassword, oldPassword) {
+  putSelfPassword(newPassword: string, oldPassword?: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         new_password: newPassword,
@@ -184,15 +176,7 @@ export class SelfService {
     });
   }
 
-  /**
-   * Change your phone number.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!//changePhone
-   *
-   * @param {string} phoneNumber - Phone number in E.164 format
-   * @returns {Promise} Promise that resolves when phone number change process has been started on backend
-   */
-  putSelfPhone(phoneNumber) {
+  putSelfPhone(phoneNumber: string): Promise<void> {
     return this.backendClient.sendJson({
       data: {
         phone: phoneNumber,

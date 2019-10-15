@@ -34,7 +34,6 @@ import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
-import {SelfService} from '../self/SelfService';
 import {StorageService} from '../storage/StorageService';
 import {UserService} from '../user/UserService';
 
@@ -61,10 +60,8 @@ dependencies.set(LinkPreviewRepository, {
 dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: 'MediaRepository'});
 dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
-dependencies.set(PropertiesRepository, {dependencies: [PropertiesService, SelfService], name: 'PropertiesRepository'});
 dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
-dependencies.set(SelfService, {dependencies: [BackendClient], name: 'SelfService'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
 
@@ -86,7 +83,6 @@ export {
   PermissionRepository,
   PropertiesRepository,
   PropertiesService,
-  SelfService,
   StorageService,
   UserService,
 };
