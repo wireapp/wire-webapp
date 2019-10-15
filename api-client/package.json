@@ -24,7 +24,7 @@
     "@types/react": "16.9.6",
     "@types/react-dom": "16.9.1",
     "@types/ws": "6.0.3",
-    "@wireapp/react-ui-kit": "7.23.9",
+    "@wireapp/react-ui-kit": "7.23.10",
     "@wireapp/store-engine-fs": "1.4.20",
     "babel-loader": "8.0.6",
     "browser-sync": "2.26.7",
@@ -76,5 +76,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/APIClient.d.ts",
-  "version": "7.1.5"
+  "version": "7.1.6"
 }
