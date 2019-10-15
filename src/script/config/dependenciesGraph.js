@@ -82,7 +82,6 @@ export {
   RichProfileRepository,
   PermissionRepository,
   PropertiesRepository,
-  PropertiesService,
   SelfService,
   StorageService,
   UserService,
