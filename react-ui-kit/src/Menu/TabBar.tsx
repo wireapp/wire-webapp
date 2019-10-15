@@ -66,6 +66,7 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => ObjectInt
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'center',
+    opacity: active ? 1 : 0.56,
     padding: '8px 0',
   };
 };
