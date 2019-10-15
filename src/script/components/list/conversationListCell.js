@@ -17,30 +17,37 @@
  *
  */
 
+import ko from 'knockout';
+
 import {noop} from 'Util/util';
 
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import {MediaType} from '../../media/MediaType';
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
+import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/availabilityState';
 
 class ConversationListCell {
-  constructor({showJoinButton, conversation, onJoinCall, is_selected = noop, click = noop}) {
+  constructor({showJoinButton, conversation, onJoinCall, is_selected = noop, click = noop}, {element}) {
     this.conversation = conversation;
-    this.is_selected = is_selected;
+    this.isSelected = ko.computed(() => is_selected(conversation));
     // TODO: "click" should be renamed to "right_click"
     this.on_click = click;
     this.ParticipantAvatar = ParticipantAvatar;
     this.showJoinButton = showJoinButton;
+    this.isGroup = conversation.isGroup();
+    this.is1To1 = conversation.is1to1();
+    this.isInTeam = conversation.selfUser().inTeam();
+    this.displayName = conversation.display_name();
+    this.isInViewport = ko.observable(false);
 
-    this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
+    viewportObserver.trackElement(element, this.isInViewport, false);
+
+    this.users = this.conversation.participating_user_ets;
 
     this.cell_state = ko.observable('');
-    this.cell_state_observable = ko
-      .computed(() => this.cell_state(generateCellState(this.conversation)))
-      .extend({rateLimit: 500});
 
     this.ConversationStatusIcon = ConversationStatusIcon;
 
@@ -48,40 +55,46 @@ class ConversationListCell {
       event.preventDefault();
       onJoinCall(conversation, MediaType.AUDIO);
     };
-  }
 
-  destroy() {
-    this.cell_state_observable.dispose();
+    const cell_state_observable = ko
+      .computed(() => this.cell_state(generateCellState(this.conversation)))
+      .extend({rateLimit: 500});
+
+    this.destroy = () => {
+      viewportObserver.removeElement(element);
+      cell_state_observable.dispose();
+    };
   }
 }
 
 ko.components.register('conversation-list-cell', {
   template: `
-    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': displayName}, css: {'conversation-list-cell-active': isSelected()}">
+    <!-- ko if: isInViewport() -->
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.isGroup() -->
+        <!-- ko if: isGroup -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: !conversation.isGroup() && users().length -->
+        <!-- ko if: !isGroup && users().length -->
           <div class="avatar-halo">
             <participant-avatar params="participant: users()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <!-- ko if: conversation.is1to1() && conversation.selfUser().inTeam() -->
+        <!-- ko if: is1To1 && isInTeam -->
           <availability-state class="conversation-list-cell-availability"
                               data-uie-name="status-availability-item"
-                              params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: is_selected(conversation)">
+                              params="availability: conversation.availabilityOfUser, label: displayName, theme: isSelected()">
           </availability-state>
         <!-- /ko -->
-        <!-- ko ifnot: conversation.is1to1() && conversation.selfUser().inTeam() -->
-          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'accent-text': is_selected(conversation)}"></span>
+        <!-- ko ifnot: is1To1 && isInTeam -->
+          <span class="conversation-list-cell-name" data-bind="text: displayName, css: {'accent-text': isSelected()}"></span>
         <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
+        <span class="conversation-list-cell-context-menu" data-bind="click: (_, event) => on_click(conversation, event)" data-uie-name="go-options"></span>
         <!-- ko ifnot: showJoinButton -->
           <!-- ko if: cell_state().icon === ConversationStatusIcon.PENDING_CONNECTION -->
             <span class="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending"><pending-icon class="svg-icon"></pending-icon></span>
@@ -109,7 +122,12 @@ ko.components.register('conversation-list-cell', {
           <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
+      <!-- /ko -->
     </div>
   `,
-  viewModel: ConversationListCell,
+  viewModel: {
+    createViewModel(props, componentInfo) {
+      return new ConversationListCell(props, componentInfo);
+    },
+  },
 });
