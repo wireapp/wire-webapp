@@ -35,6 +35,7 @@ import {PropertiesService} from '../properties/PropertiesService';
 import {RichProfileRepository} from '../user/RichProfileRepository';
 import {StorageService} from '../storage/StorageService';
 import {UserService} from '../user/UserService';
+import {SelfService} from '../self/SelfService';
 
 /**
  * Dependencies is a Map that will contain all the dependencies of the app
@@ -59,7 +60,7 @@ dependencies.set(MediaRepository, {dependencies: [PermissionRepository], name: '
 dependencies.set(MessageSender, {dependencies: [], name: 'MessageSender'});
 dependencies.set(PermissionRepository, {dependencies: [], name: 'PermissionRepository'});
 dependencies.set(PropertiesRepository, {dependencies: [PropertiesService], name: 'PropertiesRepository'});
-dependencies.set(PropertiesService, {dependencies: [BackendClient], name: 'PropertiesService'});
+dependencies.set(PropertiesService, {dependencies: [BackendClient, SelfService], name: 'PropertiesService'});
 dependencies.set(RichProfileRepository, {dependencies: [BackendClient], name: 'RichProfileRepository'});
 dependencies.set(StorageService, {dependencies: [], name: 'StorageService'});
 dependencies.set(UserService, {dependencies: [BackendClient, StorageService], name: 'UserService'});
