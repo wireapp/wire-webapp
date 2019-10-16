@@ -26,13 +26,15 @@ import {ReceiptMode} from '../conversation/ReceiptMode';
 import {ConsentType} from '../user/ConsentType';
 import {ConsentValue} from '../user/ConsentValue';
 import {PROPERTIES_TYPE} from './PropertiesType';
-import {WebappProperties} from './WebappProperties';
 
+import {WebappProperties} from '@wireapp/api-client/dist/commonjs/user/data/UserPropertiesSetData';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {AudioPreference} from '../audio/AudioPreference';
 import {config} from '../config';
 import {User} from '../entity/User';
 import {WebAppEvents} from '../event/WebApp';
+import {NotificationPreference} from '../notification/NotificationPreference';
 import {SelfService} from '../self/SelfService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {PropertiesService} from './PropertiesService';
@@ -66,7 +68,7 @@ class PropertiesRepository {
   private readonly propertiesService: PropertiesService;
   private readonly selfService: SelfService;
   private readonly logger: Logger;
-  private readonly properties: WebappProperties;
+  public properties: WebappProperties;
   private readonly selfUser: ko.Observable<User>;
   private readonly receiptMode: ko.Observable<any>;
   private readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
@@ -76,7 +78,32 @@ class PropertiesRepository {
     this.selfService = selfService;
     this.logger = getLogger('PropertiesRepository');
 
-    this.properties = new WebappProperties();
+    this.properties = {
+      contact_import: {
+        macos: undefined,
+      },
+      enable_debugging: false,
+      settings: {
+        emoji: {
+          replace_inline: true,
+        },
+        interface: {
+          theme: 'default',
+        },
+        notifications: NotificationPreference.ON,
+        previews: {
+          send: true,
+        },
+        privacy: {
+          improve_wire: undefined,
+          report_errors: undefined,
+        },
+        sound: {
+          alerts: AudioPreference.ALL,
+        },
+      },
+      version: 1,
+    };
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
     /** @type {ko.Observable<ConsentValue | boolean>} */
@@ -85,7 +112,7 @@ class PropertiesRepository {
 
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !config.FEATURE.CHECK_CONSENT;
-    const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isPrivacyPreferenceSet = this.properties.settings.privacy !== undefined;
 
     return isCheckConsentDisabled || isPrivacyPreferenceSet
       ? Promise.resolve()
@@ -188,7 +215,7 @@ class PropertiesRepository {
    * @param {*} updatedPreference - New property setting
    * @returns {undefined} No return value
    */
-  savePreference(propertiesType, updatedPreference): void {
+  savePreference(propertiesType: string, updatedPreference: any): void {
     if (updatedPreference === undefined) {
       switch (propertiesType) {
         case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
@@ -211,7 +238,7 @@ class PropertiesRepository {
   }
 
   // Reset a property to it's default state. This method is only called from external event sources (when other clients sync the settings).
-  deleteProperty(key): void {
+  deleteProperty(key: string): void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.setProperty(key, ReceiptMode.DELIVERY);
@@ -263,18 +290,18 @@ class PropertiesRepository {
     }
   }
 
-  _savePreferenceActivatedAccount(propertiesType: string, updatedPreference: {}): Promise<void> {
+  _savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
       .then(() => this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`));
   }
 
-  _savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: {}): Promise<void> {
+  _savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     this.logger.info(`Updated preference: '${propertiesType}' - '${updatedPreference}'`);
     return Promise.resolve();
   }
 
-  _publishPropertyUpdate(propertiesType: string, updatedPreference: {}): void {
+  _publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
       case PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CONTACTS, updatedPreference);

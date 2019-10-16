@@ -23,7 +23,6 @@ import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {WebAppEvents} from '../../event/WebApp';
 import {StorageKey} from '../../storage/StorageKey';
 
@@ -123,7 +122,7 @@ export class EmojiInputViewModel {
     this.emojiStartPosition = -1;
     this.emojiUsageCount = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.shouldReplaceEmoji = propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+    this.shouldReplaceEmoji = propertiesRepository.properties.emoji.replace_inline;
 
     $(document).on('click', `.${EMOJI_DIV_CLASS}`, event => {
       const clicked = $(event.target);

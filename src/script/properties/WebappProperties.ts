@@ -21,30 +21,6 @@ import {AudioPreference} from '../audio/AudioPreference';
 import {NotificationPreference} from '../notification/NotificationPreference';
 import {PROPERTIES_TYPE} from './PropertiesType';
 
-export interface WebappProperties {
-  value: {
-    contact_import: Object;
-    enable_debugging: boolean;
-    settings: {
-      emoji: {
-        replace_inline: boolean;
-      };
-      notifications: NotificationPreference;
-      previews: {
-        send: boolean;
-      };
-      privacy: {
-        improve_wire: boolean;
-      };
-      sound: {
-        alerts: AudioPreference;
-      };
-    };
-    version: number;
-  };
-  key: 'webapp';
-}
-
 class WebappProperties {
   constructor() {
     this[PROPERTIES_TYPE.VERSION] = 1;

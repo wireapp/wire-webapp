@@ -17,7 +17,6 @@
  *
  */
 
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {WebAppEvents} from '../event/WebApp';
 
 const THEMES_CLASS_PREFIX = 'theme-';
@@ -29,7 +28,7 @@ export const THEMES = {
 
 export class ThemeViewModel {
   constructor(propertiesRepository) {
-    this.setTheme(propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+    this.setTheme(propertiesRepository.properties.interface.theme);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.setTheme);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, properties =>
