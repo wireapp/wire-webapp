@@ -41,6 +41,9 @@ export interface WebappProperties {
     emoji: {
       replace_inline: boolean;
     };
+    interface: {
+      theme: 'dark' | 'default';
+    };
     notifications: NotificationPreference;
     previews: {
       send: boolean;
