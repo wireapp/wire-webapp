@@ -40,17 +40,23 @@ class ConversationListCell {
     this.isGroup = conversation.isGroup();
     this.is1To1 = conversation.is1to1();
     this.isInTeam = conversation.selfUser().inTeam();
-    this.isInViewport = ko.observable(false);
 
-    viewportObserver.trackElement(
-      element,
-      isInViewport => {
-        if (!this.isInViewport() && isInViewport) {
-          this.isInViewport(true);
-        }
-      },
-      false,
-    );
+    const {bottom, top} = element.getBoundingClientRect();
+    const isInitiallyInViewport = bottom > 0 && top < window.innerHeight;
+
+    this.isInViewport = ko.observable(isInitiallyInViewport);
+
+    if (!isInitiallyInViewport) {
+      viewportObserver.trackElement(
+        element,
+        isInViewport => {
+          if (!this.isInViewport() && isInViewport) {
+            this.isInViewport(true);
+          }
+        },
+        false,
+      );
+    }
 
     this.users = this.conversation.participating_user_ets;
 
