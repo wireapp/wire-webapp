@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.2.0...@wireapp/api-client@7.3.0) (2019-10-16)
+
+
+### Features
+
+* **api-client:** Export WebappProperties ([#2437](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2437)) ([ec27e84](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ec27e8494a5746c5466fdb0e51d77528a8c514ef))
+
+
+
+
+
 # [7.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.1.6...@wireapp/api-client@7.2.0) (2019-10-16)
 
 
