@@ -18,13 +18,12 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/commonjs/event';
-import {NotificationPayload} from '@wireapp/api-client/dist/commonjs/notification';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
 export function validateEvent(
-  event: NotificationPayload,
+  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {

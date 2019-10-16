@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/commonjs/conversation/data';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/commonjs/event';
+import {CONVERSATION_EVENT, ConversationTypingEvent} from '@wireapp/api-client/dist/commonjs/event';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
@@ -26,12 +26,12 @@ import {validateEvent} from './EventValidator';
 describe('EventValidator', () => {
   describe('validateEvent', () => {
     it('ignores "conversation.typing" events', () => {
-      const event: ConversationTypingNotification = {
+      const event: ConversationTypingEvent = {
         conversation: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b',
         data: {status: CONVERSATION_TYPING.STARTED},
         from: 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b',
         time: '2019-09-10T16:16:25.635Z',
-        type: CONVERSATION_EVENT,
+        type: CONVERSATION_EVENT.TYPING,
       };
 
       const source = EventSource.WEB_SOCKET;
