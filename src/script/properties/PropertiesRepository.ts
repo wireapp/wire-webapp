@@ -65,13 +65,13 @@ class PropertiesRepository {
     };
   }
 
-  private readonly propertiesService: PropertiesService;
-  private readonly selfService: SelfService;
   private readonly logger: Logger;
-  public properties: WebappProperties;
-  private readonly selfUser: ko.Observable<User>;
+  private readonly propertiesService: PropertiesService;
   private readonly receiptMode: ko.Observable<any>;
-  private readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
+  private readonly selfService: SelfService;
+  private readonly selfUser: ko.Observable<User>;
+  public properties: WebappProperties;
+  public readonly marketingConsent: ko.Observable<ConsentValue | boolean>;
 
   constructor(propertiesService: PropertiesService, selfService: SelfService) {
     this.propertiesService = propertiesService;
