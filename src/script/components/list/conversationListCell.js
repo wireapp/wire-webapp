@@ -42,7 +42,15 @@ class ConversationListCell {
     this.isInTeam = conversation.selfUser().inTeam();
     this.isInViewport = ko.observable(false);
 
-    viewportObserver.trackElement(element, this.isInViewport, false);
+    viewportObserver.trackElement(
+      element,
+      isInViewport => {
+        if (!this.isInViewport() && isInViewport) {
+          this.isInViewport(true);
+        }
+      },
+      false,
+    );
 
     this.users = this.conversation.participating_user_ets;
 
