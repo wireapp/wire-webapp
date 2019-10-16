@@ -30,26 +30,31 @@ export enum NotificationPreference {
   ON = 'on',
 }
 
-export interface UserPropertiesSetData {
-  value: {
-    contact_import: Object;
-    enable_debugging: boolean;
-    settings: {
-      emoji: {
-        replace_inline: boolean;
-      };
-      notifications: NotificationPreference;
-      previews: {
-        send: boolean;
-      };
-      privacy: {
-        improve_wire: boolean;
-      };
-      sound: {
-        alerts: AudioPreference;
-      };
-    };
-    version: number;
+export type WebappProperties = {
+  contact_import: {
+    google?: number;
+    macos?: number;
   };
+  enable_debugging: boolean;
+  settings: {
+    emoji: {
+      replace_inline: boolean;
+    };
+    notifications: NotificationPreference;
+    previews: {
+      send: boolean;
+    };
+    privacy: {
+      improve_wire: boolean;
+    };
+    sound: {
+      alerts: AudioPreference;
+    };
+  };
+  version: number;
+};
+
+export interface UserPropertiesSetData {
   key: 'webapp';
+  value: WebappProperties;
 }
