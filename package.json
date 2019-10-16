@@ -7,7 +7,7 @@
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "release-5.1",
     "@wireapp/commons": "2.2.12",
-    "@wireapp/core": "13.3.7",
+    "@wireapp/core": "13.3.8",
     "@wireapp/protocol-messaging": "1.24.2",
     "@wireapp/react-ui-kit": "7.19.2",
     "@wireapp/store-engine-dexie": "0.6.9",
