@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.1.6...@wireapp/api-client@7.2.0) (2019-10-16)
+
+
+### Features
+
+* **api-client:** Add HEAD /sso/initialize-bind ([#2436](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2436)) ([4771450](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4771450091d338007c2cf46f69634f95802e192b))
+
+
+
+
+
 ## [7.1.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.1.5...@wireapp/api-client@7.1.6) (2019-10-15)
 
 **Note:** Version bump only for package @wireapp/api-client
