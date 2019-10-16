@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.3.2...@wireapp/api-client@7.3.3) (2019-10-16)
+
+
+### Bug Fixes
+
+* **api-client:** Initiate-bind address ([#2441](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/2441)) ([e13b327](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e13b3275a144f3c5b196135c11bea858592565d1))
+
+
+
+
+
 ## [7.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@7.3.1...@wireapp/api-client@7.3.2) (2019-10-16)
 
 
