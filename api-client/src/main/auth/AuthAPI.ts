@@ -35,7 +35,7 @@ export class AuthAPI {
   static URL = {
     ACCESS: '/access',
     COOKIES: '/cookies',
-    INITIATE_BIND: 'initiate-bind',
+    INITIATE_BIND: '/sso-initiate-bind',
     INITIATE_LOGIN: 'initiate-login',
     LOGIN: '/login',
     LOGOUT: 'logout',
@@ -143,7 +143,7 @@ export class AuthAPI {
   public async headInitiateBind(ssoCode: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'head',
-      url: `${AuthAPI.URL.SSO}/${AuthAPI.URL.INITIATE_BIND}/${ssoCode}`,
+      url: `${AuthAPI.URL.INITIATE_BIND}/${ssoCode}`,
     };
 
     await this.client.sendJSON(config);
