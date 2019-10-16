@@ -17,9 +17,9 @@
  *
  */
 
+import {AudioPreference} from '../audio/AudioPreference';
 import {NotificationPreference} from '../notification/NotificationPreference';
 import {PROPERTIES_TYPE} from './PropertiesType';
-import {AudioPreference} from '../audio/AudioPreference';
 
 class WebappProperties {
   constructor() {
