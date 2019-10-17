@@ -577,7 +577,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message());
+            this.editMessage(this.conversationEntity().getLastEditableMessage());
             this.updateMentions(data, keyboardEvent);
           }
           break;

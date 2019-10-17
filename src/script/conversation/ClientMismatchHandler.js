@@ -112,7 +112,7 @@ export class ClientMismatchHandler {
       participantsCheckPromise = this.conversationRepository
         .get_conversation_by_id(conversationId)
         .then(conversationEntity => {
-          const knownUserIds = conversationEntity.participating_user_ids();
+          const knownUserIds = conversationEntity.participatingUserIds();
           const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
           if (unknownUserIds.length) {

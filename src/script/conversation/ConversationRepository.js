@@ -619,7 +619,7 @@ export class ConversationRepository {
 
     if (conversationEntity.inTeam()) {
       const allTeamMembersParticipate = this.teamMembers().length
-        ? this.teamMembers().every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+        ? this.teamMembers().every(teamMember => conversationEntity.participatingUserIds().includes(teamMember.id))
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -802,7 +802,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   updateConversations(conversationEntities) {
-    const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
+    const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participatingUserIds());
     const userIds = flatten(mapOfUserIds);
 
     return this.user_repository
@@ -1012,7 +1012,7 @@ export class ConversationRepository {
           return false;
         }
 
-        const [userId] = conversationEntity.participating_user_ids();
+        const [userId] = conversationEntity.participatingUserIds();
         return userEntity.id === userId;
       });
 
@@ -1287,18 +1287,16 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been updated
    */
   updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
-    return this.user_repository
-      .getUsersById(conversationEntity.participating_user_ids(), offline)
-      .then(userEntities => {
-        userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
-        conversationEntity.participatingUserEts(userEntities);
+    return this.user_repository.getUsersById(conversationEntity.participatingUserIds(), offline).then(userEntities => {
+      userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
+      conversationEntity.participatingUserEts(userEntities);
 
-        if (updateGuests) {
-          conversationEntity.updateGuests();
-        }
+      if (updateGuests) {
+        conversationEntity.updateGuests();
+      }
 
-        return conversationEntity;
-      });
+      return conversationEntity;
+    });
   }
 
   //##############################################################################
@@ -1590,7 +1588,7 @@ export class ConversationRepository {
       this.conversations()
         .filter(conversationEntity => {
           const conversationInTeam = conversationEntity.team_id === teamId;
-          const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+          const userIsParticipant = conversationEntity.participatingUserIds().includes(userId);
           return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
         })
         .forEach(conversationEntity => {
@@ -3168,7 +3166,7 @@ export class ConversationRepository {
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
-      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+      const allParticipantIds = conversationEntity.participatingUserIds().concat(this.selfUser().id);
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
@@ -3490,7 +3488,7 @@ export class ConversationRepository {
 
       const conversationEntity = this.mapConversations(eventData, initialTimestamp);
       if (conversationEntity) {
-        if (conversationEntity.participating_user_ids().length) {
+        if (conversationEntity.participatingUserIds().length) {
           this._addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -3511,7 +3509,7 @@ export class ConversationRepository {
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
-        const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+        const createdByParticipant = !!conversationEntity.participatingUserIds().find(userId => userId === creatorId);
         const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -3550,9 +3548,9 @@ export class ConversationRepository {
 
     eventData.user_ids.forEach(userId => {
       const isSelfUser = userId === this.selfUser().id;
-      const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
+      const isParticipatingUser = conversationEntity.participatingUserIds().includes(userId);
       if (!isSelfUser && !isParticipatingUser) {
-        conversationEntity.participating_user_ids.push(userId);
+        conversationEntity.participatingUserIds.push(userId);
       }
     });
 
@@ -3602,7 +3600,7 @@ export class ConversationRepository {
             .userEntities()
             .filter(userEntity => !userEntity.isMe)
             .forEach(userEntity => {
-              conversationEntity.participating_user_ids.remove(userEntity.id);
+              conversationEntity.participatingUserIds.remove(userEntity.id);
 
               if (userEntity.isTemporaryGuest()) {
                 userEntity.clearExpirationTimeout();

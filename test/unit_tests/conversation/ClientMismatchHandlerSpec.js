@@ -81,7 +81,7 @@ describe('ClientMismatchHandler', () => {
       const knownUserId = johnDoe.user_id;
       const unknownUserId = janeRoe.user_id;
 
-      conversationEntity.participating_user_ids([knownUserId]);
+      conversationEntity.participatingUserIds([knownUserId]);
 
       clientMismatch = {
         deleted: {},

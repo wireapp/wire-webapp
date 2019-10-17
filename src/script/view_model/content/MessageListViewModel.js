@@ -443,7 +443,7 @@ class MessageListViewModel {
   }
 
   get_timestamp_class(messageEntity) {
-    const previousMessage = this.conversation().get_previous_message(messageEntity);
+    const previousMessage = this.conversation().participatingUserIds(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
     }
@@ -483,7 +483,7 @@ class MessageListViewModel {
       return false;
     }
 
-    const last_message = this.conversation().get_previous_message(messageEt);
+    const last_message = this.conversation().participatingUserIds(messageEt);
     return last_message && last_message.is_content() && last_message.user().id === messageEt.user().id;
   }
 

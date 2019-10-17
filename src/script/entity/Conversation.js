@@ -74,7 +74,7 @@ export class Conversation {
     this.is_pending = ko.observable(false);
 
     this.participatingUserEts = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.participatingUserIds = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
@@ -92,7 +92,7 @@ export class Conversation {
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === ConversationType.GROUP;
-      const hasOneParticipant = this.participating_user_ids().length === 1;
+      const hasOneParticipant = this.participatingUserIds().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
@@ -116,8 +116,8 @@ export class Conversation {
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity && connectionEntity.userId;
-      if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
-        this.participating_user_ids.push(connectedUserId);
+      if (connectedUserId && !this.participatingUserIds().includes(connectedUserId)) {
+        this.participatingUserIds.push(connectedUserId);
       }
     });
 
@@ -328,7 +328,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = !!this.participating_user_ids().length;
+        const hasUserIds = !!this.participatingUserIds().length;
         if (!hasUserIds) {
           return t('conversationsEmptyConversation');
         }
@@ -344,7 +344,7 @@ export class Conversation {
   }
 
   _isInitialized() {
-    const hasMappedUsers = this.participatingUserEts().length || !this.participating_user_ids().length;
+    const hasMappedUsers = this.participatingUserEts().length || !this.participatingUserIds().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
@@ -361,7 +361,7 @@ export class Conversation {
       this.mutedState,
       this.mutedTimestamp,
       this.name,
-      this.participating_user_ids,
+      this.participatingUserIds,
       this.receiptMode,
       this.status,
       this.type,
@@ -505,11 +505,11 @@ export class Conversation {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
+    return this.participatingUserIds().length + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients() {
-    const participantsMapped = this.participating_user_ids().length === this.participatingUserEts().length;
+    const participantsMapped = this.participatingUserIds().length === this.participatingUserEts().length;
     if (participantsMapped) {
       return this.participatingUserEts().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
@@ -638,8 +638,8 @@ export class Conversation {
         if (messageEt.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
-          const from_self = messageEt.user() && messageEt.user().isMe;
-          if (from_self) {
+          const fromSelf = messageEt.user() && messageEt.user().isMe;
+          if (fromSelf) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
         }
@@ -651,7 +651,7 @@ export class Conversation {
    * Get all messages.
    * @returns {Array<Message>} Array of all message in the conversation
    */
-  get_all_messages() {
+  getAllMessages() {
     return this.messages();
   }
 
@@ -676,7 +676,7 @@ export class Conversation {
    * @param {Message} messageEt - Message to look up from
    * @returns {Message | undefined} Previous message
    */
-  get_previous_message(messageEt) {
+  getPreviousMessage(messageEt) {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(messageEt);
     if (message_index > 0) {
@@ -688,7 +688,7 @@ export class Conversation {
    * Get the last text message that was added by self user.
    * @returns {Message} Last message edited
    */
-  get_last_editable_message() {
+  getLastEditableMessage() {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const messageEt = messages[index];
@@ -781,7 +781,7 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      others: this.participating_user_ids(),
+      others: this.participatingUserIds(),
       receipt_mode: this.receiptMode(),
       status: this.status(),
       team_id: this.team_id,

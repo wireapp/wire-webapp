@@ -86,7 +86,7 @@ describe('z.conversation.EventBuilder', () => {
   });
 
   it('buildGroupCreation', () => {
-    conversationEt.participating_user_ids(['one', 'two', 'three']);
+    conversationEt.participatingUserIds(['one', 'two', 'three']);
     conversationEt.creator = 'one';
     const event = z.conversation.EventBuilder.buildGroupCreation(conversationEt);
 
@@ -94,7 +94,7 @@ describe('z.conversation.EventBuilder', () => {
       expect(messageEntity).toBeDefined();
       expect(messageEntity.type).toBe(ClientEvent.CONVERSATION.GROUP_CREATION);
       expect(messageEntity.conversation_id).toBe(conversationEt.id);
-      expect(conversationEt.participating_user_ids().length).toBe(3);
+      expect(conversationEt.participatingUserIds().length).toBe(3);
     });
   });
 });

@@ -120,7 +120,7 @@ describe('Conversation', () => {
       expect(conversationEt.isRequest()).toBeFalsy();
       expect(conversationEt.isSelf()).toBeFalsy();
 
-      conversationEt.participating_user_ids.push(createRandomUuid());
+      conversationEt.participatingUserIds.push(createRandomUuid());
       conversationEt.type(ConversationType.GROUP);
 
       expect(conversationEt.isGroup()).toBeFalsy();
@@ -128,7 +128,7 @@ describe('Conversation', () => {
       expect(conversationEt.isRequest()).toBeFalsy();
       expect(conversationEt.isSelf()).toBeFalsy();
 
-      conversationEt.participating_user_ids.push(createRandomUuid());
+      conversationEt.participatingUserIds.push(createRandomUuid());
       conversationEt.type(ConversationType.GROUP);
 
       expect(conversationEt.isGroup()).toBeTruthy();
@@ -339,7 +339,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('get_last_editable_message', () => {
+  describe('getLastEditableMessage', () => {
     let self_user_et = undefined;
 
     beforeEach(() => {
@@ -350,7 +350,7 @@ describe('Conversation', () => {
     afterEach(() => conversationEt.remove_messages());
 
     it('returns undefined if conversation has no messages', () => {
-      expect(conversationEt.get_last_editable_message()).not.toBeDefined();
+      expect(conversationEt.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is not text and not added by self user', () => {
@@ -359,7 +359,7 @@ describe('Conversation', () => {
       messageEt.user(new User());
       conversationEt.add_message(messageEt);
 
-      expect(conversationEt.get_last_editable_message()).not.toBeDefined();
+      expect(conversationEt.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is not text and not added by self user', () => {
@@ -368,7 +368,7 @@ describe('Conversation', () => {
       messageEt.user(new User());
       conversationEt.add_message(messageEt);
 
-      expect(conversationEt.get_last_editable_message()).not.toBeDefined();
+      expect(conversationEt.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is text and not send by self user', () => {
@@ -378,7 +378,7 @@ describe('Conversation', () => {
       messageEt.user(new User());
       conversationEt.add_message(messageEt);
 
-      expect(conversationEt.get_last_editable_message()).not.toBeDefined();
+      expect(conversationEt.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns message if last message is text and send by self user', () => {
@@ -388,7 +388,7 @@ describe('Conversation', () => {
       messageEt.user(self_user_et);
       conversationEt.add_message(messageEt);
 
-      expect(conversationEt.get_last_editable_message()).toBeDefined();
+      expect(conversationEt.getLastEditableMessage()).toBeDefined();
     });
 
     it('returns message if last message is text and send by self user', () => {
@@ -403,8 +403,8 @@ describe('Conversation', () => {
       ping_message_et.user(new User());
       conversationEt.add_message(ping_message_et);
 
-      expect(conversationEt.get_last_editable_message()).toBeDefined();
-      expect(conversationEt.get_last_editable_message().id).toBe(messageEt.id);
+      expect(conversationEt.getLastEditableMessage()).toBeDefined();
+      expect(conversationEt.getLastEditableMessage().id).toBe(messageEt.id);
     });
 
     it('returns message if last message is text and send by self user', () => {
@@ -420,8 +420,8 @@ describe('Conversation', () => {
       next_message_et.user(self_user_et);
       conversationEt.add_message(next_message_et);
 
-      expect(conversationEt.get_last_editable_message()).toBeDefined();
-      expect(conversationEt.get_last_editable_message().id).toBe(next_message_et.id);
+      expect(conversationEt.getLastEditableMessage()).toBeDefined();
+      expect(conversationEt.getLastEditableMessage().id).toBe(next_message_et.id);
     });
 
     it('returns message if last message is text and ephemeral', () => {
@@ -438,8 +438,8 @@ describe('Conversation', () => {
       ephemeral_message_et.ephemeral_expires(true);
       conversationEt.add_message(ephemeral_message_et);
 
-      expect(conversationEt.get_last_editable_message()).toBeDefined();
-      expect(conversationEt.get_last_editable_message().id).toBe(messageEt.id);
+      expect(conversationEt.getLastEditableMessage()).toBeDefined();
+      expect(conversationEt.getLastEditableMessage().id).toBe(messageEt.id);
     });
   });
 
@@ -506,8 +506,8 @@ describe('Conversation', () => {
     it('displays a fallback if no user name has been set for a group conversation', () => {
       const user = new User(createRandomUuid());
       conversationEt.type(ConversationType.GROUP);
-      conversationEt.participating_user_ids.push(other_user.id);
-      conversationEt.participating_user_ids.push(user.id);
+      conversationEt.participatingUserIds.push(other_user.id);
+      conversationEt.participatingUserIds.push(user.id);
 
       expect(conversationEt.display_name()).toBe('…');
     });
@@ -1053,8 +1053,8 @@ describe('Conversation', () => {
       const [new_conversation] = conversation_mapper.mapConversations([payload_conversation]);
       new_conversation.connection(connectionEntity);
 
-      expect(new_conversation.participating_user_ids().length).toBe(1);
-      expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
+      expect(new_conversation.participatingUserIds().length).toBe(1);
+      expect(new_conversation.participatingUserIds()[0]).toBe(connector_user_id);
     });
   });
 

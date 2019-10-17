@@ -36,7 +36,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: id,
       data: {
-        userIds: conversationEntity.participating_user_ids(),
+        userIds: conversationEntity.participatingUserIds(),
       },
       from: creatorId,
       id: createRandomUuid(),
@@ -105,7 +105,7 @@ z.conversation.EventBuilder = {
     const selfUserId = conversationEntity.selfUser().id;
     const isoDate = new Date(timestamp || 0).toISOString();
 
-    const userIds = conversationEntity.participating_user_ids().slice();
+    const userIds = conversationEntity.participatingUserIds().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
       userIds.push(selfUserId);

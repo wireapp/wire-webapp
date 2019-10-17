@@ -68,7 +68,7 @@ describe('Conversation Mapper', () => {
         conversation.members.others[3].id,
       ];
 
-      expect(conversationEt.participating_user_ids()).toEqual(expected_participant_ids);
+      expect(conversationEt.participatingUserIds()).toEqual(expected_participant_ids);
       expect(conversationEt.id).toBe(conversation.id);
       expect(conversationEt.getNumberOfParticipants()).toBe(conversation.members.others.length + 1);
       expect(conversationEt.isGroup()).toBeTruthy();

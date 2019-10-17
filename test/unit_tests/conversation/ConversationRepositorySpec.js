@@ -1288,7 +1288,7 @@ describe('ConversationRepository', () => {
   describe('_shouldSendAsExternal', () => {
     it('should return true for big payload', () => {
       const largeConversationEntity = _generate_conversation();
-      largeConversationEntity.participating_user_ids(
+      largeConversationEntity.participatingUserIds(
         Array(128)
           .fill()
           .map((x, i) => i),
@@ -1316,7 +1316,7 @@ describe('ConversationRepository', () => {
 
     it('should return false for small payload', () => {
       const smallConversationEntity = _generate_conversation();
-      smallConversationEntity.participating_user_ids([0, 1]);
+      smallConversationEntity.participatingUserIds([0, 1]);
 
       return TestFactory.conversation_repository
         .save_conversation(smallConversationEntity)

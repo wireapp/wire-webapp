@@ -161,7 +161,7 @@ ko.components.register('user-actions', {
             conversation() &&
             conversation().isActiveParticipant() &&
             conversation()
-              .participating_user_ids()
+              .participatingUserIds()
               .some(id => user().id === id) &&
             z.userPermission().canUpdateGroupParticipants()
           );

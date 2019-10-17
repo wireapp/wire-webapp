@@ -433,7 +433,7 @@ class StartUIViewModel {
         return conversationEntities
           .filter(conversationEntity => conversationEntity.is1to1())
           .slice(0, 6)
-          .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
+          .map(conversationEntity => conversationEntity.participatingUserIds()[0]);
       })
       .then(userIds => this.userRepository.getUsersById(userIds))
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
