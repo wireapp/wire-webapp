@@ -37,9 +37,9 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
 
     this.caption = ko.pureComputed(() => {
       if (isReceiptEnabled) {
-        return this.user().is_me ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
+        return this.user().isMe ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
       }
-      return this.user().is_me ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
+      return this.user().isMe ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
     });
   }
 }

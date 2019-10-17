@@ -46,7 +46,7 @@ describe('Conversation', () => {
   let other_user = null;
 
   const self_user = new User(entities.user.john_doe.id);
-  self_user.is_me = true;
+  self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
@@ -300,7 +300,7 @@ describe('Conversation', () => {
     it('returns last delivered message', () => {
       const remoteUserEntity = new User(createRandomUuid());
       const selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
 
       const sentMessageEntity = new ContentMessage(createRandomUuid());
       sentMessageEntity.user(selfUserEntity);
@@ -344,7 +344,7 @@ describe('Conversation', () => {
 
     beforeEach(() => {
       self_user_et = new User();
-      self_user_et.is_me = true;
+      self_user_et.isMe = true;
     });
 
     afterEach(() => conversation_et.remove_messages());
@@ -559,7 +559,7 @@ describe('Conversation', () => {
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User(createRandomUuid());
-      self_user_et.is_me = true;
+      self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
       const user_et = new User();
@@ -575,7 +575,7 @@ describe('Conversation', () => {
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();
-      self_user_et.is_me = true;
+      self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
@@ -596,7 +596,7 @@ describe('Conversation', () => {
       verified_client_et.meta.isVerified(true);
 
       const self_user_et = new User();
-      self_user_et.is_me = true;
+      self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
@@ -617,7 +617,7 @@ describe('Conversation', () => {
     it('detects conversations with guest', () => {
       conversation_et = new Conversation(createRandomUuid());
       const selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
 
@@ -872,7 +872,7 @@ describe('Conversation', () => {
     const conversationEntity = new Conversation(createRandomUuid());
 
     const selfUserEntity = new User(createRandomUuid());
-    selfUserEntity.is_me = true;
+    selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
 

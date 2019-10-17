@@ -68,8 +68,8 @@ export class MemberMessage extends SystemMessage {
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
-      const selfUser = joinedUserEntities.find(userEntity => userEntity.is_me);
-      const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.is_me);
+      const selfUser = joinedUserEntities.find(userEntity => userEntity.isMe);
+      const visibleUsers = joinedUserEntities.filter(userEntity => !userEntity.isMe);
       if (this.exceedsMaxVisibleUsers()) {
         const spliceCount = MemberMessage.CONFIG.REDUCED_USERS_COUNT;
         visibleUsers.splice(selfUser ? spliceCount - 1 : spliceCount);
@@ -83,7 +83,7 @@ export class MemberMessage extends SystemMessage {
     // Users joined the conversation without self
     this.remoteUserEntities = ko.pureComputed(() => {
       return this.userEntities()
-        .filter(userEntity => !userEntity.is_me)
+        .filter(userEntity => !userEntity.isMe)
         .map(userEntity => userEntity);
     });
 
@@ -147,7 +147,7 @@ export class MemberMessage extends SystemMessage {
               : t('conversationCreateWith', dativeUsers);
           }
 
-          if (this.user().is_me) {
+          if (this.user().isMe) {
             return this.exceedsMaxVisibleUsers()
               ? t('conversationCreatedYouMore', {count, users: dativeUsers}, replaceShowMore)
               : t('conversationCreatedYou', dativeUsers);
@@ -170,12 +170,12 @@ export class MemberMessage extends SystemMessage {
         case BackendEvent.CONVERSATION.MEMBER_JOIN: {
           const senderJoined = this.otherUser().id === this.user().id;
           if (senderJoined) {
-            return this.user().is_me
+            return this.user().isMe
               ? t('conversationMemberJoinedSelfYou')
               : t('conversationMemberJoinedSelf', this.senderName());
           }
 
-          if (this.user().is_me) {
+          if (this.user().isMe) {
             return this.exceedsMaxVisibleUsers()
               ? t('conversationMemberJoinedYouMore', {count, users: accusativeUsers}, replaceShowMore)
               : t('conversationMemberJoinedYou', accusativeUsers, replaceShowMore);
@@ -186,18 +186,18 @@ export class MemberMessage extends SystemMessage {
         }
 
         case BackendEvent.CONVERSATION.MEMBER_LEAVE: {
-          const temporaryGuestRemoval = this.otherUser().is_me && this.otherUser().isTemporaryGuest();
+          const temporaryGuestRemoval = this.otherUser().isMe && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return t('temporaryGuestLeaveMessage');
           }
 
           const senderLeft = this.otherUser().id === this.user().id;
           if (senderLeft) {
-            return this.user().is_me ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
+            return this.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
           }
 
           const allUsers = this._generateNameString();
-          return this.user().is_me
+          return this.user().isMe
             ? t('conversationMemberRemovedYou', allUsers)
             : t('conversationMemberRemoved', {name, users: allUsers});
         }
@@ -218,7 +218,7 @@ export class MemberMessage extends SystemMessage {
           return t('conversationCreateTemporary');
         }
 
-        const groupCreationString = this.user().is_me
+        const groupCreationString = this.user().isMe
           ? t('conversationCreatedNameYou')
           : t('conversationCreatedName', this.senderName());
         return capitalizeFirstChar(groupCreationString);

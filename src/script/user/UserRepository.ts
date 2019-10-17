@@ -162,10 +162,10 @@ export class UserRepository {
     });
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
     amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
   }
@@ -173,7 +173,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  on_user_event(eventJson: any, source: EventSource): void {
+  onUserEvent(eventJson: any, source: EventSource): void {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -181,10 +181,10 @@ export class UserRepository {
 
     switch (type) {
       case BackendEvent.USER.DELETE:
-        this.user_delete(eventJson);
+        this.userDelete(eventJson);
         break;
       case BackendEvent.USER.UPDATE:
-        this.user_update(eventJson);
+        this.userUpdate(eventJson);
         break;
       case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
@@ -221,7 +221,7 @@ export class UserRepository {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
             const mappingPromises = users.map(user => {
-              return this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability));
+              return this.getUserById(user.id).then(userEntity => userEntity.availability(user.availability));
             });
 
             return Promise.all(mappingPromises);
@@ -250,7 +250,7 @@ export class UserRepository {
   /**
    * Event to delete the matching user.
    */
-  user_delete({id}: {id: string}): void {
+  userDelete({id}: {id: string}): void {
     // @todo Add user deletion cases for other users
     const is_self_user = id === this.self().id;
     if (is_self_user) {
@@ -270,16 +270,16 @@ export class UserRepository {
         from: userId,
         data: {availability},
       } = event;
-      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
+      this.getUserById(userId).then(userEntity => userEntity.availability(availability));
     }
   }
 
   /**
    * Event to update the matching user.
    */
-  user_update({user}: {user: UserUpdate}): Promise<User> {
+  userUpdate({user}: {user: UserUpdate}): Promise<User> {
     const is_self_user = user.id === this.self().id;
-    const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
+    const user_promise = is_self_user ? Promise.resolve(this.self()) : this.getUserById(user.id);
     return user_promise.then(user_et => {
       this.user_mapper.updateUserFromObject(user_et, user);
 
@@ -296,7 +296,7 @@ export class UserRepository {
    */
   updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
-    return this.get_users_by_id(userIds).then(userEntities => {
+    return this.getUsersById(userIds).then(userEntities => {
       userEntities.forEach(userEntity => {
         const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
         userEntity.connection(connectionEntity);
@@ -314,7 +314,7 @@ export class UserRepository {
       const userIds = Object.keys(recipients);
       this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
 
-      return this.get_users_by_id(userIds).then(userEntities => {
+      return this.getUsersById(userIds).then(userEntities => {
         userEntities.forEach(userEntity => {
           const clientEntities = recipients[userEntity.id];
           const tooManyClients = clientEntities > 8;
@@ -335,8 +335,8 @@ export class UserRepository {
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
-    return this.get_user_by_id(userId).then(userEntity => {
-      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.is_me);
+    return this.getUserById(userId).then(userEntity => {
+      const clientEntity = this.client_repository.clientMapper.mapClient(clientPayload, userEntity.isMe);
       const wasClientAdded = userEntity.add_client(clientEntity);
 
       if (wasClientAdded) {
@@ -361,10 +361,10 @@ export class UserRepository {
   /**
    * Removes a stored client and the session connected with it.
    */
-  remove_client_from_user(user_id: string, client_id: string): Promise<void> {
+  removeClientFromUser(user_id: string, client_id: string): Promise<void> {
     return this.client_repository
       .removeClient(user_id, client_id)
-      .then(() => this.get_user_by_id(user_id))
+      .then(() => this.getUserById(user_id))
       .then(user_et => {
         user_et.remove_client(client_id);
         amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, user_id, client_id);
@@ -374,8 +374,8 @@ export class UserRepository {
   /**
    * Update clients for given user.
    */
-  update_clients_from_user(user_id: string, client_ets: ClientEntity[]): void {
-    this.get_user_by_id(user_id).then(user_et => {
+  updateClientsFromUser(user_id: string, client_ets: ClientEntity[]): void {
+    this.getUserById(user_id).then(user_et => {
       user_et.devices(client_ets);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
     });
@@ -454,7 +454,7 @@ export class UserRepository {
    * Request account deletion.
    * @returns Resolves when account deletion process has been initiated
    */
-  delete_me(): Promise<void> {
+  deleteMe(): Promise<void> {
     return this.selfService
       .deleteSelf()
       .then(() => this.logger.info('Account deletion initiated'))
@@ -500,13 +500,13 @@ export class UserRepository {
           this.mapGuestStatus(newUserEntities);
         }
 
-        return this.save_users(newUserEntities);
+        return this.saveUsers(newUserEntities);
       })
       .then(fetchedUserEntities => {
         // If there is a difference then we most likely have a case with a suspended user
         const isAllUserIds = userIds.length === fetchedUserEntities.length;
         if (!isAllUserIds) {
-          fetchedUserEntities = this._add_suspended_users(userIds, fetchedUserEntities);
+          fetchedUserEntities = this._addSuspendedUsers(userIds, fetchedUserEntities);
         }
 
         return fetchedUserEntities;
@@ -529,7 +529,7 @@ export class UserRepository {
       .then(userData => this._upgradePictureAsset(userData))
       .then(response => this.user_mapper.mapSelfUserFromJson(response))
       .then(userEntity => {
-        this.save_user(userEntity, true);
+        this.saveUser(userEntity, true);
         return this.initMarketingConsent().then(() => userEntity);
       })
       .catch(error => {
@@ -550,7 +550,7 @@ export class UserRepository {
       if (!hasAsset) {
         // if there are no assets, just upload the old picture to the new api
         const {medium} = mapProfileAssetsV1(userData.id, userData.picture);
-        medium.load().then(imageBlob => this.change_picture(imageBlob as Blob));
+        medium.load().then(imageBlob => this.changePicture(imageBlob as Blob));
       } else {
         // if an asset is already there, remove the pointer to the old picture
         this.selfService.putSelf({picture: []});
@@ -562,7 +562,7 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  get_user_by_id(user_id: string): Promise<User> {
+  getUserById(user_id: string): Promise<User> {
     const user = this.findUserById(user_id);
     return user
       ? Promise.resolve(user)
@@ -575,7 +575,7 @@ export class UserRepository {
         });
   }
 
-  get_user_id_by_handle(handle: string): Promise<void | User> {
+  getUserIdByHandle(handle: string): Promise<void | User> {
     return this.user_service
       .getUserByHandle(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
@@ -590,7 +590,7 @@ export class UserRepository {
    * Check for users locally and fetch them from the server otherwise.
    * @param offline - Should we only look for cached contacts
    */
-  get_users_by_id(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
+  getUsersById(user_ids: string[] = [], offline: boolean = false): Promise<User[]> {
     if (!user_ids.length) {
       return Promise.resolve([]);
     }
@@ -616,7 +616,7 @@ export class UserRepository {
   /**
    * Is the user the logged in user.
    */
-  is_me(user_id: User | string): boolean {
+  isMe(user_id: User | string): boolean {
     if (typeof user_id !== 'string') {
       user_id = user_id.id;
     }
@@ -625,13 +625,13 @@ export class UserRepository {
 
   /**
    * Is the user the logged in user.
-   * @param is_me - `true` if self user
+   * @param isMe - `true` if self user
    */
-  save_user(user_et: User, is_me: boolean = false): User {
+  saveUser(user_et: User, isMe: boolean = false): User {
     const user = this.findUserById(user_et.id);
     if (!user) {
-      if (is_me) {
-        user_et.is_me = true;
+      if (isMe) {
+        user_et.isMe = true;
         this.self(user_et);
       }
       this.users.push(user_et);
@@ -643,7 +643,7 @@ export class UserRepository {
    * Save multiple users at once.
    * @returns Resolves with users passed as parameter
    */
-  save_users(user_ets: User[]): User[] {
+  saveUsers(user_ets: User[]): User[] {
     const newUsers = user_ets.filter(user_et => !this.findUserById(user_et.id));
     koArrayPushAll(this.users, newUsers);
     return user_ets;
@@ -672,7 +672,7 @@ export class UserRepository {
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private _add_suspended_users(userIds: string[], userEntities: User[]): User[] {
+  private _addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
     for (const userId of userIds) {
       const matching_userIds = userEntities.find(user_et => user_et.id === userId);
 
@@ -689,16 +689,16 @@ export class UserRepository {
   /**
    * Change the accent color.
    */
-  change_accent_color(accent_id: typeof ACCENT_ID): Promise<User> {
-    return this.selfService.putSelf({accent_id}).then(() => this.user_update({user: {accent_id, id: this.self().id}}));
+  changeAccentColor(accent_id: typeof ACCENT_ID): Promise<User> {
+    return this.selfService.putSelf({accent_id}).then(() => this.userUpdate({user: {accent_id, id: this.self().id}}));
   }
 
   /**
    * Change name.
    */
-  change_name(name: string): Promise<User> {
+  changeName(name: string): Promise<User> {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.selfService.putSelf({name}).then(() => this.user_update({user: {id: this.self().id, name}}));
+      return this.selfService.putSelf({name}).then(() => this.userUpdate({user: {id: this.self().id, name}}));
     }
 
     return Promise.reject(new z.error.UserError((z as any).error.UserError.TYPE.INVALID_UPDATE));
@@ -714,13 +714,13 @@ export class UserRepository {
   /**
    * Tries to generate a username suggestion.
    */
-  get_username_suggestion(): Promise<void> {
+  getUsernameSuggestion(): Promise<void> {
     let suggestions = null;
 
     return Promise.resolve()
       .then(() => {
         suggestions = createSuggestions(this.self().name());
-        return this.verify_usernames(suggestions);
+        return this.verifyUsernames(suggestions);
       })
       .then(valid_suggestions => {
         this.should_set_username = true;
@@ -738,13 +738,13 @@ export class UserRepository {
   /**
    * Change username.
    */
-  change_username(username: string): Promise<User> {
+  changeUsername(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       return this.selfService
         .putSelfHandle(username)
         .then(() => {
           this.should_set_username = false;
-          return this.user_update({user: {handle: username, id: this.self().id}});
+          return this.userUpdate({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
           if (
@@ -764,7 +764,7 @@ export class UserRepository {
    * @param usernames - Username suggestions
    * @returns A list with usernames that are not taken.
    */
-  verify_usernames(usernames: string[]): Promise<string[]> {
+  verifyUsernames(usernames: string[]): Promise<string[]> {
     return this.user_service.checkUserHandles(usernames);
   }
 
@@ -772,7 +772,7 @@ export class UserRepository {
    * Verify a username against the backend.
    * @returns Username which is not taken.
    */
-  verify_username(username: string): Promise<string> {
+  verifyUsername(username: string): Promise<string> {
     return this.user_service
       .checkUserHandle(username)
       .catch(({code: error_code}) => {
@@ -795,7 +795,7 @@ export class UserRepository {
   /**
    * Change the profile image.
    */
-  change_picture(picture: Blob): Promise<User> {
+  changePicture(picture: Blob): Promise<User> {
     return this.asset_service
       .uploadProfileImage(picture)
       .then(({previewImageKey, mediumImageKey}) => {
@@ -805,7 +805,7 @@ export class UserRepository {
         ];
         return this.selfService
           .putSelf({assets, picture: []})
-          .then(() => this.user_update({user: {assets, id: this.self().id}}));
+          .then(() => this.userUpdate({user: {assets, id: this.self().id}}));
       })
       .catch(error => {
         throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
@@ -815,13 +815,13 @@ export class UserRepository {
   /**
    * Set the user's default profile image.
    */
-  set_default_picture(): Promise<User> {
-    return loadUrlBlob(UNSPLASH_URL).then(blob => this.change_picture(blob));
+  setDefaultPicture(): Promise<User> {
+    return loadUrlBlob(UNSPLASH_URL).then(blob => this.changePicture(blob));
   }
 
   mapGuestStatus(userEntities = this.users()): void {
     userEntities.forEach(userEntity => {
-      if (!userEntity.is_me) {
+      if (!userEntity.isMe) {
         const isTeamMember = this.teamMembers().some(teamMember => teamMember.id === userEntity.id);
         const isGuest = !userEntity.isService && !isTeamMember;
         userEntity.isGuest(isGuest);

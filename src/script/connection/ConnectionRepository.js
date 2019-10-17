@@ -254,7 +254,7 @@ export class ConnectionRepository {
         }
 
         this.connectionEntities.push(connectionEntity);
-        return this.userRepository.get_user_by_id(connectionEntity.userId);
+        return this.userRepository.getUserById(connectionEntity.userId);
       })
       .then(userEntity => userEntity.connection(connectionEntity));
   }
@@ -335,7 +335,7 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      this.userRepository.get_user_by_id(connectionEntity.userId).then(userEntity => {
+      this.userRepository.getUserById(connectionEntity.userId).then(userEntity => {
         const messageEntity = new MemberMessage();
         messageEntity.user(userEntity);
 

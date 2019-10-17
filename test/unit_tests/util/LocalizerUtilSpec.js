@@ -182,7 +182,7 @@ describe('LocalizerUtil', () => {
       const beatles = [
         {first_name: () => 'John'},
         {first_name: () => 'Paul'},
-        {first_name: () => 'George', is_me: true},
+        {first_name: () => 'George', isMe: true},
         {first_name: () => 'Ringo'},
       ];
 

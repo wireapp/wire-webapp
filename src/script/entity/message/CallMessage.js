@@ -32,7 +32,7 @@ export class CallMessage extends Message {
     this.duration = duration;
 
     this.caption = ko.pureComputed(() =>
-      this.user().is_me ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate'),
+      this.user().isMe ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate'),
     );
   }
 

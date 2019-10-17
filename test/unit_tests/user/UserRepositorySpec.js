@@ -81,11 +81,11 @@ describe('UserRepository', () => {
 
         expect(errorReporting()).toBeUndefined();
 
-        TestFactory.user_repository.on_user_event(turnOnErrorReporting, source);
+        TestFactory.user_repository.onUserEvent(turnOnErrorReporting, source);
 
         expect(errorReporting()).toBe(true);
 
-        TestFactory.user_repository.on_user_event(turnOffErrorReporting, source);
+        TestFactory.user_repository.onUserEvent(turnOffErrorReporting, source);
 
         expect(errorReporting()).toBe(false);
       });
@@ -106,11 +106,11 @@ describe('UserRepository', () => {
 
         expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
 
-        TestFactory.user_repository.on_user_event(giveOnMarketingConsent, source);
+        TestFactory.user_repository.onUserEvent(giveOnMarketingConsent, source);
 
         expect(marketingConsent()).toBe(ConsentValue.GIVEN);
 
-        TestFactory.user_repository.on_user_event(revokeMarketingConsent, source);
+        TestFactory.user_repository.onUserEvent(revokeMarketingConsent, source);
 
         expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
       });
@@ -132,11 +132,11 @@ describe('UserRepository', () => {
 
         expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
 
-        TestFactory.user_repository.on_user_event(turnOnReceiptMode, source);
+        TestFactory.user_repository.onUserEvent(turnOnReceiptMode, source);
 
         expect(receiptMode()).toBe(ReceiptMode.DELIVERY_AND_READ);
 
-        TestFactory.user_repository.on_user_event(turnOffReceiptMode, source);
+        TestFactory.user_repository.onUserEvent(turnOffReceiptMode, source);
 
         expect(receiptMode()).toBe(ReceiptMode.DELIVERY);
       });
@@ -163,7 +163,7 @@ describe('UserRepository', () => {
 
       beforeEach(() => {
         user = new User(entities.user.john_doe.id);
-        return TestFactory.user_repository.save_user(user);
+        return TestFactory.user_repository.saveUser(user);
       });
 
       afterEach(() => {
@@ -183,14 +183,14 @@ describe('UserRepository', () => {
       });
     });
 
-    describe('save_user', () => {
+    describe('saveUser', () => {
       afterEach(() => TestFactory.user_repository.users.removeAll());
 
       it('saves a user', () => {
         const user = new User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository.save_user(user);
+        TestFactory.user_repository.saveUser(user);
 
         expect(TestFactory.user_repository.users().length).toBe(1);
         expect(TestFactory.user_repository.users()[0]).toBe(user);
@@ -200,7 +200,7 @@ describe('UserRepository', () => {
         const user = new User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository.save_user(user, true);
+        TestFactory.user_repository.saveUser(user, true);
 
         expect(TestFactory.user_repository.users().length).toBe(1);
         expect(TestFactory.user_repository.users()[0]).toBe(user);
@@ -217,7 +217,7 @@ describe('UserRepository', () => {
         user_jane_roe = new User(entities.user.jane_roe.id);
         user_john_doe = new User(entities.user.john_doe.id);
 
-        TestFactory.user_repository.save_users([user_jane_roe, user_john_doe]);
+        TestFactory.user_repository.saveUsers([user_jane_roe, user_john_doe]);
         const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
           entities.clients.john_doe.permanent,
         );
@@ -247,7 +247,7 @@ describe('UserRepository', () => {
       });
     });
 
-    describe('verify_usernames', () => {
+    describe('verifyUsernames', () => {
       it('resolves with username when username is not taken', () => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${backendConfig.restUrl}/users/handles`, [
@@ -256,7 +256,7 @@ describe('UserRepository', () => {
           JSON.stringify(usernames),
         ]);
 
-        return TestFactory.user_repository.verify_usernames(usernames).then(_usernames => {
+        return TestFactory.user_repository.verifyUsernames(usernames).then(_usernames => {
           expect(_usernames).toEqual(usernames);
         });
       });
@@ -269,18 +269,18 @@ describe('UserRepository', () => {
           JSON.stringify([]),
         ]);
 
-        return TestFactory.user_repository.verify_usernames(usernames).then(_usernames => {
+        return TestFactory.user_repository.verifyUsernames(usernames).then(_usernames => {
           expect(_usernames.length).toBe(0);
         });
       });
     });
 
-    describe('verify_username', () => {
+    describe('verifyUsername', () => {
       it('resolves with username when username is not taken', () => {
         const username = 'john_doe';
         server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [404, {}, '']);
 
-        return TestFactory.user_repository.verify_username(username).then(_username => {
+        return TestFactory.user_repository.verifyUsername(username).then(_username => {
           expect(_username).toBe(username);
         });
       });
@@ -290,7 +290,7 @@ describe('UserRepository', () => {
         server.respondWith('HEAD', `${backendConfig.restUrl}/users/handles/${username}`, [200, {}, '']);
 
         TestFactory.user_repository
-          .verify_username(username)
+          .verifyUsername(username)
           .then(done.fail)
           .catch(() => done());
       });

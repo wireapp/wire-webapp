@@ -43,7 +43,7 @@ describe('ServiceMiddleware', () => {
         };
 
         const userEntities = [{}, {isService: true}];
-        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
+        spyOn(TestFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).toBe(true);
@@ -64,7 +64,7 @@ describe('ServiceMiddleware', () => {
           Promise.resolve(conversation),
         );
         const userEntities = [{}, {isService: true}];
-        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
+        spyOn(TestFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).toBe(true);
@@ -79,7 +79,7 @@ describe('ServiceMiddleware', () => {
           type: BackendEvent.CONVERSATION.MEMBER_JOIN,
         };
 
-        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve([{}, {}]));
+        spyOn(TestFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([{}, {}]));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).not.toBeDefined();
@@ -97,7 +97,7 @@ describe('ServiceMiddleware', () => {
         };
 
         const userEntities = [{}, {isService: true}];
-        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
+        spyOn(TestFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).toBe(true);
@@ -113,7 +113,7 @@ describe('ServiceMiddleware', () => {
         };
 
         const userEntities = [{}, {}];
-        spyOn(TestFactory.user_repository, 'get_users_by_id').and.returnValue(Promise.resolve(userEntities));
+        spyOn(TestFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).not.toBeDefined();

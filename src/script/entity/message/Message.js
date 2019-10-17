@@ -272,7 +272,7 @@ export class Message {
    * @returns {boolean} True, if message can be edited.
    */
   is_editable() {
-    return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
+    return this.has_asset_text() && this.user().isMe && !this.is_ephemeral();
   }
 
   /**
@@ -337,7 +337,7 @@ export class Message {
     }
 
     if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
-      const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
+      const startingTimestamp = this.user().isMe ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
       this.ephemeral_expires(expirationTimestamp);
       this.ephemeral_started(`${startingTimestamp}`);

@@ -253,7 +253,7 @@ export class Conversation {
       for (let index = this.messages().length - 1; index >= 0; index--) {
         const messageEntity = this.messages()[index];
         if (messageEntity.visible()) {
-          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().is_me;
+          const isReadMessage = messageEntity.timestamp() <= this.last_read_timestamp() || messageEntity.user().isMe;
           if (isReadMessage) {
             break;
           }
@@ -465,7 +465,7 @@ export class Conversation {
     // we found a message from self user
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
-      if (message_et.user() && message_et.user().is_me) {
+      if (message_et.user() && message_et.user().isMe) {
         this.update_timestamps(message_et);
         break;
       }
@@ -638,7 +638,7 @@ export class Conversation {
         if (message_et.timestamp_affects_order()) {
           this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
 
-          const from_self = message_et.user() && message_et.user().is_me;
+          const from_self = message_et.user() && message_et.user().isMe;
           if (from_self) {
             this.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
           }
@@ -708,7 +708,7 @@ export class Conversation {
       .reverse()
       .find(messageEntity => {
         const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
-        return isDelivered && messageEntity.user().is_me;
+        return isDelivered && messageEntity.user().isMe;
       });
   }
 

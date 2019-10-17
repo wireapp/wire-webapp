@@ -83,7 +83,7 @@ describe('NotificationRepository', () => {
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
       const selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
 
@@ -247,7 +247,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the event was triggered by the user', () => {
-      message_et.user().is_me = true;
+      message_et.user().isMe = true;
 
       return TestFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(TestFactory.notification_repository._showNotification).not.toHaveBeenCalled();
@@ -604,7 +604,7 @@ describe('NotificationRepository', () => {
       });
 
       it('with you being added to the conversation', () => {
-        other_user_et.is_me = true;
+        other_user_et.isMe = true;
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} added you to the conversation`;
@@ -638,7 +638,7 @@ describe('NotificationRepository', () => {
       });
 
       it('with you being removed from the conversation', () => {
-        other_user_et.is_me = true;
+        other_user_et.isMe = true;
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} removed you from the conversation`;
@@ -746,7 +746,7 @@ describe('NotificationRepository', () => {
 
     beforeEach(() => {
       const selfUserEntity = new User(userId);
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
 
       conversationEntity = new Conversation(createRandomUuid());

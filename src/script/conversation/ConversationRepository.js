@@ -549,7 +549,7 @@ export class ConversationRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.user_repository.get_user_by_id(message.from).then(userEntity => {
+          return this.user_repository.getUserById(message.from).then(userEntity => {
             message.user(userEntity);
             return message;
           });
@@ -806,7 +806,7 @@ export class ConversationRepository {
     const userIds = flatten(mapOfUserIds);
 
     return this.user_repository
-      .get_users_by_id(userIds)
+      .getUsersById(userIds)
       .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
   }
 
@@ -1288,7 +1288,7 @@ export class ConversationRepository {
    */
   updateParticipatingUserEntities(conversationEntity, offline = false, updateGuests = false) {
     return this.user_repository
-      .get_users_by_id(conversationEntity.participating_user_ids(), offline)
+      .getUsersById(conversationEntity.participating_user_ids(), offline)
       .then(userEntities => {
         userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
         conversationEntity.participating_user_ets(userEntities);
@@ -1586,7 +1586,7 @@ export class ConversationRepository {
    * @returns {undefined} No return value
    */
   teamMemberLeave(teamId, userId, isoDate) {
-    this.user_repository.get_user_by_id(userId).then(userEntity => {
+    this.user_repository.getUserById(userId).then(userEntity => {
       this.conversations()
         .filter(conversationEntity => {
           const conversationInTeam = conversationEntity.team_id === teamId;
@@ -1767,7 +1767,7 @@ export class ConversationRepository {
 
   _handleUsersNotConnected(userIds = []) {
     const [userID] = userIds;
-    const userPromise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
+    const userPromise = userIds.length === 1 ? this.user_repository.getUserById(userID) : Promise.resolve();
 
     userPromise.then(userEntity => {
       const username = userEntity ? userEntity.first_name() : undefined;
@@ -2002,7 +2002,7 @@ export class ConversationRepository {
   _sendConfirmationStatus(conversationEntity, messageEntity, type, moreMessageEntities = []) {
     const typeToConfirm = EventTypeHandling.CONFIRM.includes(messageEntity.type);
 
-    if (messageEntity.user().is_me || !typeToConfirm) {
+    if (messageEntity.user().isMe || !typeToConfirm) {
       return;
     }
 
@@ -2428,7 +2428,7 @@ export class ConversationRepository {
       const recipients = {};
 
       for (const user_et of user_ets) {
-        if (!(skip_own_clients && user_et.is_me)) {
+        if (!(skip_own_clients && user_et.isMe)) {
           if (user_ids && !user_ids.includes(user_et.id)) {
             continue;
           }
@@ -2689,7 +2689,7 @@ export class ConversationRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map(clientId => this.user_repository.remove_client_from_user(userId, clientId))),
+            Promise.all(clients.map(clientId => this.user_repository.removeClientFromUser(userId, clientId))),
           ),
         );
 
@@ -2816,7 +2816,7 @@ export class ConversationRepository {
         userIds = userIds || conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
         return this.user_repository
-          .get_users_by_id(userIds)
+          .getUsersById(userIds)
           .then(userEntities => {
             let actionString;
             let messageString;
@@ -2832,7 +2832,7 @@ export class ConversationRepository {
               const [userEntity] = userEntities;
 
               if (userEntity) {
-                titleString = userEntity.is_me
+                titleString = userEntity.isMe
                   ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                   : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
               } else {
@@ -2997,7 +2997,7 @@ export class ConversationRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!messageEntity.user().is_me && !messageEntity.ephemeral_expires()) {
+        if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.WRONG_USER);
         }
 
@@ -3600,7 +3600,7 @@ export class ConversationRepository {
         .then(({messageEntity}) => {
           messageEntity
             .userEntities()
-            .filter(userEntity => !userEntity.is_me)
+            .filter(userEntity => !userEntity.isMe)
             .forEach(userEntity => {
               conversationEntity.participating_user_ids.remove(userEntity.id);
 
@@ -3842,10 +3842,10 @@ export class ConversationRepository {
 
   handleMessageExpiration(messageEntity) {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-    const shouldDeleteMessage = !messageEntity.user().is_me || messageEntity.is_ping();
+    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
     if (shouldDeleteMessage) {
       this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        const isPingFromSelf = messageEntity.user().is_me && messageEntity.is_ping();
+        const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
           return this.deleteMessage(conversationEntity, messageEntity);
@@ -3949,7 +3949,7 @@ export class ConversationRepository {
 
     const messageFromSelf = messageEntity.from === this.selfUser().id;
     if (messageFromSelf && event_data.reaction) {
-      return this.user_repository.get_user_by_id(from).then(userEntity => {
+      return this.user_repository.getUserById(from).then(userEntity => {
         const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
         reactionMessageEntity.user(userEntity);
         reactionMessageEntity.reaction = event_data.reaction;
@@ -3972,11 +3972,11 @@ export class ConversationRepository {
    * @returns {Promise} Resolves when users have been update
    */
   _updateMessageUserEntities(messageEntity) {
-    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
+    return this.user_repository.getUserById(messageEntity.from).then(userEntity => {
       messageEntity.user(userEntity);
 
       if (messageEntity.is_member() || messageEntity.userEntities) {
-        return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+        return this.user_repository.getUsersById(messageEntity.userIds()).then(userEntities => {
           userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
           messageEntity.userEntities(userEntities);
           return messageEntity;
@@ -3988,7 +3988,7 @@ export class ConversationRepository {
 
         messageEntity.reactions_user_ets.removeAll();
         if (userIds.length) {
-          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+          return this.user_repository.getUsersById(userIds).then(userEntities => {
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
           });

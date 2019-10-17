@@ -40,7 +40,7 @@ describe('User Mapper', () => {
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.phone()).toBe('+49177123456');
-      expect(user_et.is_me).toBeFalsy();
+      expect(user_et.isMe).toBeFalsy();
       expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     });
 
@@ -83,7 +83,7 @@ describe('User Mapper', () => {
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.phone()).toBe('+49177123456');
-      expect(user_et.is_me).toBeTruthy();
+      expect(user_et.isMe).toBeTruthy();
       expect(user_et.locale).toBe('en');
       expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     }));
