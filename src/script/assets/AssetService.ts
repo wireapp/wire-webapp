@@ -157,7 +157,7 @@ export class AssetService {
     const isTeamMember = userEntity.inTeam();
     const isTeamConversation = conversationEntity.inTeam();
     const isTeamUserInConversation = conversationEntity
-      .participating_user_ets()
+      .participatingUserEts()
       .some((conversationParticipant: any) => conversationParticipant.inTeam());
 
     const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;

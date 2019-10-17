@@ -277,7 +277,7 @@ export class ConversationMapper {
 
     // Active participants from database or backend payload
     const participatingUserIds = others ? others : members.others.map(other => other.id);
-    conversationEntity.participating_user_ids(participatingUserIds);
+    conversationEntity.participatingUserIds(participatingUserIds);
 
     // Team ID from database or backend payload
     const teamId = conversationData.team_id || conversationData.team;

@@ -41,10 +41,10 @@ ko.components.register('group-list', {
       <div class="search-list-item" data-bind="click: () => onSelect(group), attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
         <div class="search-list-item-image">
           <!-- ko if: group.is1to1() -->
-            <participant-avatar params="participant: group.participating_user_ets()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: group.participatingUserEts()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
           <!-- ko ifnot: group.is1to1() -->
-            <group-avatar params="users: group.participating_user_ets()"></group-avatar>
+            <group-avatar params="users: group.participatingUserEts()"></group-avatar>
           <!-- /ko -->
         </div>
         <div class="search-list-item-header" data-bind="text: group.display_name"></div>

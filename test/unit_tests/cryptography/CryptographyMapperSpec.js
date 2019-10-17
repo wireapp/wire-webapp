@@ -81,16 +81,16 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(original.size);
-        expect(event_json.data.content_type).toBe(original.mime_type);
-        expect(event_json.data.info.name).toBe(original.name);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content_length).toBe(original.size);
+        expect(eventJson.data.content_type).toBe(original.mime_type);
+        expect(eventJson.data.info.name).toBe(original.name);
       });
     });
 
@@ -112,21 +112,21 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toEqual(
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content_length).toEqual(
           original_asset.size.toNumber ? original_asset.size.toNumber() : original_asset.size,
         );
 
-        expect(event_json.data.content_type).toEqual(original_asset.mimeType);
-        expect(event_json.data.info.name).toEqual(original_asset.name);
-        expect(event_json.data.meta.duration).toEqual(original_asset.audio.durationInMillis / 1000);
-        expect(event_json.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio.normalizedLoudness.buffer));
+        expect(eventJson.data.content_type).toEqual(original_asset.mimeType);
+        expect(eventJson.data.info.name).toEqual(original_asset.name);
+        expect(eventJson.data.meta.duration).toEqual(original_asset.audio.durationInMillis / 1000);
+        expect(eventJson.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio.normalizedLoudness.buffer));
       });
     });
 
@@ -151,17 +151,17 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.key).toBe(uploaded.key);
-        expect(event_json.data.token).toBe(uploaded.token);
-        expect(event_json.data.otr_key.length).toBe(2);
-        expect(event_json.data.sha256.length).toBe(2);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.key).toBe(uploaded.key);
+        expect(eventJson.data.token).toBe(uploaded.token);
+        expect(eventJson.data.otr_key.length).toBe(2);
+        expect(eventJson.data.sha256.length).toBe(2);
       });
     });
 
@@ -173,14 +173,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.reason).toBe(Asset.NotUploaded.CANCELLED);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.reason).toBe(Asset.NotUploaded.CANCELLED);
       });
     });
 
@@ -194,14 +194,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.reason).toBe(Asset.NotUploaded.FAILED);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.reason).toBe(Asset.NotUploaded.FAILED);
       });
     });
 
@@ -229,15 +229,15 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.preview_otr_key.length).toBe(2);
-        expect(event_json.data.preview_sha256.length).toBe(2);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.preview_otr_key.length).toBe(2);
+        expect(eventJson.data.preview_sha256.length).toBe(2);
       });
     });
 
@@ -249,14 +249,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.USER.AVAILABILITY);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.availability).toBe(Availability.Type.AVAILABLE);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.USER.AVAILABILITY);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.availability).toBe(Availability.Type.AVAILABLE);
       });
     });
 
@@ -273,15 +273,15 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.cleared_timestamp).toBe(date);
-        expect(event_json.data.conversationId).toBe(conversation_id);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.cleared_timestamp).toBe(date);
+        expect(eventJson.data.conversationId).toBe(conversation_id);
       });
     });
 
@@ -297,15 +297,15 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_HIDDEN);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.conversation_id).toBe(conversation_id);
-        expect(event_json.data.message_id).toBe(message_id);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.MESSAGE_HIDDEN);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.conversation_id).toBe(conversation_id);
+        expect(eventJson.data.message_id).toBe(message_id);
       });
     });
 
@@ -316,14 +316,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_DELETE);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.message_id).toBe(message_id);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.MESSAGE_DELETE);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.message_id).toBe(message_id);
       });
     });
 
@@ -353,20 +353,20 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(image.size);
-        expect(event_json.data.content_type).toBe(image.mime_type);
-        expect(event_json.data.id).toBe(event.data.id);
-        expect(event_json.data.info.tag).toBe(image.tag);
-        expect(event_json.data.info.width).toBe(image.width);
-        expect(event_json.data.info.height).toBe(image.height);
-        expect(event_json.data.info.public).toBeFalsy();
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content_length).toBe(image.size);
+        expect(eventJson.data.content_type).toBe(image.mime_type);
+        expect(eventJson.data.id).toBe(event.data.id);
+        expect(eventJson.data.info.tag).toBe(image.tag);
+        expect(eventJson.data.info.width).toBe(image.width);
+        expect(eventJson.data.info.height).toBe(image.height);
+        expect(eventJson.data.info.public).toBeFalsy();
       });
     });
 
@@ -398,20 +398,20 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(original.size);
-        expect(event_json.data.content_type).toBe(original.mimeType);
-        expect(event_json.data.key).toBe(remote_data.assetId);
-        expect(event_json.data.token).toBe(remote_data.assetToken);
-        expect(event_json.data.info.tag).toBe('medium');
-        expect(event_json.data.info.width).toBe(image_meta_data.width);
-        expect(event_json.data.info.height).toBe(image_meta_data.height);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content_length).toBe(original.size);
+        expect(eventJson.data.content_type).toBe(original.mimeType);
+        expect(eventJson.data.key).toBe(remote_data.assetId);
+        expect(eventJson.data.token).toBe(remote_data.assetToken);
+        expect(eventJson.data.info.tag).toBe('medium');
+        expect(eventJson.data.info.width).toBe(image_meta_data.width);
+        expect(eventJson.data.info.height).toBe(image_meta_data.height);
       });
     });
 
@@ -442,20 +442,20 @@ describe('CryptographyMapper', () => {
 
       delete event.data.id;
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(image.size);
-        expect(event_json.data.content_type).toBe(image.mime_type);
-        expect(event_json.data.id).toBeDefined();
-        expect(event_json.data.info.tag).toBe(image.tag);
-        expect(event_json.data.info.width).toBe(image.width);
-        expect(event_json.data.info.height).toBe(image.height);
-        expect(event_json.data.info.public).toBeFalsy();
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content_length).toBe(image.size);
+        expect(eventJson.data.content_type).toBe(image.mime_type);
+        expect(eventJson.data.id).toBeDefined();
+        expect(eventJson.data.info.tag).toBe(image.tag);
+        expect(eventJson.data.info.width).toBe(image.width);
+        expect(eventJson.data.info.height).toBe(image.height);
+        expect(eventJson.data.info.public).toBeFalsy();
       });
     });
 
@@ -481,13 +481,13 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.KNOCK);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
       });
     });
 
@@ -529,15 +529,15 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.conversationId).toBe(conversation_id);
-        expect(event_json.data.last_read_timestamp).toBe(date);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(BackendEvent.CONVERSATION.MEMBER_UPDATE);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.conversationId).toBe(conversation_id);
+        expect(eventJson.data.last_read_timestamp).toBe(date);
       });
     });
 
@@ -553,15 +553,15 @@ describe('CryptographyMapper', () => {
         messageId,
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.REACTION);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.message_id).toBe(generic_message.messageId);
+        expect(eventJson.data.reaction).toBe(ReactionType.LIKE);
       });
     });
 
@@ -571,14 +571,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content).toBe('Unit test');
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.content).toBe('Unit test');
       });
     });
 
@@ -614,10 +614,10 @@ describe('CryptographyMapper', () => {
 
           return mapper.mapGenericMessage(external_message, event);
         })
-        .then(event_json => {
-          expect(event_json.data.content).toBe(plaintext);
-          expect(event_json.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
-          expect(event_json.id).toBe(generic_message.messageId);
+        .then(eventJson => {
+          expect(eventJson.data.content).toBe(plaintext);
+          expect(eventJson.type).toBe(ClientEvent.CONVERSATION.MESSAGE_ADD);
+          expect(eventJson.id).toBe(generic_message.messageId);
         });
     });
 
@@ -641,13 +641,13 @@ describe('CryptographyMapper', () => {
           });
           return mapper.mapGenericMessage(external_message, event);
         })
-        .then(event_json => {
-          expect(isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(ClientEvent.CONVERSATION.KNOCK);
-          expect(event_json.conversation).toBe(event.conversation);
-          expect(event_json.from).toBe(event.from);
-          expect(event_json.time).toBe(event.time);
-          expect(event_json.id).toBe(genericMessage.messageId);
+        .then(eventJson => {
+          expect(isObject(eventJson)).toBeTruthy();
+          expect(eventJson.type).toBe(ClientEvent.CONVERSATION.KNOCK);
+          expect(eventJson.conversation).toBe(event.conversation);
+          expect(eventJson.from).toBe(event.from);
+          expect(eventJson.time).toBe(event.time);
+          expect(eventJson.id).toBe(genericMessage.messageId);
         });
     });
 
@@ -663,17 +663,17 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.LOCATION);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.location.longitude).toBe(generic_message.location.longitude);
-        expect(event_json.data.location.latitude).toBe(generic_message.location.latitude);
-        expect(event_json.data.location.name).toBe(generic_message.location.name);
-        expect(event_json.data.location.zoom).toBe(generic_message.location.zoom);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.LOCATION);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.location.longitude).toBe(generic_message.location.longitude);
+        expect(eventJson.data.location.latitude).toBe(generic_message.location.latitude);
+        expect(eventJson.data.location.name).toBe(generic_message.location.name);
+        expect(eventJson.data.location.zoom).toBe(generic_message.location.zoom);
       });
     });
 
@@ -689,15 +689,15 @@ describe('CryptographyMapper', () => {
         reaction,
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.REACTION);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CONVERSATION.REACTION);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.data.message_id).toBe(generic_message.messageId);
+        expect(eventJson.data.reaction).toBe(ReactionType.LIKE);
       });
     });
 
@@ -715,14 +715,14 @@ describe('CryptographyMapper', () => {
         messageId: createRandomUuid(),
       });
 
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CALL.E_CALL);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.content).toEqual(content_message);
+      return mapper.mapGenericMessage(generic_message, event).then(eventJson => {
+        expect(isObject(eventJson)).toBeTruthy();
+        expect(eventJson.type).toBe(ClientEvent.CALL.E_CALL);
+        expect(eventJson.conversation).toBe(event.conversation);
+        expect(eventJson.from).toBe(event.from);
+        expect(eventJson.time).toBe(event.time);
+        expect(eventJson.id).toBe(generic_message.messageId);
+        expect(eventJson.content).toEqual(content_message);
       });
     });
   });

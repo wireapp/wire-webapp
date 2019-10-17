@@ -100,7 +100,7 @@ ko.components.register('participant-item', {
     this.avatarSize = ParticipantAvatar.SIZE.SMALL;
     this.participant = ko.unwrap(participant);
     this.participantName = () =>
-      this.participant.is_me
+      this.participant.isMe
         ? `${this.participant.name()} (${capitalizeFirstChar(t('conversationYouNominative'))})`
         : this.participant.name;
     this.isService = this.participant instanceof ServiceEntity || this.participant.isService;

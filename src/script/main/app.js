@@ -532,10 +532,10 @@ class App {
   _checkUserInformation(userEntity) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
-        this.repository.user.set_default_picture();
+        this.repository.user.setDefaultPicture();
       }
       if (!userEntity.username()) {
-        this.repository.user.get_username_suggestion();
+        this.repository.user.getUsernameSuggestion();
       }
     }
 

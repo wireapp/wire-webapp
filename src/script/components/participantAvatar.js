@@ -116,7 +116,7 @@ export class ParticipantAvatar {
       switch (true) {
         case this.isService():
           return '';
-        case this.participant().is_me:
+        case this.participant().isMe:
           return 'self';
         case typeof params.selected === 'function' && params.selected():
           return 'selected';

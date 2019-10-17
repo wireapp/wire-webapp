@@ -224,7 +224,7 @@ export class TeamRepository {
           })
           .map(memberEntity => memberEntity.userId);
 
-        return this.userRepository.get_users_by_id(memberIds);
+        return this.userRepository.getUsersById(memberIds);
       })
       .then(userEntities => teamEntity.members(userEntities));
   }
@@ -272,7 +272,7 @@ export class TeamRepository {
     const isOtherUser = this.selfUser().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
-      this.userRepository.get_user_by_id(userId).then(userEntity => this._addUserToTeam(userEntity));
+      this.userRepository.getUserById(userId).then(userEntity => this._addUserToTeam(userEntity));
       this.getTeamMember(teamId, userId).then(members => this._updateMemberRoles(members));
     }
   }

@@ -28,15 +28,15 @@ class AssetHeader {
    * @param {Message} params.message - Message entity
    */
   constructor(params) {
-    this.message_et = params.message;
+    this.messageEt = params.message;
     this.moment = moment;
   }
 }
 
 ko.components.register('asset-header', {
   template: `
-    <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('${LDM} LT')"></span>
+    <span class="asset-header-name" data-bind="text: messageEt.user().first_name(), css: messageEt.accent_color"></span>
+    <span class="asset-header-time" data-bind="text: moment(messageEt.timestamp()).format('${LDM} LT')"></span>
   `,
   viewModel: AssetHeader,
 });

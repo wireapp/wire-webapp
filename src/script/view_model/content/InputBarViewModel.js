@@ -179,7 +179,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
 
       const candidates = this.conversationEntity()
-        .participating_user_ets()
+        .participatingUserEts()
         .filter(userEntity => !userEntity.isService);
       return this.searchRepository.searchUserInSet(this.editedMention().term, candidates);
     });
@@ -577,7 +577,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message());
+            this.editMessage(this.conversationEntity().getLastEditableMessage());
             this.updateMentions(data, keyboardEvent);
           }
           break;

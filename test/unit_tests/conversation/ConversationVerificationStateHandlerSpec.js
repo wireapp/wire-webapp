@@ -51,7 +51,7 @@ describe('ConversationVerificationStateHandler', () => {
       conversationC = new Conversation(createRandomUuid());
 
       selfUserEntity = new User(createRandomUuid());
-      selfUserEntity.is_me = true;
+      selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
       spyOn(conversationRepository, 'selfUser').and.returnValue(selfUserEntity);
@@ -68,14 +68,14 @@ describe('ConversationVerificationStateHandler', () => {
       userB.devices.push(clientB);
 
       conversationAB.selfUser(selfUserEntity);
-      conversationAB.participating_user_ids.push(userA.id, userB.id);
-      conversationAB.participating_user_ets.push(userA, userB);
+      conversationAB.participatingUserIds.push(userA.id, userB.id);
+      conversationAB.participatingUserEts.push(userA, userB);
       conversationAB.verification_state(ConversationVerificationState.VERIFIED);
 
       conversationB.selfUser(selfUserEntity);
-      conversationB.participating_user_ids.push(userB.id);
+      conversationB.participatingUserIds.push(userB.id);
       conversationB.verification_state(ConversationVerificationState.VERIFIED);
-      conversationB.participating_user_ets.push(userB);
+      conversationB.participatingUserEts.push(userB);
 
       conversationC.selfUser(selfUserEntity);
       conversationC.verification_state(ConversationVerificationState.VERIFIED);
@@ -209,8 +209,8 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
 
-      conversationAB.participating_user_ids.push(new_user.id);
-      conversationAB.participating_user_ets.push(new_user);
+      conversationAB.participatingUserIds.push(new_user.id);
+      conversationAB.participatingUserEts.push(new_user);
 
       stateHandler.onMemberJoined(conversationAB, [new_user.id]);
 
@@ -228,8 +228,8 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);
 
-      conversationAB.participating_user_ids.push(new_user.id);
-      conversationAB.participating_user_ets.push(new_user);
+      conversationAB.participatingUserIds.push(new_user.id);
+      conversationAB.participatingUserEts.push(new_user);
 
       stateHandler.onMemberJoined(conversationAB, [new_user.id]);
 

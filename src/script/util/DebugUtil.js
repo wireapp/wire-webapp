@@ -187,12 +187,12 @@ export class DebugUtil {
 
     return this.conversationRepository
       .get_conversation_by_id(event.conversation)
-      .then(conversation_et => {
-        debugInformation.conversation = conversation_et;
-        return this.userRepository.get_user_by_id(event.from);
+      .then(conversationEt => {
+        debugInformation.conversation = conversationEt;
+        return this.userRepository.getUserById(event.from);
       })
-      .then(user_et => {
-        debugInformation.user = user_et;
+      .then(userEt => {
+        debugInformation.user = userEt;
         const logMessage = `Hey ${this.userRepository.self().name()}, this is for you:`;
         this.logger.warn(logMessage, debugInformation);
         this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
@@ -441,7 +441,7 @@ export class DebugUtil {
             return groups;
           }, {});
 
-          const user = await this.userRepository.get_user_by_id(participantStats.userid);
+          const user = await this.userRepository.getUserById(participantStats.userid);
 
           return createElement('div', [
             createElement('div', [createElement('strong', user.first_name())]),

@@ -43,7 +43,7 @@ ko.components.register('user-actions', {
   template: '<panel-actions params="items: items()"></panel-actions>',
   viewModel: function({user, conversation = () => false, actionsViewModel, onAction = noop, isSelfActivated}) {
     isSelfActivated = ko.unwrap(isSelfActivated);
-    const isMe = ko.computed(() => user() && user().is_me);
+    const isMe = ko.computed(() => user() && user().isMe);
     const isNotMe = ko.computed(() => !isMe() && isSelfActivated);
 
     const allItems = [
@@ -161,7 +161,7 @@ ko.components.register('user-actions', {
             conversation() &&
             conversation().isActiveParticipant() &&
             conversation()
-              .participating_user_ids()
+              .participatingUserIds()
               .some(id => user().id === id) &&
             z.userPermission().canUpdateGroupParticipants()
           );

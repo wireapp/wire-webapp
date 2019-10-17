@@ -48,9 +48,9 @@ describe('ConversationService', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const conversation_payload = {"access":["private"],"creator":"0410795a-58dc-40d8-b216-cbc2360be21a","members":{"self":{"hidden_ref":null,"status":0,"last_read":"24fe.800122000b16c279","muted_time":null,"otr_muted_ref":null,"muted":false,"status_time":"2014-12-03T18:39:12.319Z","hidden":false,"status_ref":"0.0","id":"532af01e-1e24-4366-aacf-33b67d4ee376","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":"2016-07-25T11:30:07.883Z","archived":null},"others":[{"status":0,"id":"0410795a-58dc-40d8-b216-cbc2360be21a"}]},"name":"Michael","id":"573b6978-7700-443e-9ce5-ff78b35ac590","type":2,"last_event_time":"2016-06-21T22:53:41.778Z","last_event":"24fe.800122000b16c279"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      const [conversation_et] = conversation_mapper.mapConversations([conversation_payload]);
+      const [conversationEt] = conversation_mapper.mapConversations([conversation_payload]);
 
-      return conversation_service.save_conversation_state_in_db(conversation_et).then(conversation_record => {
+      return conversation_service.save_conversation_state_in_db(conversationEt).then(conversation_record => {
         expect(conversation_record.name()).toBe(conversation_payload.name);
       });
     });

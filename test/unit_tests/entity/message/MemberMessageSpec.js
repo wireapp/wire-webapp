@@ -31,18 +31,18 @@ import {File} from 'src/script/entity/message/File';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
-    let message_et = null;
+    let messageEt = null;
 
     beforeEach(() => {
-      message_et = new MemberMessage();
+      messageEt = new MemberMessage();
     });
 
     it('can return correct string for one user', () => {
       const user_a = new User(createRandomUuid());
       user_a.name('John');
-      message_et.userEntities.push(user_a);
+      messageEt.userEntities.push(user_a);
 
-      expect(message_et._generateNameString()).toBe('[bold]John[/bold]');
+      expect(messageEt._generateNameString()).toBe('[bold]John[/bold]');
     });
 
     it('can return correct string for two users', () => {
@@ -50,9 +50,9 @@ describe('Member Message', () => {
       user_a.name('John');
       const user_b = new User(createRandomUuid());
       user_b.name('Jim');
-      message_et.userEntities.push(user_a, user_b);
+      messageEt.userEntities.push(user_a, user_b);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
+      expect(messageEt._generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
     it('can return correct string for more than two users', () => {
@@ -62,15 +62,15 @@ describe('Member Message', () => {
       user_b.name('Jim');
       const user_c = new User(createRandomUuid());
       user_c.name('Jill');
-      message_et.userEntities.push(user_a, user_b, user_c);
+      messageEt.userEntities.push(user_a, user_b, user_c);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(messageEt._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
 
     it('can return correct string for more than one user without sender', () => {
       const user_sender = new User(createRandomUuid());
       user_sender.name('Sender');
-      message_et.user(user_sender);
+      messageEt.user(user_sender);
 
       const user_a = new User(createRandomUuid());
       user_a.name('John');
@@ -78,62 +78,62 @@ describe('Member Message', () => {
       user_b.name('Jim');
       const user_c = new User(createRandomUuid());
       user_c.name('Jill');
-      message_et.userEntities.push(user_sender, user_a, user_b, user_c);
+      messageEt.userEntities.push(user_sender, user_a, user_b, user_c);
 
-      expect(message_et._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(messageEt._generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
   });
 
-  describe('is_deletable', () => {
-    let message_et = null;
+  describe('isDeletable', () => {
+    let messageEt = null;
 
     beforeEach(() => {
-      message_et = new ContentMessage();
+      messageEt = new ContentMessage();
     });
 
     it('should be deletable when message is not sending', () => {
-      message_et.assets.push(new Text());
+      messageEt.assets.push(new Text());
 
-      expect(message_et.is_deletable()).toBe(true);
+      expect(messageEt.isDeletable()).toBe(true);
     });
 
     it('should not be deletable while message is sending', () => {
-      message_et.assets.push(new Text());
-      message_et.status(StatusType.SENDING);
+      messageEt.assets.push(new Text());
+      messageEt.status(StatusType.SENDING);
 
-      expect(message_et.is_deletable()).toBe(false);
+      expect(messageEt.isDeletable()).toBe(false);
     });
 
     it('should be deletable when message is a file and uploading or downloading', () => {
       const file_et = new File();
       file_et.status(AssetTransferState.UPLOADING);
-      message_et.assets.push(file_et);
+      messageEt.assets.push(file_et);
 
-      expect(message_et.is_deletable()).toBe(true);
+      expect(messageEt.isDeletable()).toBe(true);
     });
   });
 
   describe('has_asset_file', () => {
-    let message_et = null;
+    let messageEt = null;
 
     beforeEach(() => {
-      message_et = new ContentMessage();
+      messageEt = new ContentMessage();
     });
 
     it('should return false by default', () => {
-      expect(message_et.has_asset_file()).toBeFalsy();
+      expect(messageEt.has_asset_file()).toBeFalsy();
     });
 
     it('should return false for Text asset', () => {
-      message_et.assets.push(new Text());
+      messageEt.assets.push(new Text());
 
-      expect(message_et.has_asset_file()).toBeFalsy();
+      expect(messageEt.has_asset_file()).toBeFalsy();
     });
 
     it('should return true for File asset', () => {
-      message_et.assets.push(new File());
+      messageEt.assets.push(new File());
 
-      expect(message_et.has_asset_file()).toBeTruthy();
+      expect(messageEt.has_asset_file()).toBeTruthy();
     });
   });
 });
