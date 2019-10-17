@@ -249,8 +249,8 @@ export class APIClient extends EventEmitter {
     delete this.context;
   }
 
-  public connect(shouldLockWebsocket: boolean = false): Promise<WebSocketClient> {
-    return this.transport.ws.connect(this.context && this.context.clientId, shouldLockWebsocket);
+  public connect(onBeforeConnect?: () => Promise<void>): Promise<WebSocketClient> {
+    return this.transport.ws.connect(this.context && this.context.clientId, onBeforeConnect);
   }
 
   private createContext(userId: string, clientType: ClientType, clientId?: string): Context {

@@ -42,6 +42,7 @@ export class WebSocketClient extends EventEmitter {
   public client: HttpClient;
   private isSocketLocked: boolean;
   private bufferedMessages: string[];
+  private onBeforeConnect: () => Promise<void> = () => Promise.resolve();
 
   constructor(baseUrl: string, client: HttpClient) {
     super();
@@ -82,7 +83,17 @@ export class WebSocketClient extends EventEmitter {
     await this.refreshAccessToken();
   };
 
-  private readonly onReconnect = () => {
+  private readonly onReconnect = async () => {
+    try {
+      this.lock();
+      this.logger.info('Calling "onBeforeConnect"');
+      await this.onBeforeConnect();
+    } catch (error) {
+      this.logger.warn(`Error during execution of "beforeReconnect"`, error);
+      this.emit(WebSocketTopic.ON_ERROR, error);
+    } finally {
+      this.unlock();
+    }
     this.onStateChange(this.socket.getState());
     return this.buildWebSocketUrl();
   };
@@ -102,16 +113,14 @@ export class WebSocketClient extends EventEmitter {
    * When provided the websocket will get messages specific to the client.
    * If omitted the websocket will receive global messages for the account.
    *
-   * @param shouldLockWebsocket
-   * If `true` locks the connection which doesn't emit any messages until the websocket gets unlocked.
-   * While locked, incoming messages are buffered. When unlocking all buffered messages get emitted.
-   * The websocket should be locked when fetching messages from the notification stream.
+   * @param onBeforeConnect
+   * Handler that is executed before the websocket is fully connected.
+   * Essentially the websocket will lock before execution of this function and
+   * unlocks after the execution of the handler and pushes all buffered messages.
    */
-  public async connect(clientId?: string, shouldLockWebsocket: boolean = false): Promise<WebSocketClient> {
-    if (shouldLockWebsocket) {
-      this.lock();
-    } else {
-      this.unlock();
+  public async connect(clientId?: string, onBeforeConnect?: () => Promise<void>): Promise<WebSocketClient> {
+    if (onBeforeConnect) {
+      this.onBeforeConnect = onBeforeConnect;
     }
     this.clientId = clientId;
 

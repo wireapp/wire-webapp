@@ -98,6 +98,50 @@ describe('WebSocketClient', () => {
 
       expect(onMessageSpy.calls.count()).toBe(1);
     });
+
+    it('calls "onBeforeConnect" when "onReconnect" is called', async () => {
+      const onBeforeConnectResult = jasmine.createSpy().and.returnValue(Promise.resolve());
+      const onBeforeConnect = () => {
+        expect(websocketClient.isLocked()).toBe(true);
+        return onBeforeConnectResult();
+      };
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
+
+      await websocketClient.connect(undefined, onBeforeConnect);
+      expect(websocketClient.isLocked()).toBe(false);
+      await websocketClient.onReconnect();
+      expect(onBeforeConnectResult.calls.count()).toBe(1);
+      expect(websocketClient.isLocked()).toBe(false);
+    });
+
+    it('emits error when "onBeforeConnect" fails during "onReconnect"', async () => {
+      const testError = new Error('oh no!');
+      let errorHandlerCalled = false;
+      const onBeforeConnectResult = jasmine.createSpy().and.returnValue(Promise.reject(testError));
+      const onBeforeConnect = () => {
+        expect(websocketClient.isLocked()).toBe(true);
+        return onBeforeConnectResult();
+      };
+      const websocketClient = new WebSocketClient('url', fakeHttpClient);
+      const fakeSocket = {};
+      const socket = websocketClient.socket;
+      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
+
+      websocketClient.on(WebSocketTopic.ON_ERROR, error => {
+        expect(onBeforeConnectResult.calls.count()).toBe(1);
+        expect(error).toBe(testError);
+        errorHandlerCalled = true;
+      });
+
+      await websocketClient.connect(undefined, onBeforeConnect);
+      expect(websocketClient.isLocked()).toBe(false);
+      await websocketClient.onReconnect();
+      expect(websocketClient.isLocked()).toBe(false);
+      expect(errorHandlerCalled).toBe(true);
+    });
   });
 
   describe('refreshAccessToken', () => {
@@ -139,26 +183,6 @@ describe('WebSocketClient', () => {
       fakeSocket.onmessage({data: Buffer.from(JSON.stringify({message}), 'utf-8')});
     });
 
-    it('does lock websocket if option is set', async () => {
-      const websocketClient = new WebSocketClient('url', fakeHttpClient);
-      const onMessageSpy = spyOn(websocketClient, 'onMessage').and.callThrough();
-      const fakeSocket = {};
-      const socket = websocketClient.socket;
-      spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
-
-      await websocketClient.connect(undefined, true);
-      expect(websocketClient.isLocked()).toBe(true);
-
-      const message = 'hello';
-      websocketClient.on(WebSocketTopic.ON_MESSAGE, notification => {
-        fail();
-      });
-
-      fakeSocket.onmessage({data: Buffer.from(JSON.stringify({message}), 'utf-8')});
-      expect(onMessageSpy.calls.count()).toBe(1);
-      expect(websocketClient.bufferedMessages.length).toBe(1);
-    });
-
     it('emits buffered messages when unlocked', async done => {
       const websocketClient = new WebSocketClient('url', fakeHttpClient);
       const onMessageSpy = spyOn(websocketClient, 'onMessage').and.callThrough();
@@ -166,7 +190,8 @@ describe('WebSocketClient', () => {
       const socket = websocketClient.socket;
       spyOn(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-      await websocketClient.connect(undefined, true);
+      websocketClient.lock();
+      await websocketClient.connect();
       expect(websocketClient.isLocked()).toBe(true);
 
       const message = 'hello';
