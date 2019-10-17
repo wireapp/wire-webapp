@@ -305,7 +305,7 @@ export class ConversationRepository {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
     amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
@@ -807,7 +807,7 @@ export class ConversationRepository {
 
     return this.user_repository
       .getUsersById(userIds)
-      .then(() => conversationEntities.forEach(conversationEntity => this._fetch_users_and_events(conversationEntity)));
+      .then(() => conversationEntities.forEach(conversationEntity => this._fetchUsersAndEvents(conversationEntity)));
   }
 
   //##############################################################################
@@ -3017,7 +3017,7 @@ export class ConversationRepository {
       })
       .then(() => {
         amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationId);
-        return this._delete_message_by_id(conversationEntity, messageId);
+        return this._deleteMessageById(conversationEntity, messageId);
       })
       .catch(error => {
         const isConversationNotFound = error.code === BackendClientError.STATUS_CODE.NOT_FOUND;
@@ -3055,7 +3055,7 @@ export class ConversationRepository {
       })
       .then(() => {
         amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageEntity.id, conversationEntity.id);
-        return this._delete_message_by_id(conversationEntity, messageEntity.id);
+        return this._deleteMessageById(conversationEntity, messageEntity.id);
       })
       .catch(error => {
         this.logger.info(
@@ -3653,7 +3653,7 @@ export class ConversationRepository {
 
     const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
     if (wasUnarchived) {
-      return this._fetch_users_and_events(conversationEntity);
+      return this._fetchUsersAndEvents(conversationEntity);
     }
 
     if (conversationEntity.is_cleared()) {
@@ -3720,7 +3720,7 @@ export class ConversationRepository {
       })
       .then(() => {
         amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
-        return this._delete_message_by_id(conversationEntity, eventData.message_id);
+        return this._deleteMessageById(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         const isNotFound = error.type === z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -3757,7 +3757,7 @@ export class ConversationRepository {
       })
       .then(conversationEntity => {
         amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, eventData.message_id, conversationEntity.id);
-        return this._delete_message_by_id(conversationEntity, eventData.message_id);
+        return this._deleteMessageById(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         this.logger.info(
@@ -3928,7 +3928,7 @@ export class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation fetch events and users for
    * @returns {undefined} No return value
    */
-  _fetch_users_and_events(conversationEntity) {
+  _fetchUsersAndEvents(conversationEntity) {
     if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
       this.updateParticipatingUserEntities(conversationEntity);
       this._get_unread_events(conversationEntity);
@@ -4004,7 +4004,7 @@ export class ConversationRepository {
    * @param {string} messageId - Id of the message which upload has been cancelled
    * @returns {undefined} No return value
    */
-  cancel_asset_upload(messageId) {
+  cancelAssetUpload(messageId) {
     this.send_asset_upload_failed(this.active_conversation(), messageId, AssetUploadFailedReason.CANCELLED);
   }
 
@@ -4016,7 +4016,7 @@ export class ConversationRepository {
    * @param {Message} messageEt - Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message(conversationEntity, messageEt) {
+  _deleteMessage(conversationEntity, messageEt) {
     return this.eventService.deleteEventByKey(messageEt.primary_key);
   }
 
@@ -4028,7 +4028,7 @@ export class ConversationRepository {
    * @param {string} message_id - ID of message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message_by_id(conversationEntity, message_id) {
+  _deleteMessageById(conversationEntity, message_id) {
     return this.eventService.deleteEvent(conversationEntity.id, message_id);
   }
 
