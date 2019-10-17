@@ -161,14 +161,14 @@ class User {
     this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
-  add_client(new_clientEt) {
+  add_client(newClientEt) {
     for (const clientEt of this.devices()) {
-      if (clientEt.id === new_clientEt.id) {
+      if (clientEt.id === newClientEt.id) {
         return false;
       }
     }
 
-    this.devices.push(new_clientEt);
+    this.devices.push(newClientEt);
 
     if (this.isMe) {
       this.devices.sort((client_a, client_b) => new Date(client_b.time) - new Date(client_a.time));
