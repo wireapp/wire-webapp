@@ -37,12 +37,12 @@ export class MessageTimerUpdateMessage extends SystemMessage {
     this.caption = ko.pureComputed(() => {
       if (this.message_timer) {
         const timeString = formatDuration(this.message_timer).text;
-        return this.user().isMe
+        return this.user().is_me
           ? t('conversationUpdatedTimerYou', timeString)
           : t('conversationUpdatedTimer', timeString);
       }
 
-      return this.user().isMe ? t('conversationResetTimerYou') : t('conversationResetTimer');
+      return this.user().is_me ? t('conversationResetTimerYou') : t('conversationResetTimer');
     });
   }
 }

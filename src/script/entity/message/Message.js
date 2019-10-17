@@ -33,11 +33,11 @@ import {User} from '../User';
 export class Message {
   /**
    * Sort messages by timestamp
-   * @param {Array<Message>} messageEts - Message entities
+   * @param {Array<Message>} message_ets - Message entities
    * @returns {boolean} Sorted message entities
    */
-  static sort_by_timestamp(messageEts) {
-    return messageEts.sort((m1, m2) => m1.timestamp() > m2.timestamp());
+  static sort_by_timestamp(message_ets) {
+    return message_ets.sort((m1, m2) => m1.timestamp() > m2.timestamp());
   }
 
   constructor(id = '0', super_type = '') {
@@ -176,7 +176,7 @@ export class Message {
    * Check if message can be deleted.
    * @returns {boolean} True, if message is deletable.
    */
-  isDeletable() {
+  is_deletable() {
     return this.status() !== StatusType.SENDING;
   }
 
@@ -272,7 +272,7 @@ export class Message {
    * @returns {boolean} True, if message can be edited.
    */
   is_editable() {
-    return this.has_asset_text() && this.user().isMe && !this.is_ephemeral();
+    return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
   }
 
   /**
@@ -337,7 +337,7 @@ export class Message {
     }
 
     if (this.ephemeral_status() === EphemeralStatusType.INACTIVE) {
-      const startingTimestamp = this.user().isMe ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
+      const startingTimestamp = this.user().is_me ? Math.min(this.timestamp() + timeOffset, Date.now()) : Date.now();
       const expirationTimestamp = `${startingTimestamp + this.ephemeral_expires()}`;
       this.ephemeral_expires(expirationTimestamp);
       this.ephemeral_started(`${startingTimestamp}`);

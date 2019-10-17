@@ -237,7 +237,7 @@ export class GroupCreationViewModel {
 
     const isTeamConversation = !!conversationEntity.team_id;
     if (isTeamConversation) {
-      const participants = trackingHelpers.getParticipantTypes(conversationEntity.participatingUserEts(), true);
+      const participants = trackingHelpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
 
       Object.assign(attributes, {
         guest_num: participants.guests,

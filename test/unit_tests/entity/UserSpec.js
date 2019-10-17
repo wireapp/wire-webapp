@@ -24,70 +24,70 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 describe('User', () => {
   describe('First Name', () => {
     it('can generate first name', () => {
-      const userEt = new User();
-      userEt.name('John Doe');
+      const user_et = new User();
+      user_et.name('John Doe');
 
-      expect(userEt.first_name()).toBe('John');
+      expect(user_et.first_name()).toBe('John');
     });
   });
 
   describe('Last Name', () => {
     it('can generate last name', () => {
-      const userEt = new User();
-      userEt.name('John Doe');
+      const user_et = new User();
+      user_et.name('John Doe');
 
-      expect(userEt.last_name()).toBe('Doe');
+      expect(user_et.last_name()).toBe('Doe');
     });
 
     it('can generate last name', () => {
-      const userEt = new User();
-      userEt.name('John D. Doe');
+      const user_et = new User();
+      user_et.name('John D. Doe');
 
-      expect(userEt.last_name()).toBe('Doe');
+      expect(user_et.last_name()).toBe('Doe');
     });
 
     it('can ignore last name if user has only one name', () => {
-      const userEt = new User();
-      userEt.name('John');
+      const user_et = new User();
+      user_et.name('John');
 
-      expect(userEt.last_name()).toBeUndefined();
+      expect(user_et.last_name()).toBeUndefined();
     });
   });
 
   describe('Initials', () => {
     it('returns correct initials for user with first name and last name', () => {
-      const userEt = new User();
-      userEt.name('John Doe');
+      const user_et = new User();
+      user_et.name('John Doe');
 
-      expect(userEt.initials()).toBe('JD');
+      expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with just a first name', () => {
-      const userEt = new User();
-      userEt.name('John');
+      const user_et = new User();
+      user_et.name('John');
 
-      expect(userEt.initials()).toBe('JO');
+      expect(user_et.initials()).toBe('JO');
     });
 
     it('returns correct initials for user with middle name', () => {
-      const userEt = new User();
-      userEt.name('John Peter Doe');
+      const user_et = new User();
+      user_et.name('John Peter Doe');
 
-      expect(userEt.initials()).toBe('JD');
+      expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with one character as name', () => {
-      const userEt = new User();
-      userEt.name('J');
+      const user_et = new User();
+      user_et.name('J');
 
-      expect(userEt.initials()).toBe('J');
+      expect(user_et.initials()).toBe('J');
     });
 
     it('returns correct initials for user with an emoji as name', () => {
-      const userEt = new User();
-      userEt.name('🐒');
+      const user_et = new User();
+      user_et.name('🐒');
 
-      expect(userEt.initials()).toBe('🐒');
+      expect(user_et.initials()).toBe('🐒');
     });
   });
 
@@ -99,12 +99,12 @@ describe('User', () => {
       const second_client = new ClientEntity();
       second_client.id = '575b7a890cdb7635';
 
-      const userEt = new User();
-      userEt.add_client(first_client);
-      userEt.add_client(second_client);
-      userEt.add_client(second_client);
+      const user_et = new User();
+      user_et.add_client(first_client);
+      user_et.add_client(second_client);
+      user_et.add_client(second_client);
 
-      expect(userEt.devices().length).toBe(2);
+      expect(user_et.devices().length).toBe(2);
     }));
 
   describe('accent_color', () =>

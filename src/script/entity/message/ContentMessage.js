@@ -38,10 +38,10 @@ export class ContentMessage extends Message {
     this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
     this.reactions = ko.observable({});
-    this.reactionsUserEts = ko.observableArray();
+    this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
-      this.reactionsUserEts()
-        .map(userEt => userEt.first_name())
+      this.reactions_user_ets()
+        .map(user_et => user_et.first_name())
         .join(', ');
     });
 
@@ -60,32 +60,32 @@ export class ContentMessage extends Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactionsUserEts().filter(userEt => userEt.isMe);
+        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
         return likes.length === 1;
       },
       write: value => {
         return this.is_liked_provisional(value);
       },
     });
-    this.other_likes = ko.pureComputed(() => this.reactionsUserEts().filter(userEt => !userEt.isMe));
+    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
 
     this.like_caption = ko.pureComputed(() => {
-      if (this.reactionsUserEts().length <= 5) {
-        return this.reactionsUserEts()
-          .map(userEt => userEt.first_name())
+      if (this.reactions_user_ets().length <= 5) {
+        return this.reactions_user_ets()
+          .map(user_et => user_et.first_name())
           .join(', ');
       }
-      return t('conversationLikesCaption', this.reactionsUserEts().length);
+      return t('conversationLikesCaption', this.reactions_user_ets().length);
     });
   }
 
   /**
    * Add another content asset to the message.
-   * @param {Asset} assetEt - New content asset
+   * @param {Asset} asset_et - New content asset
    * @returns {undefined} No return value
    */
-  add_asset(assetEt) {
-    this.assets.push(assetEt);
+  add_asset(asset_et) {
+    this.assets.push(asset_et);
   }
 
   copy() {
@@ -152,9 +152,9 @@ export class ContentMessage extends Message {
    * @returns {undefined} No return value
    */
   download() {
-    const assetEt = this.get_first_asset();
+    const asset_et = this.get_first_asset();
     const file_name = this.get_content_name();
-    assetEt.download(file_name);
+    asset_et.download(file_name);
   }
 
   /**
@@ -162,16 +162,16 @@ export class ContentMessage extends Message {
    * @returns {string} The content/file name.
    */
   get_content_name() {
-    const assetEt = this.get_first_asset();
-    let {file_name} = assetEt;
+    const asset_et = this.get_first_asset();
+    let {file_name} = asset_et;
 
     if (!file_name) {
       const date = moment(this.timestamp());
       file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format('LT')}`;
     }
 
-    if (assetEt.file_type) {
-      const file_extension = assetEt.file_type.split('/').pop();
+    if (asset_et.file_type) {
+      const file_extension = asset_et.file_type.split('/').pop();
       file_name = `${file_name}.${file_extension}`;
     }
 

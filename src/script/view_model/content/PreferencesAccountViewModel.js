@@ -146,7 +146,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   changeAccentColor(id) {
-    this.userRepository.changeAccentColor(id);
+    this.userRepository.change_accent_color(id);
   }
 
   changeName(viewModel, event) {
@@ -159,7 +159,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
     if (isValidName) {
-      this.userRepository.changeName(newName).then(() => {
+      this.userRepository.change_name(newName).then(() => {
         this.nameSaved(true);
         event.target.blur();
         window.setTimeout(() => this.nameSaved(false), PreferencesAccountViewModel.CONFIG.SAVE_ANIMATION_TIMEOUT);
@@ -188,7 +188,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.submittedUsername(normalizedUsername);
     this.userRepository
-      .changeUsername(normalizedUsername)
+      .change_username(normalizedUsername)
       .then(() => {
         const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
         if (isCurrentRequest) {
@@ -280,7 +280,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   clickOnDeleteAccount() {
     modals.showModal(ModalsViewModel.TYPE.CONFIRM, {
       primaryAction: {
-        action: () => this.userRepository.deleteMe(),
+        action: () => this.userRepository.delete_me(),
         text: t('modalAccountDeletionAction'),
       },
       text: {
@@ -363,7 +363,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     return validateProfileImageResolution(newUserPicture, minWidth, minHeight).then(isValid => {
       if (isValid) {
-        return this.userRepository.changePicture(newUserPicture);
+        return this.userRepository.change_picture(newUserPicture);
       }
 
       const messageString = t('modalPictureTooSmallMessage');
@@ -389,7 +389,7 @@ z.viewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     if (validateHandle(enteredUsername)) {
       this.userRepository
-        .verifyUsername(enteredUsername)
+        .verify_username(enteredUsername)
         .then(() => {
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isCurrentRequest) {

@@ -176,7 +176,7 @@ z.viewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   clickOnLike() {
-    this.conversationRepository.toggleLike(this.conversationEntity(), this.messageEntity());
+    this.conversationRepository.toggle_like(this.conversationEntity(), this.messageEntity());
   }
 
   clickOnReply() {

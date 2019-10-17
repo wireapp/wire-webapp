@@ -365,7 +365,7 @@ export class ConversationService {
    * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolves when the message was sent
    */
-  postEncryptedMessage(conversation_id, payload, precondition_option) {
+  post_encrypted_message(conversation_id, payload, precondition_option) {
     let url = `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/otr/messages`;
 
     if (Array.isArray(precondition_option)) {
@@ -482,17 +482,17 @@ export class ConversationService {
 
   /**
    * Saves a conversation entity in the local database.
-   * @param {Conversation} conversationEt - Conversation entity
+   * @param {Conversation} conversation_et - Conversation entity
    * @returns {Promise} Resolves with the conversation entity
    */
-  save_conversation_state_in_db(conversationEt) {
-    const conversationData = conversationEt.serialize();
+  save_conversation_state_in_db(conversation_et) {
+    const conversationData = conversation_et.serialize();
 
     return this.storageService
-      .save(this.CONVERSATION_STORE_NAME, conversationEt.id, conversationData)
+      .save(this.CONVERSATION_STORE_NAME, conversation_et.id, conversationData)
       .then(primary_key => {
         this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
-        return conversationEt;
+        return conversation_et;
       });
   }
 

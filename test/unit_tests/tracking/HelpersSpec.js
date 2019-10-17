@@ -27,17 +27,17 @@ import {ConversationType} from 'src/script/conversation/ConversationType';
 describe('trackingHelpers', () => {
   describe('getConversationType', () => {
     it('returns correct type for one on one conversation', () => {
-      const conversationEt = new Conversation(createRandomUuid());
-      conversationEt.type(ConversationType.ONE2ONE);
+      const conversation_et = new Conversation(createRandomUuid());
+      conversation_et.type(ConversationType.ONE2ONE);
 
-      expect(trackingHelpers.getConversationType(conversationEt)).toBe(ConversationTypeAttribute.ONE_TO_ONE);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.ONE_TO_ONE);
     });
 
     it('returns correct type for group conversation', () => {
-      const conversationEt = new Conversation(createRandomUuid());
-      conversationEt.type(ConversationType.GROUP);
+      const conversation_et = new Conversation(createRandomUuid());
+      conversation_et.type(ConversationType.GROUP);
 
-      expect(trackingHelpers.getConversationType(conversationEt)).toBe(ConversationTypeAttribute.GROUP);
+      expect(trackingHelpers.getConversationType(conversation_et)).toBe(ConversationTypeAttribute.GROUP);
     });
 
     it('returns undefined if type cannot be determined', () => {

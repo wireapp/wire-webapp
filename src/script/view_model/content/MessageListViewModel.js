@@ -117,12 +117,12 @@ class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {Conversation} [conversationEt] - Conversation entity to change to
+   * @param {Conversation} [conversation_et] - Conversation entity to change to
    * @returns {undefined} No return value
    */
-  release_conversation(conversationEt) {
-    if (conversationEt) {
-      conversationEt.release();
+  release_conversation(conversation_et) {
+    if (conversation_et) {
+      conversation_et.release();
     }
     if (this.messagesBeforeChangeSubscription) {
       this.messagesBeforeChangeSubscription.dispose();
@@ -388,7 +388,7 @@ class MessageListViewModel {
     const conversationEntity = this.conversation_repository.active_conversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
-    if (isSingleModeConversation && !userEntity.isMe) {
+    if (isSingleModeConversation && !userEntity.is_me) {
       return this.mainViewModel.panel.togglePanel(z.viewModel.PanelViewModel.STATE.CONVERSATION_DETAILS);
     }
 
@@ -402,19 +402,19 @@ class MessageListViewModel {
 
   /**
    * Triggered when user clicks on the session reset link in a decrypt error message.
-   * @param {DecryptErrorMessage} messageEt - Decrypt error message
+   * @param {DecryptErrorMessage} message_et - Decrypt error message
    * @returns {undefined} No return value
    */
-  on_session_reset_click(messageEt) {
+  on_session_reset_click(message_et) {
     const reset_progress = () =>
       window.setTimeout(() => {
-        messageEt.is_resetting_session(false);
+        message_et.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, MotionDuration.LONG);
 
-    messageEt.is_resetting_session(true);
+    message_et.is_resetting_session(true);
     this.conversation_repository
-      .reset_session(messageEt.from, messageEt.client_id, this.conversation().id)
+      .reset_session(message_et.from, message_et.client_id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -422,27 +422,27 @@ class MessageListViewModel {
   /**
    * Shows detail image view.
    *
-   * @param {Message} messageEt - Message with asset to be displayed
+   * @param {Message} message_et - Message with asset to be displayed
    * @param {UIEvent} event - Actual scroll event
    * @returns {undefined} No return value
    */
-  show_detail(messageEt, event) {
-    if (messageEt.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
+  show_detail(message_et, event) {
+    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
       return;
     }
 
     this.conversation_repository.get_events_for_category(this.conversation(), MessageCategory.IMAGE).then(items => {
-      const messageEts = items.filter(
+      const message_ets = items.filter(
         item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
       );
-      const [imageMessageEt] = messageEts.filter(item => item.id === messageEt.id);
+      const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEt || messageEt, messageEts);
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
     });
   }
 
   get_timestamp_class(messageEntity) {
-    const previousMessage = this.conversation().participatingUserIds(messageEntity);
+    const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
     }
@@ -469,30 +469,30 @@ class MessageListViewModel {
 
   /**
    * Checks its older neighbor in order to see if the avatar should be rendered or not
-   * @param {Message} messageEt - Message to check
+   * @param {Message} message_et - Message to check
    * @returns {boolean} Should user avatar be hidden
    */
-  should_hide_user_avatar(messageEt) {
+  should_hide_user_avatar(message_et) {
     // @todo avoid double check
-    if (this.get_timestamp_class(messageEt)) {
+    if (this.get_timestamp_class(message_et)) {
       return false;
     }
 
-    if (messageEt.is_content() && messageEt.replacing_message_id) {
+    if (message_et.is_content() && message_et.replacing_message_id) {
       return false;
     }
 
-    const last_message = this.conversation().participatingUserIds(messageEt);
-    return last_message && last_message.is_content() && last_message.user().id === messageEt.user().id;
+    const last_message = this.conversation().get_previous_message(message_et);
+    return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
   }
 
   /**
    * Checks if the given message is the last delivered one
-   * @param {Message} messageEt - Message to check
+   * @param {Message} message_et - Message to check
    * @returns {boolean} Message is last delivered one
    */
-  is_last_delivered_message(messageEt) {
-    return this.conversation().getLastDeliveredMessage() === messageEt;
+  is_last_delivered_message(message_et) {
+    return this.conversation().getLastDeliveredMessage() === message_et;
   }
 
   click_on_cancel_request(messageEntity) {
@@ -501,8 +501,8 @@ class MessageListViewModel {
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   }
 
-  click_on_like(messageEt, button = true) {
-    this.conversation_repository.toggleLike(this.conversation(), messageEt, button);
+  click_on_like(message_et, button = true) {
+    this.conversation_repository.toggle_like(this.conversation(), message_et, button);
   }
 
   clickOnInvitePeople() {
@@ -546,7 +546,7 @@ class MessageListViewModel {
     }
 
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
-    const isNotOwnMessage = !messageEntity.user().isMe;
+    const isNotOwnMessage = !messageEntity.user().is_me;
 
     let shouldSendReadReceipt = false;
 
@@ -618,7 +618,7 @@ class MessageListViewModel {
 
     if (userId) {
       this.userRepository
-        .getUserById(userId)
+        .get_user_by_id(userId)
         .then(userEntity => this.showUserDetails(userEntity))
         .catch(error => {
           if (error.type !== z.error.UserError.TYPE.USER_NOT_FOUND) {

@@ -35,13 +35,13 @@ describe('User Mapper', () => {
 
   describe('mapUserFromJson', () => {
     it('can convert JSON into a single user entity', () => {
-      const userEt = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload);
 
-      expect(userEt.email()).toBe('jd@wire.com');
-      expect(userEt.name()).toBe('John Doe');
-      expect(userEt.phone()).toBe('+49177123456');
-      expect(userEt.isMe).toBeFalsy();
-      expect(userEt.accent_id()).toBe(ACCENT_ID.YELLOW);
+      expect(user_et.email()).toBe('jd@wire.com');
+      expect(user_et.name()).toBe('John Doe');
+      expect(user_et.phone()).toBe('+49177123456');
+      expect(user_et.is_me).toBeFalsy();
+      expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     });
 
     it('returns undefined if input was undefined', () => {
@@ -53,89 +53,89 @@ describe('User Mapper', () => {
     it('can convert users with profile images marked as non public', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;
-      const userEt = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload);
 
-      expect(userEt.name()).toBe('John Doe');
+      expect(user_et.name()).toBe('John Doe');
     });
 
     it('will return default accent color if null/undefined', () => {
       self_user_payload.accent_id = null;
-      const userEt = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload);
 
-      expect(userEt.name()).toBe('John Doe');
-      expect(userEt.accent_id()).toBe(ACCENT_ID.BLUE);
+      expect(user_et.name()).toBe('John Doe');
+      expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
 
     it('will return default accent color if backend returns 0', () => {
       self_user_payload.accent_id = 0;
-      const userEt = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload);
 
-      expect(userEt.name()).toBe('John Doe');
-      expect(userEt.joaatHash).toBe(526273169);
-      expect(userEt.accent_id()).toBe(ACCENT_ID.BLUE);
+      expect(user_et.name()).toBe('John Doe');
+      expect(user_et.joaatHash).toBe(526273169);
+      expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
   });
 
   describe('mapSelfUserFromJson', () =>
     it('can convert JSON into a single user entity', () => {
-      const userEt = mapper.mapSelfUserFromJson(self_user_payload);
+      const user_et = mapper.mapSelfUserFromJson(self_user_payload);
 
-      expect(userEt.email()).toBe('jd@wire.com');
-      expect(userEt.name()).toBe('John Doe');
-      expect(userEt.phone()).toBe('+49177123456');
-      expect(userEt.isMe).toBeTruthy();
-      expect(userEt.locale).toBe('en');
-      expect(userEt.accent_id()).toBe(ACCENT_ID.YELLOW);
+      expect(user_et.email()).toBe('jd@wire.com');
+      expect(user_et.name()).toBe('John Doe');
+      expect(user_et.phone()).toBe('+49177123456');
+      expect(user_et.is_me).toBeTruthy();
+      expect(user_et.locale).toBe('en');
+      expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
     }));
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {
-      const userEts = mapper.mapUsersFromJson(payload.users.get.many);
+      const user_ets = mapper.mapUsersFromJson(payload.users.get.many);
 
-      expect(userEts.length).toBe(2);
-      expect(userEts[0].email()).toBe('jd@wire.com');
-      expect(userEts[1].name()).toBe('Jane Roe');
+      expect(user_ets.length).toBe(2);
+      expect(user_ets[0].email()).toBe('jd@wire.com');
+      expect(user_ets[1].name()).toBe('Jane Roe');
     });
 
     it('returns an empty array if input was undefined', () => {
-      const userEts = mapper.mapUsersFromJson(undefined);
+      const user_ets = mapper.mapUsersFromJson(undefined);
 
-      expect(userEts).toBeDefined();
-      expect(userEts.length).toBe(0);
+      expect(user_ets).toBeDefined();
+      expect(user_ets.length).toBe(0);
     });
 
     it('returns an empty array if input was an empty array', () => {
-      const userEts = mapper.mapUsersFromJson([]);
+      const user_ets = mapper.mapUsersFromJson([]);
 
-      expect(userEts).toBeDefined();
-      expect(userEts.length).toBe(0);
+      expect(user_ets).toBeDefined();
+      expect(user_ets.length).toBe(0);
     });
   });
 
   describe('updateUserFromObject', () => {
     it('can update the accent color', () => {
-      const userEt = new User();
-      userEt.id = entities.user.john_doe.id;
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(userEt, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
       expect(updated_user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
 
     it('can update the user name', () => {
-      const userEt = new User();
-      userEt.id = entities.user.john_doe.id;
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
-      const updated_user_et = mapper.updateUserFromObject(userEt, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
 
     it('can update the user handle', () => {
-      const userEt = new User();
-      userEt.id = entities.user.john_doe.id;
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(userEt, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
@@ -161,17 +161,17 @@ describe('User Mapper', () => {
     });
 
     it('cannot update the user name of a wrong user', () => {
-      const userEt = new User();
-      userEt.id = entities.user.john_doe.id;
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const functionCall = () => mapper.updateUserFromObject(userEt, data);
+      const functionCall = () => mapper.updateUserFromObject(user_et, data);
 
       expect(functionCall).toThrow();
     });
 
     it('can update user with v3 assets', () => {
-      const userEt = new User();
-      userEt.id = entities.user.john_doe.id;
+      const user_et = new User();
+      user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
           {key: createRandomUuid(), size: 'preview', type: 'image'},
@@ -180,7 +180,7 @@ describe('User Mapper', () => {
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,
       };
-      const updated_user_et = mapper.updateUserFromObject(userEt, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data);
 
       expect(updated_user_et.previewPictureResource()).toBeDefined();
       expect(updated_user_et.mediumPictureResource()).toBeDefined();

@@ -33,7 +33,7 @@ describe('user-actions', () => {
         expected: ['go-profile', 'do-leave'],
         getParams: () => {
           const user = new User();
-          user.isMe = true;
+          user.is_me = true;
 
           const conversation = new Conversation();
           spyOn(conversation, 'isGroup').and.returnValue(true);
@@ -45,7 +45,7 @@ describe('user-actions', () => {
         expected: ['go-profile'],
         getParams: () => {
           const user = new User();
-          user.isMe = true;
+          user.is_me = true;
           const conversation = new Conversation();
           return {conversation: () => conversation, isSelfActivated: false, user: () => user};
         },

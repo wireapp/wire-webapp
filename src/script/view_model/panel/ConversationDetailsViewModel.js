@@ -79,7 +79,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
         this.userParticipants.removeAll();
 
         this.activeConversation()
-          .participatingUserEts()
+          .participating_user_ets()
           .map(userEntity => {
             if (userEntity.isService) {
               return this.serviceParticipants.push(userEntity);

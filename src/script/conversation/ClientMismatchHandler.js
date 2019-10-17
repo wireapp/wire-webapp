@@ -69,7 +69,7 @@ export class ClientMismatchHandler {
 
     const _removeDeletedClient = (userId, clientId) => {
       delete payload.recipients[userId][clientId];
-      return this.userRepository.removeClientFromUser(userId, clientId);
+      return this.userRepository.remove_client_from_user(userId, clientId);
     };
 
     const _removeDeletedUser = userId => {
@@ -112,7 +112,7 @@ export class ClientMismatchHandler {
       participantsCheckPromise = this.conversationRepository
         .get_conversation_by_id(conversationId)
         .then(conversationEntity => {
-          const knownUserIds = conversationEntity.participatingUserIds();
+          const knownUserIds = conversationEntity.participating_user_ids();
           const unknownUserIds = getDifference(knownUserIds, missingUserIds);
 
           if (unknownUserIds.length) {

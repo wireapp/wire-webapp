@@ -147,7 +147,7 @@ class AuthViewModel {
     this.remove_form_error = ko.observable(false);
     this.device_modal = undefined;
     this.permanent_devices = ko.pureComputed(() => {
-      return this.client_repository.clients().filter(clientEt => clientEt.type === ClientType.PERMANENT);
+      return this.client_repository.clients().filter(client_et => client_et.type === ClientType.PERMANENT);
     });
 
     this.code_digits = ko.observableArray([
@@ -911,10 +911,10 @@ class AuthViewModel {
     this.web_socket_service.connect(notification => {
       const [event] = notification.payload;
       const {type: event_type, user} = event;
-      const isUserUpdate = event_type === BackendEvent.USER.UPDATE;
+      const is_user_update = event_type === BackendEvent.USER.UPDATE;
 
-      this.logger.info(`»» Event: '${event_type}'`, {eventJson: JSON.stringify(event), eventObject: event});
-      if (isUserUpdate && user.email) {
+      this.logger.info(`»» Event: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      if (is_user_update && user.email) {
         this.logger.info('User account verified. User can now login.');
         this._authentication_successful();
       }
@@ -1520,9 +1520,9 @@ class AuthViewModel {
 
         const client_not_validated = error.type === z.error.ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
-          const clientEt = this.client_repository.currentClient();
+          const client_et = this.client_repository.currentClient();
           this.client_repository.currentClient(undefined);
-          return this.cryptography_repository.resetCryptobox(clientEt).then(deleted_everything => {
+          return this.cryptography_repository.resetCryptobox(client_et).then(deleted_everything => {
             if (deleted_everything) {
               this.logger.info('Database was completely reset. Reinitializing storage...');
               return this.storage_repository.storageService.init(this.self_user().id);

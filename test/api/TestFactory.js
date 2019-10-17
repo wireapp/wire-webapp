@@ -134,7 +134,7 @@ window.TestFactory = class TestFactory {
     const user = new User(entities.user.john_doe.id);
     user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
-    user.isMe = true;
+    user.is_me = true;
     user.locale = entities.user.john_doe.locale;
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
@@ -222,7 +222,7 @@ window.TestFactory = class TestFactory {
       serverTimeHandler,
       TestFactory.propertyRepository,
     );
-    TestFactory.user_repository.saveUser(TestFactory.client_repository.selfUser(), true);
+    TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
     return TestFactory.user_repository;
   }

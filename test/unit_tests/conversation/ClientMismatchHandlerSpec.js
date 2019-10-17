@@ -64,7 +64,7 @@ describe('ClientMismatchHandler', () => {
     });
 
     beforeEach(() => {
-      spyOn(TestFactory.user_repository, 'removeClientFromUser').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.user_repository, 'remove_client_from_user').and.returnValue(Promise.resolve());
 
       payload = {
         recipients: {
@@ -81,7 +81,7 @@ describe('ClientMismatchHandler', () => {
       const knownUserId = johnDoe.user_id;
       const unknownUserId = janeRoe.user_id;
 
-      conversationEntity.participatingUserIds([knownUserId]);
+      conversationEntity.participating_user_ids([knownUserId]);
 
       clientMismatch = {
         deleted: {},
@@ -180,7 +180,7 @@ describe('ClientMismatchHandler', () => {
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updatedPayload => {
-          expect(TestFactory.user_repository.removeClientFromUser).toHaveBeenCalled();
+          expect(TestFactory.user_repository.remove_client_from_user).toHaveBeenCalled();
           expect(Object.keys(updatedPayload.recipients).length).toBe(0);
         });
     });
@@ -199,7 +199,7 @@ describe('ClientMismatchHandler', () => {
       return TestFactory.conversation_repository.clientMismatchHandler
         .onClientMismatch(eventInfoEntity, clientMismatch, payload)
         .then(updated_payload => {
-          expect(TestFactory.user_repository.removeClientFromUser).not.toHaveBeenCalled();
+          expect(TestFactory.user_repository.remove_client_from_user).not.toHaveBeenCalled();
           expect(Object.keys(updated_payload.recipients).length).toBe(0);
         });
     });
