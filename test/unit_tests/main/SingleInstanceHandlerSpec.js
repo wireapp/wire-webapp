@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-check
-
 import {SingleInstanceHandler} from 'src/script/main/SingleInstanceHandler';
 import Cookies from 'js-cookie';
 
