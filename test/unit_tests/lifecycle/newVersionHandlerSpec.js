@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-check
-
 import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
 
 describe('newVersionHandler', () => {
@@ -48,7 +46,7 @@ describe('newVersionHandler', () => {
     it('warns the app if a new version is available', done => {
       jasmine.clock().install();
       const testData = {
-        callback: () => {},
+        callback: currentVersion => {},
         currentVersion: '2019-03-04',
         response: {version: '2019-03-19'},
       };
