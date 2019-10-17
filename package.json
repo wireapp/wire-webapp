@@ -46,7 +46,7 @@
     "uint32": "0.2.1",
     "underscore": "1.9.1",
     "url-search-params-polyfill": "7.0.0",
-    "uuidjs": "4.2.3",
+    "uuidjs": "4.2.4",
     "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
