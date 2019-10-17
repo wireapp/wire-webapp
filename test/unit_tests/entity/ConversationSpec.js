@@ -555,36 +555,36 @@ describe('Conversation', () => {
     });
 
     it('is verified when self user has no remote clients', () => {
-      const verified_client_et = new ClientEntity();
-      verified_client_et.meta.isVerified(true);
+      const verified_clientEt = new ClientEntity();
+      verified_clientEt.meta.isVerified(true);
 
       const self_user_et = new User(createRandomUuid());
       self_user_et.isMe = true;
       conversationEt.selfUser(self_user_et);
 
       const userEt = new User();
-      userEt.devices.push(verified_client_et);
+      userEt.devices.push(verified_clientEt);
       conversationEt.participatingUserEts.push(userEt);
 
       expect(conversationEt.is_verified()).toBeTruthy();
     });
 
     it('is not verified when participant has unverified device', () => {
-      const unverified_client_et = new ClientEntity();
-      const verified_client_et = new ClientEntity();
-      verified_client_et.meta.isVerified(true);
+      const unverified_clientEt = new ClientEntity();
+      const verified_clientEt = new ClientEntity();
+      verified_clientEt.meta.isVerified(true);
 
       const self_user_et = new User();
       self_user_et.isMe = true;
-      self_user_et.devices.push(verified_client_et);
+      self_user_et.devices.push(verified_clientEt);
       conversationEt.selfUser(self_user_et);
 
       const userEt = new User();
-      userEt.devices.push(unverified_client_et);
-      userEt.devices.push(verified_client_et);
+      userEt.devices.push(unverified_clientEt);
+      userEt.devices.push(verified_clientEt);
 
       const user_et_two = new User();
-      user_et_two.devices.push(verified_client_et);
+      user_et_two.devices.push(verified_clientEt);
 
       conversationEt.participatingUserEts.push(userEt, user_et_two);
 
@@ -592,20 +592,20 @@ describe('Conversation', () => {
     });
 
     it('is verified when all users are verified', () => {
-      const verified_client_et = new ClientEntity();
-      verified_client_et.meta.isVerified(true);
+      const verified_clientEt = new ClientEntity();
+      verified_clientEt.meta.isVerified(true);
 
       const self_user_et = new User();
       self_user_et.isMe = true;
-      self_user_et.devices.push(verified_client_et);
+      self_user_et.devices.push(verified_clientEt);
       conversationEt.selfUser(self_user_et);
 
       const userEt = new User();
-      userEt.devices.push(verified_client_et);
-      userEt.devices.push(verified_client_et);
+      userEt.devices.push(verified_clientEt);
+      userEt.devices.push(verified_clientEt);
 
       const user_et_two = new User();
-      user_et_two.devices.push(verified_client_et);
+      user_et_two.devices.push(verified_clientEt);
 
       conversationEt.participatingUserEts.push(userEt, user_et_two);
 

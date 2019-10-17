@@ -86,21 +86,21 @@ describe('Conversation Mapper', () => {
 
     it('maps multiple conversations', () => {
       const conversations = payload.conversations.get.conversations;
-      const conversation_ets = conversation_mapper.mapConversations(conversations);
+      const conversationEts = conversation_mapper.mapConversations(conversations);
 
-      expect(conversation_ets.length).toBe(conversations.length);
+      expect(conversationEts.length).toBe(conversations.length);
 
-      const [first_conversation_et, second_conversation_et] = conversation_ets;
+      const [firstConversationEt, secondConversationEt] = conversationEts;
 
-      expect(first_conversation_et.id).toBe(conversations[0].id);
-      expect(first_conversation_et.last_event_timestamp()).toBe(1);
-      expect(first_conversation_et.last_server_timestamp()).toBe(1);
-      expect(first_conversation_et.name()).toBe(conversations[0].name);
+      expect(firstConversationEt.id).toBe(conversations[0].id);
+      expect(firstConversationEt.last_event_timestamp()).toBe(1);
+      expect(firstConversationEt.last_server_timestamp()).toBe(1);
+      expect(firstConversationEt.name()).toBe(conversations[0].name);
 
-      expect(second_conversation_et.id).toBe(conversations[1].id);
-      expect(second_conversation_et.last_event_timestamp()).toBe(2);
-      expect(second_conversation_et.last_server_timestamp()).toBe(2);
-      expect(second_conversation_et.name()).toBe(conversations[1].name);
+      expect(secondConversationEt.id).toBe(conversations[1].id);
+      expect(secondConversationEt.last_event_timestamp()).toBe(2);
+      expect(secondConversationEt.last_server_timestamp()).toBe(2);
+      expect(secondConversationEt.name()).toBe(conversations[1].name);
     });
 
     it('maps a team conversation', () => {
@@ -126,11 +126,11 @@ describe('Conversation Mapper', () => {
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
         name: 'New foo bar conversation name',
       };
-      const updated_conversation_et = conversation_mapper.updateProperties(conversationEt, data);
+      const updatedConversationEt = conversation_mapper.updateProperties(conversationEt, data);
 
-      expect(updated_conversation_et.name()).toBe(data.name);
-      expect(updated_conversation_et.id).not.toBe(data.id);
-      expect(updated_conversation_et.creator).toBe(data.creator);
+      expect(updatedConversationEt.name()).toBe(data.name);
+      expect(updatedConversationEt.id).not.toBe(data.id);
+      expect(updatedConversationEt.creator).toBe(data.creator);
     });
 
     it('only updates existing properties', () => {
@@ -169,24 +169,24 @@ describe('Conversation Mapper', () => {
 
     it('can update the self status if the user leaves a conversation', () => {
       const self_status = {status: ConversationStatus.PAST_MEMBER};
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.removed_from_conversation()).toBeTruthy();
+      expect(updatedConversationEt.removed_from_conversation()).toBeTruthy();
     });
 
     it('can update the self status if the user joins a conversation', () => {
       const self_status = {status: ConversationStatus.CURRENT_MEMBER};
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.removed_from_conversation()).toBeFalsy();
+      expect(updatedConversationEt.removed_from_conversation()).toBeFalsy();
     });
 
     it('can update the self status with last event timestamp', () => {
       const timestamp = Date.now();
       const self_status = {last_event_timestamp: timestamp};
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
+      expect(updatedConversationEt.last_event_timestamp()).toBe(timestamp);
     });
 
     it('can update the self status using otr_archived', () => {
@@ -196,10 +196,10 @@ describe('Conversation Mapper', () => {
         otr_archived: true,
         otr_archived_ref: new Date(timestamp).toISOString(),
       };
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archivedState()).toBe(true);
+      expect(updatedConversationEt.archivedTimestamp()).toBe(timestamp);
+      expect(updatedConversationEt.archivedState()).toBe(true);
     });
 
     it('can update the self status using archived timestamp', () => {
@@ -208,10 +208,10 @@ describe('Conversation Mapper', () => {
         archived_state: true,
         archived_timestamp: timestamp,
       };
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archivedState()).toBe(true);
+      expect(updatedConversationEt.archivedTimestamp()).toBe(timestamp);
+      expect(updatedConversationEt.archivedState()).toBe(true);
     });
 
     it('can update the self when archive state is false', () => {
@@ -220,10 +220,10 @@ describe('Conversation Mapper', () => {
         archived_state: false,
         archived_timestamp: timestamp,
       };
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.archivedTimestamp()).toBe(timestamp);
-      expect(updated_conversation_et.archivedState()).toBe(false);
+      expect(updatedConversationEt.archivedTimestamp()).toBe(timestamp);
+      expect(updatedConversationEt.archivedState()).toBe(false);
     });
 
     it('can update the self status if a conversation is cleared', () => {
@@ -232,18 +232,18 @@ describe('Conversation Mapper', () => {
         cleared_timestamp: timestamp,
         last_event_timestamp: timestamp,
       };
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.cleared_timestamp()).toBe(timestamp);
+      expect(updatedConversationEt.last_event_timestamp()).toBe(timestamp);
+      expect(updatedConversationEt.cleared_timestamp()).toBe(timestamp);
     });
 
     it('can update the self status if a conversation is read', () => {
       const timestamp = Date.now();
       const self_status = {last_read_timestamp: timestamp};
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.last_read_timestamp()).toBe(timestamp);
+      expect(updatedConversationEt.last_read_timestamp()).toBe(timestamp);
     });
 
     it('can update the self status if a conversation is muted', () => {
@@ -254,20 +254,20 @@ describe('Conversation Mapper', () => {
         otr_muted: true,
         otr_muted_ref: new Date(timestamp).toISOString(),
       };
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.last_event_timestamp()).toBe(timestamp);
-      expect(updated_conversation_et.mutedTimestamp()).toBe(timestamp);
-      expect(updated_conversation_et.notificationState()).toBe(NOTIFICATION_STATE.NOTHING);
+      expect(updatedConversationEt.last_event_timestamp()).toBe(timestamp);
+      expect(updatedConversationEt.mutedTimestamp()).toBe(timestamp);
+      expect(updatedConversationEt.notificationState()).toBe(NOTIFICATION_STATE.NOTHING);
     });
 
     it('accepts string values which must be parsed later on', () => {
       conversationEt.last_read_timestamp(0);
       const self_status = {last_read_timestamp: '1480339377099'};
       const last_read_timestamp_number = window.parseInt(self_status.last_read_timestamp, 10);
-      const updated_conversation_et = conversation_mapper.updateSelfStatus(conversationEt, self_status);
+      const updatedConversationEt = conversation_mapper.updateSelfStatus(conversationEt, self_status);
 
-      expect(updated_conversation_et.last_read_timestamp()).toBe(last_read_timestamp_number);
+      expect(updatedConversationEt.last_read_timestamp()).toBe(last_read_timestamp_number);
     });
   });
 

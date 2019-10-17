@@ -38,9 +38,9 @@ export class ContentMessage extends Message {
     this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
     this.reactions = ko.observable({});
-    this.reactions_user_ets = ko.observableArray();
+    this.reactionsUserEts = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
-      this.reactions_user_ets()
+      this.reactionsUserEts()
         .map(userEt => userEt.first_name())
         .join(', ');
     });
@@ -60,22 +60,22 @@ export class ContentMessage extends Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter(userEt => userEt.isMe);
+        const likes = this.reactionsUserEts().filter(userEt => userEt.isMe);
         return likes.length === 1;
       },
       write: value => {
         return this.is_liked_provisional(value);
       },
     });
-    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(userEt => !userEt.isMe));
+    this.other_likes = ko.pureComputed(() => this.reactionsUserEts().filter(userEt => !userEt.isMe));
 
     this.like_caption = ko.pureComputed(() => {
-      if (this.reactions_user_ets().length <= 5) {
-        return this.reactions_user_ets()
+      if (this.reactionsUserEts().length <= 5) {
+        return this.reactionsUserEts()
           .map(userEt => userEt.first_name())
           .join(', ');
       }
-      return t('conversationLikesCaption', this.reactions_user_ets().length);
+      return t('conversationLikesCaption', this.reactionsUserEts().length);
     });
   }
 

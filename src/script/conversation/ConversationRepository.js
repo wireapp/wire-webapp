@@ -2433,7 +2433,7 @@ export class ConversationRepository {
             continue;
           }
 
-          recipients[userEt.id] = userEt.devices().map(client_et => client_et.id);
+          recipients[userEt.id] = userEt.devices().map(clientEt => clientEt.id);
         }
       }
 
@@ -3986,10 +3986,10 @@ export class ConversationRepository {
       if (messageEntity.is_content()) {
         const userIds = Object.keys(messageEntity.reactions());
 
-        messageEntity.reactions_user_ets.removeAll();
+        messageEntity.reactionsUserEts.removeAll();
         if (userIds.length) {
           return this.user_repository.getUsersById(userIds).then(userEntities => {
-            messageEntity.reactions_user_ets(userEntities);
+            messageEntity.reactionsUserEts(userEntities);
             return messageEntity;
           });
         }

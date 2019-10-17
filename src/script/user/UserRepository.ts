@@ -374,10 +374,10 @@ export class UserRepository {
   /**
    * Update clients for given user.
    */
-  updateClientsFromUser(user_id: string, client_ets: ClientEntity[]): void {
+  updateClientsFromUser(user_id: string, clientEts: ClientEntity[]): void {
     this.getUserById(user_id).then(userEt => {
-      userEt.devices(client_ets);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, client_ets);
+      userEt.devices(clientEts);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, user_id, clientEts);
     });
   }
 
@@ -599,17 +599,17 @@ export class UserRepository {
       return this.findUserById(user_id) || user_id;
     };
 
-    const find_users = user_ids.map(user_id => _find_user(user_id));
+    const findUsers = user_ids.map(user_id => _find_user(user_id));
 
-    return Promise.all(find_users).then(resolve_array => {
-      const known_user_ets = resolve_array.filter(array_item => typeof array_item !== 'string') as User[];
-      const unknown_user_ids = resolve_array.filter(array_item => typeof array_item === 'string') as string[];
+    return Promise.all(findUsers).then(resolve_array => {
+      const knownUserEts = resolve_array.filter(arrayItem => typeof arrayItem !== 'string') as User[];
+      const unknownUserIds = resolve_array.filter(arrayItem => typeof arrayItem === 'string') as string[];
 
-      if (offline || !unknown_user_ids.length) {
-        return known_user_ets;
+      if (offline || !unknownUserIds.length) {
+        return knownUserEts;
       }
 
-      return this.fetchUsersById(unknown_user_ids).then(userEts => known_user_ets.concat(userEts));
+      return this.fetchUsersById(unknownUserIds).then(userEts => knownUserEts.concat(userEts));
     });
   }
 
