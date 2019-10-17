@@ -176,7 +176,7 @@ export class Message {
    * Check if message can be deleted.
    * @returns {boolean} True, if message is deletable.
    */
-  is_deletable() {
+  isDeletable() {
     return this.status() !== StatusType.SENDING;
   }
 

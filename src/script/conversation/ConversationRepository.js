@@ -176,7 +176,7 @@ export class ConversationRepository {
     this.logger = getLogger('ConversationRepository');
 
     this.conversationMapper = new ConversationMapper();
-    this.event_mapper = new EventMapper();
+    this.eventMapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this,
       this.eventRepository,
@@ -541,7 +541,7 @@ export class ConversationRepository {
       ? Promise.resolve(messageEntity)
       : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
           if (event) {
-            return this.event_mapper.mapJsonEvent(event, conversationEntity);
+            return this.eventMapper.mapJsonEvent(event, conversationEntity);
           }
           throw new z.error.ConversationError(z.error.ConversationError.TYPE.MESSAGE_NOT_FOUND);
         });
@@ -691,7 +691,7 @@ export class ConversationRepository {
   get_events_for_category(conversationEntity, category = MessageCategory.NONE) {
     return this.eventService
       .loadEventsWithCategory(conversationEntity.id, category)
-      .then(events => this.event_mapper.mapJsonEvents(events, conversationEntity))
+      .then(events => this.eventMapper.mapJsonEvents(events, conversationEntity))
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities));
   }
 
@@ -709,7 +709,7 @@ export class ConversationRepository {
 
     return this.conversation_service
       .search_in_conversation(conversationEntity.id, query)
-      .then(events => this.event_mapper.mapJsonEvents(events, conversationEntity))
+      .then(events => this.eventMapper.mapJsonEvents(events, conversationEntity))
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
       .then(messageEntities => ({messageEntities, query}));
   }
@@ -3435,7 +3435,7 @@ export class ConversationRepository {
   }
 
   _on1to1Creation(conversationEntity, eventJson) {
-    return this.event_mapper
+    return this.eventMapper
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
@@ -3507,7 +3507,7 @@ export class ConversationRepository {
   }
 
   _onGroupCreation(conversationEntity, eventJson) {
-    return this.event_mapper
+    return this.eventMapper
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
@@ -3862,7 +3862,7 @@ export class ConversationRepository {
   //##############################################################################
 
   _initMessageEntity(conversationEntity, eventJson) {
-    return this.event_mapper
+    return this.eventMapper
       .mapJsonEvent(eventJson, conversationEntity, true)
       .then(messageEntity => this._updateMessageUserEntities(messageEntity));
   }
@@ -3872,7 +3872,7 @@ export class ConversationRepository {
     if (!originalMessage) {
       return undefined;
     }
-    const replacedMessageEntity = this.event_mapper.updateMessageEvent(originalMessage, newData);
+    const replacedMessageEntity = this.eventMapper.updateMessageEvent(originalMessage, newData);
     this.ephemeralHandler.validateMessage(replacedMessageEntity);
     return replacedMessageEntity;
   }
@@ -3907,7 +3907,7 @@ export class ConversationRepository {
    * @returns {Promise} Resolves with an array of mapped messages
    */
   _addEventsToConversation(events, conversationEntity, prepend = true) {
-    return this.event_mapper
+    return this.eventMapper
       .mapJsonEvents(events, conversationEntity, true)
       .then(messageEntities => this._updateMessagesUserEntities(messageEntities))
       .then(messageEntities => this.ephemeralHandler.validateMessages(messageEntities))

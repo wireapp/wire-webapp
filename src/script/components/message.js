@@ -205,7 +205,7 @@ class Message {
       });
     }
 
-    if (messageEntity.is_deletable()) {
+    if (messageEntity.isDeletable()) {
       entries.push({
         click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
         label: t('conversationContextMenuDelete'),

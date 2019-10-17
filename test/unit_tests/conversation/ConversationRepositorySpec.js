@@ -569,7 +569,7 @@ describe('ConversationRepository', () => {
       conversationEt = new Conversation(createRandomUuid());
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const bad_message = {
+      const badMessage = {
         'conversation': `${conversationEt.id}`,
         'id': 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
         'from': '532af01e-1e24-4366-aacf-33b67d4ee376',
@@ -577,7 +577,7 @@ describe('ConversationRepository', () => {
         'type': 'conversation.message-add',
       };
       // prettier-ignore
-      const good_message = {
+      const goodMessage = {
         'conversation': `${conversationEt.id}`,
         'id': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
         'from': '8b497692-7a38-4a5d-8287-e3d1006577d6',
@@ -587,11 +587,11 @@ describe('ConversationRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const bad_message_key = `${conversationEt.id}@${bad_message.from}@NaN`;
+      const bad_message_key = `${conversationEt.id}@${badMessage.from}@NaN`;
 
       return storage_service
-        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
+        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, badMessage)
+        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, goodMessage))
         .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversationEt))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);

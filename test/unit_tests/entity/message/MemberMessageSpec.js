@@ -84,7 +84,7 @@ describe('Member Message', () => {
     });
   });
 
-  describe('is_deletable', () => {
+  describe('isDeletable', () => {
     let messageEt = null;
 
     beforeEach(() => {
@@ -94,14 +94,14 @@ describe('Member Message', () => {
     it('should be deletable when message is not sending', () => {
       messageEt.assets.push(new Text());
 
-      expect(messageEt.is_deletable()).toBe(true);
+      expect(messageEt.isDeletable()).toBe(true);
     });
 
     it('should not be deletable while message is sending', () => {
       messageEt.assets.push(new Text());
       messageEt.status(StatusType.SENDING);
 
-      expect(messageEt.is_deletable()).toBe(false);
+      expect(messageEt.isDeletable()).toBe(false);
     });
 
     it('should be deletable when message is a file and uploading or downloading', () => {
@@ -109,7 +109,7 @@ describe('Member Message', () => {
       file_et.status(AssetTransferState.UPLOADING);
       messageEt.assets.push(file_et);
 
-      expect(messageEt.is_deletable()).toBe(true);
+      expect(messageEt.isDeletable()).toBe(true);
     });
   });
 
