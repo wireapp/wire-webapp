@@ -189,12 +189,12 @@ describe('ConversationRepository', () => {
       };
 
       const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromBackend])[0];
-      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.participatingUserEts.push(conversationPartner);
       conversationEntity.selfUser(TestFactory.user_repository.self());
 
       expect(conversationEntity._isInitialized()).toBe(true);
       expect(conversationEntity.hasLegalHold()).toBe(false);
-      expect(conversationEntity.participating_user_ets().length).toBe(1);
+      expect(conversationEntity.participatingUserEts().length).toBe(1);
 
       const eventJson = {
         category: MessageCategory.TEXT,
@@ -314,7 +314,7 @@ describe('ConversationRepository', () => {
       }
 
       const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
-      conversationEntity.participating_user_ets.push(conversationPartner);
+      conversationEntity.participatingUserEts.push(conversationPartner);
       conversationEntity.selfUser(TestFactory.user_repository.self());
       // Legal hold status is "on" because our conversation partner has a legal hold client
       expect(conversationEntity.hasLegalHold()).toBe(true);
@@ -506,7 +506,7 @@ describe('ConversationRepository', () => {
       const group_c = _generate_conversation(ConversationType.GROUP);
       self_user_et = new User();
       self_user_et.name('John');
-      group_c.participating_user_ets.push(self_user_et);
+      group_c.participatingUserEts.push(self_user_et);
 
       const group_cleared = _generate_conversation(ConversationType.GROUP);
       group_cleared.name('Cleared');
@@ -1421,22 +1421,22 @@ describe('ConversationRepository', () => {
 
       const dudes = _generate_conversation(ConversationType.GROUP);
       dudes.name('Web Dudes');
-      dudes.participating_user_ets.push(bob);
-      dudes.participating_user_ets.push(john);
+      dudes.participatingUserEts.push(bob);
+      dudes.participatingUserEts.push(john);
 
       const gals = _generate_conversation(ConversationType.GROUP);
       gals.name('Web Gals');
-      gals.participating_user_ets.push(anne);
-      gals.participating_user_ets.push(jane);
-      gals.participating_user_ets.push(lara);
+      gals.participatingUserEts.push(anne);
+      gals.participatingUserEts.push(jane);
+      gals.participatingUserEts.push(lara);
 
       const mixed_group = _generate_conversation(ConversationType.GROUP);
       mixed_group.name('Web Dudes & Gals');
-      mixed_group.participating_user_ets.push(anne);
-      mixed_group.participating_user_ets.push(bob);
-      mixed_group.participating_user_ets.push(jane);
-      mixed_group.participating_user_ets.push(john);
-      mixed_group.participating_user_ets.push(lara);
+      mixed_group.participatingUserEts.push(anne);
+      mixed_group.participatingUserEts.push(bob);
+      mixed_group.participatingUserEts.push(jane);
+      mixed_group.participatingUserEts.push(john);
+      mixed_group.participatingUserEts.push(lara);
 
       return Promise.all([
         TestFactory.conversation_repository.save_conversation(dudes),
@@ -1455,7 +1455,7 @@ describe('ConversationRepository', () => {
 
     it('should generate a user-client-map including users with clients', () => {
       const [, dudes] = TestFactory.conversation_repository.conversations();
-      const user_ets = dudes.participating_user_ets();
+      const user_ets = dudes.participatingUserEts();
 
       return TestFactory.conversation_repository.create_recipients(dudes.id).then(recipients => {
         expect(Object.keys(recipients).length).toBe(2);

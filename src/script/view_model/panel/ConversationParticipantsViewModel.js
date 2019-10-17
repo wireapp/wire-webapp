@@ -33,7 +33,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     this.participants = ko.pureComputed(() => {
       if (this.activeConversation()) {
         return this.activeConversation()
-          .participating_user_ets()
+          .participatingUserEts()
           .filter(userEntity => !userEntity.isService);
       }
       return [];

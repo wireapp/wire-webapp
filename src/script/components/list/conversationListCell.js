@@ -59,7 +59,7 @@ class ConversationListCell {
       );
     }
 
-    this.users = this.conversation.participating_user_ets;
+    this.users = this.conversation.participatingUserEts;
 
     this.cell_state = ko.observable('');
 

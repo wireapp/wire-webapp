@@ -179,7 +179,7 @@ z.viewModel.content.InputBarViewModel = class InputBarViewModel {
       }
 
       const candidates = this.conversationEntity()
-        .participating_user_ets()
+        .participatingUserEts()
         .filter(userEntity => !userEntity.isService);
       return this.searchRepository.searchUserInSet(this.editedMention().term, candidates);
     });

@@ -73,13 +73,13 @@ export class Conversation {
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
-    this.participating_user_ets = ko.observableArray([]); // Does not include self user
+    this.participatingUserEts = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
     this.selfUser = ko.observable();
 
     this.hasCreationMessage = false;
 
-    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
+    this.firstUserEntity = ko.pureComputed(() => this.participatingUserEts()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
     this.isGuest = ko.observable(false);
@@ -107,10 +107,10 @@ export class Conversation {
     this.isSelf = ko.pureComputed(() => this.type() === ConversationType.SELF);
 
     this.hasGuest = ko.pureComputed(() => {
-      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
+      const hasGuestUser = this.participatingUserEts().some(userEntity => userEntity.isGuest());
       return hasGuestUser && this.isGroup() && this.selfUser() && this.selfUser().inTeam();
     });
-    this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
+    this.hasService = ko.pureComputed(() => this.participatingUserEts().some(userEntity => userEntity.isService));
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new ConnectionEntity());
@@ -306,7 +306,7 @@ export class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
-        const [userEntity] = this.participating_user_ets();
+        const [userEntity] = this.participatingUserEts();
         const userName = userEntity && userEntity.name();
         return userName ? userName : '…';
       }
@@ -316,10 +316,10 @@ export class Conversation {
           return this.name();
         }
 
-        const hasUserEntities = !!this.participating_user_ets().length;
+        const hasUserEntities = !!this.participatingUserEts().length;
         if (hasUserEntities) {
-          const isJustServices = this.participating_user_ets().every(userEntity => userEntity.isService);
-          const joinedNames = this.participating_user_ets()
+          const isJustServices = this.participatingUserEts().every(userEntity => userEntity.isService);
+          const joinedNames = this.participatingUserEts()
             .filter(userEntity => isJustServices || !userEntity.isService)
             .map(userEntity => userEntity.first_name())
             .join(', ');
@@ -344,7 +344,7 @@ export class Conversation {
   }
 
   _isInitialized() {
-    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+    const hasMappedUsers = this.participatingUserEts().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
@@ -370,7 +370,7 @@ export class Conversation {
   }
 
   get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
+    return [this.selfUser()].concat(this.participatingUserEts());
   }
 
   persistState() {
@@ -498,7 +498,7 @@ export class Conversation {
   }
 
   getNumberOfServices() {
-    return this.participating_user_ets().filter(userEntity => userEntity.isService).length;
+    return this.participatingUserEts().filter(userEntity => userEntity.isService).length;
   }
 
   getNumberOfParticipants(countSelf = true, countServices = true) {
@@ -509,9 +509,9 @@ export class Conversation {
   }
 
   getNumberOfClients() {
-    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    const participantsMapped = this.participating_user_ids().length === this.participatingUserEts().length;
     if (participantsMapped) {
-      return this.participating_user_ets().reduce((accumulator, userEntity) => {
+      return this.participatingUserEts().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
           ? accumulator + userEntity.devices().length
           : accumulator + ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
@@ -729,15 +729,15 @@ export class Conversation {
 
   getTemporaryGuests() {
     const userEntities = this.selfUser()
-      ? this.participating_user_ets().concat(this.selfUser())
-      : this.participating_user_ets();
+      ? this.participatingUserEts().concat(this.selfUser())
+      : this.participatingUserEts();
     return userEntities.filter(userEntity => userEntity.isTemporaryGuest());
   }
 
   getUsersWithUnverifiedClients() {
     const userEntities = this.selfUser()
-      ? this.participating_user_ets().concat(this.selfUser())
-      : this.participating_user_ets();
+      ? this.participatingUserEts().concat(this.selfUser())
+      : this.participatingUserEts();
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 

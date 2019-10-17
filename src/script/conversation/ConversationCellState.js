@@ -344,7 +344,7 @@ const _getStateUnreadMessage = {
 
 const _getStateUserName = {
   description: conversationEntity => {
-    const [userEntity] = conversationEntity.participating_user_ets();
+    const [userEntity] = conversationEntity.participatingUserEts();
     const hasUsername = userEntity && userEntity.username();
     return hasUsername ? `@${userEntity.username()}` : '';
   },

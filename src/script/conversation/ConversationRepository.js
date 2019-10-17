@@ -260,7 +260,7 @@ export class ConversationRepository {
       const inviter = inviterId ? this.user_repository.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
       for (const conversation of this.conversations()) {
-        for (const user of conversation.participating_user_ets()) {
+        for (const user of conversation.participatingUserEts()) {
           const isNotService = !user.isService;
           const isNotIncluded = !connectedUsers.includes(user);
           if (isNotService && isNotIncluded && (user.isTeamMember() || user.isConnected())) {
@@ -874,7 +874,7 @@ export class ConversationRepository {
 
   get_all_users_in_conversation(conversation_id) {
     return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
-      [this.selfUser()].concat(conversationEntity.participating_user_ets()),
+      [this.selfUser()].concat(conversationEntity.participatingUserEts()),
     );
   }
 
@@ -920,7 +920,7 @@ export class ConversationRepository {
           return true;
         }
 
-        for (const userEntity of conversationEntity.participating_user_ets()) {
+        for (const userEntity of conversationEntity.participatingUserEts()) {
           const nameString = isHandle ? userEntity.username() : userEntity.name();
           if (startsWith(nameString, query)) {
             return true;
@@ -1291,7 +1291,7 @@ export class ConversationRepository {
       .getUsersById(conversationEntity.participating_user_ids(), offline)
       .then(userEntities => {
         userEntities.sort((userA, userB) => sortByPriority(userA.first_name(), userB.first_name()));
-        conversationEntity.participating_user_ets(userEntities);
+        conversationEntity.participatingUserEts(userEntities);
 
         if (updateGuests) {
           conversationEntity.updateGuests();

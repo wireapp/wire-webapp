@@ -463,14 +463,14 @@ describe('Conversation', () => {
   describe('display_name', () => {
     it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
       other_user.name(entities.user.jane_roe.name);
-      conversationEt.participating_user_ets.push(other_user);
+      conversationEt.participatingUserEts.push(other_user);
       conversationEt.type(ConversationType.ONE2ONE);
 
-      expect(conversationEt.display_name()).toBe(conversationEt.participating_user_ets()[0].name());
+      expect(conversationEt.display_name()).toBe(conversationEt.participatingUserEts()[0].name());
 
       conversationEt.type(ConversationType.CONNECT);
 
-      expect(conversationEt.display_name()).toBe(conversationEt.participating_user_ets()[0].name());
+      expect(conversationEt.display_name()).toBe(conversationEt.participatingUserEts()[0].name());
     });
 
     it('displays a fallback if no user name has been set', () => {
@@ -487,12 +487,12 @@ describe('Conversation', () => {
       const third_user = new User(createRandomUuid());
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
-      conversationEt.participating_user_ets.push(other_user);
-      conversationEt.participating_user_ets.push(third_user);
+      conversationEt.participatingUserEts.push(other_user);
+      conversationEt.participatingUserEts.push(third_user);
       conversationEt.type(ConversationType.GROUP);
       const expected_display_name = `${conversationEt
-        .participating_user_ets()[0]
-        .first_name()}, ${conversationEt.participating_user_ets()[1].first_name()}`;
+        .participatingUserEts()[0]
+        .first_name()}, ${conversationEt.participatingUserEts()[1].first_name()}`;
 
       expect(conversationEt.display_name()).toBe(expected_display_name);
     });
@@ -542,8 +542,8 @@ describe('Conversation', () => {
       const second_user_et = new User();
       second_user_et.devices.push(third_client);
 
-      conversationEt.participating_user_ets.push(userEt);
-      conversationEt.participating_user_ets.push(second_user_et);
+      conversationEt.participatingUserEts.push(userEt);
+      conversationEt.participatingUserEts.push(second_user_et);
 
       expect(conversationEt.getNumberOfClients()).toBe(4);
     });
@@ -564,7 +564,7 @@ describe('Conversation', () => {
 
       const userEt = new User();
       userEt.devices.push(verified_client_et);
-      conversationEt.participating_user_ets.push(userEt);
+      conversationEt.participatingUserEts.push(userEt);
 
       expect(conversationEt.is_verified()).toBeTruthy();
     });
@@ -586,7 +586,7 @@ describe('Conversation', () => {
       const user_et_two = new User();
       user_et_two.devices.push(verified_client_et);
 
-      conversationEt.participating_user_ets.push(userEt, user_et_two);
+      conversationEt.participatingUserEts.push(userEt, user_et_two);
 
       expect(conversationEt.is_verified()).toBeFalsy();
     });
@@ -607,7 +607,7 @@ describe('Conversation', () => {
       const user_et_two = new User();
       user_et_two.devices.push(verified_client_et);
 
-      conversationEt.participating_user_ets.push(userEt, user_et_two);
+      conversationEt.participatingUserEts.push(userEt, user_et_two);
 
       expect(conversationEt.is_verified()).toBeTruthy();
     });
@@ -623,7 +623,7 @@ describe('Conversation', () => {
 
       // Is false for conversations not containing a guest
       const userEntity = new User(createRandomUuid());
-      conversationEt.participating_user_ets.push(userEntity);
+      conversationEt.participatingUserEts.push(userEntity);
 
       conversationEt.type(ConversationType.ONE2ONE);
 
@@ -636,7 +636,7 @@ describe('Conversation', () => {
       // Is true for group conversations containing a guest
       const secondUserEntity = new User(createRandomUuid());
       secondUserEntity.isGuest(true);
-      conversationEt.participating_user_ets.push(secondUserEntity);
+      conversationEt.participatingUserEts.push(secondUserEntity);
 
       conversationEt.type(ConversationType.ONE2ONE);
 
@@ -663,7 +663,7 @@ describe('Conversation', () => {
       const userEntity = new User(createRandomUuid());
 
       conversationEt = new Conversation(createRandomUuid());
-      conversationEt.participating_user_ets.push(userEntity);
+      conversationEt.participatingUserEts.push(userEntity);
 
       conversationEt.type(ConversationType.ONE2ONE);
 
@@ -675,7 +675,7 @@ describe('Conversation', () => {
 
       const secondUserEntity = new User(createRandomUuid());
       secondUserEntity.isService = true;
-      conversationEt.participating_user_ets.push(secondUserEntity);
+      conversationEt.participatingUserEts.push(secondUserEntity);
 
       conversationEt.type(ConversationType.ONE2ONE);
 
