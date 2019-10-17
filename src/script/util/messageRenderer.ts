@@ -48,8 +48,7 @@ const originalFenceRule = markdownit.renderer.rules.fence;
 markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
   const highlighted = originalFenceRule(tokens, idx, options, env, self);
   tokens[idx].map[1] += 1;
-  // TODO: remove this casting as soon as https://github.com/DefinitelyTyped/DefinitelyTyped/pull/38461 is merged
-  return ((highlighted as unknown) as string).replace(/\n$/, '');
+  return highlighted.replace(/\n$/, '');
 };
 
 markdownit.renderer.rules.softbreak = () => '<br>';
