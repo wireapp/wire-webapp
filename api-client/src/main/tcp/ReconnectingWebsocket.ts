@@ -66,7 +66,7 @@ export class ReconnectingWebsocket {
   private onClose?: (event: CloseEvent) => void;
 
   constructor(
-    private readonly onReconnect: () => string,
+    private readonly onReconnect: () => Promise<string>,
     options: {
       pingInterval?: number;
     } = {},
@@ -114,7 +114,7 @@ export class ReconnectingWebsocket {
     }
   };
 
-  private readonly internalOnReconnect = (): string => {
+  private readonly internalOnReconnect = async (): Promise<string> => {
     this.logger.debug('Connecting to WebSocket');
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
